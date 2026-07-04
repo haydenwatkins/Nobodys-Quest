@@ -1,0 +1,46 @@
+/* ============================================================
+   SAVE — remembers your adventure in the browser's storage.
+   Each device (each iPad) keeps its own save automatically.
+   ============================================================ */
+
+"use strict";
+
+const SAVE_KEY = "nobodys-quest-save-v1";
+
+G.saveGame = function () {
+  if (!G.state) return;
+  const s = G.state;
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      formId: s.formId,
+      mapId: s.mapId,
+      px: Math.round(s.player.x),
+      py: Math.round(s.player.y),
+      damageTaken: s.player.damageTaken,
+      mana: s.player.mana,
+      stars: s.stars,
+      items: s.items,
+      opened: s.opened,
+      known: s.known,
+      loadouts: s.loadouts,
+      questCounts: G.questCounts,
+      questsDone: G.questsDone,
+    }));
+  } catch (e) {
+    // storage full or blocked — the game still plays, just won't remember
+  }
+};
+
+G.loadSaveData = function () {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+G.resetSave = function () {
+  localStorage.removeItem(SAVE_KEY);
+  location.reload();
+};

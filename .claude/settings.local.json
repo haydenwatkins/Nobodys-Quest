@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Skill(run:*)",
+      "PowerShell(New-Item -ItemType Directory -Force \"$env:TEMP\\\\nq-test\" | Out-Null; Set-Location \"$env:TEMP\\\\nq-test\"; npm init -y | Out-Null; npm install playwright --no-audit --no-fund 2>$null | Select-Object -Last 2)",
+      "PowerShell(Set-Location \"$env:TEMP\\\\nq-test\"; node smoke.js)",
+      "PowerShell(Set-Location \"$env:TEMP\\\\nq-test\"; node smoke2.js)",
+      "PowerShell(Set-Location \"$env:TEMP\\\\nq-test\"; node smoke3.js)"
+    ]
+  }
+}

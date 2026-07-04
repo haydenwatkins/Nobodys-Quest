@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nobody's Quest">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <title>Nobody's Quest</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="game" width="320" height="180"></canvas>
+  </div>
+  <!-- Text & HUD render on this full-resolution layer so words stay
+       razor-sharp while the game world below stays chunky-pixel. -->
+  <canvas id="ui"></canvas>
+
+  <!-- Touch controls (only visible on touch devices) -->
+  <div id="touch-ui">
+    <div id="joy-zone"></div>
+    <div id="btn-zone">
+      <button class="abtn" id="btn-swap">⇄</button>
+      <button class="abtn big" id="btn-a">A</button>
+      <button class="abtn" id="btn-b">B</button>
+      <button class="abtn" id="btn-c">C</button>
+    </div>
+    <button id="btn-pause">☰</button>
+  </div>
+
+  <!-- Pause menu / form workshop overlays are built by ui.js -->
+  <div id="menu" class="hidden"></div>
+  <div id="workshop-errors" class="hidden"></div>
+
+  <!-- ENGINE (Ben: you don't need to touch these!) -->
+  <script src="js/engine/core.js"></script>
+  <script src="js/engine/audio.js"></script>
+  <script src="js/engine/sprites.js"></script>
+  <script src="js/engine/input.js"></script>
+  <script src="js/engine/world.js"></script>
+  <script src="js/engine/combat.js"></script>
+  <script src="js/engine/entities.js"></script>
+  <script src="js/engine/forms.js"></script>
+  <script src="js/engine/quests.js"></script>
+  <script src="js/engine/save.js"></script>
+  <script src="js/engine/ui.js"></script>
+
+  <!-- ABILITIES (the shared toybox of moves) -->
+  <script src="js/abilities/basics.js"></script>
+
+  <!-- FORMS (Ben: THIS is where you add new classes! Copy rat.js to start.) -->
+  <script src="js/forms/nobody.js"></script>
+  <script src="js/forms/rat.js"></script>
+  <script src="js/forms/knight.js"></script>
+  <script src="js/forms/ranger.js"></script>
+
+  <!-- WORLD DATA (enemies and maps — also editable!) -->
+  <script src="js/data/enemies.js"></script>
+  <script src="js/data/maps.js"></script>
+
+  <!-- BOOT (must be last) -->
+  <script src="js/engine/main.js"></script>
+</body>
+</html>
