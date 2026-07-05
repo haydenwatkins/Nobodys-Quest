@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sprite Lab — Nobody's Quest</title>
+<style>
+  body { font-family: "Courier New", monospace; background: #1a1c2c; color: #f4f4f4; max-width: 780px; margin: 0 auto; padding: 20px; }
+  h1 { color: #ffcd75; }
+  h2 { color: #a7f070; margin-top: 34px; border-top: 2px solid #333c57; padding-top: 20px; }
+  .card { background: #24283b; border: 2px solid #566c86; border-radius: 10px; padding: 16px; margin: 12px 0; }
+  select, input[type=file], button { font-family: inherit; font-size: 15px; padding: 8px; border-radius: 6px; border: 2px solid #566c86; background: #333c57; color: #f4f4f4; }
+  button { border-color: #a7f070; background: #38b764; color: #1a1c2c; font-weight: bold; cursor: pointer; }
+  button:hover { filter: brightness(1.1); }
+  canvas.preview { image-rendering: pixelated; border: 2px solid #566c86; background: #444; margin: 6px; }
+  textarea { width: 100%; height: 220px; font-family: "Courier New", monospace; font-size: 13px; background: #12141f; color: #a7f070; border: 2px solid #566c86; border-radius: 6px; padding: 10px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .frameBox { text-align: center; }
+  .warn { color: #ffcd75; font-size: 14px; }
+  a { color: #41a6f6; }
+  code { background: #12141f; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>🎨 Sprite Lab</h1>
+<p>The game draws characters from little <b>letter grids</b> right in the code — not
+picture files. Piskel only understands pictures. This page translates between the two,
+so you can pull an existing sprite into Piskel, redraw it, and bring it back.</p>
+
+<h2>Step 1 — Export a sprite as a picture</h2>
+<div class="card">
+  <p>Pick a character, then download its frame(s) as PNGs.</p>
+  <select id="presetPick"></select>
+  <div id="exportFrames" class="row" style="margin-top:12px"></div>
+  <p class="warn">⚠️ These pictures are TINY on purpose (the same size the game uses).
+  That's normal! In Piskel, use the zoom/magnifying glass to work up close.</p>
+</div>
+
+<h2>Step 2 — Edit it in Piskel</h2>
+<div class="card">
+  <ol>
+    <li>Go to <a href="https://www.piskelapp.com" target="_blank" rel="noopener">piskelapp.com</a> → <b>Create Sprite</b></li>
+    <li>Menu → <b>Import</b> → choose the PNG you downloaded above</li>
+    <li>Draw with the plain <b>Pencil</b> tool at 100% opacity (not the soft brush) —
+        that keeps colors exact, which matters for Step 3</li>
+    <li>If your sprite has 2 frames, edit each PNG as its own separate Piskel file</li>
+    <li>When you're happy: menu → <b>Export</b> → <b>PNG</b> → download it</li>
+  </ol>
+</div>
+
+<h2>Step 3 — Bring it back into the game</h2>
+<div class="card">
+  <div class="row">
+    <div>Frame 1 PNG: <input type="file" id="upA" accept="image/png"></div>
+    <div>Frame 2 PNG (optional): <input type="file" id="upB" accept="image/png"></div>
+  </div>
+  <div class="row" id="importPreview"></div>
+  <button id="convertBtn" style="margin-top:10px">Convert to game code ▶</button>
+  <p id="convertMsg" class="warn"></p>
+  <textarea id="output" readonly placeholder="Your sprite code will show up here..."></textarea>
+  <button id="copyBtn">📋 Copy code</button>
+  <p>Paste this in place of the old <code>sprite: { ... }</code> block in your form or
+  enemy file (in <code>js/forms/</code> or <code>js/data/enemies.js</code>).</p>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- the game's current sprites, copied here so this
+   page works standalone (it doesn't load the game itself) ---------------- */
+const PRESETS = {
+  nobody: { palette: { k: "#1a1c2c", w: "#f4f4f4", s: "#94b0c2" }, frames: [
+    ["....kkkk....","..kkwwwwkk..",".kwwwwwwwwk.",".kwwwwwwwwk.",".kwkkwwkkwk.",".kwkkwwkkwk.",".kwwwwwwwwk.","..kwwsswwk..","..kkwwwwkk..","...kwwwwk...","..kwwwwwwk..","..kswwwwsk..","...kw..wk...","...kk..kk..."],
+    ["....kkkk....","..kkwwwwkk..",".kwwwwwwwwk.",".kwwwwwwwwk.",".kwkkwwkkwk.",".kwkkwwkkwk.",".kwwwwwwwwk.","..kwwsswwk..","..kkwwwwkk..","...kwwwwk...","..kwwwwwwk..","..kswwwwsk..","..kw....wk..","..kk....kk.."],
+  ]},
+  rat: { palette: { k: "#1a1c2c", g: "#94b0c2", d: "#566c86", p: "#ef7d57" }, frames: [
+    ["..............","..kk......kk..",".kpgk....kgpk.",".kggkkkkkkggk.","..kggggggggk..","pk.kgkggkgk...",".kpkggggggkk..","..kdggggggdkp.","...kkkkkkkk...","...kk....kk..."],
+    ["..............","..kk......kk..",".kpgk....kgpk.",".kggkkkkkkggk.","..kggggggggk..",".pkkgkggkgk...","kp.kggggggkk..","..kdggggggdkp.","...kkkkkkkk...","..kk......kk.."],
+  ]},
+  knight: { palette: { k: "#1a1c2c", s: "#94b0c2", d: "#566c86", r: "#b13e53", y: "#ffcd75" }, frames: [
+    [".....rr.....","....krrk....","...kssssk...","..kssssssk..","..kskksksk..","..kssssssk..","...kyyyyk...","..kddddddk..",".ksddddddsk.",".ksddyyddsk.",".kkddddddkk.","..kddddddk..","...kdkkdk...","...kd..dk...","...kk..kk..."],
+    [".....rr.....","....krrk....","...kssssk...","..kssssssk..","..kskksksk..","..kssssssk..","...kyyyyk...","..kddddddk..",".ksddddddsk.",".ksddyyddsk.",".kkddddddkk.","..kddddddk..","..kdk..kdk..","..kd....dk..","..kk....kk..."],
+  ]},
+  ranger: { palette: { k: "#1a1c2c", h: "#38b764", d: "#257179", f: "#e8b796", b: "#6b4a2b" }, frames: [
+    [".....kk.....","....khhk....","...khhhhk...","..khhhhhhk..","..khkffkhk..","..khkffkhk..","...khffhk...","..kddddddk.b",".khdddddhkb.",".khdddddhkb.","..kdddddkb..","..kddddddk..","...kd..dk...","...kk..kk..."],
+    [".....kk.....","....khhk....","...khhhhk...","..khhhhhhk..","..khkffkhk..","..khkffkhk..","...khffhk...","..kddddddk.b",".khdddddhkb.",".khdddddhkb.","..kdddddkb..","..kddddddk..","..kd....dk..","..kk....kk..."],
+  ]},
+  wizard_current: { palette: { k: "#1a1c2c", g: "#94b0c2", d: "#566c86", p: "#ef7d57" }, frames: [
+    ["..............","..kk......kk..",".kpgk....kgpk.",".kggkkkkkkggk.","..kggggggggk..","pk.kgkggkgk...",".kpkggggggkk..","..kdggggggdkp.","...kkkkkkkk...","...kk....kk..."],
+    ["..............","..kk......kk..",".kpgk....kgpk.",".kggkkkkkkggk.","..kggggggggk..",".pkkgkggkgk...","kp.kggggggkk..","..kdggggggdkp.","...kkkkkkkk...","..kk......kk.."],
+  ]},
+  slime: { palette: { k: "#1a1c2c", g: "#38b764", l: "#a7f070", d: "#257179" }, frames: [
+    ["............","...kkkkkk...","..kggggggk..",".kglgglgggk.",".kggggggggk.","kggggggggggk","kdggggggggdk",".kkkkkkkkkk."],
+    ["............","............","..kkkkkkkk..",".kglgglgggk.","kggggggggggk","kggggggggggk","kdggggggggdk",".kkkkkkkkkk."],
+  ]},
+  bat: { palette: { k: "#1a1c2c", v: "#8153c1", d: "#5d275d" }, frames: [
+    ["..k........k..",".kvk......kvk.",".kvvk....kvvk.","..kvvkkkkvvk..","...kvvvvvvk...","...kvkvvkvk...","....kdvvdk....",".....kkkk....."],
+    ["..............","...kkk..kkk...","..kvvvkkvvvk..",".kvvvvvvvvvvk.",".kkvvkvvkvvkk.","...kvvvvvvk...","....kdvvdk....",".....kkkk....."],
+  ]},
+  bones: { palette: { k: "#1a1c2c", w: "#f4f4f4", s: "#94b0c2" }, frames: [
+    ["..kkkkkkkk..",".kwwwwwwwwk.",".kwkkwwkkwk.",".kwkkwwkkwk.",".kwwwwwwwwk.","..kwkwwkwk..","....kwwk....","..kwwwwwwk..","..kwkwwkwk..","..kwwwwwwk..","..kwkwwkwk..","...kwkkwk...","...kw..wk...","...kk..kk..."],
+    ["..kkkkkkkk..",".kwwwwwwwwk.",".kwkkwwkkwk.",".kwkkwwkkwk.",".kwwwwwwwwk.","..kwkwwkwk..","....kwwk....","..kwwwwwwk..","..kwkwwkwk..","..kwwwwwwk..","..kwkwwkwk..","...kwkkwk...","..kw....wk..","..kk....kk.."],
+  ]},
+  wisp: { palette: { k: "#1a1c2c", v: "#8153c1", l: "#b58ee6", w: "#f4f4f4" }, frames: [
+    ["...kkkk...","..kvlvvk..",".kvkvvkvk.",".kvvvvvvk.",".klvwwvlk.",".kvvvvvvk.","..kvvvvk..",".kvkvkvk..","..k.k.k...","..........",".........."],
+    ["..........","...kkkk...","..kvlvvk..",".kvkvvkvk.",".kvvvvvvk.",".klvwwvlk.",".kvvvvvvk.","..kvvvvk..","..kvkvkvk.","...k.k.k..","..........."],
+  ]},
+  brute: { palette: { k: "#1a1c2c", o: "#ef7d57", d: "#b13e53", w: "#f4f4f4", b: "#6b4a2b" }, frames: [
+    ["......kkkkkk......",".....kooooook.....",".....kokookok.....","....kkoooooookk...","...kokwoooowkook..","..kookoooooookook.","..kook.kddk.kook..","..koo.kddddk.ook...","...k..kddddk..k...","......kddddk......",".....kddddddk.....",".....kbbbbbbk.....",".....kbbkkbbk.....","....kook..kook....","....koo....ook....","....kkk....kkk...."],
+    ["......kkkkkk......",".....kooooook.....",".....kokookok.....","....kkoooooookk...","...kokwoooowkook..","..kookoooooookook.","..kook.kddk.kook..","..koo.kddddk.ook...","...k..kddddk..k...","......kddddk......",".....kddddddk.....",".....kbbbbbbk.....",".....kbbkkbbk.....","...koo.k..k.ook...","...koo......ook...","...kkk......kkk..."],
+  ]},
+};
+
+/* ---------------- Step 1: sprite-def -> downloadable PNG ---------------- */
+
+function drawFrameToCanvas(palette, rows) {
+  const h = rows.length;
+  const w = Math.max(...rows.map((r) => r.length));
+  const cv = document.createElement("canvas");
+  cv.width = w; cv.height = h;
+  const c = cv.getContext("2d");
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < rows[y].length; x++) {
+      const ch = rows[y][x];
+      if (ch === "." || ch === " ") continue;
+      c.fillStyle = palette[ch] || "#ff00ff";
+      c.fillRect(x, y, 1, 1);
+    }
+  }
+  return cv;
+}
+
+function buildExportUI() {
+  const pick = document.getElementById("presetPick");
+  for (const id in PRESETS) {
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = id;
+    pick.appendChild(opt);
+  }
+  pick.value = "wizard_current";
+
+  function refresh() {
+    const def = PRESETS[pick.value];
+    const box = document.getElementById("exportFrames");
+    box.innerHTML = "";
+    def.frames.forEach((rows, i) => {
+      const native = drawFrameToCanvas(def.palette, rows);
+      const big = document.createElement("canvas");
+      big.className = "preview";
+      big.width = native.width * 12;
+      big.height = native.height * 12;
+      const bctx = big.getContext("2d");
+      bctx.imageSmoothingEnabled = false;
+      bctx.drawImage(native, 0, 0, big.width, big.height);
+
+      const wrap = document.createElement("div");
+      wrap.className = "frameBox";
+      const label = document.createElement("div");
+      label.textContent = `Frame ${i + 1} (${native.width}×${native.height}px)`;
+      const btn = document.createElement("button");
+      btn.textContent = "⬇ Download PNG";
+      btn.onclick = () => {
+        const a = document.createElement("a");
+        a.download = `${pick.value}-frame${i + 1}.png`;
+        a.href = native.toDataURL("image/png");
+        a.click();
+      };
+      wrap.appendChild(big);
+      wrap.appendChild(document.createElement("br"));
+      wrap.appendChild(label);
+      wrap.appendChild(document.createElement("br"));
+      wrap.appendChild(btn);
+      box.appendChild(wrap);
+    });
+  }
+  pick.addEventListener("change", refresh);
+  refresh();
+}
+
+/* ---------------- Step 3: PNG -> sprite-def code ---------------- */
+
+function loadImageFile(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function imageToGrid(img) {
+  const cv = document.createElement("canvas");
+  cv.width = img.width; cv.height = img.height;
+  const c = cv.getContext("2d");
+  c.drawImage(img, 0, 0);
+  const data = c.getImageData(0, 0, cv.width, cv.height).data;
+
+  const palette = {};
+  const colorToLetter = {};
+  const letters = "abcdefghijmnopqrstuvwxyz"; // skip k/l — reserved as game convention, avoids confusion
+  let nextLetter = 0;
+  const rows = [];
+
+  for (let y = 0; y < cv.height; y++) {
+    let row = "";
+    for (let x = 0; x < cv.width; x++) {
+      const idx = (y * cv.width + x) * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2], a = data[idx + 3];
+      if (a < 128) { row += "."; continue; }
+      const hex = "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+      if (!(hex in colorToLetter)) {
+        colorToLetter[hex] = letters[nextLetter++] || `x${nextLetter}`;
+        palette[colorToLetter[hex]] = hex;
+      }
+      row += colorToLetter[hex];
+    }
+    rows.push(row);
+  }
+  return { palette, rows, w: cv.width, h: cv.height };
+}
+
+function gridToCode(frameGrids) {
+  const palette = {};
+  for (const g of frameGrids) Object.assign(palette, g.palette);
+  const paletteLines = Object.entries(palette).map(([k, v]) => `      ${k}: "${v}",`).join("\n");
+  const framesCode = frameGrids.map((g) =>
+    "    [\n" + g.rows.map((r) => `      "${r}",`).join("\n") + "\n    ]"
+  ).join(",\n");
+  return `sprite: {\n    palette: {\n${paletteLines}\n    },\n    frames: [\n${framesCode},\n    ],\n  },`;
+}
+
+function buildImportUI() {
+  const upA = document.getElementById("upA");
+  const upB = document.getElementById("upB");
+  const preview = document.getElementById("importPreview");
+  const msg = document.getElementById("convertMsg");
+  const out = document.getElementById("output");
+
+  function showPreview(input) {
+    preview.innerHTML = "";
+    [upA, upB].forEach((inp, i) => {
+      if (!inp.files[0]) return;
+      const url = URL.createObjectURL(inp.files[0]);
+      const im = document.createElement("img");
+      im.src = url;
+      im.style.imageRendering = "pixelated";
+      im.style.width = "144px";
+      im.style.border = "2px solid #566c86";
+      im.title = `Frame ${i + 1}`;
+      preview.appendChild(im);
+    });
+  }
+  upA.addEventListener("change", showPreview);
+  upB.addEventListener("change", showPreview);
+
+  document.getElementById("convertBtn").addEventListener("click", async () => {
+    msg.textContent = "";
+    if (!upA.files[0]) { msg.textContent = "Pick at least a Frame 1 PNG first!"; return; }
+    try {
+      const files = [upA.files[0]];
+      if (upB.files[0]) files.push(upB.files[0]);
+      const grids = [];
+      for (const f of files) {
+        const img = await loadImageFile(f);
+        grids.push(imageToGrid(img));
+      }
+      if (grids.length === 2 && (grids[0].w !== grids[1].w || grids[0].h !== grids[1].h)) {
+        msg.textContent = `⚠️ Your two frames are different sizes (${grids[0].w}×${grids[0].h} vs ${grids[1].w}×${grids[1].h}) — in Piskel, keep the canvas size the same for both frames!`;
+      } else {
+        msg.textContent = "✅ Converted! Copy the code below.";
+      }
+      out.value = gridToCode(grids);
+    } catch (e) {
+      msg.textContent = "Hmm, couldn't read that file — make sure it's a PNG.";
+    }
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", () => {
+    out.select();
+    navigator.clipboard.writeText(out.value).then(() => {
+      document.getElementById("copyBtn").textContent = "✅ Copied!";
+      setTimeout(() => { document.getElementById("copyBtn").textContent = "📋 Copy code"; }, 1500);
+    });
+  });
+}
+
+buildExportUI();
+buildImportUI();
+
+// exposed for automated testing only — not used by the page itself
+window.__spriteLab = { PRESETS, drawFrameToCanvas, imageToGrid, gridToCode };
+</script>
+</body>
+</html>

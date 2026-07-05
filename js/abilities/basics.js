@@ -227,9 +227,6 @@ registerAbility({
   },
 });
 
-/* ============================================================
-   BEN: MAKE YOUR OWN!  Copy this, remove the slashes, tweak it:
-
 registerAbility({
   id: "shadowBolt",
   name: "Shadow Bolt",
@@ -246,4 +243,20 @@ registerAbility({
     });
   },
 });
-   ============================================================ */
+
+registerAbility({
+  id: "curse",
+  name: "Curse",
+  icon: "🌑",
+  type: "dark",          // <- pssst... nothing in the game deals
+  mana: 0,               //    dark damage yet. Just saying.
+  cooldown: 0.8,
+  use(user) {
+    G.combat.shoot(user, {
+      ability: "curse",
+      speed: 140, range: 250,
+      damage: 3, type: "dark",
+      color: "#290063",
+    });
+  },
+});

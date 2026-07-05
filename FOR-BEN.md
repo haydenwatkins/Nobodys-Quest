@@ -115,9 +115,15 @@ sprite: {
 ```
 
 Draw right in the code, or use [Piskel](https://www.piskelapp.com)
-(free, in the browser) to sketch 12×14-ish characters, then copy the
-pixels over. Two frames = walking animation. Keep a dark outline —
-it's what makes sprites pop.
+(free, in the browser) to sketch it visually. Two frames = walking
+animation. Keep a dark outline — it's what makes sprites pop.
+
+**Want to start from an existing sprite instead of a blank canvas?**
+Open [tools/sprite-lab.html](tools/sprite-lab.html) (double-click it,
+just like index.html) — pick any character, download it as a picture,
+edit it in Piskel, then upload your edit back in and it hands you the
+game code to paste in. Your Wizard is currently wearing the Rat's
+sprite — that's a perfect one to grab and make your own!
 
 ## 👹 New enemies & new places
 
