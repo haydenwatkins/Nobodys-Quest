@@ -12,15 +12,26 @@
 
   /* ---------- fit the screen, keep pixels chunky ---------- */
   function resize() {
-    const scaleX = window.innerWidth / G.W;
-    const scaleY = window.innerHeight / G.H;
+    // visualViewport tracks the actually visible area on iOS as Safari's
+    // address bar expands/collapses.  innerHeight can lag behind it.
+    const viewport = window.visualViewport;
+    const viewportWidth = viewport ? viewport.width : window.innerWidth;
+    const viewportHeight = viewport ? viewport.height : window.innerHeight;
+    const scaleX = viewportWidth / G.W;
+    const scaleY = viewportHeight / G.H;
     let scale = Math.min(scaleX, scaleY);
-    if (scale > 1) scale = Math.floor(scale); // integer scale = perfect pixels
+
+    // Integer scaling looks best on roomy desktop displays, but rounding a
+    // 390px iPhone down from 1.2x to 1x wastes almost a fifth of its screen.
+    // Touch screens use all available space and CSS keeps the pixels crisp.
+    const roomyDesktop = !G.input.isTouch && viewportWidth > 700 && viewportHeight > 500;
+    if (roomyDesktop && scale > 1) scale = Math.floor(scale);
     canvas.style.width = G.W * scale + "px";
     canvas.style.height = G.H * scale + "px";
     G.ui.resizeOverlay(); // keep the sharp text layer aligned on top
   }
   window.addEventListener("resize", resize);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", resize);
   resize();
 
   document.addEventListener("contextmenu", (e) => e.preventDefault());
