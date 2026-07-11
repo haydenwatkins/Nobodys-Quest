@@ -88,6 +88,7 @@ G.ui = (() => {
   }
 
   function drawLocationChip(c) {
+    if (G.input.isTouch) return;
     const s = G.state;
     const name = s.mapDef && s.mapDef.name ? s.mapDef.name : s.mapId;
     c.font = `6px ${FONT_HEAD}`;
@@ -209,20 +210,21 @@ G.ui = (() => {
   function drawTutorial(c) {
     const prompt = G.tutorial && G.tutorial.prompt();
     if (!prompt) return;
-    const boxW = 184;
-    const boxH = 24;
-    const x = Math.round((G.W - boxW) / 2);
-    const y = G.H - boxH - 26;
+    const touch = G.input.isTouch;
+    const boxW = touch ? 158 : 184;
+    const boxH = touch ? 20 : 24;
+    const x = touch ? 5 : Math.round((G.W - boxW) / 2);
+    const y = touch ? 38 : G.H - boxH - 26;
     c.fillStyle = "rgba(26,28,44,0.9)";
     c.fillRect(x, y, boxW, boxH);
     c.fillStyle = "#73eff7";
     c.fillRect(x, y, boxW, 1);
-    c.font = `6px ${FONT_HEAD}`;
+    c.font = `${touch ? 5 : 6}px ${FONT_HEAD}`;
     c.fillStyle = "#73eff7";
     c.fillText(prompt.title, x + 5, y + 4);
-    c.font = `9px ${FONT_BODY}`;
+    c.font = `${touch ? 8 : 9}px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
-    c.fillText(fitText(c, prompt.text, boxW - 10), x + 5, y + 12);
+    c.fillText(fitText(c, prompt.text, boxW - 10), x + 5, y + (touch ? 10 : 12));
   }
 
   function drawWardHint(c, cam) {
@@ -323,7 +325,7 @@ G.ui = (() => {
 
     /* toasts (word-wrapped so long messages fit) */
     c.font = `9px ${FONT_BODY}`;
-    let ty = G.pinnedQuests().length ? 105 : 67;
+    let ty = G.input.isTouch ? 5 : (G.pinnedQuests().length ? 105 : 67);
     for (const t of toasts) {
       const alpha = t.t > t.dur - 0.3 ? (t.dur - t.t) / 0.3 : 1;
       c.globalAlpha = Math.max(0, alpha) * 0.95;
@@ -429,6 +431,7 @@ G.ui = (() => {
     menuOpen = true;
     buildMenu();
     menuEl.classList.remove("hidden");
+    menuEl.scrollTop = 0;
     G.events.emit("menuOpen", {});
   }
   function closeMenu() {
@@ -437,6 +440,33 @@ G.ui = (() => {
     G.input.clearTaps();
   }
   function toggleMenu() { menuOpen ? closeMenu() : openMenu(); }
+
+  async function enterFullscreen() {
+    // Close immediately so the button never leaves a large menu covering the
+    // game while Android enters fullscreen or iOS shows its fallback tip.
+    closeMenu();
+    const alreadyStandalone = window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches;
+    if (document.fullscreenElement || navigator.standalone || alreadyStandalone) {
+      toast("Already running full screen", 2);
+      return;
+    }
+
+    const root = document.documentElement;
+    const request = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (!request) {
+      toast("iPad: Share → Add to Home Screen for full screen", 4);
+      return;
+    }
+
+    try {
+      await request.call(root);
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock("landscape").catch(() => {});
+      }
+    } catch (error) {
+      toast("Use Share → Add to Home Screen for full screen", 4);
+    }
+  }
 
   function buildMenu() {
     const tabs = [
@@ -460,15 +490,16 @@ G.ui = (() => {
 
     html += `</div>
       <div class="menu-footer">
-        <button data-act="resume">▶ Back to the game</button><br>
-        <button data-act="reset" class="danger">Start over (erases save!)</button>
+        <button data-act="resume">▶ Resume</button>
+        <button data-act="fullscreen" class="fullscreen-btn">⛶ Fullscreen</button>
+        <button data-act="reset" class="danger" title="Erase this device's save">Reset</button>
       </div>`;
 
     menuEl.innerHTML = html;
 
     // wire up clicks
     menuEl.querySelectorAll("[data-tab]").forEach((b) =>
-      b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); }));
+      b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); menuEl.scrollTop = 0; }));
     menuEl.querySelectorAll("[data-pin]").forEach((b) =>
       b.addEventListener("click", () => { G.toggleQuestPin(b.dataset.pin); buildMenu(); }));
     menuEl.querySelectorAll("[data-become]").forEach((b) =>
@@ -507,6 +538,8 @@ G.ui = (() => {
     });
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
+    const fullscreen = menuEl.querySelector('[data-act="fullscreen"]');
+    if (fullscreen) fullscreen.addEventListener("click", enterFullscreen);
     const reset = menuEl.querySelector('[data-act="reset"]');
     if (reset) reset.addEventListener("click", () => {
       if (confirm("Really erase the save and start over?")) G.resetSave();
