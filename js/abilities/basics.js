@@ -184,6 +184,7 @@ registerAbility({
   type: "sharp",
   mana: 0,
   cooldown: 0.45,
+  autoAim: true, aimRange: 140,
   use(user) {
     G.combat.shoot(user, {
       ability: "arrow",
@@ -200,6 +201,7 @@ registerAbility({
   type: "light",                               // the only Light move so far!
   mana: 2,
   cooldown: 0.7,
+  autoAim: true, aimRange: 160,
   use(user) {
     G.combat.shoot(user, {
       ability: "luckyArrow",
@@ -218,6 +220,7 @@ registerAbility({
   type: "sharp",
   mana: 4,
   cooldown: 1.2,
+  autoAim: true, aimRange: 130,
   use(user) {
     // three arrows in a fan — just call shoot three times!
     for (const spread of [-16, 0, 16]) {
@@ -238,6 +241,7 @@ registerAbility({
   type: "dark",
   mana: 3,
   cooldown: 0.8,
+  autoAim: true, aimRange: 150,
   use(user) {
     G.combat.shoot(user, {
       ability: "shadowBolt",
@@ -255,6 +259,7 @@ registerAbility({
   type: "dark",
   mana: 5,
   cooldown: 1.5,
+  autoAim: true, aimRange: 185,
   use(user) {
     G.combat.shoot(user, {
       ability: "dark matter",
@@ -273,6 +278,7 @@ registerAbility({
   type: "dark",
   mana: 0,
   cooldown: 0.55,
+  autoAim: true, aimRange: 135,
   use(user) {
     G.combat.shoot(user, {
       ability: "curse",
@@ -360,6 +366,7 @@ registerAbility({
   type: "blunt",
   mana: 4,
   cooldown: 1.4,
+  autoAim: true, aimRange: 115,
   use(user) {
     G.combat.shoot(user, {
       ability: "volatileFlask", speed: 135, range: 115,
@@ -376,6 +383,7 @@ registerAbility({
   type: "dark",
   mana: 5,
   cooldown: 1.8,
+  autoAim: true, aimRange: 105,
   use(user) {
     G.combat.shoot(user, {
       ability: "miasmaFlask", speed: 115, range: 105,
@@ -395,6 +403,7 @@ registerAbility({
   type: "light",
   mana: 0,
   cooldown: 0.45,
+  autoAim: true, aimRange: 125,
   use(user) {
     G.combat.shoot(user, {
       ability: "stormSpark", speed: 215, range: 125,
@@ -410,6 +419,7 @@ registerAbility({
   type: "light",
   mana: 5,
   cooldown: 1.5,
+  autoAim: true, aimRange: 78,
   use(user) {
     G.combat.chain(user, {
       ability: "chainLightning", range: 78, jumpRange: 48,
@@ -461,6 +471,7 @@ registerAbility({
   type: "light",
   mana: 4,
   cooldown: 1.2,
+  autoAim: true, aimRange: 78,
   use(user) {
     const hitGroup = {}; // one breath can hit a foe once, never five times
     for (const spreadDeg of [-28, -14, 0, 14, 28]) {
@@ -480,6 +491,7 @@ registerAbility({
   type: "light",
   mana: 7,
   cooldown: 2.3,
+  autoAim: true, aimRange: 145,
   use(user) {
     G.combat.shoot(user, {
       ability: "meteor", speed: 105, range: 145,
@@ -498,6 +510,7 @@ registerAbility({
   type: "light",
   mana: 0,
   cooldown: 0.5,
+  autoAim: true, aimRange: 170,
   use(user) {
     G.combat.shoot(user, {
       ability: "divineSpark",
@@ -533,6 +546,7 @@ registerAbility({
   type: "dark",
   mana: 5,
   cooldown: 1.7,
+  autoAim: true, aimRange: 190,
   use(user) {
     G.combat.shoot(user, {
       ability: "voidStar",

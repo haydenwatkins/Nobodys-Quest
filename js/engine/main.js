@@ -164,6 +164,7 @@
     drawables.sort((a, b) => a.y - b.y);
     for (const d of drawables) d.fn();
 
+    G.drawAimGuide(ctx);
     G.drawProjectiles(ctx);
     drawFx();
 

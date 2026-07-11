@@ -12,7 +12,7 @@ Plain JavaScript + Canvas. **No build tools, no npm, no installs.**
 Double-click `index.html`. Works from the plain filesystem — no server needed.
 
 - Desktop: WASD/arrows, J/K/L abilities, Q swap, Esc menu
-- iPad/touch: virtual joystick + on-screen buttons
+- iPad/touch: virtual joystick; tap ranged attacks to auto-aim, or drag an attack button and release to aim manually
 
 ## Project layout
 

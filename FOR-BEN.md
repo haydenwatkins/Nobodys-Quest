@@ -18,6 +18,8 @@ Double-click `index.html` — it opens in your browser. That's it.
 | Esc or Enter | menu (forms, quests, mixing) |
 
 On an iPad it's all touch — joystick on the left, buttons on the right.
+Tap a ranged attack to auto-aim at the nearest visible enemy, or drag
+an attack button like an aiming stick and release to fire your way.
 
 ---
 

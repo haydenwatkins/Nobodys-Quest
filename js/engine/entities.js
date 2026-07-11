@@ -27,6 +27,33 @@ G.playerForm = function () { return G.forms[G.state.formId]; };
 G.playerMaxHearts = function () { return G.playerForm().hearts; };
 G.playerHp = function () { return Math.max(0, G.playerMaxHearts() - G.state.player.damageTaken); };
 
+G.autoAimTarget = function (user, maxRange) {
+  let best = null, bestDist = Infinity;
+  for (const enemy of G.state.enemies) {
+    if (enemy.dead) continue;
+    const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
+    if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
+
+    // Skip enemies hidden behind walls or trees. Sampling is cheap at this
+    // tiny resolution and avoids the frustrating "shoot the wall" lock-on.
+    const steps = Math.max(2, Math.ceil(d / 8));
+    let visible = true;
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      if (G.world.solid(
+        user.x + (enemy.x - user.x) * t,
+        user.y - 5 + (enemy.y - user.y) * t,
+      )) { visible = false; break; }
+    }
+    if (!visible) continue;
+    best = enemy;
+    bestDist = d;
+  }
+  return best;
+};
+
+let touchAimHelpShown = false;
+
 G.damagePlayer = function (dmg, fromX, fromY) {
   const p = G.state.player;
   if (p.invuln > 0 || p.dashing) return;
@@ -100,10 +127,25 @@ G.updatePlayer = function (dt) {
   const buttons = ["a", "b", "c"];
   for (let slot = 0; slot < buttons.length; slot++) {
     if (!G.input.tapped(buttons[slot])) continue;
+    const touchAim = G.input.takeAim(buttons[slot]);
     const abilityId = loadout[slot];
     if (!abilityId) continue;
     const ab = G.abilities[abilityId];
     if (!ab) continue;
+    if (touchAim && touchAim.dragged) {
+      p.dir = { x: touchAim.x, y: touchAim.y };
+    } else if (touchAim && ab.autoAim) {
+      const target = G.autoAimTarget(p, ab.aimRange || 170);
+      if (target) {
+        const angle = G.util.angleTo(p.x, p.y - 5, target.x, target.y - 4);
+        p.dir = { x: Math.cos(angle), y: Math.sin(angle) };
+        G.spawnFx({ kind: "ring", x: target.x, y: target.y - 4, color: "#73eff7", radius: 6, dur: 0.18 });
+      }
+      if (!touchAimHelpShown) {
+        touchAimHelpShown = true;
+        G.ui.toast("🎯 Tap ranged attacks to auto-aim · drag to aim yourself", 3.5);
+      }
+    }
     if ((p.cooldowns[abilityId] || 0) > 0) continue;
     if (ab.mana > p.mana) {
       G.ui.toast("💧 Not enough mana — smack things with A to refill!", 1.5);
@@ -303,6 +345,36 @@ G.drawPlayer = function (ctx) {
   G.drawShadow(ctx, p.x, p.y, 10);
   const frame = p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0;
   G.drawSprite(ctx, form.sprite, frame, p.x, p.y, p.dir.x < 0);
+};
+
+G.drawAimGuide = function (ctx) {
+  const aim = G.input.aiming;
+  if (!aim || !aim.dragged || !G.state) return;
+  const p = G.state.player;
+  const slot = { a: 0, b: 1, c: 2 }[aim.btn];
+  const abilityId = G.getLoadout(G.state.formId)[slot];
+  const ability = G.abilities[abilityId];
+  const color = ability && G.DAMAGE_TYPES[ability.type]
+    ? G.DAMAGE_TYPES[ability.type].color
+    : "#73eff7";
+  const length = Math.min(90, (ability && ability.aimRange) || 70);
+  const x2 = p.x + aim.x * length;
+  const y2 = p.y - 5 + aim.y * length;
+
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y - 5);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.round(x2 - 2), Math.round(y2 - 2), 5, 1);
+  ctx.fillRect(Math.round(x2), Math.round(y2 - 4), 1, 5);
+  ctx.restore();
 };
 
 G.drawEnemy = function (ctx, e) {

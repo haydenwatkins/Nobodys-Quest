@@ -17,7 +17,7 @@ G.tutorial = (() => {
     {
       title: "2/5  ATTACK",
       desktop: "Press J, Z, or Space to use A",
-      touch: "Tap your big attack button",
+      touch: "Tap to auto-aim · drag to aim",
     },
     {
       title: "3/5  OPEN THE MENU",
