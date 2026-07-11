@@ -49,6 +49,7 @@
     known: [],
     loadouts: {},
     pinnedQuestIds: [],
+    town: G.makeTown(),
     shake: 0,
     time: 0,
     entryPoint: { x: 0, y: 0 },
@@ -66,6 +67,7 @@
     s.known = save.known || [];
     s.loadouts = save.loadouts || {};
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
+    s.town = G.normalizeTown(save.town || save.cult);
     G.questCounts = save.questCounts || {};
     G.questsDone = save.questsDone || [];
     if (save.formId && G.forms[save.formId] && !G.forms[save.formId].invalid) s.formId = save.formId;
@@ -78,8 +80,12 @@
   const startMap = save && G.maps[save.mapId] ? save.mapId : "overworld";
   G.world.load(startMap);
   if (save && save.mapId === startMap && typeof save.px === "number") {
-    G.state.player.x = save.px;
-    G.state.player.y = save.py;
+    const safeSavedSpot = typeof save.py === "number" && G.world.isSafeSpawn(save.px, save.py);
+    if (safeSavedSpot) {
+      G.state.player.x = save.px;
+      G.state.player.y = save.py;
+      G.state.entryPoint = { x: save.px, y: save.py };
+    }
     G.state.player.damageTaken = save.damageTaken || 0;
     G.state.player.mana = typeof save.mana === "number" ? save.mana : 6;
   }

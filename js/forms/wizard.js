@@ -24,15 +24,17 @@ registerForm({
   basic: "curse",               // A button — poisons enemies!
   abilities: [
     { id: "shadowBolt", level: 1 },
-
+    { id: "dark matter", level: 2 },
   ],
 
   // How do you earn the Rat? Get Nobody to level 2.
-  unlock: { type: "stars", stars: "5", level: 2 },
+  unlock: { type: "stars", stars: 5 },
 
   quests: [
     { text: "Defeat 10 baddies as a magic user", event: "kill", count: 10 },
     { text: "Break 2 wards", event: "wardBreak", count: 2 },
+    { text: "Hit 8 baddies with Shadow Bolt", event: "hit", match: { ability: "shadowBolt" }, count: 8 },
+    { text: "Hit 8 baddies with Dark Matter", event: "hit", match: { ability: "dark matter" }, count: 8 },
   ],
 
   sprite: {

@@ -24,6 +24,7 @@ registerForm({
     { text: "Slap 10 baddies", event: "hit", match: { ability: "slap" }, count: 10 },
     { text: "Read a signpost", event: "sign", count: 1 },
     { text: "Defeat 15 baddies (any way you like!)", event: "kill", count: 15 },
+    { text: "Crash into 6 baddies with Cartwheel", event: "hit", match: { ability: "cartwheel" }, count: 6 },
   ],
 
   sprite: {

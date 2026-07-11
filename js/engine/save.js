@@ -23,6 +23,7 @@ G.saveGame = function () {
       opened: s.opened,
       known: s.known,
       loadouts: s.loadouts,
+      town: s.town,
       questCounts: G.questCounts,
       questsDone: G.questsDone,
       pinnedQuestIds: s.pinnedQuestIds,

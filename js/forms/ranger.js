@@ -26,6 +26,8 @@ registerForm({
   quests: [
     { text: "Hit baddies from far away, 8 times", event: "hit", match: { dist: { gte: 100 } }, count: 8 },
     { text: "Defeat 6 baddies with Light damage", event: "kill", match: { damageType: "light" }, count: 6 },
+    { text: "Land 12 clean Arrow hits", event: "hit", match: { ability: "arrow" }, count: 12 },
+    { text: "Pepper 6 baddies with Triple Shot", event: "hit", match: { ability: "tripleShot" }, count: 6 },
   ],
 
   sprite: {

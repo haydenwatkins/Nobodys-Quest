@@ -28,6 +28,7 @@ registerForm({
     { text: "Break 3 wards (any damage type)", event: "wardBreak", count: 3 },
     { text: "Hit 3 baddies with ONE swing", event: "multiHit", match: { hits: { gte: 3 } }, count: 1 },
     { text: "Defeat 10 baddies with Sharp damage", event: "kill", match: { damageType: "sharp" }, count: 10 },
+    { text: "Stun 6 baddies with Shield Bash", event: "status", match: { status: "stun" }, count: 6 },
   ],
 
   sprite: {
