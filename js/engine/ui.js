@@ -502,6 +502,8 @@ G.ui = (() => {
       b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); menuEl.scrollTop = 0; }));
     menuEl.querySelectorAll("[data-pin]").forEach((b) =>
       b.addEventListener("click", () => { G.toggleQuestPin(b.dataset.pin); buildMenu(); }));
+    const clearPins = menuEl.querySelector('[data-act="clear-pins"]');
+    if (clearPins) clearPins.addEventListener("click", () => { G.clearQuestPins(); buildMenu(); });
     menuEl.querySelectorAll("[data-become]").forEach((b) =>
       b.addEventListener("click", () => { G.setForm(b.dataset.become); buildMenu(); }));
     menuEl.querySelectorAll("select[data-slot]").forEach((sel) =>
@@ -571,7 +573,11 @@ G.ui = (() => {
   }
 
   function buildQuestsTab() {
-    let html = "";
+    const pins = G.pinnedQuests();
+    let html = pins.length ? `<div class="form-card pin-summary">
+      <h2>📌 ${pins.length} quest${pins.length === 1 ? "" : "s"} on the HUD</h2>
+      <button data-act="clear-pins" class="clear-pins">✕ Unpin all</button>
+    </div>` : "";
     for (const id of G.unlockedForms()) {
       const f = G.forms[id];
       html += `<div class="form-card"><h2>${f.icon} ${f.name} <span class="lvl">Lv${G.formLevel(id)}</span></h2>`;
@@ -582,8 +588,21 @@ G.ui = (() => {
           <span>${done ? "✅" : "⬜"} ${q.text}</span>
           <span class="quest-actions">
             <span class="prog">${done ? "⭐" : prog + "/" + q.count}</span>
-            ${done ? "" : `<button data-pin="${q.id}" class="pin-btn ${G.isQuestPinned(q.id) ? "pinned" : ""}">${G.isQuestPinned(q.id) ? "UNPIN" : "PIN"}</button>`}
+            ${done ? "" : `<button data-pin="${q.id}" class="pin-btn ${G.isQuestPinned(q.id) ? "pinned" : ""}">${G.isQuestPinned(q.id) ? "✕ UNPIN" : "PIN"}</button>`}
           </span>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+    const bosses = Object.values(G.enemies).filter((enemy) => enemy.miniboss);
+    if (bosses.length) {
+      const found = bosses.filter((enemy) => (G.state.items || []).includes(enemy.trophy)).length;
+      html += `<div class="form-card trophy-card"><h2>🏆 Miniboss trophies ${found}/${bosses.length}</h2>`;
+      for (const boss of bosses) {
+        const collected = (G.state.items || []).includes(boss.trophy);
+        html += `<div class="quest-row ${collected ? "done" : ""}">
+          <span>${collected ? "✅ " + boss.trophyName : "⬜ ???"}</span>
+          <span class="trophy-place">${boss.location}</span>
         </div>`;
       }
       html += `</div>`;
