@@ -11,6 +11,7 @@
    HELPERS FOR ABILITY MAKERS (Ben, these are your toys):
      G.combat.meleeArc(user, {...})  — a close-up swing
      G.combat.shoot(user, {...})     — fire a projectile
+     G.combat.chain(user, {...})     — jump between nearby foes
      G.combat.dash(user, {...})      — zoom forward, hurting things
      G.combat.applyStatus(enemy, "poison", {...})
    See js/abilities/basics.js for examples of each.
@@ -227,7 +228,8 @@ G.combat = (() => {
   }
 
   // Fire a projectile in the direction you're facing.
-  // {speed, damage, type, ability, range, size, color, pierce, status, spreadDeg}
+  // {speed, damage, type, ability, range, size, color, pierce, status,
+  //  spreadDeg, explodeRadius, explodeDamage, hitGroup}
   function shoot(user, o) {
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
     G.state.projectiles.push({
@@ -240,13 +242,59 @@ G.combat = (() => {
       size: o.size || 3,
       color: o.color || G.DAMAGE_TYPES[o.type || "sharp"].color,
       pierce: !!o.pierce,
+      hitSet: new Set(),
       status: o.status,
+      explodeRadius: o.explodeRadius || 0,
+      explodeDamage: o.explodeDamage,
+      hitGroup: o.hitGroup,
       breaksAnyWard: breaksAnyWard(user),
       startX: user.x, startY: user.y,
       range: o.range || 130,
       fromPlayer: true,
     });
     G.sfx.play("shoot");
+  }
+
+  // Jump to nearby enemies one by one. Low per-target damage keeps this
+  // spectacular crowd tool fair when another form borrows it.
+  function chain(user, o) {
+    const range = o.range || 75;
+    const jumpRange = o.jumpRange || 48;
+    const maxTargets = o.maxTargets || 4;
+    const color = o.color || G.DAMAGE_TYPES[o.type || "light"].color;
+    const facing = Math.atan2(user.dir.y, user.dir.x);
+    const available = G.state.enemies.filter((e) => {
+      if (e.dead) return false;
+      const d = G.util.dist(user.x, user.y, e.x, e.y);
+      const a = G.util.angleTo(user.x, user.y, e.x, e.y);
+      return d <= range + e.def.size / 2 && (d <= 10 || Math.abs(G.util.angleDiff(facing, a)) <= Math.PI * 0.55);
+    });
+    available.sort((a, b) => G.util.dist(user.x, user.y, a.x, a.y) - G.util.dist(user.x, user.y, b.x, b.y));
+
+    const used = new Set();
+    let current = available[0];
+    let fromX = user.x, fromY = user.y - 6;
+    let hits = 0;
+    while (current && used.size < maxTargets) {
+      used.add(current);
+      if (damageEnemy(current, {
+        damage: o.damage || 1, type: o.type, ability: o.ability,
+        knockback: o.knockback || 35, status: o.status,
+        breaksAnyWard: breaksAnyWard(user), fromX, fromY,
+      })) hits++;
+      G.spawnFx({ kind: "bolt", x: fromX, y: fromY, x2: current.x, y2: current.y - 5, color, dur: 0.22 });
+      fromX = current.x; fromY = current.y - 5;
+      let next = null, nextDist = Infinity;
+      for (const e of G.state.enemies) {
+        if (e.dead || used.has(e)) continue;
+        const d = G.util.dist(current.x, current.y, e.x, e.y);
+        if (d <= jumpRange + e.def.size / 2 && d < nextDist) { next = e; nextDist = d; }
+      }
+      current = next;
+    }
+    if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits });
+    if (!used.size) G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color, radius: 8, dur: 0.2 });
+    return hits;
   }
 
   // Zoom forward! Brief invincibility, damages anything you pass through.
@@ -283,12 +331,20 @@ G.combat = (() => {
       } else if (pr.fromPlayer) {
         for (const e of s.enemies) {
           if (e.dead) continue;
+          if (pr.hitSet && pr.hitSet.has(e)) continue;
+          if (pr.hitGroup && e.lastProjectileGroup === pr.hitGroup) continue;
           if (G.util.dist(pr.x, pr.y, e.x, e.y - 4) < pr.size + e.def.size / 2) {
+            if (pr.explodeRadius) {
+              gone = true;
+              break;
+            }
+            if (pr.hitGroup) e.lastProjectileGroup = pr.hitGroup;
+            if (pr.hitSet) pr.hitSet.add(e);
             damageEnemy(e, {
-              damage: pr.damage, type: pr.type, ability: pr.ability,
-              status: pr.status, breaksAnyWard: pr.breaksAnyWard,
-              fromX: pr.startX, fromY: pr.startY,
-            });
+                damage: pr.damage, type: pr.type, ability: pr.ability,
+                status: pr.status, breaksAnyWard: pr.breaksAnyWard,
+                fromX: pr.startX, fromY: pr.startY,
+              });
             if (!pr.pierce) { gone = true; break; }
           }
         }
@@ -300,9 +356,31 @@ G.combat = (() => {
           gone = true;
         }
       }
+      if (gone && pr.fromPlayer && pr.explodeRadius) explodeProjectile(pr);
       if (gone) s.projectiles.splice(i, 1);
     }
   }
 
-  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, dash, updateProjectiles };
+  function explodeProjectile(pr) {
+    if (pr.exploded) return;
+    pr.exploded = true;
+    const damage = pr.explodeDamage === undefined ? pr.damage : pr.explodeDamage;
+    let hits = 0;
+    for (const e of G.state.enemies) {
+      if (e.dead || G.util.dist(pr.x, pr.y, e.x, e.y - 4) > pr.explodeRadius + e.def.size / 2) continue;
+      if (damageEnemy(e, {
+        damage, type: pr.type, ability: pr.ability,
+        status: pr.status, breaksAnyWard: pr.breaksAnyWard,
+        fromX: pr.x, fromY: pr.y,
+        knockback: 120,
+      })) hits++;
+    }
+    G.state.shake = Math.max(G.state.shake, 0.16);
+    G.sfx.play("hit");
+    G.spawnFx({ kind: "ring", x: pr.x, y: pr.y, color: pr.color, radius: pr.explodeRadius, dur: 0.35 });
+    burst(pr.x, pr.y, pr.color, 10);
+    if (hits >= 2) G.events.emit("multiHit", { ability: pr.ability, hits });
+  }
+
+  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, dash, updateProjectiles };
 })();

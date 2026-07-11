@@ -8,7 +8,7 @@ registerForm({
   id: "god",
   name: "God",
   icon: "☀️",
-  tagline: "A blazing final form for players who mastered everyone.",
+  tagline: "A blazing final form for players who mastered every path before it.",
 
   speed: 100,
   hearts: 6,
@@ -26,7 +26,7 @@ registerForm({
     { id: "voidStar", level: 2 },
   ],
 
-  unlock: { type: "allFormsLevel", level: 5 },
+  unlock: { type: "previousFormsLevel", level: 5 },
 
   quests: [
     { text: "Hit 12 baddies with Divine Spark", event: "hit", match: { ability: "divineSpark" }, count: 12 },

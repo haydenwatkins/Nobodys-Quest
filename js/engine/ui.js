@@ -180,30 +180,30 @@ G.ui = (() => {
   function drawQuestTracker(c) {
     const pins = G.pinnedQuests();
     if (!pins.length) return;
-    const boxW = 132;
+    const boxW = 108;
     const x = G.W - boxW - 5;
-    const lineH = 12;
+    const lineH = 9;
     const y = G.input.isTouch ? 45 : 67;
 
     c.fillStyle = "rgba(26,28,44,0.78)";
-    c.fillRect(x, y, boxW, 9 + pins.length * lineH);
+    c.fillRect(x, y, boxW, 7 + pins.length * lineH);
     c.fillStyle = "#ffcd75";
     c.fillRect(x, y, boxW, 1);
-    c.font = `5px ${FONT_HEAD}`;
-    c.fillText("PINNED QUESTS", x + 4, y + 3);
+    c.font = `4px ${FONT_HEAD}`;
+    c.fillText("PINNED QUESTS", x + 3, y + 2);
 
-    c.font = `8px ${FONT_BODY}`;
+    c.font = `7px ${FONT_BODY}`;
     pins.forEach(({ form, quest }, i) => {
       const done = G.questsDone.includes(quest.id);
       const progress = G.questProgress(quest);
       const suffix = done ? "✓" : `${progress}/${quest.count}`;
       const suffixW = c.measureText(suffix).width;
-      const label = fitText(c, `${form.icon} ${quest.text}`, boxW - suffixW - 12);
-      const rowY = y + 10 + i * lineH;
+      const label = fitText(c, `${form.icon} ${quest.text}`, boxW - suffixW - 10);
+      const rowY = y + 7 + i * lineH;
       c.fillStyle = done ? "#a7f070" : "#f4f4f4";
-      c.fillText(label, x + 4, rowY);
+      c.fillText(label, x + 3, rowY);
       c.fillStyle = done ? "#a7f070" : "#ffcd75";
-      c.fillText(suffix, x + boxW - suffixW - 4, rowY);
+      c.fillText(suffix, x + boxW - suffixW - 3, rowY);
     });
   }
 

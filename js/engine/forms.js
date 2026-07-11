@@ -113,10 +113,10 @@ G.validateCrossRefs = function () {
     if (f.unlock) {
       const u = f.unlock;
       if (u.type === "level" && !G.forms[u.form]) err(`Its unlock rule points at form "${u.form}" which doesn't exist.`);
-      if (u.type === "allFormsLevel" && (typeof u.level !== "number" || u.level < 1))
-        err("Its all-forms unlock rule needs a number level, like unlock: { type: \"allFormsLevel\", level: 5 }.");
-      if (!["level", "item", "stars", "allFormsLevel"].includes(u.type))
-        err(`Its unlock type is "${u.type}" — use "level", "item", "stars", or "allFormsLevel".`);
+      if (["allFormsLevel", "previousFormsLevel"].includes(u.type) && (typeof u.level !== "number" || u.level < 1))
+        err("Its mastery unlock rule needs a number level, like unlock: { type: \"previousFormsLevel\", level: 3 }.");
+      if (!["level", "item", "stars", "allFormsLevel", "previousFormsLevel"].includes(u.type))
+        err(`Its unlock type is "${u.type}" — use "level", "item", "stars", "previousFormsLevel", or "allFormsLevel".`);
     }
   }
 
@@ -147,6 +147,13 @@ G.formUnlocked = function (id) {
       return other && !other.invalid && G.formLevel(otherId) >= u.level;
     });
   }
+  if (u.type === "previousFormsLevel") {
+    const targetIndex = G.formOrder.indexOf(id);
+    return G.formOrder.slice(0, targetIndex).every((otherId) => {
+      const other = G.forms[otherId];
+      return other && !other.invalid && G.formLevel(otherId) >= u.level;
+    });
+  }
   return false;
 };
 
@@ -162,6 +169,7 @@ G.unlockHint = function (id) {
   if (u.type === "item") return "Find a special treasure...";
   if (u.type === "stars") return `Earn ${u.stars} ⭐`;
   if (u.type === "allFormsLevel") return `Get every other form to level ${u.level}`;
+  if (u.type === "previousFormsLevel") return `Get every previous form to level ${u.level}`;
   return "";
 };
 
@@ -205,6 +213,13 @@ G.getLoadout = function (formId) {
   st.loadouts[formId] = st.loadouts[formId] || [];
   const lo = st.loadouts[formId];
   lo[0] = f.basic; // slot A is always the form's own basic
+
+  // A progression update can re-lock a late form. Do not let an old save
+  // keep borrowing abilities that are no longer earned.
+  const earned = new Set(G.availableAbilities());
+  for (let s = 1; s <= f.slots; s++) {
+    if (lo[s] && !earned.has(lo[s])) lo[s] = null;
+  }
 
   // auto-fill empty slots with the form's own abilities as they unlock
   const lvl = G.formLevel(formId);

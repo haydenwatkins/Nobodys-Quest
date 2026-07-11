@@ -83,8 +83,8 @@ aren't random — each one protects the FUN:
 3. **Quests teach the fun.** At least 2 per form. A good quest makes
    the player try the thing that's cool about your form.
 4. **Damage types matter.** sharp / blunt / light / dark. Warded
-   enemies force players to mix. (Psst: **nothing in the game deals
-   DARK damage yet.** The first dark form is waiting to be invented.)
+   enemies force players to mix. Dark magic is especially useful
+   against Shades and the purple wards in later regions.
 5. **Fair is fun.** Speed 40–140, hearts 1–8, mana 0–8, cooldown
    0.15s+. A form that breaks the game is boring in five minutes.
 
@@ -94,11 +94,16 @@ aren't random — each one protects the FUN:
 
 Open `js/abilities/basics.js` — every move in the game is there,
 and there's a ready-to-uncomment **Shadow Bolt** at the bottom.
-The three building blocks:
+The combat building blocks:
 
 - `G.combat.meleeArc(user, {...})` — a swing (Slap, Slash, Fester)
 - `G.combat.shoot(user, {...})` — a projectile (Arrow, Lucky Arrow)
+- `G.combat.chain(user, {...})` — jumps between nearby targets
 - `G.combat.dash(user, {...})` — a zoom (Cartwheel, Squeak Zoom)
+
+Projectiles can use `explodeRadius` and `explodeDamage` to burst on
+impact. Give every projectile in a fan the same `hitGroup` object when
+one cast should only damage each enemy once (Fire Breath does this).
 
 Change `range`, `damage`, `speed`, add a `status` like poison or stun,
 or call `shoot` three times like Triple Shot does. Mix and match!
@@ -136,8 +141,8 @@ sprite — that's a perfect one to grab and make your own!
 
 ## 💡 Idea shelf (steal these!)
 
-- 🐸 **Frog** — tongue-grab basic, hops over water?
-- 🧛 **Vampire** — DARK damage, heals when it bites (first dark form!)
+- 🐹 **Mole** — burrows under danger and erupts underneath it?
+- 🧛 **Vampire** — DARK damage, heals when it bites
 - 🐢 **Turtle** — 8 hearts, speed 40, reflects arrows?
 - 🤖 **Robot** — shoots in all 4 directions at once
 - 👻 **Ghost** — walks through enemies without getting hurt
