@@ -117,6 +117,12 @@ G.world = (() => {
     return false;
   }
 
+  function isSafeSpawn(px, py) {
+    const cell = cellAt(px, py);
+    if (!cell || cell.portal || SOLID[cell.tile]) return false;
+    return !solid(px, py);
+  }
+
   // Move an entity (with a small feet-box) through the world, one
   // axis at a time so you slide along walls instead of sticking.
   function moveBox(e, dx, dy) {
@@ -150,6 +156,31 @@ G.world = (() => {
       }
     } else {
       s.lastSign = null;
+    }
+
+    // Town house plots
+    if (cell.townPlot && G.tryBuildTownHouse) {
+      if (s.lastTownPlot !== cell.townPlot) {
+        s.lastTownPlot = cell.townPlot;
+        G.tryBuildTownHouse(cell.townPlot);
+      }
+    } else {
+      s.lastTownPlot = null;
+    }
+
+    // Rest spots restore you once when you step onto them.
+    if (cell.rest) {
+      if (s.lastRest !== cell) {
+        s.lastRest = cell;
+        p.damageTaken = 0;
+        p.mana = p.manaMax;
+        G.sfx.play("pickup");
+        G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: "#a7f070", dur: 0.55 });
+        G.ui.toast(cell.restText || "Rested up. HP and mana restored.", 2.5);
+        G.saveGame();
+      }
+    } else {
+      s.lastRest = null;
     }
 
     // Doors / portals
@@ -287,6 +318,21 @@ G.world = (() => {
     /* extra decorations on top of the base tile */
     if (cell.portal) {
       const locked = cell.stars && G.state.stars < cell.stars;
+      if (cell.portalStyle === "gap") {
+        ctx.fillStyle = "#d8b06a";
+        ctx.fillRect(px + 2, py + 6, T - 4, 4);
+        ctx.fillStyle = locked ? "#6b4a2b" : "#ffcd75";
+        ctx.fillRect(px + 3, py + 9, T - 6, 2);
+        if (locked) {
+          ctx.fillStyle = "#1a1c2c";
+          ctx.fillRect(px + 6, py + 5, 4, 6);
+          ctx.fillStyle = "#ffcd75";
+          ctx.fillRect(px + 7, py + 7, 2, 2);
+        } else {
+          ctx.fillStyle = "rgba(255,205,117,0.45)";
+          ctx.fillRect(px + 5, py + 5, T - 10, 6);
+        }
+      } else {
       // dark doorway with a frame
       ctx.fillStyle = "#94b0c2";
       ctx.fillRect(px + 1, py, T - 2, T);
@@ -301,6 +347,7 @@ G.world = (() => {
         ctx.fillStyle = `rgba(129,83,193,${0.3 + glow * 0.3})`;
         ctx.fillRect(px + 4, py + 4, T - 8, T - 5);
       }
+      }
     }
     if (cell.message) { // signpost
       ctx.fillStyle = "#6b4a2b";
@@ -310,6 +357,33 @@ G.world = (() => {
       ctx.fillStyle = "#6b4a2b";
       ctx.fillRect(px + 5, py + 5, 6, 1);
       ctx.fillRect(px + 5, py + 7, 4, 1);
+    }
+    if (cell.townPlot) {
+      const built = G.townHouseBuilt && G.townHouseBuilt(cell.townPlot);
+      if (built) {
+        ctx.fillStyle = "#6b4a2b";
+        ctx.fillRect(px - 3, py + 7, T + 6, 9);
+        ctx.fillStyle = "#8a6538";
+        ctx.fillRect(px - 1, py + 9, T + 2, 7);
+        ctx.fillStyle = "#b13e53";
+        ctx.fillRect(px - 5, py + 4, T + 10, 4);
+        ctx.fillRect(px - 2, py + 2, T + 4, 3);
+        ctx.fillStyle = "#ffcd75";
+        ctx.fillRect(px + 5, py + 11, 5, 5);
+        ctx.fillStyle = "#f4f4f4";
+        ctx.fillRect(px + 1, py + 9, 3, 3);
+        ctx.fillRect(px + 12, py + 9, 3, 3);
+        ctx.fillStyle = "#1a1c2c";
+        ctx.fillRect(px + 7, py + 13, 1, 3);
+      } else {
+        ctx.fillStyle = "#d8b06a";
+        ctx.fillRect(px + 3, py + 4, 10, 9);
+        ctx.fillStyle = "#6b4a2b";
+        ctx.fillRect(px + 3, py + 4, 10, 1);
+        ctx.fillRect(px + 3, py + 12, 10, 1);
+        ctx.fillRect(px + 3, py + 4, 1, 9);
+        ctx.fillRect(px + 12, py + 4, 1, 9);
+      }
     }
   }
 
@@ -328,6 +402,47 @@ G.world = (() => {
     }
   }
 
+  function drawPlayerHouse(ctx) {
+    const s = G.state;
+    if (!s.grid) return;
+    let minX = Infinity, minY = Infinity, maxX = -1, maxY = -1;
+    for (let y = 0; y < s.mapH; y++) {
+      for (let x = 0; x < s.mapW; x++) {
+        if (!s.grid[y][x].playerHouse) continue;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+    if (maxX < 0) return;
+
+    const T = G.TILE;
+    const px = minX * T;
+    const py = minY * T;
+    const w = (maxX - minX + 1) * T;
+    const h = (maxY - minY + 1) * T;
+
+    ctx.fillStyle = "#6b4a2b";
+    ctx.fillRect(px + 3, py + 11, w - 6, h + 5);
+    ctx.fillStyle = "#8a6538";
+    ctx.fillRect(px + 6, py + 15, w - 12, h + 1);
+    ctx.fillStyle = "#b13e53";
+    ctx.fillRect(px - 4, py + 7, w + 8, 8);
+    ctx.fillRect(px + 3, py + 3, w - 6, 5);
+    ctx.fillStyle = "#ef7d57";
+    ctx.fillRect(px + 6, py + 6, w - 12, 2);
+    ctx.fillStyle = "#ffcd75";
+    ctx.fillRect(px + Math.floor(w / 2) - 4, py + h + 2, 8, 14);
+    ctx.fillStyle = "#f4f4f4";
+    ctx.fillRect(px + 10, py + 17, 7, 6);
+    ctx.fillRect(px + w - 17, py + 17, 7, 6);
+    ctx.fillStyle = "#1a1c2c";
+    ctx.fillRect(px + Math.floor(w / 2) - 1, py + h + 8, 2, 4);
+    ctx.fillStyle = "#ffcd75";
+    ctx.fillRect(px + Math.floor(w / 2) - 2, py, 4, 3);
+  }
+
   function draw(ctx, cam, time) {
     const s = G.state;
     const T = G.TILE;
@@ -338,8 +453,9 @@ G.world = (() => {
     for (let y = y0; y <= y1; y++)
       for (let x = x0; x <= x1; x++)
         drawTile(ctx, s.grid[y][x], x, y, time);
+    drawPlayerHouse(ctx);
     for (const ch of s.chests) drawChest(ctx, ch);
   }
 
-  return { load, solid, moveBox, checkTriggers, draw, cellAt };
+  return { load, solid, moveBox, checkTriggers, draw, cellAt, isSafeSpawn };
 })();

@@ -87,13 +87,102 @@ G.ui = (() => {
     return out + "…";
   }
 
+  function drawLocationChip(c) {
+    const s = G.state;
+    const name = s.mapDef && s.mapDef.name ? s.mapDef.name : s.mapId;
+    c.font = `6px ${FONT_HEAD}`;
+    const enemies = s.enemies.filter((e) => !e.dead).length;
+    const label = `${name}  enemies:${enemies}`;
+    const w = c.measureText(label).width + 8;
+    c.fillStyle = "rgba(26,28,44,0.72)";
+    c.fillRect(Math.round(G.W / 2 - w / 2), 5, w, 11);
+    c.fillStyle = "#c8d8e0";
+    c.fillText(label, Math.round(G.W / 2 - w / 2) + 4, 8);
+  }
+
+  function drawAbilityBar(c, p) {
+    if (G.input.isTouch) return;
+    const lo = G.getLoadout(G.state.formId);
+    const labels = ["A", "B", "C"];
+    c.font = `6px ${FONT_HEAD}`;
+    for (let i = 0; i < 3; i++) {
+      const ab = G.abilities[lo[i]];
+      const x = 6 + i * 34;
+      const y = G.H - 20;
+      c.fillStyle = "rgba(26,28,44,0.72)";
+      c.fillRect(x, y, 29, 15);
+      c.fillStyle = "#566c86";
+      c.fillRect(x, y, 29, 1);
+      c.fillRect(x, y + 14, 29, 1);
+      c.fillRect(x, y, 1, 15);
+      c.fillRect(x + 28, y, 1, 15);
+      c.fillStyle = "#ffcd75";
+      c.fillText(labels[i], x + 3, y + 5);
+      if (!ab) {
+        c.fillStyle = "#94b0c2";
+        c.fillText("-", x + 17, y + 5);
+        continue;
+      }
+      const ready = (p.cooldowns[lo[i]] || 0) <= 0 && ab.mana <= p.mana;
+      c.fillStyle = ready ? "#f4f4f4" : "#566c86";
+      c.fillText(ab.icon || "*", x + 16, y + 5);
+      if (!ready) {
+        const cd = Math.max(p.cooldowns[lo[i]] || 0, ab.mana > p.mana ? 1 : 0);
+        c.fillStyle = "rgba(26,28,44,0.75)";
+        c.fillRect(x + 1, y + 1, 27, Math.min(13, Math.ceil(cd / Math.max(0.1, ab.cooldown || 1) * 13)));
+      }
+    }
+  }
+
+  function drawMinimap(c) {
+    if (G.input.isTouch) return;
+    const s = G.state;
+    if (!s.grid || s.mapW <= 0 || s.mapH <= 0) return;
+    const w = 62;
+    const h = 42;
+    const x0 = G.W - w - 5;
+    const y0 = 21;
+    const step = Math.max(1, Math.ceil(Math.max(s.mapW / (w - 4), s.mapH / (h - 4))));
+    const sx = (w - 4) / s.mapW;
+    const sy = (h - 4) / s.mapH;
+
+    c.fillStyle = "rgba(26,28,44,0.78)";
+    c.fillRect(x0, y0, w, h);
+    c.fillStyle = "#566c86";
+    c.fillRect(x0, y0, w, 1);
+    c.fillRect(x0, y0 + h - 1, w, 1);
+    c.fillRect(x0, y0, 1, h);
+    c.fillRect(x0 + w - 1, y0, 1, h);
+
+    for (let y = 0; y < s.mapH; y += step) {
+      for (let x = 0; x < s.mapW; x += step) {
+        const cell = s.grid[y][x];
+        if (cell.portal) c.fillStyle = cell.stars && s.stars < cell.stars ? "#6b4a2b" : "#ffcd75";
+        else if (cell.tile === "tree") c.fillStyle = "#257179";
+        else if (cell.tile === "water") c.fillStyle = "#3b5dc9";
+        else if (cell.tile === "wall" || cell.tile === "rock") c.fillStyle = "#566c86";
+        else if (cell.tile === "floor") c.fillStyle = "#4a5b74";
+        else c.fillStyle = "#38b764";
+        c.fillRect(x0 + 2 + Math.floor(x * sx), y0 + 2 + Math.floor(y * sy), Math.max(1, Math.ceil(step * sx)), Math.max(1, Math.ceil(step * sy)));
+      }
+    }
+
+    c.fillStyle = "#b13e53";
+    for (const e of s.enemies) {
+      if (e.dead) continue;
+      c.fillRect(x0 + 2 + Math.floor((e.x / G.TILE) * sx), y0 + 2 + Math.floor((e.y / G.TILE) * sy), 2, 2);
+    }
+    c.fillStyle = "#f4f4f4";
+    c.fillRect(x0 + 1 + Math.floor((s.player.x / G.TILE) * sx), y0 + 1 + Math.floor((s.player.y / G.TILE) * sy), 3, 3);
+  }
+
   function drawQuestTracker(c) {
     const pins = G.pinnedQuests();
     if (!pins.length) return;
     const boxW = 132;
     const x = G.W - boxW - 5;
     const lineH = 12;
-    const y = 19;
+    const y = G.input.isTouch ? 45 : 67;
 
     c.fillStyle = "rgba(26,28,44,0.78)";
     c.fillRect(x, y, boxW, 9 + pins.length * lineH);
@@ -123,7 +212,7 @@ G.ui = (() => {
     const boxW = 184;
     const boxH = 24;
     const x = Math.round((G.W - boxW) / 2);
-    const y = G.H - boxH - 5;
+    const y = G.H - boxH - 26;
     c.fillStyle = "rgba(26,28,44,0.9)";
     c.fillRect(x, y, boxW, boxH);
     c.fillStyle = "#73eff7";
@@ -216,6 +305,8 @@ G.ui = (() => {
     c.fillStyle = "#f4f4f4";
     c.fillText(label, 8, 27);
 
+    drawLocationChip(c);
+
     /* stars (top right) */
     const starTxt = `⭐${G.state.stars}`;
     const sw = c.measureText(starTxt).width + 6;
@@ -224,13 +315,15 @@ G.ui = (() => {
     c.fillStyle = "#ffcd75";
     c.fillText(starTxt, G.W - sw - 1, 8);
 
+    drawMinimap(c);
     drawQuestTracker(c);
     drawWardHint(c, cam);
     drawTutorial(c);
+    drawAbilityBar(c, p);
 
     /* toasts (word-wrapped so long messages fit) */
     c.font = `9px ${FONT_BODY}`;
-    let ty = G.pinnedQuests().length ? 60 : 40;
+    let ty = G.pinnedQuests().length ? 105 : 67;
     for (const t of toasts) {
       const alpha = t.t > t.dur - 0.3 ? (t.dur - t.t) / 0.3 : 1;
       c.globalAlpha = Math.max(0, alpha) * 0.95;
@@ -320,6 +413,16 @@ G.ui = (() => {
     return `${ab.icon} ${ab.name} (${G.DAMAGE_TYPES[ab.type].name}${ab.mana ? ", " + ab.mana + " mana" : ""})`;
   }
 
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;",
+    }[ch]));
+  }
+
   let activeTab = "forms";
 
   function openMenu() {
@@ -341,6 +444,8 @@ G.ui = (() => {
       ["quests", "Quests"],
       ["mix", "Mix"],
     ];
+    if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
+    if (activeTab === "town" && !(G.townUnlocked && G.townUnlocked())) activeTab = "forms";
     let html = `<h1>Nobody's Quest</h1>
       <div class="stars">⭐ ${G.state.stars} stars</div>
       <div class="menu-tabs">${tabs.map(([id, label]) =>
@@ -351,6 +456,7 @@ G.ui = (() => {
     if (activeTab === "forms") html += buildFormsTab();
     if (activeTab === "quests") html += buildQuestsTab();
     if (activeTab === "mix") html += buildMixTab();
+    if (activeTab === "town") html += buildTownTab();
 
     html += `</div>
       <div class="menu-footer">
@@ -374,6 +480,31 @@ G.ui = (() => {
         btnCache = "";
         G.saveGame();
       }));
+    const foundTown = menuEl.querySelector('[data-act="found-town"]');
+    if (foundTown) foundTown.addEventListener("click", () => {
+      const town = G.ensureTown();
+      const name = prompt("Name your town:", town.name || "Sunrise Town");
+      G.foundTown(name || town.name);
+      buildMenu();
+    });
+    const renameTown = menuEl.querySelector('[data-act="rename-town"]');
+    if (renameTown) renameTown.addEventListener("click", () => {
+      const town = G.ensureTown();
+      const name = prompt("Rename your town:", town.name);
+      if (name) G.renameTown(name);
+      buildMenu();
+    });
+    const festival = menuEl.querySelector('[data-act="festival"]');
+    if (festival) festival.addEventListener("click", () => {
+      G.holdTownFestival();
+      buildMenu();
+    });
+    const visitTown = menuEl.querySelector('[data-act="visit-town"]');
+    if (visitTown) visitTown.addEventListener("click", () => {
+      G.world.load("town", { x: 15, y: 14 });
+      G.saveGame();
+      closeMenu();
+    });
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
     const reset = menuEl.querySelector('[data-act="reset"]');
@@ -451,6 +582,41 @@ G.ui = (() => {
       avail.map((id) => `<div class="quest-row"><span>${abilityLabel(id)}</span></div>`).join("") +
       `</div>`;
     return html;
+  }
+
+  function buildTownTab() {
+    const town = G.ensureTown();
+    const townName = escapeHtml(town.name);
+    if (!town.founded) {
+      return `<div class="form-card current">
+        <h2>☀️ Found Your Town</h2>
+        <div class="tagline">God is unlocked. Start a town, then defeat baddies as God to attract new residents.</div>
+        <button data-act="found-town">Found town</button>
+      </div>`;
+    }
+
+    return `<div class="form-card current">
+      <h2>☀️ ${townName}</h2>
+      <div class="tagline">Defeat baddies as God to attract residents. Break wards as God to raise town spirit.</div>
+      <div class="quest-row"><span>Town level</span><span class="prog">${G.townLevel ? G.townLevel() : 1}</span></div>
+      <div class="quest-row"><span>Residents</span><span class="prog">${town.residents}</span></div>
+      <div class="quest-row"><span>Capacity</span><span class="prog">${G.townCapacity ? G.townCapacity() : "?"}</span></div>
+      <div class="quest-row"><span>Town spirit</span><span class="prog">${town.spirit}</span></div>
+      <div class="quest-row"><span>Houses</span><span class="prog">${town.houses.length}</span></div>
+      <div class="quest-row"><span>Next house cost</span><span class="prog">${G.townHouseCost()} spirit</span></div>
+      <div class="quest-row"><span>Festivals held</span><span class="prog">${town.festivals}</span></div>
+      <button data-act="visit-town">Visit town</button>
+      <button data-act="festival">Hold festival</button>
+      <button data-act="rename-town">Rename town</button>
+    </div>
+    <div class="form-card">
+      <h2>🏠 Town rules</h2>
+      <div class="quest-row"><span>Visit town</span><span class="prog">walk onto empty plots</span></div>
+      <div class="quest-row"><span>Build house</span><span class="prog">spend town spirit</span></div>
+      <div class="quest-row"><span>Kill as God</span><span class="prog">+1 resident, +2 spirit</span></div>
+      <div class="quest-row"><span>Break ward as God</span><span class="prog">+1 spirit</span></div>
+      <div class="quest-row"><span>Hold festival</span><span class="prog">+residents spirit</span></div>
+    </div>`;
   }
 
   /* ---------- Form Workshop error panel ---------- */

@@ -245,6 +245,23 @@ registerAbility({
 });
 
 registerAbility({
+  id: "dark matter",
+  name: "dark matter",
+  icon: "🌑",
+  type: "dark",
+  mana: 0,
+  cooldown: 0.8,
+  use(user) {
+    G.combat.shoot(user, {
+      ability: "dark matter",
+      speed: 140, range: 250,
+      damage: 3, type: "dark",
+      color: "#000000",
+    });
+  },
+});
+
+registerAbility({
   id: "curse",
   name: "Curse",
   icon: "🌑",
@@ -257,6 +274,61 @@ registerAbility({
       speed: 140, range: 250,
       damage: 3, type: "dark",
       color: "#290063",
+    });
+  },
+});
+
+/* ----------------- GOD's moves ----------------- */
+
+registerAbility({
+  id: "divineSpark",
+  name: "Divine Spark",
+  icon: "☀️",
+  type: "light",
+  mana: 0,
+  cooldown: 0.4,
+  use(user) {
+    G.combat.shoot(user, {
+      ability: "divineSpark",
+      speed: 230, range: 170,
+      damage: 5, type: "light",
+      color: "#ffcd75",
+    });
+  },
+});
+
+registerAbility({
+  id: "judgmentRing",
+  name: "Judgment Ring",
+  icon: "⚖️",
+  type: "light",
+  mana: 0,
+  cooldown: 1.3,
+  use(user) {
+    G.combat.meleeArc(user, {
+      ability: "judgmentRing",
+      range: 34, arcDeg: 360,
+      damage: 10, type: "light",
+      knockback: 180,
+      color: "#f4f4f4",
+    });
+  },
+});
+
+registerAbility({
+  id: "voidStar",
+  name: "Void Star",
+  icon: "✴️",
+  type: "dark",
+  mana: 0,
+  cooldown: 1.5,
+  use(user) {
+    G.combat.shoot(user, {
+      ability: "voidStar",
+      speed: 155, range: 190,
+      damage: 6, type: "dark",
+      pierce: true,
+      color: "#8153c1",
     });
   },
 });

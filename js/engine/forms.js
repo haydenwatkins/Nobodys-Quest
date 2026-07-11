@@ -113,7 +113,10 @@ G.validateCrossRefs = function () {
     if (f.unlock) {
       const u = f.unlock;
       if (u.type === "level" && !G.forms[u.form]) err(`Its unlock rule points at form "${u.form}" which doesn't exist.`);
-      if (!["level", "item", "stars"].includes(u.type)) err(`Its unlock type is "${u.type}" — use "level", "item", or "stars".`);
+      if (u.type === "allFormsLevel" && (typeof u.level !== "number" || u.level < 1))
+        err("Its all-forms unlock rule needs a number level, like unlock: { type: \"allFormsLevel\", level: 5 }.");
+      if (!["level", "item", "stars", "allFormsLevel"].includes(u.type))
+        err(`Its unlock type is "${u.type}" — use "level", "item", "stars", or "allFormsLevel".`);
     }
   }
 
@@ -137,6 +140,13 @@ G.formUnlocked = function (id) {
   if (u.type === "level") return G.formLevel(u.form) >= u.level;
   if (u.type === "item") return G.state.items.includes(u.item);
   if (u.type === "stars") return G.state.stars >= u.stars;
+  if (u.type === "allFormsLevel") {
+    return G.formOrder.every((otherId) => {
+      if (otherId === id) return true;
+      const other = G.forms[otherId];
+      return other && !other.invalid && G.formLevel(otherId) >= u.level;
+    });
+  }
   return false;
 };
 
@@ -151,6 +161,7 @@ G.unlockHint = function (id) {
   if (u.type === "level") return `Get ${G.forms[u.form] ? G.forms[u.form].name : u.form} to level ${u.level}`;
   if (u.type === "item") return "Find a special treasure...";
   if (u.type === "stars") return `Earn ${u.stars} ⭐`;
+  if (u.type === "allFormsLevel") return `Get every other form to level ${u.level}`;
   return "";
 };
 

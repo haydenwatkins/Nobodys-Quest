@@ -73,7 +73,11 @@ G.updatePlayer = function (dt) {
         if (e.dead || d.hitSet.has(e)) continue;
         if (G.util.dist(p.x, p.y, e.x, e.y) < 6 + e.def.size / 2) {
           d.hitSet.add(e);
-          G.combat.damageEnemy(e, { damage: d.damage, type: d.type, ability: d.ability, fromX: beforeX, fromY: beforeY });
+          G.combat.damageEnemy(e, {
+            damage: d.damage, type: d.type, ability: d.ability,
+            breaksAnyWard: d.breaksAnyWard,
+            fromX: beforeX, fromY: beforeY,
+          });
         }
       }
     }
@@ -264,10 +268,38 @@ G.drawShadow = function (ctx, x, y, w) {
   ctx.fillRect(Math.round(x - w / 2), Math.round(y - 2), w, 3);
 };
 
+G.drawPlayerAura = function (ctx, p, form) {
+  const aura = form.aura;
+  if (!aura) return;
+  const t = G.state.time;
+  const pulse = 0.5 + Math.sin(t * 4) * 0.5;
+  ctx.save();
+  ctx.globalAlpha = 0.25 + pulse * 0.15;
+  ctx.strokeStyle = aura.ring || "#ffcd75";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y - 12, 12 + pulse * 2, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 0.22;
+  ctx.strokeStyle = aura.void || "#8153c1";
+  ctx.beginPath();
+  ctx.arc(p.x, p.y - 12, 6 + (1 - pulse) * 2, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 0.85;
+  for (let i = 0; i < 6; i++) {
+    const a = t * 1.8 + i * Math.PI / 3;
+    const r = 14 + ((i % 2) * 4) + pulse;
+    ctx.fillStyle = i % 2 ? aura.spark || "#41a6f6" : aura.ring || "#ffcd75";
+    ctx.fillRect(Math.round(p.x + Math.cos(a) * r), Math.round(p.y - 12 + Math.sin(a) * r), 2, 2);
+  }
+  ctx.restore();
+};
+
 G.drawPlayer = function (ctx) {
   const p = G.state.player;
   const form = G.playerForm();
   if (p.invuln > 0 && Math.floor(p.invuln * 12) % 2 === 0 && !p.dashing) return; // hurt blink
+  G.drawPlayerAura(ctx, p, form);
   G.drawShadow(ctx, p.x, p.y, 10);
   const frame = p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0;
   G.drawSprite(ctx, form.sprite, frame, p.x, p.y, p.dir.x < 0);

@@ -20,6 +20,10 @@
 
 G.combat = (() => {
   /* ---------- dealing damage to an enemy ---------- */
+  function breaksAnyWard(user) {
+    return user === G.state.player && G.playerForm && G.playerForm().breaksAnyWard;
+  }
+
   function damageEnemy(enemy, opts) {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
@@ -27,7 +31,9 @@ G.combat = (() => {
 
     // WARD CHECK
     if (enemy.ward && enemy.ward.hp > 0) {
-      if (!enemy.ward.types.includes(type)) {
+      const overrulesWard = opts.breaksAnyWard && !enemy.ward.types.includes(type);
+      const wardHitColor = overrulesWard ? "#ffcd75" : G.DAMAGE_TYPES[type].color;
+      if (!opts.breaksAnyWard && !enemy.ward.types.includes(type)) {
         // Wrong damage type — bounces off!
         const needed = G.DAMAGE_TYPES[enemy.ward.types[0]];
         G.sfx.play("wardDing");
@@ -42,13 +48,13 @@ G.combat = (() => {
       // Right type — chip the ward
       enemy.ward.hp -= opts.damage;
       G.sfx.play("hit");
-      G.damageNumber(enemy.x, enemy.y - enemy.h(), opts.damage, G.DAMAGE_TYPES[type].color);
+      G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "GOD!" : opts.damage, wardHitColor);
       knockback(enemy, opts, 0.7);
       if (enemy.ward.hp <= 0) {
         G.sfx.play("wardBreak");
         G.state.shake = Math.max(G.state.shake, 0.18);
-        G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: G.DAMAGE_TYPES[type].color, dur: 0.45 });
-        burst(enemy.x, enemy.y - 6, G.DAMAGE_TYPES[type].color, 8);
+        G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: wardHitColor, dur: 0.45 });
+        burst(enemy.x, enemy.y - 6, wardHitColor, 8);
         G.ui.toast("💥 Ward broken!");
         G.events.emit("wardBreak", { damageType: type, ability: opts.ability, enemy: enemy.id });
       }
@@ -181,6 +187,7 @@ G.combat = (() => {
       if (damageEnemy(e, {
         damage: o.damage, type: o.type, ability: o.ability,
         knockback: o.knockback, status: o.status,
+        breaksAnyWard: breaksAnyWard(user),
         fromX: user.x, fromY: user.y,
       })) hits++;
     }
@@ -209,6 +216,7 @@ G.combat = (() => {
       color: o.color || G.DAMAGE_TYPES[o.type || "sharp"].color,
       pierce: !!o.pierce,
       status: o.status,
+      breaksAnyWard: breaksAnyWard(user),
       startX: user.x, startY: user.y,
       range: o.range || 130,
       fromPlayer: true,
@@ -226,6 +234,7 @@ G.combat = (() => {
       damage: o.damage || 0,
       type: o.type || "blunt",
       ability: o.ability,
+      breaksAnyWard: breaksAnyWard(user),
       hitSet: new Set(),
       color: o.color || "#f4f4f4",
     };
@@ -252,7 +261,8 @@ G.combat = (() => {
           if (G.util.dist(pr.x, pr.y, e.x, e.y - 4) < pr.size + e.def.size / 2) {
             damageEnemy(e, {
               damage: pr.damage, type: pr.type, ability: pr.ability,
-              status: pr.status, fromX: pr.startX, fromY: pr.startY,
+              status: pr.status, breaksAnyWard: pr.breaksAnyWard,
+              fromX: pr.startX, fromY: pr.startY,
             });
             if (!pr.pierce) { gone = true; break; }
           }
