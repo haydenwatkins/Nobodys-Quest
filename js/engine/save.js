@@ -25,6 +25,9 @@ G.saveGame = function () {
       loadouts: s.loadouts,
       questCounts: G.questCounts,
       questsDone: G.questsDone,
+      pinnedQuestIds: s.pinnedQuestIds,
+      tutorialStep: G.tutorial ? G.tutorial.step : 0,
+      tutorialDone: G.tutorial ? G.tutorial.done : false,
     }));
   } catch (e) {
     // storage full or blocked — the game still plays, just won't remember

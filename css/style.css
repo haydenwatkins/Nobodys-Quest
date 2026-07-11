@@ -186,6 +186,13 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
 .quest-row { display: flex; justify-content: space-between; gap: 8px; font-size: 20px; padding: 4px 0; }
 .quest-row.done { color: #a7f070; }
 .quest-row .prog { color: #ffcd75; white-space: nowrap; }
+.quest-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.form-card .pin-btn {
+  min-width: 64px; margin: 0; padding: 6px 8px;
+  border-color: #73eff7; background: #333c57; color: #73eff7;
+  font-size: 8px;
+}
+.form-card .pin-btn.pinned { background: #73eff7; color: #1a1c2c; }
 
 .slot-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 20px; flex-wrap: wrap; }
 .slot-row .slot-label { width: 84px; color: #94b0c2; }
@@ -277,6 +284,8 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
 
   .quest-row { align-items: flex-start; flex-wrap: wrap; }
   .quest-row .prog { margin-left: auto; }
+  .quest-actions { width: 100%; justify-content: flex-end; }
+  .form-card .pin-btn { min-height: 38px; }
 
   .slot-row { align-items: stretch; flex-direction: column; }
   .slot-row .slot-label { width: auto; }

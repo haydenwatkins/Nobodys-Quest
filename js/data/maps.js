@@ -27,6 +27,7 @@ registerMap({
     "s": { tile: "grass", message: "Welcome, little Nobody! Smack baddies with A. Quests live in the ☰ menu!" },
     "G": { tile: "grass", message: "Beware the wisp grove... wisps only fear the LIGHT." },
     "D": { tile: "tree", portal: { map: "dungeon", x: 15, y: 14 }, stars: 3 },
+    "E": { tile: "grass", portal: { map: "whispering-grove", x: 2, y: 10 } },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
   },
 
@@ -49,7 +50,7 @@ registerMap({
     "t..................p...................t",
     "t.................sp...................t",
     "t..................p...................t",
-    "t......................................t",
+    "t.................................E....t",
     "ttttt...................1..............t",
     "tC..t..............................1...t",
     "t....1.........1.......................t",
@@ -96,5 +97,45 @@ registerMap({
     "###############f#############",
     "###############x#############",
     "#############################",
+  ],
+});
+
+/* ================== WHISPERING GROVE (30 x 18) ================== */
+
+registerMap({
+  id: "whispering-grove",
+  name: "Whispering Grove",
+  playerStart: { x: 2, y: 10 },
+
+  legend: {
+    "x": { tile: "grass", portal: { map: "overworld", x: 33, y: 18 } },
+    "s": { tile: "grass", message: "The grove whispers: ward colors are clues. Match the damage type shown above the enemy!" },
+    "2": { tile: "grass", enemy: "bat" },
+    "3": { tile: "grass", enemy: "bones" },
+    "6": { tile: "grass", enemy: "thornling" },
+    "7": { tile: "grass", enemy: "pebblebeast" },
+    "C": { tile: "grass", chest: { heal: true, name: "a moonberry pie" } },
+    "T": { tile: "grass", chest: { item: "whispering-seed", name: "the Whispering Seed" } },
+  },
+
+  tiles: [
+    "tttttttttttttttttttttttttttttt",
+    "t....6.......tt..............t",
+    "t............tt.....6........t",
+    "t..wwww......tt..............t",
+    "t..wwww..7...tt....2.........t",
+    "t..wwww......tt..............t",
+    "t............ttttttt..tttttttt",
+    "t....3.......................t",
+    "t..........s.................t",
+    "t...............7............t",
+    "tx..........................Ct",
+    "t........tttt................t",
+    "t..6.....t..t......3.........t",
+    "t........t..t................t",
+    "t........t..tttttttt.........t",
+    "t........t..............T....t",
+    "t............................t",
+    "tttttttttttttttttttttttttttttt",
   ],
 });

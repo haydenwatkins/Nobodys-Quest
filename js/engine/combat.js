@@ -29,8 +29,13 @@ G.combat = (() => {
     if (enemy.ward && enemy.ward.hp > 0) {
       if (!enemy.ward.types.includes(type)) {
         // Wrong damage type — bounces off!
+        const needed = G.DAMAGE_TYPES[enemy.ward.types[0]];
         G.sfx.play("wardDing");
-        G.damageNumber(enemy.x, enemy.y - enemy.h(), "ding!", G.DAMAGE_TYPES[enemy.ward.types[0]].color);
+        G.damageNumber(enemy.x, enemy.y - enemy.h(), `NEEDS ${needed.name.toUpperCase()}!`, needed.color);
+        if (!enemy.wardHintAt || G.state.time - enemy.wardHintAt > 1.5) {
+          enemy.wardHintAt = G.state.time;
+          G.ui.toast(`${needed.icon} Ward: use ${needed.name.toUpperCase()} damage`, 2);
+        }
         knockback(enemy, opts, 0.4);
         return false;
       }
@@ -41,7 +46,9 @@ G.combat = (() => {
       knockback(enemy, opts, 0.7);
       if (enemy.ward.hp <= 0) {
         G.sfx.play("wardBreak");
+        G.state.shake = Math.max(G.state.shake, 0.18);
         G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: G.DAMAGE_TYPES[type].color, dur: 0.45 });
+        burst(enemy.x, enemy.y - 6, G.DAMAGE_TYPES[type].color, 8);
         G.ui.toast("💥 Ward broken!");
         G.events.emit("wardBreak", { damageType: type, ability: opts.ability, enemy: enemy.id });
       }
@@ -51,7 +58,9 @@ G.combat = (() => {
     // Normal damage
     enemy.hp -= opts.damage;
     enemy.flash = 0.12;
+    G.state.shake = Math.max(G.state.shake, 0.06);
     G.sfx.play("hit");
+    burst(enemy.x, enemy.y - enemy.h() / 2, G.DAMAGE_TYPES[type].color, 3);
     G.damageNumber(enemy.x, enemy.y - enemy.h(), opts.damage, G.DAMAGE_TYPES[type].color);
     knockback(enemy, opts, 1);
 
@@ -87,7 +96,10 @@ G.combat = (() => {
 
   function killEnemy(enemy, opts) {
     enemy.dead = true;
+    G.sfx.play("defeat");
+    G.state.shake = Math.max(G.state.shake, enemy.def.heavy ? 0.3 : 0.14);
     G.spawnFx({ kind: "puff", x: enemy.x, y: enemy.y - 6, color: "#f4f4f4", dur: 0.35 });
+    burst(enemy.x, enemy.y - enemy.h() / 2, enemy.def.heavy ? "#ffcd75" : "#f4f4f4", enemy.def.heavy ? 14 : 7);
     G.events.emit("kill", {
       enemy: enemy.id,
       ability: opts.ability,
@@ -98,6 +110,21 @@ G.combat = (() => {
     const r = Math.random();
     if (r < 0.18) G.state.pickups.push({ kind: "heart", x: enemy.x, y: enemy.y, t: 0 });
     else if (r < 0.45) G.state.pickups.push({ kind: "mana", x: enemy.x, y: enemy.y, t: 0 });
+  }
+
+  function burst(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      const speed = 18 + Math.random() * 32;
+      G.spawnFx({
+        kind: "spark",
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color,
+        dur: 0.25 + Math.random() * 0.25,
+      });
+    }
   }
 
   /* ---------- statuses (poison, stun) ---------- */

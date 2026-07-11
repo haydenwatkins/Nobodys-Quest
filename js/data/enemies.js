@@ -222,3 +222,80 @@ registerEnemy({
     ],
   },
 });
+
+/* ---- THORNLING — a skittish plant that spits seeds ---- */
+registerEnemy({
+  id: "thornling",
+  name: "Thornling",
+  hp: 5, speed: 34, damage: 1,
+  behavior: "shooter", aggro: 120, shootEvery: 1.35,
+  shotColor: "#a7f070",
+  size: 12,
+  sprite: {
+    palette: { k: "#1a1c2c", g: "#38b764", l: "#a7f070", b: "#6b4a2b" },
+    frames: [
+      [
+        "....ll....",
+        "...lggl...",
+        "..kggggk..",
+        ".kglgglgk.",
+        ".kggkkggk.",
+        "..kggggk..",
+        "...kbbk...",
+        "..kb..bk..",
+        ".kk....kk.",
+      ],
+      [
+        "...ll.....",
+        "..lggl....",
+        ".kggggk...",
+        ".kglgglgk.",
+        ".kggkkggk.",
+        "..kggggk..",
+        "...kbbk...",
+        ".kb....bk.",
+        ".kk....kk.",
+      ],
+    ],
+  },
+});
+
+/* ---- PEBBLEBEAST — slow, heavy, and protected by a blunt ward ---- */
+registerEnemy({
+  id: "pebblebeast",
+  name: "Pebblebeast",
+  hp: 8, speed: 25, damage: 2,
+  behavior: "chase", aggro: 95,
+  size: 15,
+  heavy: true,
+  ward: { types: ["blunt"], hp: 3 },
+  sprite: {
+    palette: { k: "#1a1c2c", r: "#566c86", l: "#94b0c2", e: "#ffcd75" },
+    frames: [
+      [
+        "....kkkk....",
+        "..kkrrrrkk..",
+        ".krrlrrlrrk.",
+        "krrrrrrrrrrk",
+        "krreerrerrrk",
+        "krrrrrrrrrrk",
+        ".krrrllrrrk.",
+        "..krrrrrrk..",
+        "..kk....kk..",
+        ".kk......kk.",
+      ],
+      [
+        "....kkkk....",
+        "..kkrrrrkk..",
+        ".krrlrrlrrk.",
+        "krrrrrrrrrrk",
+        "krreerrerrrk",
+        "krrrrrrrrrrk",
+        ".krrrllrrrk.",
+        "..krrrrrrk..",
+        ".kk......kk.",
+        ".kk......kk.",
+      ],
+    ],
+  },
+});

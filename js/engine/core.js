@@ -85,7 +85,7 @@ G.util = {
 
 /* ---------- VISUAL EFFECTS ---------- */
 G.spawnFx = function (fx) {
-  // fx: {kind, x, y, ...extra}  kinds: "puff", "num", "slash", "ring", "bubble"
+  // fx: {kind, x, y, ...extra}  kinds: "puff", "num", "slash", "ring", "bubble", "spark"
   fx.t = 0;
   fx.dur = fx.dur || 0.4;
   G.fx.push(fx);

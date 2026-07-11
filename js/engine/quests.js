@@ -44,6 +44,43 @@ G.questProgress = function (q) {
   return G.questCounts[q.id] || 0;
 };
 
+G.questById = function (questId) {
+  for (const fid of G.formOrder) {
+    const form = G.forms[fid];
+    const quest = form && form.quests && form.quests.find((q) => q.id === questId);
+    if (quest) return { form, quest };
+  }
+  return null;
+};
+
+G.isQuestPinned = function (questId) {
+  return !!(G.state && G.state.pinnedQuestIds.includes(questId));
+};
+
+G.toggleQuestPin = function (questId) {
+  const pins = G.state.pinnedQuestIds;
+  const index = pins.indexOf(questId);
+  if (index >= 0) {
+    pins.splice(index, 1);
+    G.ui.toast("Quest removed from the HUD");
+  } else {
+    if (!G.questById(questId)) return;
+    if (pins.length >= 3) pins.shift();
+    pins.push(questId);
+    G.sfx.play("pickup");
+    G.ui.toast("Quest pinned to the HUD!");
+    G.events.emit("questPin", { quest: questId });
+  }
+  G.saveGame();
+};
+
+G.pinnedQuests = function () {
+  if (!G.state) return [];
+  // Old or edited form files can make a saved quest id disappear.
+  G.state.pinnedQuestIds = G.state.pinnedQuestIds.filter((id) => G.questById(id));
+  return G.state.pinnedQuestIds.map((id) => G.questById(id));
+};
+
 function questMatches(match, data) {
   if (!match) return true;
   for (const key in match) {

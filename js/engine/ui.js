@@ -80,6 +80,88 @@ G.ui = (() => {
     return lines;
   }
 
+  function fitText(c, text, maxW) {
+    if (c.measureText(text).width <= maxW) return text;
+    let out = text;
+    while (out.length > 4 && c.measureText(out + "…").width > maxW) out = out.slice(0, -1);
+    return out + "…";
+  }
+
+  function drawQuestTracker(c) {
+    const pins = G.pinnedQuests();
+    if (!pins.length) return;
+    const boxW = 132;
+    const x = G.W - boxW - 5;
+    const lineH = 12;
+    const y = 19;
+
+    c.fillStyle = "rgba(26,28,44,0.78)";
+    c.fillRect(x, y, boxW, 9 + pins.length * lineH);
+    c.fillStyle = "#ffcd75";
+    c.fillRect(x, y, boxW, 1);
+    c.font = `5px ${FONT_HEAD}`;
+    c.fillText("PINNED QUESTS", x + 4, y + 3);
+
+    c.font = `8px ${FONT_BODY}`;
+    pins.forEach(({ form, quest }, i) => {
+      const done = G.questsDone.includes(quest.id);
+      const progress = G.questProgress(quest);
+      const suffix = done ? "✓" : `${progress}/${quest.count}`;
+      const suffixW = c.measureText(suffix).width;
+      const label = fitText(c, `${form.icon} ${quest.text}`, boxW - suffixW - 12);
+      const rowY = y + 10 + i * lineH;
+      c.fillStyle = done ? "#a7f070" : "#f4f4f4";
+      c.fillText(label, x + 4, rowY);
+      c.fillStyle = done ? "#a7f070" : "#ffcd75";
+      c.fillText(suffix, x + boxW - suffixW - 4, rowY);
+    });
+  }
+
+  function drawTutorial(c) {
+    const prompt = G.tutorial && G.tutorial.prompt();
+    if (!prompt) return;
+    const boxW = 184;
+    const boxH = 24;
+    const x = Math.round((G.W - boxW) / 2);
+    const y = G.H - boxH - 5;
+    c.fillStyle = "rgba(26,28,44,0.9)";
+    c.fillRect(x, y, boxW, boxH);
+    c.fillStyle = "#73eff7";
+    c.fillRect(x, y, boxW, 1);
+    c.font = `6px ${FONT_HEAD}`;
+    c.fillStyle = "#73eff7";
+    c.fillText(prompt.title, x + 5, y + 4);
+    c.font = `9px ${FONT_BODY}`;
+    c.fillStyle = "#f4f4f4";
+    c.fillText(fitText(c, prompt.text, boxW - 10), x + 5, y + 12);
+  }
+
+  function drawWardHint(c, cam) {
+    const p = G.state.player;
+    let nearest = null;
+    let nearestDist = Infinity;
+    for (const enemy of G.state.enemies) {
+      if (enemy.dead || !enemy.ward || enemy.ward.hp <= 0) continue;
+      const dist = G.util.dist(p.x, p.y, enemy.x, enemy.y);
+      if (dist < 115 && dist < nearestDist) {
+        nearest = enemy;
+        nearestDist = dist;
+      }
+    }
+    if (!nearest) return;
+    const type = G.DAMAGE_TYPES[nearest.ward.types[0]];
+    const label = `${type.icon} ${type.name.toUpperCase()}`;
+    c.font = `7px ${FONT_BODY}`;
+    const w = c.measureText(label).width + 6;
+    const x = Math.round(G.util.clamp(nearest.x - cam.x - w / 2, 2, G.W - w - 2));
+    const y = Math.round(G.util.clamp(nearest.y - cam.y - nearest.def.size - 18, 2, G.H - 12));
+    c.fillStyle = "rgba(26,28,44,0.85)";
+    c.fillRect(x, y, w, 10);
+    c.fillStyle = type.color;
+    c.fillRect(x, y, 2, 10);
+    c.fillText(label, x + 4, y + 1);
+  }
+
   /* ---------- the on-screen HUD ---------- */
   function drawHUD(cam) {
     const c = uiCtx;
@@ -142,9 +224,13 @@ G.ui = (() => {
     c.fillStyle = "#ffcd75";
     c.fillText(starTxt, G.W - sw - 1, 8);
 
+    drawQuestTracker(c);
+    drawWardHint(c, cam);
+    drawTutorial(c);
+
     /* toasts (word-wrapped so long messages fit) */
     c.font = `9px ${FONT_BODY}`;
-    let ty = 40;
+    let ty = G.pinnedQuests().length ? 60 : 40;
     for (const t of toasts) {
       const alpha = t.t > t.dur - 0.3 ? (t.dur - t.t) / 0.3 : 1;
       c.globalAlpha = Math.max(0, alpha) * 0.95;
@@ -240,6 +326,7 @@ G.ui = (() => {
     menuOpen = true;
     buildMenu();
     menuEl.classList.remove("hidden");
+    G.events.emit("menuOpen", {});
   }
   function closeMenu() {
     menuOpen = false;
@@ -276,6 +363,8 @@ G.ui = (() => {
     // wire up clicks
     menuEl.querySelectorAll("[data-tab]").forEach((b) =>
       b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); }));
+    menuEl.querySelectorAll("[data-pin]").forEach((b) =>
+      b.addEventListener("click", () => { G.toggleQuestPin(b.dataset.pin); buildMenu(); }));
     menuEl.querySelectorAll("[data-become]").forEach((b) =>
       b.addEventListener("click", () => { G.setForm(b.dataset.become); buildMenu(); }));
     menuEl.querySelectorAll("select[data-slot]").forEach((sel) =>
@@ -327,7 +416,10 @@ G.ui = (() => {
         const done = G.questsDone.includes(q.id);
         html += `<div class="quest-row ${done ? "done" : ""}">
           <span>${done ? "✅" : "⬜"} ${q.text}</span>
-          <span class="prog">${done ? "⭐" : prog + "/" + q.count}</span>
+          <span class="quest-actions">
+            <span class="prog">${done ? "⭐" : prog + "/" + q.count}</span>
+            ${done ? "" : `<button data-pin="${q.id}" class="pin-btn ${G.isQuestPinned(q.id) ? "pinned" : ""}">${G.isQuestPinned(q.id) ? "UNPIN" : "PIN"}</button>`}
+          </span>
         </div>`;
       }
       html += `</div>`;

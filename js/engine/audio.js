@@ -8,6 +8,8 @@
 
 G.sfx = (() => {
   let ctx = null;
+  let musicTimer = null;
+  let musicStep = 0;
 
   // iPads refuse to play sound until the player touches the screen,
   // so we create the audio engine on the first input.
@@ -18,7 +20,28 @@ G.sfx = (() => {
       ctx = new AC();
     }
     if (ctx.state === "suspended") ctx.resume();
+    startMusic();
     return ctx;
+  }
+
+  function startMusic() {
+    if (!ctx || musicTimer) return;
+    const notes = [196, 247, 294, 247, 220, 262, 330, 262];
+    musicTimer = setInterval(() => {
+      if (!ctx || ctx.state !== "running" || document.hidden) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+      osc.type = musicStep % 4 === 0 ? "triangle" : "sine";
+      osc.frequency.setValueAtTime(notes[musicStep % notes.length], now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.025, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.45);
+      musicStep++;
+    }, 560);
   }
 
   // recipe: [wave, startPitch, endPitch, seconds, volume]
@@ -37,6 +60,7 @@ G.sfx = (() => {
     poison:    ["triangle", 250, 150, 0.15, 0.2],
     door:      ["triangle", 150, 300, 0.4,  0.35],
     ko:        ["sawtooth", 300, 50,  0.6,  0.4],
+    defeat:    ["triangle",  180, 520, 0.18, 0.28],
   };
 
   function play(name) {

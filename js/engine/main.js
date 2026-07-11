@@ -48,6 +48,7 @@
     opened: [],
     known: [],
     loadouts: {},
+    pinnedQuestIds: [],
     shake: 0,
     time: 0,
     entryPoint: { x: 0, y: 0 },
@@ -64,6 +65,7 @@
     s.opened = save.opened || [];
     s.known = save.known || [];
     s.loadouts = save.loadouts || {};
+    s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
     G.questCounts = save.questCounts || {};
     G.questsDone = save.questsDone || [];
     if (save.formId && G.forms[save.formId] && !G.forms[save.formId].invalid) s.formId = save.formId;
@@ -83,10 +85,7 @@
   }
 
   G.checkUnlocks(); // quietly registers starting forms as "known"
-
-  if (!save) {
-    G.ui.banner("👤 NOBODY'S QUEST", "Arrows/WASD to move · A to attack · ☰ for menu");
-  }
+  G.tutorial.init(save);
 
   /* ---------- the loop ---------- */
   let last = 0;
@@ -114,6 +113,7 @@
     s.shake = Math.max(0, s.shake - dt);
 
     G.updatePlayer(dt);
+    G.tutorial.update(dt);
     G.updateEnemies(dt);
     G.combat.updateProjectiles(dt);
     G.updatePickups(dt);
@@ -195,6 +195,12 @@
         case "bubble": {
           ctx.fillStyle = f.color;
           ctx.fillRect(Math.round(f.x), Math.round(f.y), 2, 2);
+          break;
+        }
+        case "spark": {
+          ctx.fillStyle = f.color;
+          const size = prog < 0.55 ? 2 : 1;
+          ctx.fillRect(Math.round(f.x), Math.round(f.y), size, size);
           break;
         }
       }
