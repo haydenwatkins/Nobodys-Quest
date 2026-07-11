@@ -124,8 +124,12 @@ G.input = (() => {
 
   if (isTouch) setupTouch();
 
-  // Stop iPad Safari from scrolling/rubber-banding the page
-  document.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
+  // Stop Safari from moving the game page, but leave scrollable overlays alone.
+  // Blocking every touchmove also blocks the pause menu on iPhone.
+  document.addEventListener("touchmove", (e) => {
+    if (e.target.closest("#menu, #workshop-errors")) return;
+    e.preventDefault();
+  }, { passive: false });
 
   /* ---------- public API ---------- */
   return {
