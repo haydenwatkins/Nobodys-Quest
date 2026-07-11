@@ -73,6 +73,9 @@
     G.questCounts = save.questCounts || {};
     G.questsDone = save.questsDone || [];
     if (save.formId && G.forms[save.formId] && !G.forms[save.formId].invalid) s.formId = save.formId;
+    // Progression rules can grow between releases. Forget knowledge of forms
+    // that are no longer earned so they announce properly when re-unlocked.
+    s.known = s.known.filter((id) => G.formUnlocked(id));
   }
   // if a form file got edited/broken since last save, fall back safely
   if (!G.formUnlocked(G.state.formId)) {
@@ -196,7 +199,19 @@
           ctx.strokeStyle = f.color;
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.arc(f.x, f.y, 3 + prog * 14, 0, Math.PI * 2);
+          ctx.arc(f.x, f.y, 3 + prog * (f.radius || 14), 0, Math.PI * 2);
+          ctx.stroke();
+          break;
+        }
+        case "bolt": {
+          ctx.strokeStyle = f.color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(f.x, f.y);
+          const mx = (f.x + f.x2) / 2 + Math.sin(f.t * 70) * 3;
+          const my = (f.y + f.y2) / 2 + Math.cos(f.t * 55) * 3;
+          ctx.lineTo(mx, my);
+          ctx.lineTo(f.x2, f.y2);
           ctx.stroke();
           break;
         }
