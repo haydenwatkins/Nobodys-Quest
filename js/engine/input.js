@@ -5,6 +5,8 @@
      G.input.vec           -> {x, y} movement direction (-1..1)
      G.input.held("a")     -> is the A button held right now?
      G.input.tapped("a")   -> was it pressed THIS frame? (auto-clears)
+     G.input.takeAim("a")  -> touch tap/drag aim released with that button
+     G.input.aiming         -> live drag direction for the on-screen guide
 
    Buttons: "a" "b" "c" (abilities), "swap" (change form),
             "pause" (menu)
@@ -17,6 +19,8 @@ G.input = (() => {
   const taps = {};
   const keyVec = { x: 0, y: 0 };
   const joyVec = { x: 0, y: 0 };
+  const releasedAims = {};
+  let liveAim = null;
 
   function press(btn) {
     if (!held[btn]) taps[btn] = true;
@@ -110,15 +114,63 @@ G.input = (() => {
       joyVec.y = Math.abs(dy) > 8 ? dy / RADIUS : 0;
     }
 
-    /* ---------- touch buttons ---------- */
-    const btns = { "btn-a": "a", "btn-b": "b", "btn-c": "c", "btn-swap": "swap", "btn-pause": "pause" };
-    for (const [id, btn] of Object.entries(btns)) {
+    /* ---------- touch ability buttons: tap to auto-aim, drag to aim ---------- */
+    const abilityBtns = { "btn-a": "a", "btn-b": "b", "btn-c": "c" };
+    for (const [id, btn] of Object.entries(abilityBtns)) {
+      const el = document.getElementById(id);
+      let pointerId = null, startX = 0, startY = 0;
+      const DEAD_ZONE = 12;
+
+      el.addEventListener("pointerdown", (e) => {
+        if (pointerId !== null || liveAim !== null) return;
+        e.preventDefault();
+        pointerId = e.pointerId;
+        startX = e.clientX; startY = e.clientY;
+        el.setPointerCapture(e.pointerId);
+        el.classList.add("held");
+        liveAim = { btn, x: 0, y: 0, dragged: false };
+        G.sfx.ensure();
+      });
+      el.addEventListener("pointermove", (e) => {
+        if (e.pointerId !== pointerId) return;
+        let dx = e.clientX - startX, dy = e.clientY - startY;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len < DEAD_ZONE) {
+          liveAim = { btn, x: 0, y: 0, dragged: false };
+          return;
+        }
+        dx /= len; dy /= len;
+        liveAim = { btn, x: dx, y: dy, dragged: true };
+      });
+      const finishAim = (e, fire) => {
+        if (e.pointerId !== pointerId) return;
+        if (e.cancelable) e.preventDefault();
+        if (fire) {
+          releasedAims[btn] = liveAim && liveAim.btn === btn
+            ? { x: liveAim.x, y: liveAim.y, dragged: liveAim.dragged }
+            : { x: 0, y: 0, dragged: false };
+        }
+        pointerId = null;
+        liveAim = null;
+        el.classList.remove("held");
+        if (fire) { press(btn); release(btn); }
+      };
+      el.addEventListener("pointerup", (e) => finishAim(e, true));
+      el.addEventListener("pointercancel", (e) => finishAim(e, false));
+      // Pointer capture is reliable on current iOS/Android, but this fallback
+      // also covers embedded browsers that drop capture during a long drag.
+      window.addEventListener("pointerup", (e) => finishAim(e, true));
+      window.addEventListener("pointercancel", (e) => finishAim(e, false));
+    }
+
+    /* ---------- simple touch buttons fire as soon as they are tapped ---------- */
+    const simpleBtns = { "btn-swap": "swap", "btn-pause": "pause" };
+    for (const [id, btn] of Object.entries(simpleBtns)) {
       const el = document.getElementById(id);
       el.addEventListener("pointerdown", (e) => { e.preventDefault(); el.classList.add("held"); press(btn); });
       const up = (e) => { e.preventDefault(); el.classList.remove("held"); release(btn); };
       el.addEventListener("pointerup", up);
       el.addEventListener("pointercancel", up);
-      el.addEventListener("pointerleave", up);
     }
   }
 
@@ -145,7 +197,16 @@ G.input = (() => {
       if (taps[btn]) { taps[btn] = false; return true; }
       return false;
     },
-    clearTaps() { for (const k in taps) taps[k] = false; },
+    takeAim(btn) {
+      const aim = releasedAims[btn] || null;
+      delete releasedAims[btn];
+      return aim;
+    },
+    get aiming() { return liveAim; },
+    clearTaps() {
+      for (const k in taps) taps[k] = false;
+      for (const k in releasedAims) delete releasedAims[k];
+    },
     isTouch,
   };
 })();
