@@ -74,6 +74,13 @@ G.toggleQuestPin = function (questId) {
   G.saveGame();
 };
 
+G.clearQuestPins = function () {
+  if (!G.state || !G.state.pinnedQuestIds.length) return;
+  G.state.pinnedQuestIds.length = 0;
+  G.ui.toast("All quests removed from the HUD");
+  G.saveGame();
+};
+
 G.pinnedQuests = function () {
   if (!G.state) return [];
   // Old or edited form files can make a saved quest id disappear.
@@ -114,6 +121,8 @@ G.events.on("*", (type, data) => {
 
       if (prog >= q.count) {
         G.questsDone.push(q.id);
+        const pinIndex = G.state.pinnedQuestIds.indexOf(q.id);
+        if (pinIndex >= 0) G.state.pinnedQuestIds.splice(pinIndex, 1);
         G.state.stars += 1;
         G.sfx.play("quest");
         G.ui.banner(`⭐ QUEST DONE! ${f.icon} ${f.name} is now level ${G.formLevel(fid)}!`, q.text);

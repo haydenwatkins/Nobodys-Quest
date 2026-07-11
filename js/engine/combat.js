@@ -112,10 +112,35 @@ G.combat = (() => {
       damageType: opts.type,
       poisoned: !!(enemy.status && enemy.status.poison),
     });
+    if (enemy.def.miniboss) awardMinibossTrophy(enemy);
     // Little rewards sometimes drop
+    if (enemy.def.miniboss) {
+      G.state.pickups.push({ kind: "heart", x: enemy.x - 6, y: enemy.y, t: 0 });
+      G.state.pickups.push({ kind: "mana", x: enemy.x + 6, y: enemy.y, t: 0 });
+      return;
+    }
     const r = Math.random();
     if (r < 0.18) G.state.pickups.push({ kind: "heart", x: enemy.x, y: enemy.y, t: 0 });
     else if (r < 0.45) G.state.pickups.push({ kind: "mana", x: enemy.x, y: enemy.y, t: 0 });
+  }
+
+  function awardMinibossTrophy(enemy) {
+    const trophy = enemy.def.trophy;
+    if (!trophy) return;
+    G.state.items = G.state.items || [];
+    if (G.state.items.includes(trophy)) {
+      G.ui.toast(`${enemy.def.name} defeated again!`);
+      return;
+    }
+    G.state.items.push(trophy);
+    G.state.stars += 1;
+    G.sfx.play("quest");
+    G.state.shake = Math.max(G.state.shake, 0.45);
+    burst(enemy.x, enemy.y - enemy.h() / 2, "#ffcd75", 24);
+    G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, `${enemy.def.trophyName} found · +1 ⭐`);
+    G.events.emit("pickup", { item: trophy });
+    G.checkUnlocks();
+    G.saveGame();
   }
 
   function burst(x, y, color, count) {

@@ -342,9 +342,20 @@ G.drawEnemy = function (ctx, e) {
     ctx.globalAlpha = 1;
   }
 
-  // hp bar once damaged
-  if (e.hp < e.def.hp) {
-    const w = e.def.size;
+  // Minibosses keep a gold crown and health bar visible so players know
+  // they have found something special before the first hit lands.
+  if (e.def.miniboss) {
+    const cy = Math.round(e.y - e.def.size - 11);
+    ctx.fillStyle = "#ffcd75";
+    ctx.fillRect(Math.round(e.x - 5), cy, 3, 3);
+    ctx.fillRect(Math.round(e.x - 1), cy - 2, 3, 5);
+    ctx.fillRect(Math.round(e.x + 3), cy, 3, 3);
+    ctx.fillRect(Math.round(e.x - 5), cy + 3, 11, 2);
+  }
+
+  // Normal health bars appear once damaged; miniboss bars are always visible.
+  if (e.def.miniboss || e.hp < e.def.hp) {
+    const w = e.def.miniboss ? Math.max(24, e.def.size + 6) : e.def.size;
     const frac = Math.max(0, e.hp / e.def.hp);
     ctx.fillStyle = "#1a1c2c";
     ctx.fillRect(Math.round(e.x - w / 2), Math.round(e.y - e.def.size - 6), w, 2);

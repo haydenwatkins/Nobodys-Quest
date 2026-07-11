@@ -193,6 +193,11 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
   font-size: 8px;
 }
 .form-card .pin-btn.pinned { background: #73eff7; color: #1a1c2c; }
+.pin-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-color: #73eff7; }
+.pin-summary h2 { margin: 0; }
+.form-card .clear-pins { margin: 0; border-color: #73eff7; background: #333c57; color: #73eff7; }
+.trophy-card { border-color: #ffcd75; }
+.trophy-place { color: #94b0c2; white-space: nowrap; }
 
 .slot-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 20px; flex-wrap: wrap; }
 .slot-row .slot-label { width: 84px; color: #94b0c2; }
@@ -292,6 +297,8 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
   .quest-row .prog { margin-left: auto; }
   .quest-actions { width: 100%; justify-content: flex-end; }
   .form-card .pin-btn { min-height: 38px; }
+  .pin-summary { align-items: stretch; flex-direction: column; }
+  .form-card .clear-pins { width: 100%; }
 
   .slot-row { align-items: stretch; flex-direction: column; }
   .slot-row .slot-label { width: auto; }
