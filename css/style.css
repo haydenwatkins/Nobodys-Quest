@@ -208,6 +208,11 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
   position: sticky;
   bottom: calc(-16px - env(safe-area-inset-bottom));
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
   text-align: center;
   margin: 16px calc(-16px - env(safe-area-inset-right)) 0 calc(-16px - env(safe-area-inset-left));
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
@@ -216,9 +221,10 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
 }
 .menu-footer button {
   font-size: 12px;
-  padding: 12px 20px; border-radius: 10px; margin: 0 6px 8px;
+  padding: 12px 20px; border-radius: 10px; margin: 0;
   border: 2px solid #ffcd75; background: #ffcd75; color: #1a1c2c;
 }
+.menu-footer button.fullscreen-btn { border-color: #73eff7; background: #333c57; color: #73eff7; }
 .menu-footer button.danger { border-color: #b13e53; background: transparent; color: #b13e53; font-size: 9px; padding: 8px 10px; }
 
 /* ---------- Form Workshop (validation errors for Ben) ---------- */
@@ -295,8 +301,12 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
     bottom: calc(-16px - env(safe-area-inset-bottom));
     margin-right: calc(-10px - env(safe-area-inset-right));
     margin-left: calc(-10px - env(safe-area-inset-left));
+    padding: 6px calc(8px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));
+    gap: 6px;
+    flex-wrap: nowrap;
   }
-  .menu-footer button:not(.danger) { width: min(100%, 360px); margin-inline: 0; }
+  .menu-footer button { flex: 1 1 0; min-width: 0; padding: 8px 6px; font-size: 9px; }
+  .menu-footer button.danger { flex: 0 0 auto; min-width: 58px; padding: 8px 6px; }
 
   #workshop-errors {
     padding: calc(12px + env(safe-area-inset-top))

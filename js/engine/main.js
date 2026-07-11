@@ -32,6 +32,8 @@
   }
   window.addEventListener("resize", resize);
   if (window.visualViewport) window.visualViewport.addEventListener("resize", resize);
+  document.addEventListener("fullscreenchange", resize);
+  document.addEventListener("webkitfullscreenchange", resize);
   resize();
 
   document.addEventListener("contextmenu", (e) => e.preventDefault());
