@@ -53,6 +53,9 @@
     pinnedQuestIds: [],
     town: G.makeTown(),
     shake: 0,
+    hitStop: 0,
+    cameraKickX: 0,
+    cameraKickY: 0,
     time: 0,
     entryPoint: { x: 0, y: 0 },
     lastSign: null,
@@ -120,8 +123,22 @@
 
   function update(dt) {
     const s = G.state;
-    s.time += dt;
     s.shake = Math.max(0, s.shake - dt);
+    s.cameraKickX *= Math.pow(0.002, dt);
+    s.cameraKickY *= Math.pow(0.002, dt);
+    if (Math.abs(s.cameraKickX) < 0.05) s.cameraKickX = 0;
+    if (Math.abs(s.cameraKickY) < 0.05) s.cameraKickY = 0;
+
+    // A very short shared impact pause lets the eye register a hit. Input is
+    // deliberately not cleared here, so the player never loses a button tap.
+    if (s.hitStop > 0) {
+      s.hitStop = Math.max(0, s.hitStop - dt);
+      G.updateFx(dt * 0.12);
+      G.ui.update(dt);
+      return;
+    }
+
+    s.time += dt;
 
     G.updatePlayer(dt);
     G.tutorial.update(dt);
@@ -145,6 +162,8 @@
     const maxY = Math.max(0, s.mapH * G.TILE - G.H);
     let camX = Math.round(G.util.clamp(p.x - G.W / 2, 0, maxX));
     let camY = Math.round(G.util.clamp(p.y - G.H / 2 - 4, 0, maxY));
+    camX += Math.round(s.cameraKickX);
+    camY += Math.round(s.cameraKickY);
     if (s.shake > 0) {
       camX += Math.round((Math.random() - 0.5) * s.shake * 10);
       camY += Math.round((Math.random() - 0.5) * s.shake * 10);
@@ -189,7 +208,7 @@
         // "num" (damage numbers) are drawn by ui.js on the sharp text layer
         case "slash": {
           ctx.strokeStyle = f.color;
-          ctx.lineWidth = 2;
+          ctx.lineWidth = prog < 0.45 ? (f.weight || 3) : 1;
           const r = f.range * (0.7 + prog * 0.3);
           ctx.beginPath();
           ctx.arc(f.x, f.y, r, f.angle - f.arc / 2, f.angle + f.arc / 2);
@@ -202,6 +221,18 @@
           ctx.beginPath();
           ctx.arc(f.x, f.y, 3 + prog * (f.radius || 14), 0, Math.PI * 2);
           ctx.stroke();
+          break;
+        }
+        case "impact": {
+          const r = (f.size || 3) * (0.6 + prog * 0.7);
+          ctx.strokeStyle = f.color;
+          ctx.lineWidth = prog < 0.5 ? 2 : 1;
+          ctx.beginPath();
+          ctx.moveTo(f.x - r, f.y); ctx.lineTo(f.x + r, f.y);
+          ctx.moveTo(f.x, f.y - r); ctx.lineTo(f.x, f.y + r);
+          ctx.stroke();
+          ctx.fillStyle = "#f4f4f4";
+          ctx.fillRect(Math.round(f.x), Math.round(f.y), 1, 1);
           break;
         }
         case "bolt": {

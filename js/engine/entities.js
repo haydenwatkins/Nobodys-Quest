@@ -17,6 +17,8 @@ G.makePlayer = function () {
     damageTaken: 0,            // hearts lost (max hearts comes from the form)
     mana: 6, manaMax: 10,
     cooldowns: {},             // abilityId -> seconds left
+    abilityBuffer: {},         // button -> recent tap waiting on cooldown
+    attackPose: null,
     swapCd: 0,
     dashing: null,
     lastSafe: null,
@@ -84,6 +86,10 @@ G.updatePlayer = function (dt) {
 
   p.invuln = Math.max(0, p.invuln - dt);
   p.swapCd = Math.max(0, p.swapCd - dt);
+  if (p.attackPose) {
+    p.attackPose.t -= dt;
+    if (p.attackPose.t <= 0) p.attackPose = null;
+  }
   for (const k in p.cooldowns) p.cooldowns[k] = Math.max(0, p.cooldowns[k] - dt);
 
   /* --- dashing overrides normal movement --- */
@@ -104,6 +110,7 @@ G.updatePlayer = function (dt) {
             damage: d.damage, type: d.type, ability: d.ability,
             breaksAnyWard: d.breaksAnyWard,
             fromX: beforeX, fromY: beforeY,
+            hitStop: d.hitStop, shake: d.shake,
           });
         }
       }
@@ -125,13 +132,26 @@ G.updatePlayer = function (dt) {
   /* --- abilities: A / B / C --- */
   const loadout = G.getLoadout(G.state.formId);
   const buttons = ["a", "b", "c"];
+  // A tap just before cooldown ends waits briefly instead of disappearing.
+  // This makes a fast rhythm reliable on both touchscreens and keyboards.
+  for (const button of buttons) {
+    if (G.input.tapped(button)) {
+      p.abilityBuffer[button] = { t: 0.12, aim: G.input.takeAim(button) };
+    } else if (p.abilityBuffer[button]) {
+      p.abilityBuffer[button].t -= dt;
+      if (p.abilityBuffer[button].t <= 0) delete p.abilityBuffer[button];
+    }
+  }
   for (let slot = 0; slot < buttons.length; slot++) {
-    if (!G.input.tapped(buttons[slot])) continue;
-    const touchAim = G.input.takeAim(buttons[slot]);
+    const button = buttons[slot];
+    const buffered = p.abilityBuffer[button];
+    if (!buffered) continue;
+    const touchAim = buffered.aim;
     const abilityId = loadout[slot];
-    if (!abilityId) continue;
+    if (!abilityId) { delete p.abilityBuffer[button]; continue; }
     const ab = G.abilities[abilityId];
-    if (!ab) continue;
+    if (!ab) { delete p.abilityBuffer[button]; continue; }
+    if ((p.cooldowns[abilityId] || 0) > 0) continue;
     if (touchAim && touchAim.dragged) {
       p.dir = { x: touchAim.x, y: touchAim.y };
     } else if (touchAim && ab.autoAim) {
@@ -146,11 +166,12 @@ G.updatePlayer = function (dt) {
         G.ui.toast("🎯 Tap ranged attacks to auto-aim · drag to aim yourself", 3.5);
       }
     }
-    if ((p.cooldowns[abilityId] || 0) > 0) continue;
     if (ab.mana > p.mana) {
       G.ui.toast("💧 Not enough mana — smack things with A to refill!", 1.5);
+      delete p.abilityBuffer[button];
       continue;
     }
+    delete p.abilityBuffer[button];
     p.mana -= ab.mana;
     p.cooldowns[abilityId] = ab.cooldown;
     ab.use(p);
@@ -193,6 +214,7 @@ G.makeEnemy = function (id, x, y) {
     shootT: 1 + Math.random(),
     touchCd: 0,
     kbx: 0, kby: 0,
+    hitKickX: 0, hitKickY: 0,
     flash: 0,
     dead: false,
     status: null,
@@ -209,6 +231,10 @@ G.updateEnemies = function (dt) {
     if (e.dead) { s.enemies.splice(i, 1); continue; }
 
     e.flash = Math.max(0, e.flash - dt);
+    e.hitKickX *= Math.pow(0.001, dt);
+    e.hitKickY *= Math.pow(0.001, dt);
+    if (Math.abs(e.hitKickX) < 0.05) e.hitKickX = 0;
+    if (Math.abs(e.hitKickY) < 0.05) e.hitKickY = 0;
     e.touchCd = Math.max(0, e.touchCd - dt);
     e.anim += dt * 4;
     G.combat.updateStatuses(e, dt);
@@ -344,7 +370,10 @@ G.drawPlayer = function (ctx) {
   G.drawPlayerAura(ctx, p, form);
   G.drawShadow(ctx, p.x, p.y, 10);
   const frame = p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0;
-  G.drawSprite(ctx, form.sprite, frame, p.x, p.y, p.dir.x < 0);
+  const poseScale = p.attackPose ? p.attackPose.t / p.attackPose.dur : 0;
+  const drawX = p.x + (p.attackPose ? p.attackPose.x * poseScale : 0);
+  const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0);
+  G.drawSprite(ctx, form.sprite, frame, drawX, drawY, p.dir.x < 0);
 };
 
 G.drawAimGuide = function (ctx) {
@@ -380,15 +409,17 @@ G.drawAimGuide = function (ctx) {
 G.drawEnemy = function (ctx, e) {
   G.drawShadow(ctx, e.x, e.y, e.def.size - 2);
   const frame = Math.floor(e.anim) % 2;
+  const drawX = e.x + (e.hitKickX || 0);
+  const drawY = e.y + (e.hitKickY || 0);
 
   if (e.flash > 0) {
     // white flash when hurt — redraw sprite silhouette in white
     ctx.save();
     ctx.filter = "brightness(3) grayscale(1)";
-    G.drawSprite(ctx, e.def.sprite, frame, e.x, e.y, e.dir.x < 0);
+    G.drawSprite(ctx, e.def.sprite, frame, drawX, drawY, e.dir.x < 0);
     ctx.restore();
   } else {
-    G.drawSprite(ctx, e.def.sprite, frame, e.x, e.y, e.dir.x < 0);
+    G.drawSprite(ctx, e.def.sprite, frame, drawX, drawY, e.dir.x < 0);
   }
 
   // poison bubbles tint
@@ -461,10 +492,19 @@ G.drawPickups = function (ctx) {
 
 G.drawProjectiles = function (ctx) {
   for (const pr of G.state.projectiles) {
+    const trail = pr.trail || [];
+    ctx.save();
+    for (let i = trail.length - 1; i >= 0; i--) {
+      const point = trail[i];
+      ctx.globalAlpha = 0.12 + (trail.length - i) / Math.max(1, trail.length) * 0.35;
+      ctx.fillStyle = pr.color;
+      ctx.fillRect(Math.round(point.x), Math.round(point.y - 4), 1, 1);
+    }
+    ctx.restore();
     ctx.fillStyle = pr.color;
     const s = pr.size;
     ctx.fillRect(Math.round(pr.x - s / 2), Math.round(pr.y - 4 - s / 2), s, s);
-    ctx.fillStyle = "rgba(244,244,244,0.6)";
-    ctx.fillRect(Math.round(pr.x - pr.vx * 0.02), Math.round(pr.y - 4 - pr.vy * 0.02), 1, 1);
+    ctx.fillStyle = "rgba(244,244,244,0.75)";
+    ctx.fillRect(Math.round(pr.x), Math.round(pr.y - 4), 1, 1);
   }
 };

@@ -26,6 +26,12 @@ const G = {
   // Visual effects (particles, floating numbers, slashes)
   fx: [],
 
+  // Keep accessibility preferences respected while still allowing the
+  // non-camera parts of impact feedback (sound, sparks, hit pause).
+  reducedMotion: typeof window !== "undefined" && window.matchMedia
+    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    : false,
+
   // Problems found while validating forms (shown in the Form Workshop panel)
   workshopErrors: [],
 };
@@ -85,7 +91,8 @@ G.util = {
 
 /* ---------- VISUAL EFFECTS ---------- */
 G.spawnFx = function (fx) {
-  // fx: {kind, x, y, ...extra}  kinds: "puff", "num", "slash", "ring", "bubble", "spark"
+  // fx: {kind, x, y, ...extra}  kinds include puff, num, slash,
+  // ring, bubble, spark, bolt, and impact.
   fx.t = 0;
   fx.dur = fx.dur || 0.4;
   G.fx.push(fx);

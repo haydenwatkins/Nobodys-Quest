@@ -10,6 +10,7 @@ G.sfx = (() => {
   let ctx = null;
   let musicTimer = null;
   let musicStep = 0;
+  const recent = {};
 
   // iPads refuse to play sound until the player touches the screen,
   // so we create the audio engine on the first input.
@@ -61,25 +62,67 @@ G.sfx = (() => {
     door:      ["triangle", 150, 300, 0.4,  0.35],
     ko:        ["sawtooth", 300, 50,  0.6,  0.4],
     defeat:    ["triangle",  180, 520, 0.18, 0.28],
+    explosion: ["sawtooth", 120, 45,  0.18, 0.25],
   };
 
-  function play(name) {
+  function tone(recipe, pitch, volumeScale, delay) {
     const c = ensure();
     if (!c) return;
-    const r = recipes[name];
-    if (!r) return;
-    const [wave, f0, f1, dur, vol] = r;
+    const [wave, f0, f1, dur, vol] = recipe;
     const osc = c.createOscillator();
     const gain = c.createGain();
+    const start = c.currentTime + (delay || 0);
     osc.type = wave;
-    osc.frequency.setValueAtTime(f0, c.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(Math.max(f1, 1), c.currentTime + dur);
-    gain.gain.setValueAtTime(vol, c.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+    osc.frequency.setValueAtTime(f0 * (pitch || 1), start);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(f1 * (pitch || 1), 1), start + dur);
+    gain.gain.setValueAtTime(vol * (volumeScale || 1), start);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
     osc.connect(gain).connect(c.destination);
-    osc.start();
-    osc.stop(c.currentTime + dur + 0.02);
+    osc.start(start);
+    osc.stop(start + dur + 0.02);
   }
 
-  return { play, ensure };
+  function play(name) {
+    const recipe = recipes[name];
+    if (recipe) tone(recipe, 0.98 + Math.random() * 0.04, 1, 0);
+  }
+
+  function allowed(key, gap) {
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    if (recent[key] && now - recent[key] < (gap || 28)) return false;
+    recent[key] = now;
+    return true;
+  }
+
+  const attackTones = {
+    sharp: ["square", 560, 260, 0.055, 0.11],
+    blunt: ["triangle", 190, 105, 0.075, 0.14],
+    light: ["sine", 620, 920, 0.075, 0.11],
+    dark: ["sawtooth", 260, 145, 0.095, 0.10],
+  };
+  const impactTones = {
+    sharp: ["square", 330, 120, 0.065, 0.15],
+    blunt: ["triangle", 145, 58, 0.085, 0.19],
+    light: ["sine", 740, 390, 0.085, 0.14],
+    dark: ["sawtooth", 205, 70, 0.105, 0.14],
+  };
+
+  // Attack and impact are separate layers: anticipation says what the move
+  // is, while contact supplies weight. Type-specific timbre makes the four
+  // ward interactions readable even on a small screen.
+  function attack(kind, type, power) {
+    if (!allowed(`attack:${kind}:${type}`)) return;
+    const strength = Math.min(1.3, 0.8 + (power || 1) * 0.12);
+    tone(attackTones[type] || attackTones.blunt, 1, strength, 0);
+    if (kind === "dash") tone(["sawtooth", 160, 420, 0.09, 0.07], 1, strength, 0.012);
+  }
+
+  function impact(type, power) {
+    if (!allowed(`impact:${type}`, 20)) return;
+    const strength = Math.min(1.35, 0.72 + (power || 1) * 0.16);
+    tone(impactTones[type] || impactTones.blunt, 1, strength, 0);
+    tone(["sine", 92, 46, 0.075, 0.11], 1, strength, 0.004);
+  }
+
+  return { play, ensure, attack, impact };
 })();

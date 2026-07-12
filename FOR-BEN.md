@@ -110,6 +110,19 @@ one cast should only damage each enemy once (Fire Breath does this).
 Change `range`, `damage`, `speed`, add a `status` like poison or stun,
 or call `shoot` three times like Triple Shot does. Mix and match!
 
+### Making an ability feel good
+
+The combat helpers add a short hit pause, damage-type sound, recoil,
+sparks, and camera kick automatically. You can tune the personality of
+a move without changing its power:
+
+- Melee: `lunge` (sprite lean), `weight` (arc thickness), `hitStop`, `shake`
+- Projectiles: `recoil`, `trail` (2-6 works well), `hitStop`, `shake`
+
+Keep `hitStop` subtle: about `0.02` for quick moves, `0.04` for heavy
+moves, and only around `0.05` for the biggest impacts. The goal is a
+crisp moment of contact, not a pause the player notices as lag.
+
 ## 🎨 Drawing sprites
 
 A sprite is just letters — each letter is a pixel, `.` is see-through:

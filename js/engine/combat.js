@@ -25,6 +25,39 @@ G.combat = (() => {
     return user === G.state.player && G.playerForm && G.playerForm().breaksAnyWard;
   }
 
+  function attackPose(user, facing, amount, dur) {
+    if (user !== G.state.player) return;
+    user.attackPose = {
+      x: Math.cos(facing) * amount,
+      y: Math.sin(facing) * amount,
+      t: dur || 0.09,
+      dur: dur || 0.09,
+    };
+  }
+
+  function impactFeedback(enemy, opts, color) {
+    const power = opts.damage || 1;
+    const stop = opts.hitStop === undefined
+      ? (power >= 3 ? 0.05 : power >= 2 ? 0.038 : 0.025)
+      : opts.hitStop;
+    const fx = opts.fromX !== undefined ? opts.fromX : G.state.player.x;
+    const fy = opts.fromY !== undefined ? opts.fromY : G.state.player.y;
+    const a = G.util.angleTo(fx, fy, enemy.x, enemy.y);
+    const kick = Math.min(3.2, 1.1 + power * 0.65);
+
+    G.state.hitStop = Math.max(G.state.hitStop || 0, stop);
+    G.state.shake = Math.max(G.state.shake, opts.shake === undefined ? 0.09 + power * 0.025 : opts.shake);
+    enemy.hitKickX = Math.cos(a) * kick;
+    enemy.hitKickY = Math.sin(a) * kick;
+    if (!G.reducedMotion) {
+      G.state.cameraKickX = G.util.clamp((G.state.cameraKickX || 0) + Math.cos(a) * kick, -4, 4);
+      G.state.cameraKickY = G.util.clamp((G.state.cameraKickY || 0) + Math.sin(a) * kick, -4, 4);
+    }
+    G.sfx.impact(opts.type || "blunt", power);
+    G.spawnFx({ kind: "impact", x: enemy.x, y: enemy.y - enemy.h() / 2, color, size: 2 + power, dur: 0.12 });
+    burst(enemy.x, enemy.y - enemy.h() / 2, color, 4 + power * 2);
+  }
+
   function damageEnemy(enemy, opts) {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
@@ -48,12 +81,13 @@ G.combat = (() => {
       }
       // Right type — chip the ward
       enemy.ward.hp -= opts.damage;
-      G.sfx.play("hit");
       G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "GOD!" : opts.damage, wardHitColor);
       knockback(enemy, opts, 0.7);
+      impactFeedback(enemy, { ...opts, hitStop: Math.min(opts.hitStop || 0.025, 0.025), shake: 0.08 }, wardHitColor);
       if (enemy.ward.hp <= 0) {
         G.sfx.play("wardBreak");
         G.state.shake = Math.max(G.state.shake, 0.18);
+        G.state.hitStop = Math.max(G.state.hitStop, 0.05);
         G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: wardHitColor, dur: 0.45 });
         burst(enemy.x, enemy.y - 6, wardHitColor, 8);
         G.ui.toast("💥 Ward broken!");
@@ -65,11 +99,9 @@ G.combat = (() => {
     // Normal damage
     enemy.hp -= opts.damage;
     enemy.flash = 0.12;
-    G.state.shake = Math.max(G.state.shake, 0.06);
-    G.sfx.play("hit");
-    burst(enemy.x, enemy.y - enemy.h() / 2, G.DAMAGE_TYPES[type].color, 3);
     G.damageNumber(enemy.x, enemy.y - enemy.h(), opts.damage, G.DAMAGE_TYPES[type].color);
     knockback(enemy, opts, 1);
+    impactFeedback(enemy, opts, G.DAMAGE_TYPES[type].color);
 
     // Attacking is how you refill mana (just like the real game —
     // it keeps players aggressive instead of hiding).
@@ -203,6 +235,8 @@ G.combat = (() => {
     const range = o.range || 20;
     const arc = ((o.arcDeg || 100) * Math.PI) / 180;
     const facing = Math.atan2(user.dir.y, user.dir.x);
+    attackPose(user, facing, o.lunge === undefined ? 2 : o.lunge, 0.09);
+    G.sfx.attack("melee", o.type || "blunt", o.damage || 1);
     let hits = 0;
     for (const e of G.state.enemies) {
       if (e.dead) continue;
@@ -215,12 +249,14 @@ G.combat = (() => {
         knockback: o.knockback, status: o.status,
         breaksAnyWard: breaksAnyWard(user),
         fromX: user.x, fromY: user.y,
+        hitStop: o.hitStop, shake: o.shake,
       })) hits++;
     }
     G.spawnFx({
       kind: "slash", x: user.x, y: user.y - 6,
       angle: facing, range, arc,
       color: o.color || G.DAMAGE_TYPES[o.type || "blunt"].color,
+      weight: o.weight,
       dur: 0.15,
     });
     if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits });
@@ -232,6 +268,7 @@ G.combat = (() => {
   //  spreadDeg, explodeRadius, explodeDamage, hitGroup}
   function shoot(user, o) {
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
+    attackPose(user, facing + Math.PI, o.recoil === undefined ? 1.5 : o.recoil, 0.08);
     G.state.projectiles.push({
       x: user.x, y: user.y - 6,
       vx: Math.cos(facing) * (o.speed || 160),
@@ -247,12 +284,23 @@ G.combat = (() => {
       explodeRadius: o.explodeRadius || 0,
       explodeDamage: o.explodeDamage,
       hitGroup: o.hitGroup,
+      hitStop: o.hitStop,
+      shake: o.shake,
+      trail: [],
+      trailLength: o.trail === undefined ? Math.min(6, 2 + (o.size || 3)) : o.trail,
       breaksAnyWard: breaksAnyWard(user),
       startX: user.x, startY: user.y,
       range: o.range || 130,
       fromPlayer: true,
     });
-    G.sfx.play("shoot");
+    G.spawnFx({
+      kind: "puff",
+      x: user.x + Math.cos(facing) * 5,
+      y: user.y - 6 + Math.sin(facing) * 5,
+      color: o.color || G.DAMAGE_TYPES[o.type || "sharp"].color,
+      dur: 0.12,
+    });
+    G.sfx.attack("shoot", o.type || "sharp", o.damage || 1);
   }
 
   // Jump to nearby enemies one by one. Low per-target damage keeps this
@@ -263,6 +311,8 @@ G.combat = (() => {
     const maxTargets = o.maxTargets || 4;
     const color = o.color || G.DAMAGE_TYPES[o.type || "light"].color;
     const facing = Math.atan2(user.dir.y, user.dir.x);
+    attackPose(user, facing + Math.PI, 1, 0.08);
+    G.sfx.attack("chain", o.type || "light", o.damage || 1);
     const available = G.state.enemies.filter((e) => {
       if (e.dead) return false;
       const d = G.util.dist(user.x, user.y, e.x, e.y);
@@ -281,6 +331,8 @@ G.combat = (() => {
         damage: o.damage || 1, type: o.type, ability: o.ability,
         knockback: o.knockback || 35, status: o.status,
         breaksAnyWard: breaksAnyWard(user), fromX, fromY,
+        hitStop: o.hitStop === undefined ? 0.02 : o.hitStop,
+        shake: o.shake,
       })) hits++;
       G.spawnFx({ kind: "bolt", x: fromX, y: fromY, x2: current.x, y2: current.y - 5, color, dur: 0.22 });
       fromX = current.x; fromY = current.y - 5;
@@ -310,9 +362,11 @@ G.combat = (() => {
       breaksAnyWard: breaksAnyWard(user),
       hitSet: new Set(),
       color: o.color || "#f4f4f4",
+      hitStop: o.hitStop === undefined ? 0.03 : o.hitStop,
+      shake: o.shake,
     };
     user.invuln = Math.max(user.invuln, 0.3);
-    G.sfx.play("dash");
+    G.sfx.attack("dash", o.type || "blunt", o.damage || 1);
   }
 
   /* ---------- projectiles flying around ---------- */
@@ -320,6 +374,9 @@ G.combat = (() => {
     const s = G.state;
     for (let i = s.projectiles.length - 1; i >= 0; i--) {
       const pr = s.projectiles[i];
+      pr.trail = pr.trail || [];
+      pr.trail.unshift({ x: pr.x, y: pr.y });
+      if (pr.trail.length > (pr.trailLength || 3)) pr.trail.length = pr.trailLength || 3;
       pr.x += pr.vx * dt;
       pr.y += pr.vy * dt;
 
@@ -344,6 +401,7 @@ G.combat = (() => {
                 damage: pr.damage, type: pr.type, ability: pr.ability,
                 status: pr.status, breaksAnyWard: pr.breaksAnyWard,
                 fromX: pr.startX, fromY: pr.startY,
+                hitStop: pr.hitStop, shake: pr.shake,
               });
             if (!pr.pierce) { gone = true; break; }
           }
@@ -375,8 +433,9 @@ G.combat = (() => {
         knockback: 120,
       })) hits++;
     }
-    G.state.shake = Math.max(G.state.shake, 0.16);
-    G.sfx.play("hit");
+    G.state.shake = Math.max(G.state.shake, 0.22);
+    G.state.hitStop = Math.max(G.state.hitStop, 0.055);
+    G.sfx.play("explosion");
     G.spawnFx({ kind: "ring", x: pr.x, y: pr.y, color: pr.color, radius: pr.explodeRadius, dur: 0.35 });
     burst(pr.x, pr.y, pr.color, 10);
     if (hits >= 2) G.events.emit("multiHit", { ability: pr.ability, hits });
