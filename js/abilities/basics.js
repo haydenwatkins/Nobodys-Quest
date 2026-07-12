@@ -510,6 +510,81 @@ registerAbility({
   },
 });
 
+/* ----------------- RIFTBLADE's moves ----------------- */
+
+registerAbility({
+  id: "riftCut",
+  name: "Rift Cut",
+  icon: "🗡️",
+  type: "sharp",
+  mana: 0,
+  cooldown: 0.36,
+  use(user) {
+    // Quick cuts flow into a wide third beat. It never adds damage; good
+    // timing earns safer crowd coverage instead of a balance-breaking spike.
+    const lastCut = typeof user.riftCutAt === "number" ? user.riftCutAt : -10;
+    const chained = G.state.time - lastCut < 0.72;
+    user.riftCutCombo = chained ? (user.riftCutCombo || 0) % 3 + 1 : 1;
+    user.riftCutAt = G.state.time;
+    const finisher = user.riftCutCombo === 3;
+    G.combat.meleeArc(user, {
+      ability: "riftCut",
+      range: finisher ? 27 : 21,
+      arcDeg: finisher ? 230 : 125,
+      damage: 1, type: "sharp", knockback: finisher ? 145 : 85,
+      color: finisher ? "#73eff7" : "#b58ee6",
+      lunge: finisher ? 3.5 : 2.5,
+      hitStop: finisher ? 0.038 : 0.024,
+      shake: finisher ? 0.14 : 0.09,
+      weight: finisher ? 4 : 3,
+      combo: finisher ? "finisher" : "flow",
+    });
+    if (finisher) {
+      G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color: "#73eff7", radius: 13, dur: 0.22 });
+    }
+  },
+});
+
+registerAbility({
+  id: "riftRush",
+  name: "Rift Rush",
+  icon: "💫",
+  type: "dark",
+  mana: 3,
+  cooldown: 1.0,
+  use(user) {
+    G.combat.dash(user, {
+      ability: "riftRush",
+      dist: 72, speed: 330,
+      damage: 2, type: "dark",
+      color: "#8153c1",
+      hitStop: 0.04, shake: 0.14,
+    });
+  },
+});
+
+registerAbility({
+  id: "returningStar",
+  name: "Returning Star",
+  icon: "✦",
+  type: "light",
+  mana: 4,
+  cooldown: 1.25,
+  autoAim: true, aimRange: 100,
+  use(user) {
+    // The return path follows the thrower. Move or Rift Rush after throwing
+    // to bend the second pass through a different group of enemies.
+    G.combat.shoot(user, {
+      ability: "returningStar",
+      speed: 180, range: 235, outboundRange: 96,
+      damage: 1, type: "light", pierce: true,
+      boomerang: true, shape: "riftBlade",
+      size: 5, color: "#73eff7", trail: 6,
+      recoil: 2, hitStop: 0.024, shake: 0.1,
+    });
+  },
+});
+
 /* ----------------- GOD's moves ----------------- */
 
 registerAbility({

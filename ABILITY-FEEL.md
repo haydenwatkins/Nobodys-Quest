@@ -2,7 +2,7 @@
 
 ## What the game has
 
-Nobody's Quest currently has 29 interchangeable abilities. Ten are zero-mana
+Nobody's Quest currently has 32 interchangeable abilities. Eleven are zero-mana
 basic attacks; those are the moves players repeat most, so they received
 individual tuning in this pass.
 
@@ -17,6 +17,7 @@ individual tuning in this pass.
 | Alchemist | Bottle Bonk (blunt, 0.40s) | explosive flask, poison-area flask |
 | Stormcaller | Storm Spark (light, 0.45s) | four-target chain, 360-degree stun/knockback |
 | Dragon | Tail Sweep (blunt, 0.55s) | five-shot breath cone, explosive meteor |
+| Riftblade | Rift Cut (sharp, 0.36s) | three-beat wide combo, damage dash, path-bending returning blade |
 | God | Divine Spark (light, 0.50s) | 360-degree judgment, piercing dark star |
 
 Before this pass, attacks already had a white hit flash, modest random camera
@@ -66,3 +67,27 @@ motion trail.
 The intended result is layered and restrained: attacks should be clearer and
 more responsive after ten minutes, without any one effect calling attention to
 itself in the first ten seconds.
+
+## Why the Riftblade works this way
+
+The Riftblade combines patterns that players repeatedly describe as fun without
+copying another game's exact class:
+
+- Final Fantasy XIV's Red Mage uses ordered actions, resource balance, and a
+  ranged-to-melee transition. Its official guide makes the rhythm explicit:
+  [Red Mage job guide](https://na.finalfantasyxiv.com/jobguide/redmage/)
+- Diablo players repeatedly point to the Rogue's mobility, active combo rhythm,
+  and ability to dive in and disengage as reasons it is fun:
+  [player discussion](https://www.reddit.com/r/diablo4/comments/140xrhr)
+- Monster Hunter players praise mobile weapons for responsiveness, repositioning,
+  and the feeling of dancing with the monster rather than standing in place:
+  [weapon discussion](https://www.reddit.com/r/MonsterHunterWilds/comments/1nfg4vw/what_weapon_is_the_most_fun_for_you_and_why/)
+- Nobody Saves the World's designers emphasize distinct forms, immediately usable
+  rewards, and abilities that remain interesting when mixed across the roster:
+  [Drinkbox design interview](https://www.gamedeveloper.com/design/designing-the-many-forms-and-abilities-of-nobody-saves-the-world)
+
+Those ideas become a simple three-part loop: throw Returning Star, move or Rift
+Rush to reshape its trip home, then land the wide third beat of Rift Cut. Every
+move also remains independently useful when another form borrows it. The
+Riftblade Adept alternates the same returning throws and rushes so the unlock
+fight teaches the fantasy before awarding it.

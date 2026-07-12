@@ -105,20 +105,63 @@ const expectedBasics = {
 for (const [id, values] of Object.entries(expectedBasics)) {
   assert.deepEqual([G.abilities[id].mana, G.abilities[id].cooldown], values, `${id} balance changed`);
 }
-assert.equal(Object.keys(G.abilities).length, 29);
+assert.equal(Object.keys(G.abilities).length, 32);
 for (const ability of Object.values(G.abilities)) {
   freshState();
   G.state.player.invuln = 0;
   assert.doesNotThrow(() => ability.use(G.state.player), `${ability.id} should execute`);
 }
 
+{
+  freshState();
+  G.abilities.returningStar.use(G.state.player);
+  const star = G.state.projectiles[0];
+  assert.equal(star.boomerang, true);
+  assert.equal(star.damage, 1);
+  for (let i = 0; i < 7 && !star.returning; i++) G.combat.updateProjectiles(0.1);
+  assert.equal(star.returning, true, "Returning Star should turn around after its outward pass");
+  const oldVy = star.vy;
+  G.state.player.y = 40;
+  G.combat.updateProjectiles(0.016);
+  assert.notEqual(star.vy, oldVy, "moving the thrower should bend the return path");
+}
+
+{
+  const target = enemy(50, 0);
+  freshState(target);
+  G.abilities.returningStar.use(G.state.player);
+  for (let i = 0; i < 40 && G.state.projectiles.length; i++) G.combat.updateProjectiles(0.04);
+  assert.equal(target.hp, 8, "Returning Star may hit once out and once back, never more");
+}
+
+{
+  freshState();
+  G.state.enemies = [enemy(10, -2), enemy(11, 0), enemy(10, 2)];
+  let finisherEvent = null;
+  G.events.on("multiHit", (data) => { if (data.ability === "riftCut") finisherEvent = data; });
+  for (let beat = 0; beat < 3; beat++) {
+    G.state.time = beat * 0.2;
+    G.abilities.riftCut.use(G.state.player);
+  }
+  assert.equal(G.state.player.riftCutCombo, 3);
+  assert.equal(finisherEvent.combo, "finisher");
+  assert.equal(finisherEvent.hits, 3);
+  assert.ok(G.fx.some((fx) => fx.kind === "ring" && fx.color === "#73eff7"));
+}
+
 // Verify a tap shortly before cooldown completion is not lost.
 run("js/engine/entities.js");
 run("js/data/enemies.js");
 assert.deepEqual(
-  [G.enemies.ancientTreant.boss.style, G.enemies.mireQueen.boss.style, G.enemies.eclipseKnight.boss.style],
-  ["charger", "caster", "duelist"],
+  [G.enemies.ancientTreant.boss.style, G.enemies.mireQueen.boss.style, G.enemies.eclipseKnight.boss.style, G.enemies.riftbladeAdept.boss.style],
+  ["charger", "caster", "duelist", "riftblade"],
 );
+
+G.maps = {};
+context.registerMap = (map) => { G.maps[map.id] = map; };
+run("js/data/maps.js");
+assert.ok(G.maps.riftbladeTrial);
+assert.ok(G.maps.riftbladeTrial.tiles.every((row) => row.length === 28), "Riftblade arena rows must stay aligned");
 
 // Bosses introduce themselves, change phase, and use telegraphed movement.
 let bossBanner = "";
@@ -181,6 +224,25 @@ G.enemies.testCaster = {
   G.updateEnemies(0.016);
   assert.equal(G.state.projectiles.length, 3, "phase-two caster should fire a readable fan");
   assert.ok(G.state.projectiles.every((shot) => shot.damage === 1), "fan must not spike damage");
+}
+
+{
+  const adept = G.makeEnemy("riftbladeAdept", 72, 0);
+  adept.bossEngaged = true;
+  adept.bossIntroT = 0;
+  adept.bossSpecialT = 0;
+  adept.bossPattern = 1; // the alternating Returning Star pattern
+  G.state = {
+    player: { x: 0, y: 0, dir: { x: 1, y: 0 }, invuln: 0 },
+    enemies: [adept], projectiles: [], pickups: [], items: [],
+    hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(adept.bossPendingAction, "blades");
+  adept.bossTelegraphT = 0.001;
+  G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles.length, 2);
+  assert.ok(G.state.projectiles.every((shot) => shot.boomerang && shot.damage === 1));
 }
 
 let fired = 0;

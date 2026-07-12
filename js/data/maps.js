@@ -55,6 +55,7 @@ function makeGreenfieldTiles() {
   put(W - 1, 45, "E"); put(W - 2, 45, ".");
   put(90, H - 1, "V"); put(90, H - 2, ".");
   put(30, H - 1, "W"); put(30, H - 2, ".");
+  put(W - 1, 18, "R"); put(W - 2, 18, ".");
 
   // Landmarks.
   put(57, 44, "s");
@@ -97,10 +98,47 @@ registerMap({
     "E": { tile: "grass", portal: { map: "emberRidge", x: 2, y: 1 }, stars: 7, portalStyle: "gap" },
     "V": { tile: "grass", portal: { map: "starfallRuins", x: 2, y: 1 }, stars: 10, portalStyle: "gap" },
     "W": { tile: "grass", portal: { map: "whispering-grove", x: 2, y: 10 }, stars: 0, portalStyle: "gap" },
+    "R": { tile: "grass", portal: { map: "riftbladeTrial", x: 2, y: 8 }, stars: 18, portalStyle: "gap" },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
   },
 
   tiles: makeGreenfieldTiles(),
+});
+
+/* ================== RIFTBLADE TRIAL (28 x 17) ================== */
+
+registerMap({
+  id: "riftbladeTrial",
+  name: "Riftblade Trial",
+  playerStart: { x: 2, y: 8 },
+
+  legend: {
+    "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 18 } },
+    "B": { tile: "floor", enemy: "riftbladeAdept" },
+    "m": { tile: "floor", message: "The Adept bends every returning blade by moving. Watch the path out — then dodge the path home." },
+    "H": { tile: "floor", chest: { heal: true, name: "a perfectly folded star-cookie" } },
+    "R": { tile: "rock", on: "floor" },
+  },
+
+  tiles: [
+    "############################",
+    "#ffffffffffffffffffffffffff#",
+    "#fffRffffffffffffffffffRfff#",
+    "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffRfffffffffffff#",
+    "#ffffffffffffffffffffffffff#",
+    "#ffffHfffffffffffffffffffff#",
+    "xffmfffffffffffffffffBfffff#",
+    "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffRfffffffffffff#",
+    "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#",
+    "#fffRffffffffffffffffffRfff#",
+    "#ffffffffffffffffffffffffff#",
+    "############################",
+  ],
 });
 
 /* ================== THE OLD DUNGEON (30 x 18) ================== */

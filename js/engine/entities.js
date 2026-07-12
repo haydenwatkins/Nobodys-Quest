@@ -221,6 +221,8 @@ G.makeEnemy = function (id, x, y) {
     bossRecoverT: 0,
     bossStrafeDir: Math.random() < 0.5 ? -1 : 1,
     bossStrafeT: 1 + Math.random(),
+    bossPattern: 0,
+    bossPendingAction: null,
     touchCd: 0,
     kbx: 0, kby: 0,
     hitKickX: 0, hitKickY: 0,
@@ -264,6 +266,18 @@ function engageBoss(e) {
   }
 }
 
+function fireRiftbladeVolley(e, p) {
+  const a = G.util.angleTo(e.x, e.y, p.x, p.y);
+  const spreads = e.bossPhase === 2 ? [-22, 0, 22] : [-13, 13];
+  for (const spread of spreads) {
+    enemyShot(G.state, e, a + spread * Math.PI / 180, {
+      damage: 1, speed: 120, range: 205, size: 5,
+      boomerang: true, outboundRange: 82, shape: "riftBlade",
+    });
+  }
+  G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: e.def.boss.color, radius: 20, dur: 0.3 });
+}
+
 function updateBossState(e, p, dist, dt) {
   const boss = e.def.boss;
   const aggro = e.def.aggro || 120;
@@ -292,7 +306,15 @@ function updateBossState(e, p, dist, dt) {
 
   if (e.bossTelegraphT > 0) {
     e.bossTelegraphT -= dt;
-    if (e.bossTelegraphT <= 0) e.bossChargeT = boss.chargeDur;
+    if (e.bossTelegraphT <= 0) {
+      if (e.bossPendingAction === "blades") {
+        fireRiftbladeVolley(e, p);
+        e.bossRecoverT = 0.32;
+      } else {
+        e.bossChargeT = boss.chargeDur;
+      }
+      e.bossPendingAction = null;
+    }
     return true;
   }
 
@@ -311,7 +333,7 @@ function updateBossState(e, p, dist, dt) {
     return true;
   }
 
-  if (boss.style === "charger" || boss.style === "duelist") {
+  if (boss.style === "charger" || boss.style === "duelist" || boss.style === "riftblade") {
     e.bossSpecialT -= dt;
     if (e.bossSpecialT <= 0) {
       const a = G.util.angleTo(e.x, e.y, p.x, p.y);
@@ -321,11 +343,16 @@ function updateBossState(e, p, dist, dt) {
       e.bossSpecialT = boss.specialEvery * (e.bossPhase === 2 ? 0.86 : 1);
       G.sfx.play("bossPhase");
       G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: boss.color, radius: 18, dur: boss.telegraph });
-      G.spawnFx({
-        kind: "tell", x: e.x, y: e.y - 5,
-        x2: e.x + e.bossChargeX * 44, y2: e.y - 5 + e.bossChargeY * 44,
-        color: boss.color, dur: boss.telegraph,
-      });
+      const throwBlades = boss.style === "riftblade" && e.bossPattern % 2 === 1;
+      e.bossPendingAction = throwBlades ? "blades" : "charge";
+      e.bossPattern++;
+      if (!throwBlades) {
+        G.spawnFx({
+          kind: "tell", x: e.x, y: e.y - 5,
+          x2: e.x + e.bossChargeX * 44, y2: e.y - 5 + e.bossChargeY * 44,
+          color: boss.color, dur: boss.telegraph,
+        });
+      }
       return true;
     }
   }
@@ -346,7 +373,7 @@ function bossMoveVector(e, p, dist, dt) {
     if (dist < 55) return { x: -Math.cos(a) * 0.85, y: -Math.sin(a) * 0.85, scale: phaseSpeed };
     return { x: -Math.sin(a) * 0.72 * e.bossStrafeDir, y: Math.cos(a) * 0.72 * e.bossStrafeDir, scale: phaseSpeed };
   }
-  if (boss.style === "duelist" && dist < 50) {
+  if ((boss.style === "duelist" || boss.style === "riftblade") && dist < 50) {
     return {
       x: Math.cos(a) * 0.2 - Math.sin(a) * 0.75 * e.bossStrafeDir,
       y: Math.sin(a) * 0.2 + Math.cos(a) * 0.75 * e.bossStrafeDir,
@@ -364,6 +391,13 @@ function enemyShot(state, enemy, angle, opts) {
     damage: opts.damage, size: opts.size || 3,
     color: enemy.def.shotColor || (enemy.def.boss && enemy.def.boss.color) || "#b13e53",
     startX: enemy.x, startY: enemy.y, range: opts.range || 140,
+    speed: opts.speed || 90,
+    boomerang: !!opts.boomerang,
+    returning: false,
+    owner: opts.boomerang ? enemy : null,
+    outboundRange: opts.outboundRange || 70,
+    travel: 0,
+    shape: opts.shape,
     fromPlayer: false,
   });
 }
@@ -660,7 +694,15 @@ G.drawProjectiles = function (ctx) {
     ctx.restore();
     ctx.fillStyle = pr.color;
     const s = pr.size;
-    ctx.fillRect(Math.round(pr.x - s / 2), Math.round(pr.y - 4 - s / 2), s, s);
+    if (pr.shape === "riftBlade") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 3, y, 7, 1);
+      ctx.fillRect(x - 1, y - 2, 3, 5);
+      ctx.fillStyle = "#f4f4f4";
+      ctx.fillRect(x, y, 1, 1);
+    } else {
+      ctx.fillRect(Math.round(pr.x - s / 2), Math.round(pr.y - 4 - s / 2), s, s);
+    }
     ctx.fillStyle = "rgba(244,244,244,0.75)";
     ctx.fillRect(Math.round(pr.x), Math.round(pr.y - 4), 1, 1);
   }

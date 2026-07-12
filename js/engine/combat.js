@@ -259,13 +259,14 @@ G.combat = (() => {
       weight: o.weight,
       dur: 0.15,
     });
-    if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits });
+    if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
     return hits;
   }
 
   // Fire a projectile in the direction you're facing.
   // {speed, damage, type, ability, range, size, color, pierce, status,
-  //  spreadDeg, explodeRadius, explodeDamage, hitGroup}
+  //  spreadDeg, explodeRadius, explodeDamage, hitGroup, boomerang,
+  //  outboundRange, shape}
   function shoot(user, o) {
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
     attackPose(user, facing + Math.PI, o.recoil === undefined ? 1.5 : o.recoil, 0.08);
@@ -288,6 +289,13 @@ G.combat = (() => {
       shake: o.shake,
       trail: [],
       trailLength: o.trail === undefined ? Math.min(6, 2 + (o.size || 3)) : o.trail,
+      shape: o.shape,
+      boomerang: !!o.boomerang,
+      returning: false,
+      owner: o.boomerang ? user : null,
+      outboundRange: o.outboundRange || Math.max(35, (o.range || 130) * 0.48),
+      travel: 0,
+      speed: o.speed || 160,
       breaksAnyWard: breaksAnyWard(user),
       startX: user.x, startY: user.y,
       range: o.range || 130,
@@ -374,18 +382,35 @@ G.combat = (() => {
     const s = G.state;
     for (let i = s.projectiles.length - 1; i >= 0; i--) {
       const pr = s.projectiles[i];
+      if (pr.boomerang && pr.returning && pr.owner) {
+        const homeAngle = G.util.angleTo(pr.x, pr.y, pr.owner.x, pr.owner.y - 6);
+        pr.vx = Math.cos(homeAngle) * pr.speed;
+        pr.vy = Math.sin(homeAngle) * pr.speed;
+      }
       pr.trail = pr.trail || [];
       pr.trail.unshift({ x: pr.x, y: pr.y });
       if (pr.trail.length > (pr.trailLength || 3)) pr.trail.length = pr.trailLength || 3;
+      const beforeX = pr.x, beforeY = pr.y;
       pr.x += pr.vx * dt;
       pr.y += pr.vy * dt;
+      pr.travel = (pr.travel || 0) + G.util.dist(beforeX, beforeY, pr.x, pr.y);
 
       let gone = false;
-      if (G.util.dist(pr.startX, pr.startY, pr.x, pr.y) > pr.range) gone = true;
-      else if (G.world.solid(pr.x, pr.y - 4)) {
+      if (pr.boomerang) {
+        if (!pr.returning && G.util.dist(pr.startX, pr.startY, pr.x, pr.y) >= pr.outboundRange) {
+          pr.returning = true;
+          if (pr.hitSet) pr.hitSet.clear(); // each foe can be hit once out and once back
+          G.spawnFx({ kind: "ring", x: pr.x, y: pr.y - 4, color: pr.color, radius: 6, dur: 0.18 });
+        } else if (pr.returning && pr.owner && G.util.dist(pr.x, pr.y, pr.owner.x, pr.owner.y - 6) < 8) {
+          gone = true;
+        }
+        if (pr.travel > pr.range) gone = true; // failsafe if its owner keeps running away
+      } else if (G.util.dist(pr.startX, pr.startY, pr.x, pr.y) > pr.range) gone = true;
+
+      if (!gone && G.world.solid(pr.x, pr.y - 4)) {
         gone = true;
         G.spawnFx({ kind: "puff", x: pr.x, y: pr.y, color: pr.color, dur: 0.2 });
-      } else if (pr.fromPlayer) {
+      } else if (!gone && pr.fromPlayer) {
         for (const e of s.enemies) {
           if (e.dead) continue;
           if (pr.hitSet && pr.hitSet.has(e)) continue;
@@ -406,7 +431,7 @@ G.combat = (() => {
             if (!pr.pierce) { gone = true; break; }
           }
         }
-      } else {
+      } else if (!gone) {
         // enemy projectile hitting the player
         const p = s.player;
         if (G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {
