@@ -235,6 +235,19 @@
           ctx.fillRect(Math.round(f.x), Math.round(f.y), 1, 1);
           break;
         }
+        case "tell": {
+          ctx.strokeStyle = f.color;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([2, 2]);
+          ctx.beginPath();
+          ctx.moveTo(f.x, f.y);
+          ctx.lineTo(f.x2, f.y2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = prog < 0.5 ? "#f4f4f4" : f.color;
+          ctx.fillRect(Math.round(f.x2 - 1), Math.round(f.y2 - 1), 3, 3);
+          break;
+        }
         case "bolt": {
           ctx.strokeStyle = f.color;
           ctx.lineWidth = 2;

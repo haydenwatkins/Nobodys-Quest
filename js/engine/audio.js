@@ -63,6 +63,8 @@ G.sfx = (() => {
     ko:        ["sawtooth", 300, 50,  0.6,  0.4],
     defeat:    ["triangle",  180, 520, 0.18, 0.28],
     explosion: ["sawtooth", 120, 45,  0.18, 0.25],
+    bossIntro: ["sawtooth",  90, 260, 0.42, 0.28],
+    bossPhase: ["square",   180, 480, 0.24, 0.22],
   };
 
   function tone(recipe, pitch, volumeScale, delay) {

@@ -212,6 +212,15 @@ G.makeEnemy = function (id, x, y) {
     anim: Math.random() * 10,
     wanderT: 0, wanderDir: { x: 0, y: 0 },
     shootT: 1 + Math.random(),
+    bossEngaged: false,
+    bossIntroT: 0,
+    bossPhase: 1,
+    bossSpecialT: def.boss ? def.boss.specialEvery : 0,
+    bossTelegraphT: 0,
+    bossChargeT: 0,
+    bossRecoverT: 0,
+    bossStrafeDir: Math.random() < 0.5 ? -1 : 1,
+    bossStrafeT: 1 + Math.random(),
     touchCd: 0,
     kbx: 0, kby: 0,
     hitKickX: 0, hitKickY: 0,
@@ -221,6 +230,143 @@ G.makeEnemy = function (id, x, y) {
     h() { return this.def.size; },
   };
 };
+
+function bossBurst(e, color, count) {
+  for (let i = 0; i < count; i++) {
+    const a = (Math.PI * 2 * i) / count;
+    G.spawnFx({
+      kind: "spark", x: e.x, y: e.y - e.def.size / 2,
+      vx: Math.cos(a) * (24 + (i % 3) * 8),
+      vy: Math.sin(a) * (24 + (i % 3) * 8),
+      color, dur: 0.45,
+    });
+  }
+}
+
+function engageBoss(e) {
+  e.bossEngaged = true;
+  const boss = e.def.boss;
+  const rematch = (G.state.items || []).includes(e.def.trophy);
+  e.bossIntroT = rematch ? 0.35 : 0.95;
+  e.shootT = Math.max(e.shootT, e.bossIntroT + 0.35);
+  G.state.hitStop = Math.max(G.state.hitStop || 0, rematch ? 0.03 : 0.08);
+  G.state.shake = Math.max(G.state.shake, rematch ? 0.16 : 0.38);
+  G.sfx.play("bossIntro");
+  G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: boss.color, radius: 22, dur: 0.65 });
+  G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: "#ffcd75", radius: 13, dur: 0.4 });
+  bossBurst(e, boss.color, rematch ? 8 : 16);
+  if (rematch) {
+    G.ui.toast(`⚔ ${e.def.name} returns!`, 2);
+  } else {
+    const ward = e.ward && G.DAMAGE_TYPES[e.ward.types[0]];
+    const wardText = ward ? ` · ${ward.icon} ${ward.name.toUpperCase()} breaks its ward` : "";
+    G.ui.banner(`⚔ ${e.def.name.toUpperCase()} ⚔`, `${boss.intro}${wardText}`);
+  }
+}
+
+function updateBossState(e, p, dist, dt) {
+  const boss = e.def.boss;
+  const aggro = e.def.aggro || 120;
+  if (!e.bossEngaged) {
+    if (dist < aggro) engageBoss(e);
+    else return false;
+  }
+
+  if (e.bossIntroT > 0) {
+    e.bossIntroT = Math.max(0, e.bossIntroT - dt);
+    return true;
+  }
+
+  if (e.bossPhase === 1 && e.hp <= e.def.hp / 2) {
+    e.bossPhase = 2;
+    e.bossRecoverT = 0.55;
+    e.bossSpecialT = Math.min(e.bossSpecialT, 0.8);
+    G.state.hitStop = Math.max(G.state.hitStop || 0, 0.055);
+    G.state.shake = Math.max(G.state.shake, 0.3);
+    G.sfx.play("bossPhase");
+    G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: boss.color, radius: 30, dur: 0.55 });
+    bossBurst(e, boss.color, 14);
+    G.ui.banner(`${e.def.name} — PHASE II`, "The fight changes. Watch its movement!");
+    return true;
+  }
+
+  if (e.bossTelegraphT > 0) {
+    e.bossTelegraphT -= dt;
+    if (e.bossTelegraphT <= 0) e.bossChargeT = boss.chargeDur;
+    return true;
+  }
+
+  if (e.bossChargeT > 0) {
+    const step = boss.chargeSpeed * dt;
+    G.world.moveBox(e, e.bossChargeX * step, e.bossChargeY * step);
+    e.dir = { x: e.bossChargeX, y: e.bossChargeY };
+    e.bossChargeT -= dt;
+    G.spawnFx({ kind: "puff", x: e.x, y: e.y - 5, color: boss.color, dur: 0.16 });
+    if (e.bossChargeT <= 0) e.bossRecoverT = boss.style === "charger" ? 0.55 : 0.38;
+    return true;
+  }
+
+  if (e.bossRecoverT > 0) {
+    e.bossRecoverT = Math.max(0, e.bossRecoverT - dt);
+    return true;
+  }
+
+  if (boss.style === "charger" || boss.style === "duelist") {
+    e.bossSpecialT -= dt;
+    if (e.bossSpecialT <= 0) {
+      const a = G.util.angleTo(e.x, e.y, p.x, p.y);
+      e.bossChargeX = Math.cos(a);
+      e.bossChargeY = Math.sin(a);
+      e.bossTelegraphT = boss.telegraph;
+      e.bossSpecialT = boss.specialEvery * (e.bossPhase === 2 ? 0.86 : 1);
+      G.sfx.play("bossPhase");
+      G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: boss.color, radius: 18, dur: boss.telegraph });
+      G.spawnFx({
+        kind: "tell", x: e.x, y: e.y - 5,
+        x2: e.x + e.bossChargeX * 44, y2: e.y - 5 + e.bossChargeY * 44,
+        color: boss.color, dur: boss.telegraph,
+      });
+      return true;
+    }
+  }
+  return false;
+}
+
+function bossMoveVector(e, p, dist, dt) {
+  const boss = e.def.boss;
+  const a = G.util.angleTo(e.x, e.y, p.x, p.y);
+  const phaseSpeed = e.bossPhase === 2 ? 1.18 : 1;
+  if (boss.style === "caster") {
+    e.bossStrafeT -= dt;
+    if (e.bossStrafeT <= 0) {
+      e.bossStrafeT = 1.1 + Math.random() * 0.8;
+      e.bossStrafeDir *= -1;
+    }
+    if (dist > 100) return { x: Math.cos(a) * 0.8, y: Math.sin(a) * 0.8, scale: phaseSpeed };
+    if (dist < 55) return { x: -Math.cos(a) * 0.85, y: -Math.sin(a) * 0.85, scale: phaseSpeed };
+    return { x: -Math.sin(a) * 0.72 * e.bossStrafeDir, y: Math.cos(a) * 0.72 * e.bossStrafeDir, scale: phaseSpeed };
+  }
+  if (boss.style === "duelist" && dist < 50) {
+    return {
+      x: Math.cos(a) * 0.2 - Math.sin(a) * 0.75 * e.bossStrafeDir,
+      y: Math.sin(a) * 0.2 + Math.cos(a) * 0.75 * e.bossStrafeDir,
+      scale: phaseSpeed,
+    };
+  }
+  return { x: Math.cos(a), y: Math.sin(a), scale: phaseSpeed };
+}
+
+function enemyShot(state, enemy, angle, opts) {
+  state.projectiles.push({
+    x: enemy.x, y: enemy.y - 6,
+    vx: Math.cos(angle) * (opts.speed || 90),
+    vy: Math.sin(angle) * (opts.speed || 90),
+    damage: opts.damage, size: opts.size || 3,
+    color: enemy.def.shotColor || (enemy.def.boss && enemy.def.boss.color) || "#b13e53",
+    startX: enemy.x, startY: enemy.y, range: opts.range || 140,
+    fromPlayer: false,
+  });
+}
 
 G.updateEnemies = function (dt) {
   const s = G.state;
@@ -250,30 +396,24 @@ G.updateEnemies = function (dt) {
 
     const stunned = e.status && e.status.stun;
     const d = G.util.dist(e.x, e.y, p.x, p.y);
+    const bossLocked = e.def.miniboss ? updateBossState(e, p, d, dt) : false;
 
-    if (!stunned) {
+    if (!stunned && !bossLocked) {
       const beh = e.def.behavior || "wander";
       let mx = 0, my = 0;
+      let moveScale = 1;
 
-      if (beh === "chase" && d < (e.def.aggro || 80)) {
+      if (e.def.miniboss && e.bossEngaged && d < (e.def.aggro || 120)) {
+        const move = bossMoveVector(e, p, d, dt);
+        mx = move.x; my = move.y; moveScale = move.scale;
+      } else if (beh === "chase" && d < (e.def.aggro || 80)) {
         const a = G.util.angleTo(e.x, e.y, p.x, p.y);
         mx = Math.cos(a); my = Math.sin(a);
       } else if (beh === "shooter" && d < (e.def.aggro || 110)) {
-        // keep a comfy distance and pew pew
+        // Normal shooters keep a comfy distance. Boss casters use their
+        // dedicated orbit/retreat movement above.
         const a = G.util.angleTo(e.x, e.y, p.x, p.y);
         if (d < 60) { mx = -Math.cos(a); my = -Math.sin(a); }
-        e.shootT -= dt;
-        if (e.shootT <= 0) {
-          e.shootT = e.def.shootEvery || 1.6;
-          s.projectiles.push({
-            x: e.x, y: e.y - 6,
-            vx: Math.cos(a) * 90, vy: Math.sin(a) * 90,
-            damage: e.def.damage || 1, size: 3,
-            color: e.def.shotColor || "#b13e53",
-            startX: e.x, startY: e.y, range: 140,
-            fromPlayer: false,
-          });
-        }
       } else {
         // amble around
         e.wanderT -= dt;
@@ -286,9 +426,26 @@ G.updateEnemies = function (dt) {
         mx = e.wanderDir.x * 0.5; my = e.wanderDir.y * 0.5;
       }
 
+      if (beh === "shooter" && d < (e.def.aggro || 110)) {
+        const a = G.util.angleTo(e.x, e.y, p.x, p.y);
+        e.shootT -= dt;
+        if (e.shootT <= 0) {
+          e.shootT = e.def.shootEvery || 1.6;
+          if (e.def.miniboss && e.bossPhase === 2) {
+            // A wider-looking second phase without a damage spike: player
+            // invulnerability means the fan still lands at most one 1-damage hit.
+            for (const spread of [-20, 0, 20]) {
+              enemyShot(s, e, a + spread * Math.PI / 180, { damage: 1, speed: 100, range: 150 });
+            }
+          } else {
+            enemyShot(s, e, a, { damage: e.def.damage || 1, speed: 90, range: 140 });
+          }
+        }
+      }
+
       if (mx || my) {
         e.dir = { x: mx, y: my };
-        G.world.moveBox(e, mx * e.def.speed * dt, my * e.def.speed * dt);
+        G.world.moveBox(e, mx * e.def.speed * moveScale * dt, my * e.def.speed * moveScale * dt);
       }
     }
 

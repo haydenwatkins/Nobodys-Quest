@@ -114,6 +114,75 @@ for (const ability of Object.values(G.abilities)) {
 
 // Verify a tap shortly before cooldown completion is not lost.
 run("js/engine/entities.js");
+run("js/data/enemies.js");
+assert.deepEqual(
+  [G.enemies.ancientTreant.boss.style, G.enemies.mireQueen.boss.style, G.enemies.eclipseKnight.boss.style],
+  ["charger", "caster", "duelist"],
+);
+
+// Bosses introduce themselves, change phase, and use telegraphed movement.
+let bossBanner = "";
+G.ui.banner = (title) => { bossBanner = title; };
+G.enemies.testBoss = {
+  id: "testBoss", name: "Test Titan", hp: 10, speed: 30, damage: 2,
+  behavior: "chase", aggro: 120, size: 16, heavy: true, miniboss: true,
+  trophy: "test-trophy", ward: { types: ["blunt"], hp: 2 },
+  boss: {
+    style: "charger", intro: "IT HAS AWAKENED", color: "#ffcd75",
+    specialEvery: 0.2, telegraph: 0.05, chargeSpeed: 100, chargeDur: 0.1,
+  },
+};
+{
+  const titan = G.makeEnemy("testBoss", 20, 0);
+  G.state = {
+    player: { x: 0, y: 0, dir: { x: 1, y: 0 }, invuln: 0 },
+    enemies: [titan], projectiles: [], pickups: [], items: [],
+    hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  G.damagePlayer = () => {};
+  G.updateEnemies(0.016);
+  assert.equal(titan.bossEngaged, true);
+  assert.match(bossBanner, /TEST TITAN/);
+  assert.ok(titan.bossIntroT > 0);
+
+  titan.bossIntroT = 0;
+  titan.hp = 5;
+  G.updateEnemies(0.016);
+  assert.equal(titan.bossPhase, 2);
+
+  titan.bossRecoverT = 0;
+  titan.bossSpecialT = 0;
+  G.updateEnemies(0.016);
+  assert.ok(titan.bossTelegraphT > 0, "charge must be telegraphed");
+  assert.ok(G.fx.some((fx) => fx.kind === "tell"), "charge direction must be visible");
+  titan.bossTelegraphT = 0.001;
+  G.updateEnemies(0.016);
+  const beforeChargeX = titan.x;
+  G.updateEnemies(0.02);
+  assert.notEqual(titan.x, beforeChargeX, "boss charge should move it decisively");
+}
+
+G.enemies.testCaster = {
+  id: "testCaster", name: "Test Caster", hp: 10, speed: 30, damage: 2,
+  behavior: "shooter", aggro: 140, shootEvery: 1, shotColor: "#8153c1",
+  size: 16, heavy: true, miniboss: true, trophy: "caster-trophy",
+  boss: { style: "caster", intro: "RISE", color: "#8153c1", specialEvery: 3 },
+};
+{
+  const caster = G.makeEnemy("testCaster", 75, 0);
+  caster.bossEngaged = true;
+  caster.bossPhase = 2;
+  caster.shootT = 0;
+  G.state = {
+    player: { x: 0, y: 0, dir: { x: 1, y: 0 }, invuln: 0 },
+    enemies: [caster], projectiles: [], pickups: [], items: [],
+    hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles.length, 3, "phase-two caster should fire a readable fan");
+  assert.ok(G.state.projectiles.every((shot) => shot.damage === 1), "fan must not spike damage");
+}
+
 let fired = 0;
 G.forms = { nobody: { speed: 80, hearts: 3 } };
 G.state = {
