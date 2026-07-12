@@ -152,6 +152,19 @@ sprite — that's a perfect one to grab and make your own!
 - Maps live in `js/data/maps.js`. They're drawn with LETTERS. Add
   rooms to the dungeon, or a whole new map with a door leading to it.
 
+### Forms earned from bosses
+
+Riftblade demonstrates a boss-earned form. Its form uses an item unlock:
+
+```js
+unlock: { type: "item", item: "riftblade-sigil", hint: "Defeat the Riftblade Adept" }
+```
+
+The matching miniboss has `trophy: "riftblade-sigil"`. Defeating it awards the
+item, checks form unlocks immediately, and presents the new form. The boss should
+demonstrate the form's signature rhythm with fair telegraphs, so earning the form
+also teaches the player how to enjoy it.
+
 ---
 
 ## 💡 Idea shelf (steal these!)

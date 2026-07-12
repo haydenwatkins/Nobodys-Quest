@@ -166,7 +166,7 @@ G.unlockHint = function (id) {
   const u = G.forms[id].unlock;
   if (!u) return "";
   if (u.type === "level") return `Get ${G.forms[u.form] ? G.forms[u.form].name : u.form} to level ${u.level}`;
-  if (u.type === "item") return "Find a special treasure...";
+  if (u.type === "item") return u.hint || "Find a special treasure...";
   if (u.type === "stars") return `Earn ${u.stars} ⭐`;
   if (u.type === "allFormsLevel") return `Get every other form to level ${u.level}`;
   if (u.type === "previousFormsLevel") return `Get every previous form to level ${u.level}`;
