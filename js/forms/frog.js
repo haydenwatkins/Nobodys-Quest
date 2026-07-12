@@ -20,7 +20,10 @@ registerForm({
     { id: "croakBurst", level: 2 },
   ],
 
-  unlock: { type: "stars", stars: 9 },
+  unlock: { type: "challenge", hint: "Build a varied little roster", requirements: [
+    { type: "stars", stars: 9 },
+    { type: "claimedForms", count: 4 },
+  ] },
 
   quests: [
     { text: "Lash 12 baddies from tongue range", event: "hit", match: { ability: "tongueLash" }, count: 12 },

@@ -17,6 +17,16 @@
     const viewport = window.visualViewport;
     const viewportWidth = viewport ? viewport.width : window.innerWidth;
     const viewportHeight = viewport ? viewport.height : window.innerHeight;
+    const wrap = document.getElementById("game-wrap");
+    // iOS can move the visible viewport inside a larger layout viewport when
+    // its address bars collapse or the phone rotates. Keep both canvases
+    // centered in what is actually visible, not in the hidden layout area.
+    wrap.style.left = (viewport ? viewport.offsetLeft : 0) + "px";
+    wrap.style.top = (viewport ? viewport.offsetTop : 0) + "px";
+    wrap.style.right = "auto";
+    wrap.style.bottom = "auto";
+    wrap.style.width = viewportWidth + "px";
+    wrap.style.height = viewportHeight + "px";
     const scaleX = viewportWidth / G.W;
     const scaleY = viewportHeight / G.H;
     let scale = Math.min(scaleX, scaleY);
@@ -31,7 +41,10 @@
     G.ui.resizeOverlay(); // keep the sharp text layer aligned on top
   }
   window.addEventListener("resize", resize);
-  if (window.visualViewport) window.visualViewport.addEventListener("resize", resize);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", resize);
+    window.visualViewport.addEventListener("scroll", resize);
+  }
   document.addEventListener("fullscreenchange", resize);
   document.addEventListener("webkitfullscreenchange", resize);
   resize();
@@ -49,6 +62,8 @@
     items: [],
     opened: [],
     known: [],
+    claimedForms: [],
+    unlockReadyNotified: [],
     loadouts: {},
     pinnedQuestIds: [],
     town: G.makeTown(),
@@ -70,15 +85,18 @@
     s.items = save.items || [];
     s.opened = save.opened || [];
     s.known = save.known || [];
+    // Saves from before explicit claiming already earned every known form.
+    // Preserve that progress instead of asking the player to re-earn it.
+    s.claimedForms = Array.isArray(save.claimedForms) ? save.claimedForms : s.known.slice();
+    s.claimedForms = s.claimedForms.filter((id) => G.forms[id] && !G.forms[id].start && !G.forms[id].invalid);
+    s.unlockReadyNotified = Array.isArray(save.unlockReadyNotified) ? save.unlockReadyNotified : [];
     s.loadouts = save.loadouts || {};
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
     s.town = G.normalizeTown(save.town || save.cult);
     G.questCounts = save.questCounts || {};
     G.questsDone = save.questsDone || [];
     if (save.formId && G.forms[save.formId] && !G.forms[save.formId].invalid) s.formId = save.formId;
-    // Progression rules can grow between releases. Forget knowledge of forms
-    // that are no longer earned so they announce properly when re-unlocked.
-    s.known = s.known.filter((id) => G.formUnlocked(id));
+    s.known = s.known.filter((id) => G.forms[id] && !G.forms[id].invalid);
   }
   // if a form file got edited/broken since last save, fall back safely
   if (!G.formUnlocked(G.state.formId)) {

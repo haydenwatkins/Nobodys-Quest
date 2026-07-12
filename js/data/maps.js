@@ -94,7 +94,7 @@ registerMap({
     "G": { tile: "grass", message: "Beware the wisp grove... wisps only fear the LIGHT." },
     "D": { tile: "tree", portal: { map: "dungeon", x: 15, y: 14 }, stars: 3 },
     "M": { tile: "grass", portal: { map: "mistwood", x: 2, y: 1 }, stars: 1, portalStyle: "gap" },
-    "S": { tile: "grass", portal: { map: "sunkenMarsh", x: 2, y: 1 }, stars: 4, portalStyle: "gap" },
+    "S": { tile: "grass", portal: { map: "sunkenMarsh", x: 4, y: 9 }, stars: 4, portalStyle: "gap" },
     "E": { tile: "grass", portal: { map: "emberRidge", x: 2, y: 1 }, stars: 7, portalStyle: "gap" },
     "V": { tile: "grass", portal: { map: "starfallRuins", x: 2, y: 1 }, stars: 10, portalStyle: "gap" },
     "W": { tile: "grass", portal: { map: "whispering-grove", x: 2, y: 10 }, stars: 0, portalStyle: "gap" },
@@ -296,10 +296,45 @@ registerMap({
 
 /* ================== SUNKEN MARSH (30 x 19) ================== */
 
+function makeSunkenMarshTiles() {
+  const w = 30, h = 19;
+  const rows = Array.from({ length: h }, (_, y) =>
+    Array.from({ length: w }, (_, x) => (x === 0 || y === 0 || x === w - 1 || y === h - 1) ? "t" : "."));
+  const put = (x, y, ch) => { rows[y][x] = ch; };
+  const pond = (cx, cy, rx, ry) => {
+    for (let y = cy - ry; y <= cy + ry; y++) {
+      for (let x = cx - rx; x <= cx + rx; x++) {
+        const wobble = G.util.hash2(x + 31, y + 19) * 0.22;
+        if (((x - cx) ** 2) / (rx * rx) + ((y - cy) ** 2) / (ry * ry) < 0.72 + wobble) put(x, y, "w");
+      }
+    }
+  };
+
+  // Broad ponds give the marsh a shape without enclosing walkable pockets.
+  pond(7, 4, 4, 2);
+  pond(22, 4, 4, 2);
+  pond(7, 14, 4, 2);
+  pond(23, 14, 4, 2);
+
+  // A three-tile causeway and crossing keep every bank connected and make
+  // the intended route readable even when enemies crowd it.
+  for (let x = 0; x < w - 1; x++) for (let y = 8; y <= 10; y++) put(x, y, "p");
+  for (let y = 1; y < h - 1; y++) for (let x = 14; x <= 16; x++) put(x, y, "p");
+
+  [[3,3,"1"],[12,3,"4"],[18,3,"2"],[27,5,"4"],[5,7,"2"],[11,7,"1"],
+   [19,7,"8"],[26,7,"1"],[4,12,"1"],[12,12,"4"],[18,12,"2"],[27,12,"8"],
+   [11,16,"2"],[19,16,"1"]].forEach(([x, y, ch]) => put(x, y, ch));
+  put(0, 9, "x");
+  put(8, 9, "m");
+  put(12, 15, "H");
+  put(23, 9, "Q");
+  return rows.map((row) => row.join(""));
+}
+
 registerMap({
   id: "sunkenMarsh",
   name: "Sunken Marsh",
-  playerStart: { x: 2, y: 1 },
+  playerStart: { x: 4, y: 9 },
 
   legend: {
     "1": { tile: "grass", enemy: "slime" },
@@ -308,31 +343,11 @@ registerMap({
     "8": { tile: "grass", enemy: "shade" },
     "Q": { tile: "grass", enemy: "mireQueen" },
     "m": { tile: "grass", message: "The Mire Queen's purple veil fears DARK magic. Return with a Wizard's spell if it holds." },
-    "x": { tile: "grass", portal: { map: "overworld", x: 1, y: 30 } },
+    "x": { tile: "path", portal: { map: "overworld", x: 1, y: 30 } },
     "H": { tile: "grass", chest: { heal: true, name: "a soggy-but-magical cookie" } },
   },
 
-  tiles: [
-    "tttttttttttttttttttttttttttttt",
-    "tx...wwww....1...wwww...4....t",
-    "t..wwwwwwww....wwwwwwww......t",
-    "t.ww....ww.ttt.ww....ww.2....t",
-    "t.....1....tmt....4..........t",
-    "t.ttt...ww.t.t.ww...ttt......t",
-    "t...t..wwww.t.t.wwww..t......t",
-    "t2..t....ww..t..ww..1........t",
-    "t...ttt.....ttt.....ttt......t",
-    "t.ww...4....H....Q...ww......t",
-    "twwww.....ttttt.....wwww.....t",
-    "t.ww.ttt..t...t..ttt.ww......t",
-    "t.....t...t.4.t...t..........t",
-    "t1....t.ttt...ttt.t..1.......t",
-    "t.....t..........t...........t",
-    "t.wwwwww..2..8..wwwwww.......t",
-    "t..........1.................t",
-    "t..2....ww....8....ww........t",
-    "tttttttttttttttttttttttttttttt",
-  ],
+  tiles: makeSunkenMarshTiles(),
 });
 
 /* ================== EMBER RIDGE (30 x 19) ================== */

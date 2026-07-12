@@ -27,7 +27,9 @@ registerForm({
   ],
 
   // How do you earn the Rat? Get Nobody to level 2.
-  unlock: { type: "level", form: "nobody", level: 2 },
+  unlock: { type: "challenge", hint: "Prove you have learned the basics", requirements: [
+    { type: "formLevel", form: "nobody", level: 3 },
+  ] },
 
   quests: [
     { text: "Poison 8 baddies", event: "status", match: { status: "poison" }, count: 8 },

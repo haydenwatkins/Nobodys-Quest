@@ -21,7 +21,10 @@ registerForm({
     { id: "tripleShot", level: 2 },
   ],
 
-  unlock: { type: "level", form: "knight", level: 2 },
+  unlock: { type: "challenge", hint: "Train with steel before taking up the bow", requirements: [
+    { type: "formLevel", form: "knight", level: 2 },
+    { type: "stars", stars: 6 },
+  ] },
 
   quests: [
     { text: "Hit baddies from far away, 8 times", event: "hit", match: { dist: { gte: 100 } }, count: 8 },

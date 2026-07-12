@@ -28,7 +28,10 @@ registerForm({
   ],
 
   // How do you earn the Rat? Get Nobody to level 2.
-  unlock: { type: "stars", stars: 5 },
+  unlock: { type: "challenge", hint: "Gather experience and study a quick form", requirements: [
+    { type: "stars", stars: 5 },
+    { type: "formLevel", form: "rat", level: 2 },
+  ] },
 
   quests: [
     { text: "Defeat 10 baddies as a magic user", event: "kill", count: 10 },

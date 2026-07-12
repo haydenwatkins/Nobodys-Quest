@@ -363,6 +363,12 @@ function bossMoveVector(e, p, dist, dt) {
   const boss = e.def.boss;
   const a = G.util.angleTo(e.x, e.y, p.x, p.y);
   const phaseSpeed = e.bossPhase === 2 ? 1.18 : 1;
+  if (boss.antiKiteRange && dist > boss.antiKiteRange) {
+    return {
+      x: Math.cos(a), y: Math.sin(a),
+      scale: phaseSpeed * (boss.chaseScale || 1),
+    };
+  }
   if (boss.style === "caster") {
     e.bossStrafeT -= dt;
     if (e.bossStrafeT <= 0) {

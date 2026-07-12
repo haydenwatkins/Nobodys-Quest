@@ -26,7 +26,9 @@ registerForm({
     { id: "voidStar", level: 2 },
   ],
 
-  unlock: { type: "previousFormsLevel", level: 5 },
+  unlock: { type: "challenge", maintain: true, hint: "Master the complete roster as it grows", requirements: [
+    { type: "previousFormsLevel", level: 5 },
+  ] },
 
   quests: [
     { text: "Hit 12 baddies with Divine Spark", event: "hit", match: { ability: "divineSpark" }, count: 12 },
