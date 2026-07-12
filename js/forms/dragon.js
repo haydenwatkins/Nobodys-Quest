@@ -20,7 +20,9 @@ registerForm({
     { id: "meteor", level: 2 },
   ],
 
-  unlock: { type: "previousFormsLevel", level: 3 },
+  unlock: { type: "challenge", hint: "Master every form that came before it", requirements: [
+    { type: "previousFormsLevel", level: 3 },
+  ] },
 
   quests: [
     { text: "Sweep 15 baddies with your tail", event: "hit", match: { ability: "tailSweep" }, count: 15 },

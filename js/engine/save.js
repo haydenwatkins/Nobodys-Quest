@@ -22,6 +22,8 @@ G.saveGame = function () {
       items: s.items,
       opened: s.opened,
       known: s.known,
+      claimedForms: s.claimedForms,
+      unlockReadyNotified: s.unlockReadyNotified,
       loadouts: s.loadouts,
       town: s.town,
       questCounts: G.questCounts,

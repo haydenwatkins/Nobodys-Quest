@@ -162,6 +162,31 @@ context.registerMap = (map) => { G.maps[map.id] = map; };
 run("js/data/maps.js");
 assert.ok(G.maps.riftbladeTrial);
 assert.ok(G.maps.riftbladeTrial.tiles.every((row) => row.length === 28), "Riftblade arena rows must stay aligned");
+assert.ok(G.maps.sunkenMarsh.tiles.every((row) => row.length === 30), "Marsh rows must stay aligned");
+
+// Every walkable marsh tile must connect to the arrival point. This catches
+// accidental tree/water rings and narrow roadblocks as the layout evolves.
+{
+  const map = G.maps.sunkenMarsh;
+  const solidChars = new Set(["t", "w", "r", "#"]);
+  const seen = new Set();
+  const queue = [[map.playerStart.x, map.playerStart.y]];
+  while (queue.length) {
+    const [x, y] = queue.shift();
+    const key = `${x},${y}`;
+    if (seen.has(key) || y < 0 || y >= map.tiles.length || x < 0 || x >= map.tiles[y].length) continue;
+    if (solidChars.has(map.tiles[y][x])) continue;
+    seen.add(key);
+    queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+  }
+  let walkable = 0;
+  for (const row of map.tiles) for (const ch of row) if (!solidChars.has(ch)) walkable++;
+  assert.equal(seen.size, walkable, "Every open part of Sunken Marsh should be reachable");
+  assert.ok(map.playerStart.x >= 4, "Marsh arrival needs breathing room from its exit");
+}
+
+assert.ok(G.enemies.riftbladeAdept.speed >= 55, "Riftblade Adept must be able to pressure ranged forms");
+assert.ok(G.enemies.riftbladeAdept.boss.antiKiteRange, "Riftblade Adept needs explicit anti-kite movement");
 
 // Bosses introduce themselves, change phase, and use telegraphed movement.
 let bossBanner = "";

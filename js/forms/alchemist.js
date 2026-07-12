@@ -20,7 +20,10 @@ registerForm({
     { id: "miasmaFlask", level: 2 },
   ],
 
-  unlock: { type: "level", form: "frog", level: 3 },
+  unlock: { type: "challenge", hint: "Master mobility and collect field notes", requirements: [
+    { type: "formLevel", form: "frog", level: 3 },
+    { type: "stars", stars: 12 },
+  ] },
 
   quests: [
     { text: "Bonk 10 baddies with a bottle", event: "hit", match: { ability: "bottleBonk" }, count: 10 },

@@ -92,8 +92,13 @@ G.world = (() => {
     const at = spawn || def.playerStart || { x: 1, y: 1 };
     p.x = at.x * G.TILE + G.TILE / 2;
     p.y = at.y * G.TILE + G.TILE / 2;
+    p.dashing = null;
     p.lastSafe = { x: p.x, y: p.y };
     s.entryPoint = { x: p.x, y: p.y };
+    // Do not let a held stick/key carry straight back through an arrival
+    // portal. Requiring one neutral input is reliable for touch and keyboard.
+    s.portalNeedsRelease = true;
+    s.portalGrace = 0.35;
 
     if (def.name) G.ui.toast("🗺 " + def.name);
     G.events.emit("mapEnter", { map: mapId });
@@ -146,6 +151,10 @@ G.world = (() => {
     const p = s.player;
     const cell = cellAt(p.x, p.y);
     doorMsgCooldown = Math.max(0, doorMsgCooldown - dt);
+    s.portalGrace = Math.max(0, (s.portalGrace || 0) - dt);
+    const move = G.input.vec;
+    if (s.portalNeedsRelease && !p.dashing && Math.abs(move.x) < 0.08 && Math.abs(move.y) < 0.08)
+      s.portalNeedsRelease = false;
 
     // Signs
     if (cell.message) {
@@ -186,12 +195,12 @@ G.world = (() => {
     // Doors / portals
     if (cell.portal) {
       const need = cell.stars || 0;
-      if (s.stars >= need) {
+      if (s.stars >= need && !s.portalNeedsRelease && s.portalGrace <= 0) {
         G.sfx.play("door");
         load(cell.portal.map, { x: cell.portal.x, y: cell.portal.y });
         G.saveGame();
         return;
-      } else if (doorMsgCooldown <= 0) {
+      } else if (s.stars < need && doorMsgCooldown <= 0) {
         doorMsgCooldown = 2;
         G.ui.toast(`🔒 This door needs ${need} ⭐ — you have ${s.stars}. Finish quests to earn stars!`, 3);
       }
@@ -225,6 +234,17 @@ G.world = (() => {
   /* ---------- drawing ----------
      Tiles are painted with code (no image files) so the whole
      game works from a single folder with zero downloads.      */
+  function groundColor(kind, x, y) {
+    // Staggered 4x4/5x4 regions read as broad natural patches instead of a
+    // checkerboard. Their subtle contrast gives motion a reference point.
+    const patchX = Math.floor((x + (Math.floor(y / 4) % 2) * 2) / 5);
+    const patchY = Math.floor(y / 4);
+    const patch = G.util.hash2(patchX + 71, patchY + 43);
+    if (kind === "path") return patch < 0.3 ? "#cfaa66" : patch > 0.76 ? "#e0b874" : "#d8b06a";
+    if (kind === "floor") return patch < 0.3 ? "#4f627c" : patch > 0.76 ? "#60738d" : "#566c86";
+    return patch < 0.27 ? "#31ad60" : patch > 0.78 ? "#42bd6a" : "#38b764";
+  }
+
   function drawTile(ctx, cell, x, y, time) {
     const T = G.TILE;
     const px = x * T, py = y * T;
@@ -232,7 +252,7 @@ G.world = (() => {
 
     switch (cell.tile) {
       case "grass": {
-        ctx.fillStyle = "#38b764";
+        ctx.fillStyle = groundColor("grass", x, y);
         ctx.fillRect(px, py, T, T);
         if (rnd > 0.75) { // scattered tufts
           ctx.fillStyle = "#a7f070";
@@ -244,7 +264,7 @@ G.world = (() => {
         break;
       }
       case "path": {
-        ctx.fillStyle = "#d8b06a";
+        ctx.fillStyle = groundColor("path", x, y);
         ctx.fillRect(px, py, T, T);
         if (rnd > 0.7) {
           ctx.fillStyle = "#c09858";
@@ -253,7 +273,7 @@ G.world = (() => {
         break;
       }
       case "tree": {
-        ctx.fillStyle = "#38b764";
+        ctx.fillStyle = groundColor("grass", x, y);
         ctx.fillRect(px, py, T, T);
         ctx.fillStyle = "#6b4a2b"; // trunk
         ctx.fillRect(px + 6, py + 11, 4, 5);
@@ -290,17 +310,15 @@ G.world = (() => {
         break;
       }
       case "floor": {
-        ctx.fillStyle = "#566c86";
+        ctx.fillStyle = groundColor("floor", x, y);
         ctx.fillRect(px, py, T, T);
-        ctx.fillStyle = "#4a5b74";
-        if ((x + y) % 2 === 0) ctx.fillRect(px, py, T, T);
         ctx.fillStyle = "#333c57";
         ctx.fillRect(px, py, T, 1);
         ctx.fillRect(px, py, 1, T);
         break;
       }
       case "rock": {
-        ctx.fillStyle = cell.on === "floor" ? "#566c86" : "#38b764";
+        ctx.fillStyle = groundColor(cell.on === "floor" ? "floor" : "grass", x, y);
         ctx.fillRect(px, py, T, T);
         ctx.fillStyle = "#94b0c2";
         ctx.fillRect(px + 3, py + 5, 10, 9);
@@ -310,7 +328,7 @@ G.world = (() => {
         break;
       }
       default: {
-        ctx.fillStyle = "#38b764";
+        ctx.fillStyle = groundColor("grass", x, y);
         ctx.fillRect(px, py, T, T);
       }
     }

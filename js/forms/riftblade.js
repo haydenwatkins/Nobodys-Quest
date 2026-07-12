@@ -24,10 +24,10 @@ registerForm({
 
   // The Riftblade Adept drops this sigil. The boss demonstrates the form's
   // dash-and-return rhythm before the player is allowed to equip it.
-  unlock: {
-    type: "item", item: "riftblade-sigil",
-    hint: "Defeat the Riftblade Adept beyond Greenfield's 18-star east gate",
-  },
+  unlock: { type: "challenge", hint: "Defeat the Adept and learn a mighty form", requirements: [
+    { type: "item", item: "riftblade-sigil", hint: "Win the Riftblade Sigil" },
+    { type: "formLevel", form: "dragon", level: 2 },
+  ] },
 
   quests: [
     { text: "Land 18 flowing Rift Cuts", event: "hit", match: { ability: "riftCut" }, count: 18 },

@@ -531,6 +531,8 @@ G.ui = (() => {
     if (clearPins) clearPins.addEventListener("click", () => { G.clearQuestPins(); buildMenu(); });
     menuEl.querySelectorAll("[data-become]").forEach((b) =>
       b.addEventListener("click", () => { G.setForm(b.dataset.become); buildMenu(); }));
+    menuEl.querySelectorAll("[data-claim]").forEach((b) =>
+      b.addEventListener("click", () => { G.claimForm(b.dataset.claim); buildMenu(); }));
     menuEl.querySelectorAll("select[data-slot]").forEach((sel) =>
       sel.addEventListener("change", () => {
         const lo = G.getLoadout(G.state.formId);
@@ -579,6 +581,7 @@ G.ui = (() => {
       const f = G.forms[id];
       if (f.invalid) continue;
       const unlocked = G.formUnlocked(id);
+      const ready = G.formReady(id);
       const current = id === G.state.formId;
       if (unlocked) {
         html += `<div class="form-card ${current ? "current" : ""}">
@@ -587,10 +590,18 @@ G.ui = (() => {
           <div>❤️ ${f.hearts} &nbsp; 👟 ${f.speed} &nbsp; ${dmgChip(G.abilities[f.basic] ? G.abilities[f.basic].type : "blunt")}</div>
           <button data-become="${id}" ${current ? "disabled" : ""}>${current ? "You are this!" : "Become " + f.name}</button>
         </div>`;
+      } else if (ready) {
+        html += `<div class="form-card ready">
+          <h2>${f.icon} ${f.name} <span class="ready-label">CHALLENGE COMPLETE</span></h2>
+          <div class="tagline">${f.tagline}</div>
+          <div class="unlock-progress">${G.unlockHint(id)}</div>
+          <button data-claim="${id}">Claim ${f.name}</button>
+        </div>`;
       } else {
         html += `<div class="form-card locked">
           <h2>❓ ???</h2>
-          <div class="tagline">${G.unlockHint(id)}</div>
+          <div class="tagline">Form challenge</div>
+          <div class="unlock-progress">${G.unlockHint(id)}</div>
         </div>`;
       }
     }

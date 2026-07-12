@@ -111,12 +111,24 @@ G.validateCrossRefs = function () {
       }
     }
     if (f.unlock) {
-      const u = f.unlock;
-      if (u.type === "level" && !G.forms[u.form]) err(`Its unlock rule points at form "${u.form}" which doesn't exist.`);
-      if (["allFormsLevel", "previousFormsLevel"].includes(u.type) && (typeof u.level !== "number" || u.level < 1))
-        err("Its mastery unlock rule needs a number level, like unlock: { type: \"previousFormsLevel\", level: 3 }.");
-      if (!["level", "item", "stars", "allFormsLevel", "previousFormsLevel"].includes(u.type))
-        err(`Its unlock type is "${u.type}" — use "level", "item", "stars", "previousFormsLevel", or "allFormsLevel".`);
+      const allowed = ["level", "formLevel", "item", "stars", "claimedForms", "allFormsLevel", "previousFormsLevel", "any"];
+      const checkRule = (u) => {
+        if (!u || !allowed.includes(u.type)) {
+          err(`Its unlock challenge has an unknown requirement type "${u && u.type}".`);
+          return;
+        }
+        if (["level", "formLevel"].includes(u.type) && !G.forms[u.form])
+          err(`Its unlock rule points at form "${u.form}" which doesn't exist.`);
+        if (["allFormsLevel", "previousFormsLevel"].includes(u.type) && (typeof u.level !== "number" || u.level < 1))
+          err("Its mastery unlock rule needs a level of at least 1.");
+        if (u.type === "any") {
+          if (!Array.isArray(u.options) || !u.options.length) err("An 'any' unlock requirement needs some options.");
+          else u.options.forEach(checkRule);
+        }
+      };
+      const rules = f.unlock.type === "challenge" ? f.unlock.requirements : [f.unlock];
+      if (!Array.isArray(rules) || !rules.length) err("Its unlock challenge needs at least one requirement.");
+      else rules.forEach(checkRule);
     }
   }
 
@@ -130,31 +142,75 @@ G.validateCrossRefs = function () {
   }
 };
 
-/* ---------- unlocking ---------- */
-G.formUnlocked = function (id) {
-  const f = G.forms[id];
-  if (!f || f.invalid) return false;
-  if (f.start) return true;
-  const u = f.unlock;
+/* ---------- unlocking ----------
+   Completing a challenge makes a form READY. The player then claims it
+   deliberately in the Forms menu. Requirements are composable data, so a
+   future roster can grow without hard-coding another unlock system.       */
+function unlockRules(form) {
+  if (!form || !form.unlock) return [];
+  return form.unlock.type === "challenge" ? (form.unlock.requirements || []) : [form.unlock];
+}
+
+function requirementMet(u, targetId) {
   if (!u) return false;
-  if (u.type === "level") return G.formLevel(u.form) >= u.level;
+  if (u.type === "level" || u.type === "formLevel") return G.formLevel(u.form) >= u.level;
   if (u.type === "item") return G.state.items.includes(u.item);
   if (u.type === "stars") return G.state.stars >= u.stars;
+  if (u.type === "claimedForms") return (G.state.claimedForms || []).length >= u.count;
+  if (u.type === "any") return (u.options || []).some((option) => requirementMet(option, targetId));
   if (u.type === "allFormsLevel") {
     return G.formOrder.every((otherId) => {
-      if (otherId === id) return true;
+      if (otherId === targetId) return true;
       const other = G.forms[otherId];
       return other && !other.invalid && G.formLevel(otherId) >= u.level;
     });
   }
   if (u.type === "previousFormsLevel") {
-    const targetIndex = G.formOrder.indexOf(id);
+    const targetIndex = G.formOrder.indexOf(targetId);
     return G.formOrder.slice(0, targetIndex).every((otherId) => {
       const other = G.forms[otherId];
       return other && !other.invalid && G.formLevel(otherId) >= u.level;
     });
   }
   return false;
+}
+
+function requirementsMet(id) {
+  const f = G.forms[id];
+  const rules = unlockRules(f);
+  return !!rules.length && rules.every((rule) => requirementMet(rule, id));
+}
+
+G.formUnlocked = function (id) {
+  const f = G.forms[id];
+  if (!f || f.invalid) return false;
+  if (f.start) return true;
+  const claimed = (G.state.claimedForms || []).includes(id);
+  // Mastery forms may deliberately track a growing roster. Once the new
+  // preceding forms catch up, the already-claimed mastery form returns.
+  if (claimed && f.unlock && f.unlock.maintain) return requirementsMet(id);
+  return claimed;
+};
+
+G.formReady = function (id) {
+  const f = G.forms[id];
+  if (!f || f.invalid || f.start || G.formUnlocked(id)) return false;
+  if ((G.state.claimedForms || []).includes(id)) return false;
+  return requirementsMet(id);
+};
+
+G.claimForm = function (id) {
+  if (!G.formReady(id)) return false;
+  G.state.claimedForms = G.state.claimedForms || [];
+  G.state.known = G.state.known || [];
+  G.state.claimedForms.push(id);
+  if (!G.state.known.includes(id)) G.state.known.push(id);
+  const f = G.forms[id];
+  G.sfx.play("unlock");
+  G.ui.banner(`${f.icon} ${f.name.toUpperCase()} CLAIMED!`, f.tagline);
+  G.events.emit("formUnlock", { form: id });
+  G.saveGame();
+  return true;
 };
 
 G.unlockedForms = function () {
@@ -163,30 +219,45 @@ G.unlockedForms = function () {
 
 // Describe how to unlock a form, for the menu ("Reach Rat level 2")
 G.unlockHint = function (id) {
-  const u = G.forms[id].unlock;
-  if (!u) return "";
-  if (u.type === "level") return `Get ${G.forms[u.form] ? G.forms[u.form].name : u.form} to level ${u.level}`;
-  if (u.type === "item") return u.hint || "Find a special treasure...";
-  if (u.type === "stars") return `Earn ${u.stars} ⭐`;
-  if (u.type === "allFormsLevel") return `Get every other form to level ${u.level}`;
-  if (u.type === "previousFormsLevel") return `Get every previous form to level ${u.level}`;
-  return "";
+  const f = G.forms[id];
+  if (!f || !f.unlock) return "";
+  const describe = (u) => {
+    const done = requirementMet(u, id) ? "✓ " : "";
+    if (u.type === "level" || u.type === "formLevel") {
+      const name = G.forms[u.form] ? G.forms[u.form].name : u.form;
+      return `${done}${name} level ${G.formLevel(u.form)}/${u.level}`;
+    }
+    if (u.type === "item") return `${done}${u.hint || "Find a special treasure"}`;
+    if (u.type === "stars") return `${done}${G.state.stars}/${u.stars} stars`;
+    if (u.type === "claimedForms") return `${done}${(G.state.claimedForms || []).length}/${u.count} forms claimed`;
+    if (u.type === "allFormsLevel") return `${done}Every other form at level ${u.level}`;
+    if (u.type === "previousFormsLevel") return `${done}Every previous form at level ${u.level}`;
+    if (u.type === "any") return `${done}One of: ${(u.options || []).map((option) => describe(option).replace(/^✓ /, "")).join(" or ")}`;
+    return "Unknown challenge";
+  };
+  const details = unlockRules(f).map(describe).join(" • ");
+  return f.unlock.hint ? `${f.unlock.hint} — ${details}` : details;
 };
 
-// Call after quests complete / items found: announces new forms.
+// Call after quests complete / items found: announces readiness, never claims.
 G.checkUnlocks = function () {
+  G.state.known = G.state.known || [];
+  G.state.unlockReadyNotified = G.state.unlockReadyNotified || [];
+  let changed = false;
   for (const id of G.formOrder) {
-    if (G.formUnlocked(id) && !G.state.known.includes(id)) {
+    const f = G.forms[id];
+    if (f.start && !G.state.known.includes(id)) {
       G.state.known.push(id);
-      const f = G.forms[id];
-      if (!f.start) {
-        G.sfx.play("unlock");
-        G.ui.banner(`${f.icon} NEW FORM: ${f.name.toUpperCase()}!`, f.tagline);
-        G.events.emit("formUnlock", { form: id });
-      }
-      G.saveGame();
+      changed = true;
+    }
+    if (G.formReady(id) && !G.state.unlockReadyNotified.includes(id)) {
+      G.state.unlockReadyNotified.push(id);
+      G.sfx.play("unlock");
+      G.ui.toast(`${f.icon} ${f.name} challenge complete — claim it in Forms!`, 4);
+      changed = true;
     }
   }
+  if (changed) G.saveGame();
 };
 
 /* ---------- switching forms ---------- */

@@ -20,7 +20,13 @@ registerForm({
     { id: "thunderclap", level: 2 },
   ],
 
-  unlock: { type: "stars", stars: 16 },
+  unlock: { type: "challenge", hint: "Bring magic or marksmanship to level 3", requirements: [
+    { type: "stars", stars: 16 },
+    { type: "any", options: [
+      { type: "formLevel", form: "wizard", level: 3 },
+      { type: "formLevel", form: "ranger", level: 3 },
+    ] },
+  ] },
 
   quests: [
     { text: "Zap 12 baddies with Storm Spark", event: "hit", match: { ability: "stormSpark" }, count: 12 },

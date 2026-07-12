@@ -22,7 +22,9 @@ registerForm({
   ],
 
   // Unlocked by TREASURE, not levels — find the Knight's Crest!
-  unlock: { type: "item", item: "knights-crest" },
+  unlock: { type: "challenge", hint: "Recover a knight's lost crest", requirements: [
+    { type: "item", item: "knights-crest", hint: "Find the Knight's Crest" },
+  ] },
 
   quests: [
     { text: "Break 3 wards (any damage type)", event: "wardBreak", count: 3 },

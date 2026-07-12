@@ -507,14 +507,15 @@ registerEnemy({
 registerEnemy({
   id: "riftbladeAdept",
   name: "Riftblade Adept",
-  hp: 20, speed: 42, damage: 2,
+  hp: 22, speed: 56, damage: 2,
   behavior: "chase", aggro: 170,
   size: 18, heavy: true, miniboss: true,
   ward: { types: ["sharp"], hp: 5 },
   boss: {
     style: "riftblade", intro: "FOLLOW THE BLADE — THEN BREAK THE RHYTHM",
-    color: "#73eff7", specialEvery: 2.8,
-    telegraph: 0.52, chargeSpeed: 150, chargeDur: 0.32,
+    color: "#73eff7", specialEvery: 2.35,
+    telegraph: 0.48, chargeSpeed: 175, chargeDur: 0.34,
+    antiKiteRange: 104, chaseScale: 1.34,
   },
   trophy: "riftblade-sigil",
   trophyName: "Riftblade Sigil",
