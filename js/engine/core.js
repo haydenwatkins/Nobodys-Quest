@@ -92,7 +92,7 @@ G.util = {
 /* ---------- VISUAL EFFECTS ---------- */
 G.spawnFx = function (fx) {
   // fx: {kind, x, y, ...extra}  kinds include puff, num, slash,
-  // ring, bubble, spark, bolt, and impact.
+  // ring, bubble, spark, bolt, impact, and tell.
   fx.t = 0;
   fx.dur = fx.dur || 0.4;
   G.fx.push(fx);
