@@ -41,6 +41,7 @@ registerAbility({
       range: 17, arcDeg: 110,
       damage: 1, type: "blunt",
       knockback: 110,
+      lunge: 3, hitStop: 0.03, shake: 0.11, weight: 3,
     });
   },
 });
@@ -77,6 +78,7 @@ registerAbility({
       range: 14, arcDeg: 90,
       damage: 1, type: "sharp",
       knockback: 60,
+      lunge: 3, hitStop: 0.024, shake: 0.09, weight: 2,
       // the germs are the point:
       status: { name: "poison", dur: 3, dps: 1 },
     });
@@ -135,6 +137,7 @@ registerAbility({
       range: 23, arcDeg: 150,
       damage: 2, type: "sharp",
       knockback: 120,
+      lunge: 3, hitStop: 0.045, shake: 0.16, weight: 4,
     });
   },
 });
@@ -190,6 +193,7 @@ registerAbility({
       ability: "arrow",
       speed: 190, range: 140,
       damage: 1, type: "sharp",
+      recoil: 2, trail: 4, hitStop: 0.022, shake: 0.09,
     });
   },
 });
@@ -285,6 +289,7 @@ registerAbility({
       speed: 165, range: 135,
       damage: 1, type: "dark",
       color: "#290063",
+      recoil: 1.5, trail: 5, hitStop: 0.025, shake: 0.1,
     });
   },
 });
@@ -303,6 +308,7 @@ registerAbility({
       ability: "tongueLash", range: 32, arcDeg: 70,
       damage: 1, type: "blunt", knockback: 65,
       color: "#ef7d57",
+      lunge: 2.5, hitStop: 0.032, shake: 0.11, weight: 3,
     });
   },
 });
@@ -355,6 +361,7 @@ registerAbility({
       ability: "bottleBonk", range: 18, arcDeg: 105,
       damage: 1, type: "blunt", knockback: 100,
       color: "#73eff7",
+      lunge: 2.5, hitStop: 0.03, shake: 0.11, weight: 3,
     });
   },
 });
@@ -408,6 +415,7 @@ registerAbility({
     G.combat.shoot(user, {
       ability: "stormSpark", speed: 215, range: 125,
       damage: 1, type: "light", color: "#73eff7",
+      recoil: 1.5, trail: 5, hitStop: 0.024, shake: 0.1,
     });
   },
 });
@@ -460,6 +468,7 @@ registerAbility({
       ability: "tailSweep", range: 28, arcDeg: 220,
       damage: 1, type: "blunt", knockback: 135,
       color: "#38b764",
+      lunge: 2, hitStop: 0.04, shake: 0.15, weight: 4,
     });
   },
 });
@@ -517,6 +526,7 @@ registerAbility({
       speed: 230, range: 170,
       damage: 2, type: "light",
       color: "#ffcd75",
+      recoil: 2, trail: 6, hitStop: 0.034, shake: 0.13,
     });
   },
 });
