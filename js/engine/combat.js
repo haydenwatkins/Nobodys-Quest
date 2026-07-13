@@ -61,6 +61,7 @@ G.combat = (() => {
   function damageEnemy(enemy, opts) {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
+    if (enemy.def.miniboss && enemy.bossIntroT > 0) return false;
     const type = opts.type || "blunt";
 
     // WARD CHECK
@@ -114,6 +115,7 @@ G.combat = (() => {
       enemy: enemy.id,
       ability: opts.ability,
       damageType: type,
+      combo: opts.combo,
       dist: G.util.dist(G.state.player.x, G.state.player.y, enemy.x, enemy.y),
     });
 
@@ -170,7 +172,8 @@ G.combat = (() => {
     G.sfx.play("quest");
     G.state.shake = Math.max(G.state.shake, 0.45);
     burst(enemy.x, enemy.y - enemy.h() / 2, "#ffcd75", 24);
-    G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, `${enemy.def.trophyName} found · +1 ⭐`);
+    const lastWord = enemy.def.boss && enemy.def.boss.defeatLine ? ` · “${enemy.def.boss.defeatLine}”` : "";
+    G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, `${enemy.def.trophyName} found · +1 ⭐${lastWord}`);
     G.events.emit("pickup", { item: trophy });
     G.checkUnlocks();
     G.saveGame();
@@ -266,7 +269,7 @@ G.combat = (() => {
   // Fire a projectile in the direction you're facing.
   // {speed, damage, type, ability, range, size, color, pierce, status,
   //  spreadDeg, explodeRadius, explodeDamage, hitGroup, boomerang,
-  //  outboundRange, shape}
+  //  outboundRange, shape, ricochets, bounceRange}
   function shoot(user, o) {
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
     attackPose(user, facing + Math.PI, o.recoil === undefined ? 1.5 : o.recoil, 0.08);
@@ -290,6 +293,9 @@ G.combat = (() => {
       trail: [],
       trailLength: o.trail === undefined ? Math.min(6, 2 + (o.size || 3)) : o.trail,
       shape: o.shape,
+      ricochets: o.ricochets || 0,
+      ricochetsMax: o.ricochets || 0,
+      bounceRange: o.bounceRange || 62,
       boomerang: !!o.boomerang,
       returning: false,
       owner: o.boomerang ? user : null,
@@ -372,9 +378,35 @@ G.combat = (() => {
       color: o.color || "#f4f4f4",
       hitStop: o.hitStop === undefined ? 0.03 : o.hitStop,
       shake: o.shake,
+      endBurst: o.endBurst || null,
     };
     user.invuln = Math.max(user.invuln, 0.3);
     G.sfx.attack("dash", o.type || "blunt", o.damage || 1);
+  }
+
+  function finishDash(user, dashData) {
+    const burstData = dashData && dashData.endBurst;
+    if (!burstData) return 0;
+    const hits = meleeArc(user, {
+      ability: burstData.ability || dashData.ability,
+      range: burstData.range || 28,
+      arcDeg: 360,
+      damage: burstData.damage || 1,
+      type: burstData.type || dashData.type,
+      knockback: burstData.knockback || 135,
+      status: burstData.status,
+      color: burstData.color || dashData.color,
+      weight: burstData.weight || 4,
+      hitStop: burstData.hitStop || 0.036,
+      shake: burstData.shake || 0.14,
+      combo: "dash-finish",
+    });
+    G.spawnFx({
+      kind: "ring", x: user.x, y: user.y - 5,
+      color: burstData.color || dashData.color,
+      radius: burstData.range || 28, dur: 0.28,
+    });
+    return hits;
   }
 
   /* ---------- projectiles flying around ---------- */
@@ -405,7 +437,7 @@ G.combat = (() => {
           gone = true;
         }
         if (pr.travel > pr.range) gone = true; // failsafe if its owner keeps running away
-      } else if (G.util.dist(pr.startX, pr.startY, pr.x, pr.y) > pr.range) gone = true;
+      } else if (pr.ricochetsMax ? pr.travel > pr.range : G.util.dist(pr.startX, pr.startY, pr.x, pr.y) > pr.range) gone = true;
 
       if (!gone && G.world.solid(pr.x, pr.y - 4)) {
         gone = true;
@@ -426,9 +458,32 @@ G.combat = (() => {
                 damage: pr.damage, type: pr.type, ability: pr.ability,
                 status: pr.status, breaksAnyWard: pr.breaksAnyWard,
                 fromX: pr.startX, fromY: pr.startY,
+                combo: pr.ricochetsMax && pr.ricochets < pr.ricochetsMax ? "ricochet" : undefined,
                 hitStop: pr.hitStop, shake: pr.shake,
               });
-            if (!pr.pierce) { gone = true; break; }
+            if (!pr.pierce) {
+              let next = null, nextDist = Infinity;
+              if (pr.ricochets > 0) {
+                for (const candidate of s.enemies) {
+                  if (candidate.dead || (pr.hitSet && pr.hitSet.has(candidate))) continue;
+                  const distance = G.util.dist(pr.x, pr.y, candidate.x, candidate.y - 4);
+                  if (distance <= pr.bounceRange + candidate.def.size / 2 && distance < nextDist) {
+                    next = candidate;
+                    nextDist = distance;
+                  }
+                }
+              }
+              if (next) {
+                pr.ricochets--;
+                const angle = G.util.angleTo(pr.x, pr.y, next.x, next.y - 4);
+                pr.vx = Math.cos(angle) * pr.speed;
+                pr.vy = Math.sin(angle) * pr.speed;
+                G.spawnFx({ kind: "ring", x: pr.x, y: pr.y - 4, color: pr.color, radius: 5, dur: 0.14 });
+              } else {
+                gone = true;
+              }
+              break;
+            }
           }
         }
       } else if (!gone) {
@@ -466,5 +521,5 @@ G.combat = (() => {
     if (hits >= 2) G.events.emit("multiHit", { ability: pr.ability, hits });
   }
 
-  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, dash, updateProjectiles };
+  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, dash, finishDash, updateProjectiles };
 })();

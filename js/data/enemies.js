@@ -516,6 +516,13 @@ registerEnemy({
     color: "#73eff7", specialEvery: 2.35,
     telegraph: 0.48, chargeSpeed: 175, chargeDur: 0.34,
     antiKiteRange: 104, chaseScale: 1.34,
+    introLines: [
+      "The blade always returns. My library books do not.",
+      "Move with the throw, or become part of the lesson.",
+    ],
+    phaseLine: "Better. Now follow three blades and one terrible metaphor.",
+    defeatLine: "The rhythm is yours. Please return it by Tuesday.",
+    rematchLine: "Again? Good. The blade was getting bored.",
   },
   trophy: "riftblade-sigil",
   trophyName: "Riftblade Sigil",
@@ -564,5 +571,151 @@ registerEnemy({
         "...cb........bc.....",
       ],
     ],
+  },
+});
+
+/* ---- FORM TRIAL BOSSES — each teaches the form it guards ---- */
+registerEnemy({
+  id: "moleMonarch", name: "Mole Monarch",
+  hp: 24, speed: 52, damage: 2, behavior: "chase", aggro: 175,
+  size: 19, heavy: true, miniboss: true,
+  ward: { types: ["blunt"], hp: 6 },
+  boss: {
+    style: "mole", color: "#d8b06a", specialEvery: 2.45,
+    telegraph: 0.52, chargeSpeed: 190, chargeDur: 0.38,
+    antiKiteRange: 108, chaseScale: 1.28,
+    patterns: ["burrow", "quake"],
+    intro: "THIS WAS A PRIVATE TUNNEL",
+    introLines: [
+      "You tracked mud into my private tunnel.",
+      "I respect the technique. I object to the visitor.",
+    ],
+    phaseLine: "Fine. I am filing a noise complaint from below!",
+    defeatLine: "Take the crown. It was terrible for digging anyway.",
+    rematchLine: "The surface person is back. Everybody look busy.",
+  },
+  trophy: "mole-crown", trophyName: "Mole Crown", location: "The Royal Burrow",
+  sprite: {
+    palette: { k: "#1a1c2c", b: "#6b4a2b", t: "#8a6538", s: "#d8b06a", y: "#ffcd75", w: "#f4f4f4", p: "#ef7d57" },
+    frames: [[
+      "....yyy....yyy....", "...yyyyyyyyyyyy...", "..kkkttttttttkkk..", ".ktttsssssssstttk.",
+      "kttsskwsssswkssttk", "kttssskkkkkksssttk", "kbbtttssppsstttbbk", ".kbbbttttttttbbbk.",
+      "..kkttttttttttkk..", "...kttttttttttk...", "..kkbbbbbbbbbbkk..", ".kbbbbbbbbbbbbbbk.",
+      "kbbbkkbbbbbbkkbbbk", ".kkk..kkkkkkkk..kkk", "yyy....kkkk....yyy", "yyyy..........yyyy",
+    ], [
+      "...yyy......yyy...", "..yyyyyyyyyyyyyy..", ".kkkttttttttttkkk.", "ktttssssssssstttk.",
+      "kttsskwsssswkssttk", "kttssskkkkkksssttk", ".kbbttssppssttbbk.", "..kbbbttttttbbbk..",
+      "...kkttttttttkk...", "....kttttttttk....", "...kkbbbbbbbbkk...", "..kbbbbbbbbbbbbk..",
+      ".kbbbkkbbbbkkbbbk.", "..kkk..kkkk..kkk..", "yyyy....kk....yyyy", ".yyy..........yyy.",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "countessCarmine", name: "Countess Carmine",
+  hp: 26, speed: 65, damage: 2, behavior: "chase", aggro: 180,
+  size: 19, heavy: true, miniboss: true,
+  ward: { types: ["dark"], hp: 6 },
+  boss: {
+    style: "vampire", color: "#b13e53", specialEvery: 2.25,
+    telegraph: 0.44, chargeSpeed: 225, chargeDur: 0.28,
+    antiKiteRange: 112, chaseScale: 1.25,
+    patterns: ["vampireDash", "bloodBurst"],
+    intro: "MIDNIGHT HAS EXCELLENT TIMING",
+    introLines: [
+      "Welcome. I would offer refreshments, but that feels threatening.",
+      "Try not to bleed on the cape. It is already very committed.",
+    ],
+    phaseLine: "I have counted to two. Conveniently, this is phase two!",
+    defeatLine: "A fine performance. Nine out of ten. Lost one point for sunlight.",
+    rematchLine: "Back already? Delightful. I barely finished brooding.",
+  },
+  trophy: "crimson-seal", trophyName: "Crimson Seal", location: "Carmine Court",
+  sprite: {
+    palette: { k: "#1a1c2c", d: "#2d1b2e", v: "#5d275d", r: "#b13e53", c: "#ef7d57", w: "#f4f4f4", s: "#94b0c2" },
+    frames: [[
+      "kkk............kkk", "kddkk........kkddk", ".kdddkkkkkkkkdddk.", "..kddwsssssswddk..",
+      "...kwswkkkkwswk...", "...kwwk....kwwk...", "..kkwwwrrrrwwwkk..", ".kvvkkwwwwwwkkvvk.",
+      "kvvvvrkkkkkkrvvvvk", "kvvrrrkkkkkkrrrvvk", ".kvrrrvvvvvvrrrvk.", "..krrvvvvvvvvrrk..",
+      "...krrvvvvvvrrk...", "....krrvvvvrrk....", "...kkkv....vkkk...", "..kddk......kddk..",
+    ], [
+      ".kkk..........kkk.", ".kddkk......kkddk.", "..kdddkkkkkkdddk..", "...kddwsssswddk...",
+      "....kwswkkwswk....", "....kwwk..kwwk....", "...kkwwwrrwwwkk...", "..kvvkkwwwwkkvvk..",
+      ".kvvvvrkkkkrvvvvk.", ".kvvrrrkkkkrrrvvk.", "..kvrrvvvvvvrrvk..", "...krrvvvvvvrrk...",
+      "....krrvvvvrrk....", ".....krrvvrrk.....", "....kkkv..vkkk....", "...kddk....kddk...",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "royalFool", name: "The Royal Fool",
+  hp: 24, speed: 54, damage: 1, behavior: "shooter", shootEvery: 1.65, aggro: 185,
+  shotColor: "#ffcd75", size: 19, heavy: true, miniboss: true,
+  ward: { types: ["sharp"], hp: 6 },
+  boss: {
+    style: "jester", color: "#ffcd75", specialEvery: 2.2,
+    telegraph: 0.5, chargeSpeed: 0, chargeDur: 0,
+    patterns: ["cards", "pie", "cards", "nova"],
+    intro: "THE COURT IS NOW IN SILLY SESSION",
+    introLines: [
+      "Why did the hero cross the arena? Poor boundary awareness.",
+      "No refunds. The pie is a combat pie.",
+    ],
+    phaseLine: "Intermission is cancelled due to excessive competence!",
+    defeatLine: "You win. My final joke is the repair bill.",
+    rematchLine: "Same hero, new material. Let us both pretend to be surprised.",
+  },
+  trophy: "jester-bell", trophyName: "Jester Bell", location: "The Crooked Court",
+  sprite: {
+    palette: { k: "#1a1c2c", r: "#b13e53", b: "#3b5dc9", y: "#ffcd75", w: "#f4f4f4", p: "#8153c1" },
+    frames: [[
+      "rrr............bbb", "ryyr..........byyb", ".ryyrkkkkkkkkbyyb.", "..rrkwwwwwwkbb...",
+      "...kwkwkkwkwk....", "...kwwp..pwwk....", "..kkwwwwwwwwkk...", ".krrkkwwwwkkbbk...",
+      "krrrrykkkkkkybbbk", ".krrryyyyyyyybbbk.", "..krrryyyyyybbbk..", "...krryyyyyybbk...",
+      "..kkrryyyyyybbkk..", ".krrkk......kkbbk.", "kkk..........kkk.", "yyy..........yyy.",
+    ], [
+      ".rrr..........bbb.", ".ryyr........byyb.", "..ryyrkkkkkkbyyb..", "...rrkwwwwkbb....",
+      "....kwkwwkwk.....", "....kwwppwwk.....", "...kkwwwwwwkk....", "..krrkkwwkkbbk...",
+      ".krrrrykkkybbbk...", "..krrryyyyybbbk...", "...krryyyyybbbk...", "....krryyyyybbk...",
+      "...kkrryyyybbkk...", "..krrkk....kkbbk..", ".kkk........kkk...", "yyy..........yyy..",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "godAvatar", name: "God of Every Form",
+  hp: 36, speed: 62, damage: 2, behavior: "chase", aggro: 190,
+  size: 22, heavy: true, miniboss: true,
+  ward: { types: ["light", "dark"], hp: 10 },
+  boss: {
+    style: "god", color: "#f4f4f4", specialEvery: 1.95,
+    telegraph: 0.48, chargeSpeed: 195, chargeDur: 0.34,
+    antiKiteRange: 118, chaseScale: 1.3,
+    patterns: ["charge", "blades", "cards", "nova"],
+    intro: "THE FINAL FORM HAS BEEN EXPECTING YOU",
+    introLines: [
+      "I know everything. Except where I put my keys.",
+      "Show me every lesson. I promise to grade on a curve.",
+    ],
+    phaseLine: "Good. I was running out of easy questions.",
+    defeatLine: "Excellent. You may be God now. I am taking a lunch break.",
+    rematchLine: "Office hours again? Very well. One final final exam.",
+  },
+  trophy: "god-spark", trophyName: "Spark of Every Form", location: "The Final Firmament",
+  sprite: {
+    palette: { k: "#1a1c2c", w: "#f4f4f4", s: "#94b0c2", y: "#ffcd75", r: "#b13e53", p: "#8153c1", b: "#41a6f6" },
+    frames: [[
+      "......yyyyyyyy......", "....yyb......byy....", "...w...kkkkkk...w...", "..w...kwwsswwk...w..",
+      ".....kkwkkkkwkk.....", "....kkwwp..pwwkk....", "...rrkkwwwwwwkkrr...", "..rrrkkwwwwwwkkrrr..",
+      ".rrrkkwwrrrrwwkkrrr.", "rrrkkwwrrpprrwwkkrrr", ".rrkkwwrpppprwwkkrr.", "..kkwwwrrrrrrwwwkk..",
+      "...kkwwwwwwwwwwkk...", "....kkrrvvvvrrkk....", ".....krrvvvvrrk.....", "....kkkrrrrrrkkk....",
+      "...yyy..kkkk..yyy...", "..yyyy........yyyy..",
+    ], [
+      ".....yyyyyyyy........", "...yyb......byy......", "..w...kkkkkk...w.....", ".w...kwwsswwk...w....",
+      "....kkwkkkkwkk.......", "...kkwwp..pwwkk......", "..rrkkwwwwwwkkrr.....", ".rrrkkwwwwwwkkrrr....",
+      "rrrkkwwrrrrwwkkrrr...", "rrkkwwrrpprrwwkkrr...", ".kkwwrpppprwwkkrr....", "..kkwwwrrrrwwwwkk....",
+      "...kkwwwwwwwwkk......", "....kkrrvvvvrrkk.....", ".....krrvvvvrrk......", "....kkkrrrrrrkkk.....",
+      "..yyy..kkkk..yyy.....", ".yyyy........yyyy....",
+    ]],
   },
 });

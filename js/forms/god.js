@@ -26,8 +26,9 @@ registerForm({
     { id: "voidStar", level: 2 },
   ],
 
-  unlock: { type: "challenge", maintain: true, hint: "Master the complete roster as it grows", requirements: [
+  unlock: { type: "challenge", maintain: true, hint: "Master the complete roster, then pass its final exam", requirements: [
     { type: "previousFormsLevel", level: 5 },
+    { type: "item", item: "god-spark", hint: "Defeat the God of Every Form" },
   ] },
 
   quests: [

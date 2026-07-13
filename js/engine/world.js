@@ -41,6 +41,15 @@ G.world = (() => {
 
   const SOLID = { tree: true, water: true, wall: true, rock: true };
 
+  function portalMasteryMet(cell) {
+    if (!cell.mastery) return true;
+    const end = cell.mastery.before ? G.formOrder.indexOf(cell.mastery.before) : G.formOrder.length;
+    return G.formOrder.slice(0, end < 0 ? G.formOrder.length : end).every((id) => {
+      const form = G.forms[id];
+      return !form || form.invalid || G.formLevel(id) >= cell.mastery.level;
+    });
+  }
+
   /* ---------- loading a map ---------- */
   function load(mapId, spawn) {
     const def = G.maps[mapId];
@@ -86,6 +95,7 @@ G.world = (() => {
     s.chests = chests;
     s.projectiles = [];
     s.pickups = [];
+    s.bossCutscene = null;
     G.fx.length = 0;
 
     const p = s.player;
@@ -117,7 +127,7 @@ G.world = (() => {
     const cell = cellAt(px, py);
     // Doors: solid while locked, walkable once you have the stars —
     // even if the door is drawn on a normally-solid tile like a tree.
-    if (cell.portal) return !!(cell.stars && G.state.stars < cell.stars);
+    if (cell.portal) return !!((cell.stars && G.state.stars < cell.stars) || !portalMasteryMet(cell));
     if (SOLID[cell.tile]) return true;
     return false;
   }
@@ -195,7 +205,8 @@ G.world = (() => {
     // Doors / portals
     if (cell.portal) {
       const need = cell.stars || 0;
-      if (s.stars >= need && !s.portalNeedsRelease && s.portalGrace <= 0) {
+      const masteryReady = portalMasteryMet(cell);
+      if (s.stars >= need && masteryReady && !s.portalNeedsRelease && s.portalGrace <= 0) {
         G.sfx.play("door");
         load(cell.portal.map, { x: cell.portal.x, y: cell.portal.y });
         G.saveGame();
@@ -203,6 +214,9 @@ G.world = (() => {
       } else if (s.stars < need && doorMsgCooldown <= 0) {
         doorMsgCooldown = 2;
         G.ui.toast(`🔒 This door needs ${need} ⭐ — you have ${s.stars}. Finish quests to earn stars!`, 3);
+      } else if (!masteryReady && doorMsgCooldown <= 0) {
+        doorMsgCooldown = 2;
+        G.ui.toast(`🔒 Final trial: every earlier form must reach level ${cell.mastery.level}.`, 3);
       }
     }
 
@@ -335,7 +349,7 @@ G.world = (() => {
 
     /* extra decorations on top of the base tile */
     if (cell.portal) {
-      const locked = cell.stars && G.state.stars < cell.stars;
+      const locked = (cell.stars && G.state.stars < cell.stars) || !portalMasteryMet(cell);
       if (cell.portalStyle === "gap") {
         ctx.fillStyle = "#d8b06a";
         ctx.fillRect(px + 2, py + 6, T - 4, 4);

@@ -23,9 +23,11 @@ G.playerMaxHearts = () => 3;
 G.makeTown = () => ({});
 run("js/engine/forms.js");
 run("js/abilities/basics.js");
-for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alchemist", "stormcaller", "dragon", "riftblade", "god"])
+for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alchemist", "stormcaller", "dragon", "riftblade", "mole", "vampire", "jester", "god"])
   run(`js/forms/${name}.js`);
 run("js/engine/quests.js");
+G.validateCrossRefs();
+assert.equal(G.workshopErrors.length, 0, "new forms must obey Ben's workshop rules");
 
 G.state = {
   player: { damageTaken: 0, dashing: null }, formId: "nobody",
@@ -45,5 +47,10 @@ assert.equal(G.formUnlocked("rat"), true, "a deliberate claim unlocks the form")
 G.state.stars = 20;
 assert.match(G.unlockHint("stormcaller"), /One of:/, "unlock hints should describe alternate challenge paths");
 assert.equal(G.formReady("stormcaller"), false, "stars alone do not bypass a composite challenge");
+assert.equal(G.formReady("mole"), false);
+G.state.items.push("mole-crown");
+assert.equal(G.formReady("mole"), false, "a trophy still needs its form-specific training requirement");
+assert.ok(G.forms.god.unlock.requirements.some((rule) => rule.item === "god-spark"), "God must require the final boss trophy");
+assert.equal(G.formOrder[G.formOrder.length - 1], "god", "God must remain the top form");
 
 console.log("progression tests passed");

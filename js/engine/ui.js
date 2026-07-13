@@ -342,16 +342,18 @@ G.ui = (() => {
     c.fillStyle = "#ffcd75";
     c.fillText(starTxt, G.W - sw - 1, 8);
 
-    drawMinimap(c);
-    drawQuestTracker(c);
-    drawWardHint(c, cam);
-    drawTutorial(c);
-    drawAbilityBar(c, p);
+    if (!G.state.bossCutscene) {
+      drawMinimap(c);
+      drawQuestTracker(c);
+      drawWardHint(c, cam);
+      drawTutorial(c);
+      drawAbilityBar(c, p);
+    }
 
     /* toasts (word-wrapped so long messages fit) */
     c.font = `9px ${FONT_BODY}`;
     let ty = G.input.isTouch ? 5 : (G.pinnedQuests().length ? 105 : 67);
-    for (const t of toasts) {
+    for (const t of G.state.bossCutscene ? [] : toasts) {
       const alpha = t.t > t.dur - 0.3 ? (t.dur - t.t) / 0.3 : 1;
       c.globalAlpha = Math.max(0, alpha) * 0.95;
       for (const line of wrapText(c, t.text, G.W - 40)) {
@@ -399,6 +401,15 @@ G.ui = (() => {
         by += 10;
       }
       c.globalAlpha = 1;
+    }
+    if (G.state.bossCutscene) {
+      const skip = "TAP AN ABILITY TO SKIP";
+      c.font = `5px ${FONT_HEAD}`;
+      const skipW = c.measureText(skip).width;
+      c.fillStyle = "rgba(26,28,44,0.8)";
+      c.fillRect(Math.round(G.W / 2 - skipW / 2 - 4), G.H - 17, skipW + 8, 10);
+      c.fillStyle = "#94b0c2";
+      c.fillText(skip, Math.round(G.W / 2 - skipW / 2), G.H - 14);
     }
   }
 

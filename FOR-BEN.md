@@ -154,16 +154,36 @@ sprite — that's a perfect one to grab and make your own!
 
 ### Forms earned from bosses
 
-Riftblade demonstrates a boss-earned form. Its form uses an item unlock:
+Riftblade and the later trials demonstrate boss-earned forms. Unlock rules are
+challenges, and finishing one makes the form ready to **claim** in the Forms menu:
 
 ```js
-unlock: { type: "item", item: "riftblade-sigil", hint: "Defeat the Riftblade Adept" }
+unlock: {
+  type: "challenge",
+  hint: "Defeat the Riftblade Adept",
+  requirements: [
+    { type: "item", item: "riftblade-sigil", hint: "Win the Riftblade Sigil" },
+    { type: "formLevel", form: "dragon", level: 2 },
+  ],
+}
 ```
 
 The matching miniboss has `trophy: "riftblade-sigil"`. Defeating it awards the
 item, checks form unlocks immediately, and presents the new form. The boss should
 demonstrate the form's signature rhythm with fair telegraphs, so earning the form
 also teaches the player how to enjoy it.
+
+Bosses can have short personalities without adding a dialogue engine. Put
+`introLines`, `phaseLine`, `defeatLine`, and `rematchLine` inside `boss`. The
+first encounter pauses briefly for the lines, and an ability button skips them.
+Keep each line short enough to read during an action game.
+
+The current boss-earned examples deliberately teach different jobs:
+
+- Mole Monarch: reposition underground, then erupt in a crowd.
+- Countess Carmine: stay aggressive to earn carefully limited healing.
+- Royal Fool: count attacks and set up a third-card ricochet.
+- God of Every Form: combines learned patterns as the final mastery exam.
 
 ---
 
