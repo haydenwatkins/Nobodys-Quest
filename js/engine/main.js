@@ -54,6 +54,8 @@
   /* ---------- boot ---------- */
   G.validateCrossRefs();
   G.ui.showWorkshop();
+  const localBuilder = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+  const builderParams = localBuilder ? new URLSearchParams(location.search) : null;
 
   G.state = {
     player: G.makePlayer(),
@@ -98,13 +100,32 @@
     if (save.formId && G.forms[save.formId] && !G.forms[save.formId].invalid) s.formId = save.formId;
     s.known = s.known.filter((id) => G.forms[id] && !G.forms[id].invalid);
   }
+  const requestedTestForm = builderParams && builderParams.get("playtestForm");
+  if (requestedTestForm && G.forms[requestedTestForm] && !G.forms[requestedTestForm].invalid) {
+    if (!G.forms[requestedTestForm].start && !G.state.claimedForms.includes(requestedTestForm))
+      G.state.claimedForms.push(requestedTestForm);
+    G.state.formId = requestedTestForm;
+  }
   // if a form file got edited/broken since last save, fall back safely
   if (!G.formUnlocked(G.state.formId)) {
     G.state.formId = G.unlockedForms()[0] || "nobody";
   }
 
-  const startMap = save && G.maps[save.mapId] ? save.mapId : "overworld";
+  // Local-only builder shortcut: ?playtestMap=moleTrial jumps directly to an
+  // arena without exposing a cheat on the published game.
+  const requestedTestMap = builderParams && builderParams.get("playtestMap");
+  const startMap = requestedTestMap && G.maps[requestedTestMap]
+    ? requestedTestMap
+    : save && G.maps[save.mapId] ? save.mapId : "overworld";
   G.world.load(startMap);
+  if (requestedTestMap) {
+    const trialBoss = G.state.enemies.find((enemy) => enemy.def.miniboss);
+    if (trialBoss) {
+      G.state.player.x = trialBoss.x - 125;
+      G.state.player.y = trialBoss.y;
+      G.state.entryPoint = { x: G.state.player.x, y: G.state.player.y };
+    }
+  }
   if (save && save.mapId === startMap && typeof save.px === "number") {
     const safeSavedSpot = typeof save.py === "number" && G.world.isSafeSpawn(save.px, save.py);
     if (safeSavedSpot) {
@@ -152,6 +173,17 @@
     if (s.hitStop > 0) {
       s.hitStop = Math.max(0, s.hitStop - dt);
       G.updateFx(dt * 0.12);
+      G.ui.update(dt);
+      return;
+    }
+
+    // First encounters get a tiny story beat. The world pauses, the boss
+    // speaks one or two short lines, and any ability button skips after the
+    // opening moment so repeat attempts never feel slow.
+    if (s.bossCutscene) {
+      s.time += dt;
+      G.updateBossCutscene(dt);
+      G.updateFx(dt * 0.35);
       G.ui.update(dt);
       return;
     }

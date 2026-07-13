@@ -68,6 +68,28 @@ The intended result is layered and restrained: attacks should be clearer and
 more responsive after ten minutes, without any one effect calling attention to
 itself in the first ten seconds.
 
+## Boss-form expansion
+
+The Mole, Vampire, and Jester expansion follows two additional lessons. Combat
+abilities are more interesting when each has a unique tactical function and a
+clear risk/reward tradeoff, and enemies are strongest as teachers for the tools
+the player will use ([combat-system design](https://www.gamedeveloper.com/design/the-fundamental-pillars-of-a-combat-system)).
+Players also warn that ricochet, chain lightning, and bouncing attacks feel
+samey when they only swap visuals; build identity needs mechanical differences
+([action-RPG player discussion](https://www.reddit.com/r/rpg_gamers/comments/1freu65)).
+
+- **Mole:** Burrow Blitz is invulnerable repositioning with no travel damage;
+  its power only arrives at the chosen endpoint. The boss telegraphs the same
+  burrow-and-erupt sequence.
+- **Vampire:** Blood Bite heals exactly one heart after five successful hits.
+  It rewards aggression but cannot passively erase mistakes or heal on misses.
+- **Jester:** the player counts a three-card rhythm. Only the third throw can
+  retarget, and it physically travels between unhit enemies rather than using
+  the existing instant chain helper.
+- **God:** the final boss cycles charge, returning blade, card fan, and radial
+  patterns. God remains last and requires both full prior mastery and victory
+  in the final trial.
+
 ## Why the Riftblade works this way
 
 The Riftblade combines patterns that players repeatedly describe as fun without

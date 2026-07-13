@@ -101,15 +101,47 @@ const expectedBasics = {
   slap: [0, 0.35], bite: [0, 0.3], slash: [0, 0.5], arrow: [0, 0.45],
   curse: [0, 0.55], tongueLash: [0, 0.45], bottleBonk: [0, 0.4],
   stormSpark: [0, 0.45], tailSweep: [0, 0.55], divineSpark: [0, 0.5],
+  drillTap: [0, 0.38], bloodBite: [0, 0.34], wildCard: [0, 0.45],
 };
 for (const [id, values] of Object.entries(expectedBasics)) {
   assert.deepEqual([G.abilities[id].mana, G.abilities[id].cooldown], values, `${id} balance changed`);
 }
-assert.equal(Object.keys(G.abilities).length, 32);
+assert.equal(Object.keys(G.abilities).length, 41);
 for (const ability of Object.values(G.abilities)) {
   freshState();
   G.state.player.invuln = 0;
   assert.doesNotThrow(() => ability.use(G.state.player), `${ability.id} should execute`);
+}
+
+{
+  const targets = [enemy(38, 0), enemy(74, 0), enemy(110, 0)];
+  freshState();
+  G.state.enemies = targets;
+  G.state.player.cardBeat = 2;
+  G.abilities.wildCard.use(G.state.player);
+  for (let i = 0; i < 40 && G.state.projectiles.length; i++) G.combat.updateProjectiles(0.03);
+  assert.deepEqual(targets.map((target) => target.hp), [9, 9, 9], "third Wild Card should ricochet through new targets once each");
+}
+
+{
+  const target = enemy(10, 0);
+  freshState(target);
+  G.state.player.damageTaken = 2;
+  for (let i = 0; i < 5; i++) G.abilities.bloodBite.use(G.state.player);
+  assert.equal(G.state.player.damageTaken, 1, "five successful bites should restore exactly one heart");
+  assert.equal(G.state.player.bloodPips, 0);
+}
+
+{
+  const targets = [enemy(10, 0), enemy(12, 4)];
+  freshState();
+  G.state.enemies = targets;
+  G.state.player.invuln = 0;
+  G.abilities.burrowBlitz.use(G.state.player);
+  const dashData = G.state.player.dashing;
+  const hits = G.combat.finishDash(G.state.player, dashData);
+  assert.equal(hits, 2, "Burrow Blitz should erupt at its chosen endpoint");
+  assert.ok(targets.every((target) => target.hp === 8));
 }
 
 {
@@ -153,15 +185,63 @@ for (const ability of Object.values(G.abilities)) {
 run("js/engine/entities.js");
 run("js/data/enemies.js");
 assert.deepEqual(
-  [G.enemies.ancientTreant.boss.style, G.enemies.mireQueen.boss.style, G.enemies.eclipseKnight.boss.style, G.enemies.riftbladeAdept.boss.style],
-  ["charger", "caster", "duelist", "riftblade"],
+  [G.enemies.ancientTreant.boss.style, G.enemies.mireQueen.boss.style, G.enemies.eclipseKnight.boss.style, G.enemies.riftbladeAdept.boss.style,
+    G.enemies.moleMonarch.boss.style, G.enemies.countessCarmine.boss.style, G.enemies.royalFool.boss.style, G.enemies.godAvatar.boss.style],
+  ["charger", "caster", "duelist", "riftblade", "mole", "vampire", "jester", "god"],
 );
+for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar"]) {
+  assert.ok(G.enemies[id].boss.introLines.length >= 2, `${id} needs a personality-driven introduction`);
+  assert.ok(G.enemies[id].boss.phaseLine && G.enemies[id].boss.defeatLine);
+}
+
+{
+  const monarch = G.makeEnemy("moleMonarch", 70, 0);
+  G.state = {
+    player: { x: 0, y: 0, dir: { x: 1, y: 0 }, invuln: 0 },
+    enemies: [monarch], projectiles: [], pickups: [], items: [],
+    hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  let spoken = "";
+  G.ui.banner = (title, sub) => { spoken = sub || title; };
+  G.input = { tapped: () => false, clearTaps() {} };
+  G.updateEnemies(0.016);
+  assert.equal(G.state.bossCutscene.lines.length, 2);
+  G.updateBossCutscene(1.16);
+  assert.match(spoken, /respect the technique/i, "boss cutscene should advance through personality lines");
+  G.state.bossCutscene = null;
+}
 
 G.maps = {};
 context.registerMap = (map) => { G.maps[map.id] = map; };
 run("js/data/maps.js");
 assert.ok(G.maps.riftbladeTrial);
 assert.ok(G.maps.riftbladeTrial.tiles.every((row) => row.length === 28), "Riftblade arena rows must stay aligned");
+for (const id of ["moleTrial", "vampireTrial", "jesterTrial", "godTrial"])
+  assert.ok(G.maps[id].tiles.length === 17 && G.maps[id].tiles.every((row) => row.length === 28), `${id} must stay aligned`);
+assert.equal(G.maps.overworld.legend.Y.mastery.before, "god");
+assert.equal(G.maps.overworld.legend.Y.mastery.level, 5, "the final trial must require full prior mastery");
+{
+  const map = G.maps.overworld;
+  const solidChars = new Set(["t", "w", "r", "#"]);
+  const seen = new Set();
+  const queue = [[map.playerStart.x, map.playerStart.y]];
+  while (queue.length) {
+    const [x, y] = queue.shift();
+    const key = `${x},${y}`;
+    if (seen.has(key) || y < 0 || y >= map.tiles.length || x < 0 || x >= map.tiles[y].length) continue;
+    if (solidChars.has(map.tiles[y][x])) continue;
+    seen.add(key);
+    queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+  }
+  for (const portal of ["L", "U", "F", "Y"]) {
+    let found = false;
+    map.tiles.forEach((row, y) => {
+      const x = row.indexOf(portal);
+      if (x >= 0 && seen.has(`${x},${y}`)) found = true;
+    });
+    assert.equal(found, true, `${portal} trial entrance must be reachable from Greenfield`);
+  }
+}
 assert.ok(G.maps.sunkenMarsh.tiles.every((row) => row.length === 30), "Marsh rows must stay aligned");
 
 // Every walkable marsh tile must connect to the arrival point. This catches
@@ -268,6 +348,29 @@ G.enemies.testCaster = {
   G.updateEnemies(0.016);
   assert.equal(G.state.projectiles.length, 2);
   assert.ok(G.state.projectiles.every((shot) => shot.boomerang && shot.damage === 1));
+}
+
+
+for (const [id, patternIndex, action, projectileCount] of [
+  ["royalFool", 0, "cards", 3],
+  ["godAvatar", 3, "nova", 12],
+]) {
+  const boss = G.makeEnemy(id, 80, 0);
+  boss.bossEngaged = true;
+  boss.bossIntroT = 0;
+  boss.bossSpecialT = 0;
+  boss.bossPattern = patternIndex;
+  G.state = {
+    player: { x: 0, y: 0, dir: { x: 1, y: 0 }, invuln: 0 },
+    enemies: [boss], projectiles: [], pickups: [], items: [],
+    hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(boss.bossPendingAction, action);
+  boss.bossTelegraphT = 0.001;
+  G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles.length, projectileCount, `${id} should fire its readable ${action} pattern`);
+  assert.ok(G.state.projectiles.every((shot) => shot.damage <= 1 || action === "pie"));
 }
 
 let fired = 0;

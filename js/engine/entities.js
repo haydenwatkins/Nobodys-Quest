@@ -116,7 +116,10 @@ G.updatePlayer = function (dt) {
       }
     }
     const stuck = p.x === beforeX && p.y === beforeY;
-    if (d.left <= 0 || stuck) p.dashing = null;
+    if (d.left <= 0 || stuck) {
+      p.dashing = null;
+      G.combat.finishDash(p, d);
+    }
   } else {
     /* --- normal movement --- */
     const v = G.input.vec;
@@ -223,6 +226,7 @@ G.makeEnemy = function (id, x, y) {
     bossStrafeT: 1 + Math.random(),
     bossPattern: 0,
     bossPendingAction: null,
+    bossAfterCharge: null,
     touchCd: 0,
     kbx: 0, kby: 0,
     hitKickX: 0, hitKickY: 0,
@@ -249,7 +253,8 @@ function engageBoss(e) {
   e.bossEngaged = true;
   const boss = e.def.boss;
   const rematch = (G.state.items || []).includes(e.def.trophy);
-  e.bossIntroT = rematch ? 0.35 : 0.95;
+  const lines = boss.introLines && boss.introLines.length ? boss.introLines : [boss.intro];
+  e.bossIntroT = rematch ? 0.35 : Math.max(1.2, lines.length * 1.15);
   e.shootT = Math.max(e.shootT, e.bossIntroT + 0.35);
   G.state.hitStop = Math.max(G.state.hitStop || 0, rematch ? 0.03 : 0.08);
   G.state.shake = Math.max(G.state.shake, rematch ? 0.16 : 0.38);
@@ -258,13 +263,43 @@ function engageBoss(e) {
   G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: "#ffcd75", radius: 13, dur: 0.4 });
   bossBurst(e, boss.color, rematch ? 8 : 16);
   if (rematch) {
-    G.ui.toast(`⚔ ${e.def.name} returns!`, 2);
+    G.ui.toast(`⚔ ${boss.rematchLine || e.def.name + " returns!"}`, 2);
   } else {
     const ward = e.ward && G.DAMAGE_TYPES[e.ward.types[0]];
     const wardText = ward ? ` · ${ward.icon} ${ward.name.toUpperCase()} breaks its ward` : "";
-    G.ui.banner(`⚔ ${e.def.name.toUpperCase()} ⚔`, `${boss.intro}${wardText}`);
+    G.state.bossCutscene = {
+      enemy: e,
+      lines,
+      index: 0,
+      lineT: 1.15,
+      elapsed: 0,
+      wardText,
+    };
+    G.ui.banner(`⚔ ${e.def.name.toUpperCase()} ⚔`, `${lines[0]}${wardText}`);
   }
 }
+
+G.updateBossCutscene = function (dt) {
+  const scene = G.state.bossCutscene;
+  if (!scene) return;
+  const e = scene.enemy;
+  scene.elapsed += dt;
+  scene.lineT -= dt;
+  e.bossIntroT = Math.max(0, e.bossIntroT - dt);
+
+  const skip = scene.elapsed > 0.35 && ["a", "b", "c", "pause"].some((button) => G.input.tapped(button));
+  if (!skip && scene.lineT <= 0 && scene.index < scene.lines.length - 1) {
+    scene.index++;
+    scene.lineT = 1.15;
+    G.sfx.play("bossPhase");
+    G.ui.banner(`⚔ ${e.def.name.toUpperCase()} ⚔`, scene.lines[scene.index]);
+  }
+  if (skip || e.bossIntroT <= 0) {
+    e.bossIntroT = 0;
+    G.state.bossCutscene = null;
+    G.input.clearTaps();
+  }
+};
 
 function fireRiftbladeVolley(e, p) {
   const a = G.util.angleTo(e.x, e.y, p.x, p.y);
@@ -276,6 +311,40 @@ function fireRiftbladeVolley(e, p) {
     });
   }
   G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: e.def.boss.color, radius: 20, dur: 0.3 });
+}
+
+function fireBossFan(e, p, count, shape, size, damage) {
+  const a = G.util.angleTo(e.x, e.y, p.x, p.y);
+  const middle = (count - 1) / 2;
+  for (let i = 0; i < count; i++) {
+    enemyShot(G.state, e, a + (i - middle) * 14 * Math.PI / 180, {
+      damage: damage || 1, speed: 105, range: 175, size: size || 4, shape,
+    });
+  }
+}
+
+function fireBossRadial(e, count, speed, shape) {
+  for (let i = 0; i < count; i++) {
+    enemyShot(G.state, e, (i / count) * Math.PI * 2, {
+      damage: 1, speed: speed || 78, range: 155, size: 4, shape,
+    });
+  }
+  G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: e.def.boss.color, radius: 28, dur: 0.32 });
+}
+
+function resolveBossAction(e, p, action) {
+  if (["charge", "burrow", "vampireDash"].includes(action)) {
+    e.bossChargeT = e.def.boss.chargeDur;
+    e.bossAfterCharge = action === "burrow" ? "quake" : action === "vampireDash" ? "bloodBurst" : null;
+    return;
+  }
+  if (action === "blades") fireRiftbladeVolley(e, p);
+  if (action === "cards") fireBossFan(e, p, e.bossPhase === 2 ? 5 : 3, "card", 5, 1);
+  if (action === "pie") fireBossFan(e, p, 1, "pie", 8, 2);
+  if (action === "quake") fireBossRadial(e, e.bossPhase === 2 ? 12 : 8, 74, "fault");
+  if (action === "bloodBurst") fireBossRadial(e, e.bossPhase === 2 ? 12 : 8, 92, null);
+  if (action === "nova") fireBossRadial(e, e.bossPhase === 2 ? 16 : 12, 82, null);
+  e.bossRecoverT = 0.34;
 }
 
 function updateBossState(e, p, dist, dt) {
@@ -300,19 +369,14 @@ function updateBossState(e, p, dist, dt) {
     G.sfx.play("bossPhase");
     G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: boss.color, radius: 30, dur: 0.55 });
     bossBurst(e, boss.color, 14);
-    G.ui.banner(`${e.def.name} — PHASE II`, "The fight changes. Watch its movement!");
+    G.ui.banner(`${e.def.name} — PHASE II`, boss.phaseLine || "The fight changes. Watch its movement!");
     return true;
   }
 
   if (e.bossTelegraphT > 0) {
     e.bossTelegraphT -= dt;
     if (e.bossTelegraphT <= 0) {
-      if (e.bossPendingAction === "blades") {
-        fireRiftbladeVolley(e, p);
-        e.bossRecoverT = 0.32;
-      } else {
-        e.bossChargeT = boss.chargeDur;
-      }
+      resolveBossAction(e, p, e.bossPendingAction);
       e.bossPendingAction = null;
     }
     return true;
@@ -324,7 +388,11 @@ function updateBossState(e, p, dist, dt) {
     e.dir = { x: e.bossChargeX, y: e.bossChargeY };
     e.bossChargeT -= dt;
     G.spawnFx({ kind: "puff", x: e.x, y: e.y - 5, color: boss.color, dur: 0.16 });
-    if (e.bossChargeT <= 0) e.bossRecoverT = boss.style === "charger" ? 0.55 : 0.38;
+    if (e.bossChargeT <= 0) {
+      if (e.bossAfterCharge) resolveBossAction(e, p, e.bossAfterCharge);
+      e.bossAfterCharge = null;
+      e.bossRecoverT = Math.max(e.bossRecoverT, boss.style === "charger" ? 0.55 : 0.38);
+    }
     return true;
   }
 
@@ -333,7 +401,7 @@ function updateBossState(e, p, dist, dt) {
     return true;
   }
 
-  if (boss.style === "charger" || boss.style === "duelist" || boss.style === "riftblade") {
+  if (boss.patterns || boss.style === "charger" || boss.style === "duelist" || boss.style === "riftblade") {
     e.bossSpecialT -= dt;
     if (e.bossSpecialT <= 0) {
       const a = G.util.angleTo(e.x, e.y, p.x, p.y);
@@ -343,10 +411,11 @@ function updateBossState(e, p, dist, dt) {
       e.bossSpecialT = boss.specialEvery * (e.bossPhase === 2 ? 0.86 : 1);
       G.sfx.play("bossPhase");
       G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: boss.color, radius: 18, dur: boss.telegraph });
-      const throwBlades = boss.style === "riftblade" && e.bossPattern % 2 === 1;
-      e.bossPendingAction = throwBlades ? "blades" : "charge";
+      const fallback = boss.style === "riftblade" ? ["charge", "blades"] : ["charge"];
+      const patterns = boss.patterns || fallback;
+      e.bossPendingAction = patterns[e.bossPattern % patterns.length];
       e.bossPattern++;
-      if (!throwBlades) {
+      if (["charge", "burrow", "vampireDash"].includes(e.bossPendingAction)) {
         G.spawnFx({
           kind: "tell", x: e.x, y: e.y - 5,
           x2: e.x + e.bossChargeX * 44, y2: e.y - 5 + e.bossChargeY * 44,
@@ -369,7 +438,7 @@ function bossMoveVector(e, p, dist, dt) {
       scale: phaseSpeed * (boss.chaseScale || 1),
     };
   }
-  if (boss.style === "caster") {
+  if (boss.style === "caster" || boss.style === "jester") {
     e.bossStrafeT -= dt;
     if (e.bossStrafeT <= 0) {
       e.bossStrafeT = 1.1 + Math.random() * 0.8;
@@ -379,7 +448,7 @@ function bossMoveVector(e, p, dist, dt) {
     if (dist < 55) return { x: -Math.cos(a) * 0.85, y: -Math.sin(a) * 0.85, scale: phaseSpeed };
     return { x: -Math.sin(a) * 0.72 * e.bossStrafeDir, y: Math.cos(a) * 0.72 * e.bossStrafeDir, scale: phaseSpeed };
   }
-  if ((boss.style === "duelist" || boss.style === "riftblade") && dist < 50) {
+  if (["duelist", "riftblade", "vampire", "god"].includes(boss.style) && dist < 50) {
     return {
       x: Math.cos(a) * 0.2 - Math.sin(a) * 0.75 * e.bossStrafeDir,
       y: Math.sin(a) * 0.2 + Math.cos(a) * 0.75 * e.bossStrafeDir,
@@ -706,6 +775,21 @@ G.drawProjectiles = function (ctx) {
       ctx.fillRect(x - 1, y - 2, 3, 5);
       ctx.fillStyle = "#f4f4f4";
       ctx.fillRect(x, y, 1, 1);
+    } else if (pr.shape === "card") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 2, y - 3, 5, 7);
+      ctx.fillStyle = pr.fromPlayer ? "#b13e53" : "#1a1c2c";
+      ctx.fillRect(x, y, 1, 1);
+    } else if (pr.shape === "pie") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 3, y - 2, 7, 4);
+      ctx.fillStyle = "#f4f4f4";
+      ctx.fillRect(x - 2, y - 1, 5, 2);
+    } else if (pr.shape === "fault") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 4, y - 1, 3, 2);
+      ctx.fillRect(x - 1, y - 3, 3, 3);
+      ctx.fillRect(x + 2, y - 1, 3, 2);
     } else {
       ctx.fillRect(Math.round(pr.x - s / 2), Math.round(pr.y - 4 - s / 2), s, s);
     }

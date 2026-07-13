@@ -56,6 +56,10 @@ function makeGreenfieldTiles() {
   put(90, H - 1, "V"); put(90, H - 2, ".");
   put(30, H - 1, "W"); put(30, H - 2, ".");
   put(W - 1, 18, "R"); put(W - 2, 18, ".");
+  put(40, 0, "L"); put(40, 1, ".");
+  put(50, H - 1, "U"); put(50, H - 2, ".");
+  put(W - 1, 60, "F"); put(W - 2, 60, ".");
+  put(110, 0, "Y"); put(110, 1, ".");
 
   // Landmarks.
   put(57, 44, "s");
@@ -99,6 +103,10 @@ registerMap({
     "V": { tile: "grass", portal: { map: "starfallRuins", x: 2, y: 1 }, stars: 10, portalStyle: "gap" },
     "W": { tile: "grass", portal: { map: "whispering-grove", x: 2, y: 10 }, stars: 0, portalStyle: "gap" },
     "R": { tile: "grass", portal: { map: "riftbladeTrial", x: 2, y: 8 }, stars: 18, portalStyle: "gap" },
+    "L": { tile: "grass", portal: { map: "moleTrial", x: 3, y: 8 }, stars: 20, portalStyle: "gap" },
+    "U": { tile: "grass", portal: { map: "vampireTrial", x: 3, y: 8 }, stars: 22, portalStyle: "gap" },
+    "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "gap" },
+    "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, mastery: { before: "god", level: 5 }, portalStyle: "gap" },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
   },
 
@@ -139,6 +147,72 @@ registerMap({
     "#ffffffffffffffffffffffffff#",
     "############################",
   ],
+});
+
+/* ================== FORM TRIALS (28 x 17) ================== */
+
+function makeFormTrialArena(variant) {
+  const w = 28, h = 17;
+  const rows = Array.from({ length: h }, (_, y) =>
+    Array.from({ length: w }, (_, x) => (x === 0 || y === 0 || x === w - 1 || y === h - 1) ? "#" : "f"));
+  const put = (x, y, ch) => { rows[y][x] = ch; };
+  put(0, 8, "x"); put(4, 8, "m"); put(6, variant % 2 ? 5 : 11, "H"); put(22, 8, "B");
+  const rocks = [
+    [[8,3],[17,4],[13,12],[23,14]],
+    [[10,3],[19,3],[14,13],[23,11]],
+    [[8,4],[16,3],[12,13],[21,13]],
+    [[9,3],[18,3],[9,13],[18,13]],
+  ][variant % 4];
+  rocks.forEach(([x, y]) => put(x, y, "R"));
+  return rows.map((row) => row.join(""));
+}
+
+registerMap({
+  id: "moleTrial", name: "The Royal Burrow", playerStart: { x: 3, y: 8 },
+  legend: {
+    "x": { tile: "floor", portal: { map: "overworld", x: 40, y: 1 } },
+    "B": { tile: "floor", enemy: "moleMonarch" },
+    "m": { tile: "floor", message: "A tiny plaque reads: PLEASE KNOCK. The next line reads: TOO LATE." },
+    "H": { tile: "floor", chest: { heal: true, name: "an underground shortbread" } },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: makeFormTrialArena(0),
+});
+
+registerMap({
+  id: "vampireTrial", name: "Carmine Court", playerStart: { x: 3, y: 8 },
+  legend: {
+    "x": { tile: "floor", portal: { map: "overworld", x: 50, y: 78 } },
+    "B": { tile: "floor", enemy: "countessCarmine" },
+    "m": { tile: "floor", message: "The invitation says FORMAL COMBAT. Capes optional. Dramatic entrances mandatory." },
+    "H": { tile: "floor", chest: { heal: true, name: "a suspiciously red velvet cookie" } },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: makeFormTrialArena(1),
+});
+
+registerMap({
+  id: "jesterTrial", name: "The Crooked Court", playerStart: { x: 3, y: 8 },
+  legend: {
+    "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 60 } },
+    "B": { tile: "floor", enemy: "royalFool" },
+    "m": { tile: "floor", message: "Tonight only: one hero, several pies, absolutely no responsible adults." },
+    "H": { tile: "floor", chest: { heal: true, name: "a custard-proof cookie" } },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: makeFormTrialArena(2),
+});
+
+registerMap({
+  id: "godTrial", name: "The Final Firmament", playerStart: { x: 3, y: 8 },
+  legend: {
+    "x": { tile: "floor", portal: { map: "overworld", x: 110, y: 1 } },
+    "B": { tile: "floor", enemy: "godAvatar" },
+    "m": { tile: "floor", message: "FINAL EXAM: bring every form. Pencils will not be provided because swords are funnier." },
+    "H": { tile: "floor", chest: { heal: true, name: "the last cookie (allegedly)" } },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: makeFormTrialArena(3),
 });
 
 /* ================== THE OLD DUNGEON (30 x 18) ================== */

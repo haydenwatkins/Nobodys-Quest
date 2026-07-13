@@ -585,6 +585,201 @@ registerAbility({
   },
 });
 
+/* ----------------- MOLE's moves ----------------- */
+
+registerAbility({
+  id: "drillTap",
+  name: "Drill Tap",
+  icon: "⛏️",
+  type: "blunt",
+  mana: 0,
+  cooldown: 0.38,
+  use(user) {
+    const last = typeof user.drillTapAt === "number" ? user.drillTapAt : -10;
+    const chained = G.state.time - last < 0.7;
+    user.drillTapCombo = chained ? (user.drillTapCombo || 0) % 3 + 1 : 1;
+    user.drillTapAt = G.state.time;
+    const eruption = user.drillTapCombo === 3;
+    G.combat.meleeArc(user, {
+      ability: "drillTap", range: eruption ? 29 : 20,
+      arcDeg: eruption ? 175 : 82, damage: 1, type: "blunt",
+      knockback: eruption ? 155 : 70,
+      status: eruption ? { name: "stun", dur: 0.28 } : null,
+      color: eruption ? "#ffcd75" : "#8a6538",
+      lunge: 3, weight: eruption ? 5 : 3,
+      hitStop: eruption ? 0.04 : 0.024,
+      combo: eruption ? "eruption" : "drill",
+    });
+  },
+});
+
+registerAbility({
+  id: "burrowBlitz",
+  name: "Burrow Blitz",
+  icon: "🕳️",
+  type: "dark",
+  mana: 3,
+  cooldown: 1.15,
+  use(user) {
+    G.combat.dash(user, {
+      ability: "burrowBlitz", dist: 70, speed: 340,
+      damage: 0, type: "dark", color: "#5d275d",
+      endBurst: {
+        ability: "burrowBlitz", range: 27, damage: 2,
+        type: "blunt", knockback: 165, color: "#d8b06a",
+        status: { name: "stun", dur: 0.3 }, weight: 5,
+      },
+    });
+  },
+});
+
+registerAbility({
+  id: "faultLine",
+  name: "Fault Line",
+  icon: "〰️",
+  type: "blunt",
+  mana: 5,
+  cooldown: 1.55,
+  autoAim: true, aimRange: 130,
+  use(user) {
+    G.combat.shoot(user, {
+      ability: "faultLine", speed: 125, range: 130,
+      damage: 2, explodeDamage: 2, explodeRadius: 27,
+      type: "blunt", size: 6, color: "#d8b06a",
+      shape: "fault", trail: 5, recoil: 3,
+    });
+  },
+});
+
+/* ----------------- VAMPIRE's moves ----------------- */
+
+registerAbility({
+  id: "bloodBite",
+  name: "Blood Bite",
+  icon: "🦇",
+  type: "sharp",
+  mana: 0,
+  cooldown: 0.34,
+  use(user) {
+    const hits = G.combat.meleeArc(user, {
+      ability: "bloodBite", range: 19, arcDeg: 95,
+      damage: 1, type: "sharp", knockback: 62,
+      color: "#b13e53", lunge: 3.2, weight: 3,
+      hitStop: 0.026,
+    });
+    if (!hits) return;
+    user.bloodPips = Math.min(5, (user.bloodPips || 0) + hits);
+    if (user.bloodPips >= 5 && user.damageTaken > 0) {
+      user.bloodPips = 0;
+      user.damageTaken--;
+      G.sfx.play("pickup");
+      G.spawnFx({ kind: "ring", x: user.x, y: user.y - 7, color: "#b13e53", radius: 18, dur: 0.4 });
+      G.damageNumber(user.x, user.y - 18, "DRAIN!", "#ef7d57");
+      G.events.emit("selfHeal", { ability: "bloodBite" });
+    }
+  },
+});
+
+registerAbility({
+  id: "crimsonWaltz",
+  name: "Crimson Waltz",
+  icon: "🌹",
+  type: "dark",
+  mana: 3,
+  cooldown: 1.05,
+  use(user) {
+    G.combat.dash(user, {
+      ability: "crimsonWaltz", dist: 62, speed: 360,
+      damage: 1, type: "dark", color: "#b13e53",
+      hitStop: 0.028, shake: 0.1,
+    });
+  },
+});
+
+registerAbility({
+  id: "bloodMoon",
+  name: "Blood Moon",
+  icon: "🌕",
+  type: "dark",
+  mana: 6,
+  cooldown: 1.85,
+  use(user) {
+    const hits = G.combat.meleeArc(user, {
+      ability: "bloodMoon", range: 40, arcDeg: 360,
+      damage: 2, type: "dark", knockback: 145,
+      color: "#b13e53", weight: 6, hitStop: 0.04, shake: 0.18,
+    });
+    G.spawnFx({ kind: "ring", x: user.x, y: user.y - 7, color: "#8153c1", radius: 40, dur: 0.42 });
+    if (hits >= 3 && user.damageTaken > 0) {
+      user.damageTaken--;
+      G.events.emit("selfHeal", { ability: "bloodMoon" });
+      G.damageNumber(user.x, user.y - 18, "FEAST!", "#ef7d57");
+    }
+  },
+});
+
+/* ----------------- JESTER's moves ----------------- */
+
+registerAbility({
+  id: "wildCard",
+  name: "Wild Card",
+  icon: "🃏",
+  type: "sharp",
+  mana: 0,
+  cooldown: 0.45,
+  autoAim: true, aimRange: 150,
+  use(user) {
+    user.cardBeat = (user.cardBeat || 0) % 3 + 1;
+    const joker = user.cardBeat === 3;
+    G.combat.shoot(user, {
+      ability: "wildCard", speed: 215, range: joker ? 260 : 150,
+      damage: 1, type: "sharp", size: 5, shape: "card",
+      color: joker ? "#ffcd75" : "#f4f4f4",
+      ricochets: joker ? 2 : 0, bounceRange: 72,
+      trail: joker ? 6 : 3, recoil: 1.6,
+    });
+  },
+});
+
+registerAbility({
+  id: "punchlinePie",
+  name: "Punchline Pie",
+  icon: "🥧",
+  type: "blunt",
+  mana: 4,
+  cooldown: 1.4,
+  autoAim: true, aimRange: 135,
+  use(user) {
+    G.combat.shoot(user, {
+      ability: "punchlinePie", speed: 135, range: 135,
+      damage: 2, explodeDamage: 2, explodeRadius: 31,
+      type: "blunt", size: 7, shape: "pie",
+      color: "#ef7d57", trail: 4, recoil: 3,
+    });
+  },
+});
+
+registerAbility({
+  id: "encore",
+  name: "Encore!",
+  icon: "🎪",
+  type: "light",
+  mana: 5,
+  cooldown: 1.7,
+  use(user) {
+    const hitGroup = {};
+    for (let spreadDeg = 0; spreadDeg < 360; spreadDeg += 45) {
+      G.combat.shoot(user, {
+        ability: "encore", speed: 175, range: 92,
+        damage: 1, type: "light", spreadDeg,
+        size: 5, shape: "card", color: "#ffcd75",
+        hitGroup, trail: 4, recoil: 0,
+      });
+    }
+    G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color: "#ffcd75", radius: 18, dur: 0.28 });
+  },
+});
+
 /* ----------------- GOD's moves ----------------- */
 
 registerAbility({
