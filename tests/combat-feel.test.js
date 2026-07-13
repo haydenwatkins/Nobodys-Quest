@@ -393,4 +393,42 @@ G.updatePlayer(0.02);
 G.updatePlayer(0.02);
 assert.equal(fired, 1, "buffered attack should fire when cooldown ends");
 
+// The resting reserve removes long farming stretches without passively
+// charging the final four mana used by the largest abilities.
+G.getLoadout = () => [];
+G.state.player.mana = 0;
+G.state.player.manaRegenDelay = 0;
+G.state.player.manaRegenProgress = 0;
+G.updatePlayer(1.24);
+assert.equal(G.state.player.mana, 0);
+G.updatePlayer(0.01);
+assert.equal(G.state.player.mana, 1, "one mana should recover every 1.25 seconds");
+G.updatePlayer(6.25);
+assert.equal(G.state.player.mana, 6, "passive recovery must stop at the six-mana reserve");
+G.updatePlayer(2.5);
+assert.equal(G.state.player.mana, 6, "waiting must never charge the final four mana");
+
+const reserveTarget = enemy(10, 0);
+G.state.enemies = [reserveTarget];
+G.state.hitStop = 0;
+G.state.shake = 0;
+G.state.cameraKickX = 0;
+G.state.cameraKickY = 0;
+G.combat.damageEnemy(reserveTarget, { damage: 1, type: "blunt", ability: "slap" });
+assert.equal(G.state.player.mana, 7, "successful hits must still charge beyond the reserve");
+
+let castTapped = true;
+G.state.enemies = [];
+G.state.player.mana = 10;
+G.state.player.cooldowns.meteor = 0;
+G.getLoadout = () => ["meteor"];
+G.input = {
+  vec: { x: 0, y: 0 }, isTouch: false,
+  tapped(button) { if (button === "a" && castTapped) { castTapped = false; return true; } return false; },
+  takeAim: () => null,
+};
+G.updatePlayer(0.016);
+assert.equal(G.state.player.mana, 3);
+assert.equal(G.state.player.manaRegenDelay, G.MANA_CAST_DELAY, "mana-spending casts should briefly delay recovery");
+
 console.log("combat-feel tests passed");

@@ -12,6 +12,9 @@ const G = {
   W: 320,
   H: 180,
   TILE: 16,
+  MANA_RESERVE: 6,
+  MANA_REGEN_SECONDS: 1.25,
+  MANA_CAST_DELAY: 0.75,
 
   // Registries — filled in by registerForm / registerAbility / etc.
   forms: {},        // id -> form definition
