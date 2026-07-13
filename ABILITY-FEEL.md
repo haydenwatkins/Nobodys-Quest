@@ -90,6 +90,14 @@ samey when they only swap visuals; build identity needs mechanical differences
   patterns. God remains last and requires both full prior mastery and victory
   in the final trial.
 
+## Mana resting reserve
+
+Mana now regenerates by one point every 1.25 seconds up to a reserve of 6,
+after a short delay when spending mana. Hits retain their existing ability to
+charge all the way to 10. A gold notch on the HUD marks the boundary. This
+means medium abilities return naturally, while a 7-mana capstone needs only
+one successful hit instead of as many as seven.
+
 ## Why the Riftblade works this way
 
 The Riftblade combines patterns that players repeatedly describe as fun without

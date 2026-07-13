@@ -16,6 +16,8 @@ G.makePlayer = function () {
     invuln: 0,                 // seconds of "can't be hurt"
     damageTaken: 0,            // hearts lost (max hearts comes from the form)
     mana: 6, manaMax: 10,
+    manaRegenDelay: 0,
+    manaRegenProgress: 0,
     cooldowns: {},             // abilityId -> seconds left
     abilityBuffer: {},         // button -> recent tap waiting on cooldown
     attackPose: null,
@@ -91,6 +93,20 @@ G.updatePlayer = function (dt) {
     if (p.attackPose.t <= 0) p.attackPose = null;
   }
   for (const k in p.cooldowns) p.cooldowns[k] = Math.max(0, p.cooldowns[k] - dt);
+
+  // Mana naturally settles back to a useful reserve. Successful hits are
+  // still the only way to charge above it, so the largest moves keep a small
+  // engagement requirement without demanding a long basic-attack farm.
+  p.manaRegenDelay = Math.max(0, (p.manaRegenDelay || 0) - dt);
+  if (p.mana < G.MANA_RESERVE && p.manaRegenDelay <= 0) {
+    p.manaRegenProgress = (p.manaRegenProgress || 0) + dt;
+    while (p.manaRegenProgress >= G.MANA_REGEN_SECONDS && p.mana < G.MANA_RESERVE) {
+      p.manaRegenProgress -= G.MANA_REGEN_SECONDS;
+      p.mana = Math.min(G.MANA_RESERVE, p.mana + 1);
+    }
+  } else if (p.mana >= G.MANA_RESERVE) {
+    p.manaRegenProgress = 0;
+  }
 
   /* --- dashing overrides normal movement --- */
   if (p.dashing) {
@@ -170,12 +186,16 @@ G.updatePlayer = function (dt) {
       }
     }
     if (ab.mana > p.mana) {
-      G.ui.toast("💧 Not enough mana — smack things with A to refill!", 1.5);
+      G.ui.toast(`💧 Mana rests at ${G.MANA_RESERVE} — land hits to fill the rest!`, 1.8);
       delete p.abilityBuffer[button];
       continue;
     }
     delete p.abilityBuffer[button];
     p.mana -= ab.mana;
+    if (ab.mana > 0) {
+      p.manaRegenDelay = G.MANA_CAST_DELAY;
+      p.manaRegenProgress = 0;
+    }
     p.cooldowns[abilityId] = ab.cooldown;
     ab.use(p);
     G.events.emit("abilityUse", { ability: abilityId, form: G.state.formId });

@@ -107,6 +107,10 @@ Projectiles can use `explodeRadius` and `explodeDamage` to burst on
 impact. Give every projectile in a fan the same `hitGroup` object when
 one cast should only damage each enemy once (Fire Breath does this).
 
+Mana naturally recovers to the gold **reserve mark** at 6. Successful
+hits can charge the remaining four points up to 10. This keeps everyday
+moves available while making the biggest 7-mana moves ask for one good hit.
+
 Change `range`, `damage`, `speed`, add a `status` like poison or stun,
 or call `shoot` three times like Triple Shot does. Mix and match!
 
