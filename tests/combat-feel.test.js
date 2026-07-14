@@ -107,6 +107,33 @@ for (const [id, values] of Object.entries(expectedBasics)) {
   assert.deepEqual([G.abilities[id].mana, G.abilities[id].cooldown], values, `${id} balance changed`);
 }
 assert.equal(Object.keys(G.abilities).length, 41);
+
+// The menu's declared type is the contract for every damaging part of a move.
+// This catches nested payload drift such as a DARK dash ending in a BLUNT burst.
+{
+  const builderNames = ["meleeArc", "shoot", "chain", "dash"];
+  const realBuilders = Object.fromEntries(builderNames.map((name) => [name, G.combat[name]]));
+  for (const ability of Object.values(G.abilities)) {
+    freshState();
+    const payloads = [];
+    for (const name of builderNames) {
+      G.combat[name] = (user, opts) => {
+        payloads.push({ name, opts });
+        if (name === "dash") user.dashing = { ...opts };
+        return 0;
+      };
+    }
+    assert.doesNotThrow(() => ability.use(G.state.player), `${ability.id} type audit should execute`);
+    assert.ok(payloads.length, `${ability.id} should use a combat damage builder`);
+    for (const payload of payloads) {
+      assert.equal(payload.opts.type, ability.type, `${ability.id} ${payload.name} must stay ${ability.type}`);
+      if (payload.opts.endBurst)
+        assert.equal(payload.opts.endBurst.type, ability.type, `${ability.id} end burst must stay ${ability.type}`);
+    }
+  }
+  Object.assign(G.combat, realBuilders);
+}
+
 for (const ability of Object.values(G.abilities)) {
   freshState();
   G.state.player.invuln = 0;
@@ -142,6 +169,26 @@ for (const ability of Object.values(G.abilities)) {
   const hits = G.combat.finishDash(G.state.player, dashData);
   assert.equal(hits, 2, "Burrow Blitz should erupt at its chosen endpoint");
   assert.ok(targets.every((target) => target.hp === 8));
+}
+
+{
+  const darkWard = enemy(10, 0);
+  darkWard.ward = { types: ["dark"], hp: 2, hpMax: 2 };
+  freshState(darkWard);
+  G.abilities.burrowBlitz.use(G.state.player);
+  G.combat.finishDash(G.state.player, G.state.player.dashing);
+  assert.equal(darkWard.ward.hp, 0, "Burrow Blitz's DARK eruption must break a dark ward");
+  assert.equal(darkWard.hp, 10, "breaking the ward should not also damage health");
+}
+
+{
+  const darkWard = enemy(10, 0);
+  darkWard.ward = { types: ["dark"], hp: 2, hpMax: 2 };
+  freshState(darkWard);
+  G.combat.damageEnemy(darkWard, {
+    ability: "burrowBlitz", damage: 2, type: "blunt", fromX: 0, fromY: 0,
+  });
+  assert.equal(darkWard.ward.hp, 0, "the registry type must override a stale nested payload");
 }
 
 {

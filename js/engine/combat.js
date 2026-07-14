@@ -25,6 +25,14 @@ G.combat = (() => {
     return user === G.state.player && G.playerForm && G.playerForm().breaksAnyWard;
   }
 
+  // An ability has one damage type everywhere it lands. The registry is the
+  // authority shown in the menu, so nested bursts and projectiles cannot
+  // accidentally drift to a different ward interaction.
+  function abilityDamageType(abilityId, requested, fallback) {
+    const ability = abilityId && G.abilities[abilityId];
+    return ability && G.DAMAGE_TYPES[ability.type] ? ability.type : (requested || fallback);
+  }
+
   function attackPose(user, facing, amount, dur) {
     if (user !== G.state.player) return;
     user.attackPose = {
@@ -62,7 +70,8 @@ G.combat = (() => {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
     if (enemy.def.miniboss && enemy.bossIntroT > 0) return false;
-    const type = opts.type || "blunt";
+    const type = abilityDamageType(opts.ability, opts.type, "blunt");
+    if (opts.type !== type) opts = { ...opts, type };
 
     // WARD CHECK
     if (enemy.ward && enemy.ward.hp > 0) {
@@ -235,11 +244,12 @@ G.combat = (() => {
   // A melee swing in front of you.
   // {range, arcDeg, damage, type, ability, knockback, status, color}
   function meleeArc(user, o) {
+    const type = abilityDamageType(o.ability, o.type, "blunt");
     const range = o.range || 20;
     const arc = ((o.arcDeg || 100) * Math.PI) / 180;
     const facing = Math.atan2(user.dir.y, user.dir.x);
     attackPose(user, facing, o.lunge === undefined ? 2 : o.lunge, 0.09);
-    G.sfx.attack("melee", o.type || "blunt", o.damage || 1);
+    G.sfx.attack("melee", type, o.damage || 1);
     let hits = 0;
     for (const e of G.state.enemies) {
       if (e.dead) continue;
@@ -248,7 +258,7 @@ G.combat = (() => {
       const a = G.util.angleTo(user.x, user.y, e.x, e.y);
       if (Math.abs(G.util.angleDiff(facing, a)) > arc / 2 && d > 10) continue;
       if (damageEnemy(e, {
-        damage: o.damage, type: o.type, ability: o.ability,
+        damage: o.damage, type, ability: o.ability,
         knockback: o.knockback, status: o.status,
         breaksAnyWard: breaksAnyWard(user),
         fromX: user.x, fromY: user.y,
@@ -258,7 +268,7 @@ G.combat = (() => {
     G.spawnFx({
       kind: "slash", x: user.x, y: user.y - 6,
       angle: facing, range, arc,
-      color: o.color || G.DAMAGE_TYPES[o.type || "blunt"].color,
+      color: o.color || G.DAMAGE_TYPES[type].color,
       weight: o.weight,
       dur: 0.15,
     });
@@ -271,6 +281,7 @@ G.combat = (() => {
   //  spreadDeg, explodeRadius, explodeDamage, hitGroup, boomerang,
   //  outboundRange, shape, ricochets, bounceRange}
   function shoot(user, o) {
+    const type = abilityDamageType(o.ability, o.type, "sharp");
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
     attackPose(user, facing + Math.PI, o.recoil === undefined ? 1.5 : o.recoil, 0.08);
     G.state.projectiles.push({
@@ -278,10 +289,10 @@ G.combat = (() => {
       vx: Math.cos(facing) * (o.speed || 160),
       vy: Math.sin(facing) * (o.speed || 160),
       damage: o.damage || 1,
-      type: o.type || "sharp",
+      type,
       ability: o.ability,
       size: o.size || 3,
-      color: o.color || G.DAMAGE_TYPES[o.type || "sharp"].color,
+      color: o.color || G.DAMAGE_TYPES[type].color,
       pierce: !!o.pierce,
       hitSet: new Set(),
       status: o.status,
@@ -311,22 +322,23 @@ G.combat = (() => {
       kind: "puff",
       x: user.x + Math.cos(facing) * 5,
       y: user.y - 6 + Math.sin(facing) * 5,
-      color: o.color || G.DAMAGE_TYPES[o.type || "sharp"].color,
+      color: o.color || G.DAMAGE_TYPES[type].color,
       dur: 0.12,
     });
-    G.sfx.attack("shoot", o.type || "sharp", o.damage || 1);
+    G.sfx.attack("shoot", type, o.damage || 1);
   }
 
   // Jump to nearby enemies one by one. Low per-target damage keeps this
   // spectacular crowd tool fair when another form borrows it.
   function chain(user, o) {
+    const type = abilityDamageType(o.ability, o.type, "light");
     const range = o.range || 75;
     const jumpRange = o.jumpRange || 48;
     const maxTargets = o.maxTargets || 4;
-    const color = o.color || G.DAMAGE_TYPES[o.type || "light"].color;
+    const color = o.color || G.DAMAGE_TYPES[type].color;
     const facing = Math.atan2(user.dir.y, user.dir.x);
     attackPose(user, facing + Math.PI, 1, 0.08);
-    G.sfx.attack("chain", o.type || "light", o.damage || 1);
+    G.sfx.attack("chain", type, o.damage || 1);
     const available = G.state.enemies.filter((e) => {
       if (e.dead) return false;
       const d = G.util.dist(user.x, user.y, e.x, e.y);
@@ -342,7 +354,7 @@ G.combat = (() => {
     while (current && used.size < maxTargets) {
       used.add(current);
       if (damageEnemy(current, {
-        damage: o.damage || 1, type: o.type, ability: o.ability,
+        damage: o.damage || 1, type, ability: o.ability,
         knockback: o.knockback || 35, status: o.status,
         breaksAnyWard: breaksAnyWard(user), fromX, fromY,
         hitStop: o.hitStop === undefined ? 0.02 : o.hitStop,
@@ -366,12 +378,13 @@ G.combat = (() => {
   // Zoom forward! Brief invincibility, damages anything you pass through.
   // {dist, damage, type, ability, color}
   function dash(user, o) {
+    const type = abilityDamageType(o.ability, o.type, "blunt");
     user.dashing = {
       left: o.dist || 60,
       speed: o.speed || 260,
       dirX: user.dir.x, dirY: user.dir.y,
       damage: o.damage || 0,
-      type: o.type || "blunt",
+      type,
       ability: o.ability,
       breaksAnyWard: breaksAnyWard(user),
       hitSet: new Set(),
@@ -381,7 +394,7 @@ G.combat = (() => {
       endBurst: o.endBurst || null,
     };
     user.invuln = Math.max(user.invuln, 0.3);
-    G.sfx.attack("dash", o.type || "blunt", o.damage || 1);
+    G.sfx.attack("dash", type, o.damage || 1);
   }
 
   function finishDash(user, dashData) {

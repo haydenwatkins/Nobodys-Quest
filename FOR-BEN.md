@@ -87,6 +87,8 @@ aren't random — each one protects the FUN:
 4. **Damage types matter.** sharp / blunt / light / dark. Warded
    enemies force players to mix. Dark magic is especially useful
    against Shades and the purple wards in later regions.
+   One ability keeps its declared type for every hit, including dash
+   finishers and projectile explosions; the combat engine enforces this.
 5. **Fair is fun.** Speed 40–140, hearts 1–8, mana 0–8, cooldown
    0.15s+. A form that breaks the game is boring in five minutes.
 
