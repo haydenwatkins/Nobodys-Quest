@@ -178,9 +178,18 @@ demonstrate the form's signature rhythm with fair telegraphs, so earning the for
 also teaches the player how to enjoy it.
 
 Bosses can have short personalities without adding a dialogue engine. Put
-`introLines`, `phaseLine`, `defeatLine`, and `rematchLine` inside `boss`. The
+`introLines`, `phaseLine`, `phaseThreeLine`, `knockoutLine`, `defeatLine`, and
+`rematchLine` inside `boss`. Set `phases: 3` and `phaseThresholds: [0.66, 0.33]`
+for a three-act fight. The
 first encounter pauses briefly for the lines, and an ability button skips them.
 Keep each line short enough to read during an action game.
+
+A boss arena can opt into the retry loop with
+`bossTrial: { exit: { map: "overworld", x: 40, y: 1 }, delay: 1.5 }` on its map.
+A knockout pauses on the boss's line, ejects the player, and rebuilding the arena
+on re-entry guarantees a full-health boss. Overworld entrances use
+`portalStyle: "trial"` plus a `portalTheme` (`riftblade`, `mole`, `vampire`,
+`jester`, or `god`) to draw a recognizable landmark without new image files.
 
 The current boss-earned examples deliberately teach different jobs:
 

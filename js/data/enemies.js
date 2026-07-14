@@ -507,12 +507,13 @@ registerEnemy({
 registerEnemy({
   id: "riftbladeAdept",
   name: "Riftblade Adept",
-  hp: 22, speed: 56, damage: 2,
+  hp: 52, speed: 56, damage: 2,
   behavior: "chase", aggro: 170,
   size: 18, heavy: true, miniboss: true,
   ward: { types: ["sharp"], hp: 5 },
   boss: {
     style: "riftblade", intro: "FOLLOW THE BLADE — THEN BREAK THE RHYTHM",
+    phases: 3, phaseThresholds: [0.66, 0.33],
     color: "#73eff7", specialEvery: 2.35,
     telegraph: 0.48, chargeSpeed: 175, chargeDur: 0.34,
     antiKiteRange: 104, chaseScale: 1.34,
@@ -521,6 +522,8 @@ registerEnemy({
       "Move with the throw, or become part of the lesson.",
     ],
     phaseLine: "Better. Now follow three blades and one terrible metaphor.",
+    phaseThreeLine: "Final lesson: every blade comes home. Try not to be there.",
+    knockoutLine: "The rhythm broke. Catch your breath and begin again.",
     defeatLine: "The rhythm is yours. Please return it by Tuesday.",
     rematchLine: "Again? Good. The blade was getting bored.",
   },
@@ -577,11 +580,12 @@ registerEnemy({
 /* ---- FORM TRIAL BOSSES — each teaches the form it guards ---- */
 registerEnemy({
   id: "moleMonarch", name: "Mole Monarch",
-  hp: 24, speed: 52, damage: 2, behavior: "chase", aggro: 175,
+  hp: 56, speed: 52, damage: 2, behavior: "chase", aggro: 175,
   size: 19, heavy: true, miniboss: true,
   ward: { types: ["blunt"], hp: 6 },
   boss: {
     style: "mole", color: "#d8b06a", specialEvery: 2.45,
+    phases: 3, phaseThresholds: [0.66, 0.33],
     telegraph: 0.52, chargeSpeed: 190, chargeDur: 0.38,
     antiKiteRange: 108, chaseScale: 1.28,
     patterns: ["burrow", "quake"],
@@ -591,6 +595,8 @@ registerEnemy({
       "I respect the technique. I object to the visitor.",
     ],
     phaseLine: "Fine. I am filing a noise complaint from below!",
+    phaseThreeLine: "Royal decree: the entire floor is now a tunnel!",
+    knockoutLine: "Back to the surface with you. My tunnel, my rules.",
     defeatLine: "Take the crown. It was terrible for digging anyway.",
     rematchLine: "The surface person is back. Everybody look busy.",
   },
@@ -613,11 +619,12 @@ registerEnemy({
 
 registerEnemy({
   id: "countessCarmine", name: "Countess Carmine",
-  hp: 26, speed: 65, damage: 2, behavior: "chase", aggro: 180,
+  hp: 58, speed: 65, damage: 2, behavior: "chase", aggro: 180,
   size: 19, heavy: true, miniboss: true,
   ward: { types: ["dark"], hp: 6 },
   boss: {
     style: "vampire", color: "#b13e53", specialEvery: 2.25,
+    phases: 3, phaseThresholds: [0.66, 0.33],
     telegraph: 0.44, chargeSpeed: 225, chargeDur: 0.28,
     antiKiteRange: 112, chaseScale: 1.25,
     patterns: ["vampireDash", "bloodBurst"],
@@ -627,6 +634,8 @@ registerEnemy({
       "Try not to bleed on the cape. It is already very committed.",
     ],
     phaseLine: "I have counted to two. Conveniently, this is phase two!",
+    phaseThreeLine: "Now this is a proper midnight dance. Do keep up.",
+    knockoutLine: "A dramatic faint! Excellent form. Try the door again later.",
     defeatLine: "A fine performance. Nine out of ten. Lost one point for sunlight.",
     rematchLine: "Back already? Delightful. I barely finished brooding.",
   },
@@ -649,11 +658,12 @@ registerEnemy({
 
 registerEnemy({
   id: "royalFool", name: "The Royal Fool",
-  hp: 24, speed: 54, damage: 1, behavior: "shooter", shootEvery: 1.65, aggro: 185,
+  hp: 54, speed: 54, damage: 1, behavior: "shooter", shootEvery: 1.65, aggro: 185,
   shotColor: "#ffcd75", size: 19, heavy: true, miniboss: true,
   ward: { types: ["sharp"], hp: 6 },
   boss: {
     style: "jester", color: "#ffcd75", specialEvery: 2.2,
+    phases: 3, phaseThresholds: [0.66, 0.33],
     telegraph: 0.5, chargeSpeed: 0, chargeDur: 0,
     patterns: ["cards", "pie", "cards", "nova"],
     intro: "THE COURT IS NOW IN SILLY SESSION",
@@ -662,6 +672,8 @@ registerEnemy({
       "No refunds. The pie is a combat pie.",
     ],
     phaseLine: "Intermission is cancelled due to excessive competence!",
+    phaseThreeLine: "Final act! More cards, fewer sensible decisions!",
+    knockoutLine: "That is a wrap! Please exit through the embarrassing door.",
     defeatLine: "You win. My final joke is the repair bill.",
     rematchLine: "Same hero, new material. Let us both pretend to be surprised.",
   },
@@ -684,11 +696,12 @@ registerEnemy({
 
 registerEnemy({
   id: "godAvatar", name: "God of Every Form",
-  hp: 36, speed: 62, damage: 2, behavior: "chase", aggro: 190,
+  hp: 82, speed: 62, damage: 2, behavior: "chase", aggro: 190,
   size: 22, heavy: true, miniboss: true,
   ward: { types: ["light", "dark"], hp: 10 },
   boss: {
     style: "god", color: "#f4f4f4", specialEvery: 1.95,
+    phases: 3, phaseThresholds: [0.67, 0.34],
     telegraph: 0.48, chargeSpeed: 195, chargeDur: 0.34,
     antiKiteRange: 118, chaseScale: 1.3,
     patterns: ["charge", "blades", "cards", "nova"],
@@ -698,6 +711,8 @@ registerEnemy({
       "Show me every lesson. I promise to grade on a curve.",
     ],
     phaseLine: "Good. I was running out of easy questions.",
+    phaseThreeLine: "No more questions. Show me the answer every form discovered.",
+    knockoutLine: "Not yet. Mastery waits outside until you are ready.",
     defeatLine: "Excellent. You may be God now. I am taking a lunch break.",
     rematchLine: "Office hours again? Very well. One final final exam.",
   },

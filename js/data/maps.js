@@ -102,11 +102,11 @@ registerMap({
     "E": { tile: "grass", portal: { map: "emberRidge", x: 2, y: 1 }, stars: 7, portalStyle: "gap" },
     "V": { tile: "grass", portal: { map: "starfallRuins", x: 2, y: 1 }, stars: 10, portalStyle: "gap" },
     "W": { tile: "grass", portal: { map: "whispering-grove", x: 2, y: 10 }, stars: 0, portalStyle: "gap" },
-    "R": { tile: "grass", portal: { map: "riftbladeTrial", x: 2, y: 8 }, stars: 18, portalStyle: "gap" },
-    "L": { tile: "grass", portal: { map: "moleTrial", x: 3, y: 8 }, stars: 20, portalStyle: "gap" },
-    "U": { tile: "grass", portal: { map: "vampireTrial", x: 3, y: 8 }, stars: 22, portalStyle: "gap" },
-    "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "gap" },
-    "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, mastery: { before: "god", level: 5 }, portalStyle: "gap" },
+    "R": { tile: "grass", portal: { map: "riftbladeTrial", x: 2, y: 8 }, stars: 18, portalStyle: "trial", portalTheme: "riftblade" },
+    "L": { tile: "grass", portal: { map: "moleTrial", x: 3, y: 8 }, stars: 20, portalStyle: "trial", portalTheme: "mole" },
+    "U": { tile: "grass", portal: { map: "vampireTrial", x: 3, y: 8 }, stars: 22, portalStyle: "trial", portalTheme: "vampire" },
+    "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "trial", portalTheme: "jester" },
+    "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, mastery: { before: "god", level: 5 }, portalStyle: "trial", portalTheme: "god" },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
   },
 
@@ -119,6 +119,7 @@ registerMap({
   id: "riftbladeTrial",
   name: "Riftblade Trial",
   playerStart: { x: 2, y: 8 },
+  bossTrial: { exit: { map: "overworld", x: 118, y: 18 }, delay: 1.5 },
 
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 18 } },
@@ -169,6 +170,7 @@ function makeFormTrialArena(variant) {
 
 registerMap({
   id: "moleTrial", name: "The Royal Burrow", playerStart: { x: 3, y: 8 },
+  bossTrial: { exit: { map: "overworld", x: 40, y: 1 }, delay: 1.5 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 40, y: 1 } },
     "B": { tile: "floor", enemy: "moleMonarch" },
@@ -181,6 +183,7 @@ registerMap({
 
 registerMap({
   id: "vampireTrial", name: "Carmine Court", playerStart: { x: 3, y: 8 },
+  bossTrial: { exit: { map: "overworld", x: 50, y: 78 }, delay: 1.5 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 50, y: 78 } },
     "B": { tile: "floor", enemy: "countessCarmine" },
@@ -193,6 +196,7 @@ registerMap({
 
 registerMap({
   id: "jesterTrial", name: "The Crooked Court", playerStart: { x: 3, y: 8 },
+  bossTrial: { exit: { map: "overworld", x: 118, y: 60 }, delay: 1.5 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 60 } },
     "B": { tile: "floor", enemy: "royalFool" },
@@ -205,6 +209,7 @@ registerMap({
 
 registerMap({
   id: "godTrial", name: "The Final Firmament", playerStart: { x: 3, y: 8 },
+  bossTrial: { exit: { map: "overworld", x: 110, y: 1 }, delay: 1.7 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 110, y: 1 } },
     "B": { tile: "floor", enemy: "godAvatar" },

@@ -177,6 +177,16 @@
       return;
     }
 
+    // A lost form trial gets a short readable defeat beat before returning
+    // the player outside. Reloading the arena on re-entry restores its boss.
+    if (s.knockout) {
+      s.time += dt;
+      G.updateKnockout(dt);
+      G.updateFx(dt * 0.35);
+      G.ui.update(dt);
+      return;
+    }
+
     // First encounters get a tiny story beat. The world pauses, the boss
     // speaks one or two short lines, and any ability button skips after the
     // opening moment so repeat attempts never feel slow.

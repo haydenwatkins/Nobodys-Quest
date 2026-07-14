@@ -191,7 +191,38 @@ assert.deepEqual(
 );
 for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar"]) {
   assert.ok(G.enemies[id].boss.introLines.length >= 2, `${id} needs a personality-driven introduction`);
-  assert.ok(G.enemies[id].boss.phaseLine && G.enemies[id].boss.defeatLine);
+  assert.ok(G.enemies[id].hp >= 50, `${id} needs enough durability for players to learn its patterns`);
+  assert.equal(G.enemies[id].boss.phases, 3, `${id} should have a three-act fight`);
+  assert.ok(G.enemies[id].boss.phaseLine && G.enemies[id].boss.phaseThreeLine && G.enemies[id].boss.defeatLine);
+  assert.ok(G.enemies[id].boss.knockoutLine, `${id} needs a personality-driven knockout line`);
+}
+
+// Trial defeats pause, eject to the declared overworld position, and reset the
+// player. Re-entering calls the normal map loader, which creates a fresh boss.
+{
+  const guardian = G.makeEnemy("moleMonarch", 20, 0);
+  let ejected = null;
+  const oldLoad = G.world.load;
+  G.world.load = (map, spawn) => { ejected = { map, spawn }; };
+  G.forms.nobody = { id: "nobody", speed: 80, hearts: 3 };
+  G.state = {
+    formId: "nobody",
+    mapId: "moleTrial",
+    mapDef: { bossTrial: { exit: { map: "overworld", x: 40, y: 1 }, delay: 1.5 } },
+    player: G.makePlayer(), enemies: [guardian], projectiles: [{}], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  G.state.player.damageTaken = 2;
+  G.damagePlayer(1);
+  assert.ok(G.state.knockout && G.state.knockout.t === 1.5);
+  assert.equal(G.state.projectiles.length, 0, "enemy shots should clear when the trial is lost");
+  G.updateKnockout(1.51);
+  assert.equal(ejected.map, "overworld");
+  assert.equal(ejected.spawn.x, 40);
+  assert.equal(ejected.spawn.y, 1);
+  assert.equal(G.state.player.damageTaken, 0);
+  assert.ok(G.state.player.mana >= G.MANA_RESERVE);
+  G.world.load = oldLoad;
 }
 
 {
@@ -218,6 +249,12 @@ assert.ok(G.maps.riftbladeTrial);
 assert.ok(G.maps.riftbladeTrial.tiles.every((row) => row.length === 28), "Riftblade arena rows must stay aligned");
 for (const id of ["moleTrial", "vampireTrial", "jesterTrial", "godTrial"])
   assert.ok(G.maps[id].tiles.length === 17 && G.maps[id].tiles.every((row) => row.length === 28), `${id} must stay aligned`);
+for (const id of ["riftbladeTrial", "moleTrial", "vampireTrial", "jesterTrial", "godTrial"])
+  assert.ok(G.maps[id].bossTrial && G.maps[id].bossTrial.exit.map === "overworld", `${id} needs a safe retry exit`);
+for (const portal of ["R", "L", "U", "F", "Y"]) {
+  assert.equal(G.maps.overworld.legend[portal].portalStyle, "trial");
+  assert.ok(G.maps.overworld.legend[portal].portalTheme, `${portal} needs a recognizable landmark theme`);
+}
 assert.equal(G.maps.overworld.legend.Y.mastery.before, "god");
 assert.equal(G.maps.overworld.legend.Y.mastery.level, 5, "the final trial must require full prior mastery");
 {
@@ -308,6 +345,22 @@ G.enemies.testBoss = {
   const beforeChargeX = titan.x;
   G.updateEnemies(0.02);
   assert.notEqual(titan.x, beforeChargeX, "boss charge should move it decisively");
+}
+
+{
+  const monarch = G.makeEnemy("moleMonarch", 45, 0);
+  monarch.bossEngaged = true;
+  monarch.bossIntroT = 0;
+  monarch.bossPhase = 2;
+  monarch.hp = 18;
+  G.state = {
+    player: { x: 0, y: 0, dir: { x: 1, y: 0 }, invuln: 0 },
+    enemies: [monarch], projectiles: [], pickups: [], items: [],
+    hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(monarch.bossPhase, 3, "form bosses need a distinct final phase");
+  assert.match(bossBanner, /PHASE III/);
 }
 
 G.enemies.testCaster = {
