@@ -462,18 +462,25 @@ G.combat = (() => {
           if (pr.hitGroup && e.lastProjectileGroup === pr.hitGroup) continue;
           if (G.util.dist(pr.x, pr.y, e.x, e.y - 4) < pr.size + e.def.size / 2) {
             if (pr.explodeRadius) {
+              // Piercing shockwaves erupt at every new target and keep going.
+              // hitSet makes overlapping eruptions damage each foe only once.
+              if (pr.pierce) {
+                explodeProjectile(pr);
+                continue;
+              }
               gone = true;
               break;
             }
             if (pr.hitGroup) e.lastProjectileGroup = pr.hitGroup;
             if (pr.hitSet) pr.hitSet.add(e);
-            damageEnemy(e, {
+            const hit = damageEnemy(e, {
                 damage: pr.damage, type: pr.type, ability: pr.ability,
                 status: pr.status, breaksAnyWard: pr.breaksAnyWard,
                 fromX: pr.startX, fromY: pr.startY,
                 combo: pr.ricochetsMax && pr.ricochets < pr.ricochetsMax ? "ricochet" : undefined,
                 hitStop: pr.hitStop, shake: pr.shake,
               });
+            if (hit) pr.hitCount = (pr.hitCount || 0) + 1;
             if (!pr.pierce) {
               let next = null, nextDist = Infinity;
               if (pr.ricochets > 0) {
@@ -508,17 +515,19 @@ G.combat = (() => {
         }
       }
       if (gone && pr.fromPlayer && pr.explodeRadius) explodeProjectile(pr);
+      if (gone && pr.fromPlayer && (pr.hitCount || 0) >= 2)
+        G.events.emit("multiHit", { ability: pr.ability, hits: pr.hitCount });
       if (gone) s.projectiles.splice(i, 1);
     }
   }
 
   function explodeProjectile(pr) {
-    if (pr.exploded) return;
-    pr.exploded = true;
     const damage = pr.explodeDamage === undefined ? pr.damage : pr.explodeDamage;
     let hits = 0;
     for (const e of G.state.enemies) {
       if (e.dead || G.util.dist(pr.x, pr.y, e.x, e.y - 4) > pr.explodeRadius + e.def.size / 2) continue;
+      if (pr.hitSet && pr.hitSet.has(e)) continue;
+      if (pr.hitSet) pr.hitSet.add(e);
       if (damageEnemy(e, {
         damage, type: pr.type, ability: pr.ability,
         status: pr.status, breaksAnyWard: pr.breaksAnyWard,
@@ -526,12 +535,13 @@ G.combat = (() => {
         knockback: 120,
       })) hits++;
     }
+    pr.hitCount = (pr.hitCount || 0) + hits;
     G.state.shake = Math.max(G.state.shake, 0.22);
     G.state.hitStop = Math.max(G.state.hitStop, 0.055);
     G.sfx.play("explosion");
     G.spawnFx({ kind: "ring", x: pr.x, y: pr.y, color: pr.color, radius: pr.explodeRadius, dur: 0.35 });
     burst(pr.x, pr.y, pr.color, 10);
-    if (hits >= 2) G.events.emit("multiHit", { ability: pr.ability, hits });
+    return hits;
   }
 
   return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, dash, finishDash, updateProjectiles };

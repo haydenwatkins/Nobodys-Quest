@@ -645,7 +645,7 @@ registerAbility({
     G.combat.shoot(user, {
       ability: "faultLine", speed: 125, range: 130,
       damage: 2, explodeDamage: 2, explodeRadius: 27,
-      type: "blunt", size: 6, color: "#d8b06a",
+      type: "blunt", size: 6, color: "#d8b06a", pierce: true,
       shape: "fault", trail: 5, recoil: 3,
     });
   },
