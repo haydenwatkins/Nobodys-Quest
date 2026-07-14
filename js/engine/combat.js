@@ -427,6 +427,9 @@ G.combat = (() => {
     const s = G.state;
     for (let i = s.projectiles.length - 1; i >= 0; i--) {
       const pr = s.projectiles[i];
+      // A knockout may clear the projectile list while this loop is already
+      // walking it. Never let a stale index stop the entire game loop.
+      if (!pr) continue;
       if (pr.boomerang && pr.returning && pr.owner) {
         const homeAngle = G.util.angleTo(pr.x, pr.y, pr.owner.x, pr.owner.y - 6);
         pr.vx = Math.cos(homeAngle) * pr.speed;
@@ -511,6 +514,9 @@ G.combat = (() => {
         const p = s.player;
         if (G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {
           G.damagePlayer(pr.damage, pr.x, pr.y);
+          // Trial knockouts intentionally clear every shot and start an eject
+          // sequence. The old loop indices are invalid after that reset.
+          if (s.knockout) return;
           gone = true;
         }
       }

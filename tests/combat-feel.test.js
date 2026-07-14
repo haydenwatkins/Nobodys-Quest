@@ -313,6 +313,37 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
   G.world.load = oldLoad;
 }
 
+// A Phase II fan can land the final hit while several sibling projectiles are
+// still in the array. Trial KO clears that array mid-update; stale indices must
+// not throw and freeze the animation loop.
+{
+  const guardian = G.makeEnemy("royalFool", 80, 0);
+  guardian.bossEngaged = true;
+  guardian.bossIntroT = 0;
+  guardian.hp = Math.floor(guardian.def.hp * guardian.def.boss.phaseThresholds[0]);
+  G.state = {
+    formId: "nobody",
+    mapId: "jesterTrial",
+    mapDef: { bossTrial: { exit: { map: "overworld", x: 118, y: 60 }, delay: 1.5 } },
+    player: G.makePlayer(), enemies: [guardian], projectiles: [],
+    pickups: [], items: [], entryPoint: { x: 0, y: 0 },
+    hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(guardian.bossPhase, 2);
+  guardian.bossRecoverT = 0;
+  guardian.shootT = 0;
+  G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles.length, 3, "Jester Phase II should create its three-card fan");
+  for (const shot of G.state.projectiles) {
+    shot.x = 0; shot.y = -5; shot.vx = 0; shot.vy = 0;
+  }
+  G.state.player.damageTaken = 2;
+  assert.doesNotThrow(() => G.combat.updateProjectiles(0.016), "a trial KO during a projectile fan must not freeze the game loop");
+  assert.ok(G.state.knockout, "the defeat eject sequence should still begin");
+  assert.equal(G.state.projectiles.length, 0, "all sibling shots should clear on defeat");
+}
+
 {
   const monarch = G.makeEnemy("moleMonarch", 70, 0);
   G.state = {

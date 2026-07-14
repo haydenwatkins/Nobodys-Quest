@@ -124,9 +124,16 @@
       G.state.player.x = trialBoss.x - 125;
       G.state.player.y = trialBoss.y;
       G.state.entryPoint = { x: G.state.player.x, y: G.state.player.y };
+      // Local-only transition shortcut: start a boss just inside the chosen
+      // phase threshold so its intro flows directly into that phase change.
+      const requestedPhase = Number(builderParams.get("playtestBossPhase"));
+      if (requestedPhase >= 2 && requestedPhase <= (trialBoss.def.boss.phases || 2)) {
+        const thresholds = trialBoss.def.boss.phaseThresholds || [0.5];
+        trialBoss.hp = Math.floor(trialBoss.def.hp * thresholds[requestedPhase - 2]);
+      }
     }
   }
-  if (save && save.mapId === startMap && typeof save.px === "number") {
+  if (!requestedTestMap && save && save.mapId === startMap && typeof save.px === "number") {
     const safeSavedSpot = typeof save.py === "number" && G.world.isSafeSpawn(save.px, save.py);
     if (safeSavedSpot) {
       G.state.player.x = save.px;
