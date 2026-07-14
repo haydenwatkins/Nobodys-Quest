@@ -71,8 +71,26 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     G.world.moveBox(p, Math.cos(a) * 10, Math.sin(a) * 10);
   }
   if (G.playerHp() <= 0) {
-    // Knocked out! Gentle for kids: back to the map entrance, fully healed.
     G.sfx.play("ko");
+    const trial = G.state.mapDef && G.state.mapDef.bossTrial;
+    if (trial) {
+      const bossEnemy = G.state.enemies.find((enemy) => enemy.def.miniboss && !enemy.dead);
+      const bossName = bossEnemy ? bossEnemy.def.name : "The guardian";
+      const bossLine = bossEnemy && bossEnemy.def.boss && bossEnemy.def.boss.knockoutLine;
+      p.dashing = null;
+      p.invuln = 3;
+      G.state.projectiles = [];
+      G.state.bossCutscene = null;
+      G.state.knockout = {
+        t: trial.delay || 1.5,
+        exit: trial.exit,
+        bossName,
+      };
+      G.ui.banner("💫 TRIAL LOST", bossLine || `${bossName} sends you back outside. Breathe, then try again.`);
+      G.events.emit("ko", { trial: G.state.mapId, boss: bossEnemy && bossEnemy.id });
+      return;
+    }
+    // Ordinary knockouts stay gentle: return to the map entrance, fully healed.
     p.damageTaken = 0;
     p.invuln = 2;
     p.x = G.state.entryPoint.x;
@@ -80,6 +98,28 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     G.ui.toast("💫 You got knocked out! ...But you're okay. Try again!", 3);
     G.events.emit("ko", {});
   }
+};
+
+G.updateKnockout = function (dt) {
+  const ko = G.state.knockout;
+  if (!ko) return false;
+  ko.t -= dt;
+  if (ko.t > 0) return true;
+
+  const p = G.state.player;
+  const exit = ko.exit;
+  p.damageTaken = 0;
+  p.invuln = 1;
+  p.dashing = null;
+  p.mana = Math.max(G.MANA_RESERVE, p.mana);
+  p.manaRegenDelay = 0;
+  p.manaRegenProgress = 0;
+  p.cooldowns = {};
+  G.state.knockout = null;
+  G.world.load(exit.map, { x: exit.x, y: exit.y });
+  G.ui.toast(`⚔ ${ko.bossName} is back at full strength.`, 2.5);
+  G.saveGame();
+  return false;
 };
 
 G.updatePlayer = function (dt) {
@@ -323,7 +363,8 @@ G.updateBossCutscene = function (dt) {
 
 function fireRiftbladeVolley(e, p) {
   const a = G.util.angleTo(e.x, e.y, p.x, p.y);
-  const spreads = e.bossPhase === 2 ? [-22, 0, 22] : [-13, 13];
+  const spreads = e.bossPhase >= 3 ? [-28, -14, 0, 14, 28]
+    : e.bossPhase === 2 ? [-22, 0, 22] : [-13, 13];
   for (const spread of spreads) {
     enemyShot(G.state, e, a + spread * Math.PI / 180, {
       damage: 1, speed: 120, range: 205, size: 5,
@@ -359,11 +400,11 @@ function resolveBossAction(e, p, action) {
     return;
   }
   if (action === "blades") fireRiftbladeVolley(e, p);
-  if (action === "cards") fireBossFan(e, p, e.bossPhase === 2 ? 5 : 3, "card", 5, 1);
+  if (action === "cards") fireBossFan(e, p, e.bossPhase >= 3 ? 7 : e.bossPhase === 2 ? 5 : 3, "card", 5, 1);
   if (action === "pie") fireBossFan(e, p, 1, "pie", 8, 2);
-  if (action === "quake") fireBossRadial(e, e.bossPhase === 2 ? 12 : 8, 74, "fault");
-  if (action === "bloodBurst") fireBossRadial(e, e.bossPhase === 2 ? 12 : 8, 92, null);
-  if (action === "nova") fireBossRadial(e, e.bossPhase === 2 ? 16 : 12, 82, null);
+  if (action === "quake") fireBossRadial(e, e.bossPhase >= 3 ? 16 : e.bossPhase === 2 ? 12 : 8, 74, "fault");
+  if (action === "bloodBurst") fireBossRadial(e, e.bossPhase >= 3 ? 16 : e.bossPhase === 2 ? 12 : 8, 92, null);
+  if (action === "nova") fireBossRadial(e, e.bossPhase >= 3 ? 20 : e.bossPhase === 2 ? 16 : 12, 82, null);
   e.bossRecoverT = 0.34;
 }
 
@@ -380,8 +421,12 @@ function updateBossState(e, p, dist, dt) {
     return true;
   }
 
-  if (e.bossPhase === 1 && e.hp <= e.def.hp / 2) {
-    e.bossPhase = 2;
+  const maxPhase = boss.phases || 2;
+  const nextPhase = e.bossPhase + 1;
+  const thresholds = boss.phaseThresholds || [0.5];
+  const nextThreshold = thresholds[e.bossPhase - 1];
+  if (e.bossPhase < maxPhase && e.hp <= e.def.hp * nextThreshold) {
+    e.bossPhase = nextPhase;
     e.bossRecoverT = 0.55;
     e.bossSpecialT = Math.min(e.bossSpecialT, 0.8);
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.055);
@@ -389,7 +434,8 @@ function updateBossState(e, p, dist, dt) {
     G.sfx.play("bossPhase");
     G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: boss.color, radius: 30, dur: 0.55 });
     bossBurst(e, boss.color, 14);
-    G.ui.banner(`${e.def.name} — PHASE II`, boss.phaseLine || "The fight changes. Watch its movement!");
+    const phaseText = nextPhase === 2 ? boss.phaseLine : boss.phaseThreeLine;
+    G.ui.banner(`${e.def.name} — PHASE ${nextPhase === 2 ? "II" : "III"}`, phaseText || "The fight changes. Watch its movement!");
     return true;
   }
 
@@ -428,7 +474,7 @@ function updateBossState(e, p, dist, dt) {
       e.bossChargeX = Math.cos(a);
       e.bossChargeY = Math.sin(a);
       e.bossTelegraphT = boss.telegraph;
-      e.bossSpecialT = boss.specialEvery * (e.bossPhase === 2 ? 0.86 : 1);
+      e.bossSpecialT = boss.specialEvery * Math.max(0.78, 1 - (e.bossPhase - 1) * 0.11);
       G.sfx.play("bossPhase");
       G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: boss.color, radius: 18, dur: boss.telegraph });
       const fallback = boss.style === "riftblade" ? ["charge", "blades"] : ["charge"];
@@ -451,7 +497,7 @@ function updateBossState(e, p, dist, dt) {
 function bossMoveVector(e, p, dist, dt) {
   const boss = e.def.boss;
   const a = G.util.angleTo(e.x, e.y, p.x, p.y);
-  const phaseSpeed = e.bossPhase === 2 ? 1.18 : 1;
+  const phaseSpeed = e.bossPhase >= 3 ? 1.28 : e.bossPhase === 2 ? 1.14 : 1;
   if (boss.antiKiteRange && dist > boss.antiKiteRange) {
     return {
       x: Math.cos(a), y: Math.sin(a),
@@ -560,10 +606,11 @@ G.updateEnemies = function (dt) {
         e.shootT -= dt;
         if (e.shootT <= 0) {
           e.shootT = e.def.shootEvery || 1.6;
-          if (e.def.miniboss && e.bossPhase === 2) {
+          if (e.def.miniboss && e.bossPhase >= 2) {
             // A wider-looking second phase without a damage spike: player
             // invulnerability means the fan still lands at most one 1-damage hit.
-            for (const spread of [-20, 0, 20]) {
+            const spreads = e.bossPhase >= 3 ? [-28, -14, 0, 14, 28] : [-20, 0, 20];
+            for (const spread of spreads) {
               enemyShot(s, e, a + spread * Math.PI / 180, { damage: 1, speed: 100, range: 150 });
             }
           } else {

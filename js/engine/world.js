@@ -350,7 +350,13 @@ G.world = (() => {
     /* extra decorations on top of the base tile */
     if (cell.portal) {
       const locked = (cell.stars && G.state.stars < cell.stars) || !portalMasteryMet(cell);
-      if (cell.portalStyle === "gap") {
+      if (cell.portalStyle === "trial") {
+        const glow = 0.45 + 0.25 * Math.sin(time * 4);
+        ctx.fillStyle = "#1a1c2c";
+        ctx.fillRect(px + 2, py + 2, T - 4, T - 2);
+        ctx.fillStyle = locked ? "#6b4a2b" : `rgba(115,239,247,${glow})`;
+        ctx.fillRect(px + 4, py + 4, T - 8, T - 4);
+      } else if (cell.portalStyle === "gap") {
         ctx.fillStyle = "#d8b06a";
         ctx.fillRect(px + 2, py + 6, T - 4, 4);
         ctx.fillStyle = locked ? "#6b4a2b" : "#ffcd75";
@@ -434,6 +440,107 @@ G.world = (() => {
     }
   }
 
+  // Trial portals are landmarks rather than anonymous doors. Each theme uses
+  // a tiny code-drawn facade so new trials only need a portalTheme in maps.js.
+  function drawTrialLandmark(ctx, cell, x, y, time) {
+    if (cell.portalStyle !== "trial") return;
+    const T = G.TILE;
+    const inwardX = x === 0 ? 8 : x === G.state.mapW - 1 ? -8 : 0;
+    const inwardY = y === 0 ? 8 : y === G.state.mapH - 1 ? -8 : 0;
+    const cx = x * T + T / 2 + inwardX;
+    const cy = y * T + T / 2 + inwardY;
+    const locked = (cell.stars && G.state.stars < cell.stars) || !portalMasteryMet(cell);
+    const pulse = 0.55 + Math.sin(time * 4) * 0.18;
+
+    ctx.save();
+    ctx.globalAlpha = locked ? 0.62 : 1;
+    ctx.fillStyle = "rgba(26,28,44,0.35)";
+    ctx.fillRect(cx - 22, cy + 9, 44, 5);
+
+    if (cell.portalTheme === "mole") {
+      ctx.fillStyle = "#6b4a2b";
+      ctx.fillRect(cx - 22, cy - 2, 44, 14);
+      ctx.fillRect(cx - 16, cy - 8, 32, 20);
+      ctx.fillStyle = "#8a6538";
+      ctx.fillRect(cx - 18, cy - 5, 36, 5);
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(cx - 7, cy, 14, 13);
+      ctx.fillStyle = "#ffcd75";
+      ctx.fillRect(cx - 8, cy - 13, 4, 5);
+      ctx.fillRect(cx - 2, cy - 16, 4, 8);
+      ctx.fillRect(cx + 4, cy - 13, 4, 5);
+      ctx.fillRect(cx - 8, cy - 9, 16, 3);
+    } else if (cell.portalTheme === "vampire") {
+      ctx.fillStyle = "#2d1b2e";
+      ctx.fillRect(cx - 19, cy - 14, 7, 28);
+      ctx.fillRect(cx + 12, cy - 14, 7, 28);
+      ctx.fillStyle = "#5d275d";
+      ctx.fillRect(cx - 16, cy - 18, 32, 5);
+      ctx.fillRect(cx - 12, cy - 22, 24, 5);
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(cx - 9, cy - 12, 18, 26);
+      ctx.fillStyle = "#b13e53";
+      ctx.fillRect(cx - 3, cy - 17, 6, 6);
+      ctx.fillRect(cx - 14, cy - 20, 3, 3);
+      ctx.fillRect(cx + 11, cy - 20, 3, 3);
+    } else if (cell.portalTheme === "jester") {
+      ctx.fillStyle = "#b13e53";
+      ctx.fillRect(cx - 20, cy - 12, 40, 7);
+      ctx.fillRect(cx - 16, cy - 5, 7, 19);
+      ctx.fillStyle = "#3b5dc9";
+      ctx.fillRect(cx - 6, cy - 12, 12, 7);
+      ctx.fillRect(cx + 9, cy - 5, 7, 19);
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(cx - 8, cy - 4, 16, 18);
+      ctx.fillStyle = "#ffcd75";
+      ctx.fillRect(cx - 20, cy - 16, 4, 4);
+      ctx.fillRect(cx - 2, cy - 18, 4, 4);
+      ctx.fillRect(cx + 16, cy - 16, 4, 4);
+      ctx.fillRect(cx - 18, cy - 7, 36, 2);
+    } else if (cell.portalTheme === "god") {
+      ctx.fillStyle = "#f4f4f4";
+      ctx.fillRect(cx - 20, cy - 14, 6, 28);
+      ctx.fillRect(cx + 14, cy - 14, 6, 28);
+      ctx.fillRect(cx - 20, cy - 16, 40, 4);
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(cx - 9, cy - 10, 18, 24);
+      ctx.strokeStyle = `rgba(255,205,117,${pulse})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy - 18, 10, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = "#ffcd75";
+      ctx.fillRect(cx - 1, cy - 23, 3, 11);
+      ctx.fillRect(cx - 5, cy - 19, 11, 3);
+    } else {
+      // Riftblade's split crystal gate is the default trial facade.
+      ctx.fillStyle = "#3b2f73";
+      ctx.fillRect(cx - 20, cy - 10, 7, 24);
+      ctx.fillRect(cx + 13, cy - 10, 7, 24);
+      ctx.fillStyle = "#73eff7";
+      ctx.fillRect(cx - 18, cy - 17, 4, 12);
+      ctx.fillRect(cx + 14, cy - 17, 4, 12);
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(cx - 9, cy - 8, 18, 22);
+      ctx.strokeStyle = `rgba(115,239,247,${pulse})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 11, cy + 8);
+      ctx.lineTo(cx + 10, cy - 10);
+      ctx.stroke();
+    }
+
+    if (locked) {
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(cx - 5, cy + 1, 10, 10);
+      ctx.fillStyle = "#ffcd75";
+      ctx.fillRect(cx - 3, cy + 4, 6, 6);
+      ctx.fillRect(cx - 2, cy + 1, 4, 4);
+    }
+    ctx.restore();
+  }
+
   function drawPlayerHouse(ctx) {
     const s = G.state;
     if (!s.grid) return;
@@ -485,6 +592,9 @@ G.world = (() => {
     for (let y = y0; y <= y1; y++)
       for (let x = x0; x <= x1; x++)
         drawTile(ctx, s.grid[y][x], x, y, time);
+    for (let y = y0; y <= y1; y++)
+      for (let x = x0; x <= x1; x++)
+        drawTrialLandmark(ctx, s.grid[y][x], x, y, time);
     drawPlayerHouse(ctx);
     for (const ch of s.chests) drawChest(ctx, ch);
   }

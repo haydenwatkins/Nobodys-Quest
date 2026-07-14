@@ -260,7 +260,8 @@ G.ui = (() => {
     const x = Math.round((G.W - w) / 2);
     const y = 4;
     const color = (boss.def.boss && boss.def.boss.color) || "#ffcd75";
-    const label = `${boss.def.name.toUpperCase()}  ${boss.bossPhase === 2 ? "II" : "I"}`;
+    const phaseLabel = ["I", "II", "III"][boss.bossPhase - 1] || String(boss.bossPhase);
+    const label = `${boss.def.name.toUpperCase()}  ${phaseLabel}`;
     const frac = Math.max(0, boss.hp / boss.def.hp);
 
     c.fillStyle = "rgba(26,28,44,0.88)";
@@ -273,7 +274,7 @@ G.ui = (() => {
     c.fillText(label, Math.round(G.W / 2 - labelW / 2), y + 3);
     c.fillStyle = "#333c57";
     c.fillRect(x + 5, y + 11, w - 10, 3);
-    c.fillStyle = boss.bossPhase === 2 ? "#b13e53" : color;
+    c.fillStyle = boss.bossPhase >= 2 ? "#b13e53" : color;
     c.fillRect(x + 5, y + 11, Math.round((w - 10) * frac), 3);
     return true;
   }
