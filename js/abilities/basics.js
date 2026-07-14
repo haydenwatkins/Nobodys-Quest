@@ -626,7 +626,7 @@ registerAbility({
       damage: 0, type: "dark", color: "#5d275d",
       endBurst: {
         ability: "burrowBlitz", range: 27, damage: 2,
-        type: "blunt", knockback: 165, color: "#d8b06a",
+        type: "dark", knockback: 165, color: "#8153c1",
         status: { name: "stun", dur: 0.3 }, weight: 5,
       },
     });
