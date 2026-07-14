@@ -108,6 +108,9 @@ The combat building blocks:
 Projectiles can use `explodeRadius` and `explodeDamage` to burst on
 impact. Give every projectile in a fan the same `hitGroup` object when
 one cast should only damage each enemy once (Fire Breath does this).
+Combining `pierce: true` with an explosion makes a traveling shockwave:
+it erupts at each new enemy, keeps moving, and counts unique hits across
+the complete cast. Fault Line is the reference example.
 
 Mana naturally recovers to the gold **reserve mark** at 6. Successful
 hits can charge the remaining four points up to 10. This keeps everyday

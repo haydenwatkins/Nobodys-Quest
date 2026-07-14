@@ -213,6 +213,47 @@ for (const ability of Object.values(G.abilities)) {
   assert.equal(target.hp, 8, "Returning Star may hit once out and once back, never more");
 }
 
+// Fault Line is a traveling shockwave: three spaced targets should each take
+// one eruption, and the whole cast should report one three-target multi-hit.
+{
+  const targets = [enemy(30, 0), enemy(70, 0), enemy(110, 0)];
+  freshState();
+  G.state.enemies = targets;
+  let faultEvent = null;
+  G.events.on("multiHit", (data) => { if (data.ability === "faultLine") faultEvent = data; });
+  G.abilities.faultLine.use(G.state.player);
+  assert.equal(G.state.projectiles[0].pierce, true);
+  assert.equal(G.state.projectiles[0].explodeRadius, 27);
+  for (let i = 0; i < 80 && G.state.projectiles.length; i++) G.combat.updateProjectiles(0.02);
+  assert.deepEqual(targets.map((target) => target.hp), [8, 8, 8], "Fault Line should erupt once per target along its path");
+  assert.equal(faultEvent.hits, 3, "Fault Line should aggregate unique hits across the complete wave");
+}
+
+// Existing straight piercing projectiles must keep passing through distinct
+// enemies after the shared projectile accounting change.
+for (const [abilityId, damage] of [["luckyArrow", 2], ["dark matter", 3], ["voidStar", 4]]) {
+  const targets = [enemy(40, 0), enemy(85, 0)];
+  freshState();
+  G.state.enemies = targets;
+  G.abilities[abilityId].use(G.state.player);
+  assert.equal(G.state.projectiles[0].pierce, true, `${abilityId} should remain piercing`);
+  for (let i = 0; i < 100 && G.state.projectiles.length; i++) G.combat.updateProjectiles(0.02);
+  assert.deepEqual(targets.map((target) => target.hp), [10 - damage, 10 - damage], `${abilityId} should hit both targets once`);
+}
+
+// Ordinary impact blasts still stop and report their clustered hit count.
+{
+  const targets = [enemy(50, -12), enemy(50, 0), enemy(50, 12)];
+  freshState();
+  G.state.enemies = targets;
+  let flaskEvent = null;
+  G.events.on("multiHit", (data) => { if (data.ability === "volatileFlask") flaskEvent = data; });
+  G.abilities.volatileFlask.use(G.state.player);
+  for (let i = 0; i < 80 && G.state.projectiles.length; i++) G.combat.updateProjectiles(0.02);
+  assert.deepEqual(targets.map((target) => target.hp), [8, 8, 8]);
+  assert.equal(flaskEvent.hits, 3, "non-piercing explosions should retain clustered multi-hit events");
+}
+
 {
   freshState();
   G.state.enemies = [enemy(10, -2), enemy(11, 0), enemy(10, 2)];

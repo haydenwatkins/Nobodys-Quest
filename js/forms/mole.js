@@ -29,7 +29,7 @@ registerForm({
     { text: "Land 18 Drill Taps", event: "hit", match: { ability: "drillTap" }, count: 18 },
     { text: "Stun 3 baddies with a third Drill Tap", event: "multiHit", match: { ability: "drillTap", combo: "eruption" }, count: 3 },
     { text: "Erupt into 12 baddies with Burrow Blitz", event: "hit", match: { ability: "burrowBlitz" }, count: 12 },
-    { text: "Catch 3 baddies in one Fault Line, twice", event: "multiHit", match: { ability: "faultLine", hits: { gte: 3 } }, count: 2 },
+    { text: "Rip one Fault Line through 3 baddies, twice", event: "multiHit", match: { ability: "faultLine", hits: { gte: 3 } }, count: 2 },
   ],
 
   sprite: {
