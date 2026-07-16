@@ -44,7 +44,28 @@ G.makeSprite = function (def) {
     return cv;
   });
 
-  const spr = { frames, w: frames[0].width, h: frames[0].height };
+  // A shared one-pixel silhouette keeps every current and future form legible
+  // against busy terrain. It is derived from transparency, so Ben's sprite
+  // grids remain the single source of truth and need no duplicate outline art.
+  const outlines = frames.map((img) => {
+    const cv = document.createElement("canvas");
+    cv.width = img.width + 2;
+    cv.height = img.height + 2;
+    const c = cv.getContext("2d");
+    c.drawImage(img, 0, 1);
+    c.drawImage(img, 2, 1);
+    c.drawImage(img, 1, 0);
+    c.drawImage(img, 1, 2);
+    c.globalCompositeOperation = "source-in";
+    c.fillStyle = "#1a1c2c";
+    c.fillRect(0, 0, cv.width, cv.height);
+    c.globalCompositeOperation = "destination-out";
+    c.drawImage(img, 1, 1);
+    c.globalCompositeOperation = "source-over";
+    return cv;
+  });
+
+  const spr = { frames, outlines, w: frames[0].width, h: frames[0].height };
   _spriteCache.set(def, spr);
   return spr;
 };
@@ -54,15 +75,18 @@ G.makeSprite = function (def) {
 G.drawSprite = function (ctx, def, frame, x, y, flip) {
   const spr = G.makeSprite(def);
   const img = spr.frames[frame % spr.frames.length];
+  const outline = spr.outlines[frame % spr.outlines.length];
   const dx = Math.round(x - spr.w / 2);
   const dy = Math.round(y - spr.h);
   if (flip) {
     ctx.save();
     ctx.translate(dx + spr.w, dy);
     ctx.scale(-1, 1);
+    ctx.drawImage(outline, -1, -1);
     ctx.drawImage(img, 0, 0);
     ctx.restore();
   } else {
+    ctx.drawImage(outline, dx - 1, dy - 1);
     ctx.drawImage(img, dx, dy);
   }
 };

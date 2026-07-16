@@ -13,8 +13,10 @@ const G = {
   H: 180,
   TILE: 16,
   MANA_RESERVE: 6,
-  MANA_REGEN_SECONDS: 1.25,
-  MANA_CAST_DELAY: 0.75,
+  // Mana refills to the true maximum. Hits still add bonus mana, so fighting
+  // aggressively beats waiting without making high-cost moves farm-only.
+  MANA_REGEN_SECONDS: 0.7,
+  MANA_CAST_DELAY: 0.4,
 
   // Registries — filled in by registerForm / registerAbility / etc.
   forms: {},        // id -> form definition

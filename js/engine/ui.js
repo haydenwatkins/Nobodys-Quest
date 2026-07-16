@@ -321,13 +321,16 @@ G.ui = (() => {
     /* mana bar */
     c.fillStyle = "#1a1c2c";
     c.fillRect(6, 16, 42, 5);
-    const reserveW = Math.round(40 * (G.MANA_RESERVE / p.manaMax));
+    const manaW = Math.round(40 * (p.mana / p.manaMax));
     c.fillStyle = "#29366f";
-    c.fillRect(7, 17, reserveW, 3);
+    c.fillRect(7, 17, 40, 3);
     c.fillStyle = "#41a6f6";
-    c.fillRect(7, 17, Math.round(40 * (p.mana / p.manaMax)), 3);
-    c.fillStyle = "#ffcd75";
-    c.fillRect(7 + reserveW - 1, 16, 1, 5);
+    c.fillRect(7, 17, manaW, 3);
+    if (p.mana < p.manaMax && p.manaRegenDelay <= 0) {
+      const pulse = 0.45 + 0.45 * Math.sin(G.state.time * 8);
+      c.fillStyle = `rgba(115,239,247,${pulse})`;
+      c.fillRect(Math.min(46, 7 + manaW), 17, 1, 3);
+    }
 
     /* current form chip */
     c.font = `6px ${FONT_HEAD}`;

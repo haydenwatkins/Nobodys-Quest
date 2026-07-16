@@ -30,6 +30,31 @@ G.state = {
 run("js/engine/world.js");
 run("js/data/maps.js");
 
+context.document = {
+  createElement() {
+    const canvas = {
+      width: 0, height: 0,
+      getContext() {
+        return {
+          drawImage() {}, fillRect() {},
+          fillStyle: "", globalCompositeOperation: "source-over",
+        };
+      },
+    };
+    return canvas;
+  },
+};
+run("js/engine/sprites.js");
+
+const testSprite = {
+  palette: { x: "#f4f4f4" },
+  frames: [[".x.", "xxx"]],
+};
+const builtSprite = G.makeSprite(testSprite);
+assert.equal(builtSprite.outlines.length, 1, "sprites should receive a shared outline frame");
+assert.equal(builtSprite.outlines[0].width, builtSprite.frames[0].width + 2);
+assert.equal(builtSprite.outlines[0].height, builtSprite.frames[0].height + 2);
+
 const expectedThemes = {
   riftbladeTrial: "riftblade",
   moleTrial: "mole",
@@ -49,7 +74,7 @@ function fakeCanvas() {
     save() { depth++; },
     restore() { depth--; assert.ok(depth >= 0, "canvas restore underflow"); },
     fillRect() {}, beginPath() {}, arc() {}, stroke() {}, moveTo() {}, lineTo() {},
-    translate() {}, rotate() {}, setLineDash() {},
+    translate() {}, rotate() {}, scale() {}, setLineDash() {}, drawImage() {},
     assertBalanced() { assert.equal(depth, 0, "canvas state leaked between frames"); },
   };
   return new Proxy(ctx, {
@@ -78,5 +103,10 @@ for (const mapId of Object.keys(G.maps)) {
 G.reducedMotion = true;
 G.world.load("overworld");
 assert.equal(G.state.mapReveal, 0, "reduced motion should skip the map reveal");
+
+const spriteCtx = fakeCanvas();
+assert.doesNotThrow(() => G.drawSprite(spriteCtx, testSprite, 0, 20, 20, false));
+assert.doesNotThrow(() => G.drawSprite(spriteCtx, testSprite, 0, 20, 20, true));
+spriteCtx.assertBalanced();
 
 console.log("visual polish tests passed");
