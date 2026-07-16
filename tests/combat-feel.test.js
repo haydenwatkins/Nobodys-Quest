@@ -372,6 +372,84 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
   assert.equal(G.state.player.damageTaken, 1, "ordinary damage resumes after melee guard expires");
 }
 
+// Bosses invite close-range play between telegraphed attacks. Their passive
+// body is safe, while ordinary enemies and active boss charges still collide.
+{
+  const guardian = G.makeEnemy("moleMonarch", 6, 0);
+  guardian.bossEngaged = true;
+  guardian.bossIntroT = 0;
+  guardian.bossRecoverT = 1;
+  G.state = {
+    formId: "nobody", mapDef: null,
+    player: G.makePlayer(), enemies: [guardian], projectiles: [], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(G.state.player.damageTaken, 0, "an idle boss body should be safe at melee range");
+}
+
+{
+  const slime = G.makeEnemy("slime", 6, 0);
+  G.state = {
+    formId: "nobody", mapDef: null,
+    player: G.makePlayer(), enemies: [slime], projectiles: [], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(G.state.player.damageTaken, 1, "ordinary enemy contact should remain dangerous");
+}
+
+{
+  const guardian = G.makeEnemy("moleMonarch", 6, 0);
+  guardian.bossEngaged = true;
+  guardian.bossIntroT = 0;
+  guardian.bossChargeT = 0.2;
+  guardian.bossChargeX = 0;
+  guardian.bossChargeY = 0;
+  G.state = {
+    formId: "nobody", mapDef: null,
+    player: G.makePlayer(), enemies: [guardian], projectiles: [], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(G.state.player.damageTaken, guardian.def.damage, "an active boss charge should still hurt on contact");
+}
+
+// Boss projectiles are visible briefly before they can hurt a nearby player;
+// regular shooters retain immediate projectile collision.
+{
+  const queen = G.makeEnemy("mireQueen", 15, 0);
+  queen.bossEngaged = true;
+  queen.bossIntroT = 0;
+  queen.bossSpecialT = 99;
+  queen.shootT = 0;
+  G.state = {
+    formId: "nobody", mapDef: null,
+    player: G.makePlayer(), enemies: [queen], projectiles: [], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles.length, 1);
+  assert.equal(G.state.projectiles[0].armT, G.BOSS_PROJECTILE_ARM_SECONDS);
+  G.combat.updateProjectiles(0.05);
+  G.combat.updateProjectiles(0.05);
+  assert.equal(G.state.player.damageTaken, 0, "a new boss shot should not hit during its warning window");
+  G.combat.updateProjectiles(0.03);
+  assert.equal(G.state.player.damageTaken, queen.def.damage, "the boss shot should become dangerous after arming");
+}
+
+{
+  const shooter = G.makeEnemy("thornling", 15, 0);
+  shooter.shootT = 0;
+  G.state = {
+    formId: "nobody", mapDef: null,
+    player: G.makePlayer(), enemies: [shooter], projectiles: [], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
+  };
+  G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles[0].armT, 0, "ordinary enemy projectile timing should stay unchanged");
+}
+
 {
   const guardian = G.makeEnemy("moleMonarch", 10, 0);
   guardian.bossEngaged = true;
@@ -446,7 +524,7 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
   G.updateEnemies(0.016);
   assert.equal(G.state.projectiles.length, 3, "Jester Phase II should create its three-card fan");
   for (const shot of G.state.projectiles) {
-    shot.x = 0; shot.y = -5; shot.vx = 0; shot.vy = 0;
+    shot.x = 0; shot.y = -5; shot.vx = 0; shot.vy = 0; shot.armT = 0;
   }
   G.state.player.damageTaken = 2;
   assert.doesNotThrow(() => G.combat.updateProjectiles(0.016), "a trial KO during a projectile fan must not freeze the game loop");

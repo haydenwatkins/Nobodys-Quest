@@ -505,6 +505,7 @@ G.combat = (() => {
       // A knockout may clear the projectile list while this loop is already
       // walking it. Never let a stale index stop the entire game loop.
       if (!pr) continue;
+      pr.armT = Math.max(0, (pr.armT || 0) - dt);
       if (pr.boomerang && pr.returning && pr.owner) {
         const homeAngle = G.util.angleTo(pr.x, pr.y, pr.owner.x, pr.owner.y - 6);
         pr.vx = Math.cos(homeAngle) * pr.speed;
@@ -584,7 +585,7 @@ G.combat = (() => {
             }
           }
         }
-      } else if (!gone) {
+      } else if (!gone && pr.armT <= 0) {
         // enemy projectile hitting the player
         const p = s.player;
         if (G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {

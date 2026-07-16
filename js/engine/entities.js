@@ -471,6 +471,10 @@ function updateBossState(e, p, dist, dt) {
   }
 
   if (e.bossChargeT > 0) {
+    // A boss's body is only dangerous during a clearly telegraphed charge.
+    // This flag is reset every frame so recovery and ordinary movement remain
+    // safe for close-range forms.
+    e.bossContactActive = true;
     const step = boss.chargeSpeed * dt;
     G.world.moveBox(e, e.bossChargeX * step, e.bossChargeY * step);
     e.dir = { x: e.bossChargeX, y: e.bossChargeY };
@@ -562,6 +566,9 @@ function enemyShot(state, enemy, angle, opts) {
     travel: 0,
     shape: opts.shape,
     fromPlayer: false,
+    // Give melee-range players a readable instant before a boss shot becomes
+    // dangerous. Ordinary enemy shots retain their existing timing.
+    armT: enemy.def.miniboss ? G.BOSS_PROJECTILE_ARM_SECONDS : 0,
   });
 }
 
@@ -593,6 +600,7 @@ G.updateEnemies = function (dt) {
 
     const stunned = e.status && e.status.stun;
     const d = G.util.dist(e.x, e.y, p.x, p.y);
+    e.bossContactActive = false;
     const bossLocked = e.def.miniboss ? updateBossState(e, p, d, dt) : false;
 
     if (!stunned && !bossLocked) {
@@ -647,8 +655,12 @@ G.updateEnemies = function (dt) {
       }
     }
 
-    // bonk the player on contact
-    if (!(e.bossStaggerT > 0) && e.touchCd <= 0 && d < 7 + e.def.size / 2) {
+    // Normal enemies still bonk on contact. Boss bodies are safe to engage in
+    // melee unless their current, telegraphed action explicitly enables it.
+    // Recompute after movement so a charge collision uses its current position.
+    const contactDist = G.util.dist(e.x, e.y, p.x, p.y);
+    const contactDanger = !e.def.miniboss || e.bossContactActive;
+    if (contactDanger && !(e.bossStaggerT > 0) && e.touchCd <= 0 && contactDist < 7 + e.def.size / 2) {
       e.touchCd = 0.6;
       G.damagePlayer(e.def.damage || 1, e.x, e.y);
     }

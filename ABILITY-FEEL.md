@@ -115,6 +115,12 @@ the current boss action for 0.72 seconds, then the boss resists further stagger
 for 4.5 seconds. Phase transitions clear the meter and always take priority,
 preventing stun-locks and preserving each fight's dramatic structure.
 
+Boss bodies are safe to overlap during ordinary movement, recovery, and attack
+windups; body contact only hurts during a clearly telegraphed charge. Boss
+projectiles also have a 0.12-second arming window at spawn so a close-range
+player can read the shot instead of being hit at its origin. Projectile damage,
+charge damage, and ordinary-enemy contact damage are unchanged.
+
 ## Why the Riftblade works this way
 
 The Riftblade combines patterns that players repeatedly describe as fun without
