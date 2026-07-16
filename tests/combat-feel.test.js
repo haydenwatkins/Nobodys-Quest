@@ -108,6 +108,76 @@ for (const [id, values] of Object.entries(expectedBasics)) {
 }
 assert.equal(Object.keys(G.abilities).length, 41);
 
+// Directional melee gets a collision-safe six-pixel contact step only when a
+// swing would narrowly miss. A landed swing also grants one cast-level mana
+// bonus and a tiny separate guard window.
+{
+  const target = enemy(28, 0);
+  freshState(target);
+  G.abilities.slap.use(G.state.player);
+  assert.equal(target.hp, 9, "contact assist should turn a six-pixel near miss into a hit");
+  assert.ok(G.state.player.x > 5.4 && G.state.player.x <= G.MELEE_ASSIST_STEP);
+  assert.equal(G.state.player.mana, 2, "melee gets normal hit mana plus one cast-level bonus");
+  assert.equal(G.state.player.meleeGuard, G.MELEE_GUARD_SECONDS);
+}
+
+{
+  const behind = enemy(-28, 0);
+  freshState(behind);
+  G.abilities.slap.use(G.state.player);
+  assert.equal(behind.hp, 10, "contact assist must never target behind the player");
+  assert.equal(G.state.player.x, 0);
+  assert.equal(G.state.player.mana, 0, "whiffs grant neither mana nor protection");
+  assert.equal(G.state.player.meleeGuard || 0, 0);
+}
+
+{
+  const blocked = enemy(28, 0);
+  freshState(blocked);
+  const realMoveBox = G.world.moveBox;
+  G.world.moveBox = () => {};
+  G.abilities.slap.use(G.state.player);
+  G.world.moveBox = realMoveBox;
+  assert.equal(blocked.hp, 10, "world collision must be able to block the contact step");
+  assert.equal(G.state.player.x, 0);
+}
+
+{
+  const outsideBurst = enemy(39, 0);
+  freshState(outsideBurst);
+  G.abilities.fester.use(G.state.player);
+  assert.equal(outsideBurst.hp, 10, "360-degree bursts must not magnetize toward targets");
+  assert.equal(G.state.player.x, 0);
+}
+
+// Six genuine melee connections stagger an engaged boss, cancel its current
+// attack, then start a resistance window that prevents stun-locking.
+{
+  const guardian = enemy(10, 0);
+  guardian.hp = guardian.def.hp = 100;
+  guardian.def.miniboss = true;
+  guardian.def.boss = { color: "#ffcd75" };
+  guardian.bossEngaged = true;
+  guardian.bossIntroT = 0;
+  guardian.bossStagger = 0;
+  guardian.bossStaggerT = 0;
+  guardian.bossStaggerResistT = 0;
+  guardian.bossTelegraphT = 0.4;
+  guardian.bossChargeT = 0.3;
+  guardian.bossPendingAction = "charge";
+  guardian.bossAfterCharge = "quake";
+  freshState(guardian);
+  for (let i = 0; i < G.BOSS_STAGGER_HITS; i++) G.abilities.slap.use(G.state.player);
+  assert.equal(guardian.bossStaggerT, G.BOSS_STAGGER_SECONDS);
+  assert.equal(guardian.bossStaggerResistT, G.BOSS_STAGGER_RESIST_SECONDS);
+  assert.equal(guardian.bossTelegraphT, 0);
+  assert.equal(guardian.bossChargeT, 0);
+  assert.equal(guardian.bossPendingAction, null);
+  assert.ok(sounds.includes("stagger"));
+  G.abilities.slap.use(G.state.player);
+  assert.equal(guardian.bossStagger, 0, "the resistance window must reject new stagger build-up");
+}
+
 // The menu's declared type is the contract for every damaging part of a move.
 // This catches nested payload drift such as a DARK dash ending in a BLUNT burst.
 {
@@ -283,6 +353,46 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
   assert.equal(G.enemies[id].boss.phases, 3, `${id} should have a three-act fight`);
   assert.ok(G.enemies[id].boss.phaseLine && G.enemies[id].boss.phaseThreeLine && G.enemies[id].boss.defeatLine);
   assert.ok(G.enemies[id].boss.knockoutLine, `${id} needs a personality-driven knockout line`);
+}
+
+// Clash grace blocks one immediate trade but is independent from normal hurt
+// invulnerability and expires on its own player timer.
+{
+  G.forms.nobody = { id: "nobody", speed: 80, hearts: 3 };
+  G.state = {
+    formId: "nobody", mapDef: null,
+    player: G.makePlayer(), enemies: [], projectiles: [], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0,
+  };
+  G.state.player.meleeGuard = G.MELEE_GUARD_SECONDS;
+  G.damagePlayer(1, 20, 0);
+  assert.equal(G.state.player.damageTaken, 0, "melee guard should prevent an immediate contact trade");
+  G.state.player.meleeGuard = 0;
+  G.damagePlayer(1, 20, 0);
+  assert.equal(G.state.player.damageTaken, 1, "ordinary damage resumes after melee guard expires");
+}
+
+{
+  const guardian = G.makeEnemy("moleMonarch", 10, 0);
+  guardian.bossEngaged = true;
+  guardian.bossIntroT = 0;
+  guardian.bossStaggerT = G.BOSS_STAGGER_SECONDS;
+  guardian.bossStaggerResistT = G.BOSS_STAGGER_RESIST_SECONDS;
+  guardian.bossPendingAction = "burrow";
+  G.state = {
+    formId: "nobody", mapDef: null,
+    player: G.makePlayer(), enemies: [guardian], projectiles: [], pickups: [], items: [],
+    entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
+  };
+  G.updateEnemies(0.4);
+  assert.ok(guardian.bossStaggerT > 0, "a staggered boss should remain action-locked for the full window");
+  assert.equal(guardian.bossPendingAction, "burrow", "the stagger timer should freeze boss logic");
+  assert.equal(G.state.player.damageTaken, 0, "a staggered boss must not deal contact damage");
+  guardian.x = 80;
+  G.updateEnemies(0.4);
+  assert.equal(guardian.bossStaggerT, 0);
+  G.updateEnemies(0.1);
+  assert.ok(guardian.bossStaggerResistT < G.BOSS_STAGGER_RESIST_SECONDS, "resistance should count down after stagger ends");
 }
 
 // Trial defeats pause, eject to the declared overworld position, and reset the

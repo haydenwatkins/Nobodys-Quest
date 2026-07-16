@@ -2,7 +2,7 @@
 
 ## What the game has
 
-Nobody's Quest currently has 32 interchangeable abilities. Eleven are zero-mana
+Nobody's Quest currently has 41 interchangeable abilities. Fourteen are zero-mana
 basic attacks; those are the moves players repeat most, so they received
 individual tuning in this pass.
 
@@ -18,6 +18,9 @@ individual tuning in this pass.
 | Stormcaller | Storm Spark (light, 0.45s) | four-target chain, 360-degree stun/knockback |
 | Dragon | Tail Sweep (blunt, 0.55s) | five-shot breath cone, explosive meteor |
 | Riftblade | Rift Cut (sharp, 0.36s) | three-beat wide combo, damage dash, path-bending returning blade |
+| Mole | Drill Tap (blunt, 0.38s) | endpoint eruption dash, traveling fault-line shockwave |
+| Vampire | Blood Bite (dark, 0.34s) | five-hit healing rhythm, dash, large blood-moon burst |
+| Jester | Wild Card (light, 0.45s) | third-card ricochet, pie fan, chaotic encore |
 | God | Divine Spark (light, 0.50s) | 360-degree judgment, piercing dark star |
 
 Before this pass, attacks already had a white hit flash, modest random camera
@@ -90,13 +93,27 @@ samey when they only swap visuals; build identity needs mechanical differences
   patterns. God remains last and requires both full prior mastery and victory
   in the final trial.
 
-## Mana resting reserve
+## Full mana recovery
 
-Mana now regenerates by one point every 1.25 seconds up to a reserve of 6,
-after a short delay when spending mana. Hits retain their existing ability to
-charge all the way to 10. A gold notch on the HUD marks the boundary. This
-means medium abilities return naturally, while a 7-mana capstone needs only
-one successful hit instead of as many as seven.
+Mana regenerates by one point every 0.7 seconds all the way to the true maximum,
+after a 0.4-second delay when spending mana. Hits still grant mana as an extra
+accelerator. Waiting can always restore a capstone, while aggressive play gets
+there faster.
+
+## Close-quarters advantage
+
+Melee now wins on tempo and control rather than receiving a blanket damage
+increase. Directional swings that would miss by at most six pixels take a
+collision-safe contact step toward a target already inside the swing's arc.
+The step never activates for 360-degree attacks, never pulls through walls,
+and never moves a swing that was already going to connect.
+
+A successful melee cast grants 0.12 seconds of clash protection and one bonus
+mana, once per cast rather than once per target. Whiffs grant neither benefit.
+Engaged bosses also build a six-hit melee stagger meter. A stagger interrupts
+the current boss action for 0.72 seconds, then the boss resists further stagger
+for 4.5 seconds. Phase transitions clear the meter and always take priority,
+preventing stun-locks and preserving each fight's dramatic structure.
 
 ## Why the Riftblade works this way
 

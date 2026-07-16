@@ -65,6 +65,7 @@ G.sfx = (() => {
     explosion: ["sawtooth", 120, 45,  0.18, 0.25],
     bossIntro: ["sawtooth",  90, 260, 0.42, 0.28],
     bossPhase: ["square",   180, 480, 0.24, 0.22],
+    stagger:   ["square",   420, 85,  0.18, 0.26],
   };
 
   function tone(recipe, pitch, volumeScale, delay) {

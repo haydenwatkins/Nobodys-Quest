@@ -14,6 +14,7 @@ G.makePlayer = function () {
     anim: 0,
     moving: false,
     invuln: 0,                 // seconds of "can't be hurt"
+    meleeGuard: 0,             // tiny hit-confirm grace; never granted on a whiff
     damageTaken: 0,            // hearts lost (max hearts comes from the form)
     mana: 6, manaMax: 10,
     manaRegenDelay: 0,
@@ -60,7 +61,7 @@ let touchAimHelpShown = false;
 
 G.damagePlayer = function (dmg, fromX, fromY) {
   const p = G.state.player;
-  if (p.invuln > 0 || p.dashing) return;
+  if (p.invuln > 0 || p.meleeGuard > 0 || p.dashing) return;
   p.damageTaken += dmg;
   p.invuln = 1.0;
   G.sfx.play("hurt");
@@ -127,6 +128,7 @@ G.updatePlayer = function (dt) {
   const form = G.playerForm();
 
   p.invuln = Math.max(0, p.invuln - dt);
+  p.meleeGuard = Math.max(0, (p.meleeGuard || 0) - dt);
   p.swapCd = Math.max(0, p.swapCd - dt);
   if (p.attackPose) {
     p.attackPose.t -= dt;
@@ -287,6 +289,10 @@ G.makeEnemy = function (id, x, y) {
     bossPattern: 0,
     bossPendingAction: null,
     bossAfterCharge: null,
+    bossStagger: 0,
+    bossStaggerT: 0,
+    bossStaggerResistT: 0,
+    bossStaggerDecayT: 0,
     touchCd: 0,
     kbx: 0, kby: 0,
     hitKickX: 0, hitKickY: 0,
@@ -427,6 +433,12 @@ function updateBossState(e, p, dist, dt) {
   const nextThreshold = thresholds[e.bossPhase - 1];
   if (e.bossPhase < maxPhase && e.hp <= e.def.hp * nextThreshold) {
     e.bossPhase = nextPhase;
+    // Phase changes always get their dramatic beat; a nearly full stagger
+    // meter cannot cancel the boss's introduction to its next pattern set.
+    e.bossStagger = 0;
+    e.bossStaggerT = 0;
+    e.bossStaggerDecayT = 0;
+    e.bossStaggerResistT = Math.max(e.bossStaggerResistT || 0, 1.4);
     e.bossRecoverT = 0.55;
     e.bossSpecialT = Math.min(e.bossSpecialT, 0.8);
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.055);
@@ -437,6 +449,16 @@ function updateBossState(e, p, dist, dt) {
     const phaseText = nextPhase === 2 ? boss.phaseLine : boss.phaseThreeLine;
     G.ui.banner(`${e.def.name} — PHASE ${nextPhase === 2 ? "II" : "III"}`, phaseText || "The fight changes. Watch its movement!");
     return true;
+  }
+
+  if (e.bossStaggerT > 0) {
+    e.bossStaggerT = Math.max(0, e.bossStaggerT - dt);
+    return true;
+  }
+  e.bossStaggerResistT = Math.max(0, (e.bossStaggerResistT || 0) - dt);
+  if (e.bossStaggerResistT <= 0 && e.bossStagger > 0) {
+    e.bossStaggerDecayT = Math.max(0, (e.bossStaggerDecayT || 0) - dt);
+    if (e.bossStaggerDecayT <= 0) e.bossStagger = Math.max(0, e.bossStagger - dt * 0.45);
   }
 
   if (e.bossTelegraphT > 0) {
@@ -626,7 +648,7 @@ G.updateEnemies = function (dt) {
     }
 
     // bonk the player on contact
-    if (e.touchCd <= 0 && d < 7 + e.def.size / 2) {
+    if (!(e.bossStaggerT > 0) && e.touchCd <= 0 && d < 7 + e.def.size / 2) {
       e.touchCd = 0.6;
       G.damagePlayer(e.def.damage || 1, e.x, e.y);
     }
@@ -706,6 +728,16 @@ G.drawPlayer = function (ctx) {
   const form = G.playerForm();
   if (p.invuln > 0 && Math.floor(p.invuln * 12) % 2 === 0 && !p.dashing) return; // hurt blink
   G.drawPlayerAura(ctx, p, form);
+  if (p.meleeGuard > 0) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(0.8, p.meleeGuard / G.MELEE_GUARD_SECONDS);
+    ctx.strokeStyle = "#fff3c2";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - 7, 9, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
   G.drawShadow(ctx, p.x, p.y, 10);
   const frame = p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0;
   const poseScale = p.attackPose ? p.attackPose.t / p.attackPose.dur : 0;
@@ -771,6 +803,14 @@ G.drawEnemy = function (ctx, e) {
     ctx.fillStyle = "#ffcd75";
     const a = e.anim * 6;
     ctx.fillRect(Math.round(e.x + Math.cos(a) * 6), Math.round(e.y - e.def.size - 2 + Math.sin(a) * 2), 2, 2);
+  }
+  if (e.bossStaggerT > 0) {
+    ctx.fillStyle = "#fff3c2";
+    const a = e.anim * 7;
+    for (let i = 0; i < 3; i++) {
+      const sa = a + i * Math.PI * 2 / 3;
+      ctx.fillRect(Math.round(e.x + Math.cos(sa) * 9), Math.round(e.y - e.def.size - 4 + Math.sin(sa) * 3), 2, 2);
+    }
   }
 
   // WARD RING — colored by the damage type that breaks it

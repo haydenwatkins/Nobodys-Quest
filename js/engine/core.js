@@ -17,6 +17,11 @@ const G = {
   // aggressively beats waiting without making high-cost moves farm-only.
   MANA_REGEN_SECONDS: 0.7,
   MANA_CAST_DELAY: 0.4,
+  MELEE_ASSIST_STEP: 6,
+  MELEE_GUARD_SECONDS: 0.12,
+  BOSS_STAGGER_HITS: 6,
+  BOSS_STAGGER_SECONDS: 0.72,
+  BOSS_STAGGER_RESIST_SECONDS: 4.5,
 
   // Registries — filled in by registerForm / registerAbility / etc.
   forms: {},        // id -> form definition
