@@ -665,8 +665,13 @@ G.updatePickups = function (dt) {
 /* ================= DRAWING ================= */
 
 G.drawShadow = function (ctx, x, y, w) {
-  ctx.fillStyle = "rgba(26,28,44,0.35)";
-  ctx.fillRect(Math.round(x - w / 2), Math.round(y - 2), w, 3);
+  const left = Math.round(x - w / 2);
+  ctx.fillStyle = "rgba(26,28,44,0.18)";
+  ctx.fillRect(left - 1, Math.round(y - 3), w + 2, 4);
+  ctx.fillStyle = "rgba(26,28,44,0.38)";
+  ctx.fillRect(left, Math.round(y - 2), w, 3);
+  ctx.fillStyle = "rgba(26,28,44,0.5)";
+  ctx.fillRect(left + 2, Math.round(y - 1), Math.max(2, w - 4), 2);
 };
 
 G.drawPlayerAura = function (ctx, p, form) {
@@ -805,6 +810,11 @@ G.drawPickups = function (ctx) {
     const bob = Math.sin(pk.t * 5) * 2;
     const x = Math.round(pk.x), y = Math.round(pk.y - 5 + bob);
     if (pk.t > 9 && Math.floor(pk.t * 8) % 2 === 0) continue; // blink before vanishing
+    ctx.save();
+    ctx.globalAlpha = 0.18 + Math.sin(pk.t * 5) * 0.04;
+    ctx.fillStyle = pk.kind === "heart" ? "#ef7d57" : "#73eff7";
+    ctx.fillRect(x - 4, y - 4, 9, 9);
+    ctx.restore();
     if (pk.kind === "heart") {
       ctx.fillStyle = "#b13e53";
       ctx.fillRect(x - 3, y - 2, 3, 3);
@@ -831,9 +841,18 @@ G.drawProjectiles = function (ctx) {
       const point = trail[i];
       ctx.globalAlpha = 0.12 + (trail.length - i) / Math.max(1, trail.length) * 0.35;
       ctx.fillStyle = pr.color;
-      ctx.fillRect(Math.round(point.x), Math.round(point.y - 4), 1, 1);
+      const trailSize = i < 2 ? 2 : 1;
+      ctx.fillRect(Math.round(point.x - trailSize / 2), Math.round(point.y - 4 - trailSize / 2), trailSize, trailSize);
     }
     ctx.restore();
+    if (pr.shape !== "card" && pr.shape !== "pie") {
+      ctx.save();
+      ctx.globalAlpha = 0.2;
+      ctx.fillStyle = pr.color;
+      const glow = Math.max(5, (pr.size || 2) + 4);
+      ctx.fillRect(Math.round(pr.x - glow / 2), Math.round(pr.y - 4 - glow / 2), glow, glow);
+      ctx.restore();
+    }
     ctx.fillStyle = pr.color;
     const s = pr.size;
     if (pr.shape === "riftBlade") {
