@@ -191,6 +191,7 @@ G.combat = (() => {
     G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, `${enemy.def.trophyName} found · +1 ⭐${lastWord}`);
     G.events.emit("pickup", { item: trophy });
     G.checkUnlocks();
+    if (G.checkGuardianCollectionReward) G.checkGuardianCollectionReward(false);
     G.saveGame();
   }
 

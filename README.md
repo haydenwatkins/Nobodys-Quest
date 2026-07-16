@@ -11,6 +11,12 @@ The current campaign includes 18 mixable forms, the late-game Shattercoast
 region, personality-driven three-phase guardian trials, and a configurable
 boss gauntlet with optional between-round recovery.
 
+The endgame continues beyond form collection. Finding every guardian earns the
+Guardian Compass and opens a repeatable Hero Board with rotating patrol,
+exploration, ward, ability-mixing, form-mixing, and rematch contracts. Contracts
+build renown and the player's town, while a full Manyfold Gauntlet clear awards
+a functional Crown with extra mana and one Second Wind per future run.
+
 ## Run it
 
 Double-click `index.html`. Works from the plain filesystem — no server needed.

@@ -300,7 +300,7 @@ registerMap({
   bossTrial: { exit: { map: "shattercoast", x: 23, y: 14 }, delay: 1.7 },
   legend: {
     "x": { tile: "floor", portal: { map: "shattercoast", x: 23, y: 14 } },
-    "m": { tile: "floor", message: "Open the menu's Gauntlet tab to choose a run. Recovery runs restore one heart and three mana between rounds." },
+    "m": { tile: "floor", message: "Open the menu's Gauntlet tab to choose a run. Recovery campfires fully heal you and restore three mana." },
     "R": { tile: "rock", on: "floor" },
   },
   tiles: [
@@ -373,6 +373,7 @@ registerMap({
     "P": { tile: "grass", playerHouse: true },
     "H": { tile: "path", portal: { map: "playerHouse", x: 7, y: 7 } },
     "s": { tile: "grass", message: "Walk onto an empty plot to build a house. Houses cost town spirit." },
+    "B": { tile: "grass", message: "The Hero Board keeps adventures coming after the guardian collection. Open its menu tab to accept a contract." },
     "x": { tile: "grass", portal: { map: "overworld", x: 60, y: 45 } },
   },
 
@@ -386,7 +387,7 @@ registerMap({
     "t....c.......p.......d.......t",
     "t............p...............t",
     "tppppppppppppppppppppppppppppt",
-    "t............s...............t",
+    "t............B...............t",
     "t....e.......p.......f.......t",
     "t............p...............t",
     "t..tttt......p......tttt.....t",

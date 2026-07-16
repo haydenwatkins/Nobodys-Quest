@@ -69,6 +69,7 @@
     loadouts: {},
     pinnedQuestIds: [],
     town: G.makeTown(),
+    heroBoard: G.makeHeroBoard(),
     gauntletBest: 0,
     gauntletIronBest: 0,
     shake: 0,
@@ -97,6 +98,7 @@
     s.loadouts = save.loadouts || {};
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
     s.town = G.normalizeTown(save.town || save.cult);
+    s.heroBoard = G.normalizeHeroBoard(save.heroBoard);
     s.gauntletBest = save.gauntletBest || 0;
     s.gauntletIronBest = save.gauntletIronBest || 0;
     G.questCounts = save.questCounts || {};
@@ -109,6 +111,18 @@
     if (!G.forms[requestedTestForm].start && !G.state.claimedForms.includes(requestedTestForm))
       G.state.claimedForms.push(requestedTestForm);
     G.state.formId = requestedTestForm;
+  }
+  // Local-only endgame builder: exposes reward menus and visuals without
+  // putting a progression cheat on the published site.
+  if (builderParams && builderParams.get("playtestEndgame") === "1") {
+    G.state.items = G.guardianTrophies().concat("guardian-compass");
+    G.state.claimedForms = G.formOrder.filter((id) => !G.forms[id].start && !G.forms[id].invalid);
+    G.state.known = G.state.claimedForms.slice();
+    G.questsDone = G.formOrder.flatMap((id) => (G.forms[id].quests || []).map((quest) => quest.id));
+    G.state.stars = 50;
+    G.state.town.founded = true;
+    G.state.town.residents = 8;
+    G.state.town.spirit = 20;
   }
   // if a form file got edited/broken since last save, fall back safely
   if (!G.formUnlocked(G.state.formId)) {
@@ -147,6 +161,10 @@
     G.state.player.damageTaken = save.damageTaken || 0;
     G.state.player.mana = typeof save.mana === "number" ? save.mana : 6;
   }
+
+  G.state.player.manaMax = G.playerMaxMana();
+  G.state.player.mana = Math.min(G.state.player.mana, G.state.player.manaMax);
+  G.checkGuardianCollectionReward(true); // migrates completed collections from older saves
 
   G.checkUnlocks(); // quietly registers starting forms as "known"
   G.tutorial.init(save);

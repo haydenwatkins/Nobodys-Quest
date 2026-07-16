@@ -142,10 +142,20 @@ will become the form's signature without making that move individually dominant:
 
 The Manyfold Gauntlet samples only bosses whose trophies are already in the
 player's save. Players choose 3, 5, 8, or their complete collected roster and
-may enable a campfire that restores one heart and three mana between rounds.
+may enable a campfire that restores all health and three mana between rounds.
 Iron runs keep all attrition. Each longer personal best awards one star, while
-clearing the entire known roster awards the Manyfold Crown. Bosses always begin
-at full health and no boss repeats inside one run.
+clearing the entire known roster awards the Manyfold Crown. The Crown adds two
+maximum mana and one non-stacking Second Wind per future gauntlet; it increases
+tactical room without increasing attack damage. Bosses always begin at full
+health and no boss repeats inside one run.
+
+Collecting every guardian trophy awards the Guardian Compass and unlocks the
+repeatable Hero Board. Its six-contract rotation sends players back through the
+world to patrol multiple regions, use varied abilities and forms, break wards
+with several damage types, explore, and rematch guardians. Contracts award
+renown, stars, and town spirit. Renown milestones are utility or cosmetic—the
+Wayfarer Ribbon trail, double-spirit Sunrise Banner, and Heroic Halo—so the
+postgame adds goals without making one combat build mandatory.
 
 First-encounter boss scenes now hold each line for 2.2 seconds. Ability buttons
 advance one line at a time after the opening beat instead of skipping the whole

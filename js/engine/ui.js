@@ -533,8 +533,10 @@ G.ui = (() => {
     ];
     if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
     if (G.gauntletUnlocked && G.gauntletUnlocked()) tabs.push(["gauntlet", "Gauntlet"]);
+    if (G.heroBoardUnlocked && G.heroBoardUnlocked()) tabs.push(["board", "Hero Board"]);
     if (activeTab === "town" && !(G.townUnlocked && G.townUnlocked())) activeTab = "forms";
     if (activeTab === "gauntlet" && !(G.gauntletUnlocked && G.gauntletUnlocked())) activeTab = "forms";
+    if (activeTab === "board" && !(G.heroBoardUnlocked && G.heroBoardUnlocked())) activeTab = "forms";
     let html = `<h1>Nobody's Quest</h1>
       <div class="stars">⭐ ${G.state.stars} stars</div>
       <div class="menu-tabs">${tabs.map(([id, label]) =>
@@ -547,6 +549,7 @@ G.ui = (() => {
     if (activeTab === "mix") html += buildMixTab();
     if (activeTab === "town") html += buildTownTab();
     if (activeTab === "gauntlet") html += buildGauntletTab();
+    if (activeTab === "board") html += buildHeroBoardTab();
 
     html += `</div>
       <div class="menu-footer">
@@ -605,6 +608,11 @@ G.ui = (() => {
       const count = menuEl.querySelector('[data-gauntlet-count]').value;
       const recovery = menuEl.querySelector('[data-gauntlet-recovery]').checked;
       if (G.startGauntlet(count, recovery)) closeMenu();
+    });
+    const acceptContract = menuEl.querySelector('[data-act="accept-contract"]');
+    if (acceptContract) acceptContract.addEventListener("click", () => {
+      G.startHeroContract();
+      buildMenu();
     });
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
@@ -682,6 +690,11 @@ G.ui = (() => {
           <span class="trophy-place">${boss.location}</span>
         </div>`;
       }
+      if (found === bosses.length) {
+        html += `<div class="quest-row done"><span>🧭 Guardian Compass</span><span class="prog">Hero Board unlocked</span></div>`;
+      } else {
+        html += `<div class="tagline">Collect every trophy to earn the Guardian Compass, bonus stars, town spirit, and repeatable Hero Board contracts.</div>`;
+      }
       html += `</div>`;
     }
     html += `<div style="text-align:center;color:#94b0c2;font-size:18px;margin-top:8px">
@@ -734,6 +747,7 @@ G.ui = (() => {
       <div class="quest-row"><span>Houses</span><span class="prog">${town.houses.length}</span></div>
       <div class="quest-row"><span>Next house cost</span><span class="prog">${G.townHouseCost()} spirit</span></div>
       <div class="quest-row"><span>Festivals held</span><span class="prog">${town.festivals}</span></div>
+      <div class="quest-row"><span>Hero renown</span><span class="prog">${G.ensureHeroBoard ? G.ensureHeroBoard().renown : 0}</span></div>
       <button data-act="visit-town">Visit town</button>
       <button data-act="festival">Hold festival</button>
       <button data-act="rename-town">Rename town</button>
@@ -745,6 +759,7 @@ G.ui = (() => {
       <div class="quest-row"><span>Kill as God</span><span class="prog">+1 resident, +2 spirit</span></div>
       <div class="quest-row"><span>Break ward as God</span><span class="prog">+1 spirit</span></div>
       <div class="quest-row"><span>Hold festival</span><span class="prog">+residents spirit</span></div>
+      ${(G.state.items || []).includes("sunrise-banner") ? `<div class="quest-row done"><span>🚩 Sunrise Banner</span><span class="prog">festival spirit ×2</span></div>` : ""}
     </div>`;
   }
 
@@ -768,13 +783,42 @@ G.ui = (() => {
       <div class="quest-row"><span>Recovery record</span><span class="prog">${G.state.gauntletBest || 0}</span></div>
       <div class="quest-row"><span>Iron record</span><span class="prog">${G.state.gauntletIronBest || 0}</span></div>
       <div class="slot-row"><span class="slot-label">Run length</span><select data-gauntlet-count>${options}</select></div>
-      <label class="quest-row"><span>Campfire between rounds<br><small>Restore 1 heart and 3 mana</small></span><input data-gauntlet-recovery type="checkbox" checked></label>
+      <label class="quest-row"><span>Campfire between rounds<br><small>Restore all health and 3 mana</small></span><input data-gauntlet-recovery type="checkbox" checked></label>
       <button data-act="start-gauntlet">Enter the gauntlet</button>
     </div>
     <div class="form-card">
       <h2>🏆 Records</h2>
-      <div class="tagline">A longer personal best awards one star. Defeat your entire collected roster in one run to earn the Manyfold Crown.</div>
+      <div class="tagline">A longer personal best awards one star. A full-roster clear earns the Manyfold Crown: +2 maximum mana, a visible crown, and one Second Wind in every future gauntlet.</div>
+      ${(G.state.items || []).includes("manyfold-crown") ? `<div class="quest-row done"><span>👑 Manyfold Crown</span><span class="prog">12 mana · Second Wind ready</span></div>` : ""}
     </div>`;
+  }
+
+  function buildHeroBoardTab() {
+    const board = G.ensureHeroBoard();
+    const progress = G.heroContractProgress();
+    const milestones = [
+      [3, "🎗 Wayfarer Ribbon", "visible travel trail"],
+      [6, "🚩 Sunrise Banner", "double festival spirit"],
+      [10, "✨ Heroic Halo", "visible in every form"],
+    ];
+    let html = `<div class="form-card current">
+      <h2>🧭 Hero Board</h2>
+      <div class="tagline">Repeatable adventures that reward exploring the world, mixing abilities, changing forms, and revisiting guardians.</div>
+      <div class="quest-row"><span>Renown</span><span class="prog">${board.renown}</span></div>
+      <div class="quest-row"><span>Contracts completed</span><span class="prog">${board.completed}</span></div>`;
+    if (progress) {
+      html += `<div class="quest-row"><span>${progress.def.icon} ${progress.def.name}</span><span class="prog">${progress.label}</span></div>
+        <div class="tagline">${progress.def.text}</div>`;
+    } else {
+      html += `<div class="tagline">The next job rotates through patrols, exploration, ward breaking, ability variety, form variety, and guardian rematches.</div>
+        <button data-act="accept-contract">Accept next contract</button>`;
+    }
+    html += `</div><div class="form-card"><h2>🏅 Renown rewards</h2>`;
+    for (const [at, name, effect] of milestones) {
+      html += `<div class="quest-row ${board.renown >= at ? "done" : ""}"><span>${name}</span><span class="prog">${board.renown >= at ? effect : `${board.renown}/${at}`}</span></div>`;
+    }
+    html += `<div class="tagline">Every contract also awards +1 star and 11–20 town spirit. Contracts continue after the milestone rewards.</div></div>`;
+    return html;
   }
 
   /* ---------- Form Workshop error panel ---------- */
