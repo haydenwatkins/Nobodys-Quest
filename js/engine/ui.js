@@ -529,6 +529,7 @@ G.ui = (() => {
     const tabs = [
       ["forms", "Forms"],
       ["quests", "Quests"],
+      ["explore", "Explore"],
       ["mix", "Mix"],
     ];
     if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
@@ -546,6 +547,7 @@ G.ui = (() => {
 
     if (activeTab === "forms") html += buildFormsTab();
     if (activeTab === "quests") html += buildQuestsTab();
+    if (activeTab === "explore") html += buildWayfinderTab();
     if (activeTab === "mix") html += buildMixTab();
     if (activeTab === "town") html += buildTownTab();
     if (activeTab === "gauntlet") html += buildGauntletTab();
@@ -614,6 +616,10 @@ G.ui = (() => {
       G.startHeroContract();
       buildMenu();
     });
+    menuEl.querySelectorAll("[data-travel-region]").forEach((button) =>
+      button.addEventListener("click", () => {
+        if (G.travelToWayfinderRegion(button.dataset.travelRegion)) closeMenu();
+      }));
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
     const fullscreen = menuEl.querySelector('[data-act="fullscreen"]');
@@ -723,6 +729,46 @@ G.ui = (() => {
     html += `<div class="form-card"><h2>🧪 Your ability collection</h2>` +
       avail.map((id) => `<div class="quest-row"><span>${abilityLabel(id)}</span></div>`).join("") +
       `</div>`;
+    return html;
+  }
+
+  function buildWayfinderTab() {
+    const progress = G.wayfinderProgress();
+    const journal = G.ensureWayfinder();
+    const travelUnlocked = G.wayfinderTravelUnlocked();
+    const canTravel = G.canWayfinderTravel();
+    let html = `<div class="form-card current">
+      <h2>🧭 The Long Way Around</h2>
+      <div class="tagline">Discover every major region. Unknown entries give directions without revealing the destination.</div>
+      <div class="quest-row"><span>Major regions</span><span class="prog">${progress.found}/${progress.total}</span></div>
+      <div class="quest-row"><span>Hidden landmarks</span><span class="prog">${progress.landmarksFound}/${progress.landmarksTotal}</span></div>
+    </div>`;
+
+    for (const region of G.WAYFINDER_REGIONS) {
+      const found = journal.discovered.includes(region.id);
+      const here = G.state.mapId === region.id;
+      html += `<div class="form-card ${found ? "current" : "wayfinder-unknown"}">
+        <h2>${found ? `✅ ${region.icon} ${region.name}` : "⬜ Undiscovered region"}</h2>
+        <div class="tagline">${found ? "Entered and recorded in the Journal." : region.clue}</div>
+        ${found ? `<div class="quest-row"><span>Entrance requirement</span><span class="prog">${region.stars ? `${region.stars} ⭐` : "Open"}</span></div>` :
+          `<div class="quest-row"><span>Trail requirement</span><span class="prog">${region.stars ? `${region.stars} ⭐` : "Open"}</span></div>`}
+        ${found && travelUnlocked ? `<button class="travel-btn" data-travel-region="${region.id}" ${here || !canTravel ? "disabled" : ""}>${here ? "You are here" : `Travel to ${region.name}`}</button>` : ""}
+      </div>`;
+    }
+
+    const landmarks = G.discoveredWayfinderLandmarks();
+    html += `<div class="form-card"><h2>📍 Discovered landmarks</h2>`;
+    if (landmarks.length) {
+      for (const map of landmarks) html += `<div class="quest-row done"><span>✅ ${map.name}</span><span class="prog">Recorded</span></div>`;
+    } else {
+      html += `<div class="tagline">Trials, dens, and the coliseum reveal themselves only after you enter them.</div>`;
+    }
+    html += `</div><div class="form-card ${journal.rewardClaimed ? "current" : ""}">
+      <h2>🎁 Explorer reward</h2>
+      <div class="tagline">${journal.rewardClaimed ? "Wayfinder Whistle earned. Fast travel is available from safe areas." : "Discover every major region to earn +3 stars and the Wayfinder Whistle."}</div>
+      ${journal.rewardClaimed ? `<div class="quest-row done"><span>🎵 Wayfinder Whistle</span><span class="prog">Fast travel unlocked</span></div>` : ""}
+      ${travelUnlocked && !canTravel ? `<div class="tagline">Fast travel pauses during boss trials, gauntlets, and story moments.</div>` : ""}
+    </div>`;
     return html;
   }
 

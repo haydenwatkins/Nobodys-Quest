@@ -17,6 +17,12 @@ exploration, ward, ability-mixing, form-mixing, and rematch contracts. Contracts
 build renown and the player's town, while a full Manyfold Gauntlet clear awards
 a functional Crown with extra mana and one Second Wind per future run.
 
+The Explore menu contains the **Wayfinder Journal**, an early-to-late side quest
+that tracks eight major regions and reveals trials only after discovery. Unknown
+regions provide directional and star-requirement clues instead of spoilers.
+Completing the region list awards three stars and a Wayfinder Whistle for safe-
+area fast travel between previously discovered regions.
+
 ## Run it
 
 Double-click `index.html`. Works from the plain filesystem — no server needed.

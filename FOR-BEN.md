@@ -223,6 +223,15 @@ collection requirement and future full-roster gauntlets. Hero Board contracts
 live in `js/engine/endgame.js`; keep additions focused on varied play across
 maps, forms, abilities, and damage types rather than raw repetition.
 
+### Wayfinder Journal
+
+`js/engine/wayfinder.js` lists major regions, their spoiler-free clues, entrance
+requirements, and safe fast-travel arrival points. Add a true campaign region to
+`G.WAYFINDER_REGIONS`; boss trials and the coliseum are discovered automatically
+from map data and should not be added there. The Long Way Around completion
+reward updates automatically with the major-region list. Fast travel is disabled
+during trials, gauntlets, knockouts, and boss story scenes.
+
 Boss introductions use three short lines with 2.2 seconds per line. Tapping an
 ability advances to the next line; it no longer discards the complete scene.
 Rematches remain quick.

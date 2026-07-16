@@ -200,6 +200,8 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
 .pin-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-color: #73eff7; }
 .pin-summary h2 { margin: 0; }
 .form-card .clear-pins { margin: 0; border-color: #73eff7; background: #333c57; color: #73eff7; }
+.form-card .travel-btn { border-color: #73eff7; background: #257179; color: #f4f4f4; }
+.form-card.wayfinder-unknown { border-style: dashed; }
 .trophy-card { border-color: #ffcd75; }
 .trophy-place { color: #94b0c2; white-space: nowrap; }
 
