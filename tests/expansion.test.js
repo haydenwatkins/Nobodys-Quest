@@ -24,7 +24,9 @@ run("js/engine/combat.js");
 run("js/engine/entities.js");
 run("js/data/enemies.js");
 run("js/data/maps.js");
+run("js/engine/town.js");
 run("js/engine/gauntlet.js");
+run("js/engine/endgame.js");
 
 for (const id of ["ancientTreant", "mireQueen", "eclipseKnight", "riftbladeAdept", "moleMonarch",
   "countessCarmine", "royalFool", "admiralTortoise", "paperRonin", "professorPerihelion",
@@ -69,6 +71,7 @@ G.state = {
   player: G.makePlayer(), formId: "nobody", stars: 0,
   items: ["tide-shell", "paper-crane", "orrery-key", "elder-acorn", "mole-crown"],
   opened: [], known: [], claimedForms: [], loadouts: {}, pinnedQuestIds: [],
+  town: G.makeTown(), heroBoard: G.makeHeroBoard(),
   hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 0,
 };
 G.world.load("overworld");
@@ -86,7 +89,7 @@ assert.equal(G.state.enemies[0].def.miniboss, true);
 G.state.player.damageTaken = 2;
 G.state.player.mana = 1;
 G.gauntletBossDefeated(G.state.enemies[0]);
-assert.equal(G.state.player.damageTaken, 1, "recovery runs restore one heart");
+assert.equal(G.state.player.damageTaken, 0, "recovery campfires restore all health");
 assert.equal(G.state.player.mana, 4, "recovery runs restore three mana");
 G.updateGauntlet(2.1);
 assert.equal(G.state.gauntletRun.index, 1);
@@ -101,5 +104,46 @@ assert.equal(G.state.mapId, "shattercoast");
 assert.equal(G.state.gauntletBest, 3);
 assert.equal(G.state.stars, 1, "a longer gauntlet record awards exactly one star");
 assert.equal(G.state.gauntletRun, null);
+
+// The collection reward is data-driven, migrates an already-complete save,
+// and opens contracts that encourage world and loadout variety.
+G.state.items = G.guardianTrophies().slice();
+const starsBeforeCollection = G.state.stars;
+assert.equal(G.checkGuardianCollectionReward(true), true);
+assert.ok(G.state.items.includes("guardian-compass"));
+assert.equal(G.state.stars, starsBeforeCollection + 3);
+assert.equal(G.state.town.spirit, 20);
+assert.equal(G.heroBoardUnlocked(), true);
+assert.equal(G.checkGuardianCollectionReward(true), false, "collection reward is one-time");
+
+assert.equal(G.startHeroContract(), true);
+assert.equal(G.state.heroBoard.active.id, "world-patrol");
+for (const map of ["overworld", "mistwood", "sunkenMarsh"]) {
+  G.state.mapId = map;
+  for (let i = 0; i < 5; i++) G.events.emit("kill", { enemy: "slime", ability: "bonk" });
+}
+assert.equal(G.state.heroBoard.active, null);
+assert.equal(G.state.heroBoard.renown, 1);
+assert.equal(G.state.heroBoard.completed, 1);
+assert.equal(G.state.town.spirit, 31, "contracts feed the town without requiring God farming");
+
+G.state.heroBoard.renown = 2;
+assert.equal(G.startHeroContract(), true);
+assert.equal(G.state.heroBoard.active.id, "mixed-arsenal");
+for (let i = 0; i < 10; i++) G.events.emit("abilityUse", { ability: `test-ability-${i}` });
+assert.ok(G.state.items.includes("wayfarer-ribbon"), "renown milestones grant visible rewards");
+
+// The Manyfold Crown is a practical endgame reward without inflating damage:
+// more ability capacity and one gauntlet-only rescue per run.
+G.state.items.push("manyfold-crown");
+G.state.gauntletRun = { bosses: ["ancientTreant"], index: 0, wins: 0, recovery: false };
+G.state.projectiles = [{ hostile: true }];
+G.state.player.damageTaken = G.playerMaxHearts() - 1;
+G.state.player.invuln = 0;
+G.damagePlayer(1);
+assert.equal(G.playerHp(), 1);
+assert.equal(G.state.gauntletRun.crownRescueUsed, true);
+assert.equal(G.state.projectiles.length, 0);
+assert.equal(G.playerMaxMana(), 12);
 
 console.log("expansion tests passed");

@@ -103,9 +103,11 @@ G.holdTownFestival = function () {
   const town = G.ensureTown();
   if (!town.founded) return;
   town.festivals += 1;
-  town.spirit += Math.max(1, town.residents);
+  const multiplier = (G.state.items || []).includes("sunrise-banner") ? 2 : 1;
+  const earned = Math.max(1, town.residents) * multiplier;
+  town.spirit += earned;
   G.sfx.play("quest");
-  G.ui.toast(`🎉 Festival held! +${Math.max(1, town.residents)} town spirit`);
+  G.ui.toast(`🎉 Festival held! +${earned} town spirit${multiplier > 1 ? " · Banner bonus!" : ""}`);
   G.saveGame();
 };
 

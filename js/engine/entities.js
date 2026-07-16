@@ -31,6 +31,9 @@ G.makePlayer = function () {
 G.playerForm = function () { return G.forms[G.state.formId]; };
 G.playerMaxHearts = function () { return G.playerForm().hearts; };
 G.playerHp = function () { return Math.max(0, G.playerMaxHearts() - G.state.player.damageTaken); };
+G.playerMaxMana = function () {
+  return 10 + (G.state && (G.state.items || []).includes("manyfold-crown") ? 2 : 0);
+};
 
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
@@ -72,6 +75,18 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     G.world.moveBox(p, Math.cos(a) * 10, Math.sin(a) * 10);
   }
   if (G.playerHp() <= 0) {
+    const run = G.state.gauntletRun;
+    if (run && (G.state.items || []).includes("manyfold-crown") && !run.crownRescueUsed) {
+      run.crownRescueUsed = true;
+      p.damageTaken = Math.max(0, G.playerMaxHearts() - 1);
+      p.invuln = 2;
+      p.dashing = null;
+      G.state.projectiles = [];
+      G.sfx.play("unlock");
+      G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: "#ffcd75", radius: 30, dur: 0.65 });
+      G.ui.banner("👑 CROWN'S SECOND WIND", "Back on your feet with one heart. It recharges next run.");
+      return;
+    }
     G.sfx.play("ko");
     const trial = G.state.mapDef && G.state.mapDef.bossTrial;
     if (trial) {
@@ -126,6 +141,9 @@ G.updateKnockout = function (dt) {
 G.updatePlayer = function (dt) {
   const p = G.state.player;
   const form = G.playerForm();
+
+  p.manaMax = G.playerMaxMana();
+  p.mana = Math.min(p.mana, p.manaMax);
 
   p.invuln = Math.max(0, p.invuln - dt);
   p.meleeGuard = Math.max(0, (p.meleeGuard || 0) - dt);
@@ -773,6 +791,28 @@ G.drawPlayer = function (ctx) {
   const gaitLift = p.moving && !p.dashing && Math.floor(p.anim) % 2 ? 1 : 0;
   const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift;
   G.drawSprite(ctx, form.sprite, frame, drawX, drawY, p.dir.x < 0);
+
+  const items = G.state.items || [];
+  if (items.includes("wayfarer-ribbon") && p.moving) {
+    const sway = Math.round(Math.sin(G.state.time * 9) * 2);
+    ctx.fillStyle = "#73eff7";
+    ctx.fillRect(Math.round(p.x - p.dir.x * 7 + sway), Math.round(p.y - 4 - p.dir.y * 5), 2, 2);
+  }
+  if (items.includes("heroic-halo")) {
+    ctx.strokeStyle = "#ffcd75";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(Math.round(p.x), Math.round(p.y - 19), 6, 2, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  if (items.includes("manyfold-crown")) {
+    const cy = Math.round(p.y - 21);
+    ctx.fillStyle = "#ffcd75";
+    ctx.fillRect(Math.round(p.x - 5), cy, 3, 3);
+    ctx.fillRect(Math.round(p.x - 1), cy - 2, 3, 5);
+    ctx.fillRect(Math.round(p.x + 3), cy, 3, 3);
+    ctx.fillRect(Math.round(p.x - 5), cy + 3, 11, 2);
+  }
 };
 
 G.drawAimGuide = function (ctx) {

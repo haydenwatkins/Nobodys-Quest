@@ -67,14 +67,14 @@ G.gauntletBossDefeated = function (enemy) {
   s.projectiles = [];
   s.pickups = [];
   if (run.recovery) {
-    s.player.damageTaken = Math.max(0, s.player.damageTaken - 1);
+    s.player.damageTaken = 0;
     s.player.mana = Math.min(s.player.manaMax, s.player.mana + 3);
   }
   const complete = run.index >= run.bosses.length;
   s.gauntletBetween = { t: complete ? 2.6 : 2.0, complete };
   G.ui.banner(complete ? "🏆 GAUNTLET COMPLETE" : `✓ ROUND ${run.index} CLEARED`,
     complete ? `${run.wins} guardians defeated back-to-back!` :
-      (run.recovery ? "Campfire: +1 heart · +3 mana" : "Iron run: no recovery"));
+      (run.recovery ? "Campfire: full health · +3 mana" : "Iron run: no recovery"));
   return true;
 };
 
@@ -93,7 +93,9 @@ function finishGauntlet() {
   }
   if (run.wins === G.gauntletBossPool().length && !(s.items || []).includes("manyfold-crown")) {
     s.items.push("manyfold-crown");
-    G.ui.banner("👑 MANYFOLD CROWN", "Every guardian in your collection defeated in one run.");
+    s.player.manaMax = 12;
+    s.player.mana = 12;
+    G.ui.banner("👑 MANYFOLD CROWN", "+2 maximum mana · one Second Wind in every future gauntlet");
   }
   G.world.load("shattercoast", { x: 23, y: 14 });
   G.saveGame();

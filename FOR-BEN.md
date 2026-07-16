@@ -212,9 +212,16 @@ Because their scripts load before `god.js`, God's `previousFormsLevel` challenge
 automatically includes them and will keep including any future form placed there.
 
 The Manyfold Gauntlet unlocks after three miniboss trophies. Its menu lets the
-player choose a run length and whether a campfire restores one heart and three
+player choose a run length and whether a campfire restores all health and three
 mana between rounds. The pool is built from collected trophies, so adding a new
 miniboss with a trophy automatically adds it to future gauntlets after defeat.
+
+The same data-driven trophy list controls the endgame collection reward. When
+every current miniboss trophy is owned, the Guardian Compass unlocks the Hero
+Board. Adding another trophy-bearing miniboss automatically extends both the
+collection requirement and future full-roster gauntlets. Hero Board contracts
+live in `js/engine/endgame.js`; keep additions focused on varied play across
+maps, forms, abilities, and damage types rather than raw repetition.
 
 Boss introductions use three short lines with 2.2 seconds per line. Tapping an
 ability advances to the next line; it no longer discards the complete scene.
