@@ -23,7 +23,7 @@ G.playerMaxHearts = () => 3;
 G.makeTown = () => ({});
 run("js/engine/forms.js");
 run("js/abilities/basics.js");
-for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alchemist", "stormcaller", "dragon", "riftblade", "mole", "vampire", "jester", "god"])
+for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alchemist", "stormcaller", "dragon", "riftblade", "mole", "vampire", "jester", "turtle", "samurai", "astronomer", "druid", "god"])
   run(`js/forms/${name}.js`);
 run("js/engine/quests.js");
 G.validateCrossRefs();
@@ -52,5 +52,12 @@ G.state.items.push("mole-crown");
 assert.equal(G.formReady("mole"), false, "a trophy still needs its form-specific training requirement");
 assert.ok(G.forms.god.unlock.requirements.some((rule) => rule.item === "god-spark"), "God must require the final boss trophy");
 assert.equal(G.formOrder[G.formOrder.length - 1], "god", "God must remain the top form");
+for (const id of ["turtle", "samurai", "astronomer", "druid"])
+  assert.equal(G.forms[id].unlock.type, "challenge", `${id} should be earned through a guardian challenge`);
+for (const id of ["turtle", "samurai", "astronomer", "druid"]) {
+  const sprite = G.forms[id].sprite;
+  for (const frame of sprite.frames) for (const row of frame) for (const pixel of row)
+    assert.ok(pixel === "." || pixel === " " || sprite.palette[pixel], `${id} uses unknown sprite color '${pixel}'`);
+}
 
 console.log("progression tests passed");

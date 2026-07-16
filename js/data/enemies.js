@@ -342,13 +342,24 @@ registerEnemy({
 registerEnemy({
   id: "ancientTreant",
   name: "Ancient Treant",
-  hp: 16, speed: 24, damage: 2,
+  hp: 34, speed: 26, damage: 2,
   behavior: "chase", aggro: 120,
   size: 18, heavy: true, miniboss: true,
   boss: {
     style: "charger", intro: "THE FOREST REMEMBERS",
     color: "#a7f070", specialEvery: 3.6,
     telegraph: 0.65, chargeSpeed: 105, chargeDur: 0.45,
+    phases: 3, phaseThresholds: [0.67, 0.34], patterns: ["charge", "briar"],
+    introLines: [
+      "I was ancient when this path was only an ambitious puddle.",
+      "The birds asked me to stop travelers. They were very persuasive.",
+      "Watch the roots, little wanderer. The forest always announces itself.",
+    ],
+    phaseLine: "A strong breeze! Let us see how you fare in a storm of roots.",
+    phaseThreeLine: "The oldest trees bend. They do not move out of the way.",
+    knockoutLine: "Rest beneath the young branches. Return when yours are steady.",
+    defeatLine: "Pass, then. Tell the birds I made this look difficult.",
+    rematchLine: "Back so soon? Trees measure soon differently, but still.",
   },
   ward: { types: ["blunt"], hp: 4 },
   trophy: "trophy-heartwood-crown",
@@ -397,13 +408,25 @@ registerEnemy({
 registerEnemy({
   id: "mireQueen",
   name: "Mire Queen",
-  hp: 18, speed: 29, damage: 2,
+  hp: 36, speed: 32, damage: 2,
   behavior: "shooter", aggro: 145, shootEvery: 1.15,
   shotColor: "#38b764",
   size: 17, heavy: true, miniboss: true,
   boss: {
     style: "caster", intro: "HER COURT HAS RISEN",
     color: "#8153c1", specialEvery: 3.8,
+    phases: 3, phaseThresholds: [0.67, 0.34], telegraph: 0.58,
+    chargeSpeed: 0, chargeDur: 0, patterns: ["seeds", "nova"],
+    introLines: [
+      "Welcome to court. The dress code is damp but distinguished.",
+      "My veil is not decorative. Well, it is also decorative.",
+      "Break the purple ward, then mind what rises from the water.",
+    ],
+    phaseLine: "The court recognizes your argument and raises three bubbles.",
+    phaseThreeLine: "No more ceremony. The entire marsh will take the stand.",
+    knockoutLine: "Court is adjourned. Dry off and file another challenge.",
+    defeatLine: "Judgment for the hero. Take the pearl; it clashes with the mud.",
+    rematchLine: "Court reconvenes! Somebody find the ceremonial towel.",
   },
   ward: { types: ["dark"], hp: 5 },
   trophy: "trophy-mire-pearl",
@@ -452,13 +475,24 @@ registerEnemy({
 registerEnemy({
   id: "eclipseKnight",
   name: "Eclipse Knight",
-  hp: 22, speed: 34, damage: 2,
+  hp: 42, speed: 40, damage: 2,
   behavior: "chase", aggro: 135,
   size: 17, heavy: true, miniboss: true,
   boss: {
     style: "duelist", intro: "THE LAST LIGHT FADES",
     color: "#b58ee6", specialEvery: 3.0,
     telegraph: 0.48, chargeSpeed: 145, chargeDur: 0.3,
+    phases: 3, phaseThresholds: [0.67, 0.34], patterns: ["charge", "crescent"],
+    introLines: [
+      "I guarded the last light until it became awkward to leave.",
+      "The armor is mostly shadow. The squeaking is entirely real.",
+      "Dark breaks dark here. Yes, the naming committee regrets it.",
+    ],
+    phaseLine: "A spark remains. I shall make it considerably less convenient.",
+    phaseThreeLine: "Eclipse complete. Fight by memory, not by brightness.",
+    knockoutLine: "The light returns outside. Follow it, then return stronger.",
+    defeatLine: "Dawn wins again. It is becoming insufferably confident.",
+    rematchLine: "Another eclipse? Fine. I had not removed the armor.",
   },
   ward: { types: ["dark"], hp: 6 },
   trophy: "trophy-eclipse-sigil",
@@ -504,6 +538,39 @@ registerEnemy({
 });
 
 /* ---- RIFTBLADE ADEPT — defeat the form before becoming it ---- */
+/* ---- SHATTERCOAST WILDLIFE ---- */
+registerEnemy({
+  id: "tideCrab", name: "Tide Crab", hp: 7, speed: 30, damage: 1,
+  behavior: "chase", aggro: 100, size: 14, heavy: true,
+  ward: { types: ["blunt"], hp: 2 },
+  sprite: {
+    palette: { k: "#1a1c2c", c: "#ef7d57", r: "#b13e53", w: "#f4f4f4", b: "#41a6f6" },
+    frames: [[
+      "k............k", "ck..........kc", ".ck..kkkk..kc.", "..kccwwwwcck..", ".kccwkkkkwcck.",
+      "kcccrwkkwrccck", "kccccwwwwccck.", ".kkcccccccckk..", "..kcck..kcck..", ".kkk......kkk.",
+    ], [
+      ".k..........k.", "kck........kck", "..ck..kkkk..kc", "...kccwwwwcck.", "..kccwkkkkwcck",
+      ".kcccrwkkwrccc", ".kccccwwwwccck", "..kkcccccccckk", ".kcck......kcck", "kkk..........kkk",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "starMote", name: "Star Mote", hp: 5, speed: 43, damage: 1,
+  behavior: "shooter", aggro: 130, shootEvery: 1.45, shotColor: "#ffcd75", size: 12,
+  ward: { types: ["light"], hp: 2 },
+  sprite: {
+    palette: { k: "#1a1c2c", y: "#ffcd75", c: "#73eff7", w: "#f4f4f4", p: "#8153c1" },
+    frames: [[
+      "......y......", "..y...y...y..", "...c..y..c...", "....kyyyk....", ".yykywwwykyy.",
+      "....ywpwy....", "..ccywwwycc..", "....kyyyk....", "...c..y..c...", "..y...y...y..", "......y......",
+    ], [
+      "..y.......y..", "....c.y.c....", ".....kyk.....", "...yywwwyy...", "..cywwpwwyc..",
+      "...yywwwyy...", ".....kyk.....", "....c.y.c....", "..y.......y..", "......y......", ".............",
+    ]],
+  },
+});
+
 registerEnemy({
   id: "riftbladeAdept",
   name: "Riftblade Adept",
@@ -520,6 +587,7 @@ registerEnemy({
     introLines: [
       "The blade always returns. My library books do not.",
       "Move with the throw, or become part of the lesson.",
+      "Three beats, one opening. Tap an ability when you are ready.",
     ],
     phaseLine: "Better. Now follow three blades and one terrible metaphor.",
     phaseThreeLine: "Final lesson: every blade comes home. Try not to be there.",
@@ -593,6 +661,7 @@ registerEnemy({
     introLines: [
       "You tracked mud into my private tunnel.",
       "I respect the technique. I object to the visitor.",
+      "When the floor glows, move. When I surface, answer loudly.",
     ],
     phaseLine: "Fine. I am filing a noise complaint from below!",
     phaseThreeLine: "Royal decree: the entire floor is now a tunnel!",
@@ -632,6 +701,7 @@ registerEnemy({
     introLines: [
       "Welcome. I would offer refreshments, but that feels threatening.",
       "Try not to bleed on the cape. It is already very committed.",
+      "Keep pace with the waltz; hesitation is how midnight catches you.",
     ],
     phaseLine: "I have counted to two. Conveniently, this is phase two!",
     phaseThreeLine: "Now this is a proper midnight dance. Do keep up.",
@@ -670,6 +740,7 @@ registerEnemy({
     introLines: [
       "Why did the hero cross the arena? Poor boundary awareness.",
       "No refunds. The pie is a combat pie.",
+      "Count the cards. The third punchline always travels farther.",
     ],
     phaseLine: "Intermission is cancelled due to excessive competence!",
     phaseThreeLine: "Final act! More cards, fewer sensible decisions!",
@@ -694,6 +765,167 @@ registerEnemy({
   },
 });
 
+/* ---- SHATTERCOAST GUARDIANS — the expansion's four form teachers ---- */
+registerEnemy({
+  id: "admiralTortoise", name: "Admiral Tortoise",
+  hp: 72, speed: 46, damage: 2, behavior: "chase", aggro: 185,
+  size: 21, heavy: true, miniboss: true,
+  ward: { types: ["blunt"], hp: 7 },
+  boss: {
+    style: "turtle", color: "#a7f070", specialEvery: 2.3,
+    phases: 3, phaseThresholds: [0.67, 0.34],
+    telegraph: 0.58, chargeSpeed: 175, chargeDur: 0.42,
+    antiKiteRange: 112, chaseScale: 1.18,
+    patterns: ["shells", "charge", "shells"],
+    intro: "THE TIDE HAS FILED A FORMAL COMPLAINT",
+    introLines: [
+      "I have defended this beach for two hundred years.",
+      "Admittedly, most of those years were against seagulls.",
+      "Strike the shell, watch the counter, and mind the tide.",
+    ],
+    phaseLine: "A respectable opening. Deploy the emergency shell formation!",
+    phaseThreeLine: "Full speed ahead! Yes, this is full speed. Be polite.",
+    knockoutLine: "Retreat is a maneuver, not an embarrassment. I checked.",
+    defeatLine: "Defense is yours. Please use it against the seagulls.",
+    rematchLine: "Back on deck? Excellent. I have finished turning around.",
+  },
+  trophy: "tide-shell", trophyName: "Tide Shell", location: "The Breakwater Bastion",
+  sprite: {
+    palette: { k: "#1a1c2c", g: "#6b8e3e", l: "#a7f070", b: "#8a6538", w: "#f4f4f4", y: "#ffcd75", c: "#73eff7" },
+    frames: [[
+      "....yyy....yyy....", "...yyyyyyyyyyyy...", "..kkkggggggggkkk..", ".kgggllllllllgggk.",
+      "kggllkwllllwkllggk", "kgglllkkkkkklllggk", "kbbggllllllllggbbk", ".kbbbggggggggbbbk.",
+      "..kkggggggggggkk..", "...kbbbbbbbbbbk...", "..kkbbbyyyybbbkk..", ".kbbbbbbbbbbbbbbk.",
+      "kbbbkkbbbbbbkkbbbk", ".kkk..kkkkkkkk..kkk", "ccc....kkkk....ccc", "cccc..........cccc",
+    ], [
+      "...yyy......yyy...", "..yyyyyyyyyyyyyy..", ".kkkggggggggggkkk.", "kgggllllllllllgggk",
+      "kggllkwllllwkllggk", "kgglllkkkkkklllggk", ".kbbggllllllllggbbk.", "..kbbbggggggggbbbk..",
+      "...kkggggggggkk...", "....kbbbbbbbbk....", "...kkbbbyybbbkk...", "..kbbbbbbbbbbbbk..",
+      ".kbbbkkbbbbkkbbbk.", "..kkk..kkkk..kkk..", "cccc....kk....cccc", ".ccc..........ccc.",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "paperRonin", name: "The Paper Ronin",
+  hp: 68, speed: 71, damage: 2, behavior: "chase", aggro: 190,
+  size: 19, heavy: true, miniboss: true,
+  ward: { types: ["sharp"], hp: 7 },
+  boss: {
+    style: "duelist", color: "#f4f4f4", specialEvery: 2.05,
+    phases: 3, phaseThresholds: [0.67, 0.34],
+    telegraph: 0.43, chargeSpeed: 235, chargeDur: 0.3,
+    antiKiteRange: 116, chaseScale: 1.34,
+    patterns: ["charge", "crescent", "charge", "blades"],
+    intro: "ONE DUEL REMAINS UNFINISHED",
+    introLines: [
+      "I folded one thousand cranes while waiting for a worthy rival.",
+      "Crane nine hundred and twelve looked suspiciously like a sandwich.",
+      "Three cuts. The silence between them is the dangerous part.",
+    ],
+    phaseLine: "Your rhythm has edges. Let us see whether it has patience.",
+    phaseThreeLine: "No more warm-up. Draw the moon before I do.",
+    knockoutLine: "A duel may pause. It does not end until both agree.",
+    defeatLine: "The final crane is yours. It is definitely not a sandwich.",
+    rematchLine: "The paper remembers every crease. I remember every cut.",
+  },
+  trophy: "paper-crane", trophyName: "Thousandth Paper Crane", location: "The Folded Dojo",
+  sprite: {
+    palette: { k: "#1a1c2c", w: "#f4f4f4", s: "#94b0c2", r: "#b13e53", d: "#2d1b2e", y: "#ffcd75", c: "#73eff7" },
+    frames: [[
+      ".....yyyyyyyy.....", "...yykkkkkkkkyy...", "..kkddddddddddkk..", ".kdwwsssssssswwdk.",
+      ".kdwskkkkkkkkswdk.", "..kwwk......kwwk..", ".kkwwwwwwwwwwwwkk.", "krrkkwwwwwwwwkkrrk",
+      "krrrrkkkkkkkkrrrrk", ".krrrddddddddrrrk.", "..krrddddddddrrk..", "...kkddddddddkk...",
+      "....kddkkkddk.....", "...kkdk...kdkk....", "..ccc.......ccc...", ".ccccc.....ccccc..",
+    ], [
+      "....yyyyyyyy......", "..yykkkkkkkkyy....", ".kkddddddddddkk....", "kdwwsssssssswwdk...",
+      "kdwskkkkkkkkswdk...", ".kwwk......kwwk....", "kkwwwwwwwwwwwwkk...", "rrkkwwwwwwwwkkrrk..",
+      "rrrrkkkkkkkkrrrrk...", "krrrddddddddrrrk...", ".krrddddddddrrk....", "..kkddddddddkk.....",
+      "...kddkkkddk......", "..kkdk...kdkk.....", ".ccc.........ccc...", "ccccc.......ccccc..",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "professorPerihelion", name: "Professor Perihelion",
+  hp: 66, speed: 48, damage: 2, behavior: "shooter", shootEvery: 1.5, aggro: 195,
+  shotColor: "#73eff7", size: 19, heavy: true, miniboss: true,
+  ward: { types: ["light"], hp: 7 },
+  boss: {
+    style: "caster", color: "#ffcd75", specialEvery: 2.25,
+    phases: 3, phaseThresholds: [0.67, 0.34],
+    telegraph: 0.54, chargeSpeed: 0, chargeDur: 0,
+    antiKiteRange: 118, chaseScale: 1.2,
+    patterns: ["stars", "orbit", "nova"],
+    intro: "THE ORRERY REFUSES TO BE WRONG",
+    introLines: [
+      "My calculations predicted a hero at precisely... yesterday.",
+      "Do not touch the brass planets. They are mostly glue.",
+      "Follow the orbit, then stand where the stars are not.",
+    ],
+    phaseLine: "A fascinating error! I shall solve it with additional stars.",
+    phaseThreeLine: "Gravity, kindly stop being theoretical and grab our guest.",
+    knockoutLine: "The result is reproducible. Rest, then challenge the data.",
+    defeatLine: "Peer review accepted. Please take the key and fix my calendar.",
+    rematchLine: "A second data point! Try to be statistically dramatic.",
+  },
+  trophy: "orrery-key", trophyName: "Orrery Key", location: "The Crooked Observatory",
+  sprite: {
+    palette: { k: "#1a1c2c", v: "#3b2f73", p: "#8153c1", b: "#41a6f6", c: "#73eff7", y: "#ffcd75", w: "#f4f4f4", s: "#94b0c2" },
+    frames: [[
+      "y.......y.......y", ".c.....c.c.....c.", "...yyyyyyyyyy....", "..kkpvvvvvvpkk...",
+      ".kpvwsssssswvpk..", ".kvwskkkkkkswvk..", "..kwwc....cwwk...", ".kkwwwwwwwwwwkk..",
+      "kpvkkwwwwwwkkvpk.", "kpvvvkkkkkkvvvpk.", ".kpvvvvvvvvvvpk...", "..kpvvvvvvvvpk....",
+      "...kkpvkkvpkk.....", "....kkv..vkk......", "..ccc......ccc....", ".ccccc....ccccc...",
+    ], [
+      ".......y.......y.", "c.....c.c.....c..", "..yyyyyyyyyy.....", ".kkpvvvvvvpkk.....",
+      "kpvwsssssswvpk....", "kvwskkkkkkswvk....", ".kwwc....cwwk.....", "kkwwwwwwwwwwkk....",
+      "pvkkwwwwwwkkvpk...", "pvvvkkkkkkvvvpk...", "kpvvvvvvvvvvpk....", ".kpvvvvvvvvpk.....",
+      "..kkpvkkvpkk......", "...kkv..vkk.......", ".ccc........ccc....", "ccccc......ccccc...",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "grandmotherBriar", name: "Grandmother Briar",
+  hp: 74, speed: 53, damage: 2, behavior: "shooter", shootEvery: 1.55, aggro: 190,
+  shotColor: "#a7f070", size: 21, heavy: true, miniboss: true,
+  ward: { types: ["dark"], hp: 8 },
+  boss: {
+    style: "caster", color: "#38b764", specialEvery: 2.3,
+    phases: 3, phaseThresholds: [0.67, 0.34],
+    telegraph: 0.56, chargeSpeed: 160, chargeDur: 0.34,
+    antiKiteRange: 112, chaseScale: 1.22,
+    patterns: ["seeds", "briar", "charge"],
+    intro: "THE GARDEN HAS DECIDED TO GARDEN BACK",
+    introLines: [
+      "Shoes off, dear. The moss has standards.",
+      "I planted one defensive hedge. It developed ambitions.",
+      "Mind the seeds. They become opinions when crowded.",
+    ],
+    phaseLine: "Lovely footwork. Terrible for the begonias, but lovely.",
+    phaseThreeLine: "Very well, dear. The whole arena is a flowerpot now.",
+    knockoutLine: "A little compost, a little rest, and you may try again.",
+    defeatLine: "Take the acorn. Plant something kinder than my hedge.",
+    rematchLine: "Tea is not ready, but the briars certainly are.",
+  },
+  trophy: "elder-acorn", trophyName: "Elder Acorn", location: "The Walking Garden",
+  sprite: {
+    palette: { k: "#1a1c2c", g: "#38b764", l: "#a7f070", b: "#6b4a2b", t: "#8a6538", w: "#f4f4f4", y: "#ffcd75" },
+    frames: [[
+      "..l....llll....l..", ".lgl..llggll..lgl.", "..l..kkggggkk..l..", "....kttttttttk....",
+      "...ktwllllllwtk...", "...ktwlkkkklwtk...", "..kktttwwwwtttkk..", ".kggkkttttttkkggk.",
+      "kggggkkttttkkggggk", ".kgggbbbbbbbbgggk.", "..kggbbbbbbbbggk..", "...kkbbbbbbbbkk...",
+      "....kbbk..kbbk....", "...kkbk....kbkk...", "..lll......lll....", ".lllll....lllll...",
+    ], [
+      ".l....llll....l...", "lgl..llggll..lgl..", ".l..kkggggkk..l...", "...kttttttttk.....",
+      "..ktwllllllwtk....", "..ktwlkkkklwtk....", ".kktttwwwwtttkk....", "kggkkttttttkkggk...",
+      ".kggggkkttttkkggggk", "..kgggbbbbbbbbgggk", "...kggbbbbbbbbggk.", "....kkbbbbbbbbkk..",
+      ".....kbbk..kbbk...", "....kkbk....kbkk..", ".lll........lll...", "lllll......lllll..",
+    ]],
+  },
+});
+
 registerEnemy({
   id: "godAvatar", name: "God of Every Form",
   hp: 82, speed: 62, damage: 2, behavior: "chase", aggro: 190,
@@ -704,11 +936,12 @@ registerEnemy({
     phases: 3, phaseThresholds: [0.67, 0.34],
     telegraph: 0.48, chargeSpeed: 195, chargeDur: 0.34,
     antiKiteRange: 118, chaseScale: 1.3,
-    patterns: ["charge", "blades", "cards", "nova"],
+    patterns: ["charge", "blades", "cards", "shells", "crescent", "stars", "briar", "nova"],
     intro: "THE FINAL FORM HAS BEEN EXPECTING YOU",
     introLines: [
       "I know everything. Except where I put my keys.",
       "Show me every lesson. I promise to grade on a curve.",
+      "I added four pages overnight. This is now an expansion-sized exam.",
     ],
     phaseLine: "Good. I was running out of easy questions.",
     phaseThreeLine: "No more questions. Show me the answer every form discovered.",

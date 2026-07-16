@@ -54,6 +54,7 @@ G.world = (() => {
   function load(mapId, spawn) {
     const def = G.maps[mapId];
     if (!def) { console.error("No map called " + mapId); return; }
+    if (G.state && G.state.gauntletRun && mapId !== "gauntletArena" && G.cancelGauntlet) G.cancelGauntlet();
 
     const legend = Object.assign({}, BASE_LEGEND, def.legend || {});
     const rows = def.tiles;
@@ -277,6 +278,18 @@ G.world = (() => {
     },
     god: {
       floor: ["#69738b", "#768198", "#606980"], wall: "#474e66", seam: "#292d43", accent: "#fff3c2",
+    },
+    turtle: {
+      floor: ["#536a57", "#60765f", "#485d4d"], wall: "#334538", seam: "#1a2d28", accent: "#a7f070",
+    },
+    samurai: {
+      floor: ["#65565e", "#725f67", "#584b55"], wall: "#382d37", seam: "#1a1c2c", accent: "#f4f4f4",
+    },
+    astronomer: {
+      floor: ["#454b78", "#505886", "#3c416b"], wall: "#292746", seam: "#17182b", accent: "#ffcd75",
+    },
+    druid: {
+      floor: ["#52684d", "#5d7454", "#465a44"], wall: "#32432f", seam: "#1e2b22", accent: "#38b764",
     },
   };
 
@@ -544,6 +557,10 @@ G.world = (() => {
       vampire: { dark: "#2d1b2e", light: "#b13e53" },
       jester: { dark: "#3b5dc9", light: "#ffcd75" },
       god: { dark: "#8153c1", light: "#fff3c2" },
+      turtle: { dark: "#334538", light: "#a7f070" },
+      samurai: { dark: "#b13e53", light: "#f4f4f4" },
+      astronomer: { dark: "#3b2f73", light: "#ffcd75" },
+      druid: { dark: "#1e5f4e", light: "#a7f070" },
     };
     const style = styles[theme] || styles.riftblade;
     const cx = Math.floor(s.mapW * G.TILE / 2);
@@ -562,7 +579,41 @@ G.world = (() => {
     ctx.strokeStyle = style.light;
     ctx.lineWidth = 1;
 
-    if (theme === "mole") {
+    if (theme === "turtle") {
+      ctx.beginPath();
+      ctx.arc(cx, cy, 34, Math.PI, Math.PI * 2);
+      ctx.arc(cx, cy, 52, Math.PI, Math.PI * 2);
+      ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - 58);
+      ctx.moveTo(cx, cy); ctx.lineTo(cx - 43, cy - 35);
+      ctx.moveTo(cx, cy); ctx.lineTo(cx + 43, cy - 35);
+      ctx.stroke();
+    } else if (theme === "samurai") {
+      ctx.beginPath();
+      ctx.arc(cx, cy, 45, Math.PI * 0.2, Math.PI * 1.8);
+      ctx.moveTo(cx - 58, cy + 32); ctx.lineTo(cx + 54, cy - 38);
+      ctx.moveTo(cx - 42, cy + 42); ctx.lineTo(cx + 39, cy - 9);
+      ctx.stroke();
+    } else if (theme === "astronomer") {
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const a = i * Math.PI / 4 + time * 0.025;
+        ctx.moveTo(cx + Math.cos(a) * 18, cy + Math.sin(a) * 18);
+        ctx.lineTo(cx + Math.cos(a) * 60, cy + Math.sin(a) * 60);
+      }
+      ctx.stroke();
+      ctx.fillStyle = style.light;
+      for (let i = 0; i < 6; i++) {
+        const a = i * Math.PI / 3;
+        ctx.fillRect(Math.round(cx + Math.cos(a) * 38) - 1, Math.round(cy + Math.sin(a) * 38) - 1, 3, 3);
+      }
+    } else if (theme === "druid") {
+      ctx.beginPath();
+      ctx.arc(cx - 24, cy, 28, -1.2, 1.2);
+      ctx.arc(cx + 24, cy, 28, Math.PI - 1.2, Math.PI + 1.2);
+      ctx.moveTo(cx, cy - 58); ctx.lineTo(cx - 22, cy - 12); ctx.lineTo(cx, cy + 58);
+      ctx.moveTo(cx - 52, cy + 30); ctx.lineTo(cx, cy - 18); ctx.lineTo(cx + 52, cy + 30);
+      ctx.stroke();
+    } else if (theme === "mole") {
       ctx.beginPath();
       ctx.moveTo(cx - 48, cy + 20); ctx.lineTo(cx - 22, cy - 12); ctx.lineTo(cx, cy + 8);
       ctx.lineTo(cx + 25, cy - 18); ctx.lineTo(cx + 52, cy + 17); ctx.stroke();
@@ -616,7 +667,8 @@ G.world = (() => {
     const s = G.state;
     const theme = s.mapDef && s.mapDef.visualTheme;
     const color = theme === "vampire" ? "#b13e53" : theme === "mole" ? "#ffcd75" :
-      theme === "jester" ? "#73eff7" : theme === "god" ? "#fff3c2" : "#a7f070";
+      theme === "jester" ? "#73eff7" : theme === "god" ? "#fff3c2" :
+      theme === "samurai" ? "#f4f4f4" : theme === "astronomer" ? "#ffcd75" : "#a7f070";
     ctx.save();
     ctx.globalAlpha = theme ? 0.45 : 0.22;
     ctx.fillStyle = color;
@@ -711,6 +763,39 @@ G.world = (() => {
       ctx.fillRect(cx - 2, cy - 18, 4, 4);
       ctx.fillRect(cx + 16, cy - 16, 4, 4);
       ctx.fillRect(cx - 18, cy - 7, 36, 2);
+    } else if (cell.portalTheme === "turtle") {
+      ctx.fillStyle = "#334538";
+      ctx.fillRect(cx - 22, cy - 3, 44, 17);
+      ctx.fillRect(cx - 16, cy - 10, 32, 10);
+      ctx.fillStyle = "#6b8e3e";
+      ctx.fillRect(cx - 17, cy - 7, 34, 6);
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(cx - 8, cy - 2, 16, 16);
+      ctx.strokeStyle = `rgba(167,240,112,${pulse})`;
+      ctx.beginPath(); ctx.arc(cx, cy - 9, 8, Math.PI, 0); ctx.stroke();
+    } else if (cell.portalTheme === "samurai") {
+      ctx.fillStyle = "#b13e53";
+      ctx.fillRect(cx - 20, cy - 15, 6, 29); ctx.fillRect(cx + 14, cy - 15, 6, 29);
+      ctx.fillRect(cx - 24, cy - 18, 48, 5); ctx.fillRect(cx - 17, cy - 10, 34, 4);
+      ctx.fillStyle = "#1a1c2c"; ctx.fillRect(cx - 9, cy - 8, 18, 22);
+      ctx.fillStyle = "#f4f4f4"; ctx.fillRect(cx - 1, cy - 16, 2, 23);
+      ctx.fillStyle = "#ffcd75"; ctx.fillRect(cx - 4, cy - 20, 8, 3);
+    } else if (cell.portalTheme === "astronomer") {
+      ctx.fillStyle = "#3b2f73";
+      ctx.fillRect(cx - 20, cy - 11, 7, 25); ctx.fillRect(cx + 13, cy - 11, 7, 25);
+      ctx.fillRect(cx - 16, cy - 17, 32, 7);
+      ctx.fillStyle = "#1a1c2c"; ctx.fillRect(cx - 9, cy - 9, 18, 23);
+      ctx.strokeStyle = `rgba(255,205,117,${pulse})`; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx, cy - 16, 12, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = "#ffcd75"; ctx.fillRect(cx - 4, cy - 16, 9, 1); ctx.fillRect(cx, cy - 20, 1, 9);
+    } else if (cell.portalTheme === "druid") {
+      ctx.fillStyle = "#6b4a2b";
+      ctx.fillRect(cx - 21, cy - 11, 8, 25); ctx.fillRect(cx + 13, cy - 11, 8, 25);
+      ctx.fillStyle = "#1e5f4e";
+      ctx.fillRect(cx - 22, cy - 18, 44, 9); ctx.fillRect(cx - 16, cy - 22, 32, 8);
+      ctx.fillStyle = "#1a1c2c"; ctx.fillRect(cx - 9, cy - 8, 18, 22);
+      ctx.fillStyle = "#a7f070";
+      ctx.fillRect(cx - 17, cy - 20, 3, 3); ctx.fillRect(cx + 14, cy - 17, 3, 3);
     } else if (cell.portalTheme === "god") {
       ctx.fillStyle = "#f4f4f4";
       ctx.fillRect(cx - 20, cy - 14, 6, 28);

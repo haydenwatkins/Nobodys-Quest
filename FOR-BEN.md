@@ -112,9 +112,9 @@ Combining `pierce: true` with an explosion makes a traveling shockwave:
 it erupts at each new enemy, keeps moving, and counts unique hits across
 the complete cast. Fault Line is the reference example.
 
-Mana naturally recovers to the gold **reserve mark** at 6. Successful
-hits can charge the remaining four points up to 10. This keeps everyday
-moves available while making the biggest 7-mana moves ask for one good hit.
+Mana naturally recovers all the way to 10 after a short casting delay.
+Successful hits add mana faster, so aggressive play reaches the biggest
+moves sooner without making waiting players farm enemies forever.
 
 Change `range`, `damage`, `speed`, add a `status` like poison or stun,
 or call `shoot` three times like Triple Shot does. Mix and match!
@@ -202,6 +202,23 @@ The current boss-earned examples deliberately teach different jobs:
 - Countess Carmine: stay aggressive to earn carefully limited healing.
 - Royal Fool: count attacks and set up a third-card ricochet.
 - God of Every Form: combines learned patterns as the final mastery exam.
+
+### The Shattercoast expansion
+
+Shattercoast is a late-game region containing four more guardian-earned forms:
+Turtle, Samurai, Astronomer, and Druid. Their scripts still follow the same
+Workshop rules as every form Ben makes; they are examples, not engine exceptions.
+Because their scripts load before `god.js`, God's `previousFormsLevel` challenge
+automatically includes them and will keep including any future form placed there.
+
+The Manyfold Gauntlet unlocks after three miniboss trophies. Its menu lets the
+player choose a run length and whether a campfire restores one heart and three
+mana between rounds. The pool is built from collected trophies, so adding a new
+miniboss with a trophy automatically adds it to future gauntlets after defeat.
+
+Boss introductions use three short lines with 2.2 seconds per line. Tapping an
+ability advances to the next line; it no longer discards the complete scene.
+Rematches remain quick.
 
 ---
 

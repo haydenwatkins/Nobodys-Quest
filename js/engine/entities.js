@@ -320,7 +320,7 @@ function engageBoss(e) {
   const boss = e.def.boss;
   const rematch = (G.state.items || []).includes(e.def.trophy);
   const lines = boss.introLines && boss.introLines.length ? boss.introLines : [boss.intro];
-  e.bossIntroT = rematch ? 0.35 : Math.max(1.2, lines.length * 1.15);
+  e.bossIntroT = rematch ? 0.35 : Math.max(G.BOSS_CUTSCENE_LINE_SECONDS, lines.length * G.BOSS_CUTSCENE_LINE_SECONDS);
   e.shootT = Math.max(e.shootT, e.bossIntroT + 0.35);
   G.state.hitStop = Math.max(G.state.hitStop || 0, rematch ? 0.03 : 0.08);
   G.state.shake = Math.max(G.state.shake, rematch ? 0.16 : 0.38);
@@ -337,7 +337,7 @@ function engageBoss(e) {
       enemy: e,
       lines,
       index: 0,
-      lineT: 1.15,
+      lineT: G.BOSS_CUTSCENE_LINE_SECONDS,
       elapsed: 0,
       wardText,
     };
@@ -353,16 +353,23 @@ G.updateBossCutscene = function (dt) {
   scene.lineT -= dt;
   e.bossIntroT = Math.max(0, e.bossIntroT - dt);
 
-  const skip = scene.elapsed > 0.35 && ["a", "b", "c", "pause"].some((button) => G.input.tapped(button));
-  if (!skip && scene.lineT <= 0 && scene.index < scene.lines.length - 1) {
+  const advance = scene.elapsed > 0.35 && ["a", "b", "c", "pause"].some((button) => G.input.tapped(button));
+  const nextLine = advance || scene.lineT <= 0;
+  if (nextLine && scene.index < scene.lines.length - 1) {
     scene.index++;
-    scene.lineT = 1.15;
+    scene.lineT = G.BOSS_CUTSCENE_LINE_SECONDS;
+    scene.elapsed = 0;
     G.sfx.play("bossPhase");
     G.ui.banner(`⚔ ${e.def.name.toUpperCase()} ⚔`, scene.lines[scene.index]);
+    G.state.shake = Math.max(G.state.shake, 0.16);
+    G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: e.def.boss.color, radius: 18, dur: 0.38 });
+    G.input.clearTaps();
+    return;
   }
-  if (skip || e.bossIntroT <= 0) {
+  if ((advance && scene.index === scene.lines.length - 1) || e.bossIntroT <= 0) {
     e.bossIntroT = 0;
     G.state.bossCutscene = null;
+    G.state.shake = Math.max(G.state.shake, 0.22);
     G.input.clearTaps();
   }
 };
@@ -390,9 +397,9 @@ function fireBossFan(e, p, count, shape, size, damage) {
   }
 }
 
-function fireBossRadial(e, count, speed, shape) {
+function fireBossRadial(e, count, speed, shape, offset) {
   for (let i = 0; i < count; i++) {
-    enemyShot(G.state, e, (i / count) * Math.PI * 2, {
+    enemyShot(G.state, e, (i / count) * Math.PI * 2 + (offset || 0), {
       damage: 1, speed: speed || 78, range: 155, size: 4, shape,
     });
   }
@@ -411,6 +418,15 @@ function resolveBossAction(e, p, action) {
   if (action === "quake") fireBossRadial(e, e.bossPhase >= 3 ? 16 : e.bossPhase === 2 ? 12 : 8, 74, "fault");
   if (action === "bloodBurst") fireBossRadial(e, e.bossPhase >= 3 ? 16 : e.bossPhase === 2 ? 12 : 8, 92, null);
   if (action === "nova") fireBossRadial(e, e.bossPhase >= 3 ? 20 : e.bossPhase === 2 ? 16 : 12, 82, null);
+  if (action === "shells") fireBossRadial(e, e.bossPhase >= 3 ? 16 : e.bossPhase === 2 ? 12 : 8, 68, "shell", e.bossPattern * 0.17);
+  if (action === "crescent") fireBossFan(e, p, e.bossPhase >= 3 ? 7 : 5, "riftBlade", 6, 1);
+  if (action === "stars") fireBossRadial(e, e.bossPhase >= 3 ? 18 : e.bossPhase === 2 ? 12 : 6, 104, "star", e.bossPattern * 0.23);
+  if (action === "orbit") {
+    fireBossRadial(e, e.bossPhase >= 3 ? 12 : 8, 58, "star", e.bossPattern * 0.31);
+    fireBossFan(e, p, e.bossPhase >= 3 ? 5 : 3, "star", 5, 1);
+  }
+  if (action === "seeds") fireBossFan(e, p, e.bossPhase >= 3 ? 7 : e.bossPhase === 2 ? 5 : 3, "seed", 6, 1);
+  if (action === "briar") fireBossRadial(e, e.bossPhase >= 3 ? 18 : e.bossPhase === 2 ? 14 : 10, 76, "seed", e.bossPattern * 0.19);
   e.bossRecoverT = 0.34;
 }
 
@@ -929,6 +945,21 @@ G.drawProjectiles = function (ctx) {
       ctx.fillRect(x - 4, y - 1, 3, 2);
       ctx.fillRect(x - 1, y - 3, 3, 3);
       ctx.fillRect(x + 2, y - 1, 3, 2);
+    } else if (pr.shape === "shell") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 3, y - 2, 7, 5);
+      ctx.fillStyle = "#6b8e3e";
+      ctx.fillRect(x - 1, y - 1, 3, 3);
+    } else if (pr.shape === "star") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 3, y, 7, 1);
+      ctx.fillRect(x, y - 3, 1, 7);
+      ctx.fillRect(x - 1, y - 1, 3, 3);
+    } else if (pr.shape === "seed") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 2, y - 2, 5, 5);
+      ctx.fillStyle = "#a7f070";
+      ctx.fillRect(x + 1, y - 3, 2, 2);
     } else {
       ctx.fillRect(Math.round(pr.x - s / 2), Math.round(pr.y - 4 - s / 2), s, s);
     }

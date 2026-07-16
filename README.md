@@ -7,6 +7,10 @@ and maps are data files designed to be extended by a kid** (see
 
 Plain JavaScript + Canvas. **No build tools, no npm, no installs.**
 
+The current campaign includes 18 mixable forms, the late-game Shattercoast
+region, personality-driven three-phase guardian trials, and a configurable
+boss gauntlet with optional between-round recovery.
+
 ## Run it
 
 Double-click `index.html`. Works from the plain filesystem — no server needed.

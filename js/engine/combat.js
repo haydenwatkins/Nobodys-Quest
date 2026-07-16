@@ -159,6 +159,10 @@ G.combat = (() => {
       poisoned: !!(enemy.status && enemy.status.poison),
     });
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);
+    if (enemy.def.miniboss && G.state.gauntletRun && G.gauntletBossDefeated) {
+      G.gauntletBossDefeated(enemy);
+      return;
+    }
     // Little rewards sometimes drop
     if (enemy.def.miniboss) {
       G.state.pickups.push({ kind: "heart", x: enemy.x - 6, y: enemy.y, t: 0 });
@@ -450,6 +454,38 @@ G.combat = (() => {
     return hits;
   }
 
+  // A readable point-blank burst for wells, counters, and growth effects.
+  // Unlike a 360-degree melee swing it can pull targets inward, and it never
+  // grants melee clash protection unless the ability supplies its own guard.
+  function areaBurst(user, o) {
+    const type = abilityDamageType(o.ability, o.type, "blunt");
+    const range = o.range || 34;
+    const color = o.color || G.DAMAGE_TYPES[type].color;
+    let hits = 0;
+    G.sfx.attack("melee", type, o.damage || 1);
+    for (const e of G.state.enemies) {
+      if (e.dead || G.util.dist(user.x, user.y, e.x, e.y) > range + e.def.size / 2) continue;
+      if (damageEnemy(e, {
+        damage: o.damage || 1, type, ability: o.ability,
+        knockback: o.pull ? 0 : o.knockback,
+        status: o.status, breaksAnyWard: breaksAnyWard(user),
+        fromX: user.x, fromY: user.y,
+        hitStop: o.hitStop, shake: o.shake,
+      })) {
+        hits++;
+        if (o.pull) {
+          const d = G.util.dist(e.x, e.y, user.x, user.y);
+          const a = G.util.angleTo(e.x, e.y, user.x, user.y);
+          const step = Math.min(o.pull, Math.max(0, d - 10));
+          G.world.moveBox(e, Math.cos(a) * step, Math.sin(a) * step);
+        }
+      }
+    }
+    G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color, radius: range, dur: o.dur || 0.34 });
+    if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
+    return hits;
+  }
+
   // Zoom forward! Brief invincibility, damages anything you pass through.
   // {dist, damage, type, ability, color}
   function dash(user, o) {
@@ -626,5 +662,5 @@ G.combat = (() => {
     return hits;
   }
 
-  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, dash, finishDash, updateProjectiles };
+  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, updateProjectiles };
 })();

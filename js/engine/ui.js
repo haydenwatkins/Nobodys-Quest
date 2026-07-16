@@ -261,7 +261,10 @@ G.ui = (() => {
     const y = 4;
     const color = (boss.def.boss && boss.def.boss.color) || "#ffcd75";
     const phaseLabel = ["I", "II", "III"][boss.bossPhase - 1] || String(boss.bossPhase);
-    const label = `${boss.def.name.toUpperCase()}  ${phaseLabel}`;
+    const round = G.state.gauntletRun
+      ? ` · ${Math.min(G.state.gauntletRun.index + 1, G.state.gauntletRun.bosses.length)}/${G.state.gauntletRun.bosses.length}`
+      : "";
+    const label = `${boss.def.name.toUpperCase()}  ${phaseLabel}${round}`;
     const frac = Math.max(0, boss.hp / boss.def.hp);
 
     c.fillStyle = "rgba(26,28,44,0.88)";
@@ -421,7 +424,7 @@ G.ui = (() => {
       c.globalAlpha = 1;
     }
     if (G.state.bossCutscene) {
-      const skip = "TAP AN ABILITY TO SKIP";
+      const skip = "TAP AN ABILITY FOR NEXT";
       c.font = `5px ${FONT_HEAD}`;
       const skipW = c.measureText(skip).width;
       c.fillStyle = "rgba(26,28,44,0.8)";
@@ -529,7 +532,9 @@ G.ui = (() => {
       ["mix", "Mix"],
     ];
     if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
+    if (G.gauntletUnlocked && G.gauntletUnlocked()) tabs.push(["gauntlet", "Gauntlet"]);
     if (activeTab === "town" && !(G.townUnlocked && G.townUnlocked())) activeTab = "forms";
+    if (activeTab === "gauntlet" && !(G.gauntletUnlocked && G.gauntletUnlocked())) activeTab = "forms";
     let html = `<h1>Nobody's Quest</h1>
       <div class="stars">⭐ ${G.state.stars} stars</div>
       <div class="menu-tabs">${tabs.map(([id, label]) =>
@@ -541,6 +546,7 @@ G.ui = (() => {
     if (activeTab === "quests") html += buildQuestsTab();
     if (activeTab === "mix") html += buildMixTab();
     if (activeTab === "town") html += buildTownTab();
+    if (activeTab === "gauntlet") html += buildGauntletTab();
 
     html += `</div>
       <div class="menu-footer">
@@ -593,6 +599,12 @@ G.ui = (() => {
       G.world.load("town", { x: 15, y: 14 });
       G.saveGame();
       closeMenu();
+    });
+    const startGauntlet = menuEl.querySelector('[data-act="start-gauntlet"]');
+    if (startGauntlet) startGauntlet.addEventListener("click", () => {
+      const count = menuEl.querySelector('[data-gauntlet-count]').value;
+      const recovery = menuEl.querySelector('[data-gauntlet-recovery]').checked;
+      if (G.startGauntlet(count, recovery)) closeMenu();
     });
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
@@ -733,6 +745,35 @@ G.ui = (() => {
       <div class="quest-row"><span>Kill as God</span><span class="prog">+1 resident, +2 spirit</span></div>
       <div class="quest-row"><span>Break ward as God</span><span class="prog">+1 spirit</span></div>
       <div class="quest-row"><span>Hold festival</span><span class="prog">+residents spirit</span></div>
+    </div>`;
+  }
+
+  function buildGauntletTab() {
+    const pool = G.gauntletBossPool();
+    const current = G.state.gauntletRun;
+    if (current) {
+      return `<div class="form-card current">
+        <h2>🏟 Gauntlet in progress</h2>
+        <div class="tagline">Round ${Math.min(current.index + 1, current.bosses.length)}/${current.bosses.length} · ${current.recovery ? "campfire recovery" : "iron run"}</div>
+        <div class="quest-row"><span>Guardians defeated</span><span class="prog">${current.wins}</span></div>
+      </div>`;
+    }
+    const choices = [3, 5, 8].filter((count) => count <= pool.length);
+    const options = choices.map((count) => `<option value="${count}">${count} bosses</option>`).join("") +
+      `<option value="all">All ${pool.length} defeated bosses</option>`;
+    return `<div class="form-card current">
+      <h2>🏟 Manyfold Gauntlet</h2>
+      <div class="tagline">Choose how many previously defeated guardians to fight back-to-back. The order changes every run.</div>
+      <div class="quest-row"><span>Available guardians</span><span class="prog">${pool.length}</span></div>
+      <div class="quest-row"><span>Recovery record</span><span class="prog">${G.state.gauntletBest || 0}</span></div>
+      <div class="quest-row"><span>Iron record</span><span class="prog">${G.state.gauntletIronBest || 0}</span></div>
+      <div class="slot-row"><span class="slot-label">Run length</span><select data-gauntlet-count>${options}</select></div>
+      <label class="quest-row"><span>Campfire between rounds<br><small>Restore 1 heart and 3 mana</small></span><input data-gauntlet-recovery type="checkbox" checked></label>
+      <button data-act="start-gauntlet">Enter the gauntlet</button>
+    </div>
+    <div class="form-card">
+      <h2>🏆 Records</h2>
+      <div class="tagline">A longer personal best awards one star. Defeat your entire collected roster in one run to earn the Manyfold Crown.</div>
     </div>`;
   }
 

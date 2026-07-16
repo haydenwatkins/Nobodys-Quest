@@ -780,6 +780,177 @@ registerAbility({
   },
 });
 
+/* ----------------- TURTLE's moves ----------------- */
+
+registerAbility({
+  id: "shellJab", name: "Shell Jab", icon: "🐢", type: "blunt",
+  mana: 0, cooldown: 0.42,
+  use(user) {
+    user.shellBeat = (user.shellBeat || 0) % 3 + 1;
+    const brace = user.shellBeat === 3;
+    const hits = G.combat.meleeArc(user, {
+      ability: "shellJab", range: brace ? 25 : 20, arcDeg: brace ? 190 : 105,
+      damage: 1, type: "blunt", knockback: brace ? 150 : 80,
+      color: brace ? "#a7f070" : "#6b8e3e", weight: brace ? 5 : 3,
+      hitStop: brace ? 0.04 : 0.026, combo: brace ? "brace" : "jab",
+    });
+    if (brace && hits) {
+      user.meleeGuard = Math.max(user.meleeGuard || 0, 0.32);
+      G.damageNumber(user.x, user.y - 18, "BRACED!", "#a7f070");
+    }
+  },
+});
+
+registerAbility({
+  id: "shellRoll", name: "Shell Roll", icon: "🛞", type: "blunt",
+  mana: 3, cooldown: 1.1,
+  use(user) {
+    G.combat.dash(user, {
+      ability: "shellRoll", dist: 62, speed: 300, damage: 1, type: "blunt",
+      color: "#a7f070", hitStop: 0.03, shake: 0.11,
+      endBurst: { ability: "shellRoll", range: 24, damage: 1, type: "blunt", knockback: 150, color: "#a7f070" },
+    });
+  },
+});
+
+registerAbility({
+  id: "shellCounter", name: "Shell Counter", icon: "🛡️", type: "blunt",
+  mana: 4, cooldown: 2.1,
+  use(user) {
+    user.meleeGuard = Math.max(user.meleeGuard || 0, 0.58);
+    G.combat.areaBurst(user, {
+      ability: "shellCounter", range: 29, damage: 1, type: "blunt",
+      knockback: 190, color: "#a7f070", hitStop: 0.038, shake: 0.16, combo: "counter",
+    });
+    G.damageNumber(user.x, user.y - 18, "GUARD!", "#f4f4f4");
+  },
+});
+
+/* ----------------- SAMURAI's moves ----------------- */
+
+registerAbility({
+  id: "quickdraw", name: "Quickdraw", icon: "⚔️", type: "sharp",
+  mana: 0, cooldown: 0.4,
+  use(user) {
+    const last = typeof user.drawAt === "number" ? user.drawAt : -10;
+    user.drawBeat = G.state.time - last < 0.76 ? (user.drawBeat || 0) % 3 + 1 : 1;
+    user.drawAt = G.state.time;
+    const final = user.drawBeat === 3;
+    G.combat.meleeArc(user, {
+      ability: "quickdraw", range: final ? 32 : 22, arcDeg: final ? 255 : 82,
+      damage: 1, type: "sharp", knockback: final ? 165 : 68,
+      color: final ? "#ffcd75" : "#f4f4f4", lunge: final ? 4 : 3,
+      weight: final ? 5 : 2, hitStop: final ? 0.045 : 0.022,
+      combo: final ? "draw-finish" : "draw",
+    });
+  },
+});
+
+registerAbility({
+  id: "flashStep", name: "Flash Step", icon: "💨", type: "sharp",
+  mana: 3, cooldown: 0.95,
+  use(user) {
+    G.combat.dash(user, {
+      ability: "flashStep", dist: 78, speed: 410, damage: 1, type: "sharp",
+      color: "#f4f4f4", hitStop: 0.026, shake: 0.1,
+    });
+  },
+});
+
+registerAbility({
+  id: "crescentDraw", name: "Crescent Draw", icon: "🌙", type: "sharp",
+  mana: 6, cooldown: 1.75,
+  use(user) {
+    G.combat.meleeArc(user, {
+      ability: "crescentDraw", range: 40, arcDeg: 300,
+      damage: 2, type: "sharp", knockback: 185,
+      color: "#73eff7", lunge: 4, weight: 7, hitStop: 0.048, shake: 0.2,
+    });
+  },
+});
+
+/* ----------------- ASTRONOMER's moves ----------------- */
+
+registerAbility({
+  id: "starNeedle", name: "Star Needle", icon: "✨", type: "light",
+  mana: 0, cooldown: 0.46, autoAim: true, aimRange: 165,
+  use(user) {
+    user.starBeat = (user.starBeat || 0) % 4 + 1;
+    const aligned = user.starBeat === 4;
+    G.combat.shoot(user, {
+      ability: "starNeedle", speed: 225, range: aligned ? 230 : 165,
+      damage: 1, type: "light", pierce: aligned, size: aligned ? 5 : 3,
+      color: aligned ? "#ffcd75" : "#73eff7", trail: aligned ? 6 : 4,
+      recoil: 1.5, hitStop: 0.026,
+    });
+  },
+});
+
+registerAbility({
+  id: "constellation", name: "Constellation", icon: "🌟", type: "light",
+  mana: 4, cooldown: 1.35,
+  use(user) {
+    const hitGroup = {};
+    for (let spreadDeg = 0; spreadDeg < 360; spreadDeg += 60) {
+      G.combat.shoot(user, {
+        ability: "constellation", speed: 155, range: 105,
+        damage: 1, type: "light", spreadDeg, hitGroup,
+        size: 5, color: "#ffcd75", trail: 5, recoil: 0,
+      });
+    }
+  },
+});
+
+registerAbility({
+  id: "gravityWell", name: "Gravity Well", icon: "🌀", type: "dark",
+  mana: 6, cooldown: 1.9,
+  use(user) {
+    G.combat.areaBurst(user, {
+      ability: "gravityWell", range: 46, damage: 2, type: "dark",
+      pull: 15, color: "#8153c1", hitStop: 0.04, shake: 0.17, combo: "gravity",
+    });
+  },
+});
+
+/* ----------------- DRUID's moves ----------------- */
+
+registerAbility({
+  id: "thornLash", name: "Thorn Lash", icon: "🌿", type: "dark",
+  mana: 0, cooldown: 0.47,
+  use(user) {
+    G.combat.meleeArc(user, {
+      ability: "thornLash", range: 30, arcDeg: 165, damage: 1, type: "dark",
+      knockback: 85, status: { name: "poison", dur: 3, dps: 1 },
+      color: "#a7f070", lunge: 2.5, weight: 4, hitStop: 0.03,
+    });
+  },
+});
+
+registerAbility({
+  id: "seedBurst", name: "Seed Burst", icon: "🌰", type: "dark",
+  mana: 4, cooldown: 1.35, autoAim: true, aimRange: 145,
+  use(user) {
+    G.combat.shoot(user, {
+      ability: "seedBurst", speed: 145, range: 145,
+      damage: 1, explodeDamage: 2, explodeRadius: 30,
+      type: "dark", size: 6, color: "#8a6538", trail: 4,
+      status: { name: "poison", dur: 4, dps: 1 },
+    });
+  },
+});
+
+registerAbility({
+  id: "wildGrowth", name: "Wild Growth", icon: "🌳", type: "dark",
+  mana: 6, cooldown: 1.95,
+  use(user) {
+    G.combat.areaBurst(user, {
+      ability: "wildGrowth", range: 43, damage: 2, type: "dark",
+      knockback: 115, color: "#38b764", hitStop: 0.042, shake: 0.18,
+      status: { name: "stun", dur: 0.55 }, combo: "overgrowth",
+    });
+  },
+});
+
 /* ----------------- GOD's moves ----------------- */
 
 registerAbility({
