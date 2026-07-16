@@ -96,6 +96,9 @@ G.world = (() => {
     s.projectiles = [];
     s.pickups = [];
     s.bossCutscene = null;
+    // A quick world-only fade makes doors feel intentional without delaying
+    // control or covering the HTML HUD. Reduced-motion players skip it.
+    s.mapReveal = G.reducedMotion ? 0 : 0.32;
     G.fx.length = 0;
 
     const p = s.player;
@@ -275,6 +278,15 @@ G.world = (() => {
           ctx.fillRect(tx, ty, 1, 2);
           ctx.fillRect(tx + 2, ty + 1, 1, 1);
         }
+        if (rnd > 0.945) { // rare flowers make large fields easier to read
+          const fx = px + 5 + Math.floor(G.util.hash2(x + 9, y) * 6);
+          const fy = py + 5 + Math.floor(G.util.hash2(x, y + 11) * 6);
+          ctx.fillStyle = rnd > 0.975 ? "#ffcd75" : "#f4f4f4";
+          ctx.fillRect(fx - 1, fy, 3, 1);
+          ctx.fillRect(fx, fy - 1, 1, 3);
+          ctx.fillStyle = "#1e5f4e";
+          ctx.fillRect(fx, fy + 2, 1, 2);
+        }
         break;
       }
       case "path": {
@@ -300,6 +312,12 @@ G.world = (() => {
         ctx.fillStyle = "#2e9e6b"; // leafy highlight
         ctx.fillRect(px + 5, py + 2, 4, 2);
         ctx.fillRect(px + 4, py + 4, 2, 3);
+        if (rnd > 0.62) {
+          ctx.fillStyle = "#38b764";
+          ctx.fillRect(px + 9, py + 5, 2, 2);
+          ctx.fillStyle = rnd > 0.86 ? "#ffcd75" : "#a7f070";
+          ctx.fillRect(px + 11, py + 8, 1, 1);
+        }
         break;
       }
       case "water": {
@@ -309,6 +327,10 @@ G.world = (() => {
         if (rnd > 0.5) {
           ctx.fillStyle = "#41a6f6";
           ctx.fillRect(px + 2 + wave, py + 4 + Math.floor(rnd * 8), 4, 1);
+        }
+        if (rnd < 0.28) {
+          ctx.fillStyle = "#5fcde4";
+          ctx.fillRect(px + 9 - wave, py + 11, 3, 1);
         }
         break;
       }
@@ -321,6 +343,12 @@ G.world = (() => {
         ctx.fillRect(px + (y % 2 ? 10 : 4), py + 8, 1, 8);
         ctx.fillStyle = "#566c86"; // top highlight
         ctx.fillRect(px, py, T, 2);
+        if (rnd > 0.78) {
+          ctx.fillStyle = "#94b0c2";
+          ctx.fillRect(px + 3, py + 3, 3, 1);
+          ctx.fillStyle = "#1a1c2c";
+          ctx.fillRect(px + 9, py + 11, 3, 1);
+        }
         break;
       }
       case "floor": {
@@ -329,6 +357,11 @@ G.world = (() => {
         ctx.fillStyle = "#333c57";
         ctx.fillRect(px, py, T, 1);
         ctx.fillRect(px, py, 1, T);
+        if (rnd > 0.82) {
+          ctx.fillStyle = "rgba(148,176,194,0.35)";
+          ctx.fillRect(px + 5, py + 5, 3, 1);
+          ctx.fillRect(px + 8, py + 6, 1, 2);
+        }
         break;
       }
       case "rock": {
@@ -339,6 +372,8 @@ G.world = (() => {
         ctx.fillRect(px + 5, py + 3, 6, 12);
         ctx.fillStyle = "#f4f4f4";
         ctx.fillRect(px + 5, py + 5, 3, 2);
+        ctx.fillStyle = "#566c86";
+        ctx.fillRect(px + 10, py + 10, 2, 3);
         break;
       }
       default: {
@@ -346,6 +381,8 @@ G.world = (() => {
         ctx.fillRect(px, py, T, T);
       }
     }
+
+    drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
     if (cell.portal) {
@@ -423,6 +460,137 @@ G.world = (() => {
         ctx.fillRect(px + 12, py + 4, 1, 9);
       }
     }
+  }
+
+  function neighborTile(x, y) {
+    const s = G.state;
+    if (y < 0 || x < 0 || y >= s.mapH || x >= s.mapW) return null;
+    return s.grid[y][x].tile;
+  }
+
+  // One-pixel borders make terrain shapes legible while leaving the tile map,
+  // collision, and navigation data completely untouched.
+  function drawTerrainEdges(ctx, cell, x, y) {
+    const T = G.TILE;
+    const px = x * T, py = y * T;
+    if (cell.tile === "water") {
+      ctx.fillStyle = "#73eff7";
+      if (neighborTile(x, y - 1) !== "water") ctx.fillRect(px, py, T, 1);
+      if (neighborTile(x - 1, y) !== "water") ctx.fillRect(px, py, 1, T);
+      ctx.fillStyle = "#293a9b";
+      if (neighborTile(x, y + 1) !== "water") ctx.fillRect(px, py + T - 1, T, 1);
+      if (neighborTile(x + 1, y) !== "water") ctx.fillRect(px + T - 1, py, 1, T);
+    } else if (cell.tile === "path") {
+      ctx.fillStyle = "#b8874d";
+      if (neighborTile(x, y - 1) === "grass") ctx.fillRect(px, py, T, 1);
+      if (neighborTile(x - 1, y) === "grass") ctx.fillRect(px, py, 1, T);
+      if (neighborTile(x, y + 1) === "grass") ctx.fillRect(px, py + T - 1, T, 1);
+      if (neighborTile(x + 1, y) === "grass") ctx.fillRect(px + T - 1, py, 1, T);
+    } else if (cell.tile === "floor") {
+      ctx.fillStyle = "rgba(26,28,44,0.55)";
+      if (neighborTile(x, y - 1) === "wall") ctx.fillRect(px, py, T, 2);
+      if (neighborTile(x - 1, y) === "wall") ctx.fillRect(px, py, 2, T);
+    }
+  }
+
+  // Each form trial has a low-contrast floor crest. It is purely decorative:
+  // arenas keep exactly the same tiles, rocks, spawns, and collision.
+  function drawTrialFloor(ctx, time) {
+    const s = G.state;
+    const theme = s.mapDef && s.mapDef.visualTheme;
+    if (!theme) return;
+    const styles = {
+      riftblade: { dark: "#3b2f73", light: "#73eff7" },
+      mole: { dark: "#6b4a2b", light: "#ffcd75" },
+      vampire: { dark: "#2d1b2e", light: "#b13e53" },
+      jester: { dark: "#3b5dc9", light: "#ffcd75" },
+      god: { dark: "#8153c1", light: "#fff3c2" },
+    };
+    const style = styles[theme] || styles.riftblade;
+    const cx = Math.floor(s.mapW * G.TILE / 2);
+    const cy = Math.floor(s.mapH * G.TILE / 2);
+    const pulse = 0.16 + Math.sin(time * 2.2) * 0.035;
+
+    ctx.save();
+    ctx.globalAlpha = 0.28;
+    ctx.strokeStyle = style.dark;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 66, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 42, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = pulse;
+    ctx.strokeStyle = style.light;
+    ctx.lineWidth = 1;
+
+    if (theme === "mole") {
+      ctx.beginPath();
+      ctx.moveTo(cx - 48, cy + 20); ctx.lineTo(cx - 22, cy - 12); ctx.lineTo(cx, cy + 8);
+      ctx.lineTo(cx + 25, cy - 18); ctx.lineTo(cx + 52, cy + 17); ctx.stroke();
+      ctx.fillStyle = style.light;
+      ctx.fillRect(cx - 13, cy - 35, 7, 5); ctx.fillRect(cx - 3, cy - 41, 7, 11);
+      ctx.fillRect(cx + 7, cy - 35, 7, 5); ctx.fillRect(cx - 13, cy - 30, 27, 3);
+    } else if (theme === "vampire") {
+      ctx.beginPath();
+      ctx.arc(cx, cy, 28, Math.PI * 0.2, Math.PI * 1.8);
+      ctx.moveTo(cx - 56, cy); ctx.lineTo(cx + 56, cy);
+      ctx.moveTo(cx, cy - 56); ctx.lineTo(cx, cy + 56); ctx.stroke();
+      ctx.fillStyle = style.dark;
+      ctx.fillRect(cx - 7, cy - 7, 14, 14);
+      ctx.fillStyle = style.light;
+      ctx.fillRect(cx - 2, cy - 8, 4, 16); ctx.fillRect(cx - 8, cy - 2, 16, 4);
+    } else if (theme === "jester") {
+      ctx.fillStyle = style.light;
+      for (let i = -3; i <= 3; i++) {
+        const x = cx + i * 18;
+        ctx.save(); ctx.translate(x, cy); ctx.rotate(Math.PI / 4);
+        ctx.fillRect(-4, -4, 8, 8); ctx.restore();
+      }
+      ctx.fillStyle = style.dark;
+      for (let i = -2; i <= 2; i++) {
+        const y = cy + i * 18;
+        ctx.save(); ctx.translate(cx, y); ctx.rotate(Math.PI / 4);
+        ctx.fillRect(-3, -3, 6, 6); ctx.restore();
+      }
+    } else if (theme === "god") {
+      ctx.beginPath();
+      for (let i = 0; i < 8; i++) {
+        const a = i * Math.PI / 4;
+        ctx.moveTo(cx + Math.cos(a) * 18, cy + Math.sin(a) * 18);
+        ctx.lineTo(cx + Math.cos(a) * 62, cy + Math.sin(a) * 62);
+      }
+      ctx.stroke();
+      ctx.fillStyle = style.light;
+      ctx.fillRect(cx - 3, cy - 12, 6, 24); ctx.fillRect(cx - 12, cy - 3, 24, 6);
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(cx - 58, cy + 30); ctx.lineTo(cx - 14, cy - 23);
+      ctx.lineTo(cx + 3, cy - 8); ctx.lineTo(cx + 55, cy - 35);
+      ctx.moveTo(cx - 42, cy - 33); ctx.lineTo(cx - 5, cy + 11);
+      ctx.lineTo(cx + 16, cy - 6); ctx.lineTo(cx + 48, cy + 33); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawAmbientDetails(ctx, cam, time) {
+    if (G.reducedMotion) return;
+    const s = G.state;
+    const theme = s.mapDef && s.mapDef.visualTheme;
+    const color = theme === "vampire" ? "#b13e53" : theme === "mole" ? "#ffcd75" :
+      theme === "jester" ? "#73eff7" : theme === "god" ? "#fff3c2" : "#a7f070";
+    ctx.save();
+    ctx.globalAlpha = theme ? 0.45 : 0.22;
+    ctx.fillStyle = color;
+    for (let i = 0; i < 7; i++) {
+      const seedX = G.util.hash2(i + 91, s.mapW) * Math.max(G.W, s.mapW * G.TILE);
+      const seedY = G.util.hash2(s.mapH, i + 37) * Math.max(G.H, s.mapH * G.TILE);
+      const drift = theme ? Math.sin(time * (0.35 + i * 0.03) + i) * 10 : time * (2 + i * 0.2);
+      const x = Math.round((seedX + drift) % (s.mapW * G.TILE));
+      const y = Math.round((seedY - drift * 0.5 + s.mapH * G.TILE) % (s.mapH * G.TILE));
+      if (x < cam.x - 2 || x > cam.x + G.W + 2 || y < cam.y - 2 || y > cam.y + G.H + 2) continue;
+      ctx.fillRect(x, y, i % 3 === 0 ? 2 : 1, i % 3 === 0 ? 2 : 1);
+    }
+    ctx.restore();
   }
 
   function drawChest(ctx, ch) {
@@ -592,6 +760,8 @@ G.world = (() => {
     for (let y = y0; y <= y1; y++)
       for (let x = x0; x <= x1; x++)
         drawTile(ctx, s.grid[y][x], x, y, time);
+    drawTrialFloor(ctx, time);
+    drawAmbientDetails(ctx, cam, time);
     for (let y = y0; y <= y1; y++)
       for (let x = x0; x <= x1; x++)
         drawTrialLandmark(ctx, s.grid[y][x], x, y, time);

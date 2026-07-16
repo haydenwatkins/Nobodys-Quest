@@ -118,6 +118,7 @@ registerMap({
 registerMap({
   id: "riftbladeTrial",
   name: "Riftblade Trial",
+  visualTheme: "riftblade",
   playerStart: { x: 2, y: 8 },
   bossTrial: { exit: { map: "overworld", x: 118, y: 18 }, delay: 1.5 },
 
@@ -170,6 +171,7 @@ function makeFormTrialArena(variant) {
 
 registerMap({
   id: "moleTrial", name: "The Royal Burrow", playerStart: { x: 3, y: 8 },
+  visualTheme: "mole",
   bossTrial: { exit: { map: "overworld", x: 40, y: 1 }, delay: 1.5 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 40, y: 1 } },
@@ -183,6 +185,7 @@ registerMap({
 
 registerMap({
   id: "vampireTrial", name: "Carmine Court", playerStart: { x: 3, y: 8 },
+  visualTheme: "vampire",
   bossTrial: { exit: { map: "overworld", x: 50, y: 78 }, delay: 1.5 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 50, y: 78 } },
@@ -196,6 +199,7 @@ registerMap({
 
 registerMap({
   id: "jesterTrial", name: "The Crooked Court", playerStart: { x: 3, y: 8 },
+  visualTheme: "jester",
   bossTrial: { exit: { map: "overworld", x: 118, y: 60 }, delay: 1.5 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 60 } },
@@ -209,6 +213,7 @@ registerMap({
 
 registerMap({
   id: "godTrial", name: "The Final Firmament", playerStart: { x: 3, y: 8 },
+  visualTheme: "god",
   bossTrial: { exit: { map: "overworld", x: 110, y: 1 }, delay: 1.7 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 110, y: 1 } },

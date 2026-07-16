@@ -170,6 +170,7 @@
   function update(dt) {
     const s = G.state;
     s.shake = Math.max(0, s.shake - dt);
+    s.mapReveal = Math.max(0, (s.mapReveal || 0) - dt);
     s.cameraKickX *= Math.pow(0.002, dt);
     s.cameraKickY *= Math.pow(0.002, dt);
     if (Math.abs(s.cameraKickX) < 0.05) s.cameraKickX = 0;
@@ -255,6 +256,10 @@
     drawFx();
 
     ctx.restore();
+    if (s.mapReveal > 0) {
+      ctx.fillStyle = `rgba(26,28,44,${Math.min(1, s.mapReveal / 0.32)})`;
+      ctx.fillRect(0, 0, G.W, G.H);
+    }
     G.ui.drawHUD({ x: camX, y: camY }); // text/HUD on the sharp overlay
   }
 
@@ -270,6 +275,9 @@
           const r = 1 + prog * 5;
           ctx.fillStyle = f.color;
           ctx.fillRect(Math.round(f.x - r / 2), Math.round(f.y - r / 2), Math.round(r), Math.round(r));
+          ctx.fillRect(Math.round(f.x - r), Math.round(f.y), 1, 1);
+          ctx.fillRect(Math.round(f.x + r), Math.round(f.y - 2), 1, 1);
+          ctx.fillRect(Math.round(f.x), Math.round(f.y - r), 1, 1);
           break;
         }
         // "num" (damage numbers) are drawn by ui.js on the sharp text layer
@@ -280,6 +288,14 @@
           ctx.beginPath();
           ctx.arc(f.x, f.y, r, f.angle - f.arc / 2, f.angle + f.arc / 2);
           ctx.stroke();
+          if (prog < 0.55) {
+            ctx.globalAlpha = Math.max(0, alpha * 0.8);
+            ctx.strokeStyle = "#f4f4f4";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, r + 1, f.angle - f.arc / 2, f.angle - f.arc / 7);
+            ctx.stroke();
+          }
           break;
         }
         case "ring": {
@@ -288,6 +304,13 @@
           ctx.beginPath();
           ctx.arc(f.x, f.y, 3 + prog * (f.radius || 14), 0, Math.PI * 2);
           ctx.stroke();
+          if (prog < 0.5) {
+            ctx.globalAlpha = alpha * 0.55;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, 4 + prog * (f.radius || 14), 0, Math.PI * 2);
+            ctx.stroke();
+          }
           break;
         }
         case "impact": {
@@ -297,6 +320,8 @@
           ctx.beginPath();
           ctx.moveTo(f.x - r, f.y); ctx.lineTo(f.x + r, f.y);
           ctx.moveTo(f.x, f.y - r); ctx.lineTo(f.x, f.y + r);
+          ctx.moveTo(f.x - r * 0.7, f.y - r * 0.7); ctx.lineTo(f.x + r * 0.7, f.y + r * 0.7);
+          ctx.moveTo(f.x + r * 0.7, f.y - r * 0.7); ctx.lineTo(f.x - r * 0.7, f.y + r * 0.7);
           ctx.stroke();
           ctx.fillStyle = "#f4f4f4";
           ctx.fillRect(Math.round(f.x), Math.round(f.y), 1, 1);
@@ -316,6 +341,15 @@
           break;
         }
         case "bolt": {
+          ctx.globalAlpha = alpha * 0.3;
+          ctx.strokeStyle = f.color;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(f.x, f.y);
+          ctx.lineTo((f.x + f.x2) / 2, (f.y + f.y2) / 2);
+          ctx.lineTo(f.x2, f.y2);
+          ctx.stroke();
+          ctx.globalAlpha = alpha;
           ctx.strokeStyle = f.color;
           ctx.lineWidth = 2;
           ctx.beginPath();
