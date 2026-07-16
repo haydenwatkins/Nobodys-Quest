@@ -20,6 +20,8 @@
 "use strict";
 
 G.combat = (() => {
+  let staggerHelpShown = false;
+
   /* ---------- dealing damage to an enemy ---------- */
   function breaksAnyWard(user) {
     return user === G.state.player && G.playerForm && G.playerForm().breaksAnyWard;
@@ -241,6 +243,66 @@ G.combat = (() => {
      ABILITY HELPERS — the building blocks for every move.
      ============================================================ */
 
+  function assistMeleeContact(user, range, arc, facing) {
+    if (user !== G.state.player || arc >= Math.PI * 1.75) return false;
+    const maxStep = G.MELEE_ASSIST_STEP;
+    let target = null;
+    let targetDist = Infinity;
+    let alreadyConnected = false;
+
+    for (const e of G.state.enemies) {
+      if (e.dead || (e.def.miniboss && e.bossIntroT > 0)) continue;
+      const d = G.util.dist(user.x, user.y, e.x, e.y);
+      const reach = range + e.def.size / 2;
+      const a = G.util.angleTo(user.x, user.y, e.x, e.y);
+      if (Math.abs(G.util.angleDiff(facing, a)) > arc / 2) continue;
+      if (d <= reach) { alreadyConnected = true; break; }
+      if (d <= reach + maxStep && d < targetDist) { target = e; targetDist = d; }
+    }
+
+    // Never shift a swing that was already going to connect. The assist only
+    // turns a near miss into contact and cannot pull through map collision.
+    if (alreadyConnected || !target) return false;
+    const a = G.util.angleTo(user.x, user.y, target.x, target.y);
+    const reach = range + target.def.size / 2;
+    const step = Math.min(maxStep, Math.max(0, targetDist - reach + 0.5));
+    const beforeX = user.x, beforeY = user.y;
+    G.world.moveBox(user, Math.cos(a) * step, Math.sin(a) * step);
+    const moved = G.util.dist(beforeX, beforeY, user.x, user.y) > 0.25;
+    if (moved) {
+      G.spawnFx({ kind: "puff", x: beforeX, y: beforeY - 3, color: "#f4f4f4", dur: 0.12 });
+    }
+    return moved;
+  }
+
+  function addBossStagger(enemy, amount) {
+    if (!enemy.def.miniboss || !enemy.bossEngaged || enemy.dead) return;
+    if (enemy.bossStaggerT > 0 || enemy.bossStaggerResistT > 0) return;
+    enemy.bossStagger = Math.min(G.BOSS_STAGGER_HITS, (enemy.bossStagger || 0) + (amount || 1));
+    enemy.bossStaggerDecayT = 2.25;
+    if (!staggerHelpShown) {
+      staggerHelpShown = true;
+      G.ui.toast("⚔ Melee pressure fills the gold STAGGER meter!", 2.8);
+    }
+    if (enemy.bossStagger < G.BOSS_STAGGER_HITS) return;
+
+    enemy.bossStagger = 0;
+    enemy.bossStaggerT = G.BOSS_STAGGER_SECONDS;
+    enemy.bossStaggerResistT = G.BOSS_STAGGER_RESIST_SECONDS;
+    enemy.bossStaggerDecayT = 0;
+    enemy.bossTelegraphT = 0;
+    enemy.bossChargeT = 0;
+    enemy.bossPendingAction = null;
+    enemy.bossAfterCharge = null;
+    enemy.bossRecoverT = Math.max(enemy.bossRecoverT || 0, 0.2);
+    G.state.hitStop = Math.max(G.state.hitStop || 0, 0.075);
+    G.state.shake = Math.max(G.state.shake || 0, 0.24);
+    G.sfx.play("stagger");
+    G.damageNumber(enemy.x, enemy.y - enemy.h() - 3, "STAGGER!", "#fff3c2");
+    G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 7, color: "#ffcd75", radius: 25, dur: 0.34 });
+    G.spawnFx({ kind: "impact", x: enemy.x, y: enemy.y - 7, color: "#fff3c2", size: 8, dur: 0.2 });
+  }
+
   // A melee swing in front of you.
   // {range, arcDeg, damage, type, ability, knockback, status, color}
   function meleeArc(user, o) {
@@ -248,6 +310,7 @@ G.combat = (() => {
     const range = o.range || 20;
     const arc = ((o.arcDeg || 100) * Math.PI) / 180;
     const facing = Math.atan2(user.dir.y, user.dir.x);
+    if (o.contactAssist !== false) assistMeleeContact(user, range, arc, facing);
     attackPose(user, facing, o.lunge === undefined ? 2 : o.lunge, 0.09);
     G.sfx.attack("melee", type, o.damage || 1);
     let hits = 0;
@@ -263,7 +326,10 @@ G.combat = (() => {
         breaksAnyWard: breaksAnyWard(user),
         fromX: user.x, fromY: user.y,
         hitStop: o.hitStop, shake: o.shake,
-      })) hits++;
+      })) {
+        hits++;
+        if (user === G.state.player && o.bossStagger !== false) addBossStagger(e, o.stagger || 1);
+      }
     }
     G.spawnFx({
       kind: "slash", x: user.x, y: user.y - 6,
@@ -272,6 +338,15 @@ G.combat = (() => {
       weight: o.weight,
       dur: 0.15,
     });
+    if (hits > 0 && user === G.state.player) {
+      user.meleeGuard = Math.max(user.meleeGuard || 0, G.MELEE_GUARD_SECONDS);
+      if (user.mana < user.manaMax) user.mana = Math.min(user.manaMax, user.mana + 1);
+      G.spawnFx({
+        kind: "ring", x: user.x, y: user.y - 6,
+        color: o.color || G.DAMAGE_TYPES[type].color,
+        radius: 7, dur: G.MELEE_GUARD_SECONDS,
+      });
+    }
     if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
     return hits;
   }

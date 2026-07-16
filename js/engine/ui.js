@@ -265,7 +265,7 @@ G.ui = (() => {
     const frac = Math.max(0, boss.hp / boss.def.hp);
 
     c.fillStyle = "rgba(26,28,44,0.88)";
-    c.fillRect(x, y, w, 16);
+    c.fillRect(x, y, w, 17);
     c.fillStyle = color;
     c.fillRect(x, y, w, 1);
     c.font = `5px ${FONT_HEAD}`;
@@ -276,6 +276,15 @@ G.ui = (() => {
     c.fillRect(x + 5, y + 11, w - 10, 3);
     c.fillStyle = boss.bossPhase >= 2 ? "#b13e53" : color;
     c.fillRect(x + 5, y + 11, Math.round((w - 10) * frac), 3);
+    const staggerFrac = boss.bossStaggerT > 0
+      ? 1
+      : Math.max(0, (boss.bossStagger || 0) / G.BOSS_STAGGER_HITS);
+    c.fillStyle = "#333c57";
+    c.fillRect(x + 5, y + 15, w - 10, 1);
+    if (staggerFrac > 0) {
+      c.fillStyle = boss.bossStaggerT > 0 ? "#fff3c2" : "#ffcd75";
+      c.fillRect(x + 5, y + 15, Math.round((w - 10) * staggerFrac), 1);
+    }
     return true;
   }
 
