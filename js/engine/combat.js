@@ -113,8 +113,8 @@ G.combat = (() => {
     knockback(enemy, opts, 1);
     impactFeedback(enemy, opts, G.DAMAGE_TYPES[type].color);
 
-    // Attacking is how you refill mana (just like the real game —
-    // it keeps players aggressive instead of hiding).
+    // Successful hits accelerate the passive refill, so aggressive players
+    // reach their next large move sooner than players who simply wait.
     if (!opts.noMana) {
       const p = G.state.player;
       if (p.mana < p.manaMax) { p.mana = Math.min(p.manaMax, p.mana + 1); }

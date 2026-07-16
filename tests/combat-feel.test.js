@@ -565,29 +565,30 @@ G.updatePlayer(0.02);
 G.updatePlayer(0.02);
 assert.equal(fired, 1, "buffered attack should fire when cooldown ends");
 
-// The resting reserve removes long farming stretches without passively
-// charging the final four mana used by the largest abilities.
+// Passive recovery reaches the true maximum quickly; successful hits remain
+// an accelerator rather than a requirement for using the largest abilities.
 G.getLoadout = () => [];
 G.state.player.mana = 0;
 G.state.player.manaRegenDelay = 0;
 G.state.player.manaRegenProgress = 0;
-G.updatePlayer(1.24);
+G.updatePlayer(0.69);
 assert.equal(G.state.player.mana, 0);
 G.updatePlayer(0.01);
-assert.equal(G.state.player.mana, 1, "one mana should recover every 1.25 seconds");
-G.updatePlayer(6.25);
-assert.equal(G.state.player.mana, 6, "passive recovery must stop at the six-mana reserve");
-G.updatePlayer(2.5);
-assert.equal(G.state.player.mana, 6, "waiting must never charge the final four mana");
+assert.equal(G.state.player.mana, 1, "one mana should recover every 0.7 seconds");
+G.updatePlayer(6.31);
+assert.equal(G.state.player.mana, 10, "passive recovery must reach the true maximum");
+G.updatePlayer(1.4);
+assert.equal(G.state.player.mana, 10, "passive recovery must respect manaMax");
 
 const reserveTarget = enemy(10, 0);
 G.state.enemies = [reserveTarget];
+G.state.player.mana = 6;
 G.state.hitStop = 0;
 G.state.shake = 0;
 G.state.cameraKickX = 0;
 G.state.cameraKickY = 0;
 G.combat.damageEnemy(reserveTarget, { damage: 1, type: "blunt", ability: "slap" });
-assert.equal(G.state.player.mana, 7, "successful hits must still charge beyond the reserve");
+assert.equal(G.state.player.mana, 7, "successful hits must still accelerate recovery");
 
 let castTapped = true;
 G.state.enemies = [];

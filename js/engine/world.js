@@ -262,6 +262,35 @@ G.world = (() => {
     return patch < 0.27 ? "#31ad60" : patch > 0.78 ? "#42bd6a" : "#38b764";
   }
 
+  const TRIAL_TILE_PALETTES = {
+    riftblade: {
+      floor: ["#494f76", "#525b83", "#45486d"], wall: "#292746", seam: "#17182b", accent: "#73eff7",
+    },
+    mole: {
+      floor: ["#695b4d", "#756553", "#5e5147"], wall: "#493627", seam: "#2d211c", accent: "#d8b06a",
+    },
+    vampire: {
+      floor: ["#4b3b56", "#55415d", "#403549"], wall: "#2d1b2e", seam: "#1a1c2c", accent: "#b13e53",
+    },
+    jester: {
+      floor: ["#4b5c82", "#56698e", "#514d79"], wall: "#302d57", seam: "#1a1c2c", accent: "#ffcd75",
+    },
+    god: {
+      floor: ["#69738b", "#768198", "#606980"], wall: "#474e66", seam: "#292d43", accent: "#fff3c2",
+    },
+  };
+
+  function trialTilePalette() {
+    const theme = G.state.mapDef && G.state.mapDef.visualTheme;
+    if (!theme) return null;
+    return TRIAL_TILE_PALETTES[theme] || TRIAL_TILE_PALETTES.riftblade;
+  }
+
+  function trialFloorColor(palette, x, y) {
+    const patch = G.util.hash2(Math.floor(x / 4) + 19, Math.floor(y / 3) + 31);
+    return palette.floor[patch < 0.28 ? 0 : patch > 0.76 ? 2 : 1];
+  }
+
   function drawTile(ctx, cell, x, y, time) {
     const T = G.TILE;
     const px = x * T, py = y * T;
@@ -301,6 +330,9 @@ G.world = (() => {
       case "tree": {
         ctx.fillStyle = groundColor("grass", x, y);
         ctx.fillRect(px, py, T, T);
+        ctx.fillStyle = "rgba(26,28,44,0.28)";
+        ctx.fillRect(px + 2, py + 12, 13, 3);
+        ctx.fillRect(px + 5, py + 14, 8, 2);
         ctx.fillStyle = "#6b4a2b"; // trunk
         ctx.fillRect(px + 6, py + 11, 4, 5);
         ctx.fillStyle = "#1e5f4e"; // canopy shadow (rounded blob)
@@ -335,14 +367,17 @@ G.world = (() => {
         break;
       }
       case "wall": {
-        ctx.fillStyle = "#333c57";
+        const trial = trialTilePalette();
+        ctx.fillStyle = trial ? trial.wall : "#333c57";
         ctx.fillRect(px, py, T, T);
-        ctx.fillStyle = "#1a1c2c"; // brick seams
+        ctx.fillStyle = trial ? trial.seam : "#1a1c2c"; // brick seams
         ctx.fillRect(px, py + 7, T, 1);
         ctx.fillRect(px + (y % 2 ? 4 : 10), py, 1, 7);
         ctx.fillRect(px + (y % 2 ? 10 : 4), py + 8, 1, 8);
-        ctx.fillStyle = "#566c86"; // top highlight
+        ctx.fillStyle = trial ? trial.accent : "#566c86"; // top highlight
+        if (trial) ctx.globalAlpha = 0.48;
         ctx.fillRect(px, py, T, 2);
+        ctx.globalAlpha = 1;
         if (rnd > 0.78) {
           ctx.fillStyle = "#94b0c2";
           ctx.fillRect(px + 3, py + 3, 3, 1);
@@ -352,9 +387,10 @@ G.world = (() => {
         break;
       }
       case "floor": {
-        ctx.fillStyle = groundColor("floor", x, y);
+        const trial = trialTilePalette();
+        ctx.fillStyle = trial ? trialFloorColor(trial, x, y) : groundColor("floor", x, y);
         ctx.fillRect(px, py, T, T);
-        ctx.fillStyle = "#333c57";
+        ctx.fillStyle = trial ? trial.seam : "#333c57";
         ctx.fillRect(px, py, T, 1);
         ctx.fillRect(px, py, 1, T);
         if (rnd > 0.82) {
@@ -365,8 +401,11 @@ G.world = (() => {
         break;
       }
       case "rock": {
-        ctx.fillStyle = groundColor(cell.on === "floor" ? "floor" : "grass", x, y);
+        const trial = cell.on === "floor" ? trialTilePalette() : null;
+        ctx.fillStyle = trial ? trialFloorColor(trial, x, y) : groundColor(cell.on === "floor" ? "floor" : "grass", x, y);
         ctx.fillRect(px, py, T, T);
+        ctx.fillStyle = "rgba(26,28,44,0.32)";
+        ctx.fillRect(px + 3, py + 11, 11, 4);
         ctx.fillStyle = "#94b0c2";
         ctx.fillRect(px + 3, py + 5, 10, 9);
         ctx.fillRect(px + 5, py + 3, 6, 12);
@@ -593,9 +632,11 @@ G.world = (() => {
     ctx.restore();
   }
 
-  function drawChest(ctx, ch) {
+  function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    ctx.fillStyle = "rgba(26,28,44,0.35)";
+    ctx.fillRect(px + 1, py + 12, 14, 3);
     ctx.fillStyle = "#6b4a2b";
     ctx.fillRect(px + 2, py + 5, 12, 9);
     ctx.fillStyle = ch.opened ? "#1a1c2c" : "#8a6538";
@@ -605,6 +646,11 @@ G.world = (() => {
     if (!ch.opened) {
       ctx.fillStyle = "#ffcd75";
       ctx.fillRect(px + 2, py + 9, 12, 1);
+      if (Math.sin(time * 3 + ch.x) > 0.72) {
+        ctx.fillStyle = "#fff3c2";
+        ctx.fillRect(px + 11, py + 6, 2, 1);
+        ctx.fillRect(px + 12, py + 5, 1, 3);
+      }
     }
   }
 
@@ -766,7 +812,7 @@ G.world = (() => {
       for (let x = x0; x <= x1; x++)
         drawTrialLandmark(ctx, s.grid[y][x], x, y, time);
     drawPlayerHouse(ctx);
-    for (const ch of s.chests) drawChest(ctx, ch);
+    for (const ch of s.chests) drawChest(ctx, ch, time);
   }
 
   return { load, solid, moveBox, checkTriggers, draw, cellAt, isSafeSpawn };

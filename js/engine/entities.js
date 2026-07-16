@@ -134,17 +134,17 @@ G.updatePlayer = function (dt) {
   }
   for (const k in p.cooldowns) p.cooldowns[k] = Math.max(0, p.cooldowns[k] - dt);
 
-  // Mana naturally settles back to a useful reserve. Successful hits are
-  // still the only way to charge above it, so the largest moves keep a small
-  // engagement requirement without demanding a long basic-attack farm.
+  // Mana now regenerates all the way to the true maximum. Successful hits
+  // remain a faster bonus route, rewarding close engagement without making
+  // any high-cost move depend on farming basic attacks.
   p.manaRegenDelay = Math.max(0, (p.manaRegenDelay || 0) - dt);
-  if (p.mana < G.MANA_RESERVE && p.manaRegenDelay <= 0) {
+  if (p.mana < p.manaMax && p.manaRegenDelay <= 0) {
     p.manaRegenProgress = (p.manaRegenProgress || 0) + dt;
-    while (p.manaRegenProgress >= G.MANA_REGEN_SECONDS && p.mana < G.MANA_RESERVE) {
+    while (p.manaRegenProgress >= G.MANA_REGEN_SECONDS && p.mana < p.manaMax) {
       p.manaRegenProgress -= G.MANA_REGEN_SECONDS;
-      p.mana = Math.min(G.MANA_RESERVE, p.mana + 1);
+      p.mana = Math.min(p.manaMax, p.mana + 1);
     }
-  } else if (p.mana >= G.MANA_RESERVE) {
+  } else if (p.mana >= p.manaMax) {
     p.manaRegenProgress = 0;
   }
 
@@ -226,7 +226,7 @@ G.updatePlayer = function (dt) {
       }
     }
     if (ab.mana > p.mana) {
-      G.ui.toast(`💧 Mana rests at ${G.MANA_RESERVE} — land hits to fill the rest!`, 1.8);
+      G.ui.toast("💧 Mana is recharging — land hits to fill it even faster!", 1.8);
       delete p.abilityBuffer[button];
       continue;
     }
@@ -710,7 +710,8 @@ G.drawPlayer = function (ctx) {
   const frame = p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0;
   const poseScale = p.attackPose ? p.attackPose.t / p.attackPose.dur : 0;
   const drawX = p.x + (p.attackPose ? p.attackPose.x * poseScale : 0);
-  const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0);
+  const gaitLift = p.moving && !p.dashing && Math.floor(p.anim) % 2 ? 1 : 0;
+  const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift;
   G.drawSprite(ctx, form.sprite, frame, drawX, drawY, p.dir.x < 0);
 };
 

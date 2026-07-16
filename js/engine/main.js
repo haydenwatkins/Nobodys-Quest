@@ -256,6 +256,18 @@
     drawFx();
 
     ctx.restore();
+    // Pixel-stepped edge shading adds depth without blurring the art or
+    // covering the sharp HTML HUD layered above this canvas.
+    ctx.fillStyle = "rgba(26,28,44,0.12)";
+    ctx.fillRect(0, 0, G.W, 3);
+    ctx.fillRect(0, G.H - 4, G.W, 4);
+    ctx.fillRect(0, 0, 4, G.H);
+    ctx.fillRect(G.W - 4, 0, 4, G.H);
+    ctx.fillStyle = "rgba(26,28,44,0.06)";
+    ctx.fillRect(4, 3, G.W - 8, 3);
+    ctx.fillRect(4, G.H - 7, G.W - 8, 3);
+    ctx.fillRect(4, 6, 3, G.H - 13);
+    ctx.fillRect(G.W - 7, 6, 3, G.H - 13);
     if (s.mapReveal > 0) {
       ctx.fillStyle = `rgba(26,28,44,${Math.min(1, s.mapReveal / 0.32)})`;
       ctx.fillRect(0, 0, G.W, G.H);
