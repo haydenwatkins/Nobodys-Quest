@@ -70,6 +70,7 @@
     pinnedQuestIds: [],
     town: G.makeTown(),
     heroBoard: G.makeHeroBoard(),
+    wayfinder: G.makeWayfinder(),
     gauntletBest: 0,
     gauntletIronBest: 0,
     shake: 0,
@@ -99,6 +100,7 @@
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
     s.town = G.normalizeTown(save.town || save.cult);
     s.heroBoard = G.normalizeHeroBoard(save.heroBoard);
+    s.wayfinder = G.normalizeWayfinder(save.wayfinder, save);
     s.gauntletBest = save.gauntletBest || 0;
     s.gauntletIronBest = save.gauntletIronBest || 0;
     G.questCounts = save.questCounts || {};
@@ -123,6 +125,14 @@
     G.state.town.founded = true;
     G.state.town.residents = 8;
     G.state.town.spirit = 20;
+    G.state.wayfinder.discovered = G.wayfinderAllIds();
+    G.state.wayfinder.rewardClaimed = true;
+    if (!G.state.items.includes("wayfinder-whistle")) G.state.items.push("wayfinder-whistle");
+  }
+  if (builderParams && builderParams.get("playtestWayfinder") === "early") {
+    G.state.wayfinder = G.makeWayfinder();
+    G.state.items = G.state.items.filter((item) => item !== "wayfinder-whistle");
+    G.state.stars = 4;
   }
   // if a form file got edited/broken since last save, fall back safely
   if (!G.formUnlocked(G.state.formId)) {
@@ -165,6 +175,9 @@
   G.state.player.manaMax = G.playerMaxMana();
   G.state.player.mana = Math.min(G.state.player.mana, G.state.player.manaMax);
   G.checkGuardianCollectionReward(true); // migrates completed collections from older saves
+  if (G.state.wayfinder.rewardClaimed && !G.state.items.includes("wayfinder-whistle"))
+    G.state.items.push("wayfinder-whistle");
+  G.checkWayfinderCompletion(false); // finishes an inferred complete legacy Journal
 
   G.checkUnlocks(); // quietly registers starting forms as "known"
   G.tutorial.init(save);

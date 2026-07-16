@@ -27,6 +27,7 @@ G.saveGame = function () {
       loadouts: s.loadouts,
       town: s.town,
       heroBoard: s.heroBoard,
+      wayfinder: s.wayfinder,
       gauntletBest: s.gauntletBest || 0,
       gauntletIronBest: s.gauntletIronBest || 0,
       questCounts: G.questCounts,
