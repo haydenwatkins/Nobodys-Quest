@@ -23,6 +23,7 @@ const G = {
   BOSS_STAGGER_HITS: 6,
   BOSS_STAGGER_SECONDS: 0.72,
   BOSS_STAGGER_RESIST_SECONDS: 4.5,
+  BOSS_CUTSCENE_LINE_SECONDS: 2.2,
 
   // Registries — filled in by registerForm / registerAbility / etc.
   forms: {},        // id -> form definition

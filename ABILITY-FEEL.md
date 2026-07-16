@@ -2,7 +2,7 @@
 
 ## What the game has
 
-Nobody's Quest currently has 41 interchangeable abilities. Fourteen are zero-mana
+Nobody's Quest currently has 53 interchangeable abilities. Eighteen are zero-mana
 basic attacks; those are the moves players repeat most, so they received
 individual tuning in this pass.
 
@@ -20,7 +20,11 @@ individual tuning in this pass.
 | Riftblade | Rift Cut (sharp, 0.36s) | three-beat wide combo, damage dash, path-bending returning blade |
 | Mole | Drill Tap (blunt, 0.38s) | endpoint eruption dash, traveling fault-line shockwave |
 | Vampire | Blood Bite (dark, 0.34s) | five-hit healing rhythm, dash, large blood-moon burst |
-| Jester | Wild Card (light, 0.45s) | third-card ricochet, pie fan, chaotic encore |
+| Jester | Wild Card (sharp, 0.45s) | third-card ricochet, pie fan, chaotic encore |
+| Turtle | Shell Jab (blunt, 0.42s) | third-hit brace, damage roll, defensive counter |
+| Samurai | Quickdraw (sharp, 0.40s) | three-cut rhythm, flash dash, 300-degree draw-cut |
+| Astronomer | Star Needle (light, 0.46s) | fourth-shot pierce, radial stars, pulling gravity well |
+| Druid | Thorn Lash (dark, 0.47s) | poisonous reach, bursting seed, stunning growth field |
 | God | Divine Spark (light, 0.50s) | 360-degree judgment, piercing dark star |
 
 Before this pass, attacks already had a white hit flash, modest random camera
@@ -120,6 +124,33 @@ windups; body contact only hurts during a clearly telegraphed charge. Boss
 projectiles also have a 0.12-second arming window at spawn so a close-range
 player can read the shot instead of being hit at its origin. Projectile damage,
 charge damage, and ordinary-enemy contact damage are unchanged.
+
+## Shattercoast expansion
+
+Four late-game forms sit before God in progression, so the final mastery rule
+automatically scales with the larger roster. Each guardian teaches the move that
+will become the form's signature without making that move individually dominant:
+
+- **Turtle:** Shell Jab builds to a short brace. Shell Counter spends mana for
+  0.58 seconds of deliberate protection and a low-damage knockback burst.
+- **Samurai:** Quickdraw rewards maintaining a three-cut rhythm; Crescent Draw
+  pays six mana for exceptional arc coverage, not exceptional damage.
+- **Astronomer:** every fourth Star Needle pierces. Gravity Well deals two damage
+  and pulls nearby targets together, enabling combinations with any shared area move.
+- **Druid:** Thorn Lash supplies reliable DARK pressure, while Seed Burst and
+  Wild Growth trade immediate speed for poison and crowd setup.
+
+The Manyfold Gauntlet samples only bosses whose trophies are already in the
+player's save. Players choose 3, 5, 8, or their complete collected roster and
+may enable a campfire that restores one heart and three mana between rounds.
+Iron runs keep all attrition. Each longer personal best awards one star, while
+clearing the entire known roster awards the Manyfold Crown. Bosses always begin
+at full health and no boss repeats inside one run.
+
+First-encounter boss scenes now hold each line for 2.2 seconds. Ability buttons
+advance one line at a time after the opening beat instead of skipping the whole
+scene, preserving control while giving jokes, mechanics, and personalities time
+to land. Rematches retain their short one-line greeting.
 
 ## Why the Riftblade works this way
 

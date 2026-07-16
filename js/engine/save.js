@@ -26,6 +26,8 @@ G.saveGame = function () {
       unlockReadyNotified: s.unlockReadyNotified,
       loadouts: s.loadouts,
       town: s.town,
+      gauntletBest: s.gauntletBest || 0,
+      gauntletIronBest: s.gauntletIronBest || 0,
       questCounts: G.questCounts,
       questsDone: G.questsDone,
       pinnedQuestIds: s.pinnedQuestIds,

@@ -69,6 +69,8 @@
     loadouts: {},
     pinnedQuestIds: [],
     town: G.makeTown(),
+    gauntletBest: 0,
+    gauntletIronBest: 0,
     shake: 0,
     hitStop: 0,
     cameraKickX: 0,
@@ -95,6 +97,8 @@
     s.loadouts = save.loadouts || {};
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
     s.town = G.normalizeTown(save.town || save.cult);
+    s.gauntletBest = save.gauntletBest || 0;
+    s.gauntletIronBest = save.gauntletIronBest || 0;
     G.questCounts = save.questCounts || {};
     G.questsDone = save.questsDone || [];
     if (save.formId && G.forms[save.formId] && !G.forms[save.formId].invalid) s.formId = save.formId;
@@ -195,13 +199,20 @@
       return;
     }
 
-    // First encounters get a tiny story beat. The world pauses, the boss
-    // speaks one or two short lines, and any ability button skips after the
-    // opening moment so repeat attempts never feel slow.
+    // First encounters get a readable story beat. The world pauses between
+    // lines, and an ability button advances instead of discarding the scene.
     if (s.bossCutscene) {
       s.time += dt;
       G.updateBossCutscene(dt);
       G.updateFx(dt * 0.35);
+      G.ui.update(dt);
+      return;
+    }
+
+    if (s.gauntletBetween) {
+      s.time += dt;
+      G.updateGauntlet(dt);
+      G.updateFx(dt * 0.45);
       G.ui.update(dt);
       return;
     }

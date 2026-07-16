@@ -102,11 +102,12 @@ const expectedBasics = {
   curse: [0, 0.55], tongueLash: [0, 0.45], bottleBonk: [0, 0.4],
   stormSpark: [0, 0.45], tailSweep: [0, 0.55], divineSpark: [0, 0.5],
   drillTap: [0, 0.38], bloodBite: [0, 0.34], wildCard: [0, 0.45],
+  shellJab: [0, 0.42], quickdraw: [0, 0.4], starNeedle: [0, 0.46], thornLash: [0, 0.47],
 };
 for (const [id, values] of Object.entries(expectedBasics)) {
   assert.deepEqual([G.abilities[id].mana, G.abilities[id].cooldown], values, `${id} balance changed`);
 }
-assert.equal(Object.keys(G.abilities).length, 41);
+assert.equal(Object.keys(G.abilities).length, 53);
 
 // Directional melee gets a collision-safe six-pixel contact step only when a
 // swing would narrowly miss. A landed swing also grants one cast-level mana
@@ -181,7 +182,7 @@ assert.equal(Object.keys(G.abilities).length, 41);
 // The menu's declared type is the contract for every damaging part of a move.
 // This catches nested payload drift such as a DARK dash ending in a BLUNT burst.
 {
-  const builderNames = ["meleeArc", "shoot", "chain", "dash"];
+  const builderNames = ["meleeArc", "shoot", "chain", "areaBurst", "dash"];
   const realBuilders = Object.fromEntries(builderNames.map((name) => [name, G.combat[name]]));
   for (const ability of Object.values(G.abilities)) {
     freshState();
@@ -208,6 +209,28 @@ for (const ability of Object.values(G.abilities)) {
   freshState();
   G.state.player.invuln = 0;
   assert.doesNotThrow(() => ability.use(G.state.player), `${ability.id} should execute`);
+}
+
+{
+  freshState();
+  G.abilities.shellCounter.use(G.state.player);
+  assert.equal(G.state.player.meleeGuard, 0.58, "Shell Counter should provide a short deliberate guard window");
+}
+
+{
+  const target = enemy(40, 0);
+  freshState(target);
+  const before = target.x;
+  G.abilities.gravityWell.use(G.state.player);
+  assert.equal(target.hp, 8);
+  assert.ok(target.x < before, "Gravity Well should pull a target toward its caster");
+}
+
+{
+  freshState();
+  G.state.player.starBeat = 3;
+  G.abilities.starNeedle.use(G.state.player);
+  assert.equal(G.state.projectiles[0].pierce, true, "every fourth Star Needle should align and pierce");
 }
 
 {
@@ -347,8 +370,9 @@ assert.deepEqual(
     G.enemies.moleMonarch.boss.style, G.enemies.countessCarmine.boss.style, G.enemies.royalFool.boss.style, G.enemies.godAvatar.boss.style],
   ["charger", "caster", "duelist", "riftblade", "mole", "vampire", "jester", "god"],
 );
-for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar"]) {
-  assert.ok(G.enemies[id].boss.introLines.length >= 2, `${id} needs a personality-driven introduction`);
+for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar",
+  "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar"]) {
+  assert.ok(G.enemies[id].boss.introLines.length >= 3, `${id} needs a personality-driven introduction`);
   assert.ok(G.enemies[id].hp >= 50, `${id} needs enough durability for players to learn its patterns`);
   assert.equal(G.enemies[id].boss.phases, 3, `${id} should have a three-act fight`);
   assert.ok(G.enemies[id].boss.phaseLine && G.enemies[id].boss.phaseThreeLine && G.enemies[id].boss.defeatLine);
@@ -543,8 +567,8 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
   G.ui.banner = (title, sub) => { spoken = sub || title; };
   G.input = { tapped: () => false, clearTaps() {} };
   G.updateEnemies(0.016);
-  assert.equal(G.state.bossCutscene.lines.length, 2);
-  G.updateBossCutscene(1.16);
+  assert.equal(G.state.bossCutscene.lines.length, 3);
+  G.updateBossCutscene(G.BOSS_CUTSCENE_LINE_SECONDS + 0.01);
   assert.match(spoken, /respect the technique/i, "boss cutscene should advance through personality lines");
   G.state.bossCutscene = null;
 }
@@ -713,7 +737,11 @@ G.enemies.testCaster = {
 
 for (const [id, patternIndex, action, projectileCount] of [
   ["royalFool", 0, "cards", 3],
-  ["godAvatar", 3, "nova", 12],
+  ["admiralTortoise", 0, "shells", 8],
+  ["paperRonin", 1, "crescent", 5],
+  ["professorPerihelion", 0, "stars", 6],
+  ["grandmotherBriar", 0, "seeds", 3],
+  ["godAvatar", 7, "nova", 12],
 ]) {
   const boss = G.makeEnemy(id, 80, 0);
   boss.bossEngaged = true;

@@ -60,6 +60,7 @@ function makeGreenfieldTiles() {
   put(50, H - 1, "U"); put(50, H - 2, ".");
   put(W - 1, 60, "F"); put(W - 2, 60, ".");
   put(110, 0, "Y"); put(110, 1, ".");
+  put(0, 65, "Z"); put(1, 65, ".");
 
   // Landmarks.
   put(57, 44, "s");
@@ -107,6 +108,7 @@ registerMap({
     "U": { tile: "grass", portal: { map: "vampireTrial", x: 3, y: 8 }, stars: 22, portalStyle: "trial", portalTheme: "vampire" },
     "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "trial", portalTheme: "jester" },
     "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, mastery: { before: "god", level: 5 }, portalStyle: "trial", portalTheme: "god" },
+    "Z": { tile: "grass", portal: { map: "shattercoast", x: 2, y: 14 }, stars: 28, portalStyle: "gap" },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
   },
 
@@ -223,6 +225,92 @@ registerMap({
     "R": { tile: "rock", on: "floor" },
   },
   tiles: makeFormTrialArena(3),
+});
+
+/* ================== SHATTERCOAST EXPANSION ================== */
+
+function makeShattercoastTiles() {
+  const w = 48, h = 30;
+  const rows = Array.from({ length: h }, (_, y) =>
+    Array.from({ length: w }, (_, x) => (x === 0 || y === 0 || x === w - 1 || y === h - 1) ? "r" : "."));
+  const put = (x, y, ch) => { rows[y][x] = ch; };
+  // A broad crossroad keeps the five landmarks readable on a phone while
+  // tide pools and stone shelves make movement visually measurable.
+  for (let x = 1; x < w - 1; x++) for (let y = 13; y <= 15; y++) put(x, y, "p");
+  for (let y = 1; y < h - 1; y++) for (let x = 22; x <= 24; x++) put(x, y, "p");
+  for (let y = 3; y <= 9; y++) for (let x = 4; x <= 9; x++) put(x, y, "w");
+  for (let y = 20; y <= 26; y++) for (let x = 38; x <= 43; x++) put(x, y, "w");
+  [[14,4],[17,8],[31,5],[37,10],[9,20],[16,25],[31,22],[35,26]].forEach(([x,y]) => put(x,y,"r"));
+  [[8,12,"9"],[14,17,"8"],[19,7,"6"],[29,8,"0"],[35,17,"4"],[40,12,"9"],[25,22,"0"],[7,25,"6"]]
+    .forEach(([x,y,ch]) => put(x,y,ch));
+  put(0, 14, "x");
+  put(11, 5, "T"); put(36, 5, "K"); put(11, 24, "A"); put(36, 24, "D");
+  put(23, 14, "G"); put(19, 14, "m"); put(27, 14, "H");
+  return rows.map((row) => row.join(""));
+}
+
+registerMap({
+  id: "shattercoast", name: "Shattercoast", playerStart: { x: 2, y: 14 },
+  legend: {
+    "x": { tile: "path", portal: { map: "overworld", x: 1, y: 65 } },
+    "4": { tile: "grass", enemy: "wisp" }, "5": { tile: "grass", enemy: "brute" },
+    "6": { tile: "grass", enemy: "thornling" }, "7": { tile: "grass", enemy: "pebblebeast" },
+    "8": { tile: "grass", enemy: "shade" },
+    "9": { tile: "grass", enemy: "tideCrab" }, "0": { tile: "grass", enemy: "starMote" },
+    "T": { tile: "path", portal: { map: "turtleTrial", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "turtle" },
+    "K": { tile: "path", portal: { map: "samuraiTrial", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "samurai" },
+    "A": { tile: "path", portal: { map: "astronomerTrial", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "astronomer" },
+    "D": { tile: "path", portal: { map: "druidTrial", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "druid" },
+    "G": { tile: "path", portal: { map: "gauntletArena", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "god" },
+    "m": { tile: "path", message: "Four guardians teach four new forms. The central coliseum remixes every guardian you have already defeated." },
+    "H": { tile: "path", chest: { heal: true, name: "a salt-spark cookie" } },
+  },
+  tiles: makeShattercoastTiles(),
+});
+
+function makeExpansionTrialArena(variant) {
+  const rows = makeFormTrialArena(variant).map((row) => row.split(""));
+  rows[8][0] = "x"; rows[8][4] = "m"; rows[8][22] = "B";
+  return rows.map((row) => row.join(""));
+}
+
+[
+  { id: "turtleTrial", name: "The Breakwater Bastion", theme: "turtle", boss: "admiralTortoise", variant: 0,
+    exit: { x: 11, y: 5 }, sign: "The Admiral's shell volleys leave lanes. Brace, reposition, then answer the charge." },
+  { id: "samuraiTrial", name: "The Folded Dojo", theme: "samurai", boss: "paperRonin", variant: 1,
+    exit: { x: 36, y: 5 }, sign: "Three deliberate cuts beat one frantic swing. Watch the pause before the draw." },
+  { id: "astronomerTrial", name: "The Crooked Observatory", theme: "astronomer", boss: "professorPerihelion", variant: 2,
+    exit: { x: 11, y: 24 }, sign: "Orbits are patterns, not walls. Cross a ring after it passes and close the distance." },
+  { id: "druidTrial", name: "The Walking Garden", theme: "druid", boss: "grandmotherBriar", variant: 3,
+    exit: { x: 36, y: 24 }, sign: "Seeds spread wide; briars leave narrow gaps. Keep moving and prune from the edges." },
+].forEach((trial) => registerMap({
+  id: trial.id, name: trial.name, visualTheme: trial.theme, playerStart: { x: 3, y: 8 },
+  bossTrial: { exit: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y }, delay: 1.7 },
+  legend: {
+    "x": { tile: "floor", portal: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y } },
+    "B": { tile: "floor", enemy: trial.boss }, "m": { tile: "floor", message: trial.sign },
+    "H": { tile: "floor", chest: { heal: true, name: "a guardian's travel biscuit" } },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: makeExpansionTrialArena(trial.variant),
+}));
+
+registerMap({
+  id: "gauntletArena", name: "The Manyfold Coliseum", visualTheme: "god", playerStart: { x: 3, y: 8 },
+  bossTrial: { exit: { map: "shattercoast", x: 23, y: 14 }, delay: 1.7 },
+  legend: {
+    "x": { tile: "floor", portal: { map: "shattercoast", x: 23, y: 14 } },
+    "m": { tile: "floor", message: "Open the menu's Gauntlet tab to choose a run. Recovery runs restore one heart and three mana between rounds." },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: [
+    "############################", "#ffffffffffffffffffffffffff#", "#fffRffffffffffffffffffRfff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "xffmfffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "#fffRffffffffffffffffffRfff#",
+    "#ffffffffffffffffffffffffff#", "############################",
+  ],
 });
 
 /* ================== THE OLD DUNGEON (30 x 18) ================== */

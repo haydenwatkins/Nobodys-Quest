@@ -61,6 +61,11 @@ const expectedThemes = {
   vampireTrial: "vampire",
   jesterTrial: "jester",
   godTrial: "god",
+  turtleTrial: "turtle",
+  samuraiTrial: "samurai",
+  astronomerTrial: "astronomer",
+  druidTrial: "druid",
+  gauntletArena: "god",
 };
 for (const [mapId, theme] of Object.entries(expectedThemes)) {
   assert.equal(G.maps[mapId].visualTheme, theme, `${mapId} needs its own arena art`);
