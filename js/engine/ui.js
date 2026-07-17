@@ -528,6 +528,7 @@ G.ui = (() => {
   function buildMenu() {
     const tabs = [
       ["forms", "Forms"],
+      ["style", "Style"],
       ["quests", "Quests"],
       ["explore", "Explore"],
       ["mix", "Mix"],
@@ -546,6 +547,7 @@ G.ui = (() => {
       <div class="menu-body">`;
 
     if (activeTab === "forms") html += buildFormsTab();
+    if (activeTab === "style") html += buildCostumesTab();
     if (activeTab === "quests") html += buildQuestsTab();
     if (activeTab === "explore") html += buildWayfinderTab();
     if (activeTab === "mix") html += buildMixTab();
@@ -573,6 +575,8 @@ G.ui = (() => {
       b.addEventListener("click", () => { G.setForm(b.dataset.become); buildMenu(); }));
     menuEl.querySelectorAll("[data-claim]").forEach((b) =>
       b.addEventListener("click", () => { G.claimForm(b.dataset.claim); buildMenu(); }));
+    menuEl.querySelectorAll("[data-costume]").forEach((b) =>
+      b.addEventListener("click", () => { G.selectCostume(b.dataset.costume); buildMenu(); }));
     menuEl.querySelectorAll("select[data-slot]").forEach((sel) =>
       sel.addEventListener("change", () => {
         const lo = G.getLoadout(G.state.formId);
@@ -628,6 +632,33 @@ G.ui = (() => {
     if (reset) reset.addEventListener("click", () => {
       if (confirm("Really erase the save and start over?")) G.resetSave();
     });
+  }
+
+  function buildCostumesTab() {
+    const wardrobe = G.ensureCostumes();
+    const selected = G.costumeById(wardrobe.selected);
+    let html = `<div class="form-card wardrobe-intro">
+      <h2>🧵 Wardrobe · ${selected.icon} ${selected.name}</h2>
+      <div class="tagline">One outfit dresses every form — including forms added later.</div>
+      <div class="cosmetic-note">Cosmetic only: outfits never change health, speed, damage, or difficulty.</div>
+    </div>`;
+    for (const costume of G.COSTUMES) {
+      const unlocked = wardrobe.unlocked.includes(costume.id);
+      const wearing = wardrobe.selected === costume.id;
+      const swatches = costume.swatches.map((color) =>
+        `<span class="costume-swatch" style="background:${color}"></span>`).join("");
+      html += `<div class="form-card costume-card ${wearing ? "current" : ""} ${unlocked ? "" : "locked"}">
+        <div class="costume-heading">
+          <h2>${costume.icon} ${costume.name}${wearing ? ` <span class="wearing-label">WEARING</span>` : ""}</h2>
+          <span class="costume-swatches" aria-label="Costume colors">${swatches}</span>
+        </div>
+        <div class="tagline">${costume.tagline}</div>
+        ${unlocked
+          ? `<button data-costume="${costume.id}" ${wearing ? "disabled" : ""}>${wearing ? "Equipped" : "Wear on every form"}</button>`
+          : `<div class="unlock-progress">🔒 ${costume.hint}</div>`}
+      </div>`;
+    }
+    return html;
   }
 
   function buildFormsTab() {

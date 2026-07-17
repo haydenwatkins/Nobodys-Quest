@@ -23,6 +23,11 @@ regions provide directional and star-requirement clues instead of spoilers.
 Completing the region list awards three stars and a Wayfinder Whistle for safe-
 area fast travel between previously discovered regions.
 
+The **Style** menu is a cosmetic progression track that starts immediately and
+grows through exploration, keepsakes, guardian trophies, and the full gauntlet.
+Its nine costumes recolor and accessorize every form without changing combat
+stats or difficulty; future forms automatically inherit the complete wardrobe.
+
 ## Run it
 
 Double-click `index.html`. Works from the plain filesystem — no server needed.

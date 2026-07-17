@@ -236,6 +236,20 @@ Boss introductions use three short lines with 2.2 seconds per line. Tapping an
 ability advances to the next line; it no longer discards the complete scene.
 Rematches remain quick.
 
+### Costumes and the Wardrobe
+
+The Style menu is deliberately separate from form power. A costume changes the
+shared palette and adds a small pixel accessory, but never changes health,
+speed, mana, damage, or cooldowns. Trailblazer unlocks after only two major
+regions so new players see the system early; later looks come from exploration,
+keepsakes, guardian trophies, and a complete Manyfold Gauntlet.
+
+Costumes live in `js/engine/costumes.js`. Adding one entry to `G.COSTUMES`
+automatically adds its card, save support, locked hint, palette, and every-form
+rendering. A new form also inherits every costume automatically. Keep unlock
+conditions tied to interesting milestones rather than harder enemies, and keep
+the dark outline color unchanged so every dressed sprite remains readable.
+
 ---
 
 ## 💡 Idea shelf (steal these!)
