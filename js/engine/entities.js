@@ -790,7 +790,9 @@ G.drawPlayer = function (ctx) {
   const drawX = p.x + (p.attackPose ? p.attackPose.x * poseScale : 0);
   const gaitLift = p.moving && !p.dashing && Math.floor(p.anim) % 2 ? 1 : 0;
   const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift;
-  G.drawSprite(ctx, form.sprite, frame, drawX, drawY, p.dir.x < 0);
+  const dressedSprite = G.costumedSprite ? G.costumedSprite(form.sprite) : form.sprite;
+  G.drawSprite(ctx, dressedSprite, frame, drawX, drawY, p.dir.x < 0);
+  if (G.drawCostumeAccessory) G.drawCostumeAccessory(ctx, p, form, drawX, drawY);
 
   const items = G.state.items || [];
   if (items.includes("wayfarer-ribbon") && p.moving) {

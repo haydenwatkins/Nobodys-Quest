@@ -13,6 +13,8 @@ G.saveGame = function () {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify({
       formId: s.formId,
+      costumeId: s.costumeId,
+      costumesUnlocked: s.costumesUnlocked,
       mapId: s.mapId,
       px: Math.round(s.player.x),
       py: Math.round(s.player.y),

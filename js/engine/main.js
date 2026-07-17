@@ -60,6 +60,8 @@
   G.state = {
     player: G.makePlayer(),
     formId: "nobody",
+    costumeId: "classic",
+    costumesUnlocked: ["classic"],
     stars: 0,
     items: [],
     opened: [],
@@ -97,6 +99,9 @@
     s.claimedForms = s.claimedForms.filter((id) => G.forms[id] && !G.forms[id].start && !G.forms[id].invalid);
     s.unlockReadyNotified = Array.isArray(save.unlockReadyNotified) ? save.unlockReadyNotified : [];
     s.loadouts = save.loadouts || {};
+    const wardrobe = G.normalizeCostumes(save.costumesUnlocked, save.costumeId);
+    s.costumeId = wardrobe.selected;
+    s.costumesUnlocked = wardrobe.unlocked;
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
     s.town = G.normalizeTown(save.town || save.cult);
     s.heroBoard = G.normalizeHeroBoard(save.heroBoard);
@@ -178,6 +183,8 @@
   if (G.state.wayfinder.rewardClaimed && !G.state.items.includes("wayfinder-whistle"))
     G.state.items.push("wayfinder-whistle");
   G.checkWayfinderCompletion(false); // finishes an inferred complete legacy Journal
+  G.checkCostumeUnlocks(true); // migrates wardrobe rewards earned by older saves
+  G.costumeBooting = false;
 
   G.checkUnlocks(); // quietly registers starting forms as "known"
   G.tutorial.init(save);

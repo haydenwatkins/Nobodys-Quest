@@ -95,7 +95,8 @@ function finishGauntlet() {
     s.items.push("manyfold-crown");
     s.player.manaMax = 12;
     s.player.mana = 12;
-    G.ui.banner("👑 MANYFOLD CROWN", "+2 maximum mana · one Second Wind in every future gauntlet");
+    if (G.checkCostumeUnlocks) G.checkCostumeUnlocks(true);
+    G.ui.banner("👑 MANYFOLD CROWN", "+2 max mana · Second Wind · Manyfold Royal costume unlocked");
   }
   G.world.load("shattercoast", { x: 23, y: 14 });
   G.saveGame();
