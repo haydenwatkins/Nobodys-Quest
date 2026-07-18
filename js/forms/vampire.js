@@ -13,6 +13,8 @@ registerForm({
   speed: 105,
   hearts: 3,
   slots: 2,
+  passive: { id: "bloodskin", name: "Bloodskin",
+    description: "Healing beyond full health becomes up to two hearts of temporary armor." },
 
   basic: "bloodBite",
   abilities: [

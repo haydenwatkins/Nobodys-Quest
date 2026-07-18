@@ -33,6 +33,7 @@ registerAbility({
   name: "Slap",
   icon: "👋",
   type: "blunt",
+  style: "melee",
   mana: 0,
   cooldown: 0.35,
   use(user) {
@@ -51,6 +52,7 @@ registerAbility({
   name: "Cartwheel",
   icon: "🤸",
   type: "blunt",
+  style: "dash",
   mana: 2,
   cooldown: 1.0,
   use(user) {
@@ -70,6 +72,8 @@ registerAbility({
   name: "Bite",
   icon: "🦷",
   type: "sharp",
+  style: "melee",
+  traits: ["status"],
   mana: 0,
   cooldown: 0.3,
   use(user) {
@@ -90,6 +94,7 @@ registerAbility({
   name: "Squeak Zoom",
   icon: "💨",
   type: "blunt",
+  style: "dash",
   mana: 2,
   cooldown: 0.8,
   use(user) {
@@ -107,6 +112,8 @@ registerAbility({
   name: "Fester",
   icon: "🤢",
   type: "sharp",
+  style: "area",
+  traits: ["status"],
   mana: 4,
   cooldown: 1.4,
   use(user) {
@@ -129,6 +136,7 @@ registerAbility({
   name: "Sword Slash",
   icon: "⚔️",
   type: "sharp",
+  style: "melee",
   mana: 0,
   cooldown: 0.5,
   use(user) {
@@ -147,6 +155,7 @@ registerAbility({
   name: "Shield Bash",
   icon: "🛡️",
   type: "blunt",
+  style: "melee",
   mana: 3,
   cooldown: 1.0,
   use(user) {
@@ -166,6 +175,7 @@ registerAbility({
   name: "Spin Slash",
   icon: "🌀",
   type: "sharp",
+  style: "area",
   mana: 4,
   cooldown: 1.2,
   use(user) {
@@ -185,6 +195,7 @@ registerAbility({
   name: "Arrow",
   icon: "🏹",
   type: "sharp",
+  style: "projectile",
   mana: 0,
   cooldown: 0.45,
   autoAim: true, aimRange: 140,
@@ -203,6 +214,7 @@ registerAbility({
   name: "Lucky Arrow",
   icon: "🌟",
   type: "light",                               // the only Light move so far!
+  style: "projectile",
   mana: 2,
   cooldown: 0.7,
   autoAim: true, aimRange: 160,
@@ -222,6 +234,7 @@ registerAbility({
   name: "Triple Shot",
   icon: "🎯",
   type: "sharp",
+  style: "projectile",
   mana: 4,
   cooldown: 1.2,
   autoAim: true, aimRange: 130,
@@ -243,6 +256,7 @@ registerAbility({
   name: "Shadow Bolt",
   icon: "🌑",
   type: "dark",
+  style: "projectile",
   mana: 3,
   cooldown: 0.8,
   autoAim: true, aimRange: 150,
@@ -261,6 +275,7 @@ registerAbility({
   name: "Dark Matter",
   icon: "🌑",
   type: "dark",
+  style: "area",
   mana: 5,
   cooldown: 1.5,
   autoAim: true, aimRange: 185,
@@ -280,6 +295,8 @@ registerAbility({
   name: "Curse",
   icon: "🌑",
   type: "dark",
+  style: "projectile",
+  traits: ["status"],
   mana: 0,
   cooldown: 0.55,
   autoAim: true, aimRange: 135,
@@ -301,6 +318,7 @@ registerAbility({
   name: "Tongue Lash",
   icon: "👅",
   type: "blunt",
+  style: "melee",
   mana: 0,
   cooldown: 0.45,
   use(user) {
@@ -318,6 +336,7 @@ registerAbility({
   name: "Hop Crash",
   icon: "🐸",
   type: "blunt",
+  style: "dash",
   mana: 3,
   cooldown: 1.0,
   use(user) {
@@ -333,6 +352,7 @@ registerAbility({
   name: "Croak Burst",
   icon: "📣",
   type: "blunt",
+  style: "area",
   mana: 4,
   cooldown: 1.25,
   use(user) {
@@ -354,6 +374,7 @@ registerAbility({
   name: "Bottle Bonk",
   icon: "🍾",
   type: "blunt",
+  style: "melee",
   mana: 0,
   cooldown: 0.4,
   use(user) {
@@ -371,6 +392,7 @@ registerAbility({
   name: "Volatile Flask",
   icon: "💥",
   type: "blunt",
+  style: "area",
   mana: 4,
   cooldown: 1.4,
   autoAim: true, aimRange: 115,
@@ -388,6 +410,8 @@ registerAbility({
   name: "Miasma Flask",
   icon: "🧪",
   type: "dark",
+  style: "area",
+  traits: ["status"],
   mana: 5,
   cooldown: 1.8,
   autoAim: true, aimRange: 105,
@@ -408,6 +432,7 @@ registerAbility({
   name: "Storm Spark",
   icon: "⚡",
   type: "light",
+  style: "projectile",
   mana: 0,
   cooldown: 0.45,
   autoAim: true, aimRange: 125,
@@ -425,6 +450,7 @@ registerAbility({
   name: "Chain Lightning",
   icon: "🌩️",
   type: "light",
+  style: "chain",
   mana: 5,
   cooldown: 1.5,
   autoAim: true, aimRange: 78,
@@ -442,6 +468,8 @@ registerAbility({
   name: "Thunderclap",
   icon: "👏",
   type: "blunt",
+  style: "area",
+  traits: ["status"],
   mana: 6,
   cooldown: 1.8,
   use(user) {
@@ -461,6 +489,7 @@ registerAbility({
   name: "Tail Sweep",
   icon: "🐉",
   type: "blunt",
+  style: "melee",
   mana: 0,
   cooldown: 0.55,
   use(user) {
@@ -478,6 +507,7 @@ registerAbility({
   name: "Fire Breath",
   icon: "🔥",
   type: "light",
+  style: "area",
   mana: 4,
   cooldown: 1.2,
   autoAim: true, aimRange: 78,
@@ -498,6 +528,7 @@ registerAbility({
   name: "Meteor",
   icon: "☄️",
   type: "light",
+  style: "area",
   mana: 7,
   cooldown: 2.3,
   autoAim: true, aimRange: 145,
@@ -517,6 +548,7 @@ registerAbility({
   name: "Rift Cut",
   icon: "🗡️",
   type: "sharp",
+  style: "melee",
   mana: 0,
   cooldown: 0.36,
   use(user) {
@@ -550,6 +582,7 @@ registerAbility({
   name: "Rift Rush",
   icon: "💫",
   type: "dark",
+  style: "dash",
   mana: 3,
   cooldown: 1.0,
   use(user) {
@@ -568,6 +601,7 @@ registerAbility({
   name: "Returning Star",
   icon: "✦",
   type: "light",
+  style: "projectile",
   mana: 4,
   cooldown: 1.25,
   autoAim: true, aimRange: 100,
@@ -592,6 +626,8 @@ registerAbility({
   name: "Drill Tap",
   icon: "⛏️",
   type: "blunt",
+  style: "melee",
+  traits: ["status"],
   mana: 0,
   cooldown: 0.38,
   use(user) {
@@ -618,6 +654,7 @@ registerAbility({
   name: "Burrow Blitz",
   icon: "🕳️",
   type: "dark",
+  style: "dash",
   mana: 3,
   cooldown: 1.15,
   use(user) {
@@ -638,6 +675,7 @@ registerAbility({
   name: "Fault Line",
   icon: "〰️",
   type: "blunt",
+  style: "area",
   mana: 5,
   cooldown: 1.55,
   autoAim: true, aimRange: 130,
@@ -658,6 +696,7 @@ registerAbility({
   name: "Blood Bite",
   icon: "🦇",
   type: "sharp",
+  style: "melee",
   mana: 0,
   cooldown: 0.34,
   use(user) {
@@ -669,13 +708,12 @@ registerAbility({
     });
     if (!hits) return;
     user.bloodPips = Math.min(5, (user.bloodPips || 0) + hits);
-    if (user.bloodPips >= 5 && user.damageTaken > 0) {
+    if (user.bloodPips >= 5) {
       user.bloodPips = 0;
-      user.damageTaken--;
+      G.healPlayer(1, "bloodBite");
       G.sfx.play("pickup");
       G.spawnFx({ kind: "ring", x: user.x, y: user.y - 7, color: "#b13e53", radius: 18, dur: 0.4 });
       G.damageNumber(user.x, user.y - 18, "DRAIN!", "#ef7d57");
-      G.events.emit("selfHeal", { ability: "bloodBite" });
     }
   },
 });
@@ -685,6 +723,7 @@ registerAbility({
   name: "Crimson Waltz",
   icon: "🌹",
   type: "dark",
+  style: "dash",
   mana: 3,
   cooldown: 1.05,
   use(user) {
@@ -701,6 +740,7 @@ registerAbility({
   name: "Blood Moon",
   icon: "🌕",
   type: "dark",
+  style: "area",
   mana: 6,
   cooldown: 1.85,
   use(user) {
@@ -710,9 +750,8 @@ registerAbility({
       color: "#b13e53", weight: 6, hitStop: 0.04, shake: 0.18,
     });
     G.spawnFx({ kind: "ring", x: user.x, y: user.y - 7, color: "#8153c1", radius: 40, dur: 0.42 });
-    if (hits >= 3 && user.damageTaken > 0) {
-      user.damageTaken--;
-      G.events.emit("selfHeal", { ability: "bloodMoon" });
+    if (hits >= 3) {
+      G.healPlayer(1, "bloodMoon");
       G.damageNumber(user.x, user.y - 18, "FEAST!", "#ef7d57");
     }
   },
@@ -725,6 +764,7 @@ registerAbility({
   name: "Wild Card",
   icon: "🃏",
   type: "sharp",
+  style: "projectile",
   mana: 0,
   cooldown: 0.45,
   autoAim: true, aimRange: 150,
@@ -746,6 +786,7 @@ registerAbility({
   name: "Punchline Pie",
   icon: "🥧",
   type: "blunt",
+  style: "area",
   mana: 4,
   cooldown: 1.4,
   autoAim: true, aimRange: 135,
@@ -764,6 +805,7 @@ registerAbility({
   name: "Encore!",
   icon: "🎪",
   type: "light",
+  style: "area",
   mana: 5,
   cooldown: 1.7,
   use(user) {
@@ -783,7 +825,7 @@ registerAbility({
 /* ----------------- TURTLE's moves ----------------- */
 
 registerAbility({
-  id: "shellJab", name: "Shell Jab", icon: "🐢", type: "blunt",
+  id: "shellJab", name: "Shell Jab", icon: "🐢", type: "blunt", style: "melee",
   mana: 0, cooldown: 0.42,
   use(user) {
     user.shellBeat = (user.shellBeat || 0) % 3 + 1;
@@ -802,7 +844,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "shellRoll", name: "Shell Roll", icon: "🛞", type: "blunt",
+  id: "shellRoll", name: "Shell Roll", icon: "🛞", type: "blunt", style: "dash",
   mana: 3, cooldown: 1.1,
   use(user) {
     G.combat.dash(user, {
@@ -814,7 +856,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "shellCounter", name: "Shell Counter", icon: "🛡️", type: "blunt",
+  id: "shellCounter", name: "Shell Counter", icon: "🛡️", type: "blunt", style: "area",
   mana: 4, cooldown: 2.1,
   use(user) {
     user.meleeGuard = Math.max(user.meleeGuard || 0, 0.58);
@@ -829,7 +871,7 @@ registerAbility({
 /* ----------------- SAMURAI's moves ----------------- */
 
 registerAbility({
-  id: "quickdraw", name: "Quickdraw", icon: "⚔️", type: "sharp",
+  id: "quickdraw", name: "Quickdraw", icon: "⚔️", type: "sharp", style: "melee",
   mana: 0, cooldown: 0.4,
   use(user) {
     const last = typeof user.drawAt === "number" ? user.drawAt : -10;
@@ -847,7 +889,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "flashStep", name: "Flash Step", icon: "💨", type: "sharp",
+  id: "flashStep", name: "Flash Step", icon: "💨", type: "sharp", style: "dash",
   mana: 3, cooldown: 0.95,
   use(user) {
     G.combat.dash(user, {
@@ -858,7 +900,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "crescentDraw", name: "Crescent Draw", icon: "🌙", type: "sharp",
+  id: "crescentDraw", name: "Crescent Draw", icon: "🌙", type: "sharp", style: "area",
   mana: 6, cooldown: 1.75,
   use(user) {
     G.combat.meleeArc(user, {
@@ -872,7 +914,7 @@ registerAbility({
 /* ----------------- ASTRONOMER's moves ----------------- */
 
 registerAbility({
-  id: "starNeedle", name: "Star Needle", icon: "✨", type: "light",
+  id: "starNeedle", name: "Star Needle", icon: "✨", type: "light", style: "projectile",
   mana: 0, cooldown: 0.46, autoAim: true, aimRange: 165,
   use(user) {
     user.starBeat = (user.starBeat || 0) % 4 + 1;
@@ -887,7 +929,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "constellation", name: "Constellation", icon: "🌟", type: "light",
+  id: "constellation", name: "Constellation", icon: "🌟", type: "light", style: "area",
   mana: 4, cooldown: 1.35,
   use(user) {
     const hitGroup = {};
@@ -902,7 +944,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "gravityWell", name: "Gravity Well", icon: "🌀", type: "dark",
+  id: "gravityWell", name: "Gravity Well", icon: "🌀", type: "dark", style: "area",
   mana: 6, cooldown: 1.9,
   use(user) {
     G.combat.areaBurst(user, {
@@ -915,7 +957,7 @@ registerAbility({
 /* ----------------- DRUID's moves ----------------- */
 
 registerAbility({
-  id: "thornLash", name: "Thorn Lash", icon: "🌿", type: "dark",
+  id: "thornLash", name: "Thorn Lash", icon: "🌿", type: "dark", style: "melee", traits: ["status"],
   mana: 0, cooldown: 0.47,
   use(user) {
     G.combat.meleeArc(user, {
@@ -927,7 +969,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "seedBurst", name: "Seed Burst", icon: "🌰", type: "dark",
+  id: "seedBurst", name: "Seed Burst", icon: "🌰", type: "dark", style: "area", traits: ["status"],
   mana: 4, cooldown: 1.35, autoAim: true, aimRange: 145,
   use(user) {
     G.combat.shoot(user, {
@@ -940,7 +982,7 @@ registerAbility({
 });
 
 registerAbility({
-  id: "wildGrowth", name: "Wild Growth", icon: "🌳", type: "dark",
+  id: "wildGrowth", name: "Wild Growth", icon: "🌳", type: "dark", style: "area", traits: ["status"],
   mana: 6, cooldown: 1.95,
   use(user) {
     G.combat.areaBurst(user, {
@@ -958,6 +1000,7 @@ registerAbility({
   name: "Divine Spark",
   icon: "☀️",
   type: "light",
+  style: "projectile",
   mana: 0,
   cooldown: 0.5,
   autoAim: true, aimRange: 170,
@@ -977,6 +1020,7 @@ registerAbility({
   name: "Judgment Ring",
   icon: "⚖️",
   type: "light",
+  style: "area",
   mana: 6,
   cooldown: 1.6,
   use(user) {
@@ -995,6 +1039,7 @@ registerAbility({
   name: "Void Star",
   icon: "✴️",
   type: "dark",
+  style: "area",
   mana: 5,
   cooldown: 1.7,
   autoAim: true, aimRange: 190,

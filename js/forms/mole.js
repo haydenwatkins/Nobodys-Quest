@@ -13,6 +13,8 @@ registerForm({
   speed: 75,
   hearts: 5,
   slots: 2,
+  passive: { id: "aftershock", name: "Aftershock",
+    description: "Area abilities and dash landings echo as delayed stunning tremors." },
 
   basic: "drillTap",
   abilities: [

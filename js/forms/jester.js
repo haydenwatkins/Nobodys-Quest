@@ -13,6 +13,8 @@ registerForm({
   speed: 90,
   hearts: 3,
   slots: 2,
+  passive: { id: "trickTrajectory", name: "Trick Trajectory",
+    description: "Projectile abilities ricochet to one extra target." },
 
   basic: "wildCard",
   abilities: [

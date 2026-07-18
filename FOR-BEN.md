@@ -41,6 +41,12 @@ registerForm({
   speed: 70,
   hearts: 3,
   slots: 2,
+  passive: {
+    id: "farCasting",
+    name: "Far Casting",
+    description: "Projectile abilities fly a little faster and farther.",
+    effects: { projectile: { speedScale: 1.12, rangeScale: 1.1 } },
+  },
 
   basic: "slap",                     // borrow Slap for now (or make your own move!)
   abilities: [
@@ -77,8 +83,13 @@ registerForm({
 This game copies what made *Nobody Saves the World* great. The rules
 aren't random — each one protects the FUN:
 
-1. **Every form is a fantasy.** Name, icon, tagline, own look.
-   If Wizard feels like Knight-but-blue, it's not done yet.
+1. **Every form is a fantasy.** Name, icon, tagline, own look, and one
+   signature passive. If Wizard feels like Knight-but-blue, it's not done yet.
+   A good passive changes movement, positioning, defense, status, or the way a
+   whole style of shared ability behaves. It should not just add damage or mana.
+   Every passive id must be unique. Simple style effects can use the safe
+   `effects` numbers shown above; unusual behavior belongs in
+   `js/engine/passives.js`, where the current roster provides examples.
 2. **Abilities are shared.** Your form must bring at least one move
    of its own — and every OLD form can borrow it. Your new form
    makes the whole game bigger, not just one page of it.
@@ -91,6 +102,8 @@ aren't random — each one protects the FUN:
    finishers and projectile explosions; the combat engine enforces this.
 5. **Fair is fun.** Speed 40–140, hearts 1–8, mana 0–8, cooldown
    0.15s+. A form that breaks the game is boring in five minutes.
+6. **Dashes are safe.** Every dash ability is invulnerable for its complete
+   travel and landing. Enemies can be hurt during a dash; the player cannot.
 
 ---
 
@@ -118,6 +131,14 @@ moves sooner without making waiting players farm enemies forever.
 
 Change `range`, `damage`, `speed`, add a `status` like poison or stun,
 or call `shoot` three times like Triple Shot does. Mix and match!
+
+Every ability also declares its primary combat `style`: `melee`, `projectile`,
+`dash`, `area`, or `chain`. Passives use that label to remix borrowed moves,
+and the Mix menu marks a matching combination with a star. Add
+`traits: ["status"]` when applying poison or stun so status-focused passives
+can recognize it. The style describes what the move feels like, even if its
+code uses another helper—for example, an exploding flask is an `area` move
+implemented with `shoot`.
 
 ### Making an ability feel good
 

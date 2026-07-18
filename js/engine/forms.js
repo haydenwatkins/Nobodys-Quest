@@ -33,6 +33,11 @@ function registerAbility(def) {
   if (!def.icon) err("It needs an icon — pick a fun emoji! 🔥");
   if (!G.DAMAGE_TYPES[def.type])
     err(`Its damage type is "${def.type}" — it must be one of: sharp, blunt, light, dark. (Rule 4: damage types are how wards work!)`);
+  const abilityStyles = ["melee", "projectile", "dash", "area", "chain"];
+  if (!abilityStyles.includes(def.style))
+    err(`Its combat style is "${def.style}" — choose melee, projectile, dash, area, or chain so form passives know how to remix it.`);
+  if (def.traits !== undefined && !Array.isArray(def.traits))
+    err("Its traits must be a list, like traits: [\"status\"].");
   if (typeof def.mana !== "number" || def.mana < 0 || def.mana > 8)
     err("Its mana cost must be a number from 0 to 8.");
   if (typeof def.cooldown !== "number" || def.cooldown < 0.15)
@@ -65,6 +70,28 @@ function registerForm(def) {
   if (typeof def.hearts !== "number" || def.hearts < 1 || def.hearts > 8)
     err(`It has ${def.hearts} hearts — keep it between 1 and 8. (Rule 5!)`);
 
+  if (!def.passive || !def.passive.id || !def.passive.name || !def.passive.description)
+    err("It needs one signature passive with an id, name, and short description. Passives make borrowed abilities feel different in every form! (Rule 1)");
+  if (def.passive && def.passive.effects) {
+    const styles = ["melee", "projectile", "dash", "area", "chain"];
+    const limits = {
+      rangeScale: [0.85, 1.25], jumpRangeScale: [0.85, 1.25], speedScale: [0.85, 1.25], sizeBonus: [0, 1.5],
+      arcBonus: [0, 45], knockbackScale: [0.75, 1.4], pull: [0, 15],
+      ricochets: [0, 1], guard: [0, 0.3], dashDistanceScale: [0.9, 1.15],
+    };
+    for (const [style, effect] of Object.entries(def.passive.effects)) {
+      if (!styles.includes(style) || !effect || typeof effect !== "object") {
+        err(`Its passive effect style "${style}" is invalid. Use melee, projectile, dash, area, or chain.`);
+        continue;
+      }
+      for (const [key, value] of Object.entries(effect)) {
+        const limit = limits[key];
+        if (!limit || typeof value !== "number" || value < limit[0] || value > limit[1])
+          err(`Its passive effect "${key}" is unknown or outside the safe Workshop limits.`);
+      }
+    }
+  }
+
   if (!def.basic)
     err("It needs a basic attack (the A button) — set basic: \"someAbilityId\". Basics cost 0 mana.");
   if (!Array.isArray(def.abilities) || def.abilities.length < 1)
@@ -95,9 +122,13 @@ function registerForm(def) {
    (a form might mention an ability that's defined in a later
     file, so we check cross-references at boot time)          */
 G.validateCrossRefs = function () {
+  const passiveIds = new Set();
   for (const id of G.formOrder) {
     const f = G.forms[id];
     const err = (msg) => { f.invalid = true; G.workshopErrors.push({ where: `form "${f.name || id}"`, msg }); };
+    if (f.passive && passiveIds.has(f.passive.id))
+      err(`Its passive id "${f.passive.id}" belongs to another form. Every passive identity must be unique.`);
+    if (f.passive) passiveIds.add(f.passive.id);
 
     if (f.basic) {
       const b = G.abilities[f.basic];
@@ -109,6 +140,11 @@ G.validateCrossRefs = function () {
         if (!G.abilities[a.id]) err(`It lists ability "${a.id}" but no ability with that id exists. Typo?`);
         if (typeof a.level !== "number" || a.level < 1) a.level = 1;
       }
+    }
+    const owned = [f.basic].concat((f.abilities || []).map((entry) => entry.id));
+    for (const abilityId of owned) {
+      const ability = G.abilities[abilityId];
+      if (ability && !ability.nativeForm) ability.nativeForm = id;
     }
     if (f.unlock) {
       const allowed = ["level", "formLevel", "item", "stars", "claimedForms", "allFormsLevel", "previousFormsLevel", "any"];
@@ -268,6 +304,7 @@ G.setForm = function (id) {
   // never let a swap knock you out — you always keep at least 1 heart
   p.damageTaken = Math.min(p.damageTaken, G.playerMaxHearts() - 1);
   p.dashing = null;
+  if (G.passives) G.passives.onFormChange(p);
   G.sfx.play("swap");
   G.spawnFx({ kind: "ring", x: p.x, y: p.y - 6, color: "#f4f4f4", dur: 0.35 });
   G.events.emit("swap", { form: id });

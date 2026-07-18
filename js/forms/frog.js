@@ -13,6 +13,8 @@ registerForm({
   speed: 105,
   hearts: 3,
   slots: 2,
+  passive: { id: "elastic", name: "Elastic",
+    description: "Melee abilities reach farther and pull enemies in instead of knocking them away." },
 
   basic: "tongueLash",
   abilities: [

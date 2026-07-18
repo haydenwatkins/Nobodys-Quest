@@ -13,6 +13,8 @@ registerForm({
   speed: 75,
   hearts: 4,
   slots: 2,
+  passive: { id: "catalyst", name: "Catalyst",
+    description: "Area abilities cover more ground and explosive projectiles burst wider." },
 
   basic: "bottleBonk",
   abilities: [

@@ -132,6 +132,8 @@ G.combat = (() => {
 
     if (opts.status) applyStatus(enemy, opts.status.name, opts.status);
 
+    if (G.passives) G.passives.onHit(enemy, opts);
+
     if (enemy.hp <= 0) killEnemy(enemy, opts);
     return true;
   }
@@ -158,6 +160,7 @@ G.combat = (() => {
       damageType: opts.type,
       poisoned: !!(enemy.status && enemy.status.poison),
     });
+    if (G.passives) G.passives.onKill(enemy, opts);
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);
     if (enemy.def.miniboss && G.state.gauntletRun && G.gauntletBossDefeated) {
       G.gauntletBossDefeated(enemy);
@@ -311,10 +314,15 @@ G.combat = (() => {
   // A melee swing in front of you.
   // {range, arcDeg, damage, type, ability, knockback, status, color}
   function meleeArc(user, o) {
+    if (G.passives) o = G.passives.prepare("melee", user, o);
     const type = abilityDamageType(o.ability, o.type, "blunt");
     const range = o.range || 20;
     const arc = ((o.arcDeg || 100) * Math.PI) / 180;
     const facing = Math.atan2(user.dir.y, user.dir.x);
+    if (o.passiveGuard) {
+      G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color: "#94b0c2", radius: 9, dur: 0.28 });
+      G.damageNumber(user.x, user.y - 18, "GUARD", "#94b0c2");
+    }
     if (o.contactAssist !== false) assistMeleeContact(user, range, arc, facing);
     attackPose(user, facing, o.lunge === undefined ? 2 : o.lunge, 0.09);
     G.sfx.attack("melee", type, o.damage || 1);
@@ -333,6 +341,13 @@ G.combat = (() => {
         hitStop: o.hitStop, shake: o.shake,
       })) {
         hits++;
+        if (o.passivePull) {
+          const d = G.util.dist(e.x, e.y, user.x, user.y);
+          const a = G.util.angleTo(e.x, e.y, user.x, user.y);
+          const weight = e.def.heavy ? 0.35 : 1;
+          const step = Math.min(o.passivePull * weight, Math.max(0, d - 10));
+          G.world.moveBox(e, Math.cos(a) * step, Math.sin(a) * step);
+        }
         if (user === G.state.player && o.bossStagger !== false) addBossStagger(e, o.stagger || 1);
       }
     }
@@ -351,6 +366,10 @@ G.combat = (() => {
         color: o.color || G.DAMAGE_TYPES[type].color,
         radius: 7, dur: G.MELEE_GUARD_SECONDS,
       });
+      if (o.passiveSlide) {
+        G.world.moveBox(user, user.dir.x * o.passiveSlide, user.dir.y * o.passiveSlide);
+        G.spawnFx({ kind: "puff", x: user.x, y: user.y - 3, color: "#f4f4f4", dur: 0.12 });
+      }
     }
     if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
     return hits;
@@ -361,6 +380,7 @@ G.combat = (() => {
   //  spreadDeg, explodeRadius, explodeDamage, hitGroup, boomerang,
   //  outboundRange, shape, ricochets, bounceRange}
   function shoot(user, o) {
+    if (G.passives) o = G.passives.prepare("projectile", user, o);
     const type = abilityDamageType(o.ability, o.type, "sharp");
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
     attackPose(user, facing + Math.PI, o.recoil === undefined ? 1.5 : o.recoil, 0.08);
@@ -378,6 +398,7 @@ G.combat = (() => {
       status: o.status,
       explodeRadius: o.explodeRadius || 0,
       explodeDamage: o.explodeDamage,
+      passivePull: o.passivePull || 0,
       hitGroup: o.hitGroup,
       hitStop: o.hitStop,
       shake: o.shake,
@@ -411,6 +432,7 @@ G.combat = (() => {
   // Jump to nearby enemies one by one. Low per-target damage keeps this
   // spectacular crowd tool fair when another form borrows it.
   function chain(user, o) {
+    if (G.passives) o = G.passives.prepare("chain", user, o);
     const type = abilityDamageType(o.ability, o.type, "light");
     const range = o.range || 75;
     const jumpRange = o.jumpRange || 48;
@@ -459,6 +481,7 @@ G.combat = (() => {
   // Unlike a 360-degree melee swing it can pull targets inward, and it never
   // grants melee clash protection unless the ability supplies its own guard.
   function areaBurst(user, o) {
+    if (G.passives) o = G.passives.prepare("area", user, o);
     const type = abilityDamageType(o.ability, o.type, "blunt");
     const range = o.range || 34;
     const color = o.color || G.DAMAGE_TYPES[type].color;
@@ -490,6 +513,7 @@ G.combat = (() => {
   // Zoom forward! Brief invincibility, damages anything you pass through.
   // {dist, damage, type, ability, color}
   function dash(user, o) {
+    if (G.passives) o = G.passives.prepare("dash", user, o);
     const type = abilityDamageType(o.ability, o.type, "blunt");
     user.dashing = {
       left: o.dist || 60,
@@ -505,14 +529,17 @@ G.combat = (() => {
       shake: o.shake,
       endBurst: o.endBurst || null,
     };
-    user.invuln = Math.max(user.invuln, 0.3);
+    // The entire travel plus its landing belongs to the dash. This duration
+    // is derived from the move instead of a fixed guess, so long and short
+    // dashes obey the same promise: enemies can be hurt; the dasher cannot.
+    user.invuln = Math.max(user.invuln, user.dashing.left / user.dashing.speed + 0.14);
     G.sfx.attack("dash", type, o.damage || 1);
   }
 
   function finishDash(user, dashData) {
     const burstData = dashData && dashData.endBurst;
-    if (!burstData) return 0;
-    const hits = meleeArc(user, {
+    let hits = 0;
+    if (burstData) hits = meleeArc(user, {
       ability: burstData.ability || dashData.ability,
       range: burstData.range || 28,
       arcDeg: 360,
@@ -526,12 +553,32 @@ G.combat = (() => {
       shake: burstData.shake || 0.14,
       combo: "dash-finish",
     });
-    G.spawnFx({
-      kind: "ring", x: user.x, y: user.y - 5,
-      color: burstData.color || dashData.color,
-      radius: burstData.range || 28, dur: 0.28,
-    });
+    if (burstData) G.spawnFx({
+        kind: "ring", x: user.x, y: user.y - 5,
+        color: burstData.color || dashData.color,
+        radius: burstData.range || 28, dur: 0.28,
+      });
+    if (G.passives) G.passives.onDashFinish(user, dashData);
     return hits;
+  }
+
+  // Crowd-control-only burst used by form passives. It never deals damage,
+  // touches wards, grants mana, or advances quests.
+  function forceEnemies(x, y, range, force, color, stunDur) {
+    let affected = 0;
+    for (const e of G.state.enemies) {
+      if (e.dead) continue;
+      const d = G.util.dist(x, y, e.x, e.y);
+      if (d > range + e.def.size / 2) continue;
+      const a = G.util.angleTo(x, y, e.x, e.y);
+      const strength = force * (e.def.heavy ? 0.3 : 1);
+      e.kbx = Math.cos(a) * strength;
+      e.kby = Math.sin(a) * strength;
+      if (stunDur && !e.def.miniboss) applyStatus(e, "stun", { dur: stunDur, dps: 0 });
+      affected++;
+    }
+    if (affected) G.spawnFx({ kind: "ring", x, y, color: color || "#f4f4f4", radius: range, dur: 0.24 });
+    return affected;
   }
 
   /* ---------- projectiles flying around ---------- */
@@ -652,7 +699,15 @@ G.combat = (() => {
         status: pr.status, breaksAnyWard: pr.breaksAnyWard,
         fromX: pr.x, fromY: pr.y,
         knockback: 120,
-      })) hits++;
+      })) {
+        hits++;
+        if (pr.passivePull) {
+          const d = G.util.dist(e.x, e.y, pr.x, pr.y);
+          const a = G.util.angleTo(e.x, e.y, pr.x, pr.y);
+          const step = Math.min(pr.passivePull * (e.def.heavy ? 0.35 : 1), Math.max(0, d - 8));
+          G.world.moveBox(e, Math.cos(a) * step, Math.sin(a) * step);
+        }
+      }
     }
     pr.hitCount = (pr.hitCount || 0) + hits;
     G.state.shake = Math.max(G.state.shake, 0.22);
@@ -660,8 +715,9 @@ G.combat = (() => {
     G.sfx.play("explosion");
     G.spawnFx({ kind: "ring", x: pr.x, y: pr.y, color: pr.color, radius: pr.explodeRadius, dur: 0.35 });
     burst(pr.x, pr.y, pr.color, 10);
+    if (G.passives) G.passives.onExplosion(pr);
     return hits;
   }
 
-  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, updateProjectiles };
+  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, forceEnemies, updateProjectiles };
 })();

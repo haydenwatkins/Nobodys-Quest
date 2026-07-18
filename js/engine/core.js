@@ -80,6 +80,19 @@ G.events = (() => {
   };
 })();
 
+// Central healing path. Combat, pickups, and future abilities all use this so
+// passives can react to real healing and overflow without each move knowing
+// which form is currently active.
+G.healPlayer = function (amount, source) {
+  const p = G.state.player;
+  const before = p.damageTaken;
+  const healed = Math.min(before, Math.max(0, amount));
+  p.damageTaken = Math.max(0, before - healed);
+  if (G.passives) G.passives.onHeal(p, amount, healed, source);
+  if (healed > 0) G.events.emit("selfHeal", { ability: source, amount: healed });
+  return healed;
+};
+
 /* ---------- MATH HELPERS ---------- */
 G.util = {
   clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; },

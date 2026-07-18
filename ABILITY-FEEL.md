@@ -162,6 +162,22 @@ advance one line at a time after the opening beat instead of skipping the whole
 scene, preserving control while giving jokes, mechanics, and personalities time
 to land. Rematches retain their short one-line greeting.
 
+## Form identity and ability mixing
+
+Forms now own one exclusive passive while all 53 abilities declare a primary
+combat style: melee, projectile, dash, area, or chain. A passive may transform
+matching native or borrowed moves, so the same unlocked ability creates a
+different play rhythm in a different body. The Mix menu uses a star and a short
+preview to expose those combinations before the player equips them.
+
+The roster deliberately avoids passive mana engines and blanket damage bonuses.
+Its identities come from handling and decisions: Frog pulls with melee, Dragon
+sweeps wider, Ranger makes projectiles easier to land, Jester adds ricochets,
+Mole adds delayed tremors, Astronomer pulls area attacks inward, Druid spreads
+living statuses, and defensive forms forgive different kinds of mistakes.
+Every dash derives its invulnerability from its actual travel duration, so a
+long dash cannot outlast a fixed safety timer and become dangerous mid-move.
+
 ## Why the Riftblade works this way
 
 The Riftblade combines patterns that players repeatedly describe as fun without

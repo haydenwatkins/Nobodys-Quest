@@ -329,6 +329,15 @@ G.ui = (() => {
       c.fillRect(x + 2, y + 5, 3, 2);
       if (i < hp) { c.fillStyle = "#f4f4f4"; c.fillRect(x + 1, y + 2, 1, 1); }
     }
+    for (let i = 0; i < (p.passiveBarrier || 0); i++) {
+      const x = 7 + maxH * 9 + i * 7, y = 6;
+      c.fillStyle = "#73eff7";
+      c.fillRect(x + 2, y, 3, 1);
+      c.fillRect(x + 1, y + 1, 5, 4);
+      c.fillRect(x + 2, y + 5, 3, 2);
+      c.fillStyle = "#f4f4f4";
+      c.fillRect(x + 2, y + 2, 1, 1);
+    }
 
     /* mana bar */
     c.fillStyle = "#1a1c2c";
@@ -466,10 +475,12 @@ G.ui = (() => {
     return `<span class="dmg-chip" style="background:${t.color}">${t.name}</span>`;
   }
 
-  function abilityLabel(id) {
+  function abilityLabel(id, form) {
     const ab = G.abilities[id];
     if (!ab) return id;
-    return `${ab.icon} ${ab.name} (${G.DAMAGE_TYPES[ab.type].name}${ab.mana ? ", " + ab.mana + " mana" : ""})`;
+    const style = G.passives ? G.passives.styleLabel(ab.style) : ab.style;
+    const synergy = form && G.passives && G.passives.formMatches(form, ab) ? "★ " : "";
+    return `${synergy}${ab.icon} ${ab.name} · ${style} · ${G.DAMAGE_TYPES[ab.type].name}${ab.mana ? " · " + ab.mana + " mana" : ""}`;
   }
 
   function escapeHtml(text) {
@@ -583,6 +594,7 @@ G.ui = (() => {
         lo[parseInt(sel.dataset.slot, 10)] = sel.value;
         btnCache = "";
         G.saveGame();
+        buildMenu();
       }));
     const foundTown = menuEl.querySelector('[data-act="found-town"]');
     if (foundTown) foundTown.addEventListener("click", () => {
@@ -673,6 +685,7 @@ G.ui = (() => {
         html += `<div class="form-card ${current ? "current" : ""}">
           <h2>${f.icon} ${f.name} <span class="lvl">Lv${G.formLevel(id)}</span></h2>
           <div class="tagline">${f.tagline}</div>
+          <div class="passive-rule"><strong>◆ ${f.passive.name}</strong><span>${f.passive.description}</span></div>
           <div>❤️ ${f.hearts} &nbsp; 👟 ${f.speed} &nbsp; ${dmgChip(G.abilities[f.basic] ? G.abilities[f.basic].type : "blunt")}</div>
           <button data-become="${id}" ${current ? "disabled" : ""}>${current ? "You are this!" : "Become " + f.name}</button>
         </div>`;
@@ -744,21 +757,29 @@ G.ui = (() => {
     const f = G.forms[fid];
     const lo = G.getLoadout(fid);
     const avail = G.availableAbilities();
+    const ranked = avail.slice().sort((a, b) => {
+      const aMatch = G.passives && G.passives.formMatches(f, G.abilities[a]) ? 1 : 0;
+      const bMatch = G.passives && G.passives.formMatches(f, G.abilities[b]) ? 1 : 0;
+      return bMatch - aMatch;
+    });
     const letters = ["A", "B", "C"];
 
     let html = `<div class="form-card current"><h2>${f.icon} ${f.name}'s moves</h2>
-      <div class="tagline">Slot A is ${f.name}'s own attack. B and C can hold ANY ability you've unlocked — from any form!</div>`;
-    html += `<div class="slot-row"><span class="slot-label">A (basic)</span><span class="fixed">${abilityLabel(lo[0])}</span></div>`;
+      <div class="tagline">B and C can hold any unlocked ability. ★ marks moves transformed by this form.</div>
+      <div class="passive-rule"><strong>◆ ${f.passive.name}</strong><span>${f.passive.description}</span></div>`;
+    html += `<div class="slot-row"><span class="slot-label">A (basic)</span><span class="fixed">${abilityLabel(lo[0], f)}</span></div>`;
     for (let s = 1; s <= f.slots; s++) {
+      const selected = G.abilities[lo[s]];
+      const synergy = selected && G.passives ? G.passives.synergyText(f, selected) : "";
       html += `<div class="slot-row"><span class="slot-label">${letters[s]}</span>
         <select data-slot="${s}">
-          ${avail.map((id) => `<option value="${id}" ${lo[s] === id ? "selected" : ""}>${abilityLabel(id)}</option>`).join("")}
-        </select></div>`;
+          ${ranked.map((id) => `<option value="${id}" ${lo[s] === id ? "selected" : ""}>${abilityLabel(id, f)}</option>`).join("")}
+        </select>${synergy ? `<span class="synergy-note">★ ${synergy}</span>` : `<span class="synergy-note quiet">No passive bonus — still useful for its ward type.</span>`}</div>`;
     }
     html += `</div>`;
 
     html += `<div class="form-card"><h2>🧪 Your ability collection</h2>` +
-      avail.map((id) => `<div class="quest-row"><span>${abilityLabel(id)}</span></div>`).join("") +
+      ranked.map((id) => `<div class="quest-row"><span>${abilityLabel(id, f)}</span></div>`).join("") +
       `</div>`;
     return html;
   }

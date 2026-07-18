@@ -15,6 +15,8 @@ registerForm({
   speed: 110,
   hearts: 4,
   slots: 2,
+  passive: { id: "afterimage", name: "Afterimage",
+    description: "Every dash landing leaves a crowd-shoving afterimage." },
 
   basic: "riftCut",
   abilities: [
