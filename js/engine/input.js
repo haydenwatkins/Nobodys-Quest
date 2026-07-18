@@ -19,8 +19,15 @@ G.input = (() => {
   const taps = {};
   const keyVec = { x: 0, y: 0 };
   const joyVec = { x: 0, y: 0 };
+  const gamepadVec = { x: 0, y: 0 };
   const releasedAims = {};
+  const gamepadControls = {};
   let liveAim = null;
+  let controllerAim = null;
+  let controllerAimButton = "a";
+  let gamepadIndex = null;
+  let gamepadName = "";
+  let gamepadNoticeShown = false;
 
   function press(btn) {
     if (!held[btn]) taps[btn] = true;
@@ -61,6 +68,131 @@ G.input = (() => {
     keyVec.x = (dirsHeld.right ? 1 : 0) - (dirsHeld.left ? 1 : 0);
     keyVec.y = (dirsHeld.down ? 1 : 0) - (dirsHeld.up ? 1 : 0);
   }
+
+  /* ---------- gamepad: Xbox layout + Steam Link standard mapping ---------- */
+  const GAMEPAD_DEAD_ZONE = 0.22;
+  const GAMEPAD_NAV_THRESHOLD = 0.62;
+
+  function stickVector(x, y, deadZone) {
+    const len = Math.sqrt(x * x + y * y);
+    if (len <= deadZone) return { x: 0, y: 0 };
+    const magnitude = Math.min(1, (len - deadZone) / (1 - deadZone));
+    return { x: x / len * magnitude, y: y / len * magnitude };
+  }
+
+  function gamepadButton(pad, index, threshold = 0.5) {
+    const button = pad.buttons && pad.buttons[index];
+    return !!button && (button.pressed || button.value > threshold);
+  }
+
+  function prepareControllerAim(btn) {
+    controllerAimButton = btn;
+    releasedAims[btn] = controllerAim
+      ? { x: controllerAim.x, y: controllerAim.y, dragged: true }
+      : { x: 0, y: 0, dragged: false };
+  }
+
+  function syncGamepadControl(id, down, action) {
+    const previous = gamepadControls[id] || { down: false, action: null };
+    if (previous.down && (!down || previous.action !== action) && previous.action) {
+      release(previous.action);
+    }
+    if (down && (!previous.down || previous.action !== action) && action) {
+      if (action === "a" || action === "b" || action === "c") prepareControllerAim(action);
+      press(action);
+    }
+    gamepadControls[id] = { down, action };
+  }
+
+  function resetGamepad() {
+    for (const control of Object.values(gamepadControls)) {
+      if (control.down && control.action) release(control.action);
+    }
+    for (const id in gamepadControls) delete gamepadControls[id];
+    gamepadVec.x = gamepadVec.y = 0;
+    controllerAim = null;
+    gamepadIndex = null;
+    gamepadName = "";
+  }
+
+  function updateGamepad() {
+    if (!navigator.getGamepads) return;
+    let pads;
+    try { pads = navigator.getGamepads() || []; }
+    catch (error) { return; }
+    let pad = gamepadIndex === null ? null : pads[gamepadIndex];
+    if (!pad || !pad.connected) {
+      pad = Array.from(pads).find((candidate) => candidate && candidate.connected) || null;
+    }
+    if (!pad) {
+      if (gamepadIndex !== null) resetGamepad();
+      return;
+    }
+
+    gamepadIndex = pad.index;
+    gamepadName = pad.id || "Gamepad";
+    if (!gamepadNoticeShown && G.ui && G.ui.toast) {
+      gamepadNoticeShown = true;
+      G.ui.toast("Controller ready - left stick moves - right stick aims", 3.2);
+    }
+
+    const menuOpen = !!(G.ui && G.ui.menuOpen);
+    const axes = pad.axes || [];
+    const left = stickVector(axes[0] || 0, axes[1] || 0, GAMEPAD_DEAD_ZONE);
+    const right = stickVector(axes[2] || 0, axes[3] || 0, 0.28);
+    const dpadX = (gamepadButton(pad, 15) ? 1 : 0) - (gamepadButton(pad, 14) ? 1 : 0);
+    const dpadY = (gamepadButton(pad, 13) ? 1 : 0) - (gamepadButton(pad, 12) ? 1 : 0);
+
+    if (menuOpen) {
+      gamepadVec.x = gamepadVec.y = 0;
+    } else {
+      gamepadVec.x = dpadX || left.x;
+      gamepadVec.y = dpadY || left.y;
+      const moveLen = Math.sqrt(gamepadVec.x * gamepadVec.x + gamepadVec.y * gamepadVec.y);
+      if (moveLen > 1) {
+        gamepadVec.x /= moveLen;
+        gamepadVec.y /= moveLen;
+      }
+    }
+    controllerAim = right.x || right.y
+      ? { btn: controllerAimButton, x: right.x, y: right.y, dragged: true }
+      : null;
+
+    // Face buttons follow the labels players see in the HUD. Triggers and
+    // bumpers duplicate combat actions so either grip feels comfortable.
+    syncGamepadControl("a", gamepadButton(pad, 0), menuOpen ? "confirm" : "a");
+    syncGamepadControl("b", gamepadButton(pad, 1), menuOpen ? "back" : "swap");
+    syncGamepadControl("x", gamepadButton(pad, 2), menuOpen ? null : "b");
+    syncGamepadControl("y", gamepadButton(pad, 3), menuOpen ? null : "c");
+    syncGamepadControl("lb", gamepadButton(pad, 4), menuOpen ? "tabPrev" : "c");
+    syncGamepadControl("rb", gamepadButton(pad, 5), menuOpen ? "tabNext" : "b");
+    syncGamepadControl("lt", gamepadButton(pad, 6, 0.35), menuOpen ? null : "c");
+    syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen ? "confirm" : "a");
+    syncGamepadControl("view", gamepadButton(pad, 8), menuOpen ? "back" : "swap");
+    syncGamepadControl("menu", gamepadButton(pad, 9), "pause");
+    syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen ? "confirm" : "a");
+
+    const navUp = gamepadButton(pad, 12) || left.y < -GAMEPAD_NAV_THRESHOLD;
+    const navDown = gamepadButton(pad, 13) || left.y > GAMEPAD_NAV_THRESHOLD;
+    const navLeft = gamepadButton(pad, 14) || left.x < -GAMEPAD_NAV_THRESHOLD;
+    const navRight = gamepadButton(pad, 15) || left.x > GAMEPAD_NAV_THRESHOLD;
+    syncGamepadControl("navUp", menuOpen && navUp, "menuUp");
+    syncGamepadControl("navDown", menuOpen && navDown, "menuDown");
+    syncGamepadControl("navLeft", menuOpen && navLeft, "menuLeft");
+    syncGamepadControl("navRight", menuOpen && navRight, "menuRight");
+  }
+
+  window.addEventListener("gamepadconnected", (event) => {
+    gamepadIndex = event.gamepad.index;
+    gamepadName = event.gamepad.id || "Gamepad";
+  });
+  window.addEventListener("gamepaddisconnected", (event) => {
+    if (event.gamepad.index === gamepadIndex) resetGamepad();
+  });
+  window.addEventListener("blur", resetGamepad);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) resetGamepad();
+  });
 
   /* ---------- touch: virtual joystick on the left half ---------- */
   const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
@@ -220,8 +352,8 @@ G.input = (() => {
   /* ---------- public API ---------- */
   return {
     get vec() {
-      let x = keyVec.x + joyVec.x;
-      let y = keyVec.y + joyVec.y;
+      let x = keyVec.x + joyVec.x + gamepadVec.x;
+      let y = keyVec.y + joyVec.y + gamepadVec.y;
       const len = Math.sqrt(x * x + y * y);
       if (len > 1) { x /= len; y /= len; }
       return { x, y };
@@ -236,11 +368,14 @@ G.input = (() => {
       delete releasedAims[btn];
       return aim;
     },
-    get aiming() { return liveAim; },
+    get aiming() { return liveAim || controllerAim; },
     clearTaps() {
       for (const k in taps) taps[k] = false;
       for (const k in releasedAims) delete releasedAims[k];
     },
+    update: updateGamepad,
+    get hasGamepad() { return gamepadIndex !== null; },
+    get gamepadName() { return gamepadName; },
     isTouch,
   };
 })();

@@ -17,6 +17,7 @@ G.ui = (() => {
   let bannerData = null;       // {title, sub, t}
   let menuOpen = false;
   let btnCache = "";
+  let controllerFocusedElement = null;
 
   /* ---------- the full-resolution overlay canvas ---------- */
   const uiCanvas = document.getElementById("ui");
@@ -104,7 +105,7 @@ G.ui = (() => {
   function drawAbilityBar(c, p) {
     if (G.input.isTouch) return;
     const lo = G.getLoadout(G.state.formId);
-    const labels = ["A", "B", "C"];
+    const labels = G.input.hasGamepad ? ["A", "X", "Y"] : ["A", "B", "C"];
     c.font = `6px ${FONT_HEAD}`;
     for (let i = 0; i < 3; i++) {
       const ab = G.abilities[lo[i]];
@@ -495,16 +496,118 @@ G.ui = (() => {
 
   let activeTab = "forms";
 
+  function controllerMenuElements() {
+    return Array.from(menuEl.querySelectorAll(
+      "button:not(:disabled), select:not(:disabled), input:not(:disabled)"
+    )).filter((element) => {
+      const rect = element.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    });
+  }
+
+  function focusControllerElement(element) {
+    if (!element) return;
+    if (controllerFocusedElement) controllerFocusedElement.classList.remove("controller-focus");
+    controllerFocusedElement = element;
+    element.classList.add("controller-focus");
+    try { element.focus({ preventScroll: true }); } catch (error) { element.focus(); }
+    if (element.scrollIntoView) element.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+
+  function focusControllerDefault() {
+    const active = menuEl.querySelector("[data-tab].active");
+    focusControllerElement(active || controllerMenuElements()[0]);
+  }
+
+  function moveControllerFocus(dx, dy) {
+    const elements = controllerMenuElements();
+    if (!elements.length) return;
+    if (!controllerFocusedElement || !elements.includes(controllerFocusedElement)) {
+      focusControllerElement(elements[0]);
+      return;
+    }
+    const from = controllerFocusedElement.getBoundingClientRect();
+    const fx = from.left + from.width / 2;
+    const fy = from.top + from.height / 2;
+    let best = null;
+    let bestScore = Infinity;
+    for (const element of elements) {
+      if (element === controllerFocusedElement) continue;
+      const rect = element.getBoundingClientRect();
+      const ex = rect.left + rect.width / 2;
+      const ey = rect.top + rect.height / 2;
+      const along = dx ? (ex - fx) * dx : (ey - fy) * dy;
+      if (along <= 2) continue;
+      const across = dx ? Math.abs(ey - fy) : Math.abs(ex - fx);
+      const score = along * 3 + across + Math.max(0, across - along * 1.5) * 4;
+      if (score < bestScore) { best = element; bestScore = score; }
+    }
+    if (!best) {
+      // Wrap at the edge, favoring the same row or column.
+      best = elements.reduce((choice, element) => {
+        if (element === controllerFocusedElement) return choice;
+        const rect = element.getBoundingClientRect();
+        const ex = rect.left + rect.width / 2;
+        const ey = rect.top + rect.height / 2;
+        const edge = dx ? ex * dx : ey * dy;
+        const across = dx ? Math.abs(ey - fy) : Math.abs(ex - fx);
+        const score = edge + across * 2;
+        return !choice || score < choice.score ? { element, score } : choice;
+      }, null)?.element;
+    }
+    focusControllerElement(best);
+  }
+
+  function adjustControllerField(direction) {
+    const element = controllerFocusedElement;
+    if (!element || element.tagName !== "SELECT") return false;
+    const count = element.options.length;
+    if (!count) return true;
+    element.selectedIndex = (element.selectedIndex + direction + count) % count;
+    element.dispatchEvent(new Event("change", { bubbles: true }));
+    return true;
+  }
+
+  function cycleControllerTab(direction) {
+    const tabs = Array.from(menuEl.querySelectorAll("[data-tab]"));
+    if (!tabs.length) return;
+    let index = tabs.findIndex((tab) => tab.classList.contains("active"));
+    index = (index + direction + tabs.length) % tabs.length;
+    tabs[index].click();
+    focusControllerDefault();
+  }
+
+  function updateControllerMenu() {
+    if (!menuOpen || !G.input.hasGamepad) return;
+    if (G.input.tapped("back")) {
+      closeMenu();
+      return;
+    }
+    if (G.input.tapped("tabPrev")) cycleControllerTab(-1);
+    if (G.input.tapped("tabNext")) cycleControllerTab(1);
+    if (G.input.tapped("menuUp")) moveControllerFocus(0, -1);
+    if (G.input.tapped("menuDown")) moveControllerFocus(0, 1);
+    if (G.input.tapped("menuLeft") && !adjustControllerField(-1)) moveControllerFocus(-1, 0);
+    if (G.input.tapped("menuRight") && !adjustControllerField(1)) moveControllerFocus(1, 0);
+    if (G.input.tapped("confirm")) {
+      if (!controllerFocusedElement) focusControllerDefault();
+      else if (!adjustControllerField(1)) controllerFocusedElement.click();
+    }
+  }
+
   function openMenu() {
     menuOpen = true;
     buildMenu();
     menuEl.classList.remove("hidden");
     menuEl.scrollTop = 0;
+    if (G.input.hasGamepad) focusControllerDefault();
     G.events.emit("menuOpen", {});
   }
   function closeMenu() {
     menuOpen = false;
     menuEl.classList.add("hidden");
+    if (controllerFocusedElement) controllerFocusedElement.classList.remove("controller-focus");
+    controllerFocusedElement = null;
     G.input.clearTaps();
   }
   function toggleMenu() { menuOpen ? closeMenu() : openMenu(); }
@@ -537,6 +640,8 @@ G.ui = (() => {
   }
 
   function buildMenu() {
+    const previousControllerElements = controllerMenuElements();
+    const previousControllerIndex = previousControllerElements.indexOf(controllerFocusedElement);
     const tabs = [
       ["forms", "Forms"],
       ["style", "Style"],
@@ -644,6 +749,14 @@ G.ui = (() => {
     if (reset) reset.addEventListener("click", () => {
       if (confirm("Really erase the save and start over?")) G.resetSave();
     });
+    if (menuOpen && G.input.hasGamepad && !menuEl.classList.contains("hidden")) {
+      const rebuiltElements = controllerMenuElements();
+      if (previousControllerIndex >= 0 && rebuiltElements.length) {
+        focusControllerElement(rebuiltElements[Math.min(previousControllerIndex, rebuiltElements.length - 1)]);
+      } else {
+        focusControllerDefault();
+      }
+    }
   }
 
   function buildCostumesTab() {
@@ -936,7 +1049,7 @@ G.ui = (() => {
 
   return {
     toast, banner, update, drawHUD, resizeOverlay,
-    openMenu, closeMenu, toggleMenu, showWorkshop,
+    openMenu, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
     get menuOpen() { return menuOpen; },
   };
 })();
