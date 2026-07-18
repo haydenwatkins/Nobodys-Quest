@@ -25,7 +25,7 @@ G.sfx = { play() {} };
 G.ui = { toast() {}, banner(title, text) { banners.push({ title, text }); } };
 G.saveGame = () => { saved++; };
 G.state = {
-  costumeId: "classic", costumesUnlocked: ["classic"], items: [], shake: 0, time: 0,
+  costumeId: "classic", costumesUnlocked: ["classic"], items: [], opened: [], shake: 0, time: 0,
 };
 run("js/engine/costumes.js");
 
@@ -56,8 +56,12 @@ G.events.emit("pickup", { item: "whispering-seed" });
 assert.ok(G.costumeUnlocked("moonberry"));
 for (const id of ["sunkenMarsh", "emberRidge", "starfallRuins", "shattercoast"]) discovered.add(id);
 G.events.emit("mapEnter", { map: "shattercoast" });
-for (const id of ["mirecloak", "emberguard", "starstrider", "tidewalker"])
+for (const id of ["mirecloak", "emberguard", "tidewalker"])
   assert.ok(G.costumeUnlocked(id), `${id} should grow naturally from exploration`);
+assert.equal(G.costumeUnlocked("starstrider"), false, "entering the hard zone should not award its vault prize");
+G.state.items.push("starfall-thread");
+G.events.emit("pickup", { item: "starfall-thread" });
+assert.ok(G.costumeUnlocked("starstrider"), "the Fallen Star Thread should unlock Starstrider");
 trophies = 3;
 G.events.emit("pickup", { item: "third-trophy" });
 assert.ok(G.costumeUnlocked("guardian"));
@@ -78,6 +82,13 @@ const normalized = G.normalizeCostumes(["classic", "fake", "trailblazer", "trail
 assert.deepEqual(Array.from(normalized.unlocked), ["classic", "trailblazer"]);
 assert.equal(normalized.selected, "classic");
 assert.ok(saved > 0, "wardrobe progress should be saved as it grows");
+
+G.state = {
+  costumeId: "classic", costumesUnlocked: ["classic"], items: [],
+  opened: ["starfallRuins:6,4"], shake: 0, time: 0,
+};
+G.checkCostumeUnlocks(true);
+assert.ok(G.costumeUnlocked("starstrider"), "legacy saves that opened the old cookie chest keep its new reward");
 
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.ok(index.indexOf("js/engine/costumes.js") < index.indexOf("js/engine/main.js"));

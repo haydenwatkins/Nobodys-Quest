@@ -35,6 +35,38 @@ for (const region of G.WAYFINDER_REGIONS) {
 }
 assert.equal(G.wayfinderLandmarkIds().length, 10, "all nine guardian trials and the coliseum are landmarks");
 
+// Starfall's western vault and lore room used to be sealed on all four sides.
+// Verify the permanent reward and both signs are reachable without a wall-skip.
+{
+  const map = G.maps.starfallRuins;
+  const solid = (x, y) => {
+    const char = map.tiles[y] && map.tiles[y][x];
+    const cell = (map.legend && map.legend[char]) || ({ "#": { tile: "wall" }, R: { tile: "rock" } })[char];
+    return !char || !!(cell && ["wall", "rock", "tree", "water"].includes(cell.tile));
+  };
+  const found = new Set();
+  const queue = [[map.playerStart.x, map.playerStart.y]];
+  while (queue.length) {
+    const [x, y] = queue.shift();
+    const key = `${x},${y}`;
+    if (found.has(key) || solid(x, y)) continue;
+    found.add(key);
+    queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+  }
+  const locate = (char) => {
+    for (let y = 0; y < map.tiles.length; y++) {
+      const x = map.tiles[y].indexOf(char);
+      if (x >= 0) return `${x},${y}`;
+    }
+    return null;
+  };
+  for (const char of ["H", "m", "s"])
+    assert.ok(found.has(locate(char)), `Starfall '${char}' must be reachable by ordinary movement`);
+  assert.equal(map.legend.H.chest.item, "starfall-thread");
+  assert.equal(map.legend.H.chest.heal, true, "the difficult vault should also restore the player");
+  assert.ok(map.tiles.every((row) => row.length === 30), "Starfall rows should keep a consistent width");
+}
+
 const migrated = G.normalizeWayfinder(null, {
   mapId: "emberRidge",
   opened: ["starfallRuins:6,4", "not-a-map:1,1"],
