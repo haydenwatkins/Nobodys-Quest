@@ -82,8 +82,11 @@ G.input = (() => {
 
     zone.addEventListener("pointerdown", (e) => {
       if (joyId !== null) return;
+      e.preventDefault();
       joyId = e.pointerId;
-      zone.setPointerCapture(e.pointerId);
+      // Safari can refuse capture while another finger is using an ability.
+      // Window-level release listeners below still make that case safe.
+      try { zone.setPointerCapture(e.pointerId); } catch (error) { /* fall back to window events */ }
       ox = e.clientX; oy = e.clientY;
       base.style.display = knob.style.display = "block";
       base.style.left = ox - 45 + "px"; base.style.top = oy - 45 + "px";
@@ -94,14 +97,45 @@ G.input = (() => {
       if (e.pointerId !== joyId) return;
       moveKnob(e.clientX, e.clientY);
     });
-    const endJoy = (e) => {
-      if (e.pointerId !== joyId) return;
+    const resetJoy = () => {
+      const capturedId = joyId;
       joyId = null;
       joyVec.x = joyVec.y = 0;
       base.style.display = knob.style.display = "none";
+      // Releasing explicitly prevents a stale capture from surviving an
+      // orientation/fullscreen transition. Null the id first because release
+      // itself may synchronously dispatch lostpointercapture.
+      try {
+        if (capturedId !== null && zone.hasPointerCapture && zone.hasPointerCapture(capturedId))
+          zone.releasePointerCapture(capturedId);
+      } catch (error) { /* capture was already lost */ }
+    };
+    const endJoy = (e) => {
+      if (joyId === null || e.pointerId !== joyId) return;
+      resetJoy();
     };
     zone.addEventListener("pointerup", endJoy);
     zone.addEventListener("pointercancel", endJoy);
+    zone.addEventListener("lostpointercapture", endJoy);
+    // iPad Safari occasionally routes the final event to window after a
+    // multi-touch boss interaction, even though the zone requested capture.
+    window.addEventListener("pointerup", endJoy);
+    window.addEventListener("pointercancel", endJoy);
+    // System gestures, app switching, rotation, and fullscreen changes may
+    // end a touch without any final pointer event. Stopping is always safer
+    // than preserving an old direction after the player has lifted a finger.
+    window.addEventListener("blur", resetJoy);
+    window.addEventListener("pagehide", resetJoy);
+    window.addEventListener("orientationchange", resetJoy);
+    document.addEventListener("fullscreenchange", resetJoy);
+    document.addEventListener("webkitfullscreenchange", resetJoy);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) resetJoy();
+    });
+    window.addEventListener("touchend", (e) => {
+      if (!e.touches || e.touches.length === 0) resetJoy();
+    }, { passive: true });
+    window.addEventListener("touchcancel", resetJoy, { passive: true });
 
     function moveKnob(cx, cy) {
       let dx = cx - ox, dy = cy - oy;
