@@ -58,6 +58,7 @@ const WAYFINDER_LEGACY_ITEMS = {
   "trophy-heartwood-crown": "mistwood",
   "trophy-mire-pearl": "sunkenMarsh",
   "trophy-eclipse-sigil": "emberRidge",
+  "starfall-thread": "starfallRuins",
   "tide-shell": "shattercoast",
   "paper-crane": "shattercoast",
   "orrery-key": "shattercoast",

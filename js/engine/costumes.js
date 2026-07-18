@@ -60,13 +60,18 @@ G.COSTUMES = [
   },
   {
     id: "starstrider", icon: "☄️", name: "Starstrider", tagline: "Midnight blue crossed by orbiting starlight.",
-    hint: "Discover Starfall Ruins.", accessory: "stars", accent: "#73eff7",
+    hint: "Find the Fallen Star Thread in Starfall Ruins.", accessory: "stars", accent: "#73eff7",
     palette: {
       "#f4f4f4": "#f4f4f4", "#94b0c2": "#73eff7", "#566c86": "#3b5dc9",
       "#38b764": "#41a6f6", "#41a6f6": "#73eff7", "#ef7d57": "#8153c1", "#ffcd75": "#fff3c2",
     },
     swatches: ["#f4f4f4", "#73eff7", "#3b5dc9"],
-    condition: () => G.wayfinderDiscovered && G.wayfinderDiscovered("starfallRuins"),
+    condition: () => !!(G.state && (
+      (G.state.items || []).includes("starfall-thread") ||
+      // Before the Thread existed this vault held only a healing cookie.
+      // Honor that already-opened chest so an older save is never stranded.
+      (G.state.opened || []).includes("starfallRuins:6,4")
+    )),
   },
   {
     id: "tidewalker", icon: "🌊", name: "Tidewalker", tagline: "Sea-glass colors and a trail of bright foam.",
