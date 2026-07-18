@@ -197,11 +197,16 @@
     const dt = Math.min(0.05, (ts - last) / 1000 || 0.016);
     last = ts;
 
+    // The Gamepad API is polling-based. Read it once at the start of every
+    // frame so Steam Link input reaches gameplay and menus without latency.
+    G.input.update();
+
     if (G.input.tapped("pause")) G.ui.toggleMenu();
 
     if (!G.ui.menuOpen) {
       update(dt);
     } else {
+      G.ui.updateControllerMenu();
       G.input.clearTaps(); // don't queue up attacks while in the menu
     }
 

@@ -162,6 +162,12 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
 }
 .menu-tabs button.active { border-color: #ffcd75; background: #566c86; color: #f4f4f4; }
 
+#menu .controller-focus {
+  outline: 3px solid #73eff7;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(115, 239, 247, 0.24);
+}
+
 .menu-body { max-width: 640px; margin: 0 auto; }
 
 .form-card {

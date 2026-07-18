@@ -12,26 +12,31 @@ G.tutorial = (() => {
     {
       title: "1/5  MOVE",
       desktop: "Use WASD or the arrow keys",
+      controller: "Move with the left stick or D-pad",
       touch: "Drag anywhere on the left side",
     },
     {
       title: "2/5  ATTACK",
       desktop: "Press J, Z, or Space to use A",
+      controller: "A or RT attacks - right stick aims",
       touch: "Tap to auto-aim · drag to aim",
     },
     {
       title: "3/5  OPEN THE MENU",
       desktop: "Press Esc or Enter",
+      controller: "Press the Menu button",
       touch: "Tap the menu button",
     },
     {
       title: "4/5  PIN A QUEST",
       desktop: "Open Quests and choose PIN",
+      controller: "Use the D-pad and A in the Quests menu",
       touch: "Open Quests and tap PIN",
     },
     {
       title: "5/5  BREAK A WARD",
       desktop: "Find Bones and use BLUNT damage",
+      controller: "Find Bones and use BLUNT damage",
       touch: "Find Bones and use BLUNT damage",
     },
   ];
@@ -74,7 +79,7 @@ G.tutorial = (() => {
     const current = steps[step];
     return {
       title: current.title,
-      text: G.input.isTouch ? current.touch : current.desktop,
+      text: G.input.hasGamepad ? current.controller : G.input.isTouch ? current.touch : current.desktop,
     };
   }
 
