@@ -179,6 +179,15 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
 .form-card h2 { font-size: 14px; margin-bottom: 6px; }
 .form-card .tagline { font-size: 19px; color: #94b0c2; font-style: italic; margin-bottom: 6px; }
 .form-card .lvl { color: #ffcd75; }
+.passive-rule {
+  display: flex; flex-direction: column; gap: 2px;
+  margin: 7px 0; padding: 7px 9px;
+  border-left: 3px solid #73eff7;
+  background: rgba(65, 166, 246, 0.09);
+  font-size: 17px; line-height: 1.25;
+}
+.passive-rule strong { color: #73eff7; font-size: 15px; }
+.passive-rule span { color: #f4f4f4; }
 .form-card button {
   font-family: "Press Start 2P", "Courier New", monospace;
   font-size: 11px;
@@ -226,6 +235,8 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
   max-width: 260px;
 }
 .slot-row .fixed { color: #f4f4f4; }
+.synergy-note { flex-basis: 100%; margin-left: 92px; color: #a7f070; font-size: 16px; }
+.synergy-note.quiet { color: #94b0c2; }
 .dmg-chip { font-size: 15px; padding: 1px 8px; border-radius: 6px; color: #1a1c2c; }
 
 .menu-footer {
@@ -329,6 +340,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-pause {
   .slot-row { align-items: stretch; flex-direction: column; }
   .slot-row .slot-label { width: auto; }
   .slot-row select { width: 100%; max-width: none; min-height: 44px; }
+  .synergy-note { margin-left: 0; }
 
   .menu-footer {
     bottom: calc(-16px - env(safe-area-inset-bottom));

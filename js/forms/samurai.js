@@ -5,6 +5,8 @@ registerForm({
   id: "samurai", name: "Samurai", icon: "⚔️",
   tagline: "Finds the quiet beat inside a crowded fight, then cuts the moon out of it.",
   speed: 104, hearts: 4, slots: 2,
+  passive: { id: "flowingDraw", name: "Flowing Draw",
+    description: "Moving melee hits slide you through the cut with extra reach." },
   basic: "quickdraw",
   abilities: [{ id: "flashStep", level: 1 }, { id: "crescentDraw", level: 2 }],
   unlock: { type: "challenge", hint: "Finish the Paper Ronin's unfinished duel", requirements: [

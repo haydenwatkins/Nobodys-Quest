@@ -11,6 +11,13 @@ The current campaign includes 18 mixable forms, the late-game Shattercoast
 region, personality-driven three-phase guardian trials, and a configurable
 boss gauntlet with optional between-round recovery.
 
+Every form carries an exclusive passive identity in addition to its basic
+attack and stats. All 53 abilities declare a combat style, and form passives
+remix matching borrowed abilities through reach, movement, defense, ricochet,
+pulls, aftershocks, status spreading, and other utility rather than blanket
+damage or mana bonuses. The Mix menu marks these combinations with a star.
+Dash abilities are invulnerable for their complete travel and landing.
+
 The endgame continues beyond form collection. Finding every guardian earns the
 Guardian Compass and opens a repeatable Hero Board with rotating patrol,
 exploration, ward, ability-mixing, form-mixing, and rematch contracts. Contracts

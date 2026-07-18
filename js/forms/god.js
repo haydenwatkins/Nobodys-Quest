@@ -13,6 +13,8 @@ registerForm({
   speed: 100,
   hearts: 6,
   slots: 2,
+  passive: { id: "providence", name: "Providence",
+    description: "Once each boss phase, a lethal hit leaves you at one heart and moves you to safety." },
   breaksAnyWard: true,
   aura: {
     ring: "#b13e53",

@@ -24,6 +24,9 @@ G.makePlayer = function () {
     attackPose: null,
     swapCd: 0,
     dashing: null,
+    passiveBarrier: 0,
+    passiveBarrierT: 0,
+    passiveHaste: 0,
     lastSafe: null,
   };
 };
@@ -65,12 +68,17 @@ let touchAimHelpShown = false;
 G.damagePlayer = function (dmg, fromX, fromY) {
   const p = G.state.player;
   if (p.invuln > 0 || p.meleeGuard > 0 || p.dashing) return;
+  const passiveResult = G.passives
+    ? G.passives.beforePlayerDamage(dmg, fromX, fromY)
+    : { damage: dmg, knockback: true, prevented: false };
+  if (passiveResult.prevented) return;
+  dmg = passiveResult.damage;
   p.damageTaken += dmg;
   p.invuln = 1.0;
   G.sfx.play("hurt");
   G.state.shake = 0.25;
   // knock the player back a bit
-  if (fromX !== undefined) {
+  if (fromX !== undefined && passiveResult.knockback) {
     const a = G.util.angleTo(fromX, fromY, p.x, p.y);
     G.world.moveBox(p, Math.cos(a) * 10, Math.sin(a) * 10);
   }
@@ -148,6 +156,7 @@ G.updatePlayer = function (dt) {
   p.invuln = Math.max(0, p.invuln - dt);
   p.meleeGuard = Math.max(0, (p.meleeGuard || 0) - dt);
   p.swapCd = Math.max(0, p.swapCd - dt);
+  if (G.passives) G.passives.update(dt);
   if (p.attackPose) {
     p.attackPose.t -= dt;
     if (p.attackPose.t <= 0) p.attackPose = null;
@@ -202,7 +211,7 @@ G.updatePlayer = function (dt) {
     p.moving = v.x !== 0 || v.y !== 0;
     if (p.moving) {
       p.dir = { x: v.x, y: v.y };
-      const spd = form.speed;
+      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1);
       G.world.moveBox(p, v.x * spd * dt, v.y * spd * dt);
       p.anim += dt * (spd / 14);
     }
@@ -258,6 +267,7 @@ G.updatePlayer = function (dt) {
     }
     p.cooldowns[abilityId] = ab.cooldown;
     ab.use(p);
+    if (G.passives) G.passives.onAbilityUse(p, abilityId);
     G.events.emit("abilityUse", { ability: abilityId, form: G.state.formId });
   }
 
@@ -717,7 +727,7 @@ G.updatePickups = function (dt) {
     }
     if (d < 8) {
       if (pk.kind === "heart") {
-        p.damageTaken = Math.max(0, p.damageTaken - 1);
+        G.healPlayer(1, "heart-pickup");
         G.sfx.play("pickup");
       } else {
         p.mana = Math.min(p.manaMax, p.mana + 3);

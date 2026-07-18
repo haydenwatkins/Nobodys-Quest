@@ -14,6 +14,8 @@ registerForm({
   speed: 80,
   hearts: 3,
   slots: 2,
+  passive: { id: "improviser", name: "Improviser",
+    description: "Borrowed abilities gain extra reach, speed, or control based on their style." },
 
   basic: "slap",
   abilities: [

@@ -14,6 +14,8 @@ registerForm({
   speed: 85,
   hearts: 3,
   slots: 2,
+  passive: { id: "clearShot", name: "Clear Shot",
+    description: "Projectile abilities fly faster, farther, and with a larger hitbox." },
 
   basic: "arrow",
   abilities: [

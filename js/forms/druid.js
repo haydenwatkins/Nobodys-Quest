@@ -5,6 +5,8 @@ registerForm({
   id: "druid", name: "Druid", icon: "🌳",
   tagline: "Plants first, asks questions later, and considers every arena excellent soil.",
   speed: 82, hearts: 5, slots: 2,
+  passive: { id: "seedbed", name: "Seedbed",
+    description: "Status effects leap to a nearby enemy when their victim falls." },
   basic: "thornLash",
   abilities: [{ id: "seedBurst", level: 1 }, { id: "wildGrowth", level: 2 }],
   unlock: { type: "challenge", hint: "Prune Grandmother Briar's impossible garden", requirements: [

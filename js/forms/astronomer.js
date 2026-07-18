@@ -5,6 +5,8 @@ registerForm({
   id: "astronomer", name: "Astronomer", icon: "🔭",
   tagline: "Charts six impossible stars and politely asks gravity to tidy the battlefield.",
   speed: 86, hearts: 3, slots: 2,
+  passive: { id: "gravityTouch", name: "Gravity Touch",
+    description: "Area bursts and explosions draw enemies toward their center." },
   basic: "starNeedle",
   abilities: [{ id: "constellation", level: 1 }, { id: "gravityWell", level: 2 }],
   unlock: { type: "challenge", hint: "Correct Professor Perihelion's orbit", requirements: [

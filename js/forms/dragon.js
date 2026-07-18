@@ -13,6 +13,8 @@ registerForm({
   speed: 65,
   hearts: 6,
   slots: 2,
+  passive: { id: "unstoppable", name: "Unstoppable",
+    description: "Melee abilities sweep wider, reach farther, and throw enemies harder." },
 
   basic: "tailSweep",
   abilities: [

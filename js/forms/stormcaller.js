@@ -13,6 +13,8 @@ registerForm({
   speed: 85,
   hearts: 3,
   slots: 2,
+  passive: { id: "conductor", name: "Conductor",
+    description: "Successful hits arc a harmless shock that shoves a nearby enemy." },
 
   basic: "stormSpark",
   abilities: [
