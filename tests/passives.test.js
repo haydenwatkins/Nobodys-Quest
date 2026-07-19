@@ -73,6 +73,17 @@ assert.ok(mixed.speed > 100 && mixed.size > 3, "Nobody should adapt a borrowed p
 const native = G.passives.prepare("melee", p, { ability: "slap", range: 20, damage: 1 });
 assert.equal(native.range, 20, "Improviser must only transform borrowed abilities");
 
+// Nobody adds half a pixel to borrowed shots. Shadow Bolt used to derive a
+// fractional trail length from that size and freeze the main loop on iOS when
+// JavaScript rejected it as an Array.length.
+G.abilities.shadowBolt.use(p);
+const improvisedShadowBolt = G.state.projectiles[0];
+assert.ok(Number.isInteger(improvisedShadowBolt.trailLength),
+  "improvised Shadow Bolt needs an integer trail length");
+assert.doesNotThrow(() => {
+  for (let i = 0; i < 12; i++) G.combat.updateProjectiles(0.016);
+}, "Nobody firing Shadow Bolt must not freeze the update loop");
+
 p = useForm("ranger");
 mixed = G.passives.prepare("projectile", p, { ability: "arrow", speed: 100, range: 100, size: 3, damage: 1 });
 assert.deepEqual([mixed.speed, mixed.range, mixed.size, mixed.damage], [122, 108, 4, 1]);
@@ -194,3 +205,4 @@ assert.equal(G.playerHp(), 1, "Providence should prevent one lethal hit per boss
 assert.match(p.providenceKey, /:2$/);
 
 console.log("passive identity tests passed");
+
