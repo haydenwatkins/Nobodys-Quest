@@ -106,4 +106,86 @@ assert.equal(G.abilities.worldBreak.damage, undefined, "ability metadata must no
 assert.equal(G.forms.colossus.hearts, 8);
 assert.equal(G.forms.colossus.speed, 48);
 
+// Worldbearers own arena-control moves instead of merely borrowing the same
+// projectile rotation as older bosses. The tighter pursuit only starts at
+// genuine kiting distance, while every floor attack remains one damage.
+const arenaPatterns = {
+  skySovereign: ["gustLanes", "windWall"],
+  oldMason: ["faultGrid", "collapseRing"],
+  silkMatriarch: ["silkTether", "webGrid"],
+  bellTitan: ["stormGrid", "echoCross"],
+  lanternKeeper: ["safeCircle", "stormGrid"],
+  lastWorldbearer: ["worldGrid", "collapseRing", "gustLanes"],
+};
+for (const [id, patterns] of Object.entries(arenaPatterns)) {
+  const boss = G.enemies[id].boss;
+  for (const pattern of patterns)
+    assert.ok(boss.patterns.includes(pattern), `${id} needs its ${pattern} arena pattern`);
+  assert.ok(boss.antiKiteRange <= 112 && boss.chaseScale >= 1.28,
+    `${id} should close only excessive ranged distance decisively`);
+}
+
+// Aurelia announces a stable safe wind lane, warns before it moves the player,
+// and never deals hidden gust damage.
+G.world.load("griffinWorldback");
+let arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
+arenaBoss.bossEngaged = true;
+arenaBoss.bossIntroT = 0;
+arenaBoss.bossSpecialT = 0;
+G.state.bossCutscene = null;
+G.updateEnemies(0.016);
+assert.equal(arenaBoss.bossPendingAction, "gustLanes");
+G.updateEnemies(arenaBoss.def.boss.telegraph + 0.02);
+assert.equal(G.state.bossHazards.length, 1);
+assert.equal(G.state.bossHazards[0].kind, "gust");
+const beforeGust = { x: G.state.player.x, damage: G.state.player.damageTaken };
+G.updateBossHazards(0.4);
+assert.equal(G.state.player.x, beforeGust.x, "gust lane must not move during its warning");
+G.updateBossHazards(0.5);
+assert.ok(G.state.player.x > beforeGust.x, "an unsafe gust lane should push a distant player inward");
+assert.equal(G.state.player.damageTaken, beforeGust.damage, "wind pressure should reposition, not damage");
+const hazardDrawCalls = { lines: 0, evenodd: 0 };
+const hazardCtx = {
+  save() {}, restore() {}, beginPath() {}, rect() {}, clip() {}, fillRect() {}, strokeRect() {},
+  moveTo() {}, lineTo() { hazardDrawCalls.lines++; }, stroke() {}, arc() {}, setLineDash() {},
+  fill(rule) { if (rule === "evenodd") hazardDrawCalls.evenodd++; },
+};
+G.drawBossHazards(hazardCtx);
+assert.ok(hazardDrawCalls.lines >= 3, "gust warnings should draw directional arrows toward the boss");
+
+// Bongle's grid alternates full readable floor bands. It can hurt once after
+// the warning, but dash invulnerability remains a universal game rule.
+G.world.load("bellWorldback");
+arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "bellTitan");
+arenaBoss.bossEngaged = true;
+arenaBoss.bossIntroT = 0;
+arenaBoss.bossSpecialT = 0;
+G.state.bossCutscene = null;
+G.updateEnemies(0.016);
+assert.equal(arenaBoss.bossPendingAction, "stormGrid");
+G.updateEnemies(arenaBoss.def.boss.telegraph + 0.02);
+const stormCell = G.state.bossHazards.find((hazard) => hazard.kind === "grid" && !hazard.delay);
+assert.ok(stormCell && stormCell.warning >= 0.85, "electric floor needs a long readable warning");
+G.state.player.x = G.TILE * 1.5 + stormCell.cell + 5; // odd vertical band
+G.state.player.y = 11 * G.TILE + G.TILE / 2;
+G.state.player.damageTaken = 0;
+G.state.player.invuln = 0;
+G.state.player.dashing = { left: 20, speed: 200 };
+G.updateBossHazards(stormCell.warning + 0.01);
+assert.equal(G.state.player.damageTaken, 0, "dash abilities must ignore electric floor damage");
+stormCell.hit = false;
+G.state.player.dashing = null;
+G.state.player.invuln = 0;
+G.updateBossHazards(0.01);
+assert.equal(G.state.player.damageTaken, 1, "an active unsafe grid cell deals one learnable hit");
+G.state.bossHazards.push({
+  kind: "ring", owner: arenaBoss, mapId: G.state.mapId, t: 1,
+  delay: 0, warning: 0.5, active: 1, color: "#ffcd75",
+  x: arenaBoss.x, y: arenaBoss.y, radius: 72,
+});
+G.drawBossHazards(hazardCtx);
+assert.equal(hazardDrawCalls.evenodd, 1, "closing safe zones must shade the exact dangerous area");
+G.cancelBossHazards(arenaBoss);
+assert.equal(G.state.bossHazards.length, 0, "melee stagger can clear a boss's active arena control");
+
 console.log("worldwake tests passed");

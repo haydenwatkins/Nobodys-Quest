@@ -107,6 +107,7 @@ G.world = (() => {
     s.passiveEchoes = [];
     s.passiveShelters = [];
     s.safeLights = [];
+    s.bossHazards = [];
     s.bossCutscene = null;
     // A quick world-only fade makes doors feel intentional without delaying
     // control or covering the HTML HUD. Reduced-motion players skip it.

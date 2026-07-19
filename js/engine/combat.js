@@ -303,6 +303,7 @@ G.combat = (() => {
     enemy.bossPendingAction = null;
     enemy.bossAfterCharge = null;
     enemy.bossRecoverT = Math.max(enemy.bossRecoverT || 0, 0.2);
+    if (G.cancelBossHazards) G.cancelBossHazards(enemy);
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.075);
     G.state.shake = Math.max(G.state.shake || 0, 0.24);
     G.sfx.play("stagger");

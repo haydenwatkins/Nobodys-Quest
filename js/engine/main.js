@@ -334,6 +334,7 @@
 
     G.world.draw(ctx, { x: camX, y: camY }, s.time);
     if (G.passives && G.passives.drawFields) G.passives.drawFields(ctx);
+    if (G.drawBossHazards) G.drawBossHazards(ctx);
     G.drawPickups(ctx);
 
     // draw everyone in y-order so closer things overlap farther things
