@@ -149,4 +149,3 @@ try {
     # more reliable than foreground detection when Chrome remains open.
     Start-Process "steam://forceinputappid/769"
 }
-
