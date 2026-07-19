@@ -27,6 +27,10 @@ G.makePlayer = function () {
     passiveBarrier: 0,
     passiveBarrierT: 0,
     passiveHaste: 0,
+    pantryGuard: 0,
+    pantryHasteT: 0,
+    pantryQuickT: 0,
+    pantryMagnetT: 0,
     lastSafe: null,
   };
 };
@@ -67,11 +71,19 @@ let touchAimHelpShown = false;
 
 G.damagePlayer = function (dmg, fromX, fromY) {
   const p = G.state.player;
-  if (p.invuln > 0 || p.meleeGuard > 0 || p.dashing) return;
+  if (p.invuln > 0 || p.meleeGuard > 0 || p.dashing) return false;
+  if (p.pantryGuard > 0) {
+    p.pantryGuard--;
+    p.invuln = Math.max(p.invuln, 0.3);
+    G.sfx.play("stagger");
+    G.damageNumber(p.x, p.y - 18, "WARDCAKE!", "#ffcd75");
+    G.spawnFx({ kind: "ring", x: p.x, y: p.y - 7, color: "#ffcd75", radius: 16, dur: 0.34 });
+    return false;
+  }
   const passiveResult = G.passives
     ? G.passives.beforePlayerDamage(dmg, fromX, fromY)
     : { damage: dmg, knockback: true, prevented: false };
-  if (passiveResult.prevented) return;
+  if (passiveResult.prevented) return false;
   dmg = passiveResult.damage;
   p.damageTaken += dmg;
   p.invuln = 1.0;
@@ -123,6 +135,7 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     G.ui.toast("💫 You got knocked out! ...But you're okay. Try again!", 3);
     G.events.emit("ko", {});
   }
+  return true;
 };
 
 G.updateKnockout = function (dt) {
@@ -157,12 +170,16 @@ G.updatePlayer = function (dt) {
   p.invuln = Math.max(0, p.invuln - dt);
   p.meleeGuard = Math.max(0, (p.meleeGuard || 0) - dt);
   p.swapCd = Math.max(0, p.swapCd - dt);
+  p.pantryHasteT = Math.max(0, (p.pantryHasteT || 0) - dt);
+  p.pantryQuickT = Math.max(0, (p.pantryQuickT || 0) - dt);
+  p.pantryMagnetT = Math.max(0, (p.pantryMagnetT || 0) - dt);
   if (G.passives) G.passives.update(dt);
   if (p.attackPose) {
     p.attackPose.t -= dt;
     if (p.attackPose.t <= 0) p.attackPose = null;
   }
-  for (const k in p.cooldowns) p.cooldowns[k] = Math.max(0, p.cooldowns[k] - dt);
+  const cooldownRate = p.pantryQuickT > 0 ? 1.35 : 1;
+  for (const k in p.cooldowns) p.cooldowns[k] = Math.max(0, p.cooldowns[k] - dt * cooldownRate);
 
   // Mana now regenerates all the way to the true maximum. Successful hits
   // remain a faster bonus route, rewarding close engagement without making
@@ -212,7 +229,8 @@ G.updatePlayer = function (dt) {
     p.moving = v.x !== 0 || v.y !== 0;
     if (p.moving) {
       p.dir = { x: v.x, y: v.y };
-      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1);
+      const pantrySpeed = p.pantryHasteT > 0 ? 1.18 : 1;
+      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1) * pantrySpeed;
       G.world.moveBox(p, v.x * spd * dt, v.y * spd * dt);
       p.anim += dt * (spd / 14);
     }
@@ -521,6 +539,7 @@ G.updateBossHazards = function (dt) {
         const a = G.util.angleTo(p.x, p.y, h.owner.x, h.owner.y);
         const speed = h.push || 58;
         G.world.moveBox(p, Math.cos(a) * speed * dt, Math.sin(a) * speed * dt);
+        punishBossHazard(h);
       }
       continue;
     }
@@ -531,6 +550,7 @@ G.updateBossHazards = function (dt) {
         const a = G.util.angleTo(p.x, p.y, h.owner.x, h.owner.y);
         const speed = Math.min(92, (h.pull || 54) + (d - h.maxRange) * 0.45);
         G.world.moveBox(p, Math.cos(a) * speed * dt, Math.sin(a) * speed * dt);
+        punishBossHazard(h);
       }
       continue;
     }
@@ -544,12 +564,24 @@ G.updateBossHazards = function (dt) {
       const a = G.util.angleTo(p.x, p.y, h.x, h.y);
       G.world.moveBox(p, Math.cos(a) * 44 * dt, Math.sin(a) * 44 * dt);
     }
-    if (!h.hit) {
-      h.hit = true;
-      G.damagePlayer(1, h.owner.x, h.owner.y);
-    }
+    punishBossHazard(h);
   }
 };
+
+function punishBossHazard(h) {
+  if (h.hit || !h.owner || h.owner.dead) return false;
+  if (!G.damagePlayer(1, h.owner.x, h.owner.y)) return false;
+  h.hit = true;
+  const recovery = h.phase >= 3 ? 3 : 2;
+  const healed = Math.min(recovery, Math.max(0, h.owner.def.hp - h.owner.hp));
+  if (healed > 0) {
+    h.owner.hp += healed;
+    G.damageNumber(h.owner.x, h.owner.y - h.owner.h() - 4, `+${healed} MEND`, "#a7f070");
+  }
+  h.owner.bossStagger = Math.max(0, (h.owner.bossStagger || 0) - 1);
+  G.damageNumber(G.state.player.x, G.state.player.y - 18, "FALTER!", "#ef7d57");
+  return true;
+}
 
 G.drawBossHazards = function (ctx) {
   const hazards = G.state.bossHazards || [];
@@ -995,7 +1027,8 @@ G.updatePickups = function (dt) {
     const pk = s.pickups[i];
     pk.t += dt;
     const d = G.util.dist(pk.x, pk.y, p.x, p.y);
-    if (d < 30) { // magnet!
+    const magnetRange = p.pantryMagnetT > 0 ? 120 : 30;
+    if (d < magnetRange) { // magnet!
       const a = G.util.angleTo(pk.x, pk.y, p.x, p.y);
       pk.x += Math.cos(a) * 90 * dt;
       pk.y += Math.sin(a) * 90 * dt;

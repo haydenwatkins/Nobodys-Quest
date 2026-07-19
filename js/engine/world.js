@@ -28,6 +28,58 @@ function registerMap(def) {
   G.maps[def.id] = def;
 }
 
+G.PANTRY_REFILL_MS = 90000;
+G.PANTRY_TREATS = [
+  { id: "wardcake", icon: "🛡️", name: "Wardcake", effect: "The next hit is completely blocked." },
+  { id: "pepperTart", icon: "🌶️", name: "Pepper Tart", effect: "Move 18% faster for 25 seconds." },
+  { id: "quickjam", icon: "⚡", name: "Quickjam Pie", effect: "Cooldowns recover 35% faster for 25 seconds." },
+  { id: "magnetMuffin", icon: "🧲", name: "Magnet Muffin", effect: "Pull pickups from far away for 35 seconds." },
+];
+
+G.isFoodChest = function (chest) {
+  return !!(chest && chest.heal && !chest.item);
+};
+
+G.ensurePantries = function () {
+  if (!G.state.pantries || typeof G.state.pantries !== "object") G.state.pantries = {};
+  return G.state.pantries;
+};
+
+G.pantryReady = function (key, now) {
+  const record = G.ensurePantries()[key];
+  return !record || (record.readyAt || 0) <= (now === undefined ? Date.now() : now);
+};
+
+G.pantryTreat = function (key) {
+  const record = G.ensurePantries()[key] || { servings: 0 };
+  const offset = Math.floor(G.util.hash2(key.length + 17, key.charCodeAt(0) || 1) * G.PANTRY_TREATS.length);
+  return G.PANTRY_TREATS[(offset + (record.servings || 0)) % G.PANTRY_TREATS.length];
+};
+
+G.servePantry = function (ch) {
+  const now = Date.now();
+  const pantries = G.ensurePantries();
+  const record = pantries[ch.key] || (pantries[ch.key] = { servings: 0, readyAt: 0 });
+  const treat = G.pantryTreat(ch.key);
+  record.servings = (record.servings || 0) + 1;
+  record.openedAt = now;
+  record.readyAt = now + G.PANTRY_REFILL_MS;
+  ch.readyAt = record.readyAt;
+  ch.opened = true;
+
+  const p = G.state.player;
+  G.healPlayer(G.playerMaxHearts(), "pantry");
+  if (treat.id === "wardcake") p.pantryGuard = Math.max(1, p.pantryGuard || 0);
+  if (treat.id === "pepperTart") p.pantryHasteT = Math.max(25, p.pantryHasteT || 0);
+  if (treat.id === "quickjam") p.pantryQuickT = Math.max(25, p.pantryQuickT || 0);
+  if (treat.id === "magnetMuffin") p.pantryMagnetT = Math.max(35, p.pantryMagnetT || 0);
+
+  G.sfx.play("unlock");
+  G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: "#ffcd75", radius: 20, dur: 0.5 });
+  G.ui.toast(`${treat.icon} ${treat.name}! Fully healed. ${treat.effect}`, 4);
+  return treat;
+};
+
 G.world = (() => {
   const BASE_LEGEND = {
     ".": { tile: "grass" },
@@ -89,7 +141,14 @@ G.world = (() => {
         if (cell.enemy) enemies.push(G.makeEnemy(cell.enemy, cx, cy));
         if (cell.chest) {
           const key = `${mapId}:${x},${y}`;
-          chests.push({ x, y, key, chest: cell.chest, opened: G.state.opened.includes(key) });
+          const food = G.isFoodChest(cell.chest);
+          const pantry = food && G.ensurePantries()[key];
+          chests.push({
+            x, y, key, chest: cell.chest, food,
+            opened: food ? !!pantry && !G.pantryReady(key) : G.state.opened.includes(key),
+            readyAt: pantry ? pantry.readyAt : 0,
+            needsLeave: false,
+          });
         }
       }
     }
@@ -248,11 +307,27 @@ G.world = (() => {
 
     // Chests
     for (const ch of s.chests) {
-      if (ch.opened) continue;
       const cx = ch.x * G.TILE + G.TILE / 2;
       const cy = ch.y * G.TILE + G.TILE / 2;
-      if (G.util.dist(p.x, p.y, cx, cy) < 14) {
+      const near = G.util.dist(p.x, p.y, cx, cy) < 14;
+      if (ch.food && ch.opened && G.pantryReady(ch.key)) {
+        ch.opened = false;
+        ch.readyAt = 0;
+        ch.needsLeave = near;
+        G.spawnFx({ kind: "spark", x: cx, y: cy - 9, color: "#fff3c2", dur: 0.45 });
+      }
+      if (ch.opened) continue;
+      if (ch.needsLeave) {
+        if (!near) ch.needsLeave = false;
+        continue;
+      }
+      if (near) {
         ch.opened = true;
+        if (ch.food) {
+          G.servePantry(ch);
+          G.saveGame();
+          continue;
+        }
         s.opened.push(ch.key);
         G.sfx.play("unlock");
         G.spawnFx({ kind: "ring", x: cx, y: cy - 8, color: "#ffcd75", dur: 0.5 });
@@ -748,6 +823,37 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (ch.food) {
+      // Renewable food is a picnic hamper, not a one-time treasure chest.
+      // The cloth and refill bar make its different rules visible at a glance.
+      ctx.fillStyle = "rgba(26,28,44,0.35)";
+      ctx.fillRect(px + 1, py + 12, 14, 3);
+      ctx.fillStyle = "#6b4a2b";
+      ctx.fillRect(px + 2, py + 7, 12, 7);
+      ctx.fillStyle = ch.opened ? "#1a1c2c" : "#b13e53";
+      ctx.fillRect(px + 3, py + 5, 10, 5);
+      ctx.fillStyle = ch.opened ? "#333c57" : "#fff3c2";
+      ctx.fillRect(px + 4, py + 6, 3, 2);
+      ctx.fillRect(px + 9, py + 6, 3, 2);
+      ctx.fillStyle = "#ffcd75";
+      ctx.fillRect(px + 4, py + 10, 8, 1);
+      ctx.fillRect(px + 5, py + 3, 1, 3);
+      ctx.fillRect(px + 10, py + 3, 1, 3);
+      ctx.fillRect(px + 6, py + 2, 4, 1);
+      if (ch.opened) {
+        const remaining = Math.max(0, (ch.readyAt || 0) - Date.now());
+        const progress = 1 - Math.min(1, remaining / G.PANTRY_REFILL_MS);
+        ctx.fillStyle = "#333c57";
+        ctx.fillRect(px + 3, py + 12, 10, 1);
+        ctx.fillStyle = "#73eff7";
+        ctx.fillRect(px + 3, py + 12, Math.round(10 * progress), 1);
+      } else if (Math.sin(time * 4 + ch.x) > 0.35) {
+        ctx.fillStyle = "#fff3c2";
+        ctx.fillRect(px + 7, py, 1, 2);
+        ctx.fillRect(px + 9, py - 1, 1, 2);
+      }
+      return;
+    }
     ctx.fillStyle = "rgba(26,28,44,0.35)";
     ctx.fillRect(px + 1, py + 12, 14, 3);
     ctx.fillStyle = "#6b4a2b";
