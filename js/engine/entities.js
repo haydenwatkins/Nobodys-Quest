@@ -104,6 +104,7 @@ G.damagePlayer = function (dmg, fromX, fromY) {
       p.dashing = null;
       p.invuln = 3;
       G.state.projectiles = [];
+      G.state.bossHazards = [];
       G.state.bossCutscene = null;
       G.state.knockout = {
         t: trial.delay || 1.5,
@@ -434,6 +435,273 @@ function fireBossRadial(e, count, speed, shape, offset) {
   G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: e.def.boss.color, radius: 28, dur: 0.32 });
 }
 
+/* ---------- Worldbearer arena control ----------
+   These patterns make distance a positioning puzzle instead of solving it by
+   adding damage or invisible speed. Every dangerous cell gets a generous
+   warning, every pattern has stable geometry, and melee stagger clears the
+   arena so closing the gap remains the strongest counterplay. */
+
+const BOSS_ARENA_ACTIONS = {
+  gustLanes: "GUST LANES",
+  windWall: "CROSSWIND",
+  faultGrid: "FAULT GRID",
+  collapseRing: "CLOSING TERRACE",
+  silkTether: "SILK TETHER",
+  webGrid: "LOOM GRID",
+  stormGrid: "STORM GRID",
+  echoCross: "ECHO CROSS",
+  safeCircle: "LANTERN CIRCLE",
+  worldGrid: "WORLD GRID",
+};
+
+function arenaBounds() {
+  return {
+    left: G.TILE * 1.5,
+    top: G.TILE * 1.5,
+    right: (G.state.mapW - 1.5) * G.TILE,
+    bottom: (G.state.mapH - 1.5) * G.TILE,
+  };
+}
+
+function spawnBossHazard(e, kind, options) {
+  const h = Object.assign({
+    kind, owner: e, mapId: G.state.mapId, t: 0, delay: 0,
+    warning: 0.82, active: 0.62, color: e.def.boss.color,
+    phase: e.bossPhase, hit: false,
+  }, options || {});
+  G.state.bossHazards = G.state.bossHazards || [];
+  G.state.bossHazards.push(h);
+  return h;
+}
+
+G.cancelBossHazards = function (owner) {
+  if (!G.state.bossHazards) return;
+  G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
+};
+
+function hazardLocalTime(h) { return h.t - (h.delay || 0); }
+function hazardIsActive(h) {
+  const t = hazardLocalTime(h);
+  return t >= h.warning && t < h.warning + h.active;
+}
+
+function gridCellDanger(h, x, y) {
+  const b = arenaBounds();
+  const cell = h.cell || 40;
+  const gx = Math.floor((x - b.left) / cell);
+  const gy = Math.floor((y - b.top) / cell);
+  if (h.grid === "checker") return ((gx + gy) & 1) === h.parity;
+  return ((h.axis === "y" ? gy : gx) & 1) === h.parity;
+}
+
+function gustLaneDanger(h, x, y) {
+  const b = arenaBounds();
+  const lanes = h.lanes || 5;
+  const span = h.axis === "y" ? b.right - b.left : b.bottom - b.top;
+  const at = h.axis === "y" ? x - b.left : y - b.top;
+  const lane = Math.max(0, Math.min(lanes - 1, Math.floor(at / (span / lanes))));
+  return lane !== h.safeLane;
+}
+
+G.updateBossHazards = function (dt) {
+  const hazards = G.state.bossHazards || (G.state.bossHazards = []);
+  const p = G.state.player;
+  for (let i = hazards.length - 1; i >= 0; i--) {
+    const h = hazards[i];
+    h.t += dt;
+    if (h.mapId !== G.state.mapId || !h.owner || h.owner.dead
+      || h.t >= (h.delay || 0) + h.warning + h.active) {
+      hazards.splice(i, 1);
+      continue;
+    }
+    if (!hazardIsActive(h) || G.state.knockout) continue;
+
+    if (h.kind === "gust") {
+      if (!p.dashing && gustLaneDanger(h, p.x, p.y)) {
+        const a = G.util.angleTo(p.x, p.y, h.owner.x, h.owner.y);
+        const speed = h.push || 58;
+        G.world.moveBox(p, Math.cos(a) * speed * dt, Math.sin(a) * speed * dt);
+      }
+      continue;
+    }
+
+    if (h.kind === "tether") {
+      const d = G.util.dist(p.x, p.y, h.owner.x, h.owner.y);
+      if (!p.dashing && d > h.maxRange) {
+        const a = G.util.angleTo(p.x, p.y, h.owner.x, h.owner.y);
+        const speed = Math.min(92, (h.pull || 54) + (d - h.maxRange) * 0.45);
+        G.world.moveBox(p, Math.cos(a) * speed * dt, Math.sin(a) * speed * dt);
+      }
+      continue;
+    }
+
+    let danger = false;
+    if (h.kind === "grid") danger = gridCellDanger(h, p.x, p.y);
+    if (h.kind === "ring") danger = G.util.dist(p.x, p.y, h.x, h.y) > h.radius;
+    if (!danger) continue;
+
+    if (h.kind === "ring" && !p.dashing) {
+      const a = G.util.angleTo(p.x, p.y, h.x, h.y);
+      G.world.moveBox(p, Math.cos(a) * 44 * dt, Math.sin(a) * 44 * dt);
+    }
+    if (!h.hit) {
+      h.hit = true;
+      G.damagePlayer(1, h.owner.x, h.owner.y);
+    }
+  }
+};
+
+G.drawBossHazards = function (ctx) {
+  const hazards = G.state.bossHazards || [];
+  const b = arenaBounds();
+  for (const h of hazards) {
+    const local = hazardLocalTime(h);
+    if (local < 0) continue;
+    const active = hazardIsActive(h);
+    const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
+    ctx.clip();
+    ctx.fillStyle = h.color;
+    ctx.strokeStyle = active ? "#f4f4f4" : h.color;
+    ctx.lineWidth = active ? 2 : 1;
+    ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
+
+    if (h.kind === "grid") {
+      const cell = h.cell || 40;
+      for (let y = b.top; y < b.bottom; y += cell) {
+        for (let x = b.left; x < b.right; x += cell) {
+          if (!gridCellDanger(h, x + 1, y + 1)) continue;
+          ctx.fillRect(Math.round(x), Math.round(y), Math.ceil(cell), Math.ceil(cell));
+          ctx.strokeRect(Math.round(x) + 1, Math.round(y) + 1, Math.ceil(cell) - 2, Math.ceil(cell) - 2);
+          if (active) {
+            // A tiny stepped bolt reads at the native 320x180 resolution and
+            // distinguishes an electric/fault cell from ordinary decoration.
+            ctx.globalAlpha = 0.9;
+            ctx.strokeStyle = "#f4f4f4";
+            ctx.beginPath();
+            ctx.moveTo(Math.round(x + cell * 0.2), Math.round(y + cell * 0.5));
+            ctx.lineTo(Math.round(x + cell * 0.42), Math.round(y + cell * 0.35));
+            ctx.lineTo(Math.round(x + cell * 0.55), Math.round(y + cell * 0.64));
+            ctx.lineTo(Math.round(x + cell * 0.8), Math.round(y + cell * 0.46));
+            ctx.stroke();
+            ctx.strokeStyle = active ? "#f4f4f4" : h.color;
+            ctx.globalAlpha = 0.24 + pulse * 0.1;
+          }
+        }
+      }
+    } else if (h.kind === "gust") {
+      const lanes = h.lanes || 5;
+      const horizontal = h.axis === "x";
+      const span = horizontal ? b.bottom - b.top : b.right - b.left;
+      const laneSize = span / lanes;
+      for (let lane = 0; lane < lanes; lane++) {
+        if (lane === h.safeLane) continue;
+        const x = horizontal ? b.left : b.left + lane * laneSize;
+        const y = horizontal ? b.top + lane * laneSize : b.top;
+        const w = horizontal ? b.right - b.left : laneSize;
+        const height = horizontal ? laneSize : b.bottom - b.top;
+        ctx.fillRect(Math.round(x), Math.round(y), Math.ceil(w), Math.ceil(height));
+        const arrowX = horizontal ? (b.left + b.right) / 2 : x + laneSize / 2;
+        const arrowY = horizontal ? y + laneSize / 2 : (b.top + b.bottom) / 2;
+        ctx.globalAlpha = active ? 0.8 : 0.35;
+        const towardX = h.owner.x - arrowX;
+        const towardY = h.owner.y - arrowY;
+        const mag = Math.max(1, Math.hypot(towardX, towardY));
+        const dx = towardX / mag, dy = towardY / mag;
+        ctx.beginPath();
+        ctx.moveTo(arrowX - dx * 7, arrowY - dy * 7);
+        ctx.lineTo(arrowX + dx * 7, arrowY + dy * 7);
+        ctx.lineTo(arrowX + dx * 3 - dy * 3, arrowY + dy * 3 + dx * 3);
+        ctx.moveTo(arrowX + dx * 7, arrowY + dy * 7);
+        ctx.lineTo(arrowX + dx * 3 + dy * 3, arrowY + dy * 3 - dx * 3);
+        ctx.stroke();
+        ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
+      }
+    } else if (h.kind === "ring") {
+      // Shade precisely outside the safe circle. The even-odd cutout keeps the
+      // picture identical to the collision test, including the four corners.
+      ctx.beginPath();
+      ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
+      ctx.moveTo(h.x + h.radius, h.y);
+      ctx.arc(h.x, h.y, h.radius, 0, Math.PI * 2);
+      ctx.fill("evenodd");
+      ctx.globalAlpha = active ? 0.9 : 0.55;
+      ctx.beginPath();
+      ctx.arc(h.x, h.y, h.radius, 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (h.kind === "tether") {
+      ctx.globalAlpha = active ? 0.9 : 0.45;
+      ctx.setLineDash(active ? [4, 2] : [2, 3]);
+      ctx.beginPath();
+      ctx.moveTo(h.owner.x, h.owner.y - 6);
+      ctx.lineTo(G.state.player.x, G.state.player.y - 5);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 0.3;
+      ctx.beginPath();
+      ctx.arc(h.owner.x, h.owner.y, h.maxRange, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+};
+
+function spawnArenaPattern(e, action) {
+  const phase = e.bossPhase;
+  const turn = e.bossPattern;
+  if (action === "gustLanes" || action === "windWall") {
+    const axis = action === "windWall" ? (turn & 1 ? "y" : "x") : (turn & 1 ? "x" : "y");
+    spawnBossHazard(e, "gust", {
+      axis, lanes: phase >= 3 ? 6 : 5, safeLane: (turn * 2 + phase) % (phase >= 3 ? 6 : 5),
+      warning: action === "windWall" ? 0.68 : 0.82, active: phase >= 3 ? 1.1 : 0.92,
+      push: action === "windWall" ? 72 : 60, color: "#73eff7",
+    });
+  }
+  if (action === "faultGrid" || action === "webGrid" || action === "worldGrid") {
+    const colors = { faultGrid: "#ffcd75", webGrid: "#d9a7ff", worldGrid: "#ef7d57" };
+    spawnBossHazard(e, "grid", {
+      grid: "checker", parity: turn & 1, cell: phase >= 3 ? 32 : 40,
+      warning: 0.88, active: 0.6, color: colors[action],
+    });
+    if (action === "worldGrid" && phase >= 3) {
+      spawnBossHazard(e, "grid", {
+        grid: "checker", parity: (turn + 1) & 1, cell: 32,
+        delay: 0.78, warning: 0.62, active: 0.48, color: "#ffcd75",
+      });
+    }
+  }
+  if (action === "stormGrid" || action === "echoCross") {
+    const firstAxis = turn & 1 ? "x" : "y";
+    spawnBossHazard(e, "grid", {
+      axis: firstAxis, parity: turn & 1, cell: phase >= 2 ? 32 : 40,
+      warning: 0.9, active: 0.5, color: action === "echoCross" ? "#fff3c2" : "#73eff7",
+    });
+    if (phase >= 2 || action === "echoCross") {
+      spawnBossHazard(e, "grid", {
+        axis: firstAxis === "x" ? "y" : "x", parity: (turn + 1) & 1, cell: phase >= 2 ? 32 : 40,
+        delay: 0.72, warning: 0.66, active: 0.48, color: action === "echoCross" ? "#ffcd75" : "#fff3c2",
+      });
+    }
+  }
+  if (action === "collapseRing" || action === "safeCircle") {
+    const radius = action === "safeCircle"
+      ? (phase >= 3 ? 64 : phase === 2 ? 76 : 90)
+      : (phase >= 3 ? 68 : phase === 2 ? 82 : 98);
+    spawnBossHazard(e, "ring", {
+      x: e.x, y: e.y, radius, warning: 0.92, active: 0.92,
+      color: action === "safeCircle" ? "#ffcd75" : "#d8b06a",
+    });
+  }
+  if (action === "silkTether") {
+    spawnBossHazard(e, "tether", {
+      maxRange: phase >= 3 ? 70 : phase === 2 ? 78 : 88,
+      warning: 0.68, active: 1.45, pull: 58, color: "#d9a7ff",
+    });
+  }
+}
+
 function resolveBossAction(e, p, action) {
   if (["charge", "burrow", "vampireDash"].includes(action)) {
     e.bossChargeT = e.def.boss.chargeDur;
@@ -455,7 +723,8 @@ function resolveBossAction(e, p, action) {
   }
   if (action === "seeds") fireBossFan(e, p, e.bossPhase >= 3 ? 7 : e.bossPhase === 2 ? 5 : 3, "seed", 6, 1);
   if (action === "briar") fireBossRadial(e, e.bossPhase >= 3 ? 18 : e.bossPhase === 2 ? 14 : 10, 76, "seed", e.bossPattern * 0.19);
-  e.bossRecoverT = 0.34;
+  if (BOSS_ARENA_ACTIONS[action]) spawnArenaPattern(e, action);
+  e.bossRecoverT = BOSS_ARENA_ACTIONS[action] ? 0.52 : 0.34;
 }
 
 function updateBossState(e, p, dist, dt) {
@@ -485,6 +754,7 @@ function updateBossState(e, p, dist, dt) {
     e.bossStaggerResistT = Math.max(e.bossStaggerResistT || 0, 1.4);
     e.bossRecoverT = 0.55;
     e.bossSpecialT = Math.min(e.bossSpecialT, 0.8);
+    G.cancelBossHazards(e);
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.055);
     G.state.shake = Math.max(G.state.shake, 0.3);
     G.sfx.play("bossPhase");
@@ -551,6 +821,9 @@ function updateBossState(e, p, dist, dt) {
       const patterns = boss.patterns || fallback;
       e.bossPendingAction = patterns[e.bossPattern % patterns.length];
       e.bossPattern++;
+      if (BOSS_ARENA_ACTIONS[e.bossPendingAction]) {
+        G.damageNumber(e.x, e.y - e.h() - 11, BOSS_ARENA_ACTIONS[e.bossPendingAction], boss.color);
+      }
       if (["charge", "burrow", "vampireDash"].includes(e.bossPendingAction)) {
         G.spawnFx({
           kind: "tell", x: e.x, y: e.y - 5,
@@ -619,6 +892,8 @@ function enemyShot(state, enemy, angle, opts) {
 G.updateEnemies = function (dt) {
   const s = G.state;
   const p = s.player;
+
+  G.updateBossHazards(dt);
 
   for (let i = s.enemies.length - 1; i >= 0; i--) {
     const e = s.enemies[i];

@@ -1040,8 +1040,8 @@ registerEnemy({
   boss: {
     style: "duelist", color: "#73eff7", specialEvery: 2.15,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.5,
-    chargeSpeed: 210, chargeDur: 0.32, antiKiteRange: 124, chaseScale: 1.25,
-    patterns: ["shells", "charge", "stars", "crescent"],
+    chargeSpeed: 218, chargeDur: 0.32, antiKiteRange: 108, chaseScale: 1.38,
+    patterns: ["gustLanes", "charge", "windWall", "crescent", "stars"],
     intro: "THE HORIZON FOLDS ITS WINGS",
     introLines: [
       "Tiny walker! You climbed onto my back without an appointment.",
@@ -1066,8 +1066,8 @@ registerEnemy({
   boss: {
     style: "charger", color: "#ffcd75", specialEvery: 2.35,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.62,
-    chargeSpeed: 175, chargeDur: 0.44, antiKiteRange: 120, chaseScale: 1.16,
-    patterns: ["quake", "charge", "shells", "quake"],
+    chargeSpeed: 182, chargeDur: 0.44, antiKiteRange: 112, chaseScale: 1.28,
+    patterns: ["faultGrid", "charge", "collapseRing", "quake", "shells"],
     intro: "THE GARDEN STANDS UP",
     introLines: [
       "Careful with the petunias. They took three centuries to stop arguing.",
@@ -1092,8 +1092,8 @@ registerEnemy({
   boss: {
     style: "caster", color: "#d9a7ff", specialEvery: 2.2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.55,
-    chargeSpeed: 165, chargeDur: 0.32, antiKiteRange: 125, chaseScale: 1.2,
-    patterns: ["cards", "briar", "seeds", "nova"],
+    chargeSpeed: 172, chargeDur: 0.32, antiKiteRange: 108, chaseScale: 1.32,
+    patterns: ["silkTether", "webGrid", "cards", "briar", "nova"],
     intro: "THE LOOM HAS EIGHT HANDS AND ONE OPINION",
     introLines: [
       "Welcome, Nobody. I knew you were coming; the web was gossiping.",
@@ -1118,8 +1118,8 @@ registerEnemy({
   boss: {
     style: "caster", color: "#fff3c2", specialEvery: 2.25,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.58,
-    chargeSpeed: 170, chargeDur: 0.36, antiKiteRange: 122, chaseScale: 1.18,
-    patterns: ["orbit", "nova", "charge", "shells"],
+    chargeSpeed: 178, chargeDur: 0.36, antiKiteRange: 110, chaseScale: 1.3,
+    patterns: ["stormGrid", "echoCross", "orbit", "charge", "shells"],
     intro: "THE TUNDRA RINGS BACK",
     introLines: [
       "BONG. That means hello. Or avalanche. Context is important.",
@@ -1144,8 +1144,8 @@ registerEnemy({
   boss: {
     style: "vampire", color: "#ffcd75", specialEvery: 2.05,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.5,
-    chargeSpeed: 205, chargeDur: 0.3, antiKiteRange: 126, chaseScale: 1.26,
-    patterns: ["stars", "vampireDash", "bloodBurst", "orbit"],
+    chargeSpeed: 212, chargeDur: 0.3, antiKiteRange: 106, chaseScale: 1.38,
+    patterns: ["safeCircle", "stormGrid", "vampireDash", "stars", "orbit"],
     intro: "A SMALL LIGHT CHALLENGES THE WHOLE STORM",
     introLines: [
       "Oh! A visitor. I would tidy up, but the storm keeps moving everything.",
@@ -1170,8 +1170,8 @@ registerEnemy({
   boss: {
     style: "god", color: "#ef7d57", specialEvery: 2.12,
     phases: 3, phaseThresholds: [0.7, 0.36], telegraph: 0.6,
-    chargeSpeed: 185, chargeDur: 0.42, antiKiteRange: 126, chaseScale: 1.2,
-    patterns: ["quake", "charge", "orbit", "briar", "nova"],
+    chargeSpeed: 192, chargeDur: 0.42, antiKiteRange: 108, chaseScale: 1.34,
+    patterns: ["worldGrid", "collapseRing", "gustLanes", "charge", "quake", "stormGrid", "nova"],
     intro: "THE MOUNTAIN REMEMBERS YOUR NAME",
     introLines: [
       "Nobody. I carried every road here so that one traveler might finish it.",
