@@ -383,6 +383,11 @@ G.combat = (() => {
     if (G.passives) o = G.passives.prepare("projectile", user, o);
     const type = abilityDamageType(o.ability, o.type, "sharp");
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
+    // Array lengths must be whole numbers. Form passives can deliberately add
+    // fractional projectile size (Nobody adds 0.5), so derive a safe visual
+    // trail count before it ever reaches the update loop.
+    const requestedTrail = o.trail === undefined ? Math.min(6, 2 + (o.size || 3)) : o.trail;
+    const trailLength = Math.max(0, Math.round(Number.isFinite(requestedTrail) ? requestedTrail : 3));
     attackPose(user, facing + Math.PI, o.recoil === undefined ? 1.5 : o.recoil, 0.08);
     G.state.projectiles.push({
       x: user.x, y: user.y - 6,
@@ -403,7 +408,7 @@ G.combat = (() => {
       hitStop: o.hitStop,
       shake: o.shake,
       trail: [],
-      trailLength: o.trail === undefined ? Math.min(6, 2 + (o.size || 3)) : o.trail,
+      trailLength,
       shape: o.shape,
       ricochets: o.ricochets || 0,
       ricochetsMax: o.ricochets || 0,
@@ -596,8 +601,16 @@ G.combat = (() => {
         pr.vy = Math.sin(homeAngle) * pr.speed;
       }
       pr.trail = pr.trail || [];
-      pr.trail.unshift({ x: pr.x, y: pr.y });
-      if (pr.trail.length > (pr.trailLength || 3)) pr.trail.length = pr.trailLength || 3;
+      // Normalize old/in-flight projectiles too, so a stale save or future
+      // passive cannot stop the animation loop with an invalid array length.
+      const trailLength = Math.max(0, Math.round(Number.isFinite(pr.trailLength) ? pr.trailLength : 3));
+      pr.trailLength = trailLength;
+      if (trailLength > 0) {
+        pr.trail.unshift({ x: pr.x, y: pr.y });
+        if (pr.trail.length > trailLength) pr.trail.length = trailLength;
+      } else {
+        pr.trail.length = 0;
+      }
       const beforeX = pr.x, beforeY = pr.y;
       pr.x += pr.vx * dt;
       pr.y += pr.vy * dt;
