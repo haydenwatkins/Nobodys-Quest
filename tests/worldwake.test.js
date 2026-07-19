@@ -125,8 +125,9 @@ for (const [id, patterns] of Object.entries(arenaPatterns)) {
     `${id} should close only excessive ranged distance decisively`);
 }
 
-// Aurelia announces a stable safe wind lane, warns before it moves the player,
-// and never deals hidden gust damage.
+// Aurelia announces a stable safe wind lane and warns before it activates.
+// Ignoring it costs one heart and mends the boss, so tanking the mechanic makes
+// the fight longer without increasing its burst damage.
 G.world.load("griffinWorldback");
 let arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
 arenaBoss.bossEngaged = true;
@@ -139,11 +140,16 @@ G.updateEnemies(arenaBoss.def.boss.telegraph + 0.02);
 assert.equal(G.state.bossHazards.length, 1);
 assert.equal(G.state.bossHazards[0].kind, "gust");
 const beforeGust = { x: G.state.player.x, damage: G.state.player.damageTaken };
+arenaBoss.hp -= 10;
+arenaBoss.bossStagger = 3;
+const beforeMend = arenaBoss.hp;
 G.updateBossHazards(0.4);
 assert.equal(G.state.player.x, beforeGust.x, "gust lane must not move during its warning");
 G.updateBossHazards(0.5);
 assert.ok(G.state.player.x > beforeGust.x, "an unsafe gust lane should push a distant player inward");
-assert.equal(G.state.player.damageTaken, beforeGust.damage, "wind pressure should reposition, not damage");
+assert.equal(G.state.player.damageTaken, beforeGust.damage + 1, "ignoring a gust lane should cost one heart");
+assert.equal(arenaBoss.hp, beforeMend + 2, "failed Phase I arena control should mend two boss health");
+assert.equal(arenaBoss.bossStagger, 2, "a failed pattern should also release a little melee pressure");
 const hazardDrawCalls = { lines: 0, evenodd: 0 };
 const hazardCtx = {
   save() {}, restore() {}, beginPath() {}, rect() {}, clip() {}, fillRect() {}, strokeRect() {},
@@ -173,7 +179,7 @@ G.state.player.invuln = 0;
 G.state.player.dashing = { left: 20, speed: 200 };
 G.updateBossHazards(stormCell.warning + 0.01);
 assert.equal(G.state.player.damageTaken, 0, "dash abilities must ignore electric floor damage");
-stormCell.hit = false;
+assert.equal(stormCell.hit, false, "a successful dash must not consume the grid's one failure check");
 G.state.player.dashing = null;
 G.state.player.invuln = 0;
 G.updateBossHazards(0.01);

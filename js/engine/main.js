@@ -88,6 +88,7 @@
     stars: 0,
     items: [],
     opened: [],
+    pantries: {},
     known: [],
     claimedForms: [],
     unlockReadyNotified: [],
@@ -116,6 +117,7 @@
     s.stars = save.stars || 0;
     s.items = save.items || [];
     s.opened = save.opened || [];
+    s.pantries = save.pantries && typeof save.pantries === "object" ? save.pantries : {};
     s.known = save.known || [];
     // Saves from before explicit claiming already earned every known form.
     // Preserve that progress instead of asking the player to re-earn it.

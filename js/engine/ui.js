@@ -363,6 +363,23 @@ G.ui = (() => {
     c.fillStyle = "#f4f4f4";
     c.fillText(label, 8, 27);
 
+    const pantryBuffs = [];
+    if (p.pantryGuard > 0) pantryBuffs.push({ text: "WARD", color: "#ffcd75" });
+    if (p.pantryHasteT > 0) pantryBuffs.push({ text: "FAST", color: "#ef7d57" });
+    if (p.pantryQuickT > 0) pantryBuffs.push({ text: "QUICK", color: "#73eff7" });
+    if (p.pantryMagnetT > 0) pantryBuffs.push({ text: "MAG", color: "#d9a7ff" });
+    let pantryX = 8 + chipW;
+    c.font = `5px ${FONT_HEAD}`;
+    for (const buff of pantryBuffs) {
+      const w = c.measureText(buff.text).width + 5;
+      c.fillStyle = "rgba(26,28,44,0.72)";
+      c.fillRect(pantryX, 24, w, 11);
+      c.fillStyle = buff.color;
+      c.fillRect(pantryX, 24, 2, 11);
+      c.fillText(buff.text, pantryX + 3, 27);
+      pantryX += w + 2;
+    }
+
     if (!drawBossBar(c)) drawLocationChip(c);
 
     /* stars (top right) */
