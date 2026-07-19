@@ -1044,7 +1044,8 @@ G.updateEnemies = function (dt) {
     // Recompute after movement so a charge collision uses its current position.
     const contactDist = G.util.dist(e.x, e.y, p.x, p.y);
     const contactDanger = !e.def.miniboss || e.bossContactActive;
-    if (contactDanger && !(e.bossStaggerT > 0) && e.touchCd <= 0 && contactDist < 7 + e.def.size / 2) {
+    const contactSize = e.def.contactSize || e.def.size;
+    if (contactDanger && !(e.bossStaggerT > 0) && e.touchCd <= 0 && contactDist < 7 + contactSize / 2) {
       e.touchCd = 0.6;
       G.damagePlayer(e.def.damage || 1, e.x, e.y);
     }
@@ -1199,6 +1200,7 @@ G.drawAimGuide = function (ctx) {
 };
 
 G.drawEnemy = function (ctx, e) {
+  const spriteScale = (e.def.boss && e.def.boss.spriteScale) || 1;
   if (e.def.worldbearer) {
     const color = e.def.boss.color;
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 3 + e.anim) * 0.5;
@@ -1207,14 +1209,14 @@ G.drawEnemy = function (ctx, e) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(e.x, e.y - 2, 18 + pulse * 4, 0, Math.PI * 2);
+    ctx.arc(e.x, e.y - 2, e.def.size / 2 + 2 + pulse * 3, 0, Math.PI * 2);
     ctx.stroke();
     // Four domain marks make the ruler visible among ordinary enemies before
     // engagement without adding a new interaction icon or UI prompt.
     ctx.fillStyle = color;
     for (let i = 0; i < 4; i++) {
       const a = (G.state.time || 0) * 0.45 + i * Math.PI / 2;
-      ctx.fillRect(Math.round(e.x + Math.cos(a) * 22), Math.round(e.y - 8 + Math.sin(a) * 9), 2, 2);
+      ctx.fillRect(Math.round(e.x + Math.cos(a) * (e.def.size / 2 + 7)), Math.round(e.y - 10 + Math.sin(a) * 12), 2, 2);
     }
     ctx.restore();
   }
@@ -1227,10 +1229,10 @@ G.drawEnemy = function (ctx, e) {
     // white flash when hurt — redraw sprite silhouette in white
     ctx.save();
     ctx.filter = "brightness(3) grayscale(1)";
-    G.drawSprite(ctx, e.def.sprite, frame, drawX, drawY, e.dir.x < 0);
+    G.drawSprite(ctx, e.def.sprite, frame, drawX, drawY, e.dir.x < 0, spriteScale);
     ctx.restore();
   } else {
-    G.drawSprite(ctx, e.def.sprite, frame, drawX, drawY, e.dir.x < 0);
+    G.drawSprite(ctx, e.def.sprite, frame, drawX, drawY, e.dir.x < 0, spriteScale);
   }
 
   // poison bubbles tint

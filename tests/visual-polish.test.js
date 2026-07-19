@@ -112,6 +112,7 @@ assert.equal(G.state.mapReveal, 0, "reduced motion should skip the map reveal");
 const spriteCtx = fakeCanvas();
 assert.doesNotThrow(() => G.drawSprite(spriteCtx, testSprite, 0, 20, 20, false));
 assert.doesNotThrow(() => G.drawSprite(spriteCtx, testSprite, 0, 20, 20, true));
+assert.doesNotThrow(() => G.drawSprite(spriteCtx, testSprite, 0, 20, 20, false, 2));
 spriteCtx.assertBalanced();
 
 console.log("visual polish tests passed");

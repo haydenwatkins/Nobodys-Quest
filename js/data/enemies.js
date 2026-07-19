@@ -1035,10 +1035,10 @@ const WORLDBEARER_FALLBACK_SPRITE = {
 registerEnemy({
   id: "skySovereign", name: "Aurelia, Sky Sovereign",
   hp: 88, speed: 66, damage: 2, behavior: "chase", aggro: 205,
-  size: 24, heavy: true, miniboss: true, worldbearer: true,
+  size: 34, contactSize: 24, heavy: true, miniboss: true, worldbearer: true,
   ward: { types: ["sharp"], hp: 7 },
   boss: {
-    style: "duelist", color: "#73eff7", specialEvery: 2.15, domain: "Windscar Canyon",
+    style: "duelist", color: "#73eff7", specialEvery: 2.15, domain: "Windscar Canyon", spriteScale: 2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.5,
     chargeSpeed: 218, chargeDur: 0.32, antiKiteRange: 108, chaseScale: 1.38,
     patterns: ["gustLanes", "charge", "windWall", "crescent", "stars"],
@@ -1061,10 +1061,10 @@ registerEnemy({
 registerEnemy({
   id: "oldMason", name: "Pillar, the Old Mason",
   hp: 96, speed: 49, damage: 2, behavior: "chase", aggro: 205,
-  size: 26, heavy: true, miniboss: true, worldbearer: true,
+  size: 34, contactSize: 26, heavy: true, miniboss: true, worldbearer: true,
   ward: { types: ["blunt"], hp: 8 },
   boss: {
-    style: "charger", color: "#ffcd75", specialEvery: 2.35, domain: "Hanging Gardens",
+    style: "charger", color: "#ffcd75", specialEvery: 2.35, domain: "Hanging Gardens", spriteScale: 2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.62,
     chargeSpeed: 182, chargeDur: 0.44, antiKiteRange: 112, chaseScale: 1.28,
     patterns: ["faultGrid", "charge", "collapseRing", "quake", "shells"],
@@ -1087,10 +1087,10 @@ registerEnemy({
 registerEnemy({
   id: "silkMatriarch", name: "Tess, Silk Matriarch",
   hp: 90, speed: 57, damage: 2, behavior: "shooter", shootEvery: 1.7, aggro: 210,
-  shotColor: "#d9a7ff", size: 23, heavy: true, miniboss: true, worldbearer: true,
+  shotColor: "#d9a7ff", size: 34, contactSize: 23, heavy: true, miniboss: true, worldbearer: true,
   ward: { types: ["dark"], hp: 8 },
   boss: {
-    style: "caster", color: "#d9a7ff", specialEvery: 2.2, domain: "Rootdeep Hollow",
+    style: "caster", color: "#d9a7ff", specialEvery: 2.2, domain: "Rootdeep Hollow", spriteScale: 2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.55,
     chargeSpeed: 172, chargeDur: 0.32, antiKiteRange: 108, chaseScale: 1.32,
     patterns: ["silkTether", "webGrid", "cards", "briar", "nova"],
@@ -1113,10 +1113,10 @@ registerEnemy({
 registerEnemy({
   id: "bellTitan", name: "Bongle, Bell Titan",
   hp: 94, speed: 52, damage: 2, behavior: "chase", aggro: 205,
-  size: 25, heavy: true, miniboss: true, worldbearer: true,
+  size: 34, contactSize: 25, heavy: true, miniboss: true, worldbearer: true,
   ward: { types: ["light"], hp: 8 },
   boss: {
-    style: "caster", color: "#fff3c2", specialEvery: 2.25, domain: "Frostbell Tundra",
+    style: "caster", color: "#fff3c2", specialEvery: 2.25, domain: "Frostbell Tundra", spriteScale: 2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.58,
     chargeSpeed: 178, chargeDur: 0.36, antiKiteRange: 110, chaseScale: 1.3,
     patterns: ["stormGrid", "echoCross", "orbit", "charge", "shells"],
@@ -1139,10 +1139,10 @@ registerEnemy({
 registerEnemy({
   id: "lanternKeeper", name: "Mallow, Lantern Keeper",
   hp: 86, speed: 63, damage: 2, behavior: "shooter", shootEvery: 1.55, aggro: 210,
-  shotColor: "#ffcd75", size: 23, heavy: true, miniboss: true, worldbearer: true,
+  shotColor: "#ffcd75", size: 34, contactSize: 23, heavy: true, miniboss: true, worldbearer: true,
   ward: { types: ["dark"], hp: 8 },
   boss: {
-    style: "vampire", color: "#ffcd75", specialEvery: 2.05, domain: "Stormspine Peaks",
+    style: "vampire", color: "#ffcd75", specialEvery: 2.05, domain: "Stormspine Peaks", spriteScale: 2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.5,
     chargeSpeed: 212, chargeDur: 0.3, antiKiteRange: 106, chaseScale: 1.38,
     patterns: ["safeCircle", "stormGrid", "vampireDash", "stars", "orbit"],
@@ -1165,10 +1165,10 @@ registerEnemy({
 registerEnemy({
   id: "lastWorldbearer", name: "Atlas, Last Worldbearer",
   hp: 104, speed: 51, damage: 2, behavior: "chase", aggro: 215,
-  size: 28, heavy: true, miniboss: true, worldbearer: true,
+  size: 36, contactSize: 28, heavy: true, miniboss: true, worldbearer: true,
   ward: { types: ["blunt"], hp: 9 },
   boss: {
-    style: "god", color: "#ef7d57", specialEvery: 2.12, domain: "Titan Grave",
+    style: "god", color: "#ef7d57", specialEvery: 2.12, domain: "Titan Grave", spriteScale: 2,
     phases: 3, phaseThresholds: [0.7, 0.36], telegraph: 0.6,
     chargeSpeed: 192, chargeDur: 0.42, antiKiteRange: 108, chaseScale: 1.34,
     patterns: ["worldGrid", "collapseRing", "gustLanes", "charge", "quake", "stormGrid", "nova"],
