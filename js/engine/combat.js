@@ -1,18 +1,18 @@
 /* ============================================================
-   COMBAT — where damage, wards, and statuses live.
+   COMBAT â€” where damage, wards, and statuses live.
 
    THE WARD RULE (a core rule of this game!):
-   Some enemies have a WARD — a colored shield. A ward only
+   Some enemies have a WARD â€” a colored shield. A ward only
    breaks when hit by its matching damage type (sharp / blunt /
    light / dark). While the ward is up, everything else just
    goes *ding*. This is on purpose: it makes players swap forms
    and mix abilities instead of using one move forever.
 
    HELPERS FOR ABILITY MAKERS (Ben, these are your toys):
-     G.combat.meleeArc(user, {...})  — a close-up swing
-     G.combat.shoot(user, {...})     — fire a projectile
-     G.combat.chain(user, {...})     — jump between nearby foes
-     G.combat.dash(user, {...})      — zoom forward, hurting things
+     G.combat.meleeArc(user, {...})  â€” a close-up swing
+     G.combat.shoot(user, {...})     â€” fire a projectile
+     G.combat.chain(user, {...})     â€” jump between nearby foes
+     G.combat.dash(user, {...})      â€” zoom forward, hurting things
      G.combat.applyStatus(enemy, "poison", {...})
    See js/abilities/basics.js for examples of each.
    ============================================================ */
@@ -80,7 +80,7 @@ G.combat = (() => {
       const overrulesWard = opts.breaksAnyWard && !enemy.ward.types.includes(type);
       const wardHitColor = overrulesWard ? "#ffcd75" : G.DAMAGE_TYPES[type].color;
       if (!opts.breaksAnyWard && !enemy.ward.types.includes(type)) {
-        // Wrong damage type — bounces off!
+        // Wrong damage type â€” bounces off!
         const needed = G.DAMAGE_TYPES[enemy.ward.types[0]];
         G.sfx.play("wardDing");
         G.damageNumber(enemy.x, enemy.y - enemy.h(), `NEEDS ${needed.name.toUpperCase()}!`, needed.color);
@@ -91,7 +91,7 @@ G.combat = (() => {
         knockback(enemy, opts, 0.4);
         return false;
       }
-      // Right type — chip the ward
+      // Right type â€” chip the ward
       enemy.ward.hp -= opts.damage;
       G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "GOD!" : opts.damage, wardHitColor);
       knockback(enemy, opts, 0.7);
@@ -102,7 +102,7 @@ G.combat = (() => {
         G.state.hitStop = Math.max(G.state.hitStop, 0.05);
         G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: wardHitColor, dur: 0.45 });
         burst(enemy.x, enemy.y - 6, wardHitColor, 8);
-        G.ui.toast("💥 Ward broken!");
+        G.ui.toast("ðŸ’¥ Ward broken!");
         G.events.emit("wardBreak", { damageType: type, ability: opts.ability, enemy: enemy.id });
       }
       return true;
@@ -190,8 +190,8 @@ G.combat = (() => {
     G.sfx.play("quest");
     G.state.shake = Math.max(G.state.shake, 0.45);
     burst(enemy.x, enemy.y - enemy.h() / 2, "#ffcd75", 24);
-    const lastWord = enemy.def.boss && enemy.def.boss.defeatLine ? ` · “${enemy.def.boss.defeatLine}”` : "";
-    G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, `${enemy.def.trophyName} found · +1 ⭐${lastWord}`);
+    const lastWord = enemy.def.boss && enemy.def.boss.defeatLine ? ` Â· â€œ${enemy.def.boss.defeatLine}â€` : "";
+    G.ui.banner(`ðŸ† MINIBOSS DEFEATED: ${enemy.def.name}!`, `${enemy.def.trophyName} found Â· +1 â­${lastWord}`);
     G.events.emit("pickup", { item: trophy });
     G.checkUnlocks();
     if (G.checkGuardianCollectionReward) G.checkGuardianCollectionReward(false);
@@ -248,7 +248,7 @@ G.combat = (() => {
   }
 
   /* ============================================================
-     ABILITY HELPERS — the building blocks for every move.
+     ABILITY HELPERS â€” the building blocks for every move.
      ============================================================ */
 
   function assistMeleeContact(user, range, arc, facing) {
@@ -290,7 +290,7 @@ G.combat = (() => {
     enemy.bossStaggerDecayT = 2.25;
     if (!staggerHelpShown) {
       staggerHelpShown = true;
-      G.ui.toast("⚔ Melee pressure fills the gold STAGGER meter!", 2.8);
+      G.ui.toast("âš” Melee pressure fills the gold STAGGER meter!", 2.8);
     }
     if (enemy.bossStagger < G.BOSS_STAGGER_HITS) return;
 
@@ -383,6 +383,11 @@ G.combat = (() => {
     if (G.passives) o = G.passives.prepare("projectile", user, o);
     const type = abilityDamageType(o.ability, o.type, "sharp");
     const facing = Math.atan2(user.dir.y, user.dir.x) + ((o.spreadDeg || 0) * Math.PI) / 180;
+    // Array lengths must be whole numbers. Form passives can deliberately add
+    // fractional projectile size (Nobody adds 0.5), so derive a safe visual
+    // trail count before it ever reaches the update loop.
+    const requestedTrail = o.trail === undefined ? Math.min(6, 2 + (o.size || 3)) : o.trail;
+    const trailLength = Math.max(0, Math.round(Number.isFinite(requestedTrail) ? requestedTrail : 3));
     attackPose(user, facing + Math.PI, o.recoil === undefined ? 1.5 : o.recoil, 0.08);
     G.state.projectiles.push({
       x: user.x, y: user.y - 6,
@@ -403,7 +408,7 @@ G.combat = (() => {
       hitStop: o.hitStop,
       shake: o.shake,
       trail: [],
-      trailLength: o.trail === undefined ? Math.min(6, 2 + (o.size || 3)) : o.trail,
+      trailLength,
       shape: o.shape,
       ricochets: o.ricochets || 0,
       ricochetsMax: o.ricochets || 0,
@@ -596,8 +601,16 @@ G.combat = (() => {
         pr.vy = Math.sin(homeAngle) * pr.speed;
       }
       pr.trail = pr.trail || [];
-      pr.trail.unshift({ x: pr.x, y: pr.y });
-      if (pr.trail.length > (pr.trailLength || 3)) pr.trail.length = pr.trailLength || 3;
+      // Normalize old/in-flight projectiles too, so a stale save or future
+      // passive cannot stop the animation loop with an invalid array length.
+      const trailLength = Math.max(0, Math.round(Number.isFinite(pr.trailLength) ? pr.trailLength : 3));
+      pr.trailLength = trailLength;
+      if (trailLength > 0) {
+        pr.trail.unshift({ x: pr.x, y: pr.y });
+        if (pr.trail.length > trailLength) pr.trail.length = trailLength;
+      } else {
+        pr.trail.length = 0;
+      }
       const beforeX = pr.x, beforeY = pr.y;
       pr.x += pr.vx * dt;
       pr.y += pr.vy * dt;
@@ -721,3 +734,4 @@ G.combat = (() => {
 
   return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, forceEnemies, updateProjectiles };
 })();
+
