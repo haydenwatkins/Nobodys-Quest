@@ -89,50 +89,64 @@ $chromeProxy = Join-Path $chromeRoot "chrome_proxy.exe"
 $chrome = Join-Path $chromeRoot "chrome.exe"
 $appId = "emcpnaopahpcnanfngjfanjgffobkbhi"
 $gameUrl = "https://haydenwatkins.github.io/Nobodys-Quest/"
+$steamInputUri = "steam://forceinputappid/2171580777"
 
-if (-not (Test-Path -LiteralPath $chromeProxy)) { throw "Google Chrome is not installed." }
+try {
+    # Steam Input normally follows the foreground executable. Nobody's Quest
+    # runs behind a persistent wrapper and an existing Chrome process, so use
+    # Valve's supported per-app lock while the game is active.
+    Start-Process $steamInputUri
+    Start-Sleep -Milliseconds 250
 
-$window = [NobodyQuestWindow]::Find("Nobody's Quest")
-if ($window -eq [IntPtr]::Zero) {
-    Start-Process -FilePath $chromeProxy -ArgumentList @(
-        "--profile-directory=Default",
-        "--app-id=$appId",
-        "--start-fullscreen"
-    )
-}
+    if (-not (Test-Path -LiteralPath $chromeProxy)) { throw "Google Chrome is not installed." }
 
-$deadline = (Get-Date).AddSeconds(6)
-do {
-    Start-Sleep -Milliseconds 200
     $window = [NobodyQuestWindow]::Find("Nobody's Quest")
-} while ($window -eq [IntPtr]::Zero -and (Get-Date) -lt $deadline)
+    if ($window -eq [IntPtr]::Zero) {
+        Start-Process -FilePath $chromeProxy -ArgumentList @(
+            "--profile-directory=Default",
+            "--app-id=$appId",
+            "--start-fullscreen"
+        )
+    }
 
-# If the installed-app registration ever disappears, the direct app URL still
-# gives Steam Link the same borderless experience.
-if ($window -eq [IntPtr]::Zero) {
-    Start-Process -FilePath $chrome -ArgumentList @(
-        "--profile-directory=Default",
-        "--app=$gameUrl",
-        "--start-fullscreen"
-    )
-    $deadline = (Get-Date).AddSeconds(10)
+    $deadline = (Get-Date).AddSeconds(6)
     do {
         Start-Sleep -Milliseconds 200
         $window = [NobodyQuestWindow]::Find("Nobody's Quest")
     } while ($window -eq [IntPtr]::Zero -and (Get-Date) -lt $deadline)
-}
 
-if ($window -eq [IntPtr]::Zero) { throw "Nobody's Quest did not open in Chrome." }
+    # If the installed-app registration ever disappears, the direct app URL
+    # still gives Steam Link the same borderless experience.
+    if ($window -eq [IntPtr]::Zero) {
+        Start-Process -FilePath $chrome -ArgumentList @(
+            "--profile-directory=Default",
+            "--app=$gameUrl",
+            "--start-fullscreen"
+        )
+        $deadline = (Get-Date).AddSeconds(10)
+        do {
+            Start-Sleep -Milliseconds 200
+            $window = [NobodyQuestWindow]::Find("Nobody's Quest")
+        } while ($window -eq [IntPtr]::Zero -and (Get-Date) -lt $deadline)
+    }
 
-[NobodyQuestWindow]::Raise($window)
-Start-Sleep -Milliseconds 700
-if (-not [NobodyQuestWindow]::IsFullscreen($window)) {
-    [NobodyQuestWindow]::PressF11()
-    Start-Sleep -Milliseconds 350
+    if ($window -eq [IntPtr]::Zero) { throw "Nobody's Quest did not open in Chrome." }
+
     [NobodyQuestWindow]::Raise($window)
+    Start-Sleep -Milliseconds 700
+    if (-not [NobodyQuestWindow]::IsFullscreen($window)) {
+        [NobodyQuestWindow]::PressF11()
+        Start-Sleep -Milliseconds 350
+        [NobodyQuestWindow]::Raise($window)
+    }
+
+    # Keep Steam's non-Steam game alive until the game window is actually closed.
+    while ([NobodyQuestWindow]::IsWindow($window)) {
+        Start-Sleep -Milliseconds 500
+    }
+} finally {
+    # Return Steam Link controllers directly to Big Picture navigation. This is
+    # more reliable than foreground detection when Chrome remains open.
+    Start-Process "steam://forceinputappid/769"
 }
 
-# Keep Steam's non-Steam game alive until the game window is actually closed.
-while ([NobodyQuestWindow]::IsWindow($window)) {
-    Start-Sleep -Milliseconds 500
-}
