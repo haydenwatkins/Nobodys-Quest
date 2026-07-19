@@ -205,4 +205,3 @@ assert.equal(G.playerHp(), 1, "Providence should prevent one lethal hit per boss
 assert.match(p.providenceKey, /:2$/);
 
 console.log("passive identity tests passed");
-
