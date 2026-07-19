@@ -103,6 +103,26 @@ G.COSTUMES = [
     swatches: ["#ffcd75", "#73eff7", "#8153c1"],
     condition: () => !!(G.state && (G.state.items || []).includes("manyfold-crown")),
   },
+  {
+    id: "worldwalker", icon: "🌍", name: "Worldwalker", tagline: "Sunlit cloth and horizon-blue trim from the roaming caravan.",
+    hint: "Complete The Whole Horizon caravan favor.", accessory: "scarf", accent: "#73eff7",
+    palette: {
+      "#f4f4f4": "#fff3c2", "#94b0c2": "#d8b06a", "#566c86": "#6b4a2b",
+      "#38b764": "#a7f070", "#41a6f6": "#73eff7", "#ef7d57": "#ffcd75", "#8153c1": "#3b5dc9",
+    },
+    swatches: ["#fff3c2", "#d8b06a", "#73eff7"],
+    condition: () => !!(G.state && (G.state.items || []).includes("worldwake-cloak")),
+  },
+  {
+    id: "worldheart", icon: "🗿", name: "Worldheart", tagline: "Ancient stone, warm embers, and six tiny orbiting lights.",
+    hint: "Complete A World at Peace caravan favor.", accessory: "stars", accent: "#ef7d57",
+    palette: {
+      "#f4f4f4": "#d8b06a", "#94b0c2": "#8a7f68", "#566c86": "#4b4541",
+      "#38b764": "#ef7d57", "#41a6f6": "#ffcd75", "#ef7d57": "#b13e53", "#8153c1": "#6b4a2b",
+    },
+    swatches: ["#d8b06a", "#ef7d57", "#4b4541"],
+    condition: () => !!(G.state && (G.state.items || []).includes("worldwake-crown")),
+  },
 ];
 
 G.costumeById = function (id) {

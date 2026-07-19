@@ -684,8 +684,19 @@ G.combat = (() => {
         }
       } else if (!gone && pr.armT <= 0) {
         // enemy projectile hitting the player
+        const shelter = (s.passiveShelters || []).find((field) =>
+          G.util.dist(pr.x, pr.y, field.x, field.y) <= field.radius + pr.size);
+        const safeLight = (s.safeLights || []).find((field) =>
+          G.util.dist(pr.x, pr.y, field.x, field.y) <= field.radius + pr.size);
+        if (shelter || safeLight) {
+          gone = true;
+          const field = shelter || safeLight;
+          G.spawnFx({ kind: "puff", x: pr.x, y: pr.y, color: shelter ? "#ffcd75" : "#fff3c2", dur: 0.2 });
+          G.spawnFx({ kind: "ring", x: pr.x, y: pr.y, color: shelter ? "#d8b06a" : "#ffcd75", radius: 7, dur: 0.2 });
+          G.events.emit("projectileBlock", { kind: shelter ? "masonry" : "safeLight" });
+        }
         const p = s.player;
-        if (G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {
+        if (!gone && G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {
           G.damagePlayer(pr.damage, pr.x, pr.y);
           // Trial knockouts intentionally clear every shot and start an eject
           // sequence. The old loop indices are invalid after that reset.

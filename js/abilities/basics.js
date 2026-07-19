@@ -993,6 +993,182 @@ registerAbility({
   },
 });
 
+/* ----------------- WORLDWAKE moves -----------------
+   These abilities emphasize handling and space over raw damage. Their form
+   passives also remix borrowed moves, so each guardian expands the entire
+   ability collection instead of only adding three isolated buttons.       */
+
+registerAbility({
+  id: "wingbeat", name: "Wingbeat", icon: "🪶", type: "blunt", style: "melee",
+  mana: 0, cooldown: 0.4,
+  use(user) {
+    G.combat.meleeArc(user, { ability: "wingbeat", range: 25, arcDeg: 190, damage: 1,
+      type: "blunt", knockback: 145, color: "#73eff7", lunge: 4, weight: 4, hitStop: 0.03 });
+  },
+});
+
+registerAbility({
+  id: "featherGale", name: "Feather Gale", icon: "🌬️", type: "sharp", style: "projectile",
+  mana: 3, cooldown: 0.95, autoAim: true, aimRange: 175,
+  use(user) {
+    const hitGroup = {};
+    [-13, 0, 13].forEach((spreadDeg) => G.combat.shoot(user, {
+      ability: "featherGale", speed: 230, range: 175, damage: 1, type: "sharp",
+      spreadDeg, size: 3, color: "#f4f4f4", trail: 5, hitGroup, recoil: 1.5,
+    }));
+  },
+});
+
+registerAbility({
+  id: "skyDive", name: "Sky Dive", icon: "🪽", type: "blunt", style: "dash",
+  mana: 5, cooldown: 1.45,
+  use(user) {
+    G.combat.dash(user, { ability: "skyDive", dist: 82, speed: 390, damage: 1, type: "blunt", color: "#73eff7",
+      endBurst: { ability: "skyDive", range: 31, damage: 2, type: "blunt", knockback: 170, color: "#f4f4f4" } });
+  },
+});
+
+registerAbility({
+  id: "stoneKnuckle", name: "Stone Knuckle", icon: "🪨", type: "blunt", style: "melee",
+  mana: 0, cooldown: 0.48,
+  use(user) {
+    user.stoneBeat = (user.stoneBeat || 0) % 3 + 1;
+    const heavy = user.stoneBeat === 3;
+    G.combat.meleeArc(user, { ability: "stoneKnuckle", range: heavy ? 29 : 22, arcDeg: heavy ? 210 : 125,
+      damage: heavy ? 2 : 1, type: "blunt", knockback: heavy ? 190 : 95, color: heavy ? "#ffcd75" : "#8a7f68",
+      lunge: 3, weight: heavy ? 7 : 4, hitStop: heavy ? 0.05 : 0.03, combo: heavy ? "keystone" : "knuckle" });
+  },
+});
+
+registerAbility({
+  id: "rampartPulse", name: "Rampart Pulse", icon: "🧱", type: "light", style: "area",
+  mana: 3, cooldown: 1.35,
+  use(user) {
+    G.combat.areaBurst(user, { ability: "rampartPulse", range: 34, damage: 1, type: "light",
+      knockback: 165, color: "#ffcd75", hitStop: 0.035, combo: "rampart" });
+  },
+});
+
+registerAbility({
+  id: "rollingMonolith", name: "Rolling Monolith", icon: "🗿", type: "blunt", style: "projectile",
+  mana: 5, cooldown: 1.65, autoAim: true, aimRange: 185,
+  use(user) {
+    G.combat.shoot(user, { ability: "rollingMonolith", speed: 125, range: 185, damage: 2, type: "blunt",
+      size: 8, pierce: true, color: "#8a7f68", trail: 4, recoil: 4, hitStop: 0.04 });
+  },
+});
+
+registerAbility({
+  id: "silkNeedle", name: "Silk Needle", icon: "🪡", type: "sharp", style: "projectile",
+  mana: 0, cooldown: 0.42, autoAim: true, aimRange: 170,
+  use(user) {
+    G.combat.shoot(user, { ability: "silkNeedle", speed: 240, range: 170, damage: 1, type: "sharp",
+      size: 3, color: "#d9a7ff", trail: 7, recoil: 1.2 });
+  },
+});
+
+registerAbility({
+  id: "stitchline", name: "Stitchline", icon: "🧵", type: "sharp", style: "chain",
+  mana: 4, cooldown: 1.25, autoAim: true, aimRange: 90,
+  use(user) {
+    G.combat.chain(user, { ability: "stitchline", range: 90, jumpRange: 58, maxTargets: 5,
+      damage: 1, type: "sharp", knockback: 0, color: "#d9a7ff", status: { name: "stun", dur: 0.32 } });
+  },
+});
+
+registerAbility({
+  id: "cocoonField", name: "Cocoon Field", icon: "🕸️", type: "dark", style: "area", traits: ["status"],
+  mana: 6, cooldown: 1.8,
+  use(user) {
+    G.combat.areaBurst(user, { ability: "cocoonField", range: 45, damage: 1, type: "dark", pull: 13,
+      color: "#8153c1", status: { name: "stun", dur: 0.7 }, hitStop: 0.035, combo: "cocoon" });
+  },
+});
+
+registerAbility({
+  id: "handbell", name: "Handbell", icon: "🔔", type: "light", style: "area",
+  mana: 0, cooldown: 0.5,
+  use(user) {
+    user.bellBeat = (user.bellBeat || 0) % 3 + 1;
+    const peal = user.bellBeat === 3;
+    G.combat.areaBurst(user, { ability: "handbell", range: peal ? 34 : 25, damage: 1, type: "light",
+      knockback: peal ? 175 : 90, color: peal ? "#fff3c2" : "#ffcd75", combo: peal ? "peal" : "chime" });
+  },
+});
+
+registerAbility({
+  id: "echoOrb", name: "Echo Orb", icon: "🫧", type: "light", style: "projectile",
+  mana: 3, cooldown: 1.05, autoAim: true, aimRange: 180,
+  use(user) {
+    G.combat.shoot(user, { ability: "echoOrb", speed: 170, range: 180, damage: 1, type: "light",
+      size: 6, ricochets: 1, bounceRange: 78, color: "#fff3c2", trail: 6, recoil: 2 });
+  },
+});
+
+registerAbility({
+  id: "silenceRing", name: "Silence Ring", icon: "⭕", type: "dark", style: "area", traits: ["status"],
+  mana: 5, cooldown: 1.75,
+  use(user) {
+    G.combat.areaBurst(user, { ability: "silenceRing", range: 47, damage: 1, type: "dark",
+      knockback: 195, color: "#8153c1", status: { name: "stun", dur: 0.48 }, combo: "silence" });
+  },
+});
+
+registerAbility({
+  id: "wickLash", name: "Wick Lash", icon: "🔥", type: "dark", style: "melee",
+  mana: 0, cooldown: 0.42,
+  use(user) {
+    G.combat.meleeArc(user, { ability: "wickLash", range: 29, arcDeg: 175, damage: 1, type: "dark",
+      knockback: 100, color: "#ffcd75", lunge: 3, weight: 4, hitStop: 0.03 });
+  },
+});
+
+registerAbility({
+  id: "ghostlight", name: "Ghostlight", icon: "🏮", type: "light", style: "area",
+  mana: 4, cooldown: 1.45,
+  use(user) {
+    G.combat.areaBurst(user, { ability: "ghostlight", range: 39, damage: 1, type: "light",
+      knockback: 135, color: "#ffcd75", combo: "safe-light" });
+  },
+});
+
+registerAbility({
+  id: "lanternDrift", name: "Lantern Drift", icon: "💫", type: "light", style: "dash",
+  mana: 5, cooldown: 1.4,
+  use(user) {
+    G.combat.dash(user, { ability: "lanternDrift", dist: 72, speed: 330, damage: 1, type: "light", color: "#ffcd75",
+      endBurst: { ability: "lanternDrift", range: 34, damage: 1, type: "light", knockback: 125, color: "#fff3c2" } });
+  },
+});
+
+registerAbility({
+  id: "pillarFist", name: "Pillar Fist", icon: "✊", type: "blunt", style: "melee",
+  mana: 0, cooldown: 0.55,
+  use(user) {
+    G.combat.meleeArc(user, { ability: "pillarFist", range: 28, arcDeg: 170, damage: 2, type: "blunt",
+      knockback: 175, color: "#ef7d57", lunge: 3, weight: 7, hitStop: 0.05, shake: 0.19 });
+  },
+});
+
+registerAbility({
+  id: "earthShoulder", name: "Earth Shoulder", icon: "💥", type: "blunt", style: "dash",
+  mana: 4, cooldown: 1.3,
+  use(user) {
+    G.combat.dash(user, { ability: "earthShoulder", dist: 63, speed: 300, damage: 2, type: "blunt", color: "#ef7d57",
+      endBurst: { ability: "earthShoulder", range: 29, damage: 1, type: "blunt", knockback: 220, color: "#d8b06a" } });
+  },
+});
+
+registerAbility({
+  id: "worldBreak", name: "World Break", icon: "🌋", type: "blunt", style: "area",
+  mana: 7, cooldown: 2.05,
+  use(user) {
+    const hits = G.combat.areaBurst(user, { ability: "worldBreak", range: 48, damage: 2, type: "blunt",
+      knockback: 230, color: "#ef7d57", hitStop: 0.055, shake: 0.24, combo: "worldbreak" });
+    if (hits) G.state.hitStop = Math.max(G.state.hitStop, 0.07);
+  },
+});
+
 /* ----------------- GOD's moves ----------------- */
 
 registerAbility({

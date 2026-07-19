@@ -61,6 +61,7 @@ function makeGreenfieldTiles() {
   put(W - 1, 60, "F"); put(W - 2, 60, ".");
   put(110, 0, "Y"); put(110, 1, ".");
   put(0, 65, "Z"); put(1, 65, ".");
+  put(W - 1, 70, "P"); put(W - 2, 70, "p");
 
   // Landmarks.
   put(57, 44, "s");
@@ -109,6 +110,7 @@ registerMap({
     "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "trial", portalTheme: "jester" },
     "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, mastery: { before: "god", level: 5 }, portalStyle: "trial", portalTheme: "god" },
     "Z": { tile: "grass", portal: { map: "shattercoast", x: 2, y: 14 }, stars: 28, portalStyle: "gap" },
+    "P": { tile: "path", portal: { map: "sunstepPrairie", x: 2, y: 14 }, stars: 24, portalStyle: "gap", seamless: true },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
   },
 
@@ -244,6 +246,7 @@ function makeShattercoastTiles() {
   [[8,12,"9"],[14,17,"8"],[19,7,"6"],[29,8,"0"],[35,17,"4"],[40,12,"9"],[25,22,"0"],[7,25,"6"]]
     .forEach(([x,y,ch]) => put(x,y,ch));
   put(0, 14, "x");
+  put(w - 1, 14, "F");
   put(11, 5, "T"); put(36, 5, "K"); put(11, 24, "A"); put(36, 24, "D");
   put(23, 14, "G"); put(19, 14, "m"); put(27, 14, "H");
   return rows.map((row) => row.join(""));
@@ -253,6 +256,7 @@ registerMap({
   id: "shattercoast", name: "Shattercoast", playerStart: { x: 2, y: 14 },
   legend: {
     "x": { tile: "path", portal: { map: "overworld", x: 1, y: 65 } },
+    "F": { tile: "path", portal: { map: "frostbellTundra", x: 2, y: 14 }, portalStyle: "gap", seamless: true },
     "4": { tile: "grass", enemy: "wisp" }, "5": { tile: "grass", enemy: "brute" },
     "6": { tile: "grass", enemy: "thornling" }, "7": { tile: "grass", enemy: "pebblebeast" },
     "8": { tile: "grass", enemy: "shade" },
@@ -648,3 +652,199 @@ registerMap({
     "tttttttttttttttttttttttttttttt",
   ],
 });
+
+/* ================== WORLDWAKE EXPANSION ==================
+   These broad regions share a reusable layout grammar: readable three-tile
+   trails, open combat pockets, memorable camps, and several connections.
+   Boundary portals slide directly into the neighboring landscape.          */
+
+function makeWorldwakeRegionTiles(variant) {
+  const w = 46, h = 29;
+  const edge = variant === 2 || variant === 5 ? "r" : "t";
+  const rows = Array.from({ length: h }, (_, y) =>
+    Array.from({ length: w }, (_, x) => (x === 0 || y === 0 || x === w - 1 || y === h - 1) ? edge : "."));
+  const put = (x, y, ch) => { if (x >= 0 && y >= 0 && x < w && y < h) rows[y][x] = ch; };
+
+  // A winding but unmistakable main road. The wide middle crossing keeps
+  // touch play from becoming a collision puzzle when several enemies gather.
+  for (let x = 1; x < w - 1; x++) for (let y = 13; y <= 15; y++) put(x, y, "p");
+  for (let y = 1; y < h - 1; y++) for (let x = 22; x <= 24; x++) put(x, y, "p");
+  for (let x = 7; x <= 38; x++) put(x, 7 + Math.round(Math.sin((x + variant) * 0.32) * 2), "p");
+
+  // Large terrain patches establish speed and direction without closing off
+  // any destination. Water for lush/cold lands, rock shelves for dry ones.
+  const patchChar = ["t", "r", "w", "t", "r", "w", "r", "r"][variant];
+  const patches = [[7,4,4,2], [37,5,4,2], [8,23,5,2], [37,23,4,2]];
+  for (const [cx, cy, rx, ry] of patches) {
+    for (let y = cy - ry; y <= cy + ry; y++) for (let x = cx - rx; x <= cx + rx; x++) {
+      const shape = ((x - cx) ** 2) / (rx * rx) + ((y - cy) ** 2) / (ry * ry);
+      if (shape < 0.82 + G.util.hash2(x + variant * 17, y + 8) * 0.18) put(x, y, patchChar);
+    }
+  }
+
+  // Re-open guaranteed loops around every patch.
+  for (let x = 3; x <= 42; x++) { put(x, 3, "."); put(x, 25, "."); }
+  for (let y = 3; y <= 25; y++) { put(3, y, "."); put(42, y, "."); }
+
+  const enemySets = [
+    ["1", "2", "6"], ["2", "3", "7"], ["4", "6", "7"], ["2", "6", "8"],
+    ["3", "7", "0"], ["4", "8", "9"], ["2", "5", "0"], ["3", "5", "8"],
+  ];
+  [[12,5],[31,5],[8,11],[37,11],[10,19],[34,19],[17,24],[29,24]].forEach(([x, y], i) =>
+    put(x, y, enemySets[variant][i % 3]));
+  put(19, 18, ["a", "a", "b", "b", "c", "d", "d", "e"][variant]);
+
+  put(0, 14, "x"); put(w - 1, 14, "y"); put(23, 0, "n"); put(23, h - 1, "s");
+  put(35, 8, "B"); put(10, 14, "m"); put(27, 14, "H"); put(7, 20, "C");
+  return rows.map((row) => row.join(""));
+}
+
+const WORLDWAKE_COMMON_ENEMIES = {
+  "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
+  "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
+  "5": { tile: "grass", enemy: "brute" }, "6": { tile: "grass", enemy: "thornling" },
+  "7": { tile: "grass", enemy: "pebblebeast" }, "8": { tile: "grass", enemy: "shade" },
+  "9": { tile: "grass", enemy: "tideCrab" }, "0": { tile: "grass", enemy: "starMote" },
+  "a": { tile: "grass", enemy: "sunHopper" }, "b": { tile: "grass", enemy: "loomling" },
+  "c": { tile: "grass", enemy: "mirageSkater" }, "d": { tile: "grass", enemy: "bellMoth" },
+  "e": { tile: "grass", enemy: "cairnWalker" },
+  "C": { tile: "path", rest: true, restText: "The caravan campfire restores every heart and all mana." },
+};
+
+function worldwakeLegend(extra) {
+  const common = {};
+  for (const [key, cell] of Object.entries(WORLDWAKE_COMMON_ENEMIES)) common[key] = Object.assign({}, cell);
+  return Object.assign(common, extra);
+}
+
+[
+  {
+    id: "sunstepPrairie", name: "Sunstep Prairie", biome: "sunstep", variant: 0,
+    message: "The land ahead has no doors. Keep walking and the horizon will carry you into the next region.",
+    portals: {
+      x: { map: "overworld", x: 118, y: 70 }, y: { map: "windscarCanyon", x: 2, y: 14 },
+      n: { map: "windscarCanyon", x: 23, y: 27 }, s: { map: "glasswaterDesert", x: 23, y: 1, mark: "sky" },
+    },
+    boss: { map: "griffinWorldback", theme: "griffin" }, cache: { item: "sunstep-ribbon", name: "the Sunstep Ribbon" },
+  },
+  {
+    id: "windscarCanyon", name: "Windscar Canyon", biome: "windscar", variant: 1,
+    message: "Claw marks cross the canyon wall, each one wider than a wagon. Their owner is circling above.",
+    portals: {
+      x: { map: "sunstepPrairie", x: 43, y: 14 }, y: { map: "hangingGardens", x: 2, y: 14 },
+      n: { map: "hangingGardens", x: 23, y: 27 }, s: { map: "sunstepPrairie", x: 23, y: 1 },
+    },
+    boss: { map: "griffinWorldback", theme: "griffin" }, cache: { item: "windscar-feather", name: "a Windscar Feather" },
+  },
+  {
+    id: "hangingGardens", name: "Hanging Gardens", biome: "gardens", variant: 2,
+    message: "These terraces are not ruins. The Old Mason is still building them, one patient footstep at a time.",
+    portals: {
+      x: { map: "windscarCanyon", x: 43, y: 14 }, y: { map: "rootdeepHollow", x: 2, y: 14 },
+      n: { map: "rootdeepHollow", x: 23, y: 27, mark: "stone" }, s: { map: "windscarCanyon", x: 23, y: 1 },
+    },
+    boss: { map: "golemWorldback", theme: "golem" }, cache: { item: "garden-keystone", name: "a singing Garden Keystone" },
+  },
+  {
+    id: "rootdeepHollow", name: "Rootdeep Hollow", biome: "rootdeep", variant: 3,
+    message: "The silver threads are roads. Step gently; the Weaver remembers every traveler by name.",
+    portals: {
+      x: { map: "hangingGardens", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 2, y: 14 },
+      n: { map: "hangingGardens", x: 23, y: 27 }, s: { map: "glasswaterDesert", x: 23, y: 1, mark: "thread" },
+    },
+    boss: { map: "weaverWorldback", theme: "weaver" }, cache: { item: "rootdeep-silk", name: "the unbreakable Rootdeep Silk" },
+  },
+  {
+    id: "glasswaterDesert", name: "Glasswater Desert", biome: "glasswater", variant: 4,
+    message: "At noon the sand reflects places that do not exist. At dusk it reflects the road to Titan Grave.",
+    portals: {
+      x: { map: "rootdeepHollow", x: 43, y: 14 }, y: { map: "titanGrave", x: 23, y: 1, mark: "light" },
+      n: { map: "rootdeepHollow", x: 23, y: 27 }, s: { map: "sunstepPrairie", x: 23, y: 1, mark: "sky" },
+    },
+    boss: { map: "weaverWorldback", theme: "weaver" }, cache: { item: "glasswater-prism", name: "the Glasswater Prism" },
+  },
+  {
+    id: "frostbellTundra", name: "Frostbell Tundra", biome: "frostbell", variant: 5,
+    message: "Every frozen arch rings a different note. The Bell Titan is trying very hard to tune the wind.",
+    portals: {
+      x: { map: "shattercoast", x: 45, y: 14 }, y: { map: "stormspinePeaks", x: 2, y: 14 },
+      n: { map: "stormspinePeaks", x: 23, y: 27, mark: "echo" }, s: { map: "shattercoast", x: 45, y: 14 },
+    },
+    boss: { map: "bellWorldback", theme: "bellkeeper" }, cache: { item: "frostbell-chime", name: "a Frostbell Chime" },
+  },
+  {
+    id: "stormspinePeaks", name: "Stormspine Peaks", biome: "stormspine", variant: 6,
+    message: "The lanterns do not mark a safe road. They are the safe road. Stay near their warm light.",
+    portals: {
+      x: { map: "frostbellTundra", x: 43, y: 14 }, y: { map: "titanGrave", x: 2, y: 14 },
+      n: { map: "titanGrave", x: 23, y: 27, mark: "light" }, s: { map: "frostbellTundra", x: 23, y: 1 },
+    },
+    boss: { map: "lanternWorldback", theme: "lantern" }, cache: { item: "stormglass-lantern", name: "the Stormglass Lantern" },
+  },
+  {
+    id: "titanGrave", name: "Titan Grave", biome: "titan", variant: 7,
+    message: "The mountain ahead is breathing. Six paths meet at its heart, and it has been waiting for Nobody.",
+    portals: {
+      x: { map: "stormspinePeaks", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 43, y: 14 },
+      n: { map: "glasswaterDesert", x: 23, y: 27 }, s: { map: "stormspinePeaks", x: 23, y: 1 },
+    },
+    boss: { map: "colossusWorldback", theme: "colossus" }, cache: { item: "titan-memory", name: "the Titan's Smallest Memory" },
+  },
+].forEach((region) => {
+  const p = region.portals;
+  registerMap({
+    id: region.id, name: region.name, biome: region.biome, worldwake: true,
+    playerStart: { x: 3, y: 14 },
+    legend: worldwakeLegend({
+      "x": { tile: "path", portal: p.x, portalStyle: "gap", seamless: true, mark: p.x.mark },
+      "y": { tile: "path", portal: p.y, portalStyle: "gap", seamless: true, mark: p.y.mark },
+      "n": { tile: "path", portal: p.n, portalStyle: "gap", seamless: true, mark: p.n.mark },
+      "s": { tile: "path", portal: p.s, portalStyle: "gap", seamless: true, mark: p.s.mark },
+      "B": { tile: "path", portal: { map: region.boss.map, x: 3, y: 11 }, portalStyle: "trial", portalTheme: region.boss.theme },
+      "m": { tile: "path", message: region.message },
+      "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
+    }),
+    tiles: makeWorldwakeRegionTiles(region.variant),
+  });
+});
+
+function makeWorldbearerArena(variant) {
+  const w = 38, h = 23;
+  const rows = Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) =>
+    (x === 0 || y === 0 || x === w - 1 || y === h - 1) ? "#" : "f"));
+  const put = (x, y, ch) => { rows[y][x] = ch; };
+  put(0, 11, "x"); put(4, 11, "m"); put(31, 11, "B"); put(8, 18, "H");
+  const shapes = [
+    [[13,4],[21,5],[16,17],[27,17]], [[12,5],[24,4],[15,17],[26,16]],
+    [[14,4],[24,7],[12,16],[23,18]], [[11,4],[20,6],[28,5],[18,18]],
+    [[14,5],[25,4],[11,17],[27,17]], [[11,5],[19,4],[27,6],[14,17],[25,18]],
+  ][variant];
+  shapes.forEach(([x, y]) => put(x, y, "R"));
+  return rows.map((row) => row.join(""));
+}
+
+[
+  { id: "griffinWorldback", name: "The Sky Sovereign's Back", theme: "griffin", boss: "skySovereign", exitMap: "windscarCanyon",
+    sign: "The canyon drops away. What looked like an island opens one enormous golden eye." },
+  { id: "golemWorldback", name: "The Old Mason's Crown", theme: "golem", boss: "oldMason", exitMap: "hangingGardens",
+    sign: "The terraces rise beneath you. You were never climbing a garden; you were climbing its gardener." },
+  { id: "weaverWorldback", name: "The Loom Below", theme: "weaver", boss: "silkMatriarch", exitMap: "rootdeepHollow",
+    sign: "Each bridge tightens into a silver string. Somewhere in the dark, eight hands begin to applaud." },
+  { id: "bellWorldback", name: "The Walking Belfry", theme: "bellkeeper", boss: "bellTitan", exitMap: "frostbellTundra",
+    sign: "Snow falls upward as the frozen cathedral takes its first step in a thousand years." },
+  { id: "lanternWorldback", name: "The Storm Lantern", theme: "lantern", boss: "lanternKeeper", exitMap: "stormspinePeaks",
+    sign: "A warm light moves inside the storm. It turns toward you, hopeful and hungry." },
+  { id: "colossusWorldback", name: "The Heart Under Stone", theme: "colossus", boss: "lastWorldbearer", exitMap: "titanGrave",
+    sign: "The mountain kneels. Its heartbeat is slow enough to count between thunderclaps." },
+].forEach((trial, variant) => registerMap({
+  id: trial.id, name: trial.name, visualTheme: trial.theme, worldbearer: true, playerStart: { x: 3, y: 11 },
+  bossTrial: { exit: { map: trial.exitMap, x: 34, y: 9 }, delay: 1.8 },
+  legend: {
+    "x": { tile: "floor", portal: { map: trial.exitMap, x: 34, y: 9 } },
+    "B": { tile: "floor", enemy: trial.boss },
+    "m": { tile: "floor", message: trial.sign },
+    "H": { tile: "floor", rest: true, restText: "The Worldbearer's quiet breath restores every heart and all mana." },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: makeWorldbearerArena(variant),
+}));

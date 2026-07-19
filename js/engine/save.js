@@ -30,6 +30,7 @@ G.saveGame = function () {
       town: s.town,
       heroBoard: s.heroBoard,
       wayfinder: s.wayfinder,
+      worldwake: s.worldwake,
       gauntletBest: s.gauntletBest || 0,
       gauntletIronBest: s.gauntletIronBest || 0,
       questCounts: G.questCounts,

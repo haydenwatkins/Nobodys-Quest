@@ -51,6 +51,29 @@
 
   document.addEventListener("contextmenu", (e) => e.preventDefault());
 
+  // Gap portals are world borders, not doors. Preserve the previous frame and
+  // slide it away while the neighboring region is already drawn underneath.
+  // The tiny 320x180 buffer is deliberately inexpensive on mobile Safari.
+  G.beginWorldTransition = function (mapId, spawn, movement) {
+    if (!G.maps[mapId]) return false;
+    if (G.reducedMotion) {
+      G.world.load(mapId, spawn, { seamless: true });
+      return true;
+    }
+    const snapshot = document.createElement("canvas");
+    snapshot.width = G.W;
+    snapshot.height = G.H;
+    snapshot.getContext("2d").drawImage(canvas, 0, 0);
+    const move = movement || { x: 1, y: 0 };
+    const horizontal = Math.abs(move.x) >= Math.abs(move.y);
+    const direction = horizontal
+      ? { x: move.x < 0 ? -1 : 1, y: 0 }
+      : { x: 0, y: move.y < 0 ? -1 : 1 };
+    G.world.load(mapId, spawn, { seamless: true });
+    G.state.zoneTransition = { snapshot, direction, t: 0, duration: 0.58 };
+    return true;
+  };
+
   /* ---------- boot ---------- */
   G.validateCrossRefs();
   G.ui.showWorkshop();
@@ -73,6 +96,7 @@
     town: G.makeTown(),
     heroBoard: G.makeHeroBoard(),
     wayfinder: G.makeWayfinder(),
+    worldwake: G.makeWorldwake(),
     gauntletBest: 0,
     gauntletIronBest: 0,
     shake: 0,
@@ -106,6 +130,7 @@
     s.town = G.normalizeTown(save.town || save.cult);
     s.heroBoard = G.normalizeHeroBoard(save.heroBoard);
     s.wayfinder = G.normalizeWayfinder(save.wayfinder, save);
+    s.worldwake = G.normalizeWorldwake(save.worldwake, save);
     s.gauntletBest = save.gauntletBest || 0;
     s.gauntletIronBest = save.gauntletIronBest || 0;
     G.questCounts = save.questCounts || {};
@@ -183,6 +208,7 @@
   if (G.state.wayfinder.rewardClaimed && !G.state.items.includes("wayfinder-whistle"))
     G.state.items.push("wayfinder-whistle");
   G.checkWayfinderCompletion(false); // finishes an inferred complete legacy Journal
+  G.checkWorldwakeFavors(true); // migrates expansion rewards without replaying banners
   G.checkCostumeUnlocks(true); // migrates wardrobe rewards earned by older saves
   G.costumeBooting = false;
 
@@ -222,6 +248,16 @@
     s.cameraKickY *= Math.pow(0.002, dt);
     if (Math.abs(s.cameraKickX) < 0.05) s.cameraKickX = 0;
     if (Math.abs(s.cameraKickY) < 0.05) s.cameraKickY = 0;
+
+    if (s.zoneTransition) {
+      s.time += dt;
+      s.zoneTransition.t += dt;
+      if (s.zoneTransition.t >= s.zoneTransition.duration) s.zoneTransition = null;
+      G.updateFx(dt * 0.4);
+      G.ui.update(dt);
+      G.input.clearTaps();
+      return;
+    }
 
     // A very short shared impact pause lets the eye register a hit. Input is
     // deliberately not cleared here, so the player never loses a button tap.
@@ -297,6 +333,7 @@
     ctx.translate(-camX, -camY);
 
     G.world.draw(ctx, { x: camX, y: camY }, s.time);
+    if (G.passives && G.passives.drawFields) G.passives.drawFields(ctx);
     G.drawPickups(ctx);
 
     // draw everyone in y-order so closer things overlap farther things
@@ -310,6 +347,19 @@
     drawFx();
 
     ctx.restore();
+    if (s.zoneTransition) {
+      const tr = s.zoneTransition;
+      const raw = Math.min(1, tr.t / tr.duration);
+      const eased = 1 - Math.pow(1 - raw, 3);
+      const x = Math.round(-tr.direction.x * eased * G.W);
+      const y = Math.round(-tr.direction.y * eased * G.H);
+      ctx.drawImage(tr.snapshot, x, y);
+      // A narrow bright seam makes the motion read as crossing a boundary,
+      // not a camera glitch, without hiding either region.
+      ctx.fillStyle = "rgba(255,243,194,0.5)";
+      if (tr.direction.x) ctx.fillRect(x + (tr.direction.x > 0 ? G.W - 2 : 0), 0, 2, G.H);
+      else ctx.fillRect(0, y + (tr.direction.y > 0 ? G.H - 2 : 0), G.W, 2);
+    }
     // Pixel-stepped edge shading adds depth without blurring the art or
     // covering the sharp HTML HUD layered above this canvas.
     ctx.fillStyle = "rgba(26,28,44,0.12)";

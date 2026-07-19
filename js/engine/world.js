@@ -50,8 +50,16 @@ G.world = (() => {
     });
   }
 
+  function portalMarkMet(cell) {
+    return !cell.mark || (G.hasWorldMark && G.hasWorldMark(cell.mark));
+  }
+
+  function portalOpen(cell) {
+    return (!cell.stars || G.state.stars >= cell.stars) && portalMasteryMet(cell) && portalMarkMet(cell);
+  }
+
   /* ---------- loading a map ---------- */
-  function load(mapId, spawn) {
+  function load(mapId, spawn, options) {
     const def = G.maps[mapId];
     if (!def) { console.error("No map called " + mapId); return; }
     if (G.state && G.state.gauntletRun && mapId !== "gauntletArena" && G.cancelGauntlet) G.cancelGauntlet();
@@ -97,10 +105,12 @@ G.world = (() => {
     s.projectiles = [];
     s.pickups = [];
     s.passiveEchoes = [];
+    s.passiveShelters = [];
+    s.safeLights = [];
     s.bossCutscene = null;
     // A quick world-only fade makes doors feel intentional without delaying
     // control or covering the HTML HUD. Reduced-motion players skip it.
-    s.mapReveal = G.reducedMotion ? 0 : 0.32;
+    s.mapReveal = G.reducedMotion || (options && options.seamless) ? 0 : 0.32;
     G.fx.length = 0;
 
     const p = s.player;
@@ -115,7 +125,9 @@ G.world = (() => {
     s.portalNeedsRelease = true;
     s.portalGrace = 0.35;
 
-    if (def.name) G.ui.toast("🗺 " + def.name);
+    // Worldwake entries introduce themselves through the campaign banner so
+    // a map-name toast does not collide with regional banter on small screens.
+    if (def.name && !def.worldwake) G.ui.toast("🗺 " + def.name);
     G.events.emit("mapEnter", { map: mapId });
   }
 
@@ -132,7 +144,7 @@ G.world = (() => {
     const cell = cellAt(px, py);
     // Doors: solid while locked, walkable once you have the stars —
     // even if the door is drawn on a normally-solid tile like a tree.
-    if (cell.portal) return !!((cell.stars && G.state.stars < cell.stars) || !portalMasteryMet(cell));
+    if (cell.portal) return !portalOpen(cell);
     if (SOLID[cell.tile]) return true;
     return false;
   }
@@ -211,9 +223,14 @@ G.world = (() => {
     if (cell.portal) {
       const need = cell.stars || 0;
       const masteryReady = portalMasteryMet(cell);
-      if (s.stars >= need && masteryReady && !s.portalNeedsRelease && s.portalGrace <= 0) {
+      const markReady = portalMarkMet(cell);
+      if (s.stars >= need && masteryReady && markReady && !s.portalNeedsRelease && s.portalGrace <= 0) {
         G.sfx.play("door");
-        load(cell.portal.map, { x: cell.portal.x, y: cell.portal.y });
+        const target = { x: cell.portal.x, y: cell.portal.y };
+        if ((cell.seamless || cell.portalStyle === "gap") && G.beginWorldTransition)
+          G.beginWorldTransition(cell.portal.map, target, move);
+        else
+          load(cell.portal.map, target);
         G.saveGame();
         return;
       } else if (s.stars < need && doorMsgCooldown <= 0) {
@@ -222,6 +239,9 @@ G.world = (() => {
       } else if (!masteryReady && doorMsgCooldown <= 0) {
         doorMsgCooldown = 2;
         G.ui.toast(`🔒 Final trial: every earlier form must reach level ${cell.mastery.level}.`, 3);
+      } else if (!markReady && doorMsgCooldown <= 0) {
+        doorMsgCooldown = 2;
+        G.ui.toast(`A World Path is sleeping. Awaken the ${cell.mark} mark first.`, 3);
       }
     }
 
@@ -253,12 +273,32 @@ G.world = (() => {
   /* ---------- drawing ----------
      Tiles are painted with code (no image files) so the whole
      game works from a single folder with zero downloads.      */
+  const BIOME_PALETTES = {
+    sunstep: { grass: ["#88c84b", "#9bd154", "#73b943"], path: ["#d8b06a", "#e8c27a", "#c99a58"], floor: ["#66745b", "#748263", "#596750"], accent: "#fff3c2" },
+    windscar: { grass: ["#b87943", "#c98a50", "#a9693d"], path: ["#dfaa61", "#efbd71", "#c99051"], floor: ["#815a4a", "#916955", "#704b42"], accent: "#73eff7" },
+    gardens: { grass: ["#55a95b", "#67b969", "#468f50"], path: ["#94b0a2", "#a8c3b2", "#7d998d"], floor: ["#687b75", "#788e85", "#586962"], accent: "#a7f070" },
+    rootdeep: { grass: ["#315b49", "#3c6a55", "#294c41"], path: ["#776176", "#896f86", "#665365"], floor: ["#4d465b", "#5b5268", "#423c50"], accent: "#d9a7ff" },
+    glasswater: { grass: ["#d8bc75", "#e8ca84", "#c6a867"], path: ["#ecd48f", "#f4dfa2", "#d8bf79"], floor: ["#6e91a0", "#7da6b3", "#607f91"], accent: "#73eff7" },
+    frostbell: { grass: ["#9bc7ca", "#aed6d5", "#89b5bb"], path: ["#c8d9d1", "#dbe8df", "#b4c8c4"], floor: ["#6d8296", "#7b93a8", "#607487"], accent: "#fff3c2" },
+    stormspine: { grass: ["#465676", "#526482", "#3d4969"], path: ["#6f7895", "#818aa6", "#606985"], floor: ["#484c69", "#555b78", "#3c405d"], accent: "#ffcd75" },
+    titan: { grass: ["#6d6654", "#7d755f", "#5f594b"], path: ["#9b875f", "#ad9870", "#897550"], floor: ["#5c5a59", "#6b6866", "#4e4d4e"], accent: "#ef7d57" },
+  };
+
+  function biomePalette() {
+    return BIOME_PALETTES[G.state.mapDef && G.state.mapDef.biome] || null;
+  }
+
   function groundColor(kind, x, y) {
     // Staggered 4x4/5x4 regions read as broad natural patches instead of a
     // checkerboard. Their subtle contrast gives motion a reference point.
     const patchX = Math.floor((x + (Math.floor(y / 4) % 2) * 2) / 5);
     const patchY = Math.floor(y / 4);
     const patch = G.util.hash2(patchX + 71, patchY + 43);
+    const biome = biomePalette();
+    if (biome) {
+      const colors = biome[kind] || biome.grass;
+      return colors[patch < 0.3 ? 0 : patch > 0.76 ? 1 : 2];
+    }
     if (kind === "path") return patch < 0.3 ? "#cfaa66" : patch > 0.76 ? "#e0b874" : "#d8b06a";
     if (kind === "floor") return patch < 0.3 ? "#4f627c" : patch > 0.76 ? "#60738d" : "#566c86";
     return patch < 0.27 ? "#31ad60" : patch > 0.78 ? "#42bd6a" : "#38b764";
@@ -291,6 +331,24 @@ G.world = (() => {
     },
     druid: {
       floor: ["#52684d", "#5d7454", "#465a44"], wall: "#32432f", seam: "#1e2b22", accent: "#38b764",
+    },
+    griffin: {
+      floor: ["#8c765b", "#9d8768", "#78654f"], wall: "#574735", seam: "#32291f", accent: "#73eff7",
+    },
+    golem: {
+      floor: ["#69685f", "#78776c", "#5a5a53"], wall: "#43443f", seam: "#292b29", accent: "#ffcd75",
+    },
+    weaver: {
+      floor: ["#50465f", "#5c506c", "#443b52"], wall: "#30273b", seam: "#1d1925", accent: "#d9a7ff",
+    },
+    bellkeeper: {
+      floor: ["#657582", "#738794", "#586873"], wall: "#3f4e59", seam: "#26313a", accent: "#fff3c2",
+    },
+    lantern: {
+      floor: ["#554967", "#625574", "#493e5a"], wall: "#31283e", seam: "#1d1927", accent: "#ffcd75",
+    },
+    colossus: {
+      floor: ["#665c51", "#756a5c", "#584f47"], wall: "#403832", seam: "#28231f", accent: "#ef7d57",
     },
   };
 
@@ -439,7 +497,7 @@ G.world = (() => {
 
     /* extra decorations on top of the base tile */
     if (cell.portal) {
-      const locked = (cell.stars && G.state.stars < cell.stars) || !portalMasteryMet(cell);
+      const locked = !portalOpen(cell);
       if (cell.portalStyle === "trial") {
         const glow = 0.45 + 0.25 * Math.sin(time * 4);
         ctx.fillStyle = "#1a1c2c";
@@ -667,11 +725,12 @@ G.world = (() => {
     if (G.reducedMotion) return;
     const s = G.state;
     const theme = s.mapDef && s.mapDef.visualTheme;
+    const biome = biomePalette();
     const color = theme === "vampire" ? "#b13e53" : theme === "mole" ? "#ffcd75" :
       theme === "jester" ? "#73eff7" : theme === "god" ? "#fff3c2" :
-      theme === "samurai" ? "#f4f4f4" : theme === "astronomer" ? "#ffcd75" : "#a7f070";
+      theme === "samurai" ? "#f4f4f4" : theme === "astronomer" ? "#ffcd75" : biome ? biome.accent : "#a7f070";
     ctx.save();
-    ctx.globalAlpha = theme ? 0.45 : 0.22;
+    ctx.globalAlpha = theme ? 0.45 : biome ? (G.worldwakePurified && G.worldwakePurified(s.mapId) ? 0.52 : 0.3) : 0.22;
     ctx.fillStyle = color;
     for (let i = 0; i < 7; i++) {
       const seedX = G.util.hash2(i + 91, s.mapW) * Math.max(G.W, s.mapW * G.TILE);
@@ -716,7 +775,7 @@ G.world = (() => {
     const inwardY = y === 0 ? 8 : y === G.state.mapH - 1 ? -8 : 0;
     const cx = x * T + T / 2 + inwardX;
     const cy = y * T + T / 2 + inwardY;
-    const locked = (cell.stars && G.state.stars < cell.stars) || !portalMasteryMet(cell);
+    const locked = !portalOpen(cell);
     const pulse = 0.55 + Math.sin(time * 4) * 0.18;
 
     ctx.save();
@@ -797,6 +856,37 @@ G.world = (() => {
       ctx.fillStyle = "#1a1c2c"; ctx.fillRect(cx - 9, cy - 8, 18, 22);
       ctx.fillStyle = "#a7f070";
       ctx.fillRect(cx - 17, cy - 20, 3, 3); ctx.fillRect(cx + 14, cy - 17, 3, 3);
+    } else if (["griffin", "golem", "weaver", "bellkeeper", "lantern", "colossus"].includes(cell.portalTheme)) {
+      const worldbearerColors = {
+        griffin: ["#8a6538", "#73eff7"], golem: ["#5c5a59", "#ffcd75"],
+        weaver: ["#3b2f73", "#d9a7ff"], bellkeeper: ["#566c86", "#fff3c2"],
+        lantern: ["#5d275d", "#ffcd75"], colossus: ["#4b4541", "#ef7d57"],
+      };
+      const colors = worldbearerColors[cell.portalTheme];
+      // Two colossal feet and a living crest make this read as stepping onto
+      // a creature, not entering another anonymous doorway.
+      ctx.fillStyle = colors[0];
+      ctx.fillRect(cx - 24, cy - 5, 12, 19); ctx.fillRect(cx + 12, cy - 5, 12, 19);
+      ctx.fillRect(cx - 20, cy - 16, 40, 12); ctx.fillRect(cx - 14, cy - 22, 28, 7);
+      ctx.fillStyle = "#1a1c2c"; ctx.fillRect(cx - 9, cy - 9, 18, 23);
+      ctx.fillStyle = colors[1];
+      ctx.fillRect(cx - 8, cy - 19, 5, 4); ctx.fillRect(cx + 3, cy - 19, 5, 4);
+      ctx.globalAlpha = pulse;
+      if (cell.portalTheme === "griffin") {
+        ctx.fillRect(cx - 30, cy - 14, 13, 3); ctx.fillRect(cx + 17, cy - 14, 13, 3);
+        ctx.fillRect(cx - 27, cy - 18, 9, 3); ctx.fillRect(cx + 18, cy - 18, 9, 3);
+      } else if (cell.portalTheme === "weaver") {
+        ctx.strokeStyle = colors[1]; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cx - 22, cy - 18); ctx.lineTo(cx + 22, cy + 8);
+        ctx.moveTo(cx + 22, cy - 18); ctx.lineTo(cx - 22, cy + 8); ctx.stroke();
+      } else if (cell.portalTheme === "bellkeeper") {
+        ctx.fillRect(cx - 6, cy - 28, 12, 8); ctx.fillRect(cx - 2, cy - 20, 4, 7);
+      } else if (cell.portalTheme === "lantern") {
+        ctx.fillRect(cx - 7, cy - 28, 14, 10); ctx.fillRect(cx - 3, cy - 18, 6, 5);
+      } else {
+        ctx.fillRect(cx - 17, cy - 25, 5, 9); ctx.fillRect(cx + 12, cy - 25, 5, 9);
+      }
+      ctx.globalAlpha = locked ? 0.62 : 1;
     } else if (cell.portalTheme === "god") {
       ctx.fillStyle = "#f4f4f4";
       ctx.fillRect(cx - 20, cy - 14, 6, 28);
@@ -882,6 +972,32 @@ G.world = (() => {
     ctx.fillRect(px + Math.floor(w / 2) - 2, py, 4, 3);
   }
 
+  function drawWorldwakeState(ctx, time) {
+    const s = G.state;
+    if (!s.mapDef.worldwake || !G.ensureWorldwake) return;
+    const campaign = G.ensureWorldwake();
+    const cx = 7 * G.TILE + 8;
+    const cy = 20 * G.TILE + 5;
+    ctx.save();
+    ctx.fillStyle = "#4b4541";
+    ctx.fillRect(cx - 10, cy - 2, 20, 7);
+    ctx.fillRect(cx - 6, cy - 8, 12, 7);
+    const colors = ["#73eff7", "#d8b06a", "#d9a7ff", "#fff3c2", "#ffcd75", "#ef7d57"];
+    for (let i = 0; i < campaign.marks.length; i++) {
+      const a = time * 0.45 + i * Math.PI * 2 / 6;
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.globalAlpha = 0.7 + Math.sin(time * 3 + i) * 0.2;
+      ctx.fillRect(Math.round(cx + Math.cos(a) * 15) - 1, Math.round(cy - 8 + Math.sin(a) * 6) - 1, 3, 3);
+    }
+    if (G.worldwakePurified && G.worldwakePurified(s.mapId)) {
+      ctx.globalAlpha = 0.55 + Math.sin(time * 2.2) * 0.12;
+      ctx.strokeStyle = biomePalette() ? biomePalette().accent : "#ffcd75";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx, cy - 6, 22, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function draw(ctx, cam, time) {
     const s = G.state;
     const T = G.TILE;
@@ -898,6 +1014,7 @@ G.world = (() => {
       for (let x = x0; x <= x1; x++)
         drawTrialLandmark(ctx, s.grid[y][x], x, y, time);
     drawPlayerHouse(ctx);
+    drawWorldwakeState(ctx, time);
     for (const ch of s.chests) drawChest(ctx, ch, time);
   }
 

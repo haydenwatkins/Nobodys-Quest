@@ -103,11 +103,13 @@ const expectedBasics = {
   stormSpark: [0, 0.45], tailSweep: [0, 0.55], divineSpark: [0, 0.5],
   drillTap: [0, 0.38], bloodBite: [0, 0.34], wildCard: [0, 0.45],
   shellJab: [0, 0.42], quickdraw: [0, 0.4], starNeedle: [0, 0.46], thornLash: [0, 0.47],
+  wingbeat: [0, 0.4], stoneKnuckle: [0, 0.48], silkNeedle: [0, 0.42],
+  handbell: [0, 0.5], wickLash: [0, 0.42], pillarFist: [0, 0.55],
 };
 for (const [id, values] of Object.entries(expectedBasics)) {
   assert.deepEqual([G.abilities[id].mana, G.abilities[id].cooldown], values, `${id} balance changed`);
 }
-assert.equal(Object.keys(G.abilities).length, 53);
+assert.equal(Object.keys(G.abilities).length, 71);
 
 // Directional melee gets a collision-safe six-pixel contact step only when a
 // swing would narrowly miss. A landed swing also grants one cast-level mana

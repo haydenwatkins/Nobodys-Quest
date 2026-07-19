@@ -29,7 +29,7 @@ G.state = {
 };
 run("js/engine/costumes.js");
 
-assert.equal(G.COSTUMES.length, 9, "the wardrobe should launch with a meaningful progression of looks");
+assert.equal(G.COSTUMES.length, 11, "the wardrobe should launch with a meaningful progression of looks");
 assert.deepEqual(Array.from(G.ensureCostumes().unlocked), ["classic"]);
 assert.ok(G.COSTUMES.every((costume) => !["damage", "health", "hearts", "speed", "mana"].some((key) => key in costume)),
   "costumes must remain mechanically neutral");

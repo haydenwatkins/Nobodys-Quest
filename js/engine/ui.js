@@ -741,6 +741,14 @@ G.ui = (() => {
       button.addEventListener("click", () => {
         if (G.travelToWayfinderRegion(button.dataset.travelRegion)) closeMenu();
       }));
+    menuEl.querySelectorAll("[data-worldwake-region]").forEach((button) =>
+      button.addEventListener("click", () => {
+        if (G.travelToWorldwakeRegion(button.dataset.worldwakeRegion)) closeMenu();
+      }));
+    menuEl.querySelectorAll("[data-travel-landmark]").forEach((button) =>
+      button.addEventListener("click", () => {
+        if (G.travelToWayfinderLandmark(button.dataset.travelLandmark)) closeMenu();
+      }));
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
     const fullscreen = menuEl.querySelector('[data-act="fullscreen"]');
@@ -924,7 +932,8 @@ G.ui = (() => {
     const landmarks = G.discoveredWayfinderLandmarks();
     html += `<div class="form-card"><h2>📍 Discovered landmarks</h2>`;
     if (landmarks.length) {
-      for (const map of landmarks) html += `<div class="quest-row done"><span>✅ ${map.name}</span><span class="prog">Recorded</span></div>`;
+      for (const map of landmarks) html += `<div class="quest-row done"><span>✅ ${map.name}</span><span class="prog">Recorded</span></div>
+        ${travelUnlocked ? `<button class="travel-btn" data-travel-landmark="${map.id}" ${G.state.mapId === map.id || !canTravel ? "disabled" : ""}>${G.state.mapId === map.id ? "You are here" : "Return for a rematch"}</button>` : ""}`;
     } else {
       html += `<div class="tagline">Trials, dens, and the coliseum reveal themselves only after you enter them.</div>`;
     }
@@ -934,6 +943,32 @@ G.ui = (() => {
       ${journal.rewardClaimed ? `<div class="quest-row done"><span>🎵 Wayfinder Whistle</span><span class="prog">Fast travel unlocked</span></div>` : ""}
       ${travelUnlocked && !canTravel ? `<div class="tagline">Fast travel pauses during boss trials, gauntlets, and story moments.</div>` : ""}
     </div>`;
+
+    const campaign = G.ensureWorldwake();
+    html += `<div class="form-card current">
+      <h2>🌍 Worldwake</h2>
+      <div class="tagline">Two roads leave the old world. Follow the horizon, befriend the caravan, and purify the six living landmarks.</div>
+      <div class="quest-row"><span>New regions</span><span class="prog">${campaign.discovered.length}/${G.WORLDWAKE_REGIONS.length}</span></div>
+      <div class="quest-row"><span>World Marks</span><span class="prog">${campaign.marks.length}/${Object.keys(G.WORLDWAKE_MARKS).length}</span></div>
+      <div class="quest-row"><span>Caravan level</span><span class="prog">${campaign.caravanLevel}/${G.WORLDWAKE_FAVORS.length}</span></div>
+    </div>`;
+    for (const region of G.WORLDWAKE_REGIONS) {
+      const found = campaign.discovered.includes(region.id);
+      const here = G.state.mapId === region.id;
+      html += `<div class="form-card ${found ? "current" : "wayfinder-unknown"}">
+        <h2>${found ? `✅ ${region.icon} ${region.name}` : `⬜ ${region.icon} ${region.name}`}</h2>
+        <div class="tagline">${found ? "The caravan recorded this stretch of the living world." : region.clue}</div>
+        ${found && travelUnlocked ? `<button class="travel-btn" data-worldwake-region="${region.id}" ${here || !canTravel ? "disabled" : ""}>${here ? "You are here" : `Travel to ${region.name}`}</button>` : ""}
+      </div>`;
+    }
+    html += `<div class="form-card"><h2>🛶 Caravan favors</h2>
+      <div class="tagline">Favors complete naturally while exploring. They add length and stories, never extra combat difficulty.</div>`;
+    for (const favor of G.WORLDWAKE_FAVORS) {
+      const done = campaign.favorsDone.includes(favor.id);
+      const progress = Math.min(favor.count, G.worldwakeFavorProgress(favor));
+      html += `<div class="quest-row ${done ? "done" : ""}"><span>${done ? "✅" : "⬜"} ${favor.name}<small>${favor.text}</small></span><span class="prog">${progress}/${favor.count}</span></div>`;
+    }
+    html += `</div>`;
     return html;
   }
 

@@ -34,10 +34,20 @@ for (const id of ["ancientTreant", "mireQueen", "eclipseKnight", "riftbladeAdept
   assert.equal(G.enemies[id].boss.phases, 3, `${id} should have a three-act fight`);
   assert.ok(G.enemies[id].boss.introLines.length >= 3, `${id} should have a readable three-line introduction`);
 }
+for (const id of ["skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer"]) {
+  assert.equal(G.enemies[id].boss.phases, 3, `${id} should have a three-act Worldbearer fight`);
+  assert.ok(G.enemies[id].boss.introLines.length >= 3, `${id} should introduce its personality before combat`);
+  assert.ok(G.enemies[id].hp >= 86 && G.enemies[id].damage <= 2, `${id} should last longer without a damage spike`);
+}
 assert.deepEqual(Array.from(G.enemies.godAvatar.boss.patterns.slice(3, 7)), ["shells", "crescent", "stars", "briar"]);
 assert.ok(G.maps.shattercoast.tiles.every((row) => row.length === 48));
 for (const id of ["turtleTrial", "samuraiTrial", "astronomerTrial", "druidTrial", "gauntletArena"])
   assert.ok(G.maps[id] && G.maps[id].tiles.every((row) => row.length === 28), `${id} should be a valid arena`);
+for (const id of ["sunstepPrairie", "windscarCanyon", "hangingGardens", "rootdeepHollow",
+  "glasswaterDesert", "frostbellTundra", "stormspinePeaks", "titanGrave"])
+  assert.ok(G.maps[id] && G.maps[id].tiles.length === 29 && G.maps[id].tiles.every((row) => row.length === 46), `${id} should be a broad valid region`);
+for (const id of ["griffinWorldback", "golemWorldback", "weaverWorldback", "bellWorldback", "lanternWorldback", "colossusWorldback"])
+  assert.ok(G.maps[id] && G.maps[id].worldbearer && G.maps[id].tiles.every((row) => row.length === 38), `${id} should make its guardian feel like a place`);
 
 // Every walkable Shattercoast tile connects to the arrival point. Solid tide
 // pools must never leave tiny grass islands that look reachable but are not.
@@ -59,7 +69,9 @@ for (const id of ["turtleTrial", "samuraiTrial", "astronomerTrial", "druidTrial"
   assert.equal(seen.size, walkable, "every open Shattercoast tile should be reachable");
 }
 
-for (const id of ["tideCrab", "starMote", "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar"]) {
+for (const id of ["tideCrab", "starMote", "sunHopper", "loomling", "mirageSkater", "bellMoth", "cairnWalker",
+  "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar",
+  "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer"]) {
   const sprite = G.enemies[id].sprite;
   for (const frame of sprite.frames) for (const row of frame) for (const pixel of row)
     assert.ok(pixel === "." || pixel === " " || sprite.palette[pixel], `${id} uses unknown sprite color '${pixel}'`);
