@@ -926,6 +926,268 @@ registerEnemy({
   },
 });
 
+/* ---- WORLDWAKE WORLDBEARERS ----
+   These guardians are deliberately longer than ordinary form trials, not
+   more damaging. Three readable phases change the pattern while body contact
+   remains safe outside telegraphed charges, preserving melee viability. */
+
+registerEnemy({
+  id: "sunHopper", name: "Sun Hopper",
+  hp: 4, speed: 72, damage: 1, behavior: "chase", aggro: 105, size: 11,
+  sprite: {
+    palette: { k: "#1a1c2c", y: "#ffcd75", o: "#ef7d57", w: "#f4f4f4" },
+    frames: [[
+      "..yy......yy..", ".ykyy....yyky.", "..kykkkkkkyk..", ".kkyyyyyyyykk.",
+      "kyykwyyyywkyyk", ".kyyyyyyyyyyk.", "..kkoooooook..", ".kkok....kokk.",
+      "kko........okk", "..............",
+    ], [
+      "....yy..yy....", "..yykyyykyyy..", ".kkykkkkkkykk.", "kyyyyyyyyyyyyk",
+      "kyykwyyyywkyyk", ".kyyyyyyyyyyk.", "..kkoooooook..", "...kok..kok...",
+      "..okk....kko..", "..............",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "loomling", name: "Loomling",
+  hp: 4, speed: 44, damage: 1, behavior: "shooter", aggro: 125, shootEvery: 1.9,
+  shotColor: "#d9a7ff", size: 12, ward: { types: ["dark"], hp: 2 },
+  sprite: {
+    palette: { k: "#1a1c2c", p: "#8153c1", s: "#d9a7ff", w: "#f4f4f4" },
+    frames: [[
+      "s..........s", ".s..kkkk..s.", "..kppppppk..", ".kpkpwwpkwpk.",
+      "kppppppppppk", ".kppkkkkppk.", "s.kkppppkk.s", ".s.kp..pk.s.",
+      "s..k....k..s", "............",
+    ], [
+      ".s........s.", "s...kkkk...s", ".kppppppk...", "kpkpwwpkwpk.",
+      "kppppppppppk", ".kppkkkkppk.", ".skkppppkks.", "s..kp..pk..s",
+      ".s.k....k.s.", "............",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "mirageSkater", name: "Mirage Skater",
+  hp: 5, speed: 82, damage: 1, behavior: "chase", aggro: 115, size: 10,
+  sprite: {
+    palette: { k: "#1a1c2c", c: "#73eff7", y: "#d8b06a", w: "#f4f4f4" },
+    frames: [[
+      "c..........c", ".c..kkkk..c.", "..kcyyyyck..", ".kcykwwkyck.",
+      "kccyyyyyycck", ".kkcccccckk.", "...ky..yk...", "..ky....yk..",
+      ".cc......cc.", "............",
+    ], [
+      "..c......c..", "c...kkkk...c", ".kcyyyyck...", "kcykwwkyck..",
+      "kccyyyyyycck", ".kkcccccckk.", "..ky....yk..", ".ky......yk.",
+      "cc........cc", "............",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "bellMoth", name: "Bell Moth",
+  hp: 4, speed: 52, damage: 1, behavior: "shooter", aggro: 130, shootEvery: 1.75,
+  shotColor: "#fff3c2", size: 11, ward: { types: ["light"], hp: 2 },
+  sprite: {
+    palette: { k: "#1a1c2c", w: "#fff3c2", c: "#73eff7", y: "#ffcd75" },
+    frames: [[
+      "w..........w", ".wk........kw.", ".kwk..yy..kwk.", "kcckkkkkkkkcck",
+      "kccckwwwwkccck", ".kkkwwkkwwkkk.", "...kwwwwk....", "....kyyk.....",
+      ".....kk......", ".............",
+    ], [
+      ".............", "..www....www..", ".wkcck..kcckw.", "kwccckkkkcccwk",
+      ".kkkwwwwwwkkk.", "...kwwkkwwk...", "....kwwwwk....", ".....kyyk.....",
+      "......kk.....", ".............",
+    ]],
+  },
+});
+
+registerEnemy({
+  id: "cairnWalker", name: "Cairn Walker",
+  hp: 7, speed: 36, damage: 1, behavior: "chase", aggro: 100,
+  size: 15, heavy: true, ward: { types: ["blunt"], hp: 3 },
+  sprite: {
+    palette: { k: "#1a1c2c", d: "#4b4541", s: "#6f665b", o: "#ef7d57", m: "#38b764" },
+    frames: [[
+      "....kkkk....", "...ksssskk..", "..ksddddssk.", ".ksdo....odsk",
+      "kssddddddddsk", ".kssmmmmsssk.", "..ksssssssk..", ".kkdddssdddkk.",
+      "kddddk..kddddk", ".kkddk..kddkk.", "..kmm....mmk..", "..............",
+    ], [
+      "...kkkk.....", "..ksssskk...", ".ksddddssk...", "ksdo....odsk.",
+      "ssddddddddsk.", "kssmmmmsssk..", ".ksssssssk...", "kkdddssdddkk..",
+      "ddddk..kddddk.", "kkddk..kddkk..", ".kmm....mmk...", "..............",
+    ]],
+  },
+});
+
+const WORLDBEARER_FALLBACK_SPRITE = {
+  palette: { k: "#1a1c2c", s: "#6b665b", l: "#d8b06a", w: "#f4f4f4", y: "#ffcd75" },
+  frames: [[
+    "...yy..yy...", "..ykkkkkky..", ".yksllllsky.", "kklsw..wslkk",
+    "kssllllllssk", ".ksskkkkssk.", "..kssssssk..", ".kksssssskk.",
+    "ksskksskkssk", "kssk....kssk", ".kk......kk.", "............",
+  ], [
+    "..yy..yy....", ".ykkkkkky...", "yksllllsky..", "klsw..wslkk.",
+    "ssllllllsskk", "ksskkkkssk..", ".kssssssk...", "kksssssskk..",
+    "sskksskkssk.", "ssk....kssk.", "kk......kk..", "............",
+  ]],
+};
+
+registerEnemy({
+  id: "skySovereign", name: "Aurelia, Sky Sovereign",
+  hp: 88, speed: 66, damage: 2, behavior: "chase", aggro: 205,
+  size: 24, heavy: true, miniboss: true,
+  ward: { types: ["sharp"], hp: 7 },
+  boss: {
+    style: "duelist", color: "#73eff7", specialEvery: 2.15,
+    phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.5,
+    chargeSpeed: 210, chargeDur: 0.32, antiKiteRange: 124, chaseScale: 1.25,
+    patterns: ["shells", "charge", "stars", "crescent"],
+    intro: "THE HORIZON FOLDS ITS WINGS",
+    introLines: [
+      "Tiny walker! You climbed onto my back without an appointment.",
+      "I admire the confidence. I question the landing strategy.",
+      "Follow my feathers through the gaps, then meet me where the wind ends.",
+    ],
+    phaseLine: "Good! The sky likes you. Unfortunately, I am the sky's landlord.",
+    phaseThreeLine: "One last dive. If we miss, tell the canyon it owes me a nest.",
+    knockoutLine: "The wind sets you down gently. I will pretend that was my idea.",
+    defeatLine: "Take my mark. You move like a storm that remembered to laugh.",
+    rematchLine: "Back for another flight? Excellent. Try not to shed on the canyon.",
+  },
+  trophy: "trophy-sky-sovereign", trophyName: "Sky Mark", location: "The Sky Sovereign's Back",
+  sprite: (G.forms.griffin && G.forms.griffin.sprite) || WORLDBEARER_FALLBACK_SPRITE,
+});
+
+registerEnemy({
+  id: "oldMason", name: "Pillar, the Old Mason",
+  hp: 96, speed: 49, damage: 2, behavior: "chase", aggro: 205,
+  size: 26, heavy: true, miniboss: true,
+  ward: { types: ["blunt"], hp: 8 },
+  boss: {
+    style: "charger", color: "#ffcd75", specialEvery: 2.35,
+    phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.62,
+    chargeSpeed: 175, chargeDur: 0.44, antiKiteRange: 120, chaseScale: 1.16,
+    patterns: ["quake", "charge", "shells", "quake"],
+    intro: "THE GARDEN STANDS UP",
+    introLines: [
+      "Careful with the petunias. They took three centuries to stop arguing.",
+      "I build slowly because mountains have dreadful handwriting.",
+      "When my palms glow, choose a gap. When I kneel, make your answer count.",
+    ],
+    phaseLine: "A crack! Wonderful. Every good wall needs somewhere for ivy.",
+    phaseThreeLine: "The final terrace goes here. Please stand somewhere else.",
+    knockoutLine: "A fallen stone is still useful. Rest. Then become a better arch.",
+    defeatLine: "Carry the Stone Mark. Build doors more often than walls.",
+    rematchLine: "Inspection day again? Fine. I have reinforced the petunias.",
+  },
+  trophy: "trophy-old-mason", trophyName: "Stone Mark", location: "The Old Mason's Crown",
+  sprite: (G.forms.golem && G.forms.golem.sprite) || WORLDBEARER_FALLBACK_SPRITE,
+});
+
+registerEnemy({
+  id: "silkMatriarch", name: "Tess, Silk Matriarch",
+  hp: 90, speed: 57, damage: 2, behavior: "shooter", shootEvery: 1.7, aggro: 210,
+  shotColor: "#d9a7ff", size: 23, heavy: true, miniboss: true,
+  ward: { types: ["dark"], hp: 8 },
+  boss: {
+    style: "caster", color: "#d9a7ff", specialEvery: 2.2,
+    phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.55,
+    chargeSpeed: 165, chargeDur: 0.32, antiKiteRange: 125, chaseScale: 1.2,
+    patterns: ["cards", "briar", "seeds", "nova"],
+    intro: "THE LOOM HAS EIGHT HANDS AND ONE OPINION",
+    introLines: [
+      "Welcome, Nobody. I knew you were coming; the web was gossiping.",
+      "Do not worry. I only eat rude guests, and you wiped your feet.",
+      "Watch where one thread ends and the next begins. That is your opening.",
+    ],
+    phaseLine: "You cut my favorite thread. It was load-bearing and emotionally important.",
+    phaseThreeLine: "No more neat stitches. Let us make something gloriously tangled.",
+    knockoutLine: "The web catches you. See? Hospitality, not lunch.",
+    defeatLine: "Take the Thread Mark. Every lonely road deserves a connection.",
+    rematchLine: "The web said you were back. It used three exclamation marks.",
+  },
+  trophy: "trophy-silk-matriarch", trophyName: "Thread Mark", location: "The Loom Below",
+  sprite: (G.forms.weaver && G.forms.weaver.sprite) || WORLDBEARER_FALLBACK_SPRITE,
+});
+
+registerEnemy({
+  id: "bellTitan", name: "Bongle, Bell Titan",
+  hp: 94, speed: 52, damage: 2, behavior: "chase", aggro: 205,
+  size: 25, heavy: true, miniboss: true,
+  ward: { types: ["light"], hp: 8 },
+  boss: {
+    style: "caster", color: "#fff3c2", specialEvery: 2.25,
+    phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.58,
+    chargeSpeed: 170, chargeDur: 0.36, antiKiteRange: 122, chaseScale: 1.18,
+    patterns: ["orbit", "nova", "charge", "shells"],
+    intro: "THE TUNDRA RINGS BACK",
+    introLines: [
+      "BONG. That means hello. Or avalanche. Context is important.",
+      "I practiced this song for a thousand winters and forgot the ending.",
+      "Change your rhythm when I change mine. Repetition makes the ice grumpy.",
+    ],
+    phaseLine: "BONG BONG! That means phase two. I am almost certain.",
+    phaseThreeLine: "The missing ending! It was louder. Of course it was louder.",
+    knockoutLine: "A soft note for the road back. Even heroes need rests.",
+    defeatLine: "Take the Echo Mark. Please rhyme responsibly.",
+    rematchLine: "Encore! I learned what that word means yesterday.",
+  },
+  trophy: "trophy-bell-titan", trophyName: "Echo Mark", location: "The Walking Belfry",
+  sprite: (G.forms.bellkeeper && G.forms.bellkeeper.sprite) || WORLDBEARER_FALLBACK_SPRITE,
+});
+
+registerEnemy({
+  id: "lanternKeeper", name: "Mallow, Lantern Keeper",
+  hp: 86, speed: 63, damage: 2, behavior: "shooter", shootEvery: 1.55, aggro: 210,
+  shotColor: "#ffcd75", size: 23, heavy: true, miniboss: true,
+  ward: { types: ["dark"], hp: 8 },
+  boss: {
+    style: "vampire", color: "#ffcd75", specialEvery: 2.05,
+    phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.5,
+    chargeSpeed: 205, chargeDur: 0.3, antiKiteRange: 126, chaseScale: 1.26,
+    patterns: ["stars", "vampireDash", "bloodBurst", "orbit"],
+    intro: "A SMALL LIGHT CHALLENGES THE WHOLE STORM",
+    introLines: [
+      "Oh! A visitor. I would tidy up, but the storm keeps moving everything.",
+      "I guard lost travelers. First I must be sure you are difficult to lose.",
+      "Stay near the warm gaps. The bright bolts are less friendly than they look.",
+    ],
+    phaseLine: "You are still here! That is either bravery or excellent boots.",
+    phaseThreeLine: "All my lights, together. Let us show the storm it is outnumbered.",
+    knockoutLine: "My lantern carries you down. Come back when your spark is steady.",
+    defeatLine: "Take the Lantern Mark. A safe place can travel with you.",
+    rematchLine: "You found me again! I knew the lantern was working.",
+  },
+  trophy: "trophy-lantern-keeper", trophyName: "Lantern Mark", location: "The Storm Lantern",
+  sprite: (G.forms.lanternWisp && G.forms.lanternWisp.sprite) || WORLDBEARER_FALLBACK_SPRITE,
+});
+
+registerEnemy({
+  id: "lastWorldbearer", name: "Atlas, Last Worldbearer",
+  hp: 104, speed: 51, damage: 2, behavior: "chase", aggro: 215,
+  size: 28, heavy: true, miniboss: true,
+  ward: { types: ["blunt"], hp: 9 },
+  boss: {
+    style: "god", color: "#ef7d57", specialEvery: 2.12,
+    phases: 3, phaseThresholds: [0.7, 0.36], telegraph: 0.6,
+    chargeSpeed: 185, chargeDur: 0.42, antiKiteRange: 126, chaseScale: 1.2,
+    patterns: ["quake", "charge", "orbit", "briar", "nova"],
+    intro: "THE MOUNTAIN REMEMBERS YOUR NAME",
+    introLines: [
+      "Nobody. I carried every road here so that one traveler might finish it.",
+      "I am tired, but do not mistake tired for fragile. Mountains dislike that.",
+      "Bring every lesson you gathered. I will answer with the weight of the world.",
+    ],
+    phaseLine: "Five marks sing inside you. I can hear each friend who trusted you.",
+    phaseThreeLine: "Then carry this final heartbeat. Show me the world will keep moving.",
+    knockoutLine: "The mountain lowers you gently. Strength returns; the road remains.",
+    defeatLine: "Take the Worldheart. I can finally put the horizon down.",
+    rematchLine: "The horizon is lighter today. There is room for one more lesson.",
+  },
+  trophy: "trophy-last-worldbearer", trophyName: "Worldheart Mark", location: "The Heart Under Stone",
+  sprite: (G.forms.colossus && G.forms.colossus.sprite) || WORLDBEARER_FALLBACK_SPRITE,
+});
+
 registerEnemy({
   id: "godAvatar", name: "God of Every Form",
   hp: 82, speed: 62, damage: 2, behavior: "chase", aggro: 190,

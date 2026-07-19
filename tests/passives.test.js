@@ -27,9 +27,11 @@ run("js/engine/combat.js");
 run("js/engine/entities.js");
 run("js/engine/forms.js");
 run("js/abilities/basics.js");
-const formIds = ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alchemist", "stormcaller",
-  "dragon", "riftblade", "mole", "vampire", "jester", "turtle", "samurai", "astronomer", "druid", "god"];
-for (const id of formIds) run(`js/forms/${id}.js`);
+const formFiles = ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alchemist", "stormcaller",
+  "dragon", "riftblade", "mole", "vampire", "jester", "turtle", "samurai", "astronomer", "druid",
+  "griffin", "golem", "weaver", "bellkeeper", "lantern-wisp", "colossus", "god"];
+for (const file of formFiles) run(`js/forms/${file}.js`);
+const formIds = G.formOrder.slice();
 run("js/engine/passives.js");
 G.validateCrossRefs();
 

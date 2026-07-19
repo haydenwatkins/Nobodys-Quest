@@ -33,7 +33,7 @@ for (const region of G.WAYFINDER_REGIONS) {
     assert.equal(entrance.stars || 0, region.stars, `${region.id} Journal requirement must match its door`);
   }
 }
-assert.equal(G.wayfinderLandmarkIds().length, 10, "all nine guardian trials and the coliseum are landmarks");
+assert.equal(G.wayfinderLandmarkIds().length, 16, "all fifteen guardian trials and the coliseum are landmarks");
 
 // Starfall's western vault and lore room used to be sealed on all four sides.
 // Verify the permanent reward and both signs are reachable without a wall-skip.

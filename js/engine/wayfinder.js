@@ -188,6 +188,21 @@ G.travelToWayfinderRegion = function (id) {
   return true;
 };
 
+G.travelToWayfinderLandmark = function (id) {
+  const map = G.maps[id];
+  if (!map || !map.bossTrial || !G.wayfinderDiscovered(id) || !G.canWayfinderTravel()) return false;
+  if (G.state.mapId === id) {
+    G.ui.toast(`Already at ${map.name}.`, 2);
+    return false;
+  }
+  G.world.load(id, map.playerStart);
+  G.sfx.play("door");
+  G.spawnFx({ kind: "ring", x: G.state.player.x, y: G.state.player.y - 8, color: "#ffcd75", radius: 28, dur: 0.55 });
+  G.ui.toast(`Wayfinder memory: ${map.name}`, 2.5);
+  G.saveGame();
+  return true;
+};
+
 G.events.on("mapEnter", (data) => {
   if (G.state) G.discoverWayfinderMap(data.map, false);
 });

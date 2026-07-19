@@ -38,13 +38,16 @@ G.passives = (() => {
     if (!form || !form.passive || !ab) return false;
     if (form.passive.effects && form.passive.effects[ab.style]) return true;
     const id = form.passive.id;
-    if (["scurry", "conductor"].includes(id)) return true;
+    if (["scurry", "conductor", "slipstream", "resonance", "lifeline"].includes(id)) return true;
     if (id === "improviser") return isBorrowed(form.id, ab.id);
     if (["steadfast", "elastic", "unstoppable", "flowingDraw"].includes(id)) return ab.style === "melee";
     if (["clearShot", "trickTrajectory"].includes(id)) return ab.style === "projectile";
     if (["catalyst", "aftershock", "gravityTouch"].includes(id)) return ab.style === "area";
     if (id === "afterimage") return ab.style === "dash";
     if (["hexcraft", "seedbed"].includes(id)) return (ab.traits || []).includes("status");
+    if (id === "masonry") return ab.style === "area";
+    if (id === "safeLight") return ab.style === "area" || ab.style === "dash";
+    if (id === "worldweight") return ab.style === "melee" || ab.style === "area";
     return false;
   }
 
@@ -70,6 +73,12 @@ G.passives = (() => {
       gravityTouch: "Gravity pull",
       seedbed: "Status can spread",
       providence: "Providence always active",
+      slipstream: "Leaves a Slipstream",
+      masonry: "Raises projectile cover",
+      lifeline: "Binds a second target",
+      resonance: "Changes the Resonance",
+      safeLight: "Leaves a Safe Light",
+      worldweight: "Unflinching force",
     };
     return text[id] || form.passive.name;
   }
@@ -173,6 +182,11 @@ G.passives = (() => {
       if (kind === "projectile" && o.explodeRadius) o.passivePull = 10;
     }
 
+    if (passive.id === "worldweight" && (style === "melee" || style === "area") && (kind === "melee" || kind === "area")) {
+      o.knockback = (o.knockback === undefined ? 90 : o.knockback) * 1.3;
+      o.weight = Math.max(6, o.weight || 0);
+    }
+
     return o;
   }
 
@@ -186,6 +200,30 @@ G.passives = (() => {
     if (passive.id === "aftershock" && styleOf(abilityId) === "area") {
       scheduleEcho(user.x, user.y - 3, 34, "#d8b06a", 0.24);
     }
+    if (passive.id === "slipstream" && user.moving) {
+      user.slipstreamT = 0.7;
+      G.combat.forceEnemies(user.x - user.dir.x * 10, user.y - user.dir.y * 10, 24, 72, "#73eff7");
+      G.spawnFx({ kind: "bolt", x: user.x - user.dir.x * 4, y: user.y - user.dir.y * 4 - 5,
+        x2: user.x - user.dir.x * 28, y2: user.y - user.dir.y * 28 - 5, color: "#73eff7", dur: 0.24 });
+    }
+    if (passive.id === "masonry" && styleOf(abilityId) === "area") {
+      const shelters = G.state.passiveShelters = G.state.passiveShelters || [];
+      shelters.push({ x: user.x + user.dir.x * 20, y: user.y + user.dir.y * 20 - 5, radius: 15, t: 3.2 });
+      if (shelters.length > 2) shelters.shift();
+      G.spawnFx({ kind: "ring", x: shelters[shelters.length - 1].x, y: shelters[shelters.length - 1].y,
+        color: "#ffcd75", radius: 15, dur: 0.35 });
+    }
+    if (passive.id === "resonance") {
+      const style = styleOf(abilityId);
+      const now = G.state.time || 0;
+      if (user.resonanceStyle && user.resonanceStyle !== style && now >= (user.resonanceReadyAt || 0)) {
+        user.resonanceReadyAt = now + 0.55;
+        G.combat.forceEnemies(user.x, user.y, 39, 115, "#fff3c2", 0.16);
+        G.damageNumber(user.x, user.y - 19, "RESONANCE!", "#ffcd75");
+      }
+      user.resonanceStyle = style;
+    }
+    if (passive.id === "safeLight" && styleOf(abilityId) === "area") addSafeLight(user.x, user.y - 5);
   }
 
   function onHit(enemy, opts) {
@@ -219,6 +257,30 @@ G.passives = (() => {
       enemy.kby *= 1.25;
       if (enemy.def.miniboss) enemy.bossStagger = Math.min(G.BOSS_STAGGER_HITS, (enemy.bossStagger || 0) + 0.25);
     }
+
+    if (passive.id === "lifeline") {
+      const now = G.state.time || 0;
+      const first = p.lifelineTarget;
+      if (first && first !== enemy && !first.dead && now >= (p.lifelineReadyAt || 0)) {
+        p.lifelineReadyAt = now + 0.3;
+        const ax = first.x, ay = first.y, bx = enemy.x, by = enemy.y;
+        if (first.def.miniboss) first.bossStagger = Math.min(G.BOSS_STAGGER_HITS, (first.bossStagger || 0) + 0.35);
+        else {
+          const a = G.util.angleTo(ax, ay, bx, by);
+          G.world.moveBox(first, Math.cos(a) * 9, Math.sin(a) * 9);
+        }
+        if (enemy.def.miniboss) enemy.bossStagger = Math.min(G.BOSS_STAGGER_HITS, (enemy.bossStagger || 0) + 0.35);
+        else {
+          const a = G.util.angleTo(bx, by, ax, ay);
+          G.world.moveBox(enemy, Math.cos(a) * 9, Math.sin(a) * 9);
+        }
+        G.spawnFx({ kind: "bolt", x: ax, y: ay - 5, x2: bx, y2: by - 5, color: "#d9a7ff", dur: 0.28 });
+        G.damageNumber(enemy.x, enemy.y - enemy.h(), "BOUND!", "#d9a7ff");
+        p.lifelineTarget = null;
+      } else {
+        p.lifelineTarget = enemy;
+      }
+    }
   }
 
   function onKill(enemy) {
@@ -248,6 +310,14 @@ G.passives = (() => {
         range: 25, arc: Math.PI * 1.4, color: "#73eff7", weight: 4, dur: 0.2 });
     }
     if (passive.id === "aftershock") scheduleEcho(user.x, user.y - 3, 30, "#d8b06a", 0.22);
+    if (passive.id === "safeLight") addSafeLight(user.x, user.y - 5);
+  }
+
+  function addSafeLight(x, y) {
+    const lights = G.state.safeLights = G.state.safeLights || [];
+    lights.push({ x, y, radius: 36, t: 3.4 });
+    if (lights.length > 2) lights.shift();
+    G.spawnFx({ kind: "ring", x, y, color: "#ffcd75", radius: 36, dur: 0.42 });
   }
 
   function onExplosion(pr) {
@@ -270,6 +340,7 @@ G.passives = (() => {
     if (!G.state) return;
     const p = G.state.player;
     p.passiveHaste = Math.max(0, (p.passiveHaste || 0) - dt);
+    p.slipstreamT = Math.max(0, (p.slipstreamT || 0) - dt);
     p.passiveBarrierT = Math.max(0, (p.passiveBarrierT || 0) - dt);
     if (p.passiveBarrierT <= 0) p.passiveBarrier = 0;
 
@@ -283,11 +354,20 @@ G.passives = (() => {
       G.sfx.play("stagger");
       echoes.splice(i, 1);
     }
+    for (const fieldName of ["passiveShelters", "safeLights"]) {
+      const fields = G.state[fieldName] || [];
+      for (let i = fields.length - 1; i >= 0; i--) {
+        fields[i].t -= dt;
+        if (fields[i].t <= 0) fields.splice(i, 1);
+      }
+    }
   }
 
   function movementScale(user) {
     const passive = current(user);
-    return passive && passive.id === "scurry" && user.passiveHaste > 0 ? 1.24 : 1;
+    if (passive && passive.id === "scurry" && user.passiveHaste > 0) return 1.24;
+    if (passive && passive.id === "slipstream" && user.slipstreamT > 0) return 1.18;
+    return 1;
   }
 
   function beforePlayerDamage(dmg, fromX, fromY) {
@@ -335,6 +415,11 @@ G.passives = (() => {
         result.prevented = true;
       }
     }
+    if (!result.prevented && passive && passive.id === "worldweight" && (p.attackPose || p.dashing)) {
+      // Worldweight preserves commitment and position; it does not erase the
+      // hit or reduce its damage, which keeps the eight-heart form fair.
+      result.knockback = false;
+    }
     return result;
   }
 
@@ -354,6 +439,32 @@ G.passives = (() => {
     user.passiveBarrier = 0;
     user.passiveBarrierT = 0;
     user.providenceKey = null;
+    user.slipstreamT = 0;
+    user.resonanceStyle = null;
+    user.lifelineTarget = null;
+  }
+
+  function drawFields(ctx) {
+    if (!G.state) return;
+    ctx.save();
+    for (const wall of G.state.passiveShelters || []) {
+      ctx.globalAlpha = Math.min(0.75, wall.t * 0.5);
+      ctx.fillStyle = "#6b665b";
+      ctx.fillRect(Math.round(wall.x - 12), Math.round(wall.y - 4), 24, 8);
+      ctx.fillStyle = "#ffcd75";
+      ctx.fillRect(Math.round(wall.x - 10), Math.round(wall.y - 5), 7, 2);
+      ctx.fillRect(Math.round(wall.x + 2), Math.round(wall.y - 5), 8, 2);
+    }
+    for (const light of G.state.safeLights || []) {
+      ctx.globalAlpha = Math.min(0.45, light.t * 0.28);
+      ctx.strokeStyle = "#ffcd75";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(light.x, light.y, light.radius, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha *= 0.55;
+      ctx.fillStyle = "#fff3c2";
+      ctx.fillRect(Math.round(light.x - 2), Math.round(light.y - 5), 4, 8);
+    }
+    ctx.restore();
   }
 
   function styleLabel(style) {
@@ -364,6 +475,6 @@ G.passives = (() => {
   return {
     STYLE_INFO, styleOf, styleLabel, hasTrait, isBorrowed, formMatches, synergyText,
     prepare, onAbilityUse, onHit, onKill, onDashFinish, onExplosion,
-    update, movementScale, beforePlayerDamage, onHeal, onFormChange,
+    update, movementScale, beforePlayerDamage, onHeal, onFormChange, drawFields,
   };
 })();
