@@ -80,6 +80,12 @@ G.servePantry = function (ch) {
   return treat;
 };
 
+G.activeWorldbearer = function () {
+  if (!G.state) return null;
+  return (G.state.enemies || []).find((enemy) =>
+    !enemy.dead && enemy.def.worldbearer && enemy.bossEngaged) || null;
+};
+
 G.world = (() => {
   const BASE_LEGEND = {
     ".": { tile: "grass" },
@@ -240,6 +246,7 @@ G.world = (() => {
     doorMsgCooldown = Math.max(0, doorMsgCooldown - dt);
     s.portalGrace = Math.max(0, (s.portalGrace || 0) - dt);
     const move = G.input.vec;
+    const travelDirection = Math.abs(move.x) + Math.abs(move.y) > 0.08 ? move : p.dir;
     if (s.portalNeedsRelease && !p.dashing && Math.abs(move.x) < 0.08 && Math.abs(move.y) < 0.08)
       s.portalNeedsRelease = false;
 
@@ -264,16 +271,25 @@ G.world = (() => {
       s.lastTownPlot = null;
     }
 
-    // Rest spots restore you once when you step onto them.
+    // Rest spots restore you once when you step onto them. A Worldbearer
+    // commands the whole region once engaged, including its fire: players may
+    // prepare here, but cannot reset the fight by circling back mid-battle.
     if (cell.rest) {
       if (s.lastRest !== cell) {
         s.lastRest = cell;
-        p.damageTaken = 0;
-        p.mana = p.manaMax;
-        G.sfx.play("pickup");
-        G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: "#a7f070", dur: 0.55 });
-        G.ui.toast(cell.restText || "Rested up. HP and mana restored.", 2.5);
-        G.saveGame();
+        const ruler = G.activeWorldbearer();
+        if (ruler) {
+          G.sfx.play("stagger");
+          G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: ruler.def.boss.color, dur: 0.45 });
+          G.ui.toast(`The fire bends toward ${ruler.def.name}. Defeat the Worldbearer before resting.`, 3);
+        } else {
+          p.damageTaken = 0;
+          p.mana = p.manaMax;
+          G.sfx.play("pickup");
+          G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: "#a7f070", dur: 0.55 });
+          G.ui.toast(cell.restText || "Rested up. HP and mana restored.", 2.5);
+          G.saveGame();
+        }
       }
     } else {
       s.lastRest = null;
@@ -288,7 +304,7 @@ G.world = (() => {
         G.sfx.play("door");
         const target = { x: cell.portal.x, y: cell.portal.y };
         if ((cell.seamless || cell.portalStyle === "gap") && G.beginWorldTransition)
-          G.beginWorldTransition(cell.portal.map, target, move);
+          G.beginWorldTransition(cell.portal.map, target, travelDirection);
         else
           load(cell.portal.map, target);
         G.saveGame();

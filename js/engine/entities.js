@@ -123,7 +123,11 @@ G.damagePlayer = function (dmg, fromX, fromY) {
         exit: trial.exit,
         bossName,
       };
-      G.ui.banner("💫 TRIAL LOST", bossLine || `${bossName} sends you back outside. Breathe, then try again.`);
+      const heading = trial.worldBoss ? "💫 THE WORLD BEARS YOU BACK" : "💫 TRIAL LOST";
+      const fallback = trial.worldBoss
+        ? `${bossName} reclaims the region. The caravan carries you to its fire.`
+        : `${bossName} sends you back outside. Breathe, then try again.`;
+      G.ui.banner(heading, bossLine || fallback);
       G.events.emit("ko", { trial: G.state.mapId, boss: bossEnemy && bossEnemy.id });
       return;
     }
@@ -376,7 +380,8 @@ function engageBoss(e) {
   G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: "#ffcd75", radius: 13, dur: 0.4 });
   bossBurst(e, boss.color, rematch ? 8 : 16);
   if (rematch) {
-    G.ui.toast(`⚔ ${boss.rematchLine || e.def.name + " returns!"}`, 2);
+    const domain = boss.domain ? ` ${boss.domain} answers with them.` : "";
+    G.ui.toast(`⚔ ${boss.rematchLine || e.def.name + " returns!"}${domain}`, 2.5);
   } else {
     const ward = e.ward && G.DAMAGE_TYPES[e.ward.types[0]];
     const wardText = ward ? ` · ${ward.icon} ${ward.name.toUpperCase()} breaks its ward` : "";
@@ -388,7 +393,10 @@ function engageBoss(e) {
       elapsed: 0,
       wardText,
     };
-    G.ui.banner(`⚔ ${e.def.name.toUpperCase()} ⚔`, `${lines[0]}${wardText}`);
+    const title = boss.domain
+      ? `⚔ WORLDBEARER OF ${boss.domain.toUpperCase()} ⚔`
+      : `⚔ ${e.def.name.toUpperCase()} ⚔`;
+    G.ui.banner(title, `${e.def.name}: ${lines[0]}${wardText}`);
   }
 }
 
@@ -407,7 +415,10 @@ G.updateBossCutscene = function (dt) {
     scene.lineT = G.BOSS_CUTSCENE_LINE_SECONDS;
     scene.elapsed = 0;
     G.sfx.play("bossPhase");
-    G.ui.banner(`⚔ ${e.def.name.toUpperCase()} ⚔`, scene.lines[scene.index]);
+    const title = e.def.boss.domain
+      ? `⚔ ${e.def.name.toUpperCase()} COMMANDS ${e.def.boss.domain.toUpperCase()} ⚔`
+      : `⚔ ${e.def.name.toUpperCase()} ⚔`;
+    G.ui.banner(title, scene.lines[scene.index]);
     G.state.shake = Math.max(G.state.shake, 0.16);
     G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: e.def.boss.color, radius: 18, dur: 0.38 });
     G.input.clearTaps();
@@ -472,20 +483,33 @@ const BOSS_ARENA_ACTIONS = {
   worldGrid: "WORLD GRID",
 };
 
-function arenaBounds() {
+function arenaBounds(hazard) {
+  if (hazard && hazard.bounds) return hazard.bounds;
   return {
-    left: G.TILE * 1.5,
-    top: G.TILE * 1.5,
+    left: G.TILE * 1.5, top: G.TILE * 1.5,
     right: (G.state.mapW - 1.5) * G.TILE,
     bottom: (G.state.mapH - 1.5) * G.TILE,
   };
+}
+
+function worldbearerBounds(owner) {
+  const map = arenaBounds();
+  if (!owner.def.worldbearer) return map;
+  const p = G.state.player;
+  const width = Math.min(360, map.right - map.left);
+  const height = Math.min(240, map.bottom - map.top);
+  const centerX = (owner.x + p.x) / 2;
+  const centerY = (owner.y + p.y) / 2;
+  const left = G.util.clamp(centerX - width / 2, map.left, map.right - width);
+  const top = G.util.clamp(centerY - height / 2, map.top, map.bottom - height);
+  return { left, top, right: left + width, bottom: top + height };
 }
 
 function spawnBossHazard(e, kind, options) {
   const h = Object.assign({
     kind, owner: e, mapId: G.state.mapId, t: 0, delay: 0,
     warning: 0.82, active: 0.62, color: e.def.boss.color,
-    phase: e.bossPhase, hit: false,
+    phase: e.bossPhase, hit: false, bounds: worldbearerBounds(e),
   }, options || {});
   G.state.bossHazards = G.state.bossHazards || [];
   G.state.bossHazards.push(h);
@@ -504,7 +528,8 @@ function hazardIsActive(h) {
 }
 
 function gridCellDanger(h, x, y) {
-  const b = arenaBounds();
+  const b = arenaBounds(h);
+  if (x < b.left || x >= b.right || y < b.top || y >= b.bottom) return true;
   const cell = h.cell || 40;
   const gx = Math.floor((x - b.left) / cell);
   const gy = Math.floor((y - b.top) / cell);
@@ -513,7 +538,8 @@ function gridCellDanger(h, x, y) {
 }
 
 function gustLaneDanger(h, x, y) {
-  const b = arenaBounds();
+  const b = arenaBounds(h);
+  if (x < b.left || x >= b.right || y < b.top || y >= b.bottom) return true;
   const lanes = h.lanes || 5;
   const span = h.axis === "y" ? b.right - b.left : b.bottom - b.top;
   const at = h.axis === "y" ? x - b.left : y - b.top;
@@ -585,8 +611,8 @@ function punishBossHazard(h) {
 
 G.drawBossHazards = function (ctx) {
   const hazards = G.state.bossHazards || [];
-  const b = arenaBounds();
   for (const h of hazards) {
+    const b = arenaBounds(h);
     const local = hazardLocalTime(h);
     if (local < 0) continue;
     const active = hazardIsActive(h);
@@ -675,6 +701,13 @@ G.drawBossHazards = function (ctx) {
       ctx.beginPath();
       ctx.arc(h.owner.x, h.owner.y, h.maxRange, 0, Math.PI * 2);
       ctx.stroke();
+    }
+    if (h.owner.def.worldbearer) {
+      ctx.globalAlpha = active ? 0.82 : 0.5;
+      ctx.strokeStyle = h.color;
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(b.left + 1, b.top + 1, b.right - b.left - 2, b.bottom - b.top - 2);
+      ctx.setLineDash([]);
     }
     ctx.restore();
   }
@@ -1166,6 +1199,25 @@ G.drawAimGuide = function (ctx) {
 };
 
 G.drawEnemy = function (ctx, e) {
+  if (e.def.worldbearer) {
+    const color = e.def.boss.color;
+    const pulse = 0.5 + Math.sin((G.state.time || 0) * 3 + e.anim) * 0.5;
+    ctx.save();
+    ctx.globalAlpha = e.bossEngaged ? 0.32 + pulse * 0.14 : 0.18 + pulse * 0.08;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y - 2, 18 + pulse * 4, 0, Math.PI * 2);
+    ctx.stroke();
+    // Four domain marks make the ruler visible among ordinary enemies before
+    // engagement without adding a new interaction icon or UI prompt.
+    ctx.fillStyle = color;
+    for (let i = 0; i < 4; i++) {
+      const a = (G.state.time || 0) * 0.45 + i * Math.PI / 2;
+      ctx.fillRect(Math.round(e.x + Math.cos(a) * 22), Math.round(e.y - 8 + Math.sin(a) * 9), 2, 2);
+    }
+    ctx.restore();
+  }
   G.drawShadow(ctx, e.x, e.y, e.def.size - 2);
   const frame = Math.floor(e.anim) % 2;
   const drawX = e.x + (e.hitKickX || 0);

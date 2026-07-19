@@ -658,7 +658,7 @@ registerMap({
    trails, open combat pockets, memorable camps, and several connections.
    Boundary portals slide directly into the neighboring landscape.          */
 
-function makeWorldwakeRegionTiles(variant) {
+function makeWorldwakeRegionTiles(variant, hasGuardian) {
   const w = 46, h = 29;
   const edge = variant === 2 || variant === 5 ? "r" : "t";
   const rows = Array.from({ length: h }, (_, y) =>
@@ -695,7 +695,8 @@ function makeWorldwakeRegionTiles(variant) {
   put(19, 18, ["a", "a", "b", "b", "c", "d", "d", "e"][variant]);
 
   put(0, 14, "x"); put(w - 1, 14, "y"); put(23, 0, "n"); put(23, h - 1, "s");
-  put(35, 8, "B"); put(10, 14, "m"); put(27, 14, "H"); put(7, 20, "C");
+  if (hasGuardian) put(35, 8, "B");
+  put(10, 14, "m"); put(27, 14, "H"); put(7, 20, "C");
   return rows.map((row) => row.join(""));
 }
 
@@ -725,7 +726,7 @@ function worldwakeLegend(extra) {
       x: { map: "overworld", x: 118, y: 70 }, y: { map: "windscarCanyon", x: 2, y: 14 },
       n: { map: "windscarCanyon", x: 23, y: 27 }, s: { map: "glasswaterDesert", x: 23, y: 1, mark: "sky" },
     },
-    boss: { map: "griffinWorldback", theme: "griffin" }, cache: { item: "sunstep-ribbon", name: "the Sunstep Ribbon" },
+    cache: { item: "sunstep-ribbon", name: "the Sunstep Ribbon" },
   },
   {
     id: "windscarCanyon", name: "Windscar Canyon", biome: "windscar", variant: 1,
@@ -734,7 +735,8 @@ function worldwakeLegend(extra) {
       x: { map: "sunstepPrairie", x: 43, y: 14 }, y: { map: "hangingGardens", x: 2, y: 14 },
       n: { map: "hangingGardens", x: 23, y: 27 }, s: { map: "sunstepPrairie", x: 23, y: 1 },
     },
-    boss: { map: "griffinWorldback", theme: "griffin" }, cache: { item: "windscar-feather", name: "a Windscar Feather" },
+    guardian: { id: "skySovereign", retreat: { x: 8, y: 20 } },
+    cache: { item: "windscar-feather", name: "a Windscar Feather" },
   },
   {
     id: "hangingGardens", name: "Hanging Gardens", biome: "gardens", variant: 2,
@@ -743,7 +745,8 @@ function worldwakeLegend(extra) {
       x: { map: "windscarCanyon", x: 43, y: 14 }, y: { map: "rootdeepHollow", x: 2, y: 14 },
       n: { map: "rootdeepHollow", x: 23, y: 27, mark: "stone" }, s: { map: "windscarCanyon", x: 23, y: 1 },
     },
-    boss: { map: "golemWorldback", theme: "golem" }, cache: { item: "garden-keystone", name: "a singing Garden Keystone" },
+    guardian: { id: "oldMason", retreat: { x: 8, y: 20 } },
+    cache: { item: "garden-keystone", name: "a singing Garden Keystone" },
   },
   {
     id: "rootdeepHollow", name: "Rootdeep Hollow", biome: "rootdeep", variant: 3,
@@ -752,7 +755,8 @@ function worldwakeLegend(extra) {
       x: { map: "hangingGardens", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 2, y: 14 },
       n: { map: "hangingGardens", x: 23, y: 27 }, s: { map: "glasswaterDesert", x: 23, y: 1, mark: "thread" },
     },
-    boss: { map: "weaverWorldback", theme: "weaver" }, cache: { item: "rootdeep-silk", name: "the unbreakable Rootdeep Silk" },
+    guardian: { id: "silkMatriarch", retreat: { x: 8, y: 20 } },
+    cache: { item: "rootdeep-silk", name: "the unbreakable Rootdeep Silk" },
   },
   {
     id: "glasswaterDesert", name: "Glasswater Desert", biome: "glasswater", variant: 4,
@@ -761,7 +765,7 @@ function worldwakeLegend(extra) {
       x: { map: "rootdeepHollow", x: 43, y: 14 }, y: { map: "titanGrave", x: 23, y: 1, mark: "light" },
       n: { map: "rootdeepHollow", x: 23, y: 27 }, s: { map: "sunstepPrairie", x: 23, y: 1, mark: "sky" },
     },
-    boss: { map: "weaverWorldback", theme: "weaver" }, cache: { item: "glasswater-prism", name: "the Glasswater Prism" },
+    cache: { item: "glasswater-prism", name: "the Glasswater Prism" },
   },
   {
     id: "frostbellTundra", name: "Frostbell Tundra", biome: "frostbell", variant: 5,
@@ -770,7 +774,8 @@ function worldwakeLegend(extra) {
       x: { map: "shattercoast", x: 45, y: 14 }, y: { map: "stormspinePeaks", x: 2, y: 14 },
       n: { map: "stormspinePeaks", x: 23, y: 27, mark: "echo" }, s: { map: "shattercoast", x: 45, y: 14 },
     },
-    boss: { map: "bellWorldback", theme: "bellkeeper" }, cache: { item: "frostbell-chime", name: "a Frostbell Chime" },
+    guardian: { id: "bellTitan", retreat: { x: 8, y: 20 } },
+    cache: { item: "frostbell-chime", name: "a Frostbell Chime" },
   },
   {
     id: "stormspinePeaks", name: "Stormspine Peaks", biome: "stormspine", variant: 6,
@@ -779,7 +784,8 @@ function worldwakeLegend(extra) {
       x: { map: "frostbellTundra", x: 43, y: 14 }, y: { map: "titanGrave", x: 2, y: 14 },
       n: { map: "titanGrave", x: 23, y: 27, mark: "light" }, s: { map: "frostbellTundra", x: 23, y: 1 },
     },
-    boss: { map: "lanternWorldback", theme: "lantern" }, cache: { item: "stormglass-lantern", name: "the Stormglass Lantern" },
+    guardian: { id: "lanternKeeper", retreat: { x: 8, y: 20 } },
+    cache: { item: "stormglass-lantern", name: "the Stormglass Lantern" },
   },
   {
     id: "titanGrave", name: "Titan Grave", biome: "titan", variant: 7,
@@ -788,23 +794,36 @@ function worldwakeLegend(extra) {
       x: { map: "stormspinePeaks", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 43, y: 14 },
       n: { map: "glasswaterDesert", x: 23, y: 27 }, s: { map: "stormspinePeaks", x: 23, y: 1 },
     },
-    boss: { map: "colossusWorldback", theme: "colossus" }, cache: { item: "titan-memory", name: "the Titan's Smallest Memory" },
+    guardian: { id: "lastWorldbearer", retreat: { x: 8, y: 20 } },
+    cache: { item: "titan-memory", name: "the Titan's Smallest Memory" },
   },
 ].forEach((region) => {
   const p = region.portals;
+  const guardian = region.guardian;
   registerMap({
     id: region.id, name: region.name, biome: region.biome, worldwake: true,
+    worldBoss: guardian ? { enemy: guardian.id, region: region.name } : null,
+    // Losing an open-world guardian fight returns Nobody to that region's
+    // caravan fire and reloads the whole living landscape. The guardian and
+    // ordinary creatures therefore begin the next attempt at full strength.
+    bossTrial: guardian ? {
+      worldBoss: true,
+      exit: { map: region.id, x: guardian.retreat.x, y: guardian.retreat.y },
+      delay: 2.1,
+    } : null,
     playerStart: { x: 3, y: 14 },
     legend: worldwakeLegend({
       "x": { tile: "path", portal: p.x, portalStyle: "gap", seamless: true, mark: p.x.mark },
       "y": { tile: "path", portal: p.y, portalStyle: "gap", seamless: true, mark: p.y.mark },
       "n": { tile: "path", portal: p.n, portalStyle: "gap", seamless: true, mark: p.n.mark },
       "s": { tile: "path", portal: p.s, portalStyle: "gap", seamless: true, mark: p.s.mark },
-      "B": { tile: "path", portal: { map: region.boss.map, x: 3, y: 11 }, portalStyle: "trial", portalTheme: region.boss.theme },
+      // The Worldbearer is part of the same simulation as the roads, terrain,
+      // caches, and ordinary enemies. There is deliberately no trial door.
+      "B": guardian ? { tile: "path", enemy: guardian.id } : { tile: "path" },
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     }),
-    tiles: makeWorldwakeRegionTiles(region.variant),
+    tiles: makeWorldwakeRegionTiles(region.variant, !!guardian),
   });
 });
 
@@ -838,11 +857,12 @@ function makeWorldbearerArena(variant) {
     sign: "The mountain kneels. Its heartbeat is slow enough to count between thunderclaps." },
 ].forEach((trial, variant) => registerMap({
   id: trial.id, name: trial.name, visualTheme: trial.theme, worldbearer: true, playerStart: { x: 3, y: 11 },
-  bossTrial: { exit: { map: trial.exitMap, x: 34, y: 9 }, delay: 1.8 },
+  // Kept as a safe migration route for saves made inside the old arenas.
+  // Their masters now live visibly in the regions outside.
   legend: {
     "x": { tile: "floor", portal: { map: trial.exitMap, x: 34, y: 9 } },
-    "B": { tile: "floor", enemy: trial.boss },
-    "m": { tile: "floor", message: trial.sign },
+    "B": { tile: "floor" },
+    "m": { tile: "floor", message: `${trial.sign} Its master now walks the open region outside.` },
     "H": { tile: "floor", rest: true, restText: "The Worldbearer's quiet breath restores every heart and all mana." },
     "R": { tile: "rock", on: "floor" },
   },
