@@ -68,6 +68,27 @@ for (const region of G.WORLDWAKE_REGIONS) {
   }
 }
 
+// Worldbearers are visible inhabitants of the regions they rule. Their old
+// worldback maps remain only as migration-safe exits for existing saves.
+const openWorldRulers = {
+  windscarCanyon: "skySovereign",
+  hangingGardens: "oldMason",
+  rootdeepHollow: "silkMatriarch",
+  frostbellTundra: "bellTitan",
+  stormspinePeaks: "lanternKeeper",
+  titanGrave: "lastWorldbearer",
+};
+for (const [mapId, bossId] of Object.entries(openWorldRulers)) {
+  const map = G.maps[mapId];
+  assert.equal(map.worldBoss.enemy, bossId, `${bossId} should rule ${mapId} directly`);
+  assert.equal(map.legend.B.enemy, bossId, `${mapId} must contain its ruler instead of a trial portal`);
+  assert.equal(map.legend.B.portal, undefined);
+  assert.equal(map.bossTrial.worldBoss, true, "open-world defeats should reset the living region");
+}
+for (const mapId of ["griffinWorldback", "golemWorldback", "weaverWorldback",
+  "bellWorldback", "lanternWorldback", "colossusWorldback"])
+  assert.equal(G.maps[mapId].legend.B.enemy, undefined, `${mapId} must not duplicate an open-world ruler`);
+
 // The southern horizon is a true shortcut: collision opens when the Sky Mark
 // is earned, with no new traversal button or inventory micromanagement.
 const southX = 23 * G.TILE + G.TILE / 2;
@@ -128,8 +149,11 @@ for (const [id, patterns] of Object.entries(arenaPatterns)) {
 // Aurelia announces a stable safe wind lane and warns before it activates.
 // Ignoring it costs one heart and mends the boss, so tanking the mechanic makes
 // the fight longer without increasing its burst damage.
-G.world.load("griffinWorldback");
+G.world.load("windscarCanyon");
 let arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
+const ordinaryEnemies = G.state.enemies.filter((enemy) => !enemy.def.miniboss).length;
+G.state.player.x = arenaBoss.x - 105;
+G.state.player.y = arenaBoss.y;
 arenaBoss.bossEngaged = true;
 arenaBoss.bossIntroT = 0;
 arenaBoss.bossSpecialT = 0;
@@ -150,6 +174,8 @@ assert.ok(G.state.player.x > beforeGust.x, "an unsafe gust lane should push a di
 assert.equal(G.state.player.damageTaken, beforeGust.damage + 1, "ignoring a gust lane should cost one heart");
 assert.equal(arenaBoss.hp, beforeMend + 2, "failed Phase I arena control should mend two boss health");
 assert.equal(arenaBoss.bossStagger, 2, "a failed pattern should also release a little melee pressure");
+assert.equal(G.state.enemies.filter((enemy) => !enemy.def.miniboss).length, ordinaryEnemies,
+  "ordinary biome enemies must remain present during a Worldbearer fight");
 const hazardDrawCalls = { lines: 0, evenodd: 0 };
 const hazardCtx = {
   save() {}, restore() {}, beginPath() {}, rect() {}, clip() {}, fillRect() {}, strokeRect() {},
@@ -161,8 +187,10 @@ assert.ok(hazardDrawCalls.lines >= 3, "gust warnings should draw directional arr
 
 // Bongle's grid alternates full readable floor bands. It can hurt once after
 // the warning, but dash invulnerability remains a universal game rule.
-G.world.load("bellWorldback");
+G.world.load("frostbellTundra");
 arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "bellTitan");
+G.state.player.x = arenaBoss.x - 105;
+G.state.player.y = arenaBoss.y;
 arenaBoss.bossEngaged = true;
 arenaBoss.bossIntroT = 0;
 arenaBoss.bossSpecialT = 0;
@@ -193,5 +221,38 @@ G.drawBossHazards(hazardCtx);
 assert.equal(hazardDrawCalls.evenodd, 1, "closing safe zones must shade the exact dangerous area");
 G.cancelBossHazards(arenaBoss);
 assert.equal(G.state.bossHazards.length, 0, "melee stagger can clear a boss's active arena control");
+
+// The regional fire is preparation and a retry point, not an infinite heal
+// during the fight. A knockout reloads the biome and restores its ruler.
+G.world.load("windscarCanyon");
+arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
+arenaBoss.bossEngaged = true;
+const fire = { x: 7 * G.TILE + G.TILE / 2, y: 20 * G.TILE + G.TILE / 2 };
+G.state.player.x = fire.x;
+G.state.player.y = fire.y;
+G.state.player.damageTaken = 2;
+G.world.checkTriggers(0.016);
+assert.equal(G.state.player.damageTaken, 2, "an engaged Worldbearer must command and lock the regional campfire");
+
+arenaBoss.hp = 1;
+G.state.player.damageTaken = G.playerMaxHearts() - 1;
+G.state.player.invuln = 0;
+G.damagePlayer(1, arenaBoss.x, arenaBoss.y);
+assert.ok(G.state.knockout && G.state.knockout.exit.map === "windscarCanyon");
+G.updateKnockout(2.2);
+arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
+assert.equal(G.state.mapId, "windscarCanyon");
+assert.equal(arenaBoss.hp, arenaBoss.def.hp, "a failed attempt must restore the open-world ruler to full health");
+assert.ok(G.util.dist(G.state.player.x, G.state.player.y, fire.x, fire.y) < G.TILE * 2,
+  "the caravan should carry a defeated player back to the regional fire");
+
+// The overworld boundary transition uses two moving room buffers, linear
+// motion, and roughly twice the former lockout to match the NES Zelda cadence.
+const mainSource = fs.readFileSync(path.join(root, "js/engine/main.js"), "utf8");
+assert.match(mainSource, /scrollDuration:\s*0\.96/);
+assert.match(mainSource, /duration:\s*1\.12/);
+assert.match(mainSource, /ctx\.drawImage\(tr\.incoming, newX, newY\)/);
+assert.doesNotMatch(mainSource, /1 - Math\.pow\(1 - raw, 3\)/,
+  "classic room scrolling should be linear rather than eased");
 
 console.log("worldwake tests passed");

@@ -51,9 +51,9 @@
 
   document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-  // Gap portals are world borders, not doors. Preserve the previous frame and
-  // slide it away while the neighboring region is already drawn underneath.
-  // The tiny 320x180 buffer is deliberately inexpensive on mobile Safari.
+  // Gap portals use the original Zelda's locked, linear screen-to-screen pan:
+  // the old room and the incoming room move together while the HUD stays put.
+  // The tiny 320x180 buffers are deliberately inexpensive on mobile Safari.
   G.beginWorldTransition = function (mapId, spawn, movement) {
     if (!G.maps[mapId]) return false;
     if (G.reducedMotion) {
@@ -70,7 +70,10 @@
       ? { x: move.x < 0 ? -1 : 1, y: 0 }
       : { x: 0, y: move.y < 0 ? -1 : 1 };
     G.world.load(mapId, spawn, { seamless: true });
-    G.state.zoneTransition = { snapshot, direction, t: 0, duration: 0.58 };
+    G.state.zoneTransition = {
+      snapshot, incoming: null, direction, t: 0,
+      leadIn: 0.08, scrollDuration: 0.96, settle: 0.08, duration: 1.12,
+    };
     return true;
   };
 
@@ -352,16 +355,21 @@
     ctx.restore();
     if (s.zoneTransition) {
       const tr = s.zoneTransition;
-      const raw = Math.min(1, tr.t / tr.duration);
-      const eased = 1 - Math.pow(1 - raw, 3);
-      const x = Math.round(-tr.direction.x * eased * G.W);
-      const y = Math.round(-tr.direction.y * eased * G.H);
-      ctx.drawImage(tr.snapshot, x, y);
-      // A narrow bright seam makes the motion read as crossing a boundary,
-      // not a camera glitch, without hiding either region.
-      ctx.fillStyle = "rgba(255,243,194,0.5)";
-      if (tr.direction.x) ctx.fillRect(x + (tr.direction.x > 0 ? G.W - 2 : 0), 0, 2, G.H);
-      else ctx.fillRect(0, y + (tr.direction.y > 0 ? G.H - 2 : 0), G.W, 2);
+      if (!tr.incoming) {
+        tr.incoming = document.createElement("canvas");
+        tr.incoming.width = G.W;
+        tr.incoming.height = G.H;
+        tr.incoming.getContext("2d").drawImage(canvas, 0, 0);
+      }
+      const raw = G.util.clamp((tr.t - tr.leadIn) / tr.scrollDuration, 0, 1);
+      const oldX = Math.round(-tr.direction.x * raw * G.W);
+      const oldY = Math.round(-tr.direction.y * raw * G.H);
+      const newX = oldX + tr.direction.x * G.W;
+      const newY = oldY + tr.direction.y * G.H;
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(0, 0, G.W, G.H);
+      ctx.drawImage(tr.snapshot, oldX, oldY);
+      ctx.drawImage(tr.incoming, newX, newY);
     }
     // Pixel-stepped edge shading adds depth without blurring the art or
     // covering the sharp HTML HUD layered above this canvas.
