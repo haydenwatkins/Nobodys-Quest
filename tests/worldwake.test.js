@@ -144,6 +144,9 @@ for (const [id, patterns] of Object.entries(arenaPatterns)) {
     assert.ok(boss.patterns.includes(pattern), `${id} needs its ${pattern} arena pattern`);
   assert.ok(boss.antiKiteRange <= 112 && boss.chaseScale >= 1.28,
     `${id} should close only excessive ranged distance decisively`);
+  assert.equal(boss.spriteScale, 2, `${id} should render at a crisp boss-only double scale`);
+  assert.ok(G.enemies[id].size >= 34 && G.enemies[id].contactSize < G.enemies[id].size,
+    `${id} should look and target physically larger without widening its damaging charge body`);
 }
 
 // Aurelia announces a stable safe wind lane and warns before it activates.

@@ -71,8 +71,18 @@ G.makeSprite = function (def) {
 };
 
 // Draw a sprite centered-horizontally at (x, y) where y is the FEET position.
-// flip = true mirrors it (for facing left).
-G.drawSprite = function (ctx, def, frame, x, y, flip) {
+// flip = true mirrors it (for facing left). An optional integer scale keeps
+// boss pixels crisp while preserving the exact same art for playable forms.
+G.drawSprite = function (ctx, def, frame, x, y, flip, scale) {
+  const pixelScale = scale || 1;
+  if (pixelScale !== 1) {
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+    ctx.scale(pixelScale, pixelScale);
+    G.drawSprite(ctx, def, frame, 0, 0, flip, 1);
+    ctx.restore();
+    return;
+  }
   const spr = G.makeSprite(def);
   const img = spr.frames[frame % spr.frames.length];
   const outline = spr.outlines[frame % spr.outlines.length];
