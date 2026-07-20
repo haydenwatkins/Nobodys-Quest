@@ -146,7 +146,17 @@ G.world = (() => {
         const cy = y * G.TILE + G.TILE / 2;
         const defeatedRuler = cell.enemy && def.worldBoss && cell.enemy === def.worldBoss.enemy
           && G.worldwakePurified && G.worldwakePurified(mapId);
-        if (cell.enemy && !defeatedRuler) enemies.push(G.makeEnemy(cell.enemy, cx, cy));
+        if (cell.enemy && !defeatedRuler) {
+          const enemy = G.makeEnemy(cell.enemy, cx, cy);
+          const ruler = def.worldBoss && G.enemies[def.worldBoss.enemy];
+          // A failed Worldbearer attempt should ask the player to learn the
+          // region's combat type, not juggle forms while re-clearing its road.
+          // Retype existing wards per instance; do not add shields to naturally
+          // unwarded creatures or mutate their definitions in other maps.
+          if (enemy.ward && !enemy.def.miniboss && ruler && ruler.ward)
+            enemy.ward.types = ruler.ward.types.slice();
+          enemies.push(enemy);
+        }
         if (cell.chest) {
           const key = `${mapId}:${x},${y}`;
           const food = G.isFoodChest(cell.chest);

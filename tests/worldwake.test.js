@@ -121,6 +121,27 @@ for (const [mapId, bossId] of Object.entries(openWorldRulers)) {
   assert.equal(map.legend.B.portal, undefined);
   assert.equal(map.bossTrial.worldBoss, true, "open-world defeats should reset the living region");
 }
+// Retrying a Worldbearer keeps its living region populated, but never forces
+// a second damage-type loadout just to clear the road back to the ruler.
+const originalWardTypes = new Map(Object.entries(G.enemies)
+  .filter(([, enemy]) => enemy.ward)
+  .map(([id, enemy]) => [id, enemy.ward.types.join(",")]));
+for (const [mapId, bossId] of Object.entries(openWorldRulers)) {
+  G.world.load(mapId);
+  const rulerTypes = G.enemies[bossId].ward.types.join(",");
+  const ordinaryWarded = G.state.enemies.filter((enemy) => !enemy.def.miniboss && enemy.ward);
+  const ordinaryUnwarded = G.state.enemies.filter((enemy) => !enemy.def.miniboss && !enemy.def.ward);
+  assert.ok(ordinaryWarded.length > 0, mapId + " should exercise its shared regional ward");
+  for (const enemy of ordinaryWarded) {
+    assert.equal(enemy.ward.types.join(","), rulerTypes,
+      enemy.def.name + " should share " + G.enemies[bossId].name + "'s ward type");
+    assert.equal(enemy.ward.hpMax, enemy.def.ward.hp, "regional ward matching must not increase shield strength");
+  }
+  for (const enemy of ordinaryUnwarded)
+    assert.equal(enemy.ward, null, "naturally unwarded enemies should not gain extra retry health");
+}
+for (const [id, types] of originalWardTypes)
+  assert.equal(G.enemies[id].ward.types.join(","), types, id + "'s ward definition must stay map-local");
 for (const mapId of ["griffinWorldback", "golemWorldback", "weaverWorldback",
   "bellWorldback", "lanternWorldback", "colossusWorldback"])
   assert.equal(G.maps[mapId].legend.B.enemy, undefined, `${mapId} must not duplicate an open-world ruler`);
