@@ -144,7 +144,9 @@ G.world = (() => {
 
         const cx = x * G.TILE + G.TILE / 2;
         const cy = y * G.TILE + G.TILE / 2;
-        if (cell.enemy) enemies.push(G.makeEnemy(cell.enemy, cx, cy));
+        const defeatedRuler = cell.enemy && def.worldBoss && cell.enemy === def.worldBoss.enemy
+          && G.worldwakePurified && G.worldwakePurified(mapId);
+        if (cell.enemy && !defeatedRuler) enemies.push(G.makeEnemy(cell.enemy, cx, cy));
         if (cell.chest) {
           const key = `${mapId}:${x},${y}`;
           const food = G.isFoodChest(cell.chest);

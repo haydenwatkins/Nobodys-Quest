@@ -108,9 +108,14 @@ G.damagePlayer = function (dmg, fromX, fromY) {
       return;
     }
     G.sfx.play("ko");
-    const trial = G.state.mapDef && G.state.mapDef.bossTrial;
+    const configuredTrial = G.state.mapDef && G.state.mapDef.bossTrial;
+    const livingBoss = G.state.enemies.find((enemy) => enemy.def.miniboss && !enemy.dead);
+    // A purified open-world region is no longer a live boss attempt. Ordinary
+    // enemies can still knock Nobody out normally without resurrecting or
+    // attributing the defeat to a Worldbearer who is already gone.
+    const trial = configuredTrial && (!configuredTrial.worldBoss || livingBoss) ? configuredTrial : null;
     if (trial) {
-      const bossEnemy = G.state.enemies.find((enemy) => enemy.def.miniboss && !enemy.dead);
+      const bossEnemy = livingBoss;
       const bossName = bossEnemy ? bossEnemy.def.name : "The guardian";
       const bossLine = bossEnemy && bossEnemy.def.boss && bossEnemy.def.boss.knockoutLine;
       p.dashing = null;
