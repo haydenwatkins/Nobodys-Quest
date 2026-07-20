@@ -254,6 +254,10 @@ function makeShattercoastTiles() {
 
 registerMap({
   id: "shattercoast", name: "Shattercoast", playerStart: { x: 45, y: 14 },
+  fences: [
+    { x: 19, y: 12, length: 5, dir: "v", style: "arena" },
+    { x: 28, y: 12, length: 5, dir: "v", style: "arena" },
+  ],
   legend: {
     "x": { tile: "path", portal: { map: "overworld", x: 1, y: 65 }, portalStyle: "gap", seamless: true },
     "F": { tile: "path", portal: { map: "frostbellTundra", x: 23, y: 27 }, portalStyle: "gap", seamless: true },
@@ -364,6 +368,16 @@ registerMap({
   id: "town",
   name: "Your Town",
   playerStart: { x: 15, y: 14 },
+  fences: [
+    { x: 4, y: 3, length: 3, dir: "h", style: "town" },
+    { x: 21, y: 3, length: 3, dir: "h", style: "town" },
+    { x: 4, y: 7, length: 3, dir: "h", style: "town" },
+    { x: 21, y: 7, length: 3, dir: "h", style: "town" },
+    { x: 4, y: 11, length: 3, dir: "h", style: "town" },
+    { x: 21, y: 11, length: 3, dir: "h", style: "town" },
+    { x: 4, y: 15, length: 3, dir: "h", style: "town" },
+    { x: 21, y: 15, length: 3, dir: "h", style: "town" },
+  ],
 
   legend: {
     "a": { tile: "grass", townPlot: "a" },
@@ -512,6 +526,12 @@ registerMap({
   id: "sunkenMarsh",
   name: "Sunken Marsh",
   playerStart: { x: 27, y: 9 },
+  fences: [
+    { x: 2, y: 7, length: 10, dir: "h", style: "marsh" },
+    { x: 18, y: 7, length: 10, dir: "h", style: "marsh" },
+    { x: 2, y: 11, length: 10, dir: "h", style: "marsh" },
+    { x: 18, y: 11, length: 10, dir: "h", style: "marsh" },
+  ],
 
   legend: {
     "1": { tile: "grass", enemy: "slime" },
@@ -724,6 +744,16 @@ function worldwakeLegend(extra) {
   return Object.assign(common, extra);
 }
 
+function caravanFenceLayout() {
+  // A broad south opening keeps the camp visually welcoming and makes the
+  // fence read as a rest area rather than another obstacle to navigate.
+  return [
+    { x: 5, y: 18, length: 5, dir: "h", style: "camp" },
+    { x: 5, y: 18, length: 4, dir: "v", style: "camp" },
+    { x: 9, y: 18, length: 4, dir: "v", style: "camp" },
+  ];
+}
+
 [
   {
     id: "sunstepPrairie", name: "Sunstep Prairie", biome: "sunstep", variant: 0,
@@ -808,6 +838,7 @@ function worldwakeLegend(extra) {
   }
   registerMap({
     id: region.id, name: region.name, biome: region.biome, worldwake: true,
+    fences: caravanFenceLayout(),
     worldBoss: guardian ? { enemy: guardian.id, region: region.name } : null,
     // Losing an open-world guardian fight returns Nobody to that region's
     // caravan fire and reloads the whole living landscape. The guardian and

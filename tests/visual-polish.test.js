@@ -73,6 +73,40 @@ for (const [mapId, theme] of Object.entries(expectedThemes)) {
   assert.ok(G.maps[mapId].tiles.every((row) => row.length === 28), `${mapId} geometry width changed`);
 }
 
+const fenceScenes = {
+  town: 8,
+  sunkenMarsh: 4,
+  shattercoast: 2,
+  sunstepPrairie: 3,
+  windscarCanyon: 3,
+  hangingGardens: 3,
+  rootdeepHollow: 3,
+  glasswaterDesert: 3,
+  frostbellTundra: 3,
+  stormspinePeaks: 3,
+  titanGrave: 3,
+};
+for (const [mapId, expectedRuns] of Object.entries(fenceScenes)) {
+  const map = G.maps[mapId];
+  assert.equal(map.fences.length, expectedRuns, mapId + " should use its restrained fence layout");
+  const width = Math.max(...map.tiles.map((row) => row.length));
+  for (const fence of map.fences) {
+    assert.ok(["h", "v"].includes(fence.dir), mapId + " fence needs a valid direction");
+    assert.ok(fence.length > 0, mapId + " fence needs visible length");
+    const endX = fence.x + (fence.dir === "h" ? fence.length : 0);
+    const endY = fence.y + (fence.dir === "v" ? fence.length : 0);
+    assert.ok(fence.x >= 0 && fence.y >= 0 && endX < width && endY < map.tiles.length,
+      mapId + " fence must stay inside the map");
+  }
+}
+for (const mapId of Object.keys(fenceScenes).filter((id) => G.maps[id].worldwake)) {
+  const fences = G.maps[mapId].fences;
+  assert.equal(fences.filter((fence) => fence.dir === "h").length, 1,
+    mapId + " camp should keep its south side visibly open");
+  assert.equal(fences.filter((fence) => fence.dir === "v").length, 2,
+    mapId + " camp needs two welcoming side rails");
+}
+
 function fakeCanvas() {
   let depth = 0;
   const ctx = {

@@ -1159,6 +1159,84 @@ G.world = (() => {
     ctx.restore();
   }
 
+  function fencePalette(style) {
+    const biome = biomePalette();
+    if (style === "arena")
+      return { dark: "#333c57", wood: "#94b0c2", light: "#c8d8e0", accent: "#b13e53" };
+    if (style === "marsh")
+      return { dark: "#3b3b32", wood: "#6f7042", light: "#a6a65d", accent: "#73c26d" };
+    if (style === "town")
+      return { dark: "#5a3825", wood: "#a56b3f", light: "#d8b06a", accent: "#f4f4f4" };
+    return {
+      dark: "#493829", wood: "#8a6538", light: "#d8b06a",
+      accent: biome ? biome.accent : "#ffcd75",
+    };
+  }
+
+  // Split-rail fences are a reusable, deliberately non-solid landmark asset.
+  // They organize a scene and suggest safety without adding collision to the
+  // game's already busy mobile-sized paths.
+  function drawFenceRun(ctx, fence) {
+    const T = G.TILE;
+    const length = Math.max(1, Math.floor(fence.length || 1));
+    const palette = fencePalette(fence.style);
+    const startX = fence.x * T;
+    const startY = fence.y * T;
+    const span = length * T;
+    ctx.save();
+
+    if (fence.dir === "v") {
+      const x = startX + 8;
+      ctx.fillStyle = "rgba(26,28,44,0.28)";
+      ctx.fillRect(x + 4, startY + 3, 4, span + 5);
+      ctx.fillStyle = palette.dark;
+      ctx.fillRect(x - 2, startY, 3, span);
+      ctx.fillRect(x + 3, startY, 3, span);
+      ctx.fillStyle = palette.wood;
+      ctx.fillRect(x - 1, startY, 1, span);
+      ctx.fillRect(x + 4, startY, 1, span);
+      for (let i = 0; i <= length; i++) {
+        const y = startY + i * T;
+        ctx.fillStyle = palette.dark;
+        ctx.fillRect(x - 4, y - 3, 10, 7);
+        ctx.fillStyle = palette.wood;
+        ctx.fillRect(x - 2, y - 2, 6, 5);
+        ctx.fillStyle = palette.light;
+        ctx.fillRect(x - 1, y - 1, 3, 1);
+      }
+    } else {
+      const y = startY + 10;
+      ctx.fillStyle = "rgba(26,28,44,0.28)";
+      ctx.fillRect(startX - 2, y + 5, span + 4, 4);
+      ctx.fillStyle = palette.dark;
+      ctx.fillRect(startX, y, span, 3);
+      ctx.fillRect(startX, y + 5, span, 3);
+      ctx.fillStyle = palette.wood;
+      ctx.fillRect(startX, y, span, 1);
+      ctx.fillRect(startX, y + 5, span, 1);
+      for (let i = 0; i <= length; i++) {
+        const x = startX + i * T;
+        ctx.fillStyle = palette.dark;
+        ctx.fillRect(x - 3, y - 5, 7, 15);
+        ctx.fillStyle = palette.wood;
+        ctx.fillRect(x - 1, y - 4, 4, 12);
+        ctx.fillStyle = palette.light;
+        ctx.fillRect(x, y - 3, 2, 2);
+      }
+      if (fence.style === "camp") {
+        const flagX = startX + Math.floor(span / 2);
+        ctx.fillStyle = palette.accent;
+        ctx.fillRect(flagX - 3, y + 2, 7, 3);
+        ctx.fillRect(flagX - 1, y + 5, 3, 2);
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawMapFences(ctx) {
+    for (const fence of G.state.mapDef.fences || []) drawFenceRun(ctx, fence);
+  }
+
   function draw(ctx, cam, time) {
     const s = G.state;
     const T = G.TILE;
@@ -1174,6 +1252,7 @@ G.world = (() => {
     for (let y = y0; y <= y1; y++)
       for (let x = x0; x <= x1; x++)
         drawTrialLandmark(ctx, s.grid[y][x], x, y, time);
+    drawMapFences(ctx);
     drawPlayerHouse(ctx);
     drawWorldwakeState(ctx, time);
     for (const ch of s.chests) drawChest(ctx, ch, time);
