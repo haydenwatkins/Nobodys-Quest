@@ -96,6 +96,7 @@
     claimedForms: [],
     unlockReadyNotified: [],
     loadouts: {},
+    npcTalk: {},
     pinnedQuestIds: [],
     town: G.makeTown(),
     heroBoard: G.makeHeroBoard(),
@@ -128,6 +129,7 @@
     s.claimedForms = s.claimedForms.filter((id) => G.forms[id] && !G.forms[id].start && !G.forms[id].invalid);
     s.unlockReadyNotified = Array.isArray(save.unlockReadyNotified) ? save.unlockReadyNotified : [];
     s.loadouts = save.loadouts || {};
+    s.npcTalk = save.npcTalk && typeof save.npcTalk === "object" ? save.npcTalk : {};
     const wardrobe = G.normalizeCostumes(save.costumesUnlocked, save.costumeId);
     s.costumeId = wardrobe.selected;
     s.costumesUnlocked = wardrobe.unlocked;
@@ -304,6 +306,7 @@
     s.time += dt;
 
     G.updatePlayer(dt);
+    G.updateNpcs(dt);
     G.tutorial.update(dt);
     G.updateEnemies(dt);
     G.combat.updateProjectiles(dt);
@@ -344,6 +347,7 @@
 
     // draw everyone in y-order so closer things overlap farther things
     const drawables = s.enemies.filter((e) => !e.dead).map((e) => ({ y: e.y, fn: () => G.drawEnemy(ctx, e) }));
+    for (const npc of s.npcs || []) drawables.push({ y: npc.y, fn: () => G.drawNpc(ctx, npc) });
     drawables.push({ y: p.y, fn: () => G.drawPlayer(ctx) });
     drawables.sort((a, b) => a.y - b.y);
     for (const d of drawables) d.fn();

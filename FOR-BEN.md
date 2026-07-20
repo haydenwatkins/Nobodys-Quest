@@ -271,6 +271,24 @@ rendering. A new form also inherits every costume automatically. Keep unlock
 conditions tied to interesting milestones rather than harder enemies, and keep
 the dark outline color unchanged so every dressed sprite remains readable.
 
+### People and the story
+
+The recurring cast lives in `js/data/npcs.js`. Each character has a two-frame
+sprite and short dialogue grouped by story chapter. The engine automatically
+uses the newest chapter the player has reached, so an old friend can react to
+new forms, guardian victories, the waking roads, Worldbearer marks, and the
+ending. Add placements to `G.NPC_PLACEMENTS`; their coordinates are only a
+preference, because the engine searches nearby for open ground instead of
+spawning a person inside Ben's newly edited tree.
+
+NPCs talk when the player walks close, then reset after the player steps away.
+That keeps the same interaction working on keyboard, Xbox controllers, iPad,
+and phones without another screen button. Keep lines short, funny, and useful.
+The game's story is about abandoned promises becoming the Unfinished, and about
+Nobody succeeding through many imperfect roles instead of becoming one perfect
+hero. New jokes should reveal character or world rules, not imitate dialogue
+from another game.
+
 ---
 
 ## 💡 Idea shelf (steal these!)

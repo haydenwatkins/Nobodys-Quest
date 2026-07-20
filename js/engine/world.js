@@ -160,6 +160,12 @@ G.world = (() => {
         }
       }
     }
+    const npcs = G.makeMapNpcs ? G.makeMapNpcs(mapId, (x, y) => {
+      if (x < 1 || y < 1 || x >= w - 1 || y >= h - 1) return false;
+      const cell = grid[y] && grid[y][x];
+      return !!cell && !SOLID[cell.tile] && !cell.enemy && !cell.chest
+        && !cell.portal && !cell.message && !cell.rest;
+    }) : [];
 
     const s = G.state;
     s.mapId = mapId;
@@ -169,6 +175,7 @@ G.world = (() => {
     s.mapH = h;
     s.enemies = enemies;
     s.chests = chests;
+    s.npcs = npcs;
     s.projectiles = [];
     s.pickups = [];
     s.passiveEchoes = [];
