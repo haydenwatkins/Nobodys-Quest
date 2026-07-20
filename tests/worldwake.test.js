@@ -47,6 +47,44 @@ assert.deepEqual(Array.from(G.state.worldwake.discovered), ["sunstepPrairie"]);
 assert.equal(G.state.mapW, 46);
 assert.equal(G.state.mapH, 29);
 
+function testProjectile(x, y, fromPlayer) {
+  return {
+    x, y, vx: 1, vy: 0, speed: 1, damage: 1, type: "sharp", size: 2,
+    color: "#f4f4f4", startX: x, startY: y, range: 100,
+    fromPlayer, armT: 0, trail: [], trailLength: 0,
+  };
+}
+
+// Water remains movement terrain, but it must never eat player or enemy shots.
+G.world.load("sunkenMarsh");
+const waterX = 7 * G.TILE + G.TILE / 2;
+const waterY = 4 * G.TILE + G.TILE / 2;
+assert.equal(G.world.cellAt(waterX, waterY).tile, "water");
+for (const fromPlayer of [true, false]) {
+  G.state.projectiles = [testProjectile(waterX, waterY, fromPlayer)];
+  G.combat.updateProjectiles(0.016);
+  assert.equal(G.state.projectiles.length, 1, "water should allow every projectile to pass");
+}
+G.world.load("emberRidge");
+G.state.projectiles = [testProjectile(G.TILE / 2, G.TILE / 2 + 4, true)];
+G.combat.updateProjectiles(0.016);
+assert.equal(G.state.projectiles.length, 0, "true walls should still stop projectiles");
+
+// Boss movement uses a padded exit keep-out, while players and ordinary
+// enemies retain the normal walkable portal behavior.
+G.world.load("windscarCanyon");
+const exit = G.state.portalKeepouts.find((portal) => portal.x === G.TILE / 2);
+const exitBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
+const clearance = G.TILE + (exitBoss.def.contactSize || Math.min(exitBoss.def.size, 18)) / 2;
+exitBoss.x = exit.x + clearance + 1;
+exitBoss.y = exit.y;
+const bossBeforeExitMove = exitBoss.x;
+G.world.moveBox(exitBoss, -4, 0);
+assert.equal(exitBoss.x, bossBeforeExitMove, "a boss must not enter an exit's player trigger footprint");
+const ordinaryAtExit = G.makeEnemy("slime", exit.x + clearance + 1, exit.y);
+G.world.moveBox(ordinaryAtExit, -4, 0);
+assert.ok(ordinaryAtExit.x < exit.x + clearance + 1, "ordinary enemies should not gain an invisible portal wall");
+
 for (const region of G.WORLDWAKE_REGIONS) {
   const map = G.maps[region.id];
   const solidChars = new Set(["t", "r", "w", "#"]);

@@ -130,6 +130,7 @@ G.world = (() => {
     const grid = [];      // grid[y][x] = legend cell for that tile
     const enemies = [];
     const chests = [];
+    const portalKeepouts = [];
 
     for (let y = 0; y < h; y++) {
       grid[y] = [];
@@ -144,6 +145,7 @@ G.world = (() => {
 
         const cx = x * G.TILE + G.TILE / 2;
         const cy = y * G.TILE + G.TILE / 2;
+        if (cell.portal) portalKeepouts.push({ x: cx, y: cy });
         const defeatedRuler = cell.enemy && def.worldBoss && cell.enemy === def.worldBoss.enemy
           && G.worldwakePurified && G.worldwakePurified(mapId);
         if (cell.enemy && !defeatedRuler) {
@@ -186,6 +188,7 @@ G.world = (() => {
     s.enemies = enemies;
     s.chests = chests;
     s.npcs = npcs;
+    s.portalKeepouts = portalKeepouts;
     s.projectiles = [];
     s.pickups = [];
     s.passiveEchoes = [];
@@ -234,6 +237,15 @@ G.world = (() => {
     return false;
   }
 
+  // Water stops feet, not magic, arrows, cards, or enemy shots. Open portals
+  // remain transparent to projectiles just as they were before; true terrain
+  // barriers and locked doors still stop them.
+  function blocksProjectile(px, py) {
+    const cell = cellAt(px, py);
+    if (cell.portal) return !portalOpen(cell);
+    return cell.tile !== "water" && !!SOLID[cell.tile];
+  }
+
   function isSafeSpawn(px, py) {
     const cell = cellAt(px, py);
     if (!cell || cell.portal || SOLID[cell.tile]) return false;
@@ -245,14 +257,21 @@ G.world = (() => {
   function moveBox(e, dx, dy) {
     const hw = (e.boxW || 10) / 2;
     const bh = e.boxH || 8;
+    function bossExitBlocked(x, y) {
+      if (!e.def || !e.def.miniboss) return false;
+      const body = e.def.contactSize || Math.min(e.def.size || 12, 18);
+      const clearance = G.TILE + body / 2;
+      return (G.state.portalKeepouts || []).some((portal) =>
+        G.util.dist(x, y, portal.x, portal.y) < clearance);
+    }
     function blocked(x, y) {
       return (
         solid(x - hw, y) || solid(x + hw, y) ||
         solid(x - hw, y - bh) || solid(x + hw, y - bh)
       );
     }
-    if (dx !== 0 && !blocked(e.x + dx, e.y)) e.x += dx;
-    if (dy !== 0 && !blocked(e.x, e.y + dy)) e.y += dy;
+    if (dx !== 0 && !bossExitBlocked(e.x + dx, e.y) && !blocked(e.x + dx, e.y)) e.x += dx;
+    if (dy !== 0 && !bossExitBlocked(e.x, e.y + dy) && !blocked(e.x, e.y + dy)) e.y += dy;
   }
 
   /* ---------- things you step on ---------- */
@@ -1160,5 +1179,5 @@ G.world = (() => {
     for (const ch of s.chests) drawChest(ctx, ch, time);
   }
 
-  return { load, solid, moveBox, checkTriggers, draw, cellAt, isSafeSpawn };
+  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn };
 })();

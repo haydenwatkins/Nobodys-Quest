@@ -629,7 +629,10 @@ G.combat = (() => {
         if (pr.travel > pr.range) gone = true; // failsafe if its owner keeps running away
       } else if (pr.ricochetsMax ? pr.travel > pr.range : G.util.dist(pr.startX, pr.startY, pr.x, pr.y) > pr.range) gone = true;
 
-      if (!gone && G.world.solid(pr.x, pr.y - 4)) {
+      const hitsTerrain = G.world.blocksProjectile
+        ? G.world.blocksProjectile(pr.x, pr.y - 4)
+        : G.world.solid(pr.x, pr.y - 4);
+      if (!gone && hitsTerrain) {
         gone = true;
         G.spawnFx({ kind: "puff", x: pr.x, y: pr.y, color: pr.color, dur: 0.2 });
       } else if (!gone && pr.fromPlayer) {
