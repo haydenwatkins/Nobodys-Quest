@@ -68,6 +68,42 @@ for (const region of G.WORLDWAKE_REGIONS) {
   }
 }
 
+// The expansion is one legible, bidirectional road between the two legacy
+// world entrances. Every arrival must land beside the portal that returns to
+// its source; otherwise holding a direction can silently chain into a loop.
+const worldwakeRoute = [
+  "sunstepPrairie", "windscarCanyon", "hangingGardens", "rootdeepHollow",
+  "glasswaterDesert", "titanGrave", "stormspinePeaks", "frostbellTundra",
+];
+function mapPortalCells(map) {
+  const found = [];
+  for (let y = 0; y < map.tiles.length; y++) for (let x = 0; x < map.tiles[y].length; x++) {
+    const cell = map.legend[map.tiles[y][x]];
+    if (cell && cell.portal) found.push({ x, y, cell });
+  }
+  return found;
+}
+for (let i = 0; i < worldwakeRoute.length - 1; i++) {
+  const fromId = worldwakeRoute[i], toId = worldwakeRoute[i + 1];
+  const forward = mapPortalCells(G.maps[fromId]).find((entry) => entry.cell.portal.map === toId);
+  const back = mapPortalCells(G.maps[toId]).find((entry) => entry.cell.portal.map === fromId);
+  assert.ok(forward && back, `${fromId} and ${toId} must link in both directions`);
+  assert.ok(Math.abs(forward.cell.portal.x - back.x) + Math.abs(forward.cell.portal.y - back.y) <= 2,
+    `${fromId} must arrive beside ${toId}'s return path`);
+  assert.ok(Math.abs(back.cell.portal.x - forward.x) + Math.abs(back.cell.portal.y - forward.y) <= 2,
+    `${toId} must arrive beside ${fromId}'s return path`);
+}
+const internalEdges = new Set();
+const regionIds = new Set(worldwakeRoute);
+const outsideWorld = new Set();
+for (const mapId of worldwakeRoute) for (const { cell } of mapPortalCells(G.maps[mapId])) {
+  if (regionIds.has(cell.portal.map)) internalEdges.add([mapId, cell.portal.map].sort().join(":"));
+  else outsideWorld.add(cell.portal.map);
+}
+assert.equal(internalEdges.size, worldwakeRoute.length - 1, "the new world should not contain a repeating zone cycle");
+assert.deepEqual(Array.from(outsideWorld).sort(), ["overworld", "shattercoast"],
+  "the Worldwake road must have a clear exit at both ends");
+
 // Worldbearers are visible inhabitants of the regions they rule. Their old
 // worldback maps remain only as migration-safe exits for existing saves.
 const openWorldRulers = {
@@ -89,13 +125,23 @@ for (const mapId of ["griffinWorldback", "golemWorldback", "weaverWorldback",
   "bellWorldback", "lanternWorldback", "colossusWorldback"])
   assert.equal(G.maps[mapId].legend.B.enemy, undefined, `${mapId} must not duplicate an open-world ruler`);
 
-// The southern horizon is a true shortcut: collision opens when the Sky Mark
-// is earned, with no new traversal button or inventory micromanagement.
+G.state.worldwake.marks.push("sky");
+G.world.load("windscarCanyon");
+assert.equal(G.state.enemies.some((enemy) => enemy.def.id === "skySovereign"), false,
+  "a purified Worldbearer must not repeat when its region reloads");
+G.state.worldwake.marks = G.state.worldwake.marks.filter((mark) => mark !== "sky");
+G.world.load("windscarCanyon");
+assert.equal(G.state.enemies.some((enemy) => enemy.def.id === "skySovereign"), true,
+  "an undefeated Worldbearer must still inhabit its region");
+
+// Titan Grave's northern road opens only after the Lantern Keeper falls. The
+// gate is progression, never a trap: Glasswater's western route stays open.
+G.world.load("glasswaterDesert");
 const southX = 23 * G.TILE + G.TILE / 2;
 const southY = 28 * G.TILE + G.TILE / 2;
 assert.equal(G.world.solid(southX, southY), true);
-G.events.emit("pickup", { item: "trophy-sky-sovereign" });
-assert.ok(G.state.worldwake.marks.includes("sky"));
+G.events.emit("pickup", { item: "trophy-lantern-keeper" });
+assert.ok(G.state.worldwake.marks.includes("light"));
 assert.equal(G.world.solid(southX, southY), false);
 
 // Exploration favors remember unique actions rather than rewarding spam.

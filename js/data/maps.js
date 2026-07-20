@@ -658,7 +658,7 @@ registerMap({
    trails, open combat pockets, memorable camps, and several connections.
    Boundary portals slide directly into the neighboring landscape.          */
 
-function makeWorldwakeRegionTiles(variant, hasGuardian) {
+function makeWorldwakeRegionTiles(variant, hasGuardian, portals) {
   const w = 46, h = 29;
   const edge = variant === 2 || variant === 5 ? "r" : "t";
   const rows = Array.from({ length: h }, (_, y) =>
@@ -694,7 +694,13 @@ function makeWorldwakeRegionTiles(variant, hasGuardian) {
     put(x, y, enemySets[variant][i % 3]));
   put(19, 18, ["a", "a", "b", "b", "c", "d", "d", "e"][variant]);
 
-  put(0, 14, "x"); put(w - 1, 14, "y"); put(23, 0, "n"); put(23, h - 1, "s");
+  // Only cut openings for real connections. The earlier four-exit template
+  // left every region looking identical and made a few non-reciprocal exits
+  // chain into other zones. A deliberate route is easier to read and escape.
+  if (portals.x) put(0, 14, "x");
+  if (portals.y) put(w - 1, 14, "y");
+  if (portals.n) put(23, 0, "n");
+  if (portals.s) put(23, h - 1, "s");
   if (hasGuardian) put(35, 8, "B");
   put(10, 14, "m"); put(27, 14, "H"); put(7, 20, "C");
   return rows.map((row) => row.join(""));
@@ -724,7 +730,6 @@ function worldwakeLegend(extra) {
     message: "The land ahead has no doors. Keep walking and the horizon will carry you into the next region.",
     portals: {
       x: { map: "overworld", x: 118, y: 70 }, y: { map: "windscarCanyon", x: 2, y: 14 },
-      n: { map: "windscarCanyon", x: 23, y: 27 }, s: { map: "glasswaterDesert", x: 23, y: 1, mark: "sky" },
     },
     cache: { item: "sunstep-ribbon", name: "the Sunstep Ribbon" },
   },
@@ -733,7 +738,6 @@ function worldwakeLegend(extra) {
     message: "Claw marks cross the canyon wall, each one wider than a wagon. Their owner is circling above.",
     portals: {
       x: { map: "sunstepPrairie", x: 43, y: 14 }, y: { map: "hangingGardens", x: 2, y: 14 },
-      n: { map: "hangingGardens", x: 23, y: 27 }, s: { map: "sunstepPrairie", x: 23, y: 1 },
     },
     guardian: { id: "skySovereign", retreat: { x: 8, y: 20 } },
     cache: { item: "windscar-feather", name: "a Windscar Feather" },
@@ -743,7 +747,6 @@ function worldwakeLegend(extra) {
     message: "These terraces are not ruins. The Old Mason is still building them, one patient footstep at a time.",
     portals: {
       x: { map: "windscarCanyon", x: 43, y: 14 }, y: { map: "rootdeepHollow", x: 2, y: 14 },
-      n: { map: "rootdeepHollow", x: 23, y: 27, mark: "stone" }, s: { map: "windscarCanyon", x: 23, y: 1 },
     },
     guardian: { id: "oldMason", retreat: { x: 8, y: 20 } },
     cache: { item: "garden-keystone", name: "a singing Garden Keystone" },
@@ -753,7 +756,6 @@ function worldwakeLegend(extra) {
     message: "The silver threads are roads. Step gently; the Weaver remembers every traveler by name.",
     portals: {
       x: { map: "hangingGardens", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 2, y: 14 },
-      n: { map: "hangingGardens", x: 23, y: 27 }, s: { map: "glasswaterDesert", x: 23, y: 1, mark: "thread" },
     },
     guardian: { id: "silkMatriarch", retreat: { x: 8, y: 20 } },
     cache: { item: "rootdeep-silk", name: "the unbreakable Rootdeep Silk" },
@@ -762,8 +764,8 @@ function worldwakeLegend(extra) {
     id: "glasswaterDesert", name: "Glasswater Desert", biome: "glasswater", variant: 4,
     message: "At noon the sand reflects places that do not exist. At dusk it reflects the road to Titan Grave.",
     portals: {
-      x: { map: "rootdeepHollow", x: 43, y: 14 }, y: { map: "titanGrave", x: 23, y: 1, mark: "light" },
-      n: { map: "rootdeepHollow", x: 23, y: 27 }, s: { map: "sunstepPrairie", x: 23, y: 1, mark: "sky" },
+      x: { map: "rootdeepHollow", x: 43, y: 14 },
+      s: { map: "titanGrave", x: 23, y: 1, mark: "light" },
     },
     cache: { item: "glasswater-prism", name: "the Glasswater Prism" },
   },
@@ -772,7 +774,6 @@ function worldwakeLegend(extra) {
     message: "Every frozen arch rings a different note. The Bell Titan is trying very hard to tune the wind.",
     portals: {
       x: { map: "shattercoast", x: 45, y: 14 }, y: { map: "stormspinePeaks", x: 2, y: 14 },
-      n: { map: "stormspinePeaks", x: 23, y: 27, mark: "echo" }, s: { map: "shattercoast", x: 45, y: 14 },
     },
     guardian: { id: "bellTitan", retreat: { x: 8, y: 20 } },
     cache: { item: "frostbell-chime", name: "a Frostbell Chime" },
@@ -781,8 +782,8 @@ function worldwakeLegend(extra) {
     id: "stormspinePeaks", name: "Stormspine Peaks", biome: "stormspine", variant: 6,
     message: "The lanterns do not mark a safe road. They are the safe road. Stay near their warm light.",
     portals: {
-      x: { map: "frostbellTundra", x: 43, y: 14 }, y: { map: "titanGrave", x: 2, y: 14 },
-      n: { map: "titanGrave", x: 23, y: 27, mark: "light" }, s: { map: "frostbellTundra", x: 23, y: 1 },
+      x: { map: "frostbellTundra", x: 43, y: 14 },
+      y: { map: "titanGrave", x: 2, y: 14, mark: "echo" },
     },
     guardian: { id: "lanternKeeper", retreat: { x: 8, y: 20 } },
     cache: { item: "stormglass-lantern", name: "the Stormglass Lantern" },
@@ -791,8 +792,8 @@ function worldwakeLegend(extra) {
     id: "titanGrave", name: "Titan Grave", biome: "titan", variant: 7,
     message: "The mountain ahead is breathing. Six paths meet at its heart, and it has been waiting for Nobody.",
     portals: {
-      x: { map: "stormspinePeaks", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 43, y: 14 },
-      n: { map: "glasswaterDesert", x: 23, y: 27 }, s: { map: "stormspinePeaks", x: 23, y: 1 },
+      x: { map: "stormspinePeaks", x: 43, y: 14 },
+      n: { map: "glasswaterDesert", x: 23, y: 27 },
     },
     guardian: { id: "lastWorldbearer", retreat: { x: 8, y: 20 } },
     cache: { item: "titan-memory", name: "the Titan's Smallest Memory" },
@@ -800,6 +801,11 @@ function worldwakeLegend(extra) {
 ].forEach((region) => {
   const p = region.portals;
   const guardian = region.guardian;
+  const portalLegend = {};
+  for (const key of ["x", "y", "n", "s"]) {
+    if (!p[key]) continue;
+    portalLegend[key] = { tile: "path", portal: p[key], portalStyle: "gap", seamless: true, mark: p[key].mark };
+  }
   registerMap({
     id: region.id, name: region.name, biome: region.biome, worldwake: true,
     worldBoss: guardian ? { enemy: guardian.id, region: region.name } : null,
@@ -812,18 +818,14 @@ function worldwakeLegend(extra) {
       delay: 2.1,
     } : null,
     playerStart: { x: 3, y: 14 },
-    legend: worldwakeLegend({
-      "x": { tile: "path", portal: p.x, portalStyle: "gap", seamless: true, mark: p.x.mark },
-      "y": { tile: "path", portal: p.y, portalStyle: "gap", seamless: true, mark: p.y.mark },
-      "n": { tile: "path", portal: p.n, portalStyle: "gap", seamless: true, mark: p.n.mark },
-      "s": { tile: "path", portal: p.s, portalStyle: "gap", seamless: true, mark: p.s.mark },
+    legend: worldwakeLegend(Object.assign(portalLegend, {
       // The Worldbearer is part of the same simulation as the roads, terrain,
       // caches, and ordinary enemies. There is deliberately no trial door.
       "B": guardian ? { tile: "path", enemy: guardian.id } : { tile: "path" },
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
-    }),
-    tiles: makeWorldwakeRegionTiles(region.variant, !!guardian),
+    })),
+    tiles: makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 
