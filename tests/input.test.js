@@ -11,7 +11,12 @@ class FakeTarget {
     this.listeners = {};
     this.style = {};
     this.captured = new Set();
-    this.classList = { add() {}, remove() {} };
+    this.classes = new Set();
+    this.classList = {
+      add: (name) => this.classes.add(name),
+      remove: (name) => this.classes.delete(name),
+      contains: (name) => this.classes.has(name),
+    };
   }
   addEventListener(type, fn) { (this.listeners[type] = this.listeners[type] || []).push(fn); }
   dispatch(type, data = {}) {
@@ -96,6 +101,29 @@ assertStopped("Safari touch cancellation must clear a stale joystick");
 startMoving(13);
 windowTarget.dispatch("touchend", { touches: [] });
 assertStopped("Safari's final touchend must clear a stale joystick");
+
+const abilityA = elements["btn-a"];
+const abilityB = elements["btn-b"];
+abilityA.dispatch("pointerdown", { pointerId: 21, clientX: 200, clientY: 100 });
+assert.equal(G.input.aiming.btn, "a", "pressing an ability should claim the shared aim lock");
+assert.equal(abilityA.classList.contains("held"), true, "the pressed ability should be highlighted");
+abilityA.dispatch("lostpointercapture", { pointerId: 21 });
+assert.equal(G.input.aiming, null, "lost capture must release the shared ability aim lock");
+assert.equal(abilityA.classList.contains("held"), false, "lost capture must remove the stuck highlight");
+
+abilityB.dispatch("pointerdown", { pointerId: 22, clientX: 220, clientY: 100 });
+abilityB.dispatch("pointerup", { pointerId: 22, clientX: 220, clientY: 100 });
+assert.equal(G.input.tapped("b"), true, "another attack must work after ability capture is lost");
+
+abilityA.dispatch("pointerdown", { pointerId: 23, clientX: 200, clientY: 100 });
+windowTarget.dispatch("orientationchange");
+assert.equal(G.input.aiming, null, "rotation must release a stale ability aim lock");
+assert.equal(abilityA.classList.contains("held"), false, "rotation must clear ability highlighting");
+
+abilityA.dispatch("pointerdown", { pointerId: 24, clientX: 200, clientY: 100 });
+windowTarget.dispatch("touchend", { touches: [] });
+assert.equal(G.input.aiming, null, "Safari's final touchend must release ability aiming");
+assert.equal(abilityA.classList.contains("held"), false, "Safari's final touchend must clear ability highlighting");
 
 function gamepadButton(value = 0) {
   return { pressed: value > 0.5, touched: value > 0, value };

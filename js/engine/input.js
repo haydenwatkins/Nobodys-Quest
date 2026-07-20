@@ -282,6 +282,7 @@ G.input = (() => {
 
     /* ---------- touch ability buttons: tap to auto-aim, drag to aim ---------- */
     const abilityBtns = { "btn-a": "a", "btn-b": "b", "btn-c": "c" };
+    const resetAbilityTouches = [];
     for (const [id, btn] of Object.entries(abilityBtns)) {
       const el = document.getElementById(id);
       let pointerId = null, startX = 0, startY = 0;
@@ -292,7 +293,9 @@ G.input = (() => {
         e.preventDefault();
         pointerId = e.pointerId;
         startX = e.clientX; startY = e.clientY;
-        el.setPointerCapture(e.pointerId);
+        // iPad Safari can reject or later drop capture during multi-touch boss
+        // fights. Window/lifecycle fallbacks below remain authoritative.
+        try { el.setPointerCapture(e.pointerId); } catch (error) { /* use fallbacks */ }
         el.classList.add("held");
         liveAim = { btn, x: 0, y: 0, dragged: false };
         G.sfx.ensure();
@@ -308,26 +311,55 @@ G.input = (() => {
         dx /= len; dy /= len;
         liveAim = { btn, x: dx, y: dy, dragged: true };
       });
-      const finishAim = (e, fire) => {
-        if (e.pointerId !== pointerId) return;
-        if (e.cancelable) e.preventDefault();
+      const resetAim = (fire, e) => {
+        if (pointerId === null || (e && e.pointerId !== undefined && e.pointerId !== pointerId)) return;
+        if (e && e.cancelable) e.preventDefault();
+        const capturedId = pointerId;
         if (fire) {
           releasedAims[btn] = liveAim && liveAim.btn === btn
             ? { x: liveAim.x, y: liveAim.y, dragged: liveAim.dragged }
             : { x: 0, y: 0, dragged: false };
         }
+        // Null state before releasing capture because release can dispatch
+        // lostpointercapture synchronously in Safari and in the test harness.
         pointerId = null;
         liveAim = null;
         el.classList.remove("held");
+        try {
+          if (el.hasPointerCapture && el.hasPointerCapture(capturedId))
+            el.releasePointerCapture(capturedId);
+        } catch (error) { /* capture was already lost */ }
         if (fire) { press(btn); release(btn); }
       };
-      el.addEventListener("pointerup", (e) => finishAim(e, true));
-      el.addEventListener("pointercancel", (e) => finishAim(e, false));
+      resetAbilityTouches.push(() => resetAim(false));
+      el.addEventListener("pointerup", (e) => resetAim(true, e));
+      el.addEventListener("pointercancel", (e) => resetAim(false, e));
+      el.addEventListener("lostpointercapture", (e) => resetAim(false, e));
       // Pointer capture is reliable on current iOS/Android, but this fallback
       // also covers embedded browsers that drop capture during a long drag.
-      window.addEventListener("pointerup", (e) => finishAim(e, true));
-      window.addEventListener("pointercancel", (e) => finishAim(e, false));
+      window.addEventListener("pointerup", (e) => resetAim(true, e));
+      window.addEventListener("pointercancel", (e) => resetAim(false, e));
     }
+
+    // A system gesture, rotation, app switch, or fullscreen transition can
+    // consume the final pointer event on iOS. Always release the shared aim
+    // lock in those cases so one highlighted button cannot disable all attacks.
+    const cancelAbilityTouches = () => {
+      for (const reset of resetAbilityTouches) reset();
+      liveAim = null;
+    };
+    window.addEventListener("blur", cancelAbilityTouches);
+    window.addEventListener("pagehide", cancelAbilityTouches);
+    window.addEventListener("orientationchange", cancelAbilityTouches);
+    document.addEventListener("fullscreenchange", cancelAbilityTouches);
+    document.addEventListener("webkitfullscreenchange", cancelAbilityTouches);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) cancelAbilityTouches();
+    });
+    window.addEventListener("touchend", (e) => {
+      if (!e.touches || e.touches.length === 0) cancelAbilityTouches();
+    }, { passive: true });
+    window.addEventListener("touchcancel", cancelAbilityTouches, { passive: true });
 
     /* ---------- simple touch buttons fire as soon as they are tapped ---------- */
     const simpleBtns = { "btn-swap": "swap", "btn-pause": "pause" };
