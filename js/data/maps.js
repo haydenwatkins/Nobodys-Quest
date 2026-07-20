@@ -99,17 +99,17 @@ registerMap({
     "s": { tile: "grass", message: "Welcome, little Nobody! Smack baddies with A. Quests live in the ☰ menu!" },
     "G": { tile: "grass", message: "Beware the wisp grove... wisps only fear the LIGHT." },
     "D": { tile: "tree", portal: { map: "dungeon", x: 15, y: 14 }, stars: 3 },
-    "M": { tile: "grass", portal: { map: "mistwood", x: 2, y: 1 }, stars: 1, portalStyle: "gap" },
-    "S": { tile: "grass", portal: { map: "sunkenMarsh", x: 4, y: 9 }, stars: 4, portalStyle: "gap" },
-    "E": { tile: "grass", portal: { map: "emberRidge", x: 2, y: 1 }, stars: 7, portalStyle: "gap" },
-    "V": { tile: "grass", portal: { map: "starfallRuins", x: 2, y: 1 }, stars: 10, portalStyle: "gap" },
-    "W": { tile: "grass", portal: { map: "whispering-grove", x: 2, y: 10 }, stars: 0, portalStyle: "gap" },
+    "M": { tile: "grass", portal: { map: "mistwood", x: 15, y: 17 }, stars: 1, portalStyle: "gap" },
+    "S": { tile: "grass", portal: { map: "sunkenMarsh", x: 27, y: 9 }, stars: 4, portalStyle: "gap" },
+    "E": { tile: "grass", portal: { map: "emberRidge", x: 2, y: 9 }, stars: 7, portalStyle: "gap" },
+    "V": { tile: "grass", portal: { map: "starfallRuins", x: 15, y: 1 }, stars: 10, portalStyle: "gap" },
+    "W": { tile: "grass", portal: { map: "whispering-grove", x: 20, y: 1 }, stars: 0, portalStyle: "gap" },
     "R": { tile: "grass", portal: { map: "riftbladeTrial", x: 2, y: 8 }, stars: 18, portalStyle: "trial", portalTheme: "riftblade" },
     "L": { tile: "grass", portal: { map: "moleTrial", x: 3, y: 8 }, stars: 20, portalStyle: "trial", portalTheme: "mole" },
     "U": { tile: "grass", portal: { map: "vampireTrial", x: 3, y: 8 }, stars: 22, portalStyle: "trial", portalTheme: "vampire" },
     "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "trial", portalTheme: "jester" },
     "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, mastery: { before: "god", level: 5 }, portalStyle: "trial", portalTheme: "god" },
-    "Z": { tile: "grass", portal: { map: "shattercoast", x: 2, y: 14 }, stars: 28, portalStyle: "gap" },
+    "Z": { tile: "grass", portal: { map: "shattercoast", x: 45, y: 14 }, stars: 28, portalStyle: "gap" },
     "P": { tile: "path", portal: { map: "sunstepPrairie", x: 2, y: 14 }, stars: 24, portalStyle: "gap", seamless: true },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
   },
@@ -245,18 +245,18 @@ function makeShattercoastTiles() {
   [[14,4],[17,8],[31,5],[37,10],[9,20],[16,25],[31,22],[35,26]].forEach(([x,y]) => put(x,y,"r"));
   [[8,12,"9"],[14,17,"8"],[19,7,"6"],[29,8,"0"],[35,17,"4"],[40,12,"9"],[25,22,"0"],[7,25,"6"]]
     .forEach(([x,y,ch]) => put(x,y,ch));
-  put(0, 14, "x");
-  put(w - 1, 14, "F");
+  put(w - 1, 14, "x");
+  put(23, 0, "F");
   put(11, 5, "T"); put(36, 5, "K"); put(11, 24, "A"); put(36, 24, "D");
   put(23, 14, "G"); put(19, 14, "m"); put(27, 14, "H");
   return rows.map((row) => row.join(""));
 }
 
 registerMap({
-  id: "shattercoast", name: "Shattercoast", playerStart: { x: 2, y: 14 },
+  id: "shattercoast", name: "Shattercoast", playerStart: { x: 45, y: 14 },
   legend: {
-    "x": { tile: "path", portal: { map: "overworld", x: 1, y: 65 } },
-    "F": { tile: "path", portal: { map: "frostbellTundra", x: 2, y: 14 }, portalStyle: "gap", seamless: true },
+    "x": { tile: "path", portal: { map: "overworld", x: 1, y: 65 }, portalStyle: "gap", seamless: true },
+    "F": { tile: "path", portal: { map: "frostbellTundra", x: 23, y: 27 }, portalStyle: "gap", seamless: true },
     "4": { tile: "grass", enemy: "wisp" }, "5": { tile: "grass", enemy: "brute" },
     "6": { tile: "grass", enemy: "thornling" }, "7": { tile: "grass", enemy: "pebblebeast" },
     "8": { tile: "grass", enemy: "shade" },
@@ -436,7 +436,7 @@ registerMap({
 registerMap({
   id: "mistwood",
   name: "Mistwood",
-  playerStart: { x: 2, y: 1 },
+  playerStart: { x: 15, y: 17 },
 
   legend: {
     "1": { tile: "grass", enemy: "slime" },
@@ -444,13 +444,13 @@ registerMap({
     "3": { tile: "grass", enemy: "bones" },
     "A": { tile: "grass", enemy: "ancientTreant" },
     "m": { tile: "grass", message: "Mistwood twists back on itself. Keep moving and the trees will open." },
-    "x": { tile: "grass", portal: { map: "overworld", x: 20, y: 1 } },
+    "x": { tile: "grass", portal: { map: "overworld", x: 20, y: 1 }, portalStyle: "gap", seamless: true },
     "H": { tile: "grass", chest: { heal: true, name: "a berry pie hidden under leaves" } },
   },
 
   tiles: [
     "tttttttttttttttttttttttttttttt",
-    "tx....t....1....t....2.......t",
+    "t.....t....1....t....2.......t",
     "t...t.t.tt.tt.ttt.t.tttt.....t",
     "t...t...t...t.t...t....t.....t",
     "t1..t.tttt.1.t.t.ttt.t.3.....t",
@@ -467,7 +467,7 @@ registerMap({
     "t.....ttt.tttt....t.3........t",
     "t.1.........t....2.....A.....t",
     "t....2......t......1.........t",
-    "tttttttttttttttttttttttttttttt",
+    "ttttttttttttttxtttttttttttttt",
   ],
 });
 
@@ -501,7 +501,7 @@ function makeSunkenMarshTiles() {
   [[3,3,"1"],[12,3,"4"],[18,3,"2"],[27,5,"4"],[5,7,"2"],[11,7,"1"],
    [19,7,"8"],[26,7,"1"],[4,12,"1"],[12,12,"4"],[18,12,"2"],[27,12,"8"],
    [11,16,"2"],[19,16,"1"]].forEach(([x, y, ch]) => put(x, y, ch));
-  put(0, 9, "x");
+  put(w - 1, 9, "x");
   put(8, 9, "m");
   put(12, 15, "H");
   put(23, 9, "Q");
@@ -511,7 +511,7 @@ function makeSunkenMarshTiles() {
 registerMap({
   id: "sunkenMarsh",
   name: "Sunken Marsh",
-  playerStart: { x: 4, y: 9 },
+  playerStart: { x: 27, y: 9 },
 
   legend: {
     "1": { tile: "grass", enemy: "slime" },
@@ -520,7 +520,7 @@ registerMap({
     "8": { tile: "grass", enemy: "shade" },
     "Q": { tile: "grass", enemy: "mireQueen" },
     "m": { tile: "grass", message: "The Mire Queen's purple veil fears DARK magic. Return with a Wizard's spell if it holds." },
-    "x": { tile: "path", portal: { map: "overworld", x: 1, y: 30 } },
+    "x": { tile: "path", portal: { map: "overworld", x: 1, y: 30 }, portalStyle: "gap", seamless: true },
     "H": { tile: "grass", chest: { heal: true, name: "a soggy-but-magical cookie" } },
   },
 
@@ -532,7 +532,7 @@ registerMap({
 registerMap({
   id: "emberRidge",
   name: "Ember Ridge",
-  playerStart: { x: 2, y: 1 },
+  playerStart: { x: 2, y: 9 },
 
   legend: {
     "2": { tile: "floor", enemy: "bat" },
@@ -541,14 +541,14 @@ registerMap({
     "8": { tile: "floor", enemy: "shade" },
     "N": { tile: "floor", enemy: "eclipseKnight" },
     "m": { tile: "floor", message: "Ember Ridge is brute country. DARK magic cracks the Eclipse Knight's purple ward." },
-    "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 45 } },
+    "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 45 }, portalStyle: "gap", seamless: true },
     "H": { tile: "floor", chest: { heal: true, name: "a warm cinnamon cookie" } },
     "R": { tile: "rock", on: "floor" },
   },
 
   tiles: [
     "##############################",
-    "#xfffffRfffffRfffff5fffffffff#",
+    "#ffffffRfffffRfffff5fffffffff#",
     "#ffRfffff3fffffRfffffffffffff#",
     "#f#####f#######f###ffffffffff#",
     "#ffffRffff2ffffRfffffffffffff#",
@@ -556,7 +556,7 @@ registerMap({
     "#ff3ffffRffff5ffffRffff8fffff#",
     "#fRfff#######ffffRfffffffffff#",
     "#fff2#fffmfff#3ffffffffffffff#",
-    "#f###f#f#####f#f###ffffffffff#",
+    "xf###f#f#####f#f###ffffffffff#",
     "#ffff#fffHfff#ffff5ffffffffff#",
     "#ffR#####f#####Rfffffffffffff#",
     "#f3ffffRffffRffff2fffffffffff#",
@@ -574,7 +574,7 @@ registerMap({
 registerMap({
   id: "starfallRuins",
   name: "Starfall Ruins",
-  playerStart: { x: 2, y: 1 },
+  playerStart: { x: 15, y: 1 },
 
   legend: {
     "2": { tile: "floor", enemy: "bat" },
@@ -584,14 +584,14 @@ registerMap({
     "8": { tile: "floor", enemy: "shade" },
     "s": { tile: "floor", message: "Starfall tests every ward. Match the four damage colors — or retreat and mix a new loadout." },
     "m": { tile: "floor", message: "A cracked tablet points west: THE FALLEN STAR STILL SHINES. The vault was built with a door, thankfully." },
-    "x": { tile: "floor", portal: { map: "overworld", x: 90, y: 78 } },
+    "x": { tile: "floor", portal: { map: "overworld", x: 90, y: 78 }, portalStyle: "gap", seamless: true },
     "H": { tile: "floor", chest: { item: "starfall-thread", heal: true, name: "the Fallen Star Thread" } },
     "R": { tile: "rock", on: "floor" },
   },
 
   tiles: [
-    "##############################",
-    "#xfsff4ffffRffff8ffffffffffff#",
+    "###############x##############",
+    "#ffsff4ffffRffff8ffffffffffff#",
     "#fff#####ffff#####fffffffffff#",
     "#f2f#fff#f3f#fff#f2ffffffffff#",
     "#fff#fHfffffffmf#ffffffffffff#",
@@ -618,10 +618,10 @@ registerMap({
 registerMap({
   id: "whispering-grove",
   name: "Whispering Grove",
-  playerStart: { x: 2, y: 10 },
+  playerStart: { x: 20, y: 1 },
 
   legend: {
-    "x": { tile: "grass", portal: { map: "overworld", x: 30, y: 77 } },
+    "x": { tile: "grass", portal: { map: "overworld", x: 30, y: 77 }, portalStyle: "gap", seamless: true },
     "s": { tile: "grass", message: "The grove whispers: ward colors are clues. Match the damage type shown above the enemy!" },
     "2": { tile: "grass", enemy: "bat" },
     "3": { tile: "grass", enemy: "bones" },
@@ -632,7 +632,7 @@ registerMap({
   },
 
   tiles: [
-    "tttttttttttttttttttttttttttttt",
+    "ttttttttttttttttttttxttttttttt",
     "t....6.......tt..............t",
     "t............tt.....6........t",
     "t..wwww......tt..............t",
@@ -642,7 +642,7 @@ registerMap({
     "t....3.......................t",
     "t..........s.................t",
     "t...............7............t",
-    "tx..........................Ct",
+    "t...........................Ct",
     "t........tttt................t",
     "t..6.....t..t......3.........t",
     "t........t..t................t",
@@ -773,7 +773,7 @@ function worldwakeLegend(extra) {
     id: "frostbellTundra", name: "Frostbell Tundra", biome: "frostbell", variant: 5,
     message: "Every frozen arch rings a different note. The Bell Titan is trying very hard to tune the wind.",
     portals: {
-      x: { map: "shattercoast", x: 45, y: 14 }, y: { map: "stormspinePeaks", x: 2, y: 14 },
+      s: { map: "shattercoast", x: 23, y: 2 }, y: { map: "stormspinePeaks", x: 2, y: 14 },
     },
     guardian: { id: "bellTitan", retreat: { x: 8, y: 20 } },
     cache: { item: "frostbell-chime", name: "a Frostbell Chime" },

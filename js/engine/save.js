@@ -28,6 +28,7 @@ G.saveGame = function () {
       claimedForms: s.claimedForms,
       unlockReadyNotified: s.unlockReadyNotified,
       loadouts: s.loadouts,
+      npcTalk: s.npcTalk,
       town: s.town,
       heroBoard: s.heroBoard,
       wayfinder: s.wayfinder,
