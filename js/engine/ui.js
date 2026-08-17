@@ -1075,6 +1075,15 @@ G.ui = (() => {
       }));
     menuEl.querySelectorAll("[data-loadout-slot]").forEach((button) =>
       button.addEventListener("click", () => { labSlot = Number(button.dataset.loadoutSlot); buildMenu(); }));
+    const restoreDefaultLoadout = menuEl.querySelector('[data-act="restore-default-loadout"]');
+    if (restoreDefaultLoadout) restoreDefaultLoadout.addEventListener("click", () => {
+      const restored = G.restoreDefaultLoadout(labFormId);
+      labAbilityId = restored[labSlot] || restored[1] || null;
+      btnCache = "";
+      G.sfx.play("pickup");
+      G.ui.toast(`↺ ${G.forms[labFormId].name}'s own moves restored.`, 2.2);
+      buildMenu();
+    });
     menuEl.querySelectorAll("[data-ability-filter]").forEach((button) =>
       button.addEventListener("click", () => { labAbilityFilter = button.dataset.abilityFilter; buildMenu(); }));
     menuEl.querySelectorAll("[data-ability-select]").forEach((button) =>
@@ -1322,6 +1331,8 @@ G.ui = (() => {
   function buildLoadoutLab() {
     const form = labSelectedForm(true);
     const lo = G.getLoadout(form.id);
+    const defaults = G.defaultLoadout(form.id);
+    const usingDefaults = defaults.every((abilityId, slot) => lo[slot] === abilityId);
     const slots = [0, 1, 2].filter((slot) => slot === 0 || slot <= form.slots);
     if (!slots.includes(labSlot) || labSlot === 0) labSlot = Math.min(1, form.slots);
     const filters = [["boosted", "★ Boosted"], ["all", "All"], ["sharp", "Sharp"], ["blunt", "Blunt"],
@@ -1342,6 +1353,10 @@ G.ui = (() => {
           <div class="eyebrow">BUILDING FOR</div><h2>${form.icon} ${escapeHtml(form.name)}</h2>
           ${previewCanvas(form.id, skin ? skin.id : "classic", "loadout-preview", form.name, false, !skin)}
           <div class="passive-rule"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></div>
+          <button class="restore-loadout" data-act="restore-default-loadout" ${usingDefaults ? "disabled" : ""}>
+            <strong>↺ ${usingDefaults ? "Native moves equipped" : "Restore native moves"}</strong>
+            <span>${usingDefaults ? "This is the form's original kit." : "Put this form's own B and C moves back."}</span>
+          </button>
         </section>
         <section class="loadout-slots" aria-label="Ability slots">${slots.map((slot) => {
           const ability = G.abilities[lo[slot]];

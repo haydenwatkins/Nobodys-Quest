@@ -54,7 +54,7 @@ registerAbility({
   type: "blunt",
   style: "dash",
   mana: 2,
-  cooldown: 1.0,
+  cooldown: 0.8,
   use(user) {
     G.combat.dash(user, {
       ability: "cartwheel",
@@ -96,7 +96,7 @@ registerAbility({
   type: "blunt",
   style: "dash",
   mana: 2,
-  cooldown: 0.8,
+  cooldown: 0.65,
   use(user) {
     G.combat.dash(user, {
       ability: "squeakDash",
@@ -115,7 +115,7 @@ registerAbility({
   style: "area",
   traits: ["status"],
   mana: 4,
-  cooldown: 1.4,
+  cooldown: 1.1,
   use(user) {
     // a gross burst of germs all around you
     G.combat.meleeArc(user, {
@@ -157,7 +157,7 @@ registerAbility({
   type: "blunt",
   style: "melee",
   mana: 3,
-  cooldown: 1.0,
+  cooldown: 0.85,
   use(user) {
     G.combat.meleeArc(user, {
       ability: "shieldBash",
@@ -177,7 +177,7 @@ registerAbility({
   type: "sharp",
   style: "area",
   mana: 4,
-  cooldown: 1.2,
+  cooldown: 1.0,
   use(user) {
     G.combat.meleeArc(user, {
       ability: "spinSlash",
@@ -216,7 +216,7 @@ registerAbility({
   type: "light",                               // the only Light move so far!
   style: "projectile",
   mana: 2,
-  cooldown: 0.7,
+  cooldown: 0.6,
   autoAim: true, aimRange: 160,
   use(user) {
     G.combat.shoot(user, {
@@ -236,7 +236,7 @@ registerAbility({
   type: "sharp",
   style: "projectile",
   mana: 4,
-  cooldown: 1.2,
+  cooldown: 0.95,
   autoAim: true, aimRange: 130,
   use(user) {
     // three arrows in a fan — just call shoot three times!
@@ -258,7 +258,7 @@ registerAbility({
   type: "dark",
   style: "projectile",
   mana: 3,
-  cooldown: 0.8,
+  cooldown: 0.7,
   autoAim: true, aimRange: 150,
   use(user) {
     G.combat.shoot(user, {
@@ -277,7 +277,7 @@ registerAbility({
   type: "dark",
   style: "area",
   mana: 5,
-  cooldown: 1.5,
+  cooldown: 1.15,
   autoAim: true, aimRange: 185,
   use(user) {
     G.combat.shoot(user, {
@@ -306,6 +306,7 @@ registerAbility({
       speed: 165, range: 135,
       damage: 1, type: "dark",
       color: "#290063",
+      status: { name: "poison", dur: 2, dps: 1 },
       recoil: 1.5, trail: 5, hitStop: 0.025, shake: 0.1,
     });
   },
@@ -338,7 +339,7 @@ registerAbility({
   type: "blunt",
   style: "dash",
   mana: 3,
-  cooldown: 1.0,
+  cooldown: 0.8,
   use(user) {
     G.combat.dash(user, {
       ability: "hopCrash", dist: 52, speed: 260,
@@ -352,16 +353,19 @@ registerAbility({
   name: "Croak Burst",
   icon: "📣",
   type: "blunt",
-  style: "area",
-  mana: 4,
-  cooldown: 1.25,
+  style: "projectile",
+  mana: 3,
+  cooldown: 0.9,
+  autoAim: true, aimRange: 92,
   use(user) {
+    // An aimed wall of sound replaces the old eight-way star. It rewards
+    // facing and covers a useful lane without wasting shots behind you.
     const hitGroup = {};
-    for (let spreadDeg = 0; spreadDeg < 360; spreadDeg += 45) {
+    for (const spreadDeg of [-24, -12, 0, 12, 24]) {
       G.combat.shoot(user, {
-        ability: "croakBurst", speed: 125, range: 62,
-        damage: 1, type: "blunt", spreadDeg, hitGroup,
-        size: 4, color: "#73eff7",
+        ability: "croakBurst", speed: 175, range: 92,
+        damage: 2, type: "blunt", spreadDeg, hitGroup,
+        size: 5, shape: "wave", color: "#73eff7", trail: 4,
       });
     }
   },
@@ -394,7 +398,7 @@ registerAbility({
   type: "blunt",
   style: "area",
   mana: 4,
-  cooldown: 1.4,
+  cooldown: 1.0,
   autoAim: true, aimRange: 115,
   use(user) {
     G.combat.shoot(user, {
@@ -413,7 +417,7 @@ registerAbility({
   style: "area",
   traits: ["status"],
   mana: 5,
-  cooldown: 1.8,
+  cooldown: 1.25,
   autoAim: true, aimRange: 105,
   use(user) {
     G.combat.shoot(user, {
@@ -451,8 +455,8 @@ registerAbility({
   icon: "🌩️",
   type: "light",
   style: "chain",
-  mana: 5,
-  cooldown: 1.5,
+  mana: 4,
+  cooldown: 1.05,
   autoAim: true, aimRange: 78,
   use(user) {
     G.combat.chain(user, {
@@ -470,8 +474,8 @@ registerAbility({
   type: "blunt",
   style: "area",
   traits: ["status"],
-  mana: 6,
-  cooldown: 1.8,
+  mana: 5,
+  cooldown: 1.3,
   use(user) {
     G.combat.meleeArc(user, {
       ability: "thunderclap", range: 31, arcDeg: 360,
@@ -509,7 +513,7 @@ registerAbility({
   type: "light",
   style: "area",
   mana: 4,
-  cooldown: 1.2,
+  cooldown: 1.0,
   autoAim: true, aimRange: 78,
   use(user) {
     const hitGroup = {}; // one breath can hit a foe once, never five times
@@ -529,8 +533,8 @@ registerAbility({
   icon: "☄️",
   type: "light",
   style: "area",
-  mana: 7,
-  cooldown: 2.3,
+  mana: 6,
+  cooldown: 1.45,
   autoAim: true, aimRange: 145,
   use(user) {
     G.combat.shoot(user, {
@@ -584,7 +588,7 @@ registerAbility({
   type: "dark",
   style: "dash",
   mana: 3,
-  cooldown: 1.0,
+  cooldown: 0.8,
   use(user) {
     G.combat.dash(user, {
       ability: "riftRush",
@@ -603,7 +607,7 @@ registerAbility({
   type: "light",
   style: "projectile",
   mana: 4,
-  cooldown: 1.25,
+  cooldown: 1.05,
   autoAim: true, aimRange: 100,
   use(user) {
     // The return path follows the thrower. Move or Rift Rush after throwing
@@ -656,7 +660,7 @@ registerAbility({
   type: "dark",
   style: "dash",
   mana: 3,
-  cooldown: 1.15,
+  cooldown: 0.9,
   use(user) {
     G.combat.dash(user, {
       ability: "burrowBlitz", dist: 70, speed: 340,
@@ -677,7 +681,7 @@ registerAbility({
   type: "blunt",
   style: "area",
   mana: 5,
-  cooldown: 1.55,
+  cooldown: 1.25,
   autoAim: true, aimRange: 130,
   use(user) {
     G.combat.shoot(user, {
@@ -725,7 +729,7 @@ registerAbility({
   type: "dark",
   style: "dash",
   mana: 3,
-  cooldown: 1.05,
+  cooldown: 0.85,
   use(user) {
     G.combat.dash(user, {
       ability: "crimsonWaltz", dist: 62, speed: 360,
@@ -741,8 +745,8 @@ registerAbility({
   icon: "🌕",
   type: "dark",
   style: "area",
-  mana: 6,
-  cooldown: 1.85,
+  mana: 5,
+  cooldown: 1.35,
   use(user) {
     const hits = G.combat.meleeArc(user, {
       ability: "bloodMoon", range: 40, arcDeg: 360,
@@ -788,7 +792,7 @@ registerAbility({
   type: "blunt",
   style: "area",
   mana: 4,
-  cooldown: 1.4,
+  cooldown: 1.0,
   autoAim: true, aimRange: 135,
   use(user) {
     G.combat.shoot(user, {
@@ -805,19 +809,19 @@ registerAbility({
   name: "Encore!",
   icon: "🎪",
   type: "light",
-  style: "area",
-  mana: 5,
-  cooldown: 1.7,
+  style: "projectile",
+  mana: 4,
+  cooldown: 1.1,
+  autoAim: true, aimRange: 145,
   use(user) {
-    const hitGroup = {};
-    for (let spreadDeg = 0; spreadDeg < 360; spreadDeg += 45) {
-      G.combat.shoot(user, {
-        ability: "encore", speed: 175, range: 92,
-        damage: 1, type: "light", spreadDeg,
-        size: 5, shape: "card", color: "#ffcd75",
-        hitGroup, trail: 4, recoil: 0,
-      });
-    }
+    // One marquee card ricochets through the crowd. The player chooses its
+    // opening line; the Jester passive adds yet another bounce.
+    G.combat.shoot(user, {
+      ability: "encore", speed: 220, range: 280,
+      damage: 2, type: "light", ricochets: 4, bounceRange: 88,
+      size: 7, shape: "card", color: "#ffcd75",
+      trail: 7, recoil: 3, hitStop: 0.03, shake: 0.13,
+    });
     G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color: "#ffcd75", radius: 18, dur: 0.28 });
   },
 });
@@ -845,7 +849,7 @@ registerAbility({
 
 registerAbility({
   id: "shellRoll", name: "Shell Roll", icon: "🛞", type: "blunt", style: "dash",
-  mana: 3, cooldown: 1.1,
+  mana: 3, cooldown: 0.9,
   use(user) {
     G.combat.dash(user, {
       ability: "shellRoll", dist: 62, speed: 300, damage: 1, type: "blunt",
@@ -857,11 +861,11 @@ registerAbility({
 
 registerAbility({
   id: "shellCounter", name: "Shell Counter", icon: "🛡️", type: "blunt", style: "area",
-  mana: 4, cooldown: 2.1,
+  mana: 4, cooldown: 1.35,
   use(user) {
-    user.meleeGuard = Math.max(user.meleeGuard || 0, 0.58);
+    user.meleeGuard = Math.max(user.meleeGuard || 0, 0.72);
     G.combat.areaBurst(user, {
-      ability: "shellCounter", range: 29, damage: 1, type: "blunt",
+      ability: "shellCounter", range: 31, damage: 2, type: "blunt",
       knockback: 190, color: "#a7f070", hitStop: 0.038, shake: 0.16, combo: "counter",
     });
     G.damageNumber(user.x, user.y - 18, "GUARD!", "#f4f4f4");
@@ -890,7 +894,7 @@ registerAbility({
 
 registerAbility({
   id: "flashStep", name: "Flash Step", icon: "💨", type: "sharp", style: "dash",
-  mana: 3, cooldown: 0.95,
+  mana: 3, cooldown: 0.75,
   use(user) {
     G.combat.dash(user, {
       ability: "flashStep", dist: 78, speed: 410, damage: 1, type: "sharp",
@@ -901,7 +905,7 @@ registerAbility({
 
 registerAbility({
   id: "crescentDraw", name: "Crescent Draw", icon: "🌙", type: "sharp", style: "area",
-  mana: 6, cooldown: 1.75,
+  mana: 5, cooldown: 1.25,
   use(user) {
     G.combat.meleeArc(user, {
       ability: "crescentDraw", range: 40, arcDeg: 300,
@@ -929,27 +933,26 @@ registerAbility({
 });
 
 registerAbility({
-  id: "constellation", name: "Constellation", icon: "🌟", type: "light", style: "area",
-  mana: 4, cooldown: 1.35,
+  id: "constellation", name: "Constellation", icon: "🌟", type: "light", style: "chain",
+  mana: 4, cooldown: 1.0, autoAim: true, aimRange: 120,
   use(user) {
-    const hitGroup = {};
-    for (let spreadDeg = 0; spreadDeg < 360; spreadDeg += 60) {
-      G.combat.shoot(user, {
-        ability: "constellation", speed: 155, range: 105,
-        damage: 1, type: "light", spreadDeg, hitGroup,
-        size: 5, color: "#ffcd75", trail: 5, recoil: 0,
-      });
-    }
+    // Draw a readable constellation through actual targets instead of firing
+    // six arbitrary spokes into empty space.
+    G.combat.chain(user, {
+      ability: "constellation", range: 120, jumpRange: 70,
+      maxTargets: 6, damage: 1, type: "light",
+      knockback: 22, color: "#ffcd75", hitStop: 0.025,
+    });
   },
 });
 
 registerAbility({
   id: "gravityWell", name: "Gravity Well", icon: "🌀", type: "dark", style: "area",
-  mana: 6, cooldown: 1.9,
+  mana: 5, cooldown: 1.35,
   use(user) {
     G.combat.areaBurst(user, {
-      ability: "gravityWell", range: 46, damage: 2, type: "dark",
-      pull: 15, color: "#8153c1", hitStop: 0.04, shake: 0.17, combo: "gravity",
+      ability: "gravityWell", range: 52, damage: 2, type: "dark",
+      pull: 18, color: "#8153c1", hitStop: 0.04, shake: 0.17, combo: "gravity",
     });
   },
 });
@@ -970,7 +973,7 @@ registerAbility({
 
 registerAbility({
   id: "seedBurst", name: "Seed Burst", icon: "🌰", type: "dark", style: "area", traits: ["status"],
-  mana: 4, cooldown: 1.35, autoAim: true, aimRange: 145,
+  mana: 4, cooldown: 1.05, autoAim: true, aimRange: 145,
   use(user) {
     G.combat.shoot(user, {
       ability: "seedBurst", speed: 145, range: 145,
@@ -983,12 +986,12 @@ registerAbility({
 
 registerAbility({
   id: "wildGrowth", name: "Wild Growth", icon: "🌳", type: "dark", style: "area", traits: ["status"],
-  mana: 6, cooldown: 1.95,
+  mana: 5, cooldown: 1.4,
   use(user) {
     G.combat.areaBurst(user, {
-      ability: "wildGrowth", range: 43, damage: 2, type: "dark",
+      ability: "wildGrowth", range: 48, damage: 2, type: "dark",
       knockback: 115, color: "#38b764", hitStop: 0.042, shake: 0.18,
-      status: { name: "stun", dur: 0.55 }, combo: "overgrowth",
+      status: { name: "stun", dur: 0.7 }, combo: "overgrowth",
     });
   },
 });
@@ -1009,7 +1012,7 @@ registerAbility({
 
 registerAbility({
   id: "featherGale", name: "Feather Gale", icon: "🌬️", type: "sharp", style: "projectile",
-  mana: 3, cooldown: 0.95, autoAim: true, aimRange: 175,
+  mana: 3, cooldown: 0.8, autoAim: true, aimRange: 175,
   use(user) {
     const hitGroup = {};
     [-13, 0, 13].forEach((spreadDeg) => G.combat.shoot(user, {
@@ -1021,7 +1024,7 @@ registerAbility({
 
 registerAbility({
   id: "skyDive", name: "Sky Dive", icon: "🪽", type: "blunt", style: "dash",
-  mana: 5, cooldown: 1.45,
+  mana: 4, cooldown: 1.2,
   use(user) {
     G.combat.dash(user, { ability: "skyDive", dist: 82, speed: 390, damage: 1, type: "blunt", color: "#73eff7",
       endBurst: { ability: "skyDive", range: 31, damage: 2, type: "blunt", knockback: 170, color: "#f4f4f4" } });
@@ -1042,7 +1045,7 @@ registerAbility({
 
 registerAbility({
   id: "rampartPulse", name: "Rampart Pulse", icon: "🧱", type: "light", style: "area",
-  mana: 3, cooldown: 1.35,
+  mana: 3, cooldown: 1.0,
   use(user) {
     G.combat.areaBurst(user, { ability: "rampartPulse", range: 34, damage: 1, type: "light",
       knockback: 165, color: "#ffcd75", hitStop: 0.035, combo: "rampart" });
@@ -1051,7 +1054,7 @@ registerAbility({
 
 registerAbility({
   id: "rollingMonolith", name: "Rolling Monolith", icon: "🗿", type: "blunt", style: "projectile",
-  mana: 5, cooldown: 1.65, autoAim: true, aimRange: 185,
+  mana: 5, cooldown: 1.25, autoAim: true, aimRange: 185,
   use(user) {
     G.combat.shoot(user, { ability: "rollingMonolith", speed: 125, range: 185, damage: 2, type: "blunt",
       size: 8, pierce: true, color: "#8a7f68", trail: 4, recoil: 4, hitStop: 0.04 });
@@ -1069,7 +1072,7 @@ registerAbility({
 
 registerAbility({
   id: "stitchline", name: "Stitchline", icon: "🧵", type: "sharp", style: "chain",
-  mana: 4, cooldown: 1.25, autoAim: true, aimRange: 90,
+  mana: 4, cooldown: 1.0, autoAim: true, aimRange: 90,
   use(user) {
     G.combat.chain(user, { ability: "stitchline", range: 90, jumpRange: 58, maxTargets: 5,
       damage: 1, type: "sharp", knockback: 0, color: "#d9a7ff", status: { name: "stun", dur: 0.32 } });
@@ -1078,10 +1081,10 @@ registerAbility({
 
 registerAbility({
   id: "cocoonField", name: "Cocoon Field", icon: "🕸️", type: "dark", style: "area", traits: ["status"],
-  mana: 6, cooldown: 1.8,
+  mana: 5, cooldown: 1.4,
   use(user) {
-    G.combat.areaBurst(user, { ability: "cocoonField", range: 45, damage: 1, type: "dark", pull: 13,
-      color: "#8153c1", status: { name: "stun", dur: 0.7 }, hitStop: 0.035, combo: "cocoon" });
+    G.combat.areaBurst(user, { ability: "cocoonField", range: 50, damage: 1, type: "dark", pull: 15,
+      color: "#8153c1", status: { name: "stun", dur: 0.85 }, hitStop: 0.035, combo: "cocoon" });
   },
 });
 
@@ -1098,7 +1101,7 @@ registerAbility({
 
 registerAbility({
   id: "echoOrb", name: "Echo Orb", icon: "🫧", type: "light", style: "projectile",
-  mana: 3, cooldown: 1.05, autoAim: true, aimRange: 180,
+  mana: 3, cooldown: 0.85, autoAim: true, aimRange: 180,
   use(user) {
     G.combat.shoot(user, { ability: "echoOrb", speed: 170, range: 180, damage: 1, type: "light",
       size: 6, ricochets: 1, bounceRange: 78, color: "#fff3c2", trail: 6, recoil: 2 });
@@ -1107,10 +1110,10 @@ registerAbility({
 
 registerAbility({
   id: "silenceRing", name: "Silence Ring", icon: "⭕", type: "dark", style: "area", traits: ["status"],
-  mana: 5, cooldown: 1.75,
+  mana: 5, cooldown: 1.3,
   use(user) {
-    G.combat.areaBurst(user, { ability: "silenceRing", range: 47, damage: 1, type: "dark",
-      knockback: 195, color: "#8153c1", status: { name: "stun", dur: 0.48 }, combo: "silence" });
+    G.combat.areaBurst(user, { ability: "silenceRing", range: 49, damage: 2, type: "dark",
+      knockback: 195, color: "#8153c1", status: { name: "stun", dur: 0.65 }, combo: "silence" });
   },
 });
 
@@ -1125,19 +1128,19 @@ registerAbility({
 
 registerAbility({
   id: "ghostlight", name: "Ghostlight", icon: "🏮", type: "light", style: "area",
-  mana: 4, cooldown: 1.45,
+  mana: 4, cooldown: 1.05,
   use(user) {
-    G.combat.areaBurst(user, { ability: "ghostlight", range: 39, damage: 1, type: "light",
+    G.combat.areaBurst(user, { ability: "ghostlight", range: 39, damage: 2, type: "light",
       knockback: 135, color: "#ffcd75", combo: "safe-light" });
   },
 });
 
 registerAbility({
   id: "lanternDrift", name: "Lantern Drift", icon: "💫", type: "light", style: "dash",
-  mana: 5, cooldown: 1.4,
+  mana: 4, cooldown: 1.15,
   use(user) {
     G.combat.dash(user, { ability: "lanternDrift", dist: 72, speed: 330, damage: 1, type: "light", color: "#ffcd75",
-      endBurst: { ability: "lanternDrift", range: 34, damage: 1, type: "light", knockback: 125, color: "#fff3c2" } });
+      endBurst: { ability: "lanternDrift", range: 34, damage: 2, type: "light", knockback: 125, color: "#fff3c2" } });
   },
 });
 
@@ -1152,7 +1155,7 @@ registerAbility({
 
 registerAbility({
   id: "earthShoulder", name: "Earth Shoulder", icon: "💥", type: "blunt", style: "dash",
-  mana: 4, cooldown: 1.3,
+  mana: 4, cooldown: 1.0,
   use(user) {
     G.combat.dash(user, { ability: "earthShoulder", dist: 63, speed: 300, damage: 2, type: "blunt", color: "#ef7d57",
       endBurst: { ability: "earthShoulder", range: 29, damage: 1, type: "blunt", knockback: 220, color: "#d8b06a" } });
@@ -1161,9 +1164,9 @@ registerAbility({
 
 registerAbility({
   id: "worldBreak", name: "World Break", icon: "🌋", type: "blunt", style: "area",
-  mana: 7, cooldown: 2.05,
+  mana: 6, cooldown: 1.45,
   use(user) {
-    const hits = G.combat.areaBurst(user, { ability: "worldBreak", range: 48, damage: 2, type: "blunt",
+    const hits = G.combat.areaBurst(user, { ability: "worldBreak", range: 48, damage: 3, type: "blunt",
       knockback: 230, color: "#ef7d57", hitStop: 0.055, shake: 0.24, combo: "worldbreak" });
     if (hits) G.state.hitStop = Math.max(G.state.hitStop, 0.07);
   },
@@ -1197,8 +1200,8 @@ registerAbility({
   icon: "⚖️",
   type: "light",
   style: "area",
-  mana: 6,
-  cooldown: 1.6,
+  mana: 5,
+  cooldown: 1.15,
   use(user) {
     G.combat.meleeArc(user, {
       ability: "judgmentRing",
@@ -1217,7 +1220,7 @@ registerAbility({
   type: "dark",
   style: "area",
   mana: 5,
-  cooldown: 1.7,
+  cooldown: 1.3,
   autoAim: true, aimRange: 190,
   use(user) {
     G.combat.shoot(user, {

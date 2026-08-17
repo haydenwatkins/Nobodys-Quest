@@ -216,7 +216,7 @@ for (const ability of Object.values(G.abilities)) {
 {
   freshState();
   G.abilities.shellCounter.use(G.state.player);
-  assert.equal(G.state.player.meleeGuard, 0.58, "Shell Counter should provide a short deliberate guard window");
+  assert.equal(G.state.player.meleeGuard, 0.72, "Shell Counter should provide a generous deliberate guard window");
 }
 
 {
@@ -233,6 +233,35 @@ for (const ability of Object.values(G.abilities)) {
   G.state.player.starBeat = 3;
   G.abilities.starNeedle.use(G.state.player);
   assert.equal(G.state.projectiles[0].pierce, true, "every fourth Star Needle should align and pierce");
+}
+
+// Old radial starbursts were noisy but rarely useful. Their replacements all
+// make the player's facing decision matter and have a distinct combat job.
+{
+  freshState();
+  G.abilities.croakBurst.use(G.state.player);
+  assert.equal(G.state.projectiles.length, 5, "Croak Burst should create one broad aimed sound cone");
+  assert.ok(G.state.projectiles.every((shot) => shot.vx > 0 && shot.damage === 2 && shot.shape === "wave"));
+  assert.ok(G.state.projectiles.every((shot) => shot.hitGroup === G.state.projectiles[0].hitGroup),
+    "the cone should control a crowd without shotgunning one target");
+}
+
+{
+  freshState();
+  G.abilities.encore.use(G.state.player);
+  assert.equal(G.state.projectiles.length, 1, "Encore should throw one readable marquee card");
+  assert.equal(G.state.projectiles[0].ricochets, 4, "Encore should turn into a crowd-chasing payoff");
+  assert.equal(G.state.projectiles[0].damage, 2);
+}
+
+{
+  const targets = [enemy(35, 0), enemy(75, 0), enemy(115, 0)];
+  freshState();
+  G.state.enemies = targets;
+  G.abilities.constellation.use(G.state.player);
+  assert.deepEqual(targets.map((target) => target.hp), [9, 9, 9],
+    "Constellation should draw itself through actual nearby targets");
+  assert.equal(G.state.projectiles.length, 0, "Constellation should no longer spray radial stars");
 }
 
 {
@@ -819,7 +848,7 @@ G.input = {
   takeAim: () => null,
 };
 G.updatePlayer(0.016);
-assert.equal(G.state.player.mana, 3);
+assert.equal(G.state.player.mana, 4);
 assert.equal(G.state.player.manaRegenDelay, G.MANA_CAST_DELAY, "mana-spending casts should briefly delay recovery");
 
 console.log("combat-feel tests passed");

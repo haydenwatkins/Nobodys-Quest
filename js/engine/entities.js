@@ -1456,6 +1456,11 @@ G.drawProjectiles = function (ctx) {
       ctx.fillRect(x - 2, y - 2, 5, 5);
       ctx.fillStyle = "#a7f070";
       ctx.fillRect(x + 1, y - 3, 2, 2);
+    } else if (pr.shape === "wave") {
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      ctx.fillRect(x - 4, y - 3, 2, 7);
+      ctx.fillRect(x - 1, y - 2, 2, 5);
+      ctx.fillRect(x + 2, y - 1, 3, 3);
     } else {
       ctx.fillRect(Math.round(pr.x - s / 2), Math.round(pr.y - 4 - s / 2), s, s);
     }

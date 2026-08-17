@@ -31,6 +31,26 @@ assert.equal(G.workshopErrors.length, 0, "new forms must obey Ben's workshop rul
 assert.ok(G.formOrder.every((id) => G.forms[id].hearts >= 5),
   "the registration boundary should guarantee at least five hearts for every present and future form");
 
+// Native specials should keep combat moving. B is the frequent utility move;
+// C may be stronger, but never earns a multi-second lockout or an entire mana
+// bar by itself.
+for (const id of G.formOrder) {
+  const form = G.forms[id];
+  for (const [index, native] of (form.abilities || []).entries()) {
+    const ability = G.abilities[native.id];
+    const maxCooldown = index === 0 ? 1.15 : 1.45;
+    assert.ok(ability.cooldown <= maxCooldown,
+      `${id}'s ${index === 0 ? "B" : "C"} move should recover within ${maxCooldown}s`);
+    assert.ok(ability.mana <= 6, `${id}'s native special should not consume more than six mana`);
+  }
+}
+assert.equal(G.abilities.croakBurst.style, "projectile", "Croak Burst should be an aimed sound cone");
+assert.equal(G.abilities.encore.style, "projectile", "Encore should be a deliberate ricochet");
+assert.equal(G.abilities.constellation.style, "chain", "Constellation should connect actual targets");
+assert.doesNotMatch(fs.readFileSync(path.join(root, "js/abilities/basics.js"), "utf8"),
+  /spreadDeg\s*=\s*0[^\n]*spreadDeg\s*<\s*360/,
+  "player abilities must not regress to arbitrary radial projectile stars");
+
 G.state = {
   player: { damageTaken: 0, dashing: null }, formId: "nobody",
   stars: 0, items: [], known: [], claimedForms: [], unlockReadyNotified: [], loadouts: {},
@@ -82,5 +102,22 @@ for (const id of ["turtle", "samurai", "astronomer", "druid", "griffin", "golem"
   for (const frame of sprite.frames) for (const row of frame) for (const pixel of row)
     assert.ok(pixel === "." || pixel === " " || sprite.palette[pixel], `${id} uses unknown sprite color '${pixel}'`);
 }
+
+// Mixing a kit is reversible in one action, and restoring never sneaks in a
+// native move the form has not earned yet.
+G.questsDone.push(...G.forms.rat.quests.map((quest) => quest.id));
+G.state.loadouts.rat = ["bite", "meteor", "encore"];
+let loadoutSaves = 0;
+G.saveGame = () => { loadoutSaves++; };
+assert.deepEqual(Array.from(G.defaultLoadout("rat")), ["bite", "squeakDash", "fester"]);
+assert.deepEqual(Array.from(G.restoreDefaultLoadout("rat")), ["bite", "squeakDash", "fester"]);
+assert.equal(loadoutSaves, 1, "restoring a form's native kit should persist immediately");
+G.questsDone = [];
+assert.deepEqual(Array.from(G.defaultLoadout("rat")), ["bite", "squeakDash", null],
+  "restore defaults must respect native ability levels");
+
+const uiSource = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
+assert.match(uiSource, /data-act="restore-default-loadout"/,
+  "the graphical Form Lab should expose native-kit restoration");
 
 console.log("progression tests passed");

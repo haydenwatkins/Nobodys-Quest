@@ -572,6 +572,14 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .loadout-form-panel h2 { margin: 0; color: #f4f4f4; font-size: 14px; }
 .loadout-preview { height: 190px; margin: 8px 0; border: 1px solid #3e4762; border-radius: 8px; }
 .loadout-form-panel .passive-rule { text-align: left; }
+.restore-loadout {
+  display: flex; flex-direction: column; gap: 4px; width: 100%; margin-top: 10px; padding: 10px;
+  border-color: #73eff7; text-align: left;
+}
+.restore-loadout strong { color: #f4f4f4; font-size: 8px; line-height: 1.4; }
+.restore-loadout span { color: #94b0c2; font: 15px "VT323", monospace; line-height: 1.15; }
+.restore-loadout:disabled { border-color: #457960; opacity: .72; }
+.restore-loadout:disabled strong { color: #a7f070; }
 .loadout-slots { display: flex; flex-direction: column; justify-content: center; gap: 9px; padding: 14px; }
 .ability-slot { display: grid; grid-template-columns: 48px 54px 1fr; align-items: center; min-height: 76px; padding: 8px; text-align: left; }
 .ability-slot.selected { border-color: #ffcd75; background: #3a3950; }

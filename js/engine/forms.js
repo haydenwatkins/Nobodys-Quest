@@ -318,6 +318,29 @@ G.setForm = function (id) {
    the form's identity), plus open slots B and C where you can
    equip ANY ability you've unlocked from ANY form.            */
 
+// The native moves currently earned for a form, in their intended A/B/C
+// order. Keeping this as a single source of truth lets the Form Lab offer a
+// safe way home after experimenting with mixed builds.
+G.defaultLoadout = function (formId) {
+  const f = G.forms[formId];
+  if (!f) return [];
+  const loadout = [f.basic];
+  const level = G.formLevel(formId);
+  const natives = (f.abilities || [])
+    .filter((ability) => ability.level <= level && G.abilities[ability.id])
+    .map((ability) => ability.id);
+  for (let slot = 1; slot <= f.slots; slot++) loadout[slot] = natives[slot - 1] || null;
+  return loadout;
+};
+
+G.restoreDefaultLoadout = function (formId) {
+  if (!G.forms[formId]) return [];
+  const restored = G.defaultLoadout(formId);
+  G.state.loadouts[formId] = restored.slice();
+  G.saveGame();
+  return G.state.loadouts[formId];
+};
+
 G.getLoadout = function (formId) {
   const f = G.forms[formId];
   const st = G.state;
