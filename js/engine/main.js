@@ -88,6 +88,8 @@
     formId: "nobody",
     costumeId: "classic",
     costumesUnlocked: ["classic"],
+    skinsUnlocked: [],
+    skinByForm: {},
     stars: 0,
     items: [],
     opened: [],
@@ -133,6 +135,9 @@
     const wardrobe = G.normalizeCostumes(save.costumesUnlocked, save.costumeId);
     s.costumeId = wardrobe.selected;
     s.costumesUnlocked = wardrobe.unlocked;
+    const skins = G.normalizeSkins(save.skinsUnlocked, save.skinByForm);
+    s.skinsUnlocked = skins.unlocked;
+    s.skinByForm = skins.equipped;
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
     s.town = G.normalizeTown(save.town || save.cult);
     s.heroBoard = G.normalizeHeroBoard(save.heroBoard);
@@ -167,6 +172,7 @@
     G.state.wayfinder.introSeen = true;
     G.state.wayfinder.whistleClaimed = true;
     G.state.wayfinder.rewardClaimed = true;
+    G.state.skinsUnlocked = G.FORM_SKINS.map((skin) => skin.id);
     if (!G.state.items.includes("wayfinder-whistle")) G.state.items.push("wayfinder-whistle");
   }
   if (builderParams && builderParams.get("playtestWayfinder") === "early") {
@@ -201,6 +207,7 @@
       }
     }
   }
+  G.checkSkinUnlocks(true);
   if (!requestedTestMap && save && save.mapId === startMap && typeof save.px === "number") {
     const safeSavedSpot = typeof save.py === "number" && G.world.isSafeSpawn(save.px, save.py);
     if (safeSavedSpot) {

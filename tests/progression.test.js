@@ -35,6 +35,27 @@ G.state = {
 };
 G.questsDone = [];
 
+// Signature skins are authored against the full roster. Validate the actual
+// generated text-art, not just the registry metadata, so a motif can never
+// introduce an unknown palette key or accidentally miss a newly added form.
+G.state.costumeId = "classic";
+G.state.costumesUnlocked = ["classic"];
+G.state.skinsUnlocked = [];
+G.state.skinByForm = {};
+run("js/engine/costumes.js");
+assert.deepEqual(new Set(G.FORM_SKINS.map((skin) => skin.formId)), new Set(G.formOrder),
+  "the signature collection must cover the complete form roster exactly once");
+for (const id of G.formOrder) {
+  const skin = G.skinForForm(id);
+  const source = G.forms[id].sprite;
+  const variant = G.signatureSprite(source, skin);
+  assert.notDeepEqual(Array.from(variant.frames[0]), Array.from(source.frames[0]),
+    `${id}'s signature must change its silhouette`);
+  for (const frame of variant.frames) for (const row of frame) for (const pixel of row)
+    assert.ok(pixel === "." || pixel === " " || variant.palette[pixel],
+      `${skin.name} uses unknown sprite color '${pixel}'`);
+}
+
 assert.equal(G.formUnlocked("rat"), false);
 G.questsDone.push(G.forms.nobody.quests[0].id, G.forms.nobody.quests[1].id);
 assert.equal(G.formLevel("nobody"), 3);

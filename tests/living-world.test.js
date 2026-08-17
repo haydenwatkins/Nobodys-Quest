@@ -65,6 +65,7 @@ G.startNpcExchange(residents[0], residents[1], 0);
 assert.equal(residents[0].bubble.text, "Lovely day!");
 assert.equal(residents[1].bubble.text, "For something.");
 assert.ok(residents[1].bubble.delay > 0, "ambient replies should be staggered instead of modal");
+assert.ok(residents[0].bubble.duration <= 2.5, "ambient comments should clear promptly");
 
 // A routine should produce actual travel rather than an in-place idle loop.
 const walker = named[0];
@@ -130,5 +131,13 @@ assert.doesNotThrow(() => {
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.ok(index.indexOf("js/engine/living-world.js") < index.indexOf("js/engine/main.js"),
   "the living-world systems must load before the game boots");
+const npcSource = fs.readFileSync(path.join(root, "js/engine/npcs.js"), "utf8");
+const uiSource = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
+assert.ok(!npcSource.includes('ctx.font = "5px monospace"'),
+  "ambient comments should not be rasterized into the low-resolution world canvas");
+assert.ok(uiSource.includes("function drawNpcChatter"),
+  "ambient comments should render on the crisp screen-space text layer");
+assert.ok(npcSource.includes("s.npcChatterT = 21"),
+  "ambient exchanges should leave enough quiet time to feel incidental");
 
 console.log("living world tests passed");

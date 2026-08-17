@@ -15,6 +15,8 @@ G.saveGame = function () {
       formId: s.formId,
       costumeId: s.costumeId,
       costumesUnlocked: s.costumesUnlocked,
+      skinsUnlocked: s.skinsUnlocked,
+      skinByForm: s.skinByForm,
       mapId: s.mapId,
       px: Math.round(s.player.x),
       py: Math.round(s.player.y),

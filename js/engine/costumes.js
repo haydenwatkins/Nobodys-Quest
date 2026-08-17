@@ -1,9 +1,9 @@
 /* ============================================================
-   COSTUME WARDROBE — cosmetic progression for every form.
+   APPEARANCE SYSTEM — dyes plus form-specific signature skins.
 
-   Costumes remap a form's existing pixel palette and add a tiny accessory.
-   They never change combat stats, and new forms inherit every costume
-   automatically because the wardrobe dresses the sprite at draw time.
+   Legacy costumes remain as global dyes so old saves stay intact. Signature
+   skins rebuild the actual text-art frames with a new silhouette, palette,
+   and effect. Neither system changes combat stats.
    ============================================================ */
 
 "use strict";
@@ -262,4 +262,239 @@ G.drawCostumeAccessory = function (ctx, p, form, drawX, drawY) {
     }
   }
   ctx.restore();
+};
+
+/* ---------- Signature skins ----------
+   Every form owns one authored alternate identity. These are deliberately
+   more than palette swaps: the motif builder adds hats, horns, capes,
+   branches, machinery, or orbiting shapes directly to every animation frame.
+   Level 3 is the mastery threshold: two form quests is meaningful, while the
+   reward still arrives early enough to enjoy through the rest of the game. */
+
+G.FORM_SKINS = [
+  ["nobody", "cardboardHero", "📦", "Cardboard Hero", "A box-built champion with a heroic red cape.", "boxhero", ["#7b4f2c", "#c58b55", "#f2c879", "#ef5b5b"], "paper"],
+  ["rat", "sewerKing", "👑", "Sewer King", "A bottle-cap crown and royal scrap-cloak.", "crowncape", ["#352746", "#72506f", "#c9957a", "#ffd166"], "spark"],
+  ["knight", "hollowBlackguard", "🛡️", "Hollow Blackguard", "A horned helm wrapped in a void-black mantle.", "horncape", ["#11131f", "#323852", "#70799a", "#a779e9"], "void"],
+  ["ranger", "mossStalker", "🍃", "Moss Stalker", "A deep hood, leaf mantle, and living bow-string.", "hoodleaf", ["#173b32", "#2f6b4f", "#8fbd62", "#d7ef8a"], "leaf"],
+  ["wizard", "starSage", "🌠", "Star Sage", "A towering night-sky hat with a comet brim.", "starhat", ["#1b234a", "#394c98", "#94bfff", "#fff0a8"], "orbit"],
+  ["frog", "poisonPrince", "🪷", "Poison Prince", "A lily crown and bright warning-color mantle.", "lilycrown", ["#17463d", "#2c8f5b", "#8be04e", "#f15bb5"], "bubble"],
+  ["alchemist", "brassBrewer", "⚗️", "Brass Brewer", "Goggles, copper tanks, and a bubbling shoulder flask.", "goggles", ["#49311f", "#a46434", "#e0b35a", "#73eff7"], "bubble"],
+  ["stormcaller", "thunderIdol", "⚡", "Thunder Idol", "A lightning crown built to hold a living storm.", "thundercrown", ["#25214a", "#594da8", "#b9abff", "#fff36b"], "lightning"],
+  ["dragon", "frostbone", "❄️", "Frostbone", "Ice antlers and ancient pale-blue armor plates.", "icehorns", ["#193448", "#356c88", "#b9e7ef", "#ffffff"], "snow"],
+  ["riftblade", "neonRonin", "🌈", "Neon Ronin", "A razor hat and impossible magenta afterimage.", "ronin", ["#17152d", "#38306b", "#56d6d2", "#ff4fd8"], "afterimage"],
+  ["mole", "drillBaron", "⛏️", "Drill Baron", "A brass mining helm with a mechanical crown-drill.", "drillhelm", ["#34291f", "#755633", "#d8a84e", "#ffef9a"], "spark"],
+  ["vampire", "daybreaker", "☀️", "Daybreaker", "A sun halo, high collar, and white-gold coat.", "sunhalo", ["#4a2031", "#9d3d4d", "#f1d3b3", "#ffd95a"], "sun"],
+  ["jester", "puppetKing", "🎭", "Puppet King", "A tall split crown with dangling marionette strings.", "puppetcrown", ["#35205a", "#7d45a5", "#ef6f9a", "#ffd166"], "ribbon"],
+  ["turtle", "volcanoShell", "🌋", "Volcano Shell", "An obsidian shell split by glowing magma vents.", "volcanoshell", ["#241d1d", "#5a3630", "#db553a", "#ffcf55"], "ember"],
+  ["samurai", "moonRonin", "🌙", "Moon Ronin", "A crescent crest and midnight traveling cloak.", "mooncrest", ["#151d3a", "#314b79", "#83a6d8", "#e9efff"], "moon"],
+  ["astronomer", "livingOrrery", "🪐", "Living Orrery", "A brass observatory with tiny worlds in orbit.", "orrery", ["#27304a", "#596b8b", "#d2b36c", "#73eff7"], "orbit"],
+  ["druid", "autumnAncient", "🍂", "Autumn Ancient", "Great branch antlers crowned in ember-red leaves.", "antlers", ["#3b2d25", "#765137", "#c97941", "#f2c14e"], "leaf"],
+  ["griffin", "stormRoc", "🪶", "Storm Roc", "A crested sky-hunter with sweeping electric plumage.", "feathercrest", ["#293653", "#4b72a6", "#d9edf2", "#ffe45e"], "lightning"],
+  ["golem", "overgrownRuin", "🏛️", "Overgrown Ruin", "A walking shrine split by roots, moss, and flowers.", "ruin", ["#36433d", "#697869", "#b3b79b", "#8ed15c"], "leaf"],
+  ["weaver", "clockworkSpider", "⚙️", "Clockwork Spider", "A many-legged brass machine with a wound key.", "clockwork", ["#332d2b", "#806044", "#d9a441", "#77e0d4"], "gear"],
+  ["bellkeeper", "cathedralBell", "⛪", "Cathedral Bell", "A vaulted iron crown with stained-glass light.", "cathedral", ["#23283b", "#555f79", "#c3c8d4", "#ef5b8c"], "chime"],
+  ["lanternWisp", "festivalSpirit", "🎐", "Festival Spirit", "A ribboned lantern dancing with warm festival fire.", "lanternribbons", ["#45254b", "#a33f5f", "#ff9b62", "#fff2a8"], "ribbon"],
+  ["colossus", "crystalTitan", "💎", "Crystal Titan", "A mountain split open by enormous living crystals.", "crystaltitan", ["#293544", "#536879", "#9ad5d8", "#c08cff"], "crystal"],
+  ["god", "cosmicNobody", "🌌", "Cosmic Nobody", "The little blank someone, containing every horizon.", "cosmichalo", ["#16142e", "#41366f", "#8f7ee7", "#fff36b"], "cosmos"],
+].map(([formId, id, icon, name, tagline, motif, colors, effect]) => ({
+  formId, id, icon, name, tagline, motif, colors, effect, unlockLevel: 3,
+}));
+
+G.skinById = function (id) {
+  return G.FORM_SKINS.find((skin) => skin.id === id) || null;
+};
+
+G.skinForForm = function (formId) {
+  return G.FORM_SKINS.find((skin) => skin.formId === formId) || null;
+};
+
+G.normalizeSkins = function (unlocked, equipped) {
+  const valid = new Set(G.FORM_SKINS.map((skin) => skin.id));
+  const owned = Array.isArray(unlocked) ? Array.from(new Set(unlocked.filter((id) => valid.has(id)))) : [];
+  const selected = {};
+  if (equipped && typeof equipped === "object") {
+    for (const [formId, id] of Object.entries(equipped)) {
+      const skin = G.skinById(id);
+      if (skin && skin.formId === formId && owned.includes(id)) selected[formId] = id;
+    }
+  }
+  return { unlocked: owned, equipped: selected };
+};
+
+G.ensureSkins = function () {
+  const normalized = G.normalizeSkins(G.state.skinsUnlocked, G.state.skinByForm);
+  G.state.skinsUnlocked = normalized.unlocked;
+  G.state.skinByForm = normalized.equipped;
+  return normalized;
+};
+
+G.skinUnlocked = function (id) {
+  return !!(G.state && G.ensureSkins().unlocked.includes(id));
+};
+
+G.selectedFormSkin = function (formId) {
+  if (!G.state) return null;
+  return G.skinById(G.ensureSkins().equipped[formId]) || null;
+};
+
+G.selectFormSkin = function (formId, id) {
+  if (!G.state || !G.forms[formId]) return false;
+  const skins = G.ensureSkins();
+  if (id === "classic") delete skins.equipped[formId];
+  else {
+    const skin = G.skinById(id);
+    if (!skin || skin.formId !== formId || !skins.unlocked.includes(id)) return false;
+    skins.equipped[formId] = id;
+  }
+  if (G.sfx) G.sfx.play("pickup");
+  if (G.ui) G.ui.toast(id === "classic" ? `✨ ${G.forms[formId].name}: Classic` : `${G.skinById(id).icon} ${G.skinById(id).name} equipped`, 2.2);
+  G.saveGame();
+  return true;
+};
+
+G.checkSkinUnlocks = function (quiet) {
+  if (!G.state) return [];
+  const skins = G.ensureSkins();
+  const earned = G.FORM_SKINS.filter((skin) => !skins.unlocked.includes(skin.id) &&
+    G.formUnlocked(skin.formId) && G.formLevel(skin.formId) >= skin.unlockLevel);
+  if (!earned.length) return earned;
+  for (const skin of earned) skins.unlocked.push(skin.id);
+  if (!quiet && G.ui) {
+    if (G.sfx) G.sfx.play("unlock");
+    const names = earned.map((skin) => `${skin.icon} ${skin.name}`).join(" · ");
+    G.ui.banner(earned.length > 1 ? "✨ SIGNATURE SKINS UNLOCKED" : "✨ SIGNATURE SKIN UNLOCKED", names);
+  }
+  G.saveGame();
+  return earned;
+};
+
+for (const event of ["questDone", "formUnlock"]) {
+  G.events.on(event, () => G.checkSkinUnlocks(G.costumeBooting));
+}
+
+const signatureSpriteCache = new WeakMap();
+
+function skinPalette(sprite, skin) {
+  const palette = { K: "#151522", X: skin.colors[3], Y: skin.colors[2] };
+  const entries = Object.entries(sprite.palette || {});
+  const brightness = (hex) => {
+    const n = parseInt(String(hex).replace("#", ""), 16);
+    return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000;
+  };
+  const values = entries.map(([, color]) => brightness(color));
+  const min = Math.min(...values), max = Math.max(...values);
+  for (const [key, color] of entries) {
+    if (String(color).toLowerCase() === "#1a1c2c") palette[key] = "#151522";
+    else {
+      const t = max === min ? 0.5 : (brightness(color) - min) / (max - min);
+      palette[key] = t > 0.68 ? skin.colors[2] : t > 0.33 ? skin.colors[1] : skin.colors[0];
+    }
+  }
+  return palette;
+}
+
+function skinFrame(rows, motif) {
+  const sourceW = rows.reduce((width, row) => Math.max(width, row.length), 1);
+  const sourceH = rows.length;
+  const pad = 5;
+  const w = sourceW + pad * 2;
+  const h = sourceH + pad * 2;
+  const grid = Array.from({ length: h }, () => Array(w).fill("."));
+  for (let y = 0; y < sourceH; y++) for (let x = 0; x < rows[y].length; x++)
+    if (rows[y][x] !== "." && rows[y][x] !== " ") grid[y + pad][x + pad] = rows[y][x];
+  const cx = Math.floor(w / 2), top = pad, bottom = pad + sourceH - 1;
+  const put = (x, y, ch = "X") => {
+    x = Math.round(x); y = Math.round(y);
+    if (x >= 0 && x < w && y >= 0 && y < h) grid[y][x] = ch;
+  };
+  const line = (x1, y1, x2, y2, ch = "X") => {
+    const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1), 1);
+    for (let i = 0; i <= steps; i++) put(Math.round(x1 + (x2 - x1) * i / steps), Math.round(y1 + (y2 - y1) * i / steps), ch);
+  };
+  const crown = (wide) => { for (let x = cx - wide; x <= cx + wide; x++) put(x, top - 1, "X"); put(cx - wide, top - 2, "Y"); put(cx, top - 3, "Y"); put(cx + wide, top - 2, "Y"); };
+  const cape = () => { line(pad - 1, top + 5, pad - 2, bottom - 1, "X"); line(w - pad, top + 5, w - pad + 1, bottom - 1, "X"); };
+  switch (motif) {
+    case "boxhero":
+      for (let x = cx - 5; x <= cx + 5; x++) { put(x, top - 2, "K"); put(x, top + 2, "K"); }
+      for (let y = top - 1; y <= top + 1; y++) { put(cx - 5, y, "K"); put(cx + 5, y, "K"); }
+      put(cx - 2, top, "Y"); put(cx + 2, top, "Y"); cape(); break;
+    case "crowncape": crown(4); cape(); break;
+    case "horncape": line(cx - 4, top, cx - 6, top - 4, "Y"); line(cx + 4, top, cx + 6, top - 4, "Y"); cape(); break;
+    case "hoodleaf": line(cx - 5, top + 3, cx, top - 3, "X"); line(cx, top - 3, cx + 5, top + 3, "X"); put(cx + 4, top - 2, "Y"); put(cx + 5, top - 3, "Y"); break;
+    case "starhat": line(cx - 6, top, cx + 6, top, "X"); line(cx - 3, top - 1, cx, top - 5, "X"); line(cx, top - 5, cx + 3, top - 1, "X"); put(cx + 1, top - 4, "Y"); break;
+    case "lilycrown": crown(3); put(cx - 5, top - 1, "Y"); put(cx + 5, top - 1, "Y"); break;
+    case "goggles": line(cx - 5, top + 2, cx + 5, top + 2, "K"); put(cx - 3, top + 2, "Y"); put(cx + 3, top + 2, "Y"); put(cx + 6, top + 5, "X"); put(cx + 7, top + 6, "X"); break;
+    case "thundercrown": crown(4); line(cx - 6, top, cx - 8, top - 3, "Y"); line(cx + 6, top, cx + 8, top - 3, "Y"); break;
+    case "icehorns": line(cx - 4, top, cx - 7, top - 4, "Y"); line(cx + 4, top, cx + 7, top - 4, "Y"); put(cx - 8, top - 3, "X"); put(cx + 8, top - 3, "X"); break;
+    case "ronin": line(cx - 7, top, cx + 7, top, "X"); line(cx - 3, top - 1, cx, top - 4, "Y"); line(cx, top - 4, cx + 3, top - 1, "Y"); cape(); break;
+    case "drillhelm": line(cx - 5, top, cx + 5, top, "X"); line(cx, top - 1, cx + 5, top - 5, "Y"); put(cx + 6, top - 6, "X"); break;
+    case "sunhalo": for (let x = cx - 5; x <= cx + 5; x += 2) put(x, top - 4 + Math.abs(cx - x) / 3, "Y"); cape(); break;
+    case "puppetcrown": crown(5); line(cx - 6, top - 2, cx - 7, top + 5, "X"); line(cx + 6, top - 2, cx + 7, top + 5, "X"); break;
+    case "volcanoshell": for (let x = cx - 6; x <= cx + 6; x += 3) line(x, top + 5, x + 1, top + 1, "X"); put(cx - 3, bottom - 4, "Y"); put(cx + 3, bottom - 6, "Y"); break;
+    case "mooncrest": line(cx - 5, top, cx + 5, top, "X"); line(cx, top - 1, cx + 3, top - 5, "Y"); put(cx + 1, top - 5, "Y"); cape(); break;
+    case "orrery": line(cx - 6, top - 2, cx + 6, top - 2, "X"); put(cx - 6, top - 3, "Y"); put(cx + 6, top - 1, "Y"); put(cx, top - 4, "Y"); break;
+    case "antlers": line(cx - 3, top, cx - 7, top - 5, "X"); line(cx + 3, top, cx + 7, top - 5, "X"); put(cx - 8, top - 4, "Y"); put(cx + 8, top - 4, "Y"); break;
+    case "feathercrest": line(cx - 4, top, cx + 4, top - 5, "Y"); line(cx, top - 1, cx + 6, top - 3, "X"); break;
+    case "ruin": line(cx - 6, top + 2, cx - 7, bottom - 2, "X"); line(cx + 6, top + 2, cx + 7, bottom - 2, "X"); put(cx - 6, top - 1, "Y"); put(cx + 5, top - 2, "Y"); put(cx + 7, top, "Y"); break;
+    case "clockwork": crown(3); put(cx + 6, top + 2, "X"); put(cx + 7, top + 1, "Y"); put(cx + 7, top + 3, "Y"); line(pad - 2, bottom - 3, pad + 2, bottom - 5, "X"); line(w - pad + 1, bottom - 3, w - pad - 2, bottom - 5, "X"); break;
+    case "cathedral": line(cx - 5, top + 2, cx, top - 5, "X"); line(cx, top - 5, cx + 5, top + 2, "X"); put(cx, top - 3, "Y"); put(cx - 2, top - 1, "Y"); put(cx + 2, top - 1, "Y"); break;
+    case "lanternribbons": crown(4); line(cx - 5, top + 1, cx - 8, bottom - 2, "X"); line(cx + 5, top + 1, cx + 8, bottom - 2, "Y"); break;
+    case "crystaltitan": for (let x = cx - 7; x <= cx + 7; x += 4) line(x, top + 3, x + (x < cx ? -2 : 2), top - 4, x === cx - 3 ? "Y" : "X"); break;
+    case "cosmichalo": crown(5); put(cx - 7, top - 4, "Y"); put(cx + 7, top - 3, "Y"); put(cx, top - 5, "Y"); cape(); break;
+  }
+  return grid.map((row) => row.join(""));
+}
+
+G.signatureSprite = function (sprite, skin) {
+  if (!sprite || !skin) return sprite;
+  let variants = signatureSpriteCache.get(sprite);
+  if (!variants) { variants = new Map(); signatureSpriteCache.set(sprite, variants); }
+  if (variants.has(skin.id)) return variants.get(skin.id);
+  const variant = {
+    palette: skinPalette(sprite, skin),
+    frames: sprite.frames.map((rows) => skinFrame(rows, skin.motif)),
+  };
+  variants.set(skin.id, variant);
+  return variant;
+};
+
+G.formPreviewSprite = function (formId, skinId) {
+  const form = G.forms[formId];
+  if (!form) return null;
+  const skin = skinId && skinId !== "classic" ? G.skinById(skinId) : null;
+  return skin && skin.formId === formId ? G.signatureSprite(form.sprite, skin) : form.sprite;
+};
+
+G.playerAppearanceSprite = function (form) {
+  const skin = form && G.selectedFormSkin(form.id);
+  return skin ? G.signatureSprite(form.sprite, skin) : G.costumedSprite(form.sprite);
+};
+
+G.drawFormSkinEffect = function (ctx, p, form, drawX, drawY) {
+  const skin = form && G.selectedFormSkin(form.id);
+  if (!skin) return false;
+  const t = G.state.time || 0;
+  const phase = Math.floor(t * 5) % 3;
+  ctx.save();
+  ctx.fillStyle = skin.colors[3];
+  if (["orbit", "cosmos", "orrery"].includes(skin.effect)) {
+    ctx.fillRect(Math.round(drawX + Math.cos(t * 2.5) * 12), Math.round(drawY - 10 + Math.sin(t * 2.5) * 5), 2, 2);
+    ctx.fillStyle = skin.colors[2];
+    ctx.fillRect(Math.round(drawX - Math.cos(t * 2.5) * 10), Math.round(drawY - 10 - Math.sin(t * 2.5) * 4), 1, 1);
+  } else if (["leaf", "paper", "ribbon", "snow"].includes(skin.effect)) {
+    ctx.fillRect(Math.round(drawX - 9 + phase * 4), Math.round(drawY - 4 - ((t * 7) % 9)), 2, 2);
+  } else if (["ember", "sun", "lightning", "spark", "crystal"].includes(skin.effect)) {
+    ctx.fillRect(Math.round(drawX - 7), Math.round(drawY - 4 - ((t * 8) % 7)), 2, 2);
+    ctx.fillRect(Math.round(drawX + 6), Math.round(drawY - 7 - ((t * 6 + 3) % 6)), 1, 2);
+  } else if (["void", "afterimage", "moon"].includes(skin.effect)) {
+    ctx.globalAlpha = 0.55;
+    ctx.fillRect(Math.round(drawX - p.dir.x * (8 + phase)), Math.round(drawY - 9), 3, 5);
+  } else if (skin.effect === "bubble") {
+    ctx.globalAlpha = 0.7;
+    ctx.fillRect(Math.round(drawX + 8), Math.round(drawY - 8 - ((t * 6) % 8)), 2, 2);
+  } else if (skin.effect === "gear" || skin.effect === "chime") {
+    ctx.fillRect(Math.round(drawX + Math.cos(t * 4) * 9), Math.round(drawY - 9 + Math.sin(t * 4) * 3), 2, 2);
+  }
+  ctx.restore();
+  return true;
 };

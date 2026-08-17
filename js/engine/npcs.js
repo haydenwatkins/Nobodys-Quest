@@ -261,7 +261,8 @@
   }
 
   function setBubble(npc, text, delay) {
-    npc.bubble = { text, delay: delay || 0, t: 3.2 + (delay || 0) };
+    const wait = delay || 0;
+    npc.bubble = { text, delay: wait, t: 2.25 + wait, duration: 2.25 };
   }
 
   G.startNpcExchange = function (first, second, index) {
@@ -338,8 +339,12 @@
 
   G.celebrateTown = function () {
     if (!G.state || G.state.mapId !== "town") return;
-    const residents = (G.state.npcs || []).filter((npc) => npc.ambientOnly);
-    for (let i = 0; i < residents.length; i++) setBubble(residents[i], i % 3 === 0 ? "♪" : i % 3 === 1 ? "Hooray!" : "♥", i * 0.08);
+    const p = G.state.player;
+    const residents = (G.state.npcs || []).filter((npc) => npc.ambientOnly)
+      .sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))
+      .slice(0, 3);
+    for (let i = 0; i < residents.length; i++)
+      setBubble(residents[i], i === 0 ? "Hooray!" : i === 1 ? "♪" : "♥", i * 0.75);
   };
 
   function chapterLines(def, chapter) {
@@ -405,19 +410,19 @@
       }
     }
 
-    s.npcChatterT = (s.npcChatterT == null ? 5.5 : s.npcChatterT) - dt;
+    s.npcChatterT = (s.npcChatterT == null ? 12 + ((s.time || 0) % 5) : s.npcChatterT) - dt;
     if (s.npcChatterT <= 0 && !blocked && !danger) {
-      const nearby = npcs.filter((npc) => Math.hypot(npc.x - p.x, npc.y - p.y) < 125 && !npc.bubble);
+      const nearby = npcs.filter((npc) => Math.hypot(npc.x - p.x, npc.y - p.y) < 108 && !npc.bubble);
       let pair = null;
       for (let i = 0; i < nearby.length && !pair; i++) for (let j = i + 1; j < nearby.length; j++) {
-        if (Math.hypot(nearby[i].x - nearby[j].x, nearby[i].y - nearby[j].y) < 78) {
+        if (Math.hypot(nearby[i].x - nearby[j].x, nearby[i].y - nearby[j].y) < 70) {
           pair = [nearby[i], nearby[j]];
           break;
         }
       }
       if (pair) G.startNpcExchange(pair[0], pair[1]);
-      else if (nearby.length) G.startNpcExchange(nearby[0], null);
-      s.npcChatterT = 9 + ((s.time || 0) % 5);
+      else if (nearby.length && Math.floor(s.time || 0) % 2 === 0) G.startNpcExchange(nearby[0], null);
+      s.npcChatterT = 21 + ((s.time || 0) % 8);
     }
 
     if (candidate && !blocked && !danger) {
@@ -463,22 +468,6 @@
       ctx.restore();
     }
     const distance = Math.hypot(npc.x - p.x, npc.y - p.y);
-    if (npc.bubble && npc.bubble.delay <= 0 && npc.bubble.t > 0 && distance < 135) {
-      const text = npc.bubble.text;
-      const width = Math.max(12, Math.min(72, text.length * 4 + 6));
-      const bx = Math.round(npc.x - width / 2);
-      const by = Math.round(npc.y - 25 + bob);
-      ctx.save();
-      ctx.fillStyle = "rgba(244,244,244,0.94)";
-      ctx.fillRect(bx, by, width, 10);
-      ctx.fillStyle = "#1a1c2c";
-      ctx.fillRect(Math.round(npc.x - 1), by + 10, 3, 2);
-      ctx.font = "5px monospace";
-      ctx.textBaseline = "top";
-      ctx.textAlign = "center";
-      ctx.fillText(text, Math.round(npc.x), by + 2);
-      ctx.restore();
-    }
     if (npc.ambientOnly || distance > 44) return;
 
     const y = Math.round(npc.y - 18 + bob);

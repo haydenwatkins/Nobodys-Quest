@@ -237,6 +237,57 @@ G.ui = (() => {
     c.fillText(label, x + 5, y + 3);
   }
 
+  function drawNpcChatter(c, cam) {
+    if (dialogueData || G.state.bossCutscene) return;
+    const p = G.state.player;
+    const active = (G.state.npcs || []).filter((npc) => npc.bubble &&
+      npc.bubble.delay <= 0 && npc.bubble.t > 0 &&
+      G.util.dist(npc.x, npc.y, p.x, p.y) < 125)
+      .sort((a, b) => G.util.dist(a.x, a.y, p.x, p.y) - G.util.dist(b.x, b.y, p.x, p.y))
+      .slice(0, 2);
+    const placed = [];
+    for (const npc of active) {
+      const bubble = npc.bubble;
+      const speaker = npc.ambientOnly ? "RESIDENT" : String(npc.def.name || "NEARBY").toUpperCase();
+      c.font = `9px ${FONT_BODY}`;
+      const lines = wrapText(c, bubble.text, 86);
+      let width = Math.max(c.measureText(speaker).width + 12, 36);
+      for (const line of lines) width = Math.max(width, c.measureText(line).width + 12);
+      width = Math.min(98, width);
+      const height = 13 + lines.length * 9;
+      let x = Math.round(G.util.clamp(npc.x - cam.x - width / 2, 4, G.W - width - 4));
+      let y = Math.round(G.util.clamp(npc.y - cam.y - height - 23, 37, G.H - height - 34));
+      for (const other of placed) {
+        const overlaps = x < other.x + other.w + 3 && x + width + 3 > other.x &&
+          y < other.y + other.h + 3 && y + height + 3 > other.y;
+        if (overlaps) y = Math.max(37, other.y - height - 4);
+      }
+      placed.push({ x, y, w: width, h: height });
+
+      const remaining = Math.min(bubble.duration || 2.25, bubble.t);
+      c.globalAlpha = remaining < 0.28 ? Math.max(0, remaining / 0.28) : 1;
+      c.fillStyle = "rgba(15,16,27,0.94)";
+      c.fillRect(x + 2, y + 2, width, height);
+      c.fillStyle = "rgba(244,244,244,0.97)";
+      c.fillRect(x, y, width, height);
+      const accent = (npc.def.sprite && npc.def.sprite.palette && npc.def.sprite.palette.a) || "#73eff7";
+      c.fillStyle = accent;
+      c.fillRect(x, y, 3, height);
+      const tailX = Math.round(G.util.clamp(npc.x - cam.x, x + 8, x + width - 8));
+      c.fillStyle = "rgba(244,244,244,0.97)";
+      c.fillRect(tailX - 2, y + height, 5, 3);
+      c.fillRect(tailX - 1, y + height + 3, 3, 2);
+
+      c.font = `4px ${FONT_HEAD}`;
+      c.fillStyle = "#566c86";
+      c.fillText(speaker, x + 7, y + 4);
+      c.font = `9px ${FONT_BODY}`;
+      c.fillStyle = "#1a1c2c";
+      lines.forEach((line, index) => c.fillText(line, x + 7, y + 11 + index * 9));
+      c.globalAlpha = 1;
+    }
+  }
+
   function drawAbilityBar(c, p) {
     if (G.input.isTouch) return;
     const lo = G.getLoadout(G.state.formId);
@@ -533,6 +584,7 @@ G.ui = (() => {
       drawTutorial(c);
       drawAbilityBar(c, p);
     }
+    drawNpcChatter(c, cam);
 
     /* toasts (word-wrapped so long messages fit) */
     c.font = `9px ${FONT_BODY}`;
@@ -596,6 +648,7 @@ G.ui = (() => {
       c.fillText(skip, Math.round(G.W / 2 - skipW / 2), G.H - 14);
     }
     drawDialogue(c);
+    if (menuOpen && activeTab === "forms") drawFormPreviews(false);
   }
 
   /* ---------- keep touch buttons showing the right icons ---------- */
@@ -651,6 +704,13 @@ G.ui = (() => {
   let activeTab = "forms";
   let atlasView = "world";
   let atlasSelectedId = null;
+  let formLabView = "roster";
+  let labFormId = null;
+  let labSlot = 1;
+  let labAbilityId = null;
+  let labAbilityFilter = "boosted";
+  let labSkinId = "classic";
+  let lastFormPreviewDraw = 0;
 
   function controllerMenuElements() {
     return Array.from(menuEl.querySelectorAll(
@@ -804,11 +864,9 @@ G.ui = (() => {
     const previousControllerElements = controllerMenuElements();
     const previousControllerIndex = previousControllerElements.indexOf(controllerFocusedElement);
     const tabs = [
-      ["forms", "Forms"],
-      ["style", "Style"],
+      ["forms", "Form Lab"],
       ["quests", "Quests"],
       ["map", "Map"],
-      ["mix", "Mix"],
     ];
     if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
     if (G.gauntletUnlocked && G.gauntletUnlocked()) tabs.push(["gauntlet", "Gauntlet"]);
@@ -821,13 +879,11 @@ G.ui = (() => {
       <div class="menu-tabs">${tabs.map(([id, label]) =>
         `<button data-tab="${id}" class="${activeTab === id ? "active" : ""}">${label}</button>`).join("")}
       </div>
-      <div class="menu-body ${activeTab === "map" ? "atlas-body" : ""}">`;
+      <div class="menu-body ${activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : ""}">`;
 
-    if (activeTab === "forms") html += buildFormsTab();
-    if (activeTab === "style") html += buildCostumesTab();
+    if (activeTab === "forms") html += buildFormLab();
     if (activeTab === "quests") html += buildQuestsTab();
     if (activeTab === "map") html += buildWayfinderTab();
-    if (activeTab === "mix") html += buildMixTab();
     if (activeTab === "town") html += buildTownTab();
     if (activeTab === "gauntlet") html += buildGauntletTab();
     if (activeTab === "board") html += buildHeroBoardTab();
@@ -842,10 +898,46 @@ G.ui = (() => {
     menuEl.innerHTML = html;
 
     if (activeTab === "map" && atlasView === "local") drawLocalAtlas();
+    if (activeTab === "forms") drawFormPreviews(true);
 
     // wire up clicks
     menuEl.querySelectorAll("[data-tab]").forEach((b) =>
       b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); menuEl.scrollTop = 0; }));
+    menuEl.querySelectorAll("[data-formlab-view]").forEach((button) =>
+      button.addEventListener("click", () => {
+        formLabView = button.dataset.formlabView;
+        labFormId = G.formUnlocked(labFormId) ? labFormId : G.state.formId;
+        labSkinId = G.selectedFormSkin(labFormId)?.id || "classic";
+        buildMenu();
+      }));
+    menuEl.querySelectorAll("[data-form-select]").forEach((button) =>
+      button.addEventListener("click", () => {
+        labFormId = button.dataset.formSelect;
+        labSkinId = G.selectedFormSkin(labFormId)?.id || "classic";
+        labAbilityId = null;
+        buildMenu();
+      }));
+    menuEl.querySelectorAll("[data-loadout-slot]").forEach((button) =>
+      button.addEventListener("click", () => { labSlot = Number(button.dataset.loadoutSlot); buildMenu(); }));
+    menuEl.querySelectorAll("[data-ability-filter]").forEach((button) =>
+      button.addEventListener("click", () => { labAbilityFilter = button.dataset.abilityFilter; buildMenu(); }));
+    menuEl.querySelectorAll("[data-ability-select]").forEach((button) =>
+      button.addEventListener("click", () => { labAbilityId = button.dataset.abilitySelect; buildMenu(); }));
+    const equipAbility = menuEl.querySelector('[data-act="equip-ability"]');
+    if (equipAbility) equipAbility.addEventListener("click", () => {
+      const lo = G.getLoadout(labFormId);
+      lo[labSlot] = labAbilityId;
+      btnCache = "";
+      G.saveGame();
+      buildMenu();
+    });
+    menuEl.querySelectorAll("[data-skin-preview]").forEach((button) =>
+      button.addEventListener("click", () => { labSkinId = button.dataset.skinPreview; buildMenu(); }));
+    const equipSkin = menuEl.querySelector('[data-act="equip-skin"]');
+    if (equipSkin) equipSkin.addEventListener("click", () => {
+      G.selectFormSkin(labFormId, labSkinId);
+      buildMenu();
+    });
     menuEl.querySelectorAll("[data-atlas-view]").forEach((button) =>
       button.addEventListener("click", () => {
         atlasView = button.dataset.atlasView;
@@ -938,6 +1030,199 @@ G.ui = (() => {
         focusControllerDefault();
       }
     }
+  }
+
+  function labSelectedForm(requireUnlocked) {
+    if (!labFormId || !G.forms[labFormId] || G.forms[labFormId].invalid ||
+      (requireUnlocked && !G.formUnlocked(labFormId))) labFormId = G.state.formId;
+    return G.forms[labFormId];
+  }
+
+  function previewCanvas(formId, skinId, classes, label, locked, useDye) {
+    return `<canvas width="160" height="132" class="form-preview ${classes || ""}"
+      data-form-preview="${formId}" data-preview-skin="${skinId || "classic"}"
+      ${locked ? `data-preview-locked="true"` : ""} ${useDye ? `data-preview-dye="true"` : ""}
+      role="img" aria-label="${escapeHtml(label)}"></canvas>`;
+  }
+
+  function buildFormLab() {
+    const labels = { roster: "Roster", loadout: "Loadout", skins: "Skins" };
+    let html = `<div class="form-lab-header">
+      <div><h2>⚗ FORM LAB</h2><p>Choose a form, build its moves, and shape its look.</p></div>
+      <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
+        `<button data-formlab-view="${id}" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}</div>
+    </div>`;
+    if (formLabView === "loadout") return html + buildLoadoutLab();
+    if (formLabView === "skins") return html + buildSkinsLab();
+    return html + buildRosterLab();
+  }
+
+  function buildRosterLab() {
+    const selected = labSelectedForm(false);
+    const tiles = G.formOrder.filter((id) => G.forms[id] && !G.forms[id].invalid).map((id) => {
+      const form = G.forms[id];
+      const unlocked = G.formUnlocked(id);
+      const ready = !unlocked && G.formReady(id);
+      const current = id === G.state.formId;
+      const skin = unlocked && G.selectedFormSkin(id);
+      return `<button class="form-portrait-tile ${labFormId === id ? "selected" : ""} ${current ? "current" : ""} ${ready ? "ready" : ""} ${unlocked ? "" : "locked"}"
+        data-form-select="${id}" aria-label="${unlocked ? escapeHtml(form.name) : "Locked form"}">
+        ${previewCanvas(id, skin ? skin.id : "classic", "tile-preview", unlocked ? form.name : "Unknown form silhouette", !unlocked, !skin)}
+        <span class="portrait-name">${unlocked || ready ? `${form.icon} ${escapeHtml(form.name)}` : "❔ UNKNOWN"}</span>
+        <span class="portrait-status">${current ? "CURRENT" : ready ? "READY" : unlocked ? `LV ${G.formLevel(id)}` : "LOCKED"}</span>
+      </button>`;
+    }).join("");
+    const unlocked = G.formUnlocked(selected.id);
+    const ready = !unlocked && G.formReady(selected.id);
+    const current = selected.id === G.state.formId;
+    const completed = (selected.quests || []).filter((quest) => G.questsDone.includes(quest.id)).length;
+    const skin = unlocked && G.selectedFormSkin(selected.id);
+    return `<div class="form-roster-grid">${tiles}</div>
+      <section class="form-stage ${unlocked ? "" : "locked"}">
+        <div class="form-stage-art">${previewCanvas(selected.id, skin ? skin.id : "classic", "hero-preview", unlocked ? selected.name : "Unknown form", !unlocked, !skin)}</div>
+        <div class="form-stage-copy">
+          <div class="eyebrow">${current ? "CURRENT FORM" : ready ? "CHALLENGE COMPLETE" : unlocked ? `FORM LEVEL ${G.formLevel(selected.id)}` : "UNDISCOVERED FORM"}</div>
+          <h2>${unlocked || ready ? `${selected.icon} ${escapeHtml(selected.name)}` : "❔ UNKNOWN FORM"}</h2>
+          <p class="lab-tagline">${unlocked || ready ? escapeHtml(selected.tagline) : "A new way of moving through the world is waiting to be understood."}</p>
+          ${unlocked ? `<div class="lab-stat-row"><span>❤️ ${selected.hearts}</span><span>👟 ${selected.speed}</span>${dmgChip(G.abilities[selected.basic]?.type || "blunt")}</div>
+            <div class="passive-rule"><strong>◆ ${escapeHtml(selected.passive.name)}</strong><span>${escapeHtml(selected.passive.description)}</span></div>
+            <div class="mastery-track"><span>MASTERY</span><span class="mastery-pips">${selected.quests.map((quest) => `<i class="${G.questsDone.includes(quest.id) ? "done" : ""}"></i>`).join("")}</span><span>${completed}/${selected.quests.length}</span></div>
+            <div class="lab-actions"><button data-become="${selected.id}" ${current ? "disabled" : ""}>${current ? "Equipped" : `Become ${escapeHtml(selected.name)}`}</button>
+            <button data-formlab-view="loadout">Build moves</button><button data-formlab-view="skins">View skins</button></div>`
+          : `<div class="unlock-panel">${escapeHtml(G.unlockHint(selected.id))}</div>${ready ? `<button data-claim="${selected.id}">Claim ${escapeHtml(selected.name)}</button>` : ""}`}
+        </div>
+      </section>`;
+  }
+
+  function abilityMatchesFilter(form, ability, filter) {
+    if (filter === "all") return true;
+    if (filter === "boosted") return !!(G.passives && G.passives.formMatches(form, ability));
+    if (["sharp", "blunt", "light", "dark"].includes(filter)) return ability.type === filter;
+    return ability.style === filter;
+  }
+
+  function buildLoadoutLab() {
+    const form = labSelectedForm(true);
+    const lo = G.getLoadout(form.id);
+    const slots = [0, 1, 2].filter((slot) => slot === 0 || slot <= form.slots);
+    if (!slots.includes(labSlot) || labSlot === 0) labSlot = Math.min(1, form.slots);
+    const filters = [["boosted", "★ Boosted"], ["all", "All"], ["sharp", "Sharp"], ["blunt", "Blunt"],
+      ["light", "Light"], ["dark", "Dark"], ["melee", "Melee"], ["projectile", "Ranged"], ["area", "Area"]];
+    const all = G.availableAbilities();
+    const visible = all.filter((id) => abilityMatchesFilter(form, G.abilities[id], labAbilityFilter));
+    if (!visible.length) labAbilityFilter = "all";
+    const filtered = all.filter((id) => abilityMatchesFilter(form, G.abilities[id], labAbilityFilter));
+    if (!labAbilityId || !filtered.includes(labAbilityId)) labAbilityId = lo[labSlot] && filtered.includes(lo[labSlot]) ? lo[labSlot] : filtered[0];
+    const selected = G.abilities[labAbilityId];
+    const source = selected && G.forms[selected.nativeForm];
+    const synergy = selected && G.passives ? G.passives.synergyText(form, selected) : "";
+    const skin = G.selectedFormSkin(form.id);
+    return `<div class="lab-form-switcher">${G.unlockedForms().map((id) =>
+        `<button data-form-select="${id}" class="${id === form.id ? "active" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span></button>`).join("")}</div>
+      <div class="loadout-workbench">
+        <section class="loadout-form-panel">
+          <div class="eyebrow">BUILDING FOR</div><h2>${form.icon} ${escapeHtml(form.name)}</h2>
+          ${previewCanvas(form.id, skin ? skin.id : "classic", "loadout-preview", form.name, false, !skin)}
+          <div class="passive-rule"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></div>
+        </section>
+        <section class="loadout-slots" aria-label="Ability slots">${slots.map((slot) => {
+          const ability = G.abilities[lo[slot]];
+          const match = ability && G.passives && G.passives.formMatches(form, ability);
+          return `<button class="ability-slot ${slot === labSlot ? "selected" : ""} ${slot === 0 ? "fixed" : ""}" ${slot === 0 ? "disabled" : `data-loadout-slot="${slot}"`}>
+            <span class="slot-letter">${["A", "B", "C"][slot]}</span><span class="slot-icon">${ability?.icon || "＋"}</span>
+            <span class="slot-copy"><strong>${escapeHtml(ability?.name || "Empty")}</strong><small>${slot === 0 ? "FORM BASIC · FIXED" : match ? "★ PASSIVE BOOSTED" : "OPEN MIX SLOT"}</small></span>
+          </button>`;
+        }).join("")}</section>
+      </div>
+      <section class="ability-tray">
+        <div class="tray-heading"><div><span class="eyebrow">ABILITY TRAY</span><h2>Choose a move for slot ${["A", "B", "C"][labSlot]}</h2></div>
+          <div class="ability-filters">${filters.map(([id, label]) => `<button data-ability-filter="${id}" class="${labAbilityFilter === id ? "active" : ""}">${label}</button>`).join("")}</div></div>
+        <div class="ability-card-grid">${filtered.map((id) => {
+          const ability = G.abilities[id];
+          const origin = G.forms[ability.nativeForm];
+          const match = G.passives && G.passives.formMatches(form, ability);
+          return `<button data-ability-select="${id}" class="ability-card ${id === labAbilityId ? "selected" : ""} ${match ? "boosted" : ""}">
+            <span class="ability-card-icon">${ability.icon}</span><strong>${escapeHtml(ability.name)}</strong>
+            <span>${dmgChip(ability.type)} <small>${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}</small></span>
+            <small>${origin ? `${origin.icon} ${escapeHtml(origin.name)}` : "Discovered move"}${match ? " · ★" : ""}</small>
+          </button>`;
+        }).join("")}</div>
+        ${selected ? `<div class="ability-inspector">
+          <div class="ability-inspector-icon">${selected.icon}</div><div><span class="eyebrow">${source ? `${source.icon} ${escapeHtml(source.name)} MOVE` : "DISCOVERED MOVE"}</span>
+          <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${selected.mana} mana` : " · no mana"} · ${selected.cooldown}s recovery</p>
+          <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(form.passive.name)} will not modify it.`}</div></div>
+          <button data-act="equip-ability" ${lo[labSlot] === selected.id ? "disabled" : ""}>${lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
+        </div>` : `<div class="empty-tray">No moves match this filter yet.</div>`}
+      </section>`;
+  }
+
+  function buildSkinsLab() {
+    const form = labSelectedForm(true);
+    const signature = G.skinForForm(form.id);
+    const owned = signature && G.skinUnlocked(signature.id);
+    const equipped = G.selectedFormSkin(form.id);
+    if (labSkinId !== "classic" && (!signature || labSkinId !== signature.id)) labSkinId = equipped?.id || "classic";
+    const previewSkin = labSkinId === signature?.id ? signature : null;
+    const dyes = G.ensureCostumes();
+    return `<div class="lab-form-switcher">${G.unlockedForms().map((id) =>
+        `<button data-form-select="${id}" class="${id === form.id ? "active" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span></button>`).join("")}</div>
+      <section class="skin-stage">
+        <div class="skin-spotlight">${previewCanvas(form.id, previewSkin?.id || "classic", "skin-hero-preview", previewSkin?.name || `${form.name} Classic`, false, !previewSkin)}
+          <span>COSMETIC ONLY · STATS UNCHANGED</span></div>
+        <div class="skin-stage-copy"><span class="eyebrow">${previewSkin ? "SIGNATURE SKIN" : dyes.selected === "classic" ? "ORIGINAL LOOK" : "CLASSIC + GLOBAL DYE"}</span>
+          <h2>${previewSkin ? `${previewSkin.icon} ${escapeHtml(previewSkin.name)}` : `✨ ${escapeHtml(form.name)} Classic`}</h2>
+          <p>${previewSkin ? escapeHtml(previewSkin.tagline) : `The original ${escapeHtml(form.name)} silhouette${dyes.selected === "classic" ? " and colors." : ` wearing the ${escapeHtml(G.costumeById(dyes.selected).name)} dye.`}`}</p>
+          ${previewSkin && !owned ? `<div class="unlock-panel">🔒 Reach ${escapeHtml(form.name)} level ${previewSkin.unlockLevel}. Current level: ${G.formLevel(form.id)}.</div>` : ""}
+          <button data-act="equip-skin" ${previewSkin && !owned || (previewSkin ? equipped?.id === previewSkin.id : !equipped) ? "disabled" : ""}>${previewSkin && !owned ? "Mastery required" : previewSkin ? equipped?.id === previewSkin.id ? "Signature equipped" : "Equip signature" : !equipped ? "Classic equipped" : "Equip classic"}</button>
+        </div>
+      </section>
+      <div class="skin-tile-grid">
+        <button data-skin-preview="classic" class="skin-tile ${labSkinId === "classic" ? "selected" : ""} ${!equipped ? "equipped" : ""}">
+          ${previewCanvas(form.id, "classic", "skin-tile-preview", `${form.name} Classic`, false, true)}<strong>✨ Classic</strong><small>${dyes.selected === "classic" ? "Original colors" : G.costumeById(dyes.selected).name + " dye"}</small></button>
+        <button data-skin-preview="${signature.id}" class="skin-tile ${labSkinId === signature.id ? "selected" : ""} ${equipped?.id === signature.id ? "equipped" : ""} ${owned ? "" : "locked"}">
+          ${previewCanvas(form.id, signature.id, "skin-tile-preview", signature.name, !owned, false)}<strong>${signature.icon} ${escapeHtml(signature.name)}</strong><small>${owned ? equipped?.id === signature.id ? "EQUIPPED" : "Signature skin" : `🔒 Level ${signature.unlockLevel}`}</small></button>
+      </div>
+      <details class="dye-drawer"><summary>🎨 Global dyes <span>${escapeHtml(G.costumeById(dyes.selected).name)} selected</span></summary>
+        <p>Dyes recolor every form's Classic look. Signature skins keep their authored colors and silhouette.</p>
+        <div class="dye-grid">${G.COSTUMES.map((costume) => {
+          const unlocked = dyes.unlocked.includes(costume.id);
+          const wearing = dyes.selected === costume.id;
+          return `<button data-costume="${costume.id}" class="dye-tile ${wearing ? "selected" : ""}" ${unlocked ? "" : "disabled"}>
+            <span>${costume.swatches.map((color) => `<i style="background:${color}"></i>`).join("")}</span><strong>${costume.icon} ${escapeHtml(costume.name)}</strong><small>${unlocked ? wearing ? "SELECTED" : "Apply dye" : `🔒 ${escapeHtml(costume.hint)}`}</small></button>`;
+        }).join("")}</div>
+      </details>`;
+  }
+
+  function drawFormPreviews(force) {
+    const now = Date.now();
+    if (!force && now - lastFormPreviewDraw < 160) return;
+    lastFormPreviewDraw = now;
+    const frame = Math.floor(now / 360) % 2;
+    menuEl.querySelectorAll("canvas[data-form-preview]").forEach((canvas) => {
+      const form = G.forms[canvas.dataset.formPreview];
+      if (!form) return;
+      let sprite = G.formPreviewSprite(form.id, canvas.dataset.previewSkin);
+      if (canvas.dataset.previewDye === "true" && canvas.dataset.previewSkin === "classic") sprite = G.costumedSprite(form.sprite);
+      const c = canvas.getContext("2d");
+      c.imageSmoothingEnabled = false;
+      const w = canvas.width, h = canvas.height;
+      const skin = canvas.dataset.previewSkin !== "classic" && G.skinById(canvas.dataset.previewSkin);
+      const accent = skin ? skin.colors[3] : (form.sprite.palette.a || form.sprite.palette.w || "#73eff7");
+      const gradient = c.createLinearGradient(0, 0, 0, h);
+      gradient.addColorStop(0, "#20263b"); gradient.addColorStop(1, "#111522");
+      c.fillStyle = gradient; c.fillRect(0, 0, w, h);
+      c.globalAlpha = 0.12; c.fillStyle = accent; c.beginPath(); c.arc(w / 2, h * 0.54, w * 0.34, 0, Math.PI * 2); c.fill();
+      c.globalAlpha = 0.32; c.fillStyle = accent; c.fillRect(w * 0.23, h - 20, w * 0.54, 2);
+      c.globalAlpha = 1;
+      const made = G.makeSprite(sprite);
+      const scale = Math.max(2, Math.min(7, Math.floor(Math.min((w - 24) / (made.w + 2), (h - 28) / (made.h + 2)))));
+      G.drawSprite(c, sprite, frame, w / 2, h - 19, false, scale);
+      if (canvas.dataset.previewLocked === "true") {
+        c.globalCompositeOperation = "source-atop"; c.fillStyle = "#252a40"; c.fillRect(0, 0, w, h); c.globalCompositeOperation = "source-over";
+        c.fillStyle = "rgba(17,21,34,0.56)"; c.fillRect(0, 0, w, h);
+        c.font = '28px "Press Start 2P", monospace'; c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#94b0c2"; c.fillText("?", w / 2, h / 2);
+      }
+    });
   }
 
   function buildCostumesTab() {

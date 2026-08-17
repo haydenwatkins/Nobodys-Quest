@@ -25,7 +25,8 @@ G.sfx = { play() {} };
 G.ui = { toast() {}, banner(title, text) { banners.push({ title, text }); } };
 G.saveGame = () => { saved++; };
 G.state = {
-  costumeId: "classic", costumesUnlocked: ["classic"], items: [], opened: [], shake: 0, time: 0,
+  costumeId: "classic", costumesUnlocked: ["classic"], skinsUnlocked: [], skinByForm: {},
+  items: [], opened: [], shake: 0, time: 0,
 };
 run("js/engine/costumes.js");
 
@@ -33,6 +34,28 @@ assert.equal(G.COSTUMES.length, 11, "the wardrobe should launch with a meaningfu
 assert.deepEqual(Array.from(G.ensureCostumes().unlocked), ["classic"]);
 assert.ok(G.COSTUMES.every((costume) => !["damage", "health", "hearts", "speed", "mana"].some((key) => key in costume)),
   "costumes must remain mechanically neutral");
+assert.equal(G.FORM_SKINS.length, 24, "every launch form should receive a signature skin");
+assert.equal(new Set(G.FORM_SKINS.map((skin) => skin.formId)).size, 24,
+  "signature skins should belong to distinct forms rather than being global palette swaps");
+assert.ok(G.FORM_SKINS.every((skin) => skin.unlockLevel === 3), "skin mastery should use one legible rule");
+assert.ok(G.FORM_SKINS.every((skin) => !["damage", "health", "hearts", "speed", "mana"].some((key) => key in skin)),
+  "signature skins must remain mechanically neutral");
+
+const nobodySkin = G.skinById("cardboardHero");
+const tinyNobody = { palette: { k: "#1a1c2c", w: "#f4f4f4" }, frames: [[".kk.", "kwwk", ".kk."]] };
+const signature = G.signatureSprite(tinyNobody, nobodySkin);
+assert.notEqual(signature, tinyNobody);
+assert.notDeepEqual(Array.from(signature.frames[0]), Array.from(tinyNobody.frames[0]),
+  "a signature skin should rebuild the frame silhouette, not merely remap colors");
+assert.ok(signature.frames[0].length > tinyNobody.frames[0].length, "signature silhouettes need room for authored accessories");
+assert.equal(G.signatureSprite(tinyNobody, nobodySkin), signature, "signature sprites should be cached");
+
+const normalizedSkins = G.normalizeSkins(["cardboardHero", "fake", "cardboardHero"], {
+  nobody: "cardboardHero", rat: "cardboardHero", wizard: "fake",
+});
+assert.deepEqual(Array.from(normalizedSkins.unlocked), ["cardboardHero"]);
+assert.deepEqual(Object.assign({}, normalizedSkins.equipped), { nobody: "cardboardHero" },
+  "save migration should reject skins equipped to the wrong form");
 
 found = 2;
 let unlocked = G.checkCostumeUnlocks(false);
@@ -84,7 +107,7 @@ assert.equal(normalized.selected, "classic");
 assert.ok(saved > 0, "wardrobe progress should be saved as it grows");
 
 G.state = {
-  costumeId: "classic", costumesUnlocked: ["classic"], items: [],
+  costumeId: "classic", costumesUnlocked: ["classic"], skinsUnlocked: [], skinByForm: {}, items: [],
   opened: ["starfallRuins:6,4"], shake: 0, time: 0,
 };
 G.checkCostumeUnlocks(true);
@@ -93,7 +116,9 @@ assert.ok(G.costumeUnlocked("starstrider"), "legacy saves that opened the old co
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.ok(index.indexOf("js/engine/costumes.js") < index.indexOf("js/engine/main.js"));
 const ui = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
-for (const text of ["Style", "Wardrobe", "Cosmetic only", "Wear on every form"])
-  assert.ok(ui.includes(text), `wardrobe UI should include '${text}'`);
+for (const text of ["Form Lab", "Roster", "Loadout", "Skins", "ABILITY TRAY", "Global dyes"])
+  assert.ok(ui.includes(text), `graphical form UI should include '${text}'`);
+assert.ok(!ui.includes('["style", "Style"]'), "the old standalone Style list should leave the main navigation");
+assert.ok(!ui.includes('["mix", "Mix"]'), "the old dropdown Mix tab should leave the main navigation");
 
 console.log("costume tests passed");
