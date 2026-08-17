@@ -118,6 +118,89 @@ G.world = (() => {
     return (!cell.stars || G.state.stars >= cell.stars) && portalMasteryMet(cell) && portalMarkMet(cell);
   }
 
+  function portalDestinationName(cell) {
+    const destination = cell.portal && G.maps[cell.portal.map];
+    return (destination && destination.name) || "Sealed Passage";
+  }
+
+  function portalMasteryMissing(cell) {
+    if (!cell.mastery) return [];
+    const end = cell.mastery.before ? G.formOrder.indexOf(cell.mastery.before) : G.formOrder.length;
+    return G.formOrder.slice(0, end < 0 ? G.formOrder.length : end).filter((id) => {
+      const form = G.forms[id];
+      return form && !form.invalid && G.formLevel(id) < cell.mastery.level;
+    });
+  }
+
+  function portalMarkDetails(id) {
+    const marks = Object.values(G.WORLDWAKE_MARKS || {});
+    return marks.find((mark) => mark.id === id) || null;
+  }
+
+  function readableList(parts) {
+    if (parts.length < 2) return parts[0] || "";
+    if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+    return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+  }
+
+  // Describe every unmet condition at once. Besides being more helpful than
+  // revealing one lock at a time, keeping this pure makes progression copy
+  // easy to regression-test as new dungeon gates are added.
+  function portalBlockReason(cell) {
+    if (!cell || !cell.portal || portalOpen(cell)) return null;
+    const requirements = [];
+    const need = cell.stars || 0;
+    const held = G.state.stars || 0;
+    if (held < need) {
+      const remaining = need - held;
+      requirements.push(
+        `Earn ${remaining} more ${remaining === 1 ? "star" : "stars"} by finishing form quests ` +
+        `(${need} required; ${held} held).`
+      );
+    }
+
+    const missing = portalMasteryMissing(cell);
+    if (missing.length) {
+      const shown = missing.slice(0, 4).map((id) => {
+        const form = G.forms[id];
+        return `${form.name || id} (level ${G.formLevel(id)})`;
+      });
+      if (missing.length > shown.length) shown.push(`${missing.length - shown.length} more forms`);
+      requirements.push(
+        `Raise ${readableList(shown)} to level ${cell.mastery.level}. ` +
+        `Finish those forms' quests in the Forms menu.`
+      );
+    }
+
+    if (!portalMarkMet(cell)) {
+      const mark = portalMarkDetails(cell.mark);
+      const markName = mark ? mark.name : `${cell.mark} mark`;
+      const region = mark && G.maps[mark.region];
+      const where = region && region.name ? ` in ${region.name}` : "";
+      requirements.push(`Purify the Worldbearer${where} to awaken the ${markName}.`);
+    }
+
+    return {
+      title: `🔒 ${portalDestinationName(cell).toUpperCase()}`,
+      text: requirements.join(" "),
+    };
+  }
+
+  function blockedPortalAhead(player, move, currentCell) {
+    if (currentCell.portal && !portalOpen(currentCell)) return currentCell;
+    const length = Math.hypot(move.x, move.y);
+    if (length < 0.08) return null;
+    // A locked portal is solid, so the player's centre can never reach its
+    // tile. Probe just beyond the player's collision box while they press
+    // against it and treat that contact as the entrance interaction.
+    const reach = G.TILE * 0.75;
+    const ahead = cellAt(
+      player.x + move.x / length * reach,
+      player.y + move.y / length * reach
+    );
+    return ahead.portal && !portalOpen(ahead) ? ahead : null;
+  }
+
   /* ---------- loading a map ---------- */
   function load(mapId, spawn, options) {
     const def = G.maps[mapId];
@@ -198,6 +281,7 @@ G.world = (() => {
     s.safeLights = [];
     s.bossHazards = [];
     s.bossCutscene = null;
+    s.lastBlockedPortal = null;
     // A quick world-only fade makes doors feel intentional without delaying
     // control or covering the HTML HUD. Reduced-motion players skip it.
     s.mapReveal = G.reducedMotion || (options && options.seamless) ? 0 : 0.32;
@@ -232,7 +316,7 @@ G.world = (() => {
 
   function solid(px, py) {
     const cell = cellAt(px, py);
-    // Doors: solid while locked, walkable once you have the stars —
+    // Doors: solid while locked, walkable once you meet every requirement —
     // even if the door is drawn on a normally-solid tile like a tree.
     if (cell.portal) return !portalOpen(cell);
     if (SOLID[cell.tile]) return true;
@@ -277,13 +361,10 @@ G.world = (() => {
   }
 
   /* ---------- things you step on ---------- */
-  let doorMsgCooldown = 0;
-
   function checkTriggers(dt) {
     const s = G.state;
     const p = s.player;
     const cell = cellAt(p.x, p.y);
-    doorMsgCooldown = Math.max(0, doorMsgCooldown - dt);
     s.portalGrace = Math.max(0, (s.portalGrace || 0) - dt);
     const move = G.input.vec;
     const travelDirection = Math.abs(move.x) + Math.abs(move.y) > 0.08 ? move : p.dir;
@@ -338,7 +419,23 @@ G.world = (() => {
       s.lastRest = null;
     }
 
-    // Doors / portals
+    // Doors / portals. Locked portals are solid, so detect the entrance just
+    // ahead when the player presses against it instead of waiting for the
+    // impossible event of their centre reaching the portal tile.
+    const blockedPortal = blockedPortalAhead(p, move, cell);
+    if (blockedPortal) {
+      if (s.lastBlockedPortal !== blockedPortal) {
+        s.lastBlockedPortal = blockedPortal;
+        const reason = portalBlockReason(blockedPortal);
+        if (reason) {
+          if (G.ui.dialogue) G.ui.dialogue(reason.title, reason.text, { accent: "#ffcd75" });
+          else G.ui.toast(`${reason.title} — ${reason.text}`, 5);
+        }
+      }
+    } else {
+      s.lastBlockedPortal = null;
+    }
+
     if (cell.portal) {
       const need = cell.stars || 0;
       const masteryReady = portalMasteryMet(cell);
@@ -352,15 +449,6 @@ G.world = (() => {
           load(cell.portal.map, target);
         G.saveGame();
         return;
-      } else if (s.stars < need && doorMsgCooldown <= 0) {
-        doorMsgCooldown = 2;
-        G.ui.toast(`🔒 This door needs ${need} ⭐ — you have ${s.stars}. Finish quests to earn stars!`, 3);
-      } else if (!masteryReady && doorMsgCooldown <= 0) {
-        doorMsgCooldown = 2;
-        G.ui.toast(`🔒 Final trial: every earlier form must reach level ${cell.mastery.level}.`, 3);
-      } else if (!markReady && doorMsgCooldown <= 0) {
-        doorMsgCooldown = 2;
-        G.ui.toast(`A World Path is sleeping. Awaken the ${cell.mark} mark first.`, 3);
       }
     }
 
@@ -1274,5 +1362,5 @@ G.world = (() => {
     for (const ch of s.chests) drawChest(ctx, ch, time);
   }
 
-  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn };
+  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, portalBlockReason };
 })();
