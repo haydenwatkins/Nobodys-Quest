@@ -2,8 +2,8 @@
    WAYFINDER ATLAS — orientation, discovery, and staged fast travel.
 
    The world map is always available. Regional posts teach fast travel early;
-   the Whistle later makes those routes available from any safe area. Trials
-   and dens reveal their names only after entry.
+   the Whistle later keeps those routes available even during overworld
+   combat. Closed trials and dens reveal their names only after entry.
    ============================================================ */
 
 "use strict";
@@ -254,7 +254,7 @@ G.checkWayfinderMilestones = function (quiet) {
     if (!quiet) {
       G.sfx.play("unlock");
       G.state.shake = Math.max(G.state.shake, 0.35);
-      G.ui.banner("🎵 WAYFINDER WHISTLE", "Travel to awakened posts from anywhere safe");
+      G.ui.banner("🎵 WAYFINDER WHISTLE", "Travel to awakened posts, even under attack");
     }
   }
 
@@ -309,7 +309,12 @@ G.wayfinderTravelUnlocked = function () {
 G.canWayfinderTravel = function () {
   if (!G.state || !G.wayfinderTravelUnlocked()) return false;
   if (G.state.gauntletRun || G.state.knockout || G.state.bossCutscene) return false;
-  if (G.state.mapDef && G.state.mapDef.bossTrial) return false;
+  const trial = G.state.mapDef && G.state.mapDef.bossTrial;
+  // Worldbearers fight in the shared overworld, so their regions remain part
+  // of the travel network after engagement. Instanced trials stay sealed to
+  // prevent skipping a guardian, preserving a damaged boss, or claiming a
+  // reward without completing the arena.
+  if (trial && !trial.worldBoss) return false;
   return G.nearWayfinderPost() || (G.state.items || []).includes("wayfinder-whistle");
 };
 
@@ -317,11 +322,12 @@ G.wayfinderTravelReason = function () {
   if (!G.state) return "The route is unavailable.";
   if (G.state.gauntletRun) return "Finish or leave the gauntlet before traveling.";
   if (G.state.knockout || G.state.bossCutscene) return "Finish this story moment before traveling.";
-  if (G.state.mapDef && G.state.mapDef.bossTrial) return "Guardian trials must be entered and exited on foot.";
+  const trial = G.state.mapDef && G.state.mapDef.bossTrial;
+  if (trial && !trial.worldBoss) return "Guardian trials must be entered and exited on foot.";
   if (!G.wayfinderTravelUnlocked()) return "Awaken a Wayfinder Post to begin traveling.";
   if (!G.nearWayfinderPost() && !(G.state.items || []).includes("wayfinder-whistle"))
     return "Stand beside this region's Wayfinder Post to travel.";
-  return "Choose an awakened post.";
+  return "Choose an awakened post — combat does not close the route.";
 };
 
 G.wayfinderLandmarkTravelUnlocked = function () {

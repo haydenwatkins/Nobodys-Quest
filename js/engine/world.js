@@ -274,6 +274,7 @@ G.world = (() => {
     s.chests = chests;
     s.npcs = npcs;
     s.portalKeepouts = portalKeepouts;
+    s.campFenceKeepouts = campFenceKeepouts(def.fences);
     s.wayfinderPost = G.wayfinderPostForMap ? G.wayfinderPostForMap(mapId, grid) : null;
     s.wildlife = G.makeWildlife ? G.makeWildlife(mapId, grid, w, h, spawn || def.playerStart) : [];
     s.restorationDetails = G.makeRestorationDetails ? G.makeRestorationDetails(mapId, grid, w, h) : [];
@@ -327,13 +328,51 @@ G.world = (() => {
     return false;
   }
 
+  function campFenceKeepouts(fences) {
+    return (fences || []).filter((fence) => fence.style === "camp").map((fence) => {
+      const startX = fence.x * G.TILE;
+      const startY = fence.y * G.TILE;
+      const span = Math.max(1, Math.floor(fence.length || 1)) * G.TILE;
+      // Match the visible rails and posts closely. These are creature and
+      // projectile keepouts only: Nobody can walk freely through the camp.
+      return fence.dir === "v"
+        ? { left: startX + 4, right: startX + 14, top: startY - 3, bottom: startY + span + 4 }
+        : { left: startX - 3, right: startX + span + 4, top: startY + 5, bottom: startY + 20 };
+    });
+  }
+
+  function segmentHitsKeepout(x1, y1, x2, y2, keepout, padding) {
+    const pad = padding || 0;
+    const left = keepout.left - pad, right = keepout.right + pad;
+    const top = keepout.top - pad, bottom = keepout.bottom + pad;
+    const dx = x2 - x1, dy = y2 - y1;
+    let near = 0, far = 1;
+    for (const [origin, delta, low, high] of [[x1, dx, left, right], [y1, dy, top, bottom]]) {
+      if (Math.abs(delta) < 0.0001) {
+        if (origin < low || origin > high) return false;
+        continue;
+      }
+      let a = (low - origin) / delta;
+      let b = (high - origin) / delta;
+      if (a > b) [a, b] = [b, a];
+      near = Math.max(near, a);
+      far = Math.min(far, b);
+      if (near > far) return false;
+    }
+    return true;
+  }
+
   // Water stops feet, not magic, arrows, cards, or enemy shots. Open portals
   // remain transparent to projectiles just as they were before; true terrain
   // barriers and locked doors still stop them.
-  function blocksProjectile(px, py) {
+  function blocksProjectile(px, py, fromX, fromY, radius) {
     const cell = cellAt(px, py);
     if (cell.portal) return !portalOpen(cell);
-    return cell.tile !== "water" && !!SOLID[cell.tile];
+    if (cell.tile !== "water" && !!SOLID[cell.tile]) return true;
+    const startX = Number.isFinite(fromX) ? fromX : px;
+    const startY = Number.isFinite(fromY) ? fromY : py;
+    return (G.state.campFenceKeepouts || []).some((keepout) =>
+      segmentHitsKeepout(startX, startY, px, py, keepout, radius));
   }
 
   function isSafeSpawn(px, py) {
@@ -355,10 +394,18 @@ G.world = (() => {
         G.util.dist(x, y, portal.x, portal.y) < clearance);
     }
     function blocked(x, y) {
-      return (
+      const terrain = (
         solid(x - hw, y) || solid(x + hw, y) ||
         solid(x - hw, y - bh) || solid(x + hw, y - bh)
       );
+      if (terrain) return true;
+      // Camp rails keep ordinary creatures out without becoming another wall
+      // for the player. Bosses deliberately ignore them and can invade the
+      // refuge, so the fence cannot be used to trivialize a Worldbearer.
+      if (!e.def || e.def.miniboss) return false;
+      return (G.state.campFenceKeepouts || []).some((keepout) =>
+        x + hw >= keepout.left && x - hw <= keepout.right &&
+        y >= keepout.top && y - bh <= keepout.bottom);
     }
     if (dx !== 0 && !bossExitBlocked(e.x + dx, e.y) && !blocked(e.x + dx, e.y)) e.x += dx;
     if (dy !== 0 && !bossExitBlocked(e.x, e.y + dy) && !blocked(e.x, e.y + dy)) e.y += dy;

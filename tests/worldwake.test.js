@@ -70,6 +70,30 @@ G.state.projectiles = [testProjectile(G.TILE / 2, G.TILE / 2 + 4, true)];
 G.combat.updateProjectiles(0.016);
 assert.equal(G.state.projectiles.length, 0, "true walls should still stop projectiles");
 
+// Caravan fences are selective keepouts: they stop every shot in both
+// directions and ordinary enemies, but never trap the player or a Worldbearer.
+G.world.load("windscarCanyon");
+const fenceX = 7.5 * G.TILE;
+const fenceY = 18 * G.TILE + 3;
+const campRaider = G.makeEnemy("slime", fenceX, fenceY);
+const raiderStart = campRaider.y;
+G.world.moveBox(campRaider, 0, 12);
+assert.equal(campRaider.y, raiderStart, "ordinary enemies must stay outside the caravan fence");
+const campBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
+campBoss.x = fenceX;
+campBoss.y = fenceY;
+G.world.moveBox(campBoss, 0, 12);
+assert.equal(campBoss.y, fenceY + 12, "bosses must be able to cross the caravan fence");
+G.state.player.x = fenceX;
+G.state.player.y = fenceY;
+G.world.moveBox(G.state.player, 0, 12);
+assert.equal(G.state.player.y, fenceY + 12, "the caravan fence must not restrict player movement");
+for (const fromPlayer of [true, false]) {
+  G.state.projectiles = [testProjectile(fenceX, 18 * G.TILE + 14, fromPlayer)];
+  G.combat.updateProjectiles(0.016);
+  assert.equal(G.state.projectiles.length, 0, "camp fences should stop shots in both directions");
+}
+
 // Boss movement uses a padded exit keep-out, while players and ordinary
 // enemies retain the normal walkable portal behavior.
 G.world.load("windscarCanyon");

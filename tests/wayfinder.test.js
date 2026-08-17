@@ -118,6 +118,11 @@ assert.equal(G.wayfinderLandmarkTravelUnlocked(), true, "full exploration unlock
 G.world.load("riftbladeTrial");
 assert.equal(G.canWayfinderTravel(), false, "the Whistle cannot escape a guardian trial");
 assert.equal(G.discoveredWayfinderLandmarks().length, 1, "landmarks reveal only after entry");
+G.state.mapDef = { bossTrial: { worldBoss: true } };
+G.state.enemies = [{ dead: false, def: { miniboss: true }, bossEngaged: true }];
+G.state.projectiles = [{ fromPlayer: false }];
+assert.equal(G.canWayfinderTravel(), true, "an engaged open-world boss must not close fast travel");
+assert.match(G.wayfinderTravelReason(), /combat does not close/i);
 G.state.mapDef = G.maps.overworld;
 G.state.gauntletRun = { wins: 1 };
 assert.equal(G.canWayfinderTravel(), false, "the Whistle cannot escape a gauntlet");

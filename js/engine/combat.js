@@ -640,7 +640,7 @@ G.combat = (() => {
       } else if (pr.ricochetsMax ? pr.travel > pr.range : G.util.dist(pr.startX, pr.startY, pr.x, pr.y) > pr.range) gone = true;
 
       const hitsTerrain = G.world.blocksProjectile
-        ? G.world.blocksProjectile(pr.x, pr.y - 4)
+        ? G.world.blocksProjectile(pr.x, pr.y - 4, beforeX, beforeY - 4, pr.size)
         : G.world.solid(pr.x, pr.y - 4);
       if (!gone && hitsTerrain) {
         gone = true;
