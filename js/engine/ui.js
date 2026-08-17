@@ -1239,7 +1239,7 @@ G.ui = (() => {
     return `<section class="settings-panel" aria-label="Settings and help">
       <div class="settings-heading"><div><span class="eyebrow">SETTINGS & HELP</span><h2>Keep the adventure comfortable</h2></div></div>
       <div class="settings-grid">
-        <button data-act="music"><strong>♫ Music</strong><span>${musicOn ? "ON · adaptive regional score" : "OFF"}</span></button>
+        <button data-act="music"><strong>♫ Music</strong><span>${musicOn ? "ON · organic regional score" : "OFF"}</span></button>
         <button data-act="sound"><strong>◖ Sound effects</strong><span>${soundOn ? "ON" : "OFF"}</span></button>
         <button data-act="hd-pilot"><strong>✦ World detail</strong><span>${G.hdPilot ? "HD · 640×360" : "Original · 320×180"}</span></button>
         <button data-act="tutorial"><strong>? Tutorial</strong><span>Replay contextual hints</span></button>

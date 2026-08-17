@@ -32,18 +32,31 @@ assert.ok(world.includes("BIOME_MATERIALS") && world.includes("drawHdWorldDetail
 
 let scheduledMusic = null;
 let oscillatorCount = 0;
+let bufferSourceCount = 0;
 const audioStore = new Map();
 class FakeParam {
   setValueAtTime() {} exponentialRampToValueAtTime() {} cancelScheduledValues() {} setTargetAtTime() {}
 }
 class FakeNode {
-  constructor() { this.gain = new FakeParam(); this.frequency = new FakeParam(); this.type = "sine"; }
+  constructor() {
+    this.gain = new FakeParam(); this.frequency = new FakeParam(); this.playbackRate = new FakeParam();
+    this.type = "sine"; this.buffer = null;
+  }
   connect(next) { return next; } start() {} stop() {}
 }
+class FakeBuffer {
+  constructor(channels, length, rate) {
+    this.duration = length / rate;
+    this.channels = Array.from({ length: channels }, () => new Float32Array(length));
+  }
+  getChannelData(index) { return this.channels[index]; }
+}
 class FakeAudioContext {
-  constructor() { this.state = "running"; this.currentTime = 0; this.destination = new FakeNode(); audioContext = this; }
+  constructor() { this.state = "running"; this.currentTime = 0; this.sampleRate = 8000; this.destination = new FakeNode(); audioContext = this; }
   createGain() { return new FakeNode(); }
   createOscillator() { oscillatorCount++; return new FakeNode(); }
+  createBuffer(channels, length, rate) { return new FakeBuffer(channels, length, rate); }
+  createBufferSource() { bufferSourceCount++; return new FakeNode(); }
   resume() { this.state = "running"; }
 }
 let audioContext = null;
@@ -57,7 +70,8 @@ const audioVm = vm.createContext({ console, Math, Date,
 vm.runInContext(audio, audioVm, { filename: "audio.js" });
 audioVm.G.sfx.ensure();
 scheduledMusic();
-assert.ok(oscillatorCount >= 4, "one adaptive music beat should layer melody, bass, harmony, and rhythm");
+assert.ok(bufferSourceCount >= 4, "one adaptive music beat should layer organic melody, bass, harmony, and rhythm samples");
+assert.equal(oscillatorCount, 0, "regional music should no longer use steady synth oscillators");
 assert.equal(audioVm.G.sfx.musicTheme, "sunstep");
 audioVm.G.state.mapDef.biome = "frostbell";
 audioContext.currentTime = 1;
@@ -140,5 +154,39 @@ assert.equal(tutorialContext.G.tutorial.seen, true);
 assert.ok(saved > 0, "the quiet tutorial migration should persist immediately");
 tutorialContext.G.tutorial.replay();
 assert.ok(tutorialContext.G.tutorial.prompt(), "Help should deliberately replay tutorial hints");
+
+// Ember Ridge once placed its normal arrival on a wall and contained isolated
+// one-tile floor pockets. Every apparently walkable cell must now lead back to
+// the entrance, so neither a portal arrival nor a recovery spawn can trap Ben.
+const mapVm = vm.createContext({ console, Math, Date });
+vm.runInContext(source("js/engine/core.js") + ";this.G=G;", mapVm, { filename: "core.js" });
+vm.runInContext(source("js/engine/world.js"), mapVm, { filename: "world.js" });
+vm.runInContext(source("js/data/maps.js"), mapVm, { filename: "maps.js" });
+const ember = mapVm.G.maps.emberRidge;
+const blocked = (x, y) => {
+  const symbol = ember.tiles[y] && ember.tiles[y][x];
+  const cell = ember.legend[symbol];
+  return symbol === "#" || !!(cell && ["wall", "rock", "tree", "water"].includes(cell.tile));
+};
+assert.equal(blocked(ember.playerStart.x, ember.playerStart.y), false, "Ember Ridge must not spawn the player inside stone");
+const emberRoad = mapVm.G.maps.overworld.legend.E.portal;
+assert.equal(emberRoad.x, ember.playerStart.x);
+assert.equal(emberRoad.y, ember.playerStart.y);
+assert.equal(blocked(emberRoad.x, emberRoad.y), false, "Greenfield's Ember Ridge road must arrive on open floor");
+const queue = [[ember.playerStart.x, ember.playerStart.y]];
+const reached = new Set();
+while (queue.length) {
+  const [x, y] = queue.shift();
+  const key = `${x},${y}`;
+  if (reached.has(key) || y < 0 || y >= ember.tiles.length || x < 0 || x >= ember.tiles[y].length || blocked(x, y)) continue;
+  reached.add(key);
+  queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+}
+let walkable = 0;
+for (let y = 0; y < ember.tiles.length; y++)
+  for (let x = 0; x < ember.tiles[y].length; x++) if (!blocked(x, y)) walkable++;
+assert.equal(reached.size, walkable, "every Ember Ridge floor tile should connect to its entrance");
+assert.ok(!blocked(7, 9) && !blocked(8, 9) && !blocked(9, 11) && !blocked(10, 11),
+  "the central stone ruin should keep two-tile escape lanes");
 
 console.log("world polish tests passed");

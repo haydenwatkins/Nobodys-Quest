@@ -1,7 +1,7 @@
 /* ============================================================
-   AUDIO — tiny retro sound effects, made from pure math.
-   No sound files needed! Each effect is a little recipe:
-   a wave shape, a starting pitch, an ending pitch, and a length.
+   AUDIO — tiny retro effects plus an organic regional score.
+   Effects use quick oscillator recipes. Music uses prebuilt PCM samples that
+   model plucked strings, breath, wooden mallets, and hand percussion.
    ============================================================ */
 
 "use strict";
@@ -13,6 +13,7 @@ G.sfx = (() => {
   let nextMusicTime = 0;
   let currentTheme = "";
   let musicGain = null;
+  let musicSamples = null;
   let bossMusicUntil = 0;
   const recent = {};
   const AUDIO_KEY = "nobodys-quest-audio-v2";
@@ -40,8 +41,9 @@ G.sfx = (() => {
       if (!AC) return null;
       ctx = new AC();
       musicGain = ctx.createGain();
-      musicGain.gain.value = musicEnabled ? 0.42 : 0.0001;
+      musicGain.gain.value = musicEnabled ? 0.34 : 0.0001;
       musicGain.connect(ctx.destination);
+      musicSamples = buildMusicSamples();
     }
     if (ctx.state === "suspended") ctx.resume();
     startMusic();
@@ -54,27 +56,27 @@ G.sfx = (() => {
     musicTimer = setInterval(scheduleMusic, 80);
   }
 
-  // Each cue is an original two-bar composition. Four inexpensive synth
-  // voices create melody, harmony, bass, and percussion without downloads or
-  // licensing, and the map decides which musical identity is active.
+  // Each cue is an original two-bar composition. The third value chooses an
+  // organic lead voice; melody, harmony, bass, and percussion are all rendered
+  // from short PCM instrument samples rather than steady oscillator tones.
   const MUSIC = {
-    overworld:  [102, 55, "triangle", [0,2,4,7,4,2,9,7, 0,4,5,9,7,5,2,4], [0,0,5,0]],
-    forest:     [86,  52, "sine",     [0,3,7,10,7,3,null,5, 0,3,8,7,5,3,2,null], [0,5,3,7]],
-    marsh:      [74,  46, "triangle", [0,null,3,1,0,6,3,null, 0,1,3,8,6,3,1,null], [0,3,6,1]],
-    ember:      [118, 55, "square",   [0,7,5,3,7,10,8,7, 0,3,5,7,12,10,8,5], [0,8,5,7]],
-    coast:      [94,  58, "sine",     [0,4,7,11,9,7,4,2, 0,2,4,9,7,4,2,null], [0,7,9,4]],
-    ruins:      [78,  49, "triangle", [0,null,7,6,3,null,10,7, 0,3,6,10,8,6,3,null], [0,6,3,8]],
-    town:       [96,  65, "triangle", [0,4,7,9,7,4,2,4, 5,9,7,4,2,0,2,null], [0,5,7,4]],
-    dungeon:    [82,  44, "square",   [0,null,1,6,null,3,1,null, 0,1,6,8,6,3,1,null], [0,1,6,3]],
-    sunstep:    [108, 58, "triangle", [0,4,7,12,9,7,4,2, 5,9,12,14,12,9,7,4], [0,5,9,7]],
-    windscar:   [112, 49, "square",   [0,7,10,7,5,3,5,7, 0,3,7,12,10,7,5,3], [0,10,5,7]],
-    gardens:    [92,  62, "sine",     [0,2,7,9,11,9,7,4, 2,4,9,11,9,7,4,2], [0,7,2,9]],
-    rootdeep:   [72,  41, "triangle", [0,null,6,3,1,null,8,6, 0,1,3,6,10,8,6,null], [0,6,1,8]],
-    glasswater: [100, 60, "sine",     [0,5,9,12,16,12,9,5, 2,7,11,14,11,7,5,2], [0,9,2,7]],
-    frostbell:  [84,  69, "sine",     [0,3,7,12,10,7,3,null, 0,5,8,12,8,5,3,null], [0,8,5,10]],
-    stormspine: [122, 46, "sawtooth", [0,7,3,10,7,12,10,7, 0,3,7,15,12,10,7,3], [0,3,10,7]],
-    titan:      [68,  43, "triangle", [0,null,1,7,6,null,3,1, 0,6,10,7,6,3,1,null], [0,1,6,10]],
-    boss:       [132, 41, "sawtooth", [0,1,7,6,10,7,13,12, 0,3,7,10,15,13,12,7], [0,6,10,1]],
+    overworld:  [102, 55, "lute",     [0,2,4,7,4,2,9,7, 0,4,5,9,7,5,2,4], [0,0,5,0]],
+    forest:     [86,  52, "flute",    [0,3,7,10,7,3,null,5, 0,3,8,7,5,3,2,null], [0,5,3,7]],
+    marsh:      [74,  46, "lute",     [0,null,3,1,0,6,3,null, 0,1,3,8,6,3,1,null], [0,3,6,1]],
+    ember:      [118, 55, "dulcimer", [0,7,5,3,7,10,8,7, 0,3,5,7,12,10,8,5], [0,8,5,7]],
+    coast:      [94,  58, "flute",    [0,4,7,11,9,7,4,2, 0,2,4,9,7,4,2,null], [0,7,9,4]],
+    ruins:      [78,  49, "harp",     [0,null,7,6,3,null,10,7, 0,3,6,10,8,6,3,null], [0,6,3,8]],
+    town:       [96,  65, "lute",     [0,4,7,9,7,4,2,4, 5,9,7,4,2,0,2,null], [0,5,7,4]],
+    dungeon:    [82,  44, "dulcimer", [0,null,1,6,null,3,1,null, 0,1,6,8,6,3,1,null], [0,1,6,3]],
+    sunstep:    [108, 58, "lute",     [0,4,7,12,9,7,4,2, 5,9,12,14,12,9,7,4], [0,5,9,7]],
+    windscar:   [112, 49, "dulcimer", [0,7,10,7,5,3,5,7, 0,3,7,12,10,7,5,3], [0,10,5,7]],
+    gardens:    [92,  62, "flute",    [0,2,7,9,11,9,7,4, 2,4,9,11,9,7,4,2], [0,7,2,9]],
+    rootdeep:   [72,  41, "harp",     [0,null,6,3,1,null,8,6, 0,1,3,6,10,8,6,null], [0,6,1,8]],
+    glasswater: [100, 60, "harp",     [0,5,9,12,16,12,9,5, 2,7,11,14,11,7,5,2], [0,9,2,7]],
+    frostbell:  [84,  69, "wood",     [0,3,7,12,10,7,3,null, 0,5,8,12,8,5,3,null], [0,8,5,10]],
+    stormspine: [122, 46, "dulcimer", [0,7,3,10,7,12,10,7, 0,3,7,15,12,10,7,3], [0,3,10,7]],
+    titan:      [68,  43, "lute",     [0,null,1,7,6,null,3,1, 0,6,10,7,6,3,1,null], [0,1,6,10]],
+    boss:       [132, 41, "dulcimer", [0,1,7,6,10,7,13,12, 0,3,7,10,15,13,12,7], [0,6,10,1]],
   };
 
   const BIOME_CUE = {
@@ -101,32 +103,145 @@ G.sfx = (() => {
 
   function frequency(root, semitones) { return root * Math.pow(2, semitones / 12); }
 
-  function musicVoice(freq, start, duration, volume, wave) {
-    if (!musicEnabled || !musicGain) return;
-    const osc = ctx.createOscillator();
+  function pcmSample(seconds, render) {
+    const rate = Math.max(8000, ctx.sampleRate || 44100);
+    const buffer = ctx.createBuffer(1, Math.ceil(seconds * rate), rate);
+    const data = buffer.getChannelData(0);
+    render(data, rate);
+    let peak = 0;
+    for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]));
+    const scale = peak > 0.001 ? 0.86 / peak : 1;
+    for (let i = 0; i < data.length; i++) data[i] *= scale;
+    return buffer;
+  }
+
+  function seededNoise(seed) {
+    let value = seed >>> 0;
+    return () => {
+      value = (value * 1664525 + 1013904223) >>> 0;
+      return value / 2147483648 - 1;
+    };
+  }
+
+  // Karplus–Strong feedback produces a struck string's evolving body rather
+  // than a waveform that stays electronically perfect for the whole note.
+  function pluckedString(root, seconds, damping, brightness, seed) {
+    return pcmSample(seconds, (data, rate) => {
+      const period = Math.max(3, Math.round(rate / root));
+      const ring = new Float32Array(period);
+      const noise = seededNoise(seed);
+      for (let i = 0; i < period; i++) ring[i] = noise() * (0.72 + 0.28 * Math.sin(Math.PI * i / period));
+      let index = 0;
+      const own = 0.38 + brightness * 0.28;
+      for (let i = 0; i < data.length; i++) {
+        const value = ring[index];
+        const next = ring[(index + 1) % period];
+        ring[index] = (value * own + next * (1 - own)) * damping;
+        data[i] = value;
+        index = (index + 1) % period;
+      }
+    });
+  }
+
+  function buildMusicSamples() {
+    const twoPi = Math.PI * 2;
+    const flute = pcmSample(2.8, (data, rate) => {
+      const noise = seededNoise(7127);
+      let breath = 0;
+      for (let i = 0; i < data.length; i++) {
+        const t = i / rate;
+        const attack = Math.min(1, t / 0.11);
+        const release = t > 2.25 ? Math.max(0, (2.8 - t) / 0.55) : 1;
+        const vibrato = Math.sin(twoPi * 5.1 * t) * 0.012;
+        const phase = twoPi * 220 * t + vibrato;
+        breath = breath * 0.92 + noise() * 0.08;
+        data[i] = attack * release * (Math.sin(phase) * 0.68 + Math.sin(phase * 2) * 0.17 +
+          Math.sin(phase * 3) * 0.07 + breath * 0.055);
+      }
+    });
+    const dulcimer = pcmSample(1.9, (data, rate) => {
+      const noise = seededNoise(991);
+      for (let i = 0; i < data.length; i++) {
+        const t = i / rate;
+        const env = Math.exp(-2.8 * t);
+        const phase = twoPi * 220 * t;
+        const strike = noise() * Math.exp(-38 * t) * 0.28;
+        data[i] = env * (Math.sin(phase) * 0.55 + Math.sin(phase * 2.01) * 0.31 +
+          Math.sin(phase * 3.98) * 0.15) + strike;
+      }
+    });
+    const wood = pcmSample(1.15, (data, rate) => {
+      const noise = seededNoise(4401);
+      for (let i = 0; i < data.length; i++) {
+        const t = i / rate;
+        const phase = twoPi * 220 * t;
+        data[i] = Math.exp(-5.2 * t) * (Math.sin(phase) * 0.64 + Math.sin(phase * 2.72) * 0.28 +
+          Math.sin(phase * 4.18) * 0.12) + noise() * Math.exp(-55 * t) * 0.2;
+      }
+    });
+    const drum = pcmSample(0.62, (data, rate) => {
+      const noise = seededNoise(303);
+      let skin = 0;
+      for (let i = 0; i < data.length; i++) {
+        const t = i / rate;
+        const fallingPhase = twoPi * (92 * t - 31 * t * t);
+        skin = skin * 0.76 + noise() * 0.24;
+        data[i] = Math.sin(fallingPhase) * Math.exp(-8.2 * t) + skin * Math.exp(-18 * t) * 0.32;
+      }
+    });
+    const shaker = pcmSample(0.2, (data, rate) => {
+      const noise = seededNoise(5150);
+      let previous = 0;
+      for (let i = 0; i < data.length; i++) {
+        const t = i / rate;
+        const current = noise();
+        data[i] = (current - previous) * Math.exp(-23 * t);
+        previous = current;
+      }
+    });
+    return {
+      lute: { buffer: pluckedString(220, 2.4, 0.9962, 0.38, 1801), root: 220 },
+      harp: { buffer: pluckedString(220, 3.2, 0.9981, 0.78, 2657), root: 220 },
+      bass: { buffer: pluckedString(110, 3.1, 0.9974, 0.2, 3907), root: 110 },
+      flute: { buffer: flute, root: 220 },
+      dulcimer: { buffer: dulcimer, root: 220 },
+      wood: { buffer: wood, root: 220 },
+      drum: { buffer: drum, root: 1 },
+      shaker: { buffer: shaker, root: 1 },
+    };
+  }
+
+  function musicVoice(instrument, freq, start, duration, volume) {
+    const sample = musicSamples && musicSamples[instrument];
+    if (!musicEnabled || !musicGain || !sample) return;
+    const source = ctx.createBufferSource();
     const gain = ctx.createGain();
-    osc.type = wave;
-    osc.frequency.setValueAtTime(Math.max(24, freq), start);
+    const rate = Math.max(0.18, freq / sample.root);
+    source.buffer = sample.buffer;
+    source.playbackRate.setValueAtTime(rate, start);
+    const audible = Math.max(0.04, Math.min(duration, sample.buffer.duration / rate));
     gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(volume, start + 0.018);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-    osc.connect(gain).connect(musicGain);
-    osc.start(start); osc.stop(start + duration + 0.03);
+    gain.gain.exponentialRampToValueAtTime(volume, start + Math.min(0.025, audible / 3));
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + audible);
+    source.connect(gain).connect(musicGain);
+    source.start(start); source.stop(start + audible + 0.025);
   }
 
   function scheduleMusicStep(theme, step, at) {
-    const [bpm, root, wave, melody, bass] = theme;
+    const [bpm, root, lead, melody, bass] = theme;
     const beat = 30 / bpm;
     const note = melody[step % melody.length];
-    if (note !== null) musicVoice(frequency(root * 4, note), at, beat * 0.78, 0.075, wave);
-    if (step % 2 === 0) musicVoice(frequency(root, bass[Math.floor(step / 4) % bass.length]), at, beat * 1.7, 0.105, "triangle");
+    if (note !== null) musicVoice(lead, frequency(root * 4, note), at, beat * 0.92, 0.15);
+    if (step % 2 === 0)
+      musicVoice("bass", frequency(root, bass[Math.floor(step / 4) % bass.length]), at, beat * 1.8, 0.17);
     if (step % 4 === 0) {
       const chord = bass[Math.floor(step / 4) % bass.length];
-      musicVoice(frequency(root * 2, chord + 7), at, beat * 3.4, 0.032, "sine");
-      musicVoice(frequency(root * 2, chord + 12), at, beat * 3.4, 0.024, "sine");
-      musicVoice(78, at, beat * 0.34, 0.09, "sine");
+      musicVoice("harp", frequency(root * 2, chord + 7), at, beat * 3.5, 0.06);
+      musicVoice("harp", frequency(root * 2, chord + 12), at + 0.035, beat * 3.3, 0.045);
+      musicVoice("drum", 1, at, beat * 0.72, 0.15);
     }
-    if (step % 2 === 1) musicVoice(1500 + (step % 4) * 280, at, beat * 0.12, 0.018, "square");
+    if (step % 4 === 2) musicVoice("wood", 220 * (1.1 + (step % 8) * 0.03), at, beat * 0.55, 0.075);
+    if (step % 2 === 1) musicVoice("shaker", 1, at, beat * 0.34, 0.045);
   }
 
   function scheduleMusic() {
@@ -152,7 +267,7 @@ G.sfx = (() => {
     const c = ensure();
     if (c && musicGain) {
       musicGain.gain.cancelScheduledValues(c.currentTime);
-      musicGain.gain.setTargetAtTime(musicEnabled ? 0.42 : 0.0001, c.currentTime, 0.08);
+      musicGain.gain.setTargetAtTime(musicEnabled ? 0.34 : 0.0001, c.currentTime, 0.08);
       nextMusicTime = c.currentTime + 0.06;
     }
   }
