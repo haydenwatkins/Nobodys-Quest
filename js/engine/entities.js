@@ -104,7 +104,9 @@ G.damagePlayer = function (dmg, fromX, fromY) {
       G.state.projectiles = [];
       G.sfx.play("unlock");
       G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: "#ffcd75", radius: 30, dur: 0.65 });
-      G.ui.banner("👑 CROWN'S SECOND WIND", "Back on your feet with one heart. It recharges next run.");
+      const rescueText = "Back on your feet with one heart. It recharges next run.";
+      if (G.ui.dialogue) G.ui.dialogue("👑 CROWN'S SECOND WIND", rescueText, { accent: "#ffcd75" });
+      else G.ui.banner("👑 CROWN'S SECOND WIND", rescueText);
       return;
     }
     G.sfx.play("ko");
@@ -132,7 +134,10 @@ G.damagePlayer = function (dmg, fromX, fromY) {
       const fallback = trial.worldBoss
         ? `${bossName} reclaims the region. The caravan carries you to its fire.`
         : `${bossName} sends you back outside. Breathe, then try again.`;
-      G.ui.banner(heading, bossLine || fallback);
+      if (G.ui.dialogue) G.ui.dialogue(heading, bossLine || fallback, {
+        accent: bossEnemy && bossEnemy.def.boss ? bossEnemy.def.boss.color : "#ffcd75",
+      });
+      else G.ui.banner(heading, bossLine || fallback);
       G.events.emit("ko", { trial: G.state.mapId, boss: bossEnemy && bossEnemy.id });
       return;
     }
@@ -141,7 +146,9 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     p.invuln = 2;
     p.x = G.state.entryPoint.x;
     p.y = G.state.entryPoint.y;
-    G.ui.toast("💫 You got knocked out! ...But you're okay. Try again!", 3);
+    const safeText = "You got knocked out, but you're okay. Take a breath and try again!";
+    if (G.ui.dialogue) G.ui.dialogue("💫 A GENTLE LANDING", safeText, { accent: "#73eff7" });
+    else G.ui.toast(safeText, 3);
     G.events.emit("ko", {});
   }
   return true;
@@ -386,11 +393,13 @@ function engageBoss(e) {
   bossBurst(e, boss.color, rematch ? 8 : 16);
   if (rematch) {
     const domain = boss.domain ? ` ${boss.domain} answers with them.` : "";
-    G.ui.toast(`⚔ ${boss.rematchLine || e.def.name + " returns!"}${domain}`, 2.5);
+    const rematchLine = `${boss.rematchLine || e.def.name + " returns!"}${domain}`;
+    if (G.ui.dialogue) G.ui.dialogue(`⚔ ${e.def.name}`, rematchLine, { accent: boss.color });
+    else G.ui.toast(`⚔ ${rematchLine}`, 2.5);
   } else {
     const ward = e.ward && G.DAMAGE_TYPES[e.ward.types[0]];
     const wardText = ward ? ` · ${ward.icon} ${ward.name.toUpperCase()} breaks its ward` : "";
-    G.state.bossCutscene = {
+    const scene = G.state.bossCutscene = {
       enemy: e,
       lines,
       index: 0,
@@ -401,7 +410,24 @@ function engageBoss(e) {
     const title = boss.domain
       ? `⚔ WORLDBEARER OF ${boss.domain.toUpperCase()} ⚔`
       : `⚔ ${e.def.name.toUpperCase()} ⚔`;
-    G.ui.banner(title, `${e.def.name}: ${lines[0]}${wardText}`);
+    if (G.ui.dialogue) {
+      scene.dialogueDriven = true;
+      lines.forEach((line, index) => G.ui.dialogue(
+        index ? `⚔ ${e.def.name}` : title,
+        line + (index === 0 ? wardText : ""),
+        {
+          accent: boss.color,
+          onClose: index === lines.length - 1 ? () => {
+            e.bossIntroT = 0;
+            if (G.state.bossCutscene === scene) G.state.bossCutscene = null;
+            G.state.shake = Math.max(G.state.shake, 0.22);
+            G.input.clearTaps();
+          } : null,
+        }
+      ));
+    } else {
+      G.ui.banner(title, `${e.def.name}: ${lines[0]}${wardText}`);
+    }
   }
 }
 
@@ -409,6 +435,13 @@ G.updateBossCutscene = function (dt) {
   const scene = G.state.bossCutscene;
   if (!scene) return;
   const e = scene.enemy;
+  if (scene.dialogueDriven) {
+    if (!G.ui.dialogueOpen) {
+      e.bossIntroT = 0;
+      G.state.bossCutscene = null;
+    }
+    return;
+  }
   scene.elapsed += dt;
   scene.lineT -= dt;
   e.bossIntroT = Math.max(0, e.bossIntroT - dt);
@@ -831,7 +864,10 @@ function updateBossState(e, p, dist, dt) {
     G.spawnFx({ kind: "ring", x: e.x, y: e.y - 7, color: boss.color, radius: 30, dur: 0.55 });
     bossBurst(e, boss.color, 14);
     const phaseText = nextPhase === 2 ? boss.phaseLine : boss.phaseThreeLine;
-    G.ui.banner(`${e.def.name} — PHASE ${nextPhase === 2 ? "II" : "III"}`, phaseText || "The fight changes. Watch its movement!");
+    const phaseTitle = `${e.def.name} — PHASE ${nextPhase === 2 ? "II" : "III"}`;
+    const phaseLine = phaseText || "The fight changes. Watch its movement!";
+    if (G.ui.dialogue) G.ui.dialogue(phaseTitle, phaseLine, { accent: boss.color });
+    else G.ui.banner(phaseTitle, phaseLine);
     return true;
   }
 

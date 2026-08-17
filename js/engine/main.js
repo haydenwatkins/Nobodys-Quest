@@ -234,7 +234,9 @@
     // frame so Steam Link input reaches gameplay and menus without latency.
     G.input.update();
 
-    if (G.input.tapped("pause")) G.ui.toggleMenu();
+    // Dialogue owns every action button while it is open. In particular,
+    // Enter/Escape must advance the conversation instead of opening a menu.
+    if (!G.ui.dialogueOpen && G.input.tapped("pause")) G.ui.toggleMenu();
 
     if (!G.ui.menuOpen) {
       update(dt);
@@ -255,6 +257,16 @@
     s.cameraKickY *= Math.pow(0.002, dt);
     if (Math.abs(s.cameraKickX) < 0.05) s.cameraKickX = 0;
     if (Math.abs(s.cameraKickY) < 0.05) s.cameraKickY = 0;
+
+    // Story boxes are a real pause, not a toast with a longer timer. Nothing
+    // in the world moves until the player finishes the current conversation.
+    if (G.ui.dialogueOpen) {
+      s.time += dt;
+      G.updateFx(dt * 0.2);
+      G.ui.update(dt);
+      G.input.clearTaps();
+      return;
+    }
 
     if (s.zoneTransition) {
       s.time += dt;

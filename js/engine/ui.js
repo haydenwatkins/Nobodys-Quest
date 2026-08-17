@@ -15,6 +15,9 @@
 G.ui = (() => {
   const toasts = [];           // {text, t, dur}
   let bannerData = null;       // {title, sub, t}
+  const dialogueQueue = [];    // deliberate, player-advanced story text
+  let dialogueData = null;     // {speaker, text, accent, shown, age, onClose}
+  let dialoguePointerAdvance = false;
   let menuOpen = false;
   let btnCache = "";
   let controllerFocusedElement = null;
@@ -26,6 +29,15 @@ G.ui = (() => {
 
   const FONT_HEAD = '"Press Start 2P", "Courier New", monospace';
   const FONT_BODY = '"VT323", "Courier New", monospace';
+
+  // Dialogue sits above the touch controls while it is open, making the
+  // entire game view one large, comfortable "continue" target on iPad.
+  uiCanvas.addEventListener("pointerdown", (event) => {
+    if (!dialogueData) return;
+    event.preventDefault();
+    dialoguePointerAdvance = true;
+    if (G.sfx && G.sfx.ensure) G.sfx.ensure();
+  });
 
   function resizeOverlay() {
     const gameCanvas = document.getElementById("game");
@@ -52,6 +64,49 @@ G.ui = (() => {
     bannerData = { title, sub: sub || "", t: 0 };
   }
 
+  function setDialogueCapture(active) {
+    uiCanvas.style.pointerEvents = active ? "auto" : "none";
+    uiCanvas.style.zIndex = active ? "15" : "5";
+  }
+
+  function showNextDialogue() {
+    dialogueData = dialogueQueue.shift() || null;
+    dialoguePointerAdvance = false;
+    if (dialogueData) {
+      dialogueData.shown = 0;
+      dialogueData.age = 0;
+      setDialogueCapture(true);
+      if (G.sfx && G.sfx.play) G.sfx.play("menu");
+    } else {
+      setDialogueCapture(false);
+    }
+  }
+
+  function dialogue(speaker, text, options) {
+    const opts = options || {};
+    dialogueQueue.push({
+      speaker: String(speaker || ""),
+      text: String(text || ""),
+      accent: opts.accent || "#ffcd75",
+      onClose: typeof opts.onClose === "function" ? opts.onClose : null,
+    });
+    if (!dialogueData) showNextDialogue();
+  }
+
+  function advanceDialogue() {
+    if (!dialogueData || dialogueData.age < 0.12) return;
+    if (dialogueData.shown < dialogueData.text.length) {
+      dialogueData.shown = dialogueData.text.length;
+      dialogueData.age = 0;
+      if (G.sfx && G.sfx.play) G.sfx.play("menu");
+      return;
+    }
+    const finished = dialogueData;
+    dialogueData = null;
+    if (finished.onClose) finished.onClose();
+    if (!dialogueData) showNextDialogue();
+  }
+
   function update(dt) {
     for (let i = toasts.length - 1; i >= 0; i--) {
       toasts[i].t += dt;
@@ -60,6 +115,17 @@ G.ui = (() => {
     if (bannerData) {
       bannerData.t += dt;
       if (bannerData.t > 3.2) bannerData = null;
+    }
+    if (dialogueData) {
+      dialogueData.age += dt;
+      dialogueData.shown = Math.min(
+        dialogueData.text.length,
+        dialogueData.shown + dt * 48
+      );
+      const action = dialoguePointerAdvance ||
+        ["a", "b", "c", "swap", "pause"].some((button) => G.input.tapped(button));
+      dialoguePointerAdvance = false;
+      if (action) advanceDialogue();
     }
     syncButtons();
   }
@@ -86,6 +152,59 @@ G.ui = (() => {
     let out = text;
     while (out.length > 4 && c.measureText(out + "…").width > maxW) out = out.slice(0, -1);
     return out + "…";
+  }
+
+  function drawDialogue(c) {
+    if (!dialogueData) return;
+    const d = dialogueData;
+    const visible = d.text.slice(0, Math.floor(d.shown));
+    const boxX = 7;
+    const boxW = G.W - 14;
+
+    c.font = `11px ${FONT_BODY}`;
+    const allLines = wrapText(c, d.text, boxW - 18);
+    const visibleLines = wrapText(c, visible, boxW - 18);
+    const lineCount = Math.max(1, allLines.length);
+    const boxH = 27 + lineCount * 11;
+    const boxY = G.H - boxH - 7;
+
+    c.fillStyle = "rgba(12,14,25,0.48)";
+    c.fillRect(0, 0, G.W, G.H);
+    c.fillStyle = "#0f101b";
+    c.fillRect(boxX + 3, boxY + 3, boxW, boxH);
+    c.fillStyle = "rgba(26,28,44,0.98)";
+    c.fillRect(boxX, boxY, boxW, boxH);
+    c.fillStyle = d.accent;
+    c.fillRect(boxX, boxY, boxW, 2);
+    c.fillRect(boxX, boxY + boxH - 2, boxW, 2);
+    c.fillRect(boxX, boxY, 2, boxH);
+    c.fillRect(boxX + boxW - 2, boxY, 2, boxH);
+
+    c.font = `6px ${FONT_HEAD}`;
+    c.fillStyle = d.accent;
+    c.fillText(d.speaker.toUpperCase(), boxX + 9, boxY + 7);
+
+    c.font = `11px ${FONT_BODY}`;
+    c.fillStyle = "#f4f4f4";
+    let y = boxY + 17;
+    for (const line of visibleLines) {
+      c.fillText(line, boxX + 9, y);
+      y += 11;
+    }
+
+    if (d.shown >= d.text.length) {
+      const prompt = G.input.isTouch ? "TAP TO CONTINUE" : G.input.hasGamepad ? "A  CONTINUE" : "SPACE / ENTER";
+      c.font = `5px ${FONT_HEAD}`;
+      const promptW = c.measureText(prompt).width;
+      c.fillStyle = "#94b0c2";
+      c.fillText(prompt, boxX + boxW - promptW - 11, boxY + boxH - 9);
+      const blink = Math.floor((d.age || 0) * 3) % 2 === 0;
+      if (blink) {
+        c.fillStyle = d.accent;
+        c.fillRect(boxX + boxW - 8, boxY + boxH - 10, 3, 3);
+        c.fillRect(boxX + boxW - 7, boxY + boxH - 7, 1, 1);
+      }
+    }
   }
 
   function drawLocationChip(c) {
@@ -450,7 +569,7 @@ G.ui = (() => {
       }
       c.globalAlpha = 1;
     }
-    if (G.state.bossCutscene) {
+    if (G.state.bossCutscene && !dialogueData) {
       const skip = "TAP AN ABILITY FOR NEXT";
       c.font = `5px ${FONT_HEAD}`;
       const skipW = c.measureText(skip).width;
@@ -459,6 +578,7 @@ G.ui = (() => {
       c.fillStyle = "#94b0c2";
       c.fillText(skip, Math.round(G.W / 2 - skipW / 2), G.H - 14);
     }
+    drawDialogue(c);
   }
 
   /* ---------- keep touch buttons showing the right icons ---------- */
@@ -1100,8 +1220,10 @@ G.ui = (() => {
   }
 
   return {
-    toast, banner, update, drawHUD, resizeOverlay,
+    toast, banner, dialogue, update, drawHUD, resizeOverlay,
     openMenu, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
     get menuOpen() { return menuOpen; },
+    get dialogueOpen() { return !!dialogueData; },
+    get dialogueQueueLength() { return dialogueQueue.length + (dialogueData ? 1 : 0); },
   };
 })();

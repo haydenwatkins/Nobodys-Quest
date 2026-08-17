@@ -182,7 +182,11 @@ G.combat = (() => {
     if (!trophy) return;
     G.state.items = G.state.items || [];
     if (G.state.items.includes(trophy)) {
-      G.ui.toast(`${enemy.def.name} defeated again!`);
+      const repeatVictory = `${enemy.def.name} is defeated again.`;
+      if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
+        accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",
+      });
+      else G.ui.toast(repeatVictory);
       return;
     }
     G.state.items.push(trophy);
@@ -190,8 +194,14 @@ G.combat = (() => {
     G.sfx.play("quest");
     G.state.shake = Math.max(G.state.shake, 0.45);
     burst(enemy.x, enemy.y - enemy.h() / 2, "#ffcd75", 24);
-    const lastWord = enemy.def.boss && enemy.def.boss.defeatLine ? ` · “${enemy.def.boss.defeatLine}”` : "";
-    G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, `${enemy.def.trophyName} found · +1 ⭐${lastWord}`);
+    const defeatLine = enemy.def.boss && enemy.def.boss.defeatLine;
+    const rewardLine = `${enemy.def.trophyName} found · +1 ⭐`;
+    if (G.ui.dialogue) G.ui.dialogue(
+      `🏆 ${enemy.def.name}`,
+      `${defeatLine ? `“${defeatLine}” ` : ""}${rewardLine}`,
+      { accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75" }
+    );
+    else G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, rewardLine + (defeatLine ? ` · “${defeatLine}”` : ""));
     G.events.emit("pickup", { item: trophy });
     G.checkUnlocks();
     if (G.checkGuardianCollectionReward) G.checkGuardianCollectionReward(false);

@@ -105,8 +105,10 @@
     const line = G.npcDialogue(npc.id, chapter, count);
     if (!line) return;
     s.npcTalk[key] = count + 1;
-    const title = chapter === 0 && count === 0 ? " - " + G.storyChapterName(chapter) : "";
-    G.ui.toast(npc.def.icon + " " + npc.def.name + title + ": " + line, 5.8);
+    const chapterTitle = chapter === 0 && count === 0 ? " · " + G.storyChapterName(chapter) : "";
+    const speaker = npc.def.icon + " " + npc.def.name + chapterTitle;
+    if (G.ui.dialogue) G.ui.dialogue(speaker, line, { accent: npc.def.sprite.palette.a });
+    else G.ui.toast(speaker + ": " + line, 5.8);
     if (G.sfx && G.sfx.play) G.sfx.play("menu");
     if (G.spawnFx) G.spawnFx({
       kind: "ring", x: npc.x, y: npc.y - 8,

@@ -76,7 +76,9 @@ G.servePantry = function (ch) {
 
   G.sfx.play("unlock");
   G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: "#ffcd75", radius: 20, dur: 0.5 });
-  G.ui.toast(`${treat.icon} ${treat.name}! Fully healed. ${treat.effect}`, 4);
+  const pantryText = `Fully healed. ${treat.effect}`;
+  if (G.ui.dialogue) G.ui.dialogue(`${treat.icon} ${treat.name}`, pantryText, { accent: "#ffcd75" });
+  else G.ui.toast(`${treat.icon} ${treat.name}! ${pantryText}`, 4);
   return treat;
 };
 
@@ -292,7 +294,8 @@ G.world = (() => {
     if (cell.message) {
       if (s.lastSign !== cell) {
         s.lastSign = cell;
-        G.ui.toast("🪧 " + cell.message, 3.5);
+        if (G.ui.dialogue) G.ui.dialogue("🪧 SIGN", cell.message, { accent: "#fff3c2" });
+        else G.ui.toast("🪧 " + cell.message, 3.5);
         G.events.emit("sign", { message: cell.message });
       }
     } else {
@@ -319,7 +322,9 @@ G.world = (() => {
         if (ruler) {
           G.sfx.play("stagger");
           G.spawnFx({ kind: "ring", x: p.x, y: p.y - 8, color: ruler.def.boss.color, dur: 0.45 });
-          G.ui.toast(`The fire bends toward ${ruler.def.name}. Defeat the Worldbearer before resting.`, 3);
+          const warning = `The fire bends toward ${ruler.def.name}. Defeat the Worldbearer before resting.`;
+          if (G.ui.dialogue) G.ui.dialogue("🔥 THE CARAVAN FIRE", warning, { accent: ruler.def.boss.color });
+          else G.ui.toast(warning, 3);
         } else {
           p.damageTaken = 0;
           p.mana = p.manaMax;
@@ -385,15 +390,26 @@ G.world = (() => {
         s.opened.push(ch.key);
         G.sfx.play("unlock");
         G.spawnFx({ kind: "ring", x: cx, y: cy - 8, color: "#ffcd75", dur: 0.5 });
+        const chestMessages = [];
+        let pickedUpItem = null;
         if (ch.chest.item) {
           s.items.push(ch.chest.item);
-          G.ui.toast("🎁 You found: " + (ch.chest.name || ch.chest.item) + "!", 3.5);
-          G.events.emit("pickup", { item: ch.chest.item });
-          G.checkUnlocks();
+          pickedUpItem = ch.chest.item;
+          chestMessages.push("You found " + (ch.chest.name || ch.chest.item) + "!");
         }
         if (ch.chest.heal) {
           s.player.damageTaken = 0;
-          G.ui.toast("🍪 " + (ch.chest.name || "A snack") + "! Fully healed!", 3);
+          chestMessages.push((ch.chest.name || "A snack") + " restored all your hearts.");
+        }
+        if (chestMessages.length) {
+          const chestText = chestMessages.join(" ");
+          if (G.ui.dialogue) G.ui.dialogue("🎁 TREASURE CHEST", chestText, { accent: "#ffcd75" });
+          else G.ui.toast(chestText, 3.5);
+        }
+        // Queue any follow-on reward story after the chest itself has spoken.
+        if (pickedUpItem) {
+          G.events.emit("pickup", { item: pickedUpItem });
+          G.checkUnlocks();
         }
         G.saveGame();
       }

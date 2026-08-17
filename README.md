@@ -39,9 +39,9 @@ stats or difficulty; future forms automatically inherit the complete wardrobe.
 
 Double-click `index.html`. Works from the plain filesystem — no server needed.
 
-- Desktop: WASD/arrows, J/K/L abilities, Q swap, Esc menu
-- iPad/touch: virtual joystick; tap ranged attacks to auto-aim, or drag an attack button and release to aim manually
-- Xbox/standard controller: left stick or D-pad moves; A/RT, X/RB, and Y/LB use the three abilities; right stick aims; B or View swaps forms; Menu pauses. Every menu is controller-navigable.
+- Desktop: WASD/arrows, J/K/L abilities, Q swap, Esc menu; Space or Enter advances dialogue
+- iPad/touch: virtual joystick; tap ranged attacks to auto-aim, or drag an attack button and release to aim manually; tap the dialogue box to continue
+- Xbox/standard controller: left stick or D-pad moves; A/RT, X/RB, and Y/LB use the three abilities; right stick aims; B or View swaps forms; Menu pauses. A advances dialogue, and every menu is controller-navigable.
 
 For a TV-like Steam Link launch on Windows, `tools/steam-launch.ps1` opens the
 installed Chrome app, raises it above Big Picture, enters fullscreen, and stays

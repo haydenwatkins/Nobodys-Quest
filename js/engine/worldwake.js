@@ -164,8 +164,10 @@ G.events.on("mapEnter", (data) => {
   if (first) {
     campaign.discovered.push(data.map);
     campaign.heardBanter.push(data.map);
-    G.ui.banner("WORLDWAKE REGION DISCOVERED",
-      `${region.icon} ${region.name} · ${campaign.discovered.length}/${G.WORLDWAKE_REGIONS.length} · ${WORLDWAKE_BANTER[data.map]}`);
+    const banter = WORLDWAKE_BANTER[data.map].replace(/^Pebble:\s*/, "");
+    const discovery = `${region.icon} ${region.name} · ${campaign.discovered.length}/${G.WORLDWAKE_REGIONS.length}. ${banter}`;
+    if (G.ui.dialogue) G.ui.dialogue("🪨 PEBBLE · NEW REGION", discovery, { accent: "#73eff7" });
+    else G.ui.banner("WORLDWAKE REGION DISCOVERED", discovery);
   } else {
     G.ui.toast(`🗺 ${region.name}`, 2.2);
   }
@@ -197,7 +199,9 @@ G.events.on("pickup", (data) => {
   const campaign = G.ensureWorldwake();
   if (!campaign.marks.includes(mark.id)) {
     campaign.marks.push(mark.id);
-    G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, "The region changes, and a new World Path answers you.");
+    const awakening = "The region changes, and a new World Path answers you.";
+    if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening, { accent: mark.color || "#ffcd75" });
+    else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening);
   }
   G.checkWorldwakeFavors(false);
 });
