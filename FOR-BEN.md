@@ -253,6 +253,32 @@ from map data and should not be added there. The Long Way Around completion
 reward updates automatically with the major-region list. Fast travel is disabled
 during trials, gauntlets, knockouts, and boss story scenes.
 
+### The shifting world update
+
+Sunrise Town is an early home base now. Claiming the first new form introduces
+it with two residents and enough spirit for the first house. Ordinary enemy
+victories, ward breaks, new forms, Atlas incidents, Rival victories, and
+Expeditions can all help it grow; no particular endgame form is required.
+
+`js/engine/incidents.js` keeps three **Living Atlas** situations active in
+places the player has already discovered. They do not expire while somebody is
+at school or asleep. Each one asks for normal play—victories, distinct moves,
+different forms, ward breaks, or finding a Rival—and resolving it replaces it
+with a new situation.
+
+`js/engine/rival.js` turns an ordinary creature that knocks Nobody out into one
+named recurring opponent. Its extra health, speed, ward, and ranged behavior
+are applied to that individual instance, never to the base enemy definition.
+Three victories complete its story and award a keepsake.
+
+`js/engine/expeditions.js` powers **Manyfold Expeditions**. A saved seed varies
+the route order, drafts, and enemy mix while keeping a reload consistent. Route
+and draft effects last only for the run; the player's campaign location,
+health, mana, form, and loadouts are backed up and restored on a safe exit.
+Finishing longer routes gives more town spirit and residents. Keep new route
+ideas legible as a choice between two distinct risks instead of hiding surprise
+punishments behind vague labels.
+
 Boss introductions use three short lines with 2.2 seconds per line. Tapping an
 ability advances to the next line; it no longer discards the complete scene.
 Rematches remain quick.

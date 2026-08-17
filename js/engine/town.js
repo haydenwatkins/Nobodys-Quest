@@ -1,8 +1,8 @@
 /* ============================================================
-   TOWN - a post-God-unlock home base.
+   TOWN — an early home base that grows with the whole adventure.
 
-   Once the God form is unlocked, the player can found a town
-   from the pause menu. Defeating enemies as God attracts residents.
+   Claiming the first new form opens Sunrise Town. Every form can contribute;
+   later systems such as incidents, rivals, and expeditions feed it directly.
    ============================================================ */
 
 "use strict";
@@ -16,6 +16,8 @@ G.makeTown = function () {
     festivals: 0,
     festivalUntil: 0,
     houses: [],
+    introduced: false,
+    deeds: 0,
   };
 };
 
@@ -26,6 +28,8 @@ G.normalizeTown = function (saved) {
   if (saved && saved.faith !== undefined) town.spirit = saved.faith;
   if (saved && saved.sermons !== undefined) town.festivals = saved.sermons;
   if (!Array.isArray(town.houses)) town.houses = [];
+  town.introduced = !!(town.introduced || town.founded);
+  town.deeds = Math.max(0, Number(town.deeds) || 0);
   town.festivalUntil = Number(town.festivalUntil) || 0;
   if (!town.name || town.name === "The Little Flock") town.name = "Sunrise Town";
   return town;
@@ -37,7 +41,26 @@ G.ensureTown = function () {
 };
 
 G.townUnlocked = function () {
-  return !!(G.forms.god && G.formUnlocked("god"));
+  if (!G.state) return false;
+  const town = G.ensureTown();
+  return !!(town.founded || (G.state.claimedForms || []).length >= 1 || G.state.stars >= 2);
+};
+
+G.checkTownIntroduction = function (quiet) {
+  if (!G.townUnlocked()) return false;
+  const town = G.ensureTown();
+  if (town.introduced) return false;
+  town.introduced = true;
+  town.founded = true;
+  town.residents = Math.max(town.residents, 2);
+  town.spirit = Math.max(town.spirit, 12);
+  if (!quiet) {
+    G.sfx.play("unlock");
+    G.ui.banner("☀️ SUNRISE TOWN", "A little home is waiting · 12 spirit · first house ready");
+  }
+  if (G.syncTownResidents) G.syncTownResidents();
+  G.saveGame();
+  return true;
 };
 
 G.foundTown = function (name) {
@@ -54,6 +77,25 @@ G.foundTown = function (name) {
   if (G.syncTownResidents) G.syncTownResidents();
   G.saveGame();
   return true;
+};
+
+G.addTownReward = function (spirit, residents, reason, quiet) {
+  const town = G.ensureTown();
+  if (!town.founded) G.checkTownIntroduction(true);
+  const gainedSpirit = Math.max(0, Math.round(spirit || 0));
+  const room = Math.max(0, G.townCapacity() - town.residents);
+  const gainedResidents = Math.min(room, Math.max(0, Math.round(residents || 0)));
+  town.spirit += gainedSpirit;
+  town.residents += gainedResidents;
+  if (!quiet && (gainedSpirit || gainedResidents)) {
+    const parts = [];
+    if (gainedSpirit) parts.push(`+${gainedSpirit} town spirit`);
+    if (gainedResidents) parts.push(`+${gainedResidents} resident${gainedResidents === 1 ? "" : "s"}`);
+    G.ui.toast(`☀️ ${reason || "Town progress"}: ${parts.join(" · ")}`, 3);
+  }
+  if (G.syncTownResidents) G.syncTownResidents();
+  G.saveGame();
+  return { spirit: gainedSpirit, residents: gainedResidents };
 };
 
 G.renameTown = function (name) {
@@ -112,7 +154,11 @@ G.townFestivalActive = function (now) {
 
 G.holdTownFestival = function () {
   const town = G.ensureTown();
-  if (!town.founded) return;
+  if (!town.founded) return false;
+  if (G.townFestivalActive()) {
+    G.ui.toast(`${town.name} is already celebrating.`, 2.5);
+    return false;
+  }
   town.festivals += 1;
   const multiplier = (G.state.items || []).includes("sunrise-banner") ? 2 : 1;
   const earned = Math.max(1, town.residents) * multiplier;
@@ -122,35 +168,34 @@ G.holdTownFestival = function () {
   G.ui.toast(`🎉 Festival held! ${town.name} will celebrate for five minutes. +${earned} town spirit${multiplier > 1 ? " · Banner bonus!" : ""}`);
   if (G.celebrateTown) G.celebrateTown();
   G.saveGame();
+  return true;
 };
 
-G.events.on("kill", () => {
-  if (!G.state || !G.townUnlocked()) return;
+G.events.on("kill", (data) => {
+  if (!G.state) return;
+  G.checkTownIntroduction(false);
+  if (!G.townUnlocked()) return;
   const town = G.ensureTown();
-  if (!town.founded || G.state.formId !== "god") return;
-  const capacity = G.townCapacity();
-  const addedResident = town.residents < capacity;
-  if (addedResident) town.residents += 1;
-  town.spirit += 2;
-  if (addedResident && (town.residents <= 5 || town.residents % 5 === 0)) {
-    G.ui.toast(`🏠 A resident moves to ${town.name}! ${town.residents} total`);
-  } else if (!addedResident) {
-    G.ui.toast(`${town.name} is full. Build houses to welcome more residents.`, 2.5);
-  }
-  if (G.syncTownResidents) G.syncTownResidents();
-  G.saveGame();
+  if (!town.founded || (data.enemy && G.enemies[data.enemy] && G.enemies[data.enemy].miniboss)) return;
+  town.deeds += 1;
+  if (town.deeds % 5 !== 0) return;
+  const newResident = town.deeds % 10 === 0 && town.residents < G.townCapacity() ? 1 : 0;
+  G.addTownReward(2, newResident, newResident ? "Your adventures attract a neighbour" : "Five good deeds");
 });
 
 G.events.on("wardBreak", () => {
-  if (!G.state || !G.townUnlocked()) return;
+  if (!G.state) return;
+  G.checkTownIntroduction(false);
+  if (!G.townUnlocked()) return;
   const town = G.ensureTown();
-  if (!town.founded || G.state.formId !== "god") return;
+  if (!town.founded) return;
   town.spirit += 1;
   G.saveGame();
 });
 
 G.events.on("formUnlock", (data) => {
-  if (data.form === "god") {
-    G.ui.toast("☀️ Town tab unlocked in the menu!", 4);
-  }
+  const alreadyFounded = G.ensureTown().founded;
+  const introduced = G.checkTownIntroduction(false);
+  if (introduced) G.ui.toast("☀️ Town tab unlocked — your first house is affordable now!", 4);
+  else if (alreadyFounded) G.addTownReward(3, 1, `${G.forms[data.form].name} joins the town story`);
 });

@@ -159,6 +159,8 @@ G.combat = (() => {
       ability: opts.ability,
       damageType: opts.type,
       poisoned: !!(enemy.status && enemy.status.poison),
+      rival: !!enemy.rival,
+      expeditionChampion: !!enemy.expeditionChampion,
     });
     if (G.passives) G.passives.onKill(enemy, opts);
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);
@@ -711,7 +713,7 @@ G.combat = (() => {
         }
         const p = s.player;
         if (!gone && G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {
-          G.damagePlayer(pr.damage, pr.x, pr.y);
+          G.damagePlayer(pr.damage, pr.owner ? pr.owner.x : pr.x, pr.owner ? pr.owner.y : pr.y);
           // Trial knockouts intentionally clear every shot and start an eject
           // sequence. The old loop indices are invalid after that reset.
           if (s.knockout) return;

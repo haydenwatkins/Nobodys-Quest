@@ -139,6 +139,10 @@
     heroBoard: G.makeHeroBoard(),
     wayfinder: G.makeWayfinder(),
     worldwake: G.makeWorldwake(),
+    incidents: G.makeIncidents(),
+    rivalState: G.makeRivalState(),
+    expedition: G.makeExpeditionProgress(),
+    expeditionRun: null,
     gauntletBest: 0,
     gauntletIronBest: 0,
     shake: 0,
@@ -178,6 +182,10 @@
     s.heroBoard = G.normalizeHeroBoard(save.heroBoard);
     s.wayfinder = G.normalizeWayfinder(save.wayfinder, save);
     s.worldwake = G.normalizeWorldwake(save.worldwake, save);
+    s.incidents = G.normalizeIncidents(save.incidents);
+    s.rivalState = G.normalizeRivalState(save.rivalState);
+    s.expedition = G.normalizeExpeditionProgress(save.expedition);
+    s.expeditionRun = G.normalizeExpeditionRun(save.expeditionRun);
     s.gauntletBest = save.gauntletBest || 0;
     s.gauntletIronBest = save.gauntletIronBest || 0;
     G.questCounts = save.questCounts || {};
@@ -200,6 +208,7 @@
     G.questsDone = G.formOrder.flatMap((id) => (G.forms[id].quests || []).map((quest) => quest.id));
     G.state.stars = 50;
     G.state.town.founded = true;
+    G.state.town.introduced = true;
     G.state.town.residents = 8;
     G.state.town.spirit = 20;
     G.state.wayfinder.discovered = G.wayfinderAllIds();
@@ -223,9 +232,16 @@
   // Local-only builder shortcut: ?playtestMap=moleTrial jumps directly to an
   // arena without exposing a cheat on the published game.
   const requestedTestMap = builderParams && builderParams.get("playtestMap");
+  if (requestedTestMap) G.state.expeditionRun = null;
+  const savedMap = G.state.expeditionRun
+    ? "manyfoldExpedition"
+    : save && save.mapId === "manyfoldExpedition"
+      ? (save.expeditionRun && save.expeditionRun.backup && G.maps[save.expeditionRun.backup.mapId]
+        ? save.expeditionRun.backup.mapId : "overworld")
+      : save && G.maps[save.mapId] ? save.mapId : "overworld";
   const startMap = requestedTestMap && G.maps[requestedTestMap]
     ? requestedTestMap
-    : save && G.maps[save.mapId] ? save.mapId : "overworld";
+    : savedMap;
   G.world.load(startMap);
   if (requestedTestMap) {
     const trialBoss = G.state.enemies.find((enemy) => enemy.def.miniboss);
@@ -265,7 +281,10 @@
   G.costumeBooting = false;
 
   G.checkUnlocks(); // quietly registers starting forms as "known"
+  G.checkTownIntroduction(false); // puts the shared home into the early game
+  G.refreshIncidents(true); // restores or creates the three action-driven map situations
   G.tutorial.init(save);
+  G.resumeManyfoldExpedition();
 
   /* ---------- the loop ---------- */
   let last = 0;

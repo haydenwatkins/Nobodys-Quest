@@ -7,9 +7,10 @@ and maps are data files designed to be extended by a kid** (see
 
 Plain JavaScript + Canvas. **No build tools, no npm, no installs.**
 
-The current campaign includes 18 mixable forms, the late-game Shattercoast
-region, personality-driven three-phase guardian trials, and a configurable
-boss gauntlet with optional between-round recovery.
+The current campaign includes 24 mixable forms, the late-game Shattercoast and
+Worldwake regions, personality-driven three-phase guardian trials, and two
+different run systems: a configurable boss gauntlet and branching Manyfold
+Expeditions.
 
 Every form carries an exclusive passive identity in addition to its basic
 attack and stats. All 53 abilities declare a combat style, and form passives
@@ -24,7 +25,17 @@ exploration, ward, ability-mixing, form-mixing, and rematch contracts. Contracts
 build renown and the player's town, while a full Manyfold Gauntlet clear awards
 a functional Crown with extra mana and one Second Wind per future run.
 
-The Explore menu contains the **Wayfinder Journal**, an early-to-late side quest
+Sunrise Town now enters the story after the first claimed form, starts with an
+affordable house, and grows from ordinary good deeds as well as late-game wins.
+The Living Atlas maintains three untimed situations in discovered regions, and
+an ordinary creature that knocks Nobody out can become a named Rival that
+returns with new readable traits. Manyfold Expeditions unlock with two forms and
+provide short roguelite-inspired runs: varied branching routes, combat and rest
+rooms, temporary boon/move/form drafts, safe failure, and persistent town
+rewards. Campaign position, health, form, and loadouts are protected during a
+run, so entering or abandoning one cannot be used as a free heal.
+
+The Map menu contains the **Wayfinder Atlas**, an early-to-late side quest
 that tracks eight major regions and reveals trials only after discovery. Unknown
 regions provide directional and star-requirement clues instead of spoilers.
 Completing the region list awards three stars and a Wayfinder Whistle for safe-

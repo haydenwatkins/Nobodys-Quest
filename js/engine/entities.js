@@ -36,10 +36,13 @@ G.makePlayer = function () {
 };
 
 G.playerForm = function () { return G.forms[G.state.formId]; };
-G.playerMaxHearts = function () { return G.playerForm().hearts; };
+G.playerMaxHearts = function () {
+  return G.playerForm().hearts + (G.expeditionHeartBonus ? G.expeditionHeartBonus() : 0);
+};
 G.playerHp = function () { return Math.max(0, G.playerMaxHearts() - G.state.player.damageTaken); };
 G.playerMaxMana = function () {
-  return 12 + (G.state && (G.state.items || []).includes("manyfold-crown") ? 2 : 0);
+  return 12 + (G.state && (G.state.items || []).includes("manyfold-crown") ? 2 : 0) +
+    (G.expeditionManaBonus ? G.expeditionManaBonus() : 0);
 };
 
 G.autoAimTarget = function (user, maxRange) {
@@ -71,6 +74,15 @@ let touchAimHelpShown = false;
 
 G.damagePlayer = function (dmg, fromX, fromY) {
   const p = G.state.player;
+  const sourceEnemy = fromX === undefined ? null : G.state.enemies.reduce((closest, enemy) => {
+    if (enemy.dead) return closest;
+    const distance = G.util.dist(fromX, fromY, enemy.x, enemy.y);
+    return distance < 28 && (!closest || distance < closest.distance) ? { enemy, distance } : closest;
+  }, null);
+  const knockoutSource = sourceEnemy ? {
+    enemy: sourceEnemy.enemy.id,
+    rival: !!sourceEnemy.enemy.rival,
+  } : {};
   if (p.invuln > 0 || p.meleeGuard > 0 || p.dashing) return false;
   if (p.pantryGuard > 0) {
     p.pantryGuard--;
@@ -108,6 +120,11 @@ G.damagePlayer = function (dmg, fromX, fromY) {
       if (G.ui.dialogue) G.ui.dialogue("👑 CROWN'S SECOND WIND", rescueText, { accent: "#ffcd75" });
       else G.ui.banner("👑 CROWN'S SECOND WIND", rescueText);
       return;
+    }
+    if (G.state.expeditionRun && G.failManyfoldExpedition) {
+      G.events.emit("ko", Object.assign({ expedition: true }, knockoutSource));
+      G.failManyfoldExpedition("Nobody was carried home from the shifting path.");
+      return true;
     }
     G.sfx.play("ko");
     const configuredTrial = G.state.mapDef && G.state.mapDef.bossTrial;
@@ -149,7 +166,7 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     const safeText = "You got knocked out, but you're okay. Take a breath and try again!";
     if (G.ui.dialogue) G.ui.dialogue("💫 A GENTLE LANDING", safeText, { accent: "#73eff7" });
     else G.ui.toast(safeText, 3);
-    G.events.emit("ko", {});
+    G.events.emit("ko", knockoutSource);
   }
   return true;
 };
@@ -246,7 +263,8 @@ G.updatePlayer = function (dt) {
     if (p.moving) {
       p.dir = { x: v.x, y: v.y };
       const pantrySpeed = p.pantryHasteT > 0 ? 1.18 : 1;
-      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1) * pantrySpeed;
+      const expeditionSpeed = G.expeditionSpeedScale ? G.expeditionSpeedScale() : 1;
+      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1) * pantrySpeed * expeditionSpeed;
       G.world.moveBox(p, v.x * spd * dt, v.y * spd * dt);
       p.anim += dt * (spd / 14);
     }
@@ -984,7 +1002,7 @@ function enemyShot(state, enemy, angle, opts) {
     speed: opts.speed || 90,
     boomerang: !!opts.boomerang,
     returning: false,
-    owner: opts.boomerang ? enemy : null,
+    owner: enemy,
     outboundRange: opts.outboundRange || 70,
     travel: 0,
     shape: opts.shape,
@@ -1246,6 +1264,17 @@ G.drawAimGuide = function (ctx) {
 
 G.drawEnemy = function (ctx, e) {
   const spriteScale = (e.def.boss && e.def.boss.spriteScale) || 1;
+  if (e.rival || e.expeditionElite) {
+    const pulse = 0.5 + Math.sin((G.state.time || 0) * 4 + e.anim) * 0.5;
+    ctx.save();
+    ctx.globalAlpha = 0.25 + pulse * 0.2;
+    ctx.strokeStyle = e.rival ? "#d9a7ff" : e.expeditionChampion ? "#ffcd75" : "#73eff7";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y - e.def.size / 2, e.def.size / 2 + 4 + pulse * 2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
   if (e.def.worldbearer) {
     const color = e.def.boss.color;
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 3 + e.anim) * 0.5;
@@ -1323,13 +1352,21 @@ G.drawEnemy = function (ctx, e) {
   }
 
   // Normal health bars appear once damaged; miniboss bars are always visible.
-  if (e.def.miniboss || e.hp < e.def.hp) {
-    const w = e.def.miniboss ? Math.max(24, e.def.size + 6) : e.def.size;
+  if (e.def.miniboss || e.rival || e.expeditionChampion || e.hp < e.def.hp) {
+    const featured = e.def.miniboss || e.rival || e.expeditionChampion;
+    const w = featured ? Math.max(24, e.def.size + 6) : e.def.size;
     const frac = Math.max(0, e.hp / e.def.hp);
     ctx.fillStyle = "#1a1c2c";
     ctx.fillRect(Math.round(e.x - w / 2), Math.round(e.y - e.def.size - 6), w, 2);
     ctx.fillStyle = "#b13e53";
     ctx.fillRect(Math.round(e.x - w / 2), Math.round(e.y - e.def.size - 6), Math.round(w * frac), 2);
+  }
+  if (e.rival) {
+    ctx.font = "5px monospace";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#d9a7ff";
+    ctx.fillText(`★ ${e.def.name}`, Math.round(e.x), Math.round(e.y - e.def.size - 15));
+    ctx.textAlign = "left";
   }
 };
 

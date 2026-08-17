@@ -137,7 +137,7 @@ for (const map of ["overworld", "mistwood", "sunkenMarsh"]) {
 assert.equal(G.state.heroBoard.active, null);
 assert.equal(G.state.heroBoard.renown, 1);
 assert.equal(G.state.heroBoard.completed, 1);
-assert.equal(G.state.town.spirit, 31, "contracts feed the town without requiring God farming");
+assert.equal(G.state.town.spirit, 37, "contracts and ordinary good deeds feed the town without requiring God farming");
 
 G.state.heroBoard.renown = 2;
 assert.equal(G.startHeroContract(), true);

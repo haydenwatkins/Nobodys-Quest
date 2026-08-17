@@ -962,8 +962,12 @@ G.ui = (() => {
     G.events.emit("menuOpen", {});
   }
   function openMap() {
-    activeTab = "map";
+    activeTab = G.state && G.state.expeditionRun ? "expedition" : "map";
     atlasSelectedId = G.state && G.state.mapId;
+    openMenu();
+  }
+  function openExpedition() {
+    activeTab = "expedition";
     openMenu();
   }
   function closeMenu() {
@@ -1009,16 +1013,22 @@ G.ui = (() => {
   function buildMenu() {
     const previousControllerElements = controllerMenuElements();
     const previousControllerIndex = previousControllerElements.indexOf(controllerFocusedElement);
-    const tabs = [
+    let tabs = [
       ["forms", "Form Lab"],
       ["quests", "Quests"],
       ["map", "Map"],
     ];
     if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
+    if (G.expeditionUnlocked && G.expeditionUnlocked()) tabs.push(["expedition", "Expedition"]);
     if (G.gauntletUnlocked && G.gauntletUnlocked()) tabs.push(["gauntlet", "Gauntlet"]);
     if (G.heroBoardUnlocked && G.heroBoardUnlocked()) tabs.push(["board", "Hero Board"]);
+    if (G.state.expeditionRun) {
+      tabs = [["expedition", "Expedition"]];
+      activeTab = "expedition";
+    }
     if (activeTab === "town" && !(G.townUnlocked && G.townUnlocked())) activeTab = "forms";
     if (activeTab === "gauntlet" && !(G.gauntletUnlocked && G.gauntletUnlocked())) activeTab = "forms";
+    if (activeTab === "expedition" && !(G.expeditionUnlocked && G.expeditionUnlocked())) activeTab = "forms";
     if (activeTab === "board" && !(G.heroBoardUnlocked && G.heroBoardUnlocked())) activeTab = "forms";
     let html = `<h1>Nobody's Quest</h1>
       <div class="stars">⭐ ${G.state.stars} stars</div>
@@ -1032,6 +1042,7 @@ G.ui = (() => {
     if (activeTab === "map") html += buildWayfinderTab();
     if (activeTab === "town") html += buildTownTab();
     if (activeTab === "gauntlet") html += buildGauntletTab();
+    if (activeTab === "expedition") html += buildExpeditionTab();
     if (activeTab === "board") html += buildHeroBoardTab();
 
     html += `</div>${settingsOpen ? buildSettingsPanel() : ""}
@@ -1146,6 +1157,27 @@ G.ui = (() => {
       const count = menuEl.querySelector('[data-gauntlet-count]').value;
       const recovery = menuEl.querySelector('[data-gauntlet-recovery]').checked;
       if (G.startGauntlet(count, recovery)) closeMenu();
+    });
+    const startExpedition = menuEl.querySelector('[data-act="start-expedition"]');
+    if (startExpedition) startExpedition.addEventListener("click", () => {
+      const length = menuEl.querySelector('[data-expedition-length]').value;
+      if (G.startManyfoldExpedition(length)) { activeTab = "expedition"; buildMenu(); }
+    });
+    menuEl.querySelectorAll("[data-expedition-route]").forEach((button) =>
+      button.addEventListener("click", () => {
+        if (!G.chooseExpeditionRoute(button.dataset.expeditionRoute)) return;
+        if (G.state.expeditionRun && G.state.expeditionRun.phase === "battle") closeMenu();
+        else buildMenu();
+      }));
+    menuEl.querySelectorAll("[data-expedition-draft]").forEach((button) =>
+      button.addEventListener("click", () => {
+        if (G.chooseExpeditionDraft(Number(button.dataset.expeditionDraft))) buildMenu();
+      }));
+    const abandonExpedition = menuEl.querySelector('[data-act="abandon-expedition"]');
+    if (abandonExpedition) abandonExpedition.addEventListener("click", () => {
+      G.failManyfoldExpedition("The route will rearrange for next time.", true);
+      activeTab = "map";
+      closeMenu();
     });
     const acceptContract = menuEl.querySelector('[data-act="accept-contract"]');
     if (acceptContract) acceptContract.addEventListener("click", () => {
@@ -1613,12 +1645,14 @@ G.ui = (() => {
       const found = atlasRegionFound(node.id);
       const here = current === node.id;
       const awake = G.wayfinderPostActivated(node.id);
+      const incidentCount = G.incidentsForMap ? G.incidentsForMap(node.id).length : 0;
       const classes = [found ? "known" : "unknown", here ? "here" : "", awake ? "awake" : "",
-        selected.id === node.id ? "selected" : ""].filter(Boolean).join(" ");
+        selected.id === node.id ? "selected" : "", incidentCount ? "incident" : ""].filter(Boolean).join(" ");
       return `<button class="atlas-node ${classes}" style="left:${node.x}%;top:${node.y}%" data-map-node="${node.id}"
         aria-label="${found ? escapeHtml(region.name) : "Undiscovered region"}${here ? ", you are here" : ""}">
         <span class="atlas-icon">${found ? region.icon : "?"}</span>
         <span class="atlas-name">${found ? escapeHtml(region.name) : "Unknown"}</span>
+        ${incidentCount ? `<span class="atlas-incident-count">⚑${incidentCount}</span>` : ""}
         ${here ? `<span class="you-are-here">YOU ARE HERE</span>` : ""}
       </button>`;
     }).join("");
@@ -1630,6 +1664,7 @@ G.ui = (() => {
     const inboundLock = atlasInboundLock(selected.id);
     const requirement = inboundLock ? inboundLock.text : selected.stars ? `${selected.stars} stars required` : "Open road";
     const landmarks = atlasLandmarksForRegion(selected.id);
+    const incidents = G.incidentsForMap ? G.incidentsForMap(selected.id) : [];
     const travelAttr = isWorldwake ? `data-worldwake-region="${selected.id}"` : `data-travel-region="${selected.id}"`;
     let action = "";
     if (found && awake) {
@@ -1658,6 +1693,8 @@ G.ui = (() => {
         </div>
         ${landmarks.length ? `<div class="atlas-landmark-chips"><strong>KNOWN LANDMARKS</strong>${landmarks.map((map) =>
           `<span>◆ ${escapeHtml(map.name)}</span>`).join("")}</div>` : ""}
+        ${incidents.length ? `<div class="atlas-incidents"><strong>⚑ ACTIVE SITUATIONS</strong>${incidents.map((incident) =>
+          `<div class="quest-row"><span>${incident.icon} ${escapeHtml(incident.name)}<small>${escapeHtml(incident.text)}</small></span><span class="prog">${G.incidentProgressLabel(incident)}</span></div>`).join("")}</div>` : ""}
         ${action}
       </div>`;
   }
@@ -1782,14 +1819,14 @@ G.ui = (() => {
     if (!town.founded) {
       return `<div class="form-card current">
         <h2>☀️ Found Your Town</h2>
-        <div class="tagline">God is unlocked. Start a town, then defeat baddies as God to attract new residents.</div>
+        <div class="tagline">Claim your first new form to begin a home that grows with every kind of adventure.</div>
         <button data-act="found-town">Found town</button>
       </div>`;
     }
 
     return `<div class="form-card current">
       <h2>☀️ ${townName}</h2>
-      <div class="tagline">Defeat baddies as God to attract residents. Break wards as God to raise town spirit.</div>
+      <div class="tagline">Forms, good deeds, incidents, Rivals, and Expeditions all help this shared home grow.</div>
       <div class="quest-row"><span>Town level</span><span class="prog">${G.townLevel ? G.townLevel() : 1}</span></div>
       <div class="quest-row"><span>Residents</span><span class="prog">${town.residents}</span></div>
       <div class="quest-row"><span>Capacity</span><span class="prog">${G.townCapacity ? G.townCapacity() : "?"}</span></div>
@@ -1806,11 +1843,62 @@ G.ui = (() => {
       <h2>🏠 Town rules</h2>
       <div class="quest-row"><span>Visit town</span><span class="prog">walk onto empty plots</span></div>
       <div class="quest-row"><span>Build house</span><span class="prog">spend town spirit</span></div>
-      <div class="quest-row"><span>Kill as God</span><span class="prog">+1 resident, +2 spirit</span></div>
-      <div class="quest-row"><span>Break ward as God</span><span class="prog">+1 spirit</span></div>
+      <div class="quest-row"><span>Five ordinary victories</span><span class="prog">+2 spirit</span></div>
+      <div class="quest-row"><span>Claim a form</span><span class="prog">resident + spirit</span></div>
+      <div class="quest-row"><span>Resolve Atlas incident</span><span class="prog">major growth</span></div>
+      <div class="quest-row"><span>Complete Expedition</span><span class="prog">major growth</span></div>
+      <div class="quest-row"><span>Break any ward</span><span class="prog">+1 spirit</span></div>
       <div class="quest-row"><span>Hold festival</span><span class="prog">+residents spirit</span></div>
       ${(G.state.items || []).includes("sunrise-banner") ? `<div class="quest-row done"><span>🚩 Sunrise Banner</span><span class="prog">festival spirit ×2</span></div>` : ""}
     </div>`;
+  }
+
+  function buildExpeditionTab() {
+    const progress = G.ensureExpeditionProgress();
+    const run = G.state.expeditionRun;
+    if (!run) {
+      const longUnlocked = G.unlockedForms().length >= 5;
+      return `<div class="form-card current expedition-intro">
+        <span class="eyebrow">ROGUELITE-INSPIRED ADVENTURE</span><h2>◇ Manyfold Expeditions</h2>
+        <div class="tagline">Choose branching routes, clear hand-built combat rooms, and draft temporary forms, moves, and boons. Losing safely returns you home.</div>
+        <div class="quest-row"><span>Runs entered</span><span class="prog">${progress.runs}</span></div>
+        <div class="quest-row"><span>Victories</span><span class="prog">${progress.victories}</span></div>
+        <div class="quest-row"><span>Best room</span><span class="prog">${progress.bestRoom}</span></div>
+        <div class="quest-row"><span>Longest clear</span><span class="prog">${progress.longestWin || "—"}</span></div>
+        <div class="slot-row"><span class="slot-label">Route length</span><select data-expedition-length>
+          <option value="5">Trail · 5 rooms</option>${longUnlocked ? `<option value="7">Deep path · 7 rooms</option>` : ""}
+          ${G.unlockedForms().length >= 10 ? `<option value="9">Worldfold · 9 rooms</option>` : ""}
+        </select></div>
+        <button data-act="start-expedition">Enter the shifting path</button>
+      </div><div class="form-card"><h2>How a run works</h2>
+        <div class="quest-row"><span>① Pick a route</span><span class="prog">risk vs reward</span></div>
+        <div class="quest-row"><span>② Win the room</span><span class="prog">campaign is safe</span></div>
+        <div class="quest-row"><span>③ Draft one reward</span><span class="prog">run-only power</span></div>
+        <div class="quest-row"><span>④ Defeat the final champion</span><span class="prog">town rewards</span></div></div>`;
+    }
+
+    const boonCatalog = G.EXPEDITION_BOONS || {};
+    const boonNames = Object.entries(run.boons).filter(([, count]) => count).map(([id, count]) => {
+      const boon = boonCatalog[id];
+      return boon ? `${boon.icon} ${boon.name}${count > 1 ? ` ×${count}` : ""}` : id;
+    });
+    let body = `<div class="form-card current"><span class="eyebrow">RUN IN PROGRESS</span>
+      <h2>◇ Room ${Math.min(run.room + 1, run.length)}/${run.length}</h2>
+      <div class="quest-row"><span>Rooms cleared</span><span class="prog">${run.wins}</span></div>
+      <div class="tagline">${boonNames.length ? boonNames.join(" · ") : "No boons yet. The first draft is ahead."}</div></div>`;
+    if (run.phase === "route") {
+      body += `<div class="expedition-choice-grid">${run.routeChoices.map((route) => `<button class="expedition-choice" data-expedition-route="${route.id}">
+        <span class="choice-icon">${route.icon}</span><strong>${escapeHtml(route.name)}</strong><small>${escapeHtml(route.risk)}</small><em>${escapeHtml(route.reward)}</em>
+      </button>`).join("")}</div>`;
+    } else if (run.phase === "reward") {
+      body += `<div class="form-card"><h2>Choose one draft</h2><div class="tagline">Everything here lasts only for this expedition.</div></div>
+        <div class="expedition-choice-grid draft-grid">${run.draftOptions.map((option, index) => `<button class="expedition-choice" data-expedition-draft="${index}">
+          <span class="choice-icon">${option.icon}</span><strong>${escapeHtml(option.name)}</strong><small>${escapeHtml(option.text)}</small><em>TAKE THIS</em>
+        </button>`).join("")}</div>`;
+    } else {
+      body += `<div class="form-card"><h2>Battle underway</h2><div class="tagline">Close this menu and clear the room. Your draft appears after the last foe falls.</div></div>`;
+    }
+    return body + `<div class="form-card"><button data-act="abandon-expedition" class="danger">Leave expedition safely</button></div>`;
   }
 
   function buildGauntletTab() {
@@ -1888,7 +1976,7 @@ G.ui = (() => {
 
   return {
     toast, banner, dialogue, update, drawHUD, resizeOverlay,
-    openMenu, openMap, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
+    openMenu, openMap, openExpedition, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
     openFormWheel, closeFormWheel, aimFormWheel, commitFormWheel, updateFormWheel,
     get menuOpen() { return menuOpen; },
     get formWheelOpen() { return formWheelOpen; },

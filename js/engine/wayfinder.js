@@ -308,7 +308,7 @@ G.wayfinderTravelUnlocked = function () {
 
 G.canWayfinderTravel = function () {
   if (!G.state || !G.wayfinderTravelUnlocked()) return false;
-  if (G.state.gauntletRun || G.state.knockout || G.state.bossCutscene) return false;
+  if (G.state.expeditionRun || G.state.gauntletRun || G.state.knockout || G.state.bossCutscene) return false;
   const trial = G.state.mapDef && G.state.mapDef.bossTrial;
   // Worldbearers fight in the shared overworld, so their regions remain part
   // of the travel network after engagement. Instanced trials stay sealed to
@@ -320,6 +320,7 @@ G.canWayfinderTravel = function () {
 
 G.wayfinderTravelReason = function () {
   if (!G.state) return "The route is unavailable.";
+  if (G.state.expeditionRun) return "Finish or leave the expedition before traveling.";
   if (G.state.gauntletRun) return "Finish or leave the gauntlet before traveling.";
   if (G.state.knockout || G.state.bossCutscene) return "Finish this story moment before traveling.";
   const trial = G.state.mapDef && G.state.mapDef.bossTrial;

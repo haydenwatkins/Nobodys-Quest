@@ -321,6 +321,22 @@ registerMap({
   ],
 });
 
+registerMap({
+  id: "manyfoldExpedition", name: "The Shifting Path", visualTheme: "riftblade", playerStart: { x: 6, y: 8 },
+  legend: {
+    "m": { tile: "floor", message: "The path rearranges after every room. Routes, forms, moves, and boons last only until the expedition ends." },
+    "R": { tile: "rock", on: "floor" },
+  },
+  tiles: [
+    "############################", "#ffffffffffffffffffffffffff#", "#fffRffffffffffffffffffRfff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "#fffffmffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#",
+    "#ffffffffffffffffffffffffff#", "#ffffffffffffffffffffffffff#", "#fffRffffffffffffffffffRfff#",
+    "#ffffffffffffffffffffffffff#", "############################",
+  ],
+});
+
 /* ================== THE OLD DUNGEON (30 x 18) ================== */
 
 registerMap({

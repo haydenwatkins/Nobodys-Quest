@@ -348,6 +348,23 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   font-family: "VT323", "Courier New", monospace;
 }
 .atlas-node.known { border-color: #73eff7; color: #f4f4f4; background: #29384a; }
+.atlas-node.incident {
+  border-color: #ffcd75;
+  background: linear-gradient(145deg, #34304a, #29384a);
+  box-shadow: 0 0 0 3px rgba(255,205,117,.12), 0 4px 0 rgba(10,12,22,.45);
+}
+.atlas-incident-count {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  min-width: 20px;
+  padding: 3px 4px;
+  border: 2px solid #1a1c2c;
+  border-radius: 8px;
+  background: #ffcd75;
+  color: #1a1c2c;
+  font: 7px "Press Start 2P", "Courier New", monospace;
+}
 .atlas-node.awake::after {
   content: "";
   position: absolute;
@@ -394,6 +411,15 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .atlas-landmark-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .atlas-landmark-chips strong { color: #ffcd75; font: 7px "Press Start 2P", "Courier New", monospace; }
 .atlas-landmark-chips span { padding: 3px 6px; border-radius: 5px; background: #333c57; color: #d9a7ff; font-size: 15px; }
+.atlas-incidents {
+  margin-top: 10px;
+  padding: 9px 11px;
+  border: 2px solid #ffcd75;
+  border-radius: 9px;
+  background: rgba(255,205,117,.07);
+}
+.atlas-incidents > strong { color: #ffcd75; font: 7px "Press Start 2P", "Courier New", monospace; }
+.atlas-incidents small { display: block; margin-top: 3px; color: #c8d8e0; font-size: 16px; }
 .form-card .atlas-travel {
   width: 100%;
   min-height: 46px;
@@ -576,6 +602,46 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .synergy-callout { margin-top: 7px; padding: 7px; color: #94b0c2; border-left: 3px solid #566c86; background: #1d2233; font-size: 17px; }
 .synergy-callout.good { color: #a7f070; border-color: #a7f070; }
 .empty-tray { padding: 22px; color: #94b0c2; text-align: center; }
+
+/* ---------- Manyfold Expeditions ---------- */
+
+.expedition-intro {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(217,167,255,.25), transparent 31%),
+    linear-gradient(145deg, #292842, #24283b);
+}
+.eyebrow { color: #d9a7ff; font: 7px "Press Start 2P", "Courier New", monospace; letter-spacing: 1px; }
+.expedition-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.expedition-choice {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  justify-items: start;
+  gap: 8px;
+  min-height: 178px;
+  padding: 15px;
+  border: 2px solid #d9a7ff;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 86% 10%, rgba(217,167,255,.19), transparent 34%),
+    #292842;
+  color: #f4f4f4;
+  font-family: "Press Start 2P", "Courier New", monospace;
+  text-align: left;
+  box-shadow: 0 5px 0 rgba(10,12,22,.45);
+}
+.expedition-choice:hover, .expedition-choice:focus { border-color: #ffcd75; transform: translateY(-1px); }
+.expedition-choice .choice-icon { font-size: 34px; line-height: 1; }
+.expedition-choice strong { font-size: 10px; line-height: 1.5; }
+.expedition-choice small { color: #c8d8e0; font: 18px "VT323", "Courier New", monospace; line-height: 1.1; }
+.expedition-choice em { align-self: end; color: #ffcd75; font: normal 7px "Press Start 2P", "Courier New", monospace; line-height: 1.5; }
+.draft-grid .expedition-choice { border-color: #73eff7; }
+.form-card button.danger { border-color: #b13e53; background: #633447; color: #f4f4f4; }
 
 .skin-stage { margin-bottom: 10px; }
 .skin-spotlight { position: relative; }
@@ -763,6 +829,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .atlas-detail-heading { align-items: flex-start; }
   .atlas-facts { font-size: 16px; gap: 8px; }
   .atlas-body .quest-row .prog { max-width: 100%; }
+  .expedition-choice { min-height: 155px; padding: 12px; }
   .landmark-route { align-items: stretch; flex-direction: column; }
   .landmark-route small { text-align: left; }
   .landmark-route .travel-btn { width: 100%; }
@@ -795,4 +862,6 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .ability-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .skin-tile-grid { grid-template-columns: 1fr; }
   .dye-grid { grid-template-columns: 1fr; }
+  .expedition-choice-grid { grid-template-columns: 1fr; }
+  .expedition-choice { min-height: 135px; }
 }
