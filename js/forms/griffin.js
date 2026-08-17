@@ -4,7 +4,7 @@
 registerForm({
   id: "griffin", name: "Griffin", icon: "🦅",
   tagline: "A sky hunter who turns movement itself into a weapon and never lands quietly.",
-  speed: 118, hearts: 4, slots: 2,
+  speed: 118, hearts: 5, slots: 2,
   passive: { id: "slipstream", name: "Slipstream",
     description: "Attack while moving to leave a tailwind that speeds you and shoves enemies without adding damage." },
   basic: "wingbeat",

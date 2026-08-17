@@ -16,7 +16,7 @@ G.makePlayer = function () {
     invuln: 0,                 // seconds of "can't be hurt"
     meleeGuard: 0,             // tiny hit-confirm grace; never granted on a whiff
     damageTaken: 0,            // hearts lost (max hearts comes from the form)
-    mana: 6, manaMax: 10,
+    mana: 6, manaMax: 12,
     manaRegenDelay: 0,
     manaRegenProgress: 0,
     cooldowns: {},             // abilityId -> seconds left
@@ -39,7 +39,7 @@ G.playerForm = function () { return G.forms[G.state.formId]; };
 G.playerMaxHearts = function () { return G.playerForm().hearts; };
 G.playerHp = function () { return Math.max(0, G.playerMaxHearts() - G.state.player.damageTaken); };
 G.playerMaxMana = function () {
-  return 10 + (G.state && (G.state.items || []).includes("manyfold-crown") ? 2 : 0);
+  return 12 + (G.state && (G.state.items || []).includes("manyfold-crown") ? 2 : 0);
 };
 
 G.autoAimTarget = function (user, maxRange) {

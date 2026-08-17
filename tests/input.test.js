@@ -46,10 +46,18 @@ documentTarget.getElementById = (id) => elements[id];
 documentTarget.createElement = (tag) => new FakeTarget(tag);
 const fakeGamepads = [];
 const navigatorTarget = { maxTouchPoints: 5, getGamepads: () => fakeGamepads };
+let inputClock = 0;
+let wheelOpened = 0;
+let wheelCommitted = 0;
 
 const context = vm.createContext({
-  console, Math,
-  G: { sfx: { ensure() {} }, ui: { menuOpen: false, toast() {} } },
+  console, Math, performance: { now: () => inputClock },
+  G: { sfx: { ensure() {} }, ui: {
+    menuOpen: false, formWheelOpen: false, toast() {},
+    openFormWheel() { wheelOpened++; this.formWheelOpen = true; return true; },
+    commitFormWheel() { wheelCommitted++; this.formWheelOpen = false; return true; },
+    closeFormWheel() { this.formWheelOpen = false; },
+  } },
   window: windowTarget,
   document: documentTarget,
   navigator: navigatorTarget,
@@ -177,9 +185,19 @@ G.input.update();
 
 pad.buttons[1] = gamepadButton(1);
 G.input.update();
-assert.equal(G.input.tapped("swap"), true, "Xbox B should swap forms during gameplay");
+assert.equal(G.input.tapped("swap"), false, "swap waits for release so a hold can open the form wheel");
 pad.buttons[1] = gamepadButton();
 G.input.update();
+assert.equal(G.input.tapped("swap"), true, "a quick Xbox B release should still swap forms");
+
+pad.buttons[1] = gamepadButton(1);
+G.input.update();
+inputClock += 400;
+G.input.update();
+assert.equal(wheelOpened, 1, "holding Xbox B should open the paused form wheel");
+pad.buttons[1] = gamepadButton();
+G.input.update();
+assert.equal(wheelCommitted, 1, "releasing a held swap should commit the aimed radial choice");
 
 pad.buttons[8] = gamepadButton(1);
 G.input.update();

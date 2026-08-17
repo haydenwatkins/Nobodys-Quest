@@ -56,6 +56,14 @@ assert.deepEqual(Object.assign({}, G.spriteMetrics(base)), { w: 4, h: 4, density
   "HD sprites must occupy the exact same logical footprint");
 assert.ok(G.spriteFrame(base, "idle", 2) >= 0);
 
+const plainSprite = () => ({ palette: { k: "#1a1c2c", c: "#73eff7" }, frames: [["kk", "cc"], ["kk", "c."]] });
+G.forms = { test: { sprite: plainSprite() } };
+G.enemies = { test: { sprite: plainSprite() } };
+G.NPCS = { test: { sprite: plainSprite() } };
+assert.equal(G.upgradeSpriteCatalog(), 3);
+for (const registry of [G.forms, G.enemies, G.NPCS])
+  assert.equal(registry.test.sprite.hd.density, 2, "every sprite registry should complete the HD migration");
+
 const draw = {
   save() {}, restore() {}, translate() {}, scale() {}, drawImage(...args) { canvasCalls.push(args); },
 };
@@ -73,9 +81,11 @@ for (const text of [
   "snapshot.width = canvas.width",
   "G.setHdPilot",
 ]) assert.ok(main.includes(text), `resolution foundation should include '${text}'`);
-assert.ok(ui.includes("RESOLUTION PILOT") && ui.includes("Compare original"));
-assert.ok(world.includes("drawHdPilotDetail") && world.includes("0.5"),
-  "the world pilot should use detail below the old one-logical-pixel grid");
+assert.ok(ui.includes("World detail") && ui.includes("Original · 320×180"),
+  "the completed resolution control should live in compact settings");
+assert.ok(world.includes("drawHdWorldDetail") && world.includes("0.5"),
+  "the full world renderer should use detail below the old one-logical-pixel grid");
+assert.ok(main.includes("G.upgradeSpriteCatalog"), "every registered sprite should join the HD catalog");
 
 for (const file of ["js/forms/nobody.js", "js/data/npcs.js", "js/data/enemies.js"]) {
   const source = fs.readFileSync(path.join(root, file), "utf8");

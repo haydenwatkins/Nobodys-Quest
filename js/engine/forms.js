@@ -69,6 +69,9 @@ function registerForm(def) {
     err(`Its speed is ${def.speed} — keep it between 40 (slow tank) and 140 (zoomy). (Rule 5: fair is fun.)`);
   if (typeof def.hearts !== "number" || def.hearts < 1 || def.hearts > 8)
     err(`It has ${def.hearts} hearts — keep it between 1 and 8. (Rule 5!)`);
+  // Five hearts is the roster-wide survivability floor. Keeping this at the
+  // registration boundary also protects future forms Ben adds to the game.
+  if (typeof def.hearts === "number") def.hearts = Math.max(5, def.hearts);
 
   if (!def.passive || !def.passive.id || !def.passive.name || !def.passive.description)
     err("It needs one signature passive with an id, name, and short description. Passives make borrowed abilities feel different in every form! (Rule 1)");

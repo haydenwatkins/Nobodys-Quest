@@ -18,7 +18,7 @@ registerForm({
 
 
   speed: 70,                  // zoomy! (limit is 140)
-  hearts: 3,                   // but fragile
+  hearts: 5,                   // magic-focused without being one-shot fragile
   slots: 2,
   passive: { id: "hexcraft", name: "Hexcraft",
     description: "Status abilities last longer and shove afflicted enemies harder." },

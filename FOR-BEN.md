@@ -14,7 +14,7 @@ Double-click `index.html` — it opens in your browser. That's it.
 |------|--------------|
 | WASD or Arrows | move |
 | J / K / L (or Z / X / C, or Space) | abilities A / B / C |
-| Q or Tab | quick-swap form |
+| Q or Tab | tap to quick-swap; hold and aim for the paused form wheel |
 | Esc or Enter | menu (forms, quests, mixing) |
 
 On an iPad it's all touch — joystick on the left, buttons on the right.
@@ -39,7 +39,7 @@ registerForm({
   tagline: "Old, wise, and slightly explosive.",
 
   speed: 70,
-  hearts: 3,
+  hearts: 5,
   slots: 2,
   passive: {
     id: "farCasting",
@@ -100,7 +100,7 @@ aren't random — each one protects the FUN:
    against Shades and the purple wards in later regions.
    One ability keeps its declared type for every hit, including dash
    finishers and projectile explosions; the combat engine enforces this.
-5. **Fair is fun.** Speed 40–140, hearts 1–8, mana 0–8, cooldown
+5. **Fair is fun.** Speed 40–140, hearts 5–8, mana 0–8, cooldown
    0.15s+. A form that breaks the game is boring in five minutes.
 6. **Dashes are safe.** Every dash ability is invulnerable for its complete
    travel and landing. Enemies can be hurt during a dash; the player cannot.

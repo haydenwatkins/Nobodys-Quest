@@ -11,7 +11,7 @@ registerForm({
   tagline: "Carries thunder in both hands and absolutely no umbrella.",
 
   speed: 85,
-  hearts: 3,
+  hearts: 5,
   slots: 2,
   passive: { id: "conductor", name: "Conductor",
     description: "Successful hits arc a harmless shock that shoves a nearby enemy." },

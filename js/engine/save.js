@@ -42,6 +42,7 @@ G.saveGame = function () {
       pinnedQuestIds: s.pinnedQuestIds,
       tutorialStep: G.tutorial ? G.tutorial.step : 0,
       tutorialDone: G.tutorial ? G.tutorial.done : false,
+      tutorialSeen: G.tutorial ? G.tutorial.seen : false,
     }));
   } catch (e) {
     // storage full or blocked — the game still plays, just won't remember

@@ -11,7 +11,7 @@ registerForm({
   tagline: "A spring-loaded swamp hero with a tongue longer than good sense.",
 
   speed: 105,
-  hearts: 3,
+  hearts: 5,
   slots: 2,
   passive: { id: "elastic", name: "Elastic",
     description: "Melee abilities reach farther and pull enemies in instead of knocking them away." },

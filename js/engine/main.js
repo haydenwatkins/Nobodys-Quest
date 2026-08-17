@@ -113,6 +113,7 @@
 
   /* ---------- boot ---------- */
   G.validateCrossRefs();
+  G.upgradeSpriteCatalog();
   G.ui.showWorkshop();
   const localBuilder = location.hostname === "127.0.0.1" || location.hostname === "localhost";
   const builderParams = localBuilder ? new URLSearchParams(location.search) : null;
@@ -280,10 +281,13 @@
 
     // Dialogue owns every action button while it is open. In particular,
     // Enter/Escape must advance the conversation instead of opening a menu.
-    if (!G.ui.dialogueOpen && G.input.tapped("map")) G.ui.openMap();
-    if (!G.ui.dialogueOpen && G.input.tapped("pause")) G.ui.toggleMenu();
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("map")) G.ui.openMap();
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("pause")) G.ui.toggleMenu();
 
-    if (!G.ui.menuOpen) {
+    if (G.ui.formWheelOpen) {
+      G.ui.updateFormWheel();
+      G.input.clearTaps();
+    } else if (!G.ui.menuOpen) {
       update(dt);
     } else {
       G.ui.updateControllerMenu();

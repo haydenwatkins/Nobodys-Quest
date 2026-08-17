@@ -156,6 +156,6 @@ G.damagePlayer(1);
 assert.equal(G.playerHp(), 1);
 assert.equal(G.state.gauntletRun.crownRescueUsed, true);
 assert.equal(G.state.projectiles.length, 0);
-assert.equal(G.playerMaxMana(), 12);
+assert.equal(G.playerMaxMana(), 14);
 
 console.log("expansion tests passed");

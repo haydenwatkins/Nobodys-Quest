@@ -28,6 +28,8 @@ for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alch
 run("js/engine/quests.js");
 G.validateCrossRefs();
 assert.equal(G.workshopErrors.length, 0, "new forms must obey Ben's workshop rules");
+assert.ok(G.formOrder.every((id) => G.forms[id].hearts >= 5),
+  "the registration boundary should guarantee at least five hearts for every present and future form");
 
 G.state = {
   player: { damageTaken: 0, dashing: null }, formId: "nobody",

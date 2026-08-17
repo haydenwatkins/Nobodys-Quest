@@ -43,15 +43,23 @@ G.tutorial = (() => {
 
   let step = 0;
   let done = false;
+  let seen = false;
+  let visibleFor = 0;
   let startX = 0;
   let startY = 0;
 
   function init(save) {
     step = save && Number.isInteger(save.tutorialStep) ? save.tutorialStep : 0;
     done = !!(save && save.tutorialDone);
+    const previouslySeen = !!(save && save.tutorialSeen);
+    seen = true;
+    // Existing adventures migrate quietly. A genuinely new adventure gets a
+    // brief first hint, then later lessons appear only when they are reached.
+    visibleFor = save ? 0 : 7;
     step = G.util.clamp(step, 0, steps.length - 1);
     startX = G.state.player.x;
     startY = G.state.player.y;
+    if (!previouslySeen) G.saveGame();
   }
 
   function advance(expectedStep) {
@@ -62,25 +70,42 @@ G.tutorial = (() => {
       G.ui.banner("TUTORIAL COMPLETE!", "Explore, mix abilities, and finish quests your way.");
     } else {
       step++;
+      visibleFor = 5;
       G.sfx.play("pickup");
       G.ui.toast("Tutorial step complete!");
     }
     G.saveGame();
   }
 
-  function update() {
+  function update(dt) {
+    visibleFor = Math.max(0, visibleFor - (dt || 0));
     if (done || step !== 0 || !G.state) return;
     const p = G.state.player;
     if (G.util.dist(startX, startY, p.x, p.y) >= 20) advance(0);
   }
 
   function prompt() {
-    if (done) return null;
+    if (done || visibleFor <= 0) return null;
     const current = steps[step];
     return {
       title: current.title,
       text: G.input.hasGamepad ? current.controller : G.input.isTouch ? current.touch : current.desktop,
     };
+  }
+
+  function dismiss() {
+    visibleFor = 0;
+    G.saveGame();
+  }
+
+  function replay() {
+    step = 0;
+    done = false;
+    seen = true;
+    visibleFor = 8;
+    startX = G.state.player.x;
+    startY = G.state.player.y;
+    G.saveGame();
   }
 
   G.events.on("abilityUse", () => advance(1));
@@ -89,10 +114,11 @@ G.tutorial = (() => {
   G.events.on("wardBreak", () => advance(4));
 
   return {
-    init,
+    init, dismiss, replay,
     update,
     prompt,
     get step() { return step; },
     get done() { return done; },
+    get seen() { return seen; },
   };
 })();

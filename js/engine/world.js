@@ -522,8 +522,43 @@ G.world = (() => {
     titan: { grass: ["#6d6654", "#7d755f", "#5f594b"], path: ["#9b875f", "#ad9870", "#897550"], floor: ["#5c5a59", "#6b6866", "#4e4d4e"], accent: "#ef7d57" },
   };
 
+  const REGION_BIOME = {
+    overworld: "greenfield", mistwood: "mistwood", sunkenMarsh: "marsh", emberRidge: "ember",
+    starfallRuins: "ruins", shattercoast: "coast", town: "town",
+  };
+  Object.assign(BIOME_PALETTES, {
+    greenfield: { grass: ["#31ad60", "#42bd6a", "#38b764"], path: ["#cfaa66", "#e0b874", "#d8b06a"], floor: ["#4f627c", "#60738d", "#566c86"], accent: "#a7f070" },
+    mistwood: { grass: ["#235c4b", "#2e7158", "#1d4e42"], path: ["#8d7654", "#9d8662", "#796548"], floor: ["#465b5d", "#526b6c", "#3b4e51"], accent: "#73c99a" },
+    marsh: { grass: ["#50633f", "#627449", "#435738"], path: ["#827654", "#938761", "#706548"], floor: ["#445b54", "#50675f", "#394c47"], accent: "#b6d466" },
+    ember: { grass: ["#6e3c35", "#81473b", "#5b332f"], path: ["#a76842", "#bd7a4d", "#8e5739"], floor: ["#51404a", "#604a52", "#453740"], accent: "#ff8f57" },
+    ruins: { grass: ["#45466d", "#53547d", "#3b3c60"], path: ["#77749a", "#8986aa", "#666382"], floor: ["#484866", "#575674", "#3d3d59"], accent: "#d9a7ff" },
+    coast: { grass: ["#448b78", "#54a089", "#397664"], path: ["#d1b67b", "#e0c78c", "#baa16d"], floor: ["#536f7b", "#62818d", "#465e69"], accent: "#73eff7" },
+    town: { grass: ["#55a95b", "#67b969", "#468f50"], path: ["#c79a61", "#d8aa6d", "#b28654"], floor: ["#7a6858", "#8b7764", "#69594d"], accent: "#ffcd75" },
+  });
+
+  const BIOME_MATERIALS = {
+    greenfield: { texture: "meadow", tree: ["#1e5f4e", "#257179", "#38b764"], trunk: "#6b4a2b", water: ["#3b5dc9", "#41a6f6", "#5fcde4"], rock: ["#566c86", "#94b0c2", "#f4f4f4"] },
+    mistwood: { texture: "needles", tree: ["#173f3b", "#1e5f4e", "#318a62"], trunk: "#4b3b35", water: ["#293a6b", "#356c88", "#55a6a6"], rock: ["#43585e", "#71868a", "#a5b9b4"] },
+    marsh: { texture: "reeds", tree: ["#37472f", "#4c613a", "#708344"], trunk: "#50452e", water: ["#334e54", "#47706b", "#6f9480"], rock: ["#4f5c4f", "#75806a", "#a4aa84"] },
+    ember: { texture: "embers", tree: ["#3b292d", "#663238", "#a44a3f"], trunk: "#412c2a", water: ["#512d46", "#8b3d42", "#ef7d57"], rock: ["#4a3b42", "#79524d", "#c27655"] },
+    ruins: { texture: "stars", tree: ["#292d57", "#3f4774", "#696a9b"], trunk: "#38344d", water: ["#293a9b", "#3b5dc9", "#73eff7"], rock: ["#4d4c70", "#8584a8", "#d9a7ff"] },
+    coast: { texture: "shells", tree: ["#1e5f5a", "#267b6c", "#45ad82"], trunk: "#796044", water: ["#2874a6", "#41a6f6", "#73eff7"], rock: ["#607f91", "#94b0c2", "#d8f3f1"] },
+    town: { texture: "cobbles", tree: ["#286045", "#397d4f", "#61ad5c"], trunk: "#795033", water: ["#3b5dc9", "#41a6f6", "#73eff7"], rock: ["#6e665d", "#a69480", "#e0c49d"] },
+    sunstep: { texture: "sunbursts", tree: ["#397a43", "#55a94a", "#8cc84b"], trunk: "#8a6538", water: ["#2f8f9c", "#51bdba", "#9ce1cf"], rock: ["#92704c", "#c49a61", "#f0c982"] },
+    windscar: { texture: "strata", tree: ["#5a4334", "#805a3d", "#b87943"], trunk: "#593827", water: ["#315b73", "#3b8195", "#73c7ca"], rock: ["#70483e", "#a8684a", "#e0a468"] },
+    gardens: { texture: "petals", tree: ["#276b53", "#369166", "#67bd70"], trunk: "#53604a", water: ["#3d7790", "#55abc0", "#9ad9d1"], rock: ["#627776", "#9bb4aa", "#e1efe0"] },
+    rootdeep: { texture: "spores", tree: ["#253b3e", "#395650", "#687463"], trunk: "#49384d", water: ["#362f61", "#554979", "#9b6aa1"], rock: ["#423c50", "#776176", "#d9a7ff"] },
+    glasswater: { texture: "shards", tree: ["#5d826e", "#79a77f", "#b0c77e"], trunk: "#8b6b4b", water: ["#3488aa", "#55bed0", "#b4f0e5"], rock: ["#607f91", "#8fb9c3", "#d8f3f1"] },
+    frostbell: { texture: "snow", tree: ["#476778", "#63899a", "#a4c9c8"], trunk: "#596378", water: ["#536f91", "#7da6c0", "#d8f3f1"], rock: ["#607487", "#9db5c0", "#edf4ed"] },
+    stormspine: { texture: "lightning", tree: ["#26384b", "#354e62", "#526a76"], trunk: "#3c3440", water: ["#293a6b", "#3d5688", "#6f82b5"], rock: ["#3c405d", "#6f7895", "#bdc4d7"] },
+    titan: { texture: "runes", tree: ["#45473e", "#60614e", "#80785c"], trunk: "#514334", water: ["#4e4144", "#705259", "#a86b63"], rock: ["#4e4d4e", "#89827a", "#d2c4a6"] },
+  };
+  for (const [id, materials] of Object.entries(BIOME_MATERIALS))
+    if (BIOME_PALETTES[id]) Object.assign(BIOME_PALETTES[id], materials);
+
   function biomePalette() {
-    return BIOME_PALETTES[G.state.mapDef && G.state.mapDef.biome] || null;
+    const id = G.state.mapDef && G.state.mapDef.biome || REGION_BIOME[G.state.mapId];
+    return BIOME_PALETTES[id] || null;
   }
 
   function groundColor(kind, x, y) {
@@ -638,24 +673,26 @@ G.world = (() => {
         break;
       }
       case "tree": {
+        const biome = biomePalette();
+        const tree = biome && biome.tree || ["#1e5f4e", "#257179", "#2e9e6b"];
         ctx.fillStyle = groundColor("grass", x, y);
         ctx.fillRect(px, py, T, T);
         ctx.fillStyle = "rgba(26,28,44,0.28)";
         ctx.fillRect(px + 2, py + 12, 13, 3);
         ctx.fillRect(px + 5, py + 14, 8, 2);
-        ctx.fillStyle = "#6b4a2b"; // trunk
+        ctx.fillStyle = biome && biome.trunk || "#6b4a2b"; // trunk
         ctx.fillRect(px + 6, py + 11, 4, 5);
-        ctx.fillStyle = "#1e5f4e"; // canopy shadow (rounded blob)
+        ctx.fillStyle = tree[0]; // canopy shadow (rounded blob)
         ctx.fillRect(px + 2, py + 3, 12, 9);
         ctx.fillRect(px + 4, py + 1, 8, 13);
-        ctx.fillStyle = "#257179"; // canopy body
+        ctx.fillStyle = tree[1]; // canopy body
         ctx.fillRect(px + 3, py + 3, 10, 7);
         ctx.fillRect(px + 5, py + 1, 6, 11);
-        ctx.fillStyle = "#2e9e6b"; // leafy highlight
+        ctx.fillStyle = tree[2]; // leafy highlight
         ctx.fillRect(px + 5, py + 2, 4, 2);
         ctx.fillRect(px + 4, py + 4, 2, 3);
         if (rnd > 0.62) {
-          ctx.fillStyle = "#38b764";
+          ctx.fillStyle = tree[2];
           ctx.fillRect(px + 9, py + 5, 2, 2);
           ctx.fillStyle = rnd > 0.86 ? "#ffcd75" : "#a7f070";
           ctx.fillRect(px + 11, py + 8, 1, 1);
@@ -663,15 +700,16 @@ G.world = (() => {
         break;
       }
       case "water": {
-        ctx.fillStyle = "#3b5dc9";
+        const water = biomePalette() && biomePalette().water || ["#3b5dc9", "#41a6f6", "#5fcde4"];
+        ctx.fillStyle = water[0];
         ctx.fillRect(px, py, T, T);
         const wave = Math.floor((time * 2 + rnd * 4) % 4);
         if (rnd > 0.5) {
-          ctx.fillStyle = "#41a6f6";
+          ctx.fillStyle = water[1];
           ctx.fillRect(px + 2 + wave, py + 4 + Math.floor(rnd * 8), 4, 1);
         }
         if (rnd < 0.28) {
-          ctx.fillStyle = "#5fcde4";
+          ctx.fillStyle = water[2];
           ctx.fillRect(px + 9 - wave, py + 11, 3, 1);
         }
         break;
@@ -712,16 +750,17 @@ G.world = (() => {
       }
       case "rock": {
         const trial = cell.on === "floor" ? trialTilePalette() : null;
+        const rock = biomePalette() && biomePalette().rock || ["#566c86", "#94b0c2", "#f4f4f4"];
         ctx.fillStyle = trial ? trialFloorColor(trial, x, y) : groundColor(cell.on === "floor" ? "floor" : "grass", x, y);
         ctx.fillRect(px, py, T, T);
         ctx.fillStyle = "rgba(26,28,44,0.32)";
         ctx.fillRect(px + 3, py + 11, 11, 4);
-        ctx.fillStyle = "#94b0c2";
+        ctx.fillStyle = rock[1];
         ctx.fillRect(px + 3, py + 5, 10, 9);
         ctx.fillRect(px + 5, py + 3, 6, 12);
-        ctx.fillStyle = "#f4f4f4";
+        ctx.fillStyle = rock[2];
         ctx.fillRect(px + 5, py + 5, 3, 2);
-        ctx.fillStyle = "#566c86";
+        ctx.fillStyle = rock[0];
         ctx.fillRect(px + 10, py + 10, 2, 3);
         break;
       }
@@ -809,24 +848,22 @@ G.world = (() => {
         ctx.fillRect(px + 12, py + 4, 1, 9);
       }
     }
-    drawHdPilotDetail(ctx, cell, x, y, time);
+    drawHdWorldDetail(ctx, cell, x, y, time);
   }
 
-  function drawHdPilotDetail(ctx, cell, x, y, time) {
-    if (!G.hdPilot || !["overworld", "mistwood"].includes(G.state.mapId)) return;
+  function drawHdWorldDetail(ctx, cell, x, y, time) {
+    if (!G.hdPilot) return;
     const T = G.TILE, px = x * T, py = y * T;
     const rnd = G.util.hash2(x + 211, y + 307);
+    const biome = biomePalette();
+    const texture = biome && biome.texture || "meadow";
+    const accent = biome && biome.accent || "#a7f070";
     ctx.save();
     if (cell.tile === "grass") {
-      ctx.fillStyle = rnd > 0.5 ? "#55c878" : "#31955f";
+      ctx.fillStyle = biome && biome.tree ? biome.tree[2] : rnd > 0.5 ? "#55c878" : "#31955f";
       const gx = px + 2.5 + Math.floor(rnd * 10), gy = py + 3.5 + Math.floor(G.util.hash2(y + 17, x + 9) * 9);
       ctx.fillRect(gx, gy, 0.5, 1.5);
       ctx.fillRect(gx + 1, gy + 0.5, 0.5, 1);
-      if (rnd > 0.9) {
-        ctx.fillStyle = "#fff3c2";
-        ctx.fillRect(gx + 2.5, gy - 1, 0.5, 0.5);
-        ctx.fillRect(gx + 2, gy - 0.5, 1.5, 0.5);
-      }
     } else if (cell.tile === "path") {
       ctx.fillStyle = "rgba(255,243,194,0.28)";
       ctx.fillRect(px + 2.5 + Math.floor(rnd * 9), py + 4.5 + Math.floor(rnd * 6), 1.5, 0.5);
@@ -838,13 +875,50 @@ G.world = (() => {
       ctx.fillRect(px + 3 + drift, py + 7.5 + Math.floor(rnd * 4), 3.5, 0.5);
       ctx.fillRect(px + 7 + drift, py + 8, 1, 0.5);
     } else if (cell.tile === "tree") {
-      ctx.fillStyle = "#55c878";
+      ctx.fillStyle = biome && biome.tree ? biome.tree[2] : "#55c878";
       ctx.fillRect(px + 6.5, py + 2.5, 1, 0.5);
       ctx.fillRect(px + 3.5 + Math.floor(rnd * 7), py + 6.5, 0.5, 1);
       ctx.fillStyle = "rgba(255,243,194,0.42)";
       if (rnd > 0.55) ctx.fillRect(px + 9.5, py + 4, 0.5, 0.5);
-      ctx.fillStyle = "#3f2e20";
+      ctx.fillStyle = biome && biome.trunk || "#3f2e20";
       ctx.fillRect(px + 7.5, py + 12, 0.5, 3);
+    }
+    if (["grass", "path", "floor"].includes(cell.tile) && rnd > 0.48) {
+      const mx = px + 3.5 + Math.floor(rnd * 8), my = py + 4 + Math.floor(G.util.hash2(x + 43, y + 29) * 7);
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = 0.58;
+      if (texture === "sunbursts") {
+        ctx.fillRect(mx - 1, my, 2.5, 0.5); ctx.fillRect(mx, my - 1, 0.5, 2.5);
+      } else if (texture === "strata") {
+        ctx.fillRect(mx - 2, my, 4.5, 0.5); ctx.fillRect(mx - 1, my + 1, 3.5, 0.5);
+      } else if (texture === "petals") {
+        ctx.fillRect(mx, my, 1, 0.5); ctx.fillRect(mx + 1, my - 0.5, 0.5, 1.5);
+      } else if (texture === "spores") {
+        ctx.fillRect(mx, my, 0.5, 0.5); ctx.fillRect(mx + 2, my - 1, 0.5, 0.5); ctx.fillRect(mx + 1, my + 1, 0.5, 0.5);
+      } else if (texture === "shards") {
+        ctx.fillRect(mx, my - 1, 0.5, 2.5); ctx.fillRect(mx - 0.5, my, 1.5, 0.5);
+      } else if (texture === "snow") {
+        ctx.fillRect(mx - 1, my, 2.5, 0.5); ctx.fillRect(mx, my - 1, 0.5, 2.5); ctx.fillRect(mx - 0.5, my - 0.5, 1.5, 1.5);
+      } else if (texture === "lightning") {
+        ctx.fillRect(mx, my - 1, 1, 0.5); ctx.fillRect(mx - 0.5, my - 0.5, 1, 0.5); ctx.fillRect(mx - 1, my, 1, 1);
+      } else if (texture === "runes") {
+        ctx.fillRect(mx - 1, my - 1, 0.5, 2); ctx.fillRect(mx - 1, my + 0.5, 2.5, 0.5); ctx.fillRect(mx + 1, my - 1, 0.5, 2);
+      } else if (texture === "reeds") {
+        ctx.fillRect(mx - 1, my - 1, 0.5, 2.5); ctx.fillRect(mx + 1, my - 0.5, 0.5, 2);
+      } else if (texture === "embers") {
+        ctx.fillRect(mx, my, 0.5, 0.5); ctx.fillRect(mx + 1, my - 1.5, 0.5, 1);
+      } else if (texture === "stars") {
+        ctx.fillRect(mx - 1, my, 2.5, 0.5); ctx.fillRect(mx, my - 1, 0.5, 2.5);
+      } else if (texture === "shells") {
+        ctx.fillRect(mx - 1, my, 2.5, 0.5); ctx.fillRect(mx - 0.5, my - 0.5, 1.5, 0.5);
+      } else if (texture === "cobbles") {
+        ctx.strokeStyle = accent; ctx.lineWidth = 0.5; ctx.strokeRect(mx - 1.5, my - 1, 3.5, 2.5);
+      } else if (texture === "needles") {
+        ctx.fillRect(mx - 1, my - 1, 0.5, 2.5); ctx.fillRect(mx, my, 1.5, 0.5);
+      } else if (rnd > 0.8) {
+        ctx.fillRect(mx - 1, my, 2.5, 0.5); ctx.fillRect(mx, my - 1, 0.5, 2.5);
+      }
+      ctx.globalAlpha = 1;
     }
     if (cell.message) {
       ctx.fillStyle = "#fff3c2";
@@ -868,14 +942,16 @@ G.world = (() => {
     const T = G.TILE;
     const px = x * T, py = y * T;
     if (cell.tile === "water") {
-      ctx.fillStyle = "#73eff7";
+      const water = biomePalette() && biomePalette().water || ["#293a9b", "#41a6f6", "#73eff7"];
+      ctx.fillStyle = water[2];
       if (neighborTile(x, y - 1) !== "water") ctx.fillRect(px, py, T, 1);
       if (neighborTile(x - 1, y) !== "water") ctx.fillRect(px, py, 1, T);
-      ctx.fillStyle = "#293a9b";
+      ctx.fillStyle = water[0];
       if (neighborTile(x, y + 1) !== "water") ctx.fillRect(px, py + T - 1, T, 1);
       if (neighborTile(x + 1, y) !== "water") ctx.fillRect(px + T - 1, py, 1, T);
     } else if (cell.tile === "path") {
-      ctx.fillStyle = "#b8874d";
+      const path = biomePalette() && biomePalette().path;
+      ctx.fillStyle = path ? path[2] : "#b8874d";
       if (neighborTile(x, y - 1) === "grass") ctx.fillRect(px, py, T, 1);
       if (neighborTile(x - 1, y) === "grass") ctx.fillRect(px, py, 1, T);
       if (neighborTile(x, y + 1) === "grass") ctx.fillRect(px, py + T - 1, T, 1);
@@ -1009,6 +1085,7 @@ G.world = (() => {
     const s = G.state;
     const theme = s.mapDef && s.mapDef.visualTheme;
     const biome = biomePalette();
+    const texture = biome && biome.texture || "meadow";
     const color = theme === "vampire" ? "#b13e53" : theme === "mole" ? "#ffcd75" :
       theme === "jester" ? "#73eff7" : theme === "god" ? "#fff3c2" :
       theme === "samurai" ? "#f4f4f4" : theme === "astronomer" ? "#ffcd75" : biome ? biome.accent : "#a7f070";
@@ -1019,10 +1096,20 @@ G.world = (() => {
       const seedX = G.util.hash2(i + 91, s.mapW) * Math.max(G.W, s.mapW * G.TILE);
       const seedY = G.util.hash2(s.mapH, i + 37) * Math.max(G.H, s.mapH * G.TILE);
       const drift = theme ? Math.sin(time * (0.35 + i * 0.03) + i) * 10 : time * (2 + i * 0.2);
-      const x = Math.round((seedX + drift) % (s.mapW * G.TILE));
-      const y = Math.round((seedY - drift * 0.5 + s.mapH * G.TILE) % (s.mapH * G.TILE));
+      const rise = texture === "embers" ? -drift * 1.4 : texture === "snow" ? drift * 0.75 : -drift * 0.5;
+      const sweep = texture === "lightning" ? drift * 2.4 : texture === "petals" ? Math.sin(time + i) * 8 : drift;
+      const x = Math.round((seedX + sweep + s.mapW * G.TILE) % (s.mapW * G.TILE));
+      const y = Math.round((seedY + rise + s.mapH * G.TILE) % (s.mapH * G.TILE));
       if (x < cam.x - 2 || x > cam.x + G.W + 2 || y < cam.y - 2 || y > cam.y + G.H + 2) continue;
-      ctx.fillRect(x, y, i % 3 === 0 ? 2 : 1, i % 3 === 0 ? 2 : 1);
+      if (G.hdPilot && texture === "snow") {
+        ctx.fillRect(x - 1, y, 2.5, 0.5); ctx.fillRect(x, y - 1, 0.5, 2.5);
+      } else if (G.hdPilot && texture === "lightning" && i % 3 === 0) {
+        ctx.fillRect(x, y, 3.5, 0.5); ctx.fillRect(x + 2.5, y + 0.5, 2, 0.5);
+      } else if (G.hdPilot && texture === "shards") {
+        ctx.fillRect(x, y - 1, 0.5, 2.5); ctx.fillRect(x - 0.5, y, 1.5, 0.5);
+      } else if (G.hdPilot && ["spores", "embers", "stars"].includes(texture)) {
+        ctx.fillRect(x, y, 0.5, 0.5);
+      } else ctx.fillRect(x, y, i % 3 === 0 ? 2 : 1, i % 3 === 0 ? 2 : 1);
     }
     ctx.restore();
   }

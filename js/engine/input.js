@@ -28,13 +28,37 @@ G.input = (() => {
   let gamepadIndex = null;
   let gamepadName = "";
   let gamepadNoticeShown = false;
+  let swapPressedAt = 0;
+  let swapLongTriggered = false;
+  let swapOrigin = null;
+  const SWAP_HOLD_MS = 360;
 
-  function press(btn) {
-    if (!held[btn]) taps[btn] = true;
+  function inputNow() {
+    return typeof performance !== "undefined" && performance.now ? performance.now() : Date.now();
+  }
+
+  function press(btn, origin) {
+    if (!held[btn]) {
+      if (btn === "swap") {
+        swapPressedAt = inputNow();
+        swapLongTriggered = false;
+        swapOrigin = origin || null;
+      } else taps[btn] = true;
+    }
     held[btn] = true;
     G.sfx.ensure(); // unlock iPad audio on any input
   }
-  function release(btn) { held[btn] = false; }
+  function release(btn, cancelled) {
+    if (btn === "swap" && held[btn]) {
+      if (!cancelled && swapLongTriggered && G.ui && G.ui.commitFormWheel) G.ui.commitFormWheel();
+      else if (!cancelled && !swapLongTriggered) taps.swap = true;
+      else if (cancelled && swapLongTriggered && G.ui && G.ui.closeFormWheel) G.ui.closeFormWheel();
+      swapPressedAt = 0;
+      swapLongTriggered = false;
+      swapOrigin = null;
+    }
+    held[btn] = false;
+  }
 
   /* ---------- keyboard ---------- */
   const keyMap = {
@@ -107,7 +131,7 @@ G.input = (() => {
 
   function resetGamepad() {
     for (const control of Object.values(gamepadControls)) {
-      if (control.down && control.action) release(control.action);
+      if (control.down && control.action) release(control.action, true);
     }
     for (const id in gamepadControls) delete gamepadControls[id];
     gamepadVec.x = gamepadVec.y = 0;
@@ -138,6 +162,7 @@ G.input = (() => {
     }
 
     const menuOpen = !!(G.ui && G.ui.menuOpen);
+    const wheelOpen = !!(G.ui && G.ui.formWheelOpen);
     const axes = pad.axes || [];
     const left = stickVector(axes[0] || 0, axes[1] || 0, GAMEPAD_DEAD_ZONE);
     const right = stickVector(axes[2] || 0, axes[3] || 0, 0.28);
@@ -161,17 +186,17 @@ G.input = (() => {
 
     // Face buttons follow the labels players see in the HUD. Triggers and
     // bumpers duplicate combat actions so either grip feels comfortable.
-    syncGamepadControl("a", gamepadButton(pad, 0), menuOpen ? "confirm" : "a");
+    syncGamepadControl("a", gamepadButton(pad, 0), menuOpen || wheelOpen ? "confirm" : "a");
     syncGamepadControl("b", gamepadButton(pad, 1), menuOpen ? "back" : "swap");
-    syncGamepadControl("x", gamepadButton(pad, 2), menuOpen ? null : "b");
-    syncGamepadControl("y", gamepadButton(pad, 3), menuOpen ? null : "c");
-    syncGamepadControl("lb", gamepadButton(pad, 4), menuOpen ? "tabPrev" : "c");
-    syncGamepadControl("rb", gamepadButton(pad, 5), menuOpen ? "tabNext" : "b");
-    syncGamepadControl("lt", gamepadButton(pad, 6, 0.35), menuOpen ? null : "c");
-    syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen ? "confirm" : "a");
-    syncGamepadControl("view", gamepadButton(pad, 8), menuOpen ? "back" : "map");
-    syncGamepadControl("menu", gamepadButton(pad, 9), "pause");
-    syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen ? "confirm" : "a");
+    syncGamepadControl("x", gamepadButton(pad, 2), menuOpen || wheelOpen ? null : "b");
+    syncGamepadControl("y", gamepadButton(pad, 3), menuOpen || wheelOpen ? null : "c");
+    syncGamepadControl("lb", gamepadButton(pad, 4), wheelOpen ? "wheelPrev" : menuOpen ? "tabPrev" : "c");
+    syncGamepadControl("rb", gamepadButton(pad, 5), wheelOpen ? "wheelNext" : menuOpen ? "tabNext" : "b");
+    syncGamepadControl("lt", gamepadButton(pad, 6, 0.35), menuOpen || wheelOpen ? null : "c");
+    syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen || wheelOpen ? "confirm" : "a");
+    syncGamepadControl("view", gamepadButton(pad, 8), menuOpen || wheelOpen ? "back" : "map");
+    syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen ? "back" : "pause");
+    syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen || wheelOpen ? "confirm" : "a");
 
     const navUp = gamepadButton(pad, 12) || left.y < -GAMEPAD_NAV_THRESHOLD;
     const navDown = gamepadButton(pad, 13) || left.y > GAMEPAD_NAV_THRESHOLD;
@@ -363,7 +388,45 @@ G.input = (() => {
     window.addEventListener("touchcancel", cancelAbilityTouches, { passive: true });
 
     /* ---------- simple touch buttons fire as soon as they are tapped ---------- */
-    const simpleBtns = { "btn-swap": "swap", "btn-map": "map", "btn-pause": "pause" };
+    const swapButton = document.getElementById("btn-swap");
+    if (swapButton) {
+      let swapPointerId = null;
+      swapButton.addEventListener("pointerdown", (e) => {
+        if (swapPointerId !== null) return;
+        e.preventDefault();
+        swapPointerId = e.pointerId;
+        swapButton.classList.add("held");
+        try { swapButton.setPointerCapture(e.pointerId); } catch (error) {}
+        press("swap", { x: e.clientX, y: e.clientY });
+      });
+      swapButton.addEventListener("pointermove", (e) => {
+        if (e.pointerId !== swapPointerId || !swapLongTriggered || !G.ui || !G.ui.aimFormWheel) return;
+        G.ui.aimFormWheel(e.clientX, e.clientY);
+      });
+      const endSwap = (e, cancelled) => {
+        if (swapPointerId === null || (e && e.pointerId !== undefined && e.pointerId !== swapPointerId)) return;
+        if (e && e.cancelable) e.preventDefault();
+        const id = swapPointerId;
+        swapPointerId = null;
+        swapButton.classList.remove("held");
+        release("swap", cancelled);
+        try {
+          if (swapButton.hasPointerCapture && swapButton.hasPointerCapture(id)) swapButton.releasePointerCapture(id);
+        } catch (error) {}
+      };
+      swapButton.addEventListener("pointerup", (e) => endSwap(e, false));
+      swapButton.addEventListener("pointercancel", (e) => endSwap(e, true));
+      swapButton.addEventListener("lostpointercapture", (e) => endSwap(e, true));
+      window.addEventListener("pointerup", (e) => endSwap(e, false));
+      window.addEventListener("pointercancel", (e) => endSwap(e, true));
+      const cancelSwap = () => endSwap(null, true);
+      window.addEventListener("blur", cancelSwap);
+      window.addEventListener("pagehide", cancelSwap);
+      window.addEventListener("orientationchange", cancelSwap);
+      document.addEventListener("visibilitychange", () => { if (document.hidden) cancelSwap(); });
+    }
+
+    const simpleBtns = { "btn-map": "map", "btn-pause": "pause" };
     for (const [id, btn] of Object.entries(simpleBtns)) {
       const el = document.getElementById(id);
       if (!el) continue;
@@ -382,6 +445,15 @@ G.input = (() => {
     if (e.target.closest("#menu, #workshop-errors")) return;
     e.preventDefault();
   }, { passive: false });
+
+  function updateInput() {
+    updateGamepad();
+    if (held.swap && !swapLongTriggered && inputNow() - swapPressedAt >= SWAP_HOLD_MS &&
+      G.ui && G.ui.openFormWheel) {
+      swapLongTriggered = G.ui.openFormWheel(swapOrigin);
+      if (swapLongTriggered) taps.swap = false;
+    }
+  }
 
   /* ---------- public API ---------- */
   return {
@@ -407,7 +479,7 @@ G.input = (() => {
       for (const k in taps) taps[k] = false;
       for (const k in releasedAims) delete releasedAims[k];
     },
-    update: updateGamepad,
+    update: updateInput,
     get hasGamepad() { return gamepadIndex !== null; },
     get gamepadName() { return gamepadName; },
     isTouch,

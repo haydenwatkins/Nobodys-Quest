@@ -12,7 +12,7 @@ registerForm({
   tagline: "Why walk up to danger when arrows can do the walking?",
 
   speed: 85,
-  hearts: 3,
+  hearts: 5,
   slots: 2,
   passive: { id: "clearShot", name: "Clear Shot",
     description: "Projectile abilities fly faster, farther, and with a larger hitbox." },

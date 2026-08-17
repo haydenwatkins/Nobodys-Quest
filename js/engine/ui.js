@@ -677,6 +677,7 @@ G.ui = (() => {
 
   /* ---------- pause menu ---------- */
   const menuEl = document.getElementById("menu");
+  const formWheelEl = document.getElementById("form-wheel");
 
   function dmgChip(type) {
     const t = G.DAMAGE_TYPES[type];
@@ -705,12 +706,153 @@ G.ui = (() => {
   let atlasView = "world";
   let atlasSelectedId = null;
   let formLabView = "roster";
+  let settingsOpen = false;
   let labFormId = null;
   let labSlot = 1;
   let labAbilityId = null;
   let labAbilityFilter = "boosted";
   let labSkinId = "classic";
   let lastFormPreviewDraw = 0;
+  let formWheelOpen = false;
+  let formWheelPage = 0;
+  let formWheelAimIndex = -1;
+  let formWheelCenter = { x: 0, y: 0 };
+
+  function wheelPages() {
+    const forms = G.unlockedForms ? G.unlockedForms() : [];
+    const pages = [];
+    for (let i = 0; i < forms.length; i += 8) pages.push(forms.slice(i, i + 8));
+    return pages;
+  }
+
+  function renderFormWheel() {
+    const pages = wheelPages();
+    if (!pages.length) return;
+    formWheelPage = Math.max(0, Math.min(pages.length - 1, formWheelPage));
+    const forms = pages[formWheelPage];
+    const choices = forms.map((id, index) => {
+      const angle = -Math.PI / 2 + index * Math.PI * 2 / 8;
+      const x = 50 + Math.cos(angle) * 34;
+      const y = 50 + Math.sin(angle) * 34;
+      const form = G.forms[id];
+      return `<button class="form-wheel-choice ${id === G.state.formId ? "current" : ""} ${index === formWheelAimIndex ? "aimed" : ""}"
+        style="--x:${x}%;--y:${y}%" data-wheel-form="${id}" data-wheel-index="${index}" aria-label="Become ${escapeHtml(form.name)}">
+        <span class="icon">${form.icon}</span><span class="name">${escapeHtml(form.name)}</span></button>`;
+    }).join("");
+    formWheelEl.style.setProperty("--wheel-x", `${formWheelCenter.x}px`);
+    formWheelEl.style.setProperty("--wheel-y", `${formWheelCenter.y}px`);
+    formWheelEl.innerHTML = `<div class="form-wheel-ring" role="dialog" aria-modal="true" aria-label="Choose a form">
+      ${choices}<div class="form-wheel-title"><strong>CHOOSE FORM</strong><span>Aim and release</span></div></div>
+      ${pages.length > 1 ? `<div class="form-wheel-pages"><button data-wheel-page="-1" aria-label="Previous forms">◀</button>
+        <span>${formWheelPage + 1} / ${pages.length}</span><button data-wheel-page="1" aria-label="Next forms">▶</button></div>` : ""}
+      <button class="form-wheel-cancel" data-wheel-cancel aria-label="Close form selector">×</button>`;
+    formWheelEl.querySelectorAll("[data-wheel-form]").forEach((button) => {
+      button.addEventListener("click", () => chooseWheelForm(button.dataset.wheelForm));
+      button.addEventListener("pointerenter", () => {
+        formWheelAimIndex = Number(button.dataset.wheelIndex);
+        syncWheelAim();
+      });
+    });
+    formWheelEl.querySelectorAll("[data-wheel-page]").forEach((button) => button.addEventListener("click", () => {
+      formWheelPage = (formWheelPage + Number(button.dataset.wheelPage) + pages.length) % pages.length;
+      formWheelAimIndex = -1;
+      renderFormWheel();
+      if (G.sfx) G.sfx.play("menu");
+    }));
+    const cancel = formWheelEl.querySelector("[data-wheel-cancel]");
+    if (cancel) cancel.addEventListener("click", closeFormWheel);
+    const ring = formWheelEl.querySelector(".form-wheel-ring");
+    if (ring) {
+      ring.addEventListener("pointermove", (event) => aimFormWheel(event.clientX, event.clientY));
+      ring.addEventListener("pointerup", () => commitFormWheel());
+    }
+  }
+
+  function openFormWheel(origin) {
+    if (formWheelOpen || menuOpen || dialogueData || !G.unlockedForms || G.unlockedForms().length < 2) return false;
+    const vw = window.innerWidth || document.documentElement.clientWidth || 800;
+    const vh = window.innerHeight || document.documentElement.clientHeight || 450;
+    const size = Math.min(310, Math.max(224, Math.min(vw, vh) * 0.78));
+    const radius = size / 2;
+    formWheelCenter.x = G.util.clamp(origin && origin.x || vw / 2, radius + 10, vw - radius - 10);
+    formWheelCenter.y = G.util.clamp(origin && origin.y || vh / 2, radius + 10, vh - radius - 55);
+    const unlocked = G.unlockedForms();
+    formWheelPage = Math.max(0, Math.floor(unlocked.indexOf(G.state.formId) / 8));
+    formWheelAimIndex = -1;
+    formWheelOpen = true;
+    formWheelEl.classList.remove("hidden");
+    formWheelEl.setAttribute("aria-hidden", "false");
+    renderFormWheel();
+    if (G.sfx) G.sfx.play("menu");
+    return true;
+  }
+
+  function closeFormWheel() {
+    if (!formWheelOpen) return;
+    formWheelOpen = false;
+    formWheelAimIndex = -1;
+    formWheelEl.classList.add("hidden");
+    formWheelEl.setAttribute("aria-hidden", "true");
+    formWheelEl.innerHTML = "";
+    if (G.input) G.input.clearTaps();
+  }
+
+  function syncWheelAim() {
+    if (!formWheelOpen) return;
+    formWheelEl.querySelectorAll("[data-wheel-index]").forEach((button) =>
+      button.classList.toggle("aimed", Number(button.dataset.wheelIndex) === formWheelAimIndex));
+  }
+
+  function aimFormWheel(clientX, clientY) {
+    if (!formWheelOpen) return false;
+    const dx = clientX - formWheelCenter.x, dy = clientY - formWheelCenter.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < 42 || distance > 190) formWheelAimIndex = -1;
+    else {
+      const angle = Math.atan2(dy, dx) + Math.PI / 2;
+      formWheelAimIndex = (Math.round(angle / (Math.PI * 2 / 8)) % 8 + 8) % 8;
+      const page = wheelPages()[formWheelPage] || [];
+      if (!page[formWheelAimIndex]) formWheelAimIndex = -1;
+    }
+    syncWheelAim();
+    return formWheelAimIndex >= 0;
+  }
+
+  function aimFormWheelVector(vector) {
+    if (!formWheelOpen || !vector) return false;
+    const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+    if (magnitude < 0.45) return false;
+    return aimFormWheel(formWheelCenter.x + vector.x * 100, formWheelCenter.y + vector.y * 100);
+  }
+
+  function chooseWheelForm(id) {
+    if (!formWheelOpen || !G.formUnlocked(id)) return false;
+    if (id !== G.state.formId) G.setForm(id);
+    G.saveGame();
+    closeFormWheel();
+    return true;
+  }
+
+  function commitFormWheel() {
+    if (!formWheelOpen || formWheelAimIndex < 0) return false;
+    const page = wheelPages()[formWheelPage] || [];
+    return page[formWheelAimIndex] ? chooseWheelForm(page[formWheelAimIndex]) : false;
+  }
+
+  function updateFormWheel() {
+    if (!formWheelOpen) return;
+    aimFormWheelVector(G.input.vec);
+    if (G.input.tapped("wheelPrev")) {
+      formWheelPage = (formWheelPage - 1 + wheelPages().length) % wheelPages().length;
+      formWheelAimIndex = -1; renderFormWheel();
+    }
+    if (G.input.tapped("wheelNext")) {
+      formWheelPage = (formWheelPage + 1) % wheelPages().length;
+      formWheelAimIndex = -1; renderFormWheel();
+    }
+    if (G.input.tapped("confirm")) commitFormWheel();
+    if (G.input.tapped("back") || G.input.tapped("pause")) closeFormWheel();
+  }
 
   function controllerMenuElements() {
     return Array.from(menuEl.querySelectorAll(
@@ -833,12 +975,16 @@ G.ui = (() => {
   }
   function toggleMenu() { menuOpen ? closeMenu() : openMenu(); }
 
+  function runningFullscreen() {
+    const standalone = window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches;
+    return !!(document.fullscreenElement || navigator.standalone || standalone);
+  }
+
   async function enterFullscreen() {
     // Close immediately so the button never leaves a large menu covering the
     // game while Android enters fullscreen or iOS shows its fallback tip.
     closeMenu();
-    const alreadyStandalone = window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches;
-    if (document.fullscreenElement || navigator.standalone || alreadyStandalone) {
+    if (runningFullscreen()) {
       toast("Already running full screen", 2);
       return;
     }
@@ -888,11 +1034,10 @@ G.ui = (() => {
     if (activeTab === "gauntlet") html += buildGauntletTab();
     if (activeTab === "board") html += buildHeroBoardTab();
 
-    html += `</div>
+    html += `</div>${settingsOpen ? buildSettingsPanel() : ""}
       <div class="menu-footer">
         <button data-act="resume">▶ Resume</button>
-        <button data-act="fullscreen" class="fullscreen-btn">⛶ Fullscreen</button>
-        <button data-act="reset" class="danger" title="Erase this device's save">Reset</button>
+        <button data-act="settings" class="settings-btn">⚙ Settings</button>
       </div>`;
 
     menuEl.innerHTML = html;
@@ -1021,8 +1166,26 @@ G.ui = (() => {
       }));
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
+    const settings = menuEl.querySelector('[data-act="settings"]');
+    if (settings) settings.addEventListener("click", () => { settingsOpen = !settingsOpen; buildMenu(); });
     const fullscreen = menuEl.querySelector('[data-act="fullscreen"]');
     if (fullscreen) fullscreen.addEventListener("click", enterFullscreen);
+    const tutorial = menuEl.querySelector('[data-act="tutorial"]');
+    if (tutorial) tutorial.addEventListener("click", () => {
+      G.tutorial.replay();
+      closeMenu();
+      toast("Tutorial hints restarted", 2.4);
+    });
+    const music = menuEl.querySelector('[data-act="music"]');
+    if (music) music.addEventListener("click", () => {
+      if (G.sfx && G.sfx.setMusicEnabled) G.sfx.setMusicEnabled(!G.sfx.musicEnabled);
+      buildMenu();
+    });
+    const sound = menuEl.querySelector('[data-act="sound"]');
+    if (sound) sound.addEventListener("click", () => {
+      if (G.sfx && G.sfx.setSoundEnabled) G.sfx.setSoundEnabled(!G.sfx.soundEnabled);
+      buildMenu();
+    });
     const reset = menuEl.querySelector('[data-act="reset"]');
     if (reset) reset.addEventListener("click", () => {
       if (confirm("Really erase the save and start over?")) G.resetSave();
@@ -1035,6 +1198,24 @@ G.ui = (() => {
         focusControllerDefault();
       }
     }
+  }
+
+  function buildSettingsPanel() {
+    const canFullscreen = !runningFullscreen();
+    const musicOn = !G.sfx || G.sfx.musicEnabled !== false;
+    const soundOn = !G.sfx || G.sfx.soundEnabled !== false;
+    return `<section class="settings-panel" aria-label="Settings and help">
+      <div class="settings-heading"><div><span class="eyebrow">SETTINGS & HELP</span><h2>Keep the adventure comfortable</h2></div></div>
+      <div class="settings-grid">
+        <button data-act="music"><strong>♫ Music</strong><span>${musicOn ? "ON · adaptive regional score" : "OFF"}</span></button>
+        <button data-act="sound"><strong>◖ Sound effects</strong><span>${soundOn ? "ON" : "OFF"}</span></button>
+        <button data-act="hd-pilot"><strong>✦ World detail</strong><span>${G.hdPilot ? "HD · 640×360" : "Original · 320×180"}</span></button>
+        <button data-act="tutorial"><strong>? Tutorial</strong><span>Replay contextual hints</span></button>
+        ${canFullscreen ? `<button data-act="fullscreen"><strong>⛶ Fullscreen</strong><span>Use more of this screen</span></button>` : ""}
+      </div>
+      <details class="save-data"><summary>Save data</summary><p>Erasing removes this device's forms, quests, map discoveries, skins, and town.</p>
+        <button data-act="reset" class="danger" title="Erase this device's save">Erase all progress</button></details>
+    </section>`;
   }
 
   function labSelectedForm(requireUnlocked) {
@@ -1056,11 +1237,6 @@ G.ui = (() => {
       <div><h2>⚗ FORM LAB</h2><p>Choose a form, build its moves, and shape its look.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
         `<button data-formlab-view="${id}" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}</div>
-    </div>
-    <div class="hd-pilot-bar ${G.hdPilot ? "enabled" : ""}">
-      <div><span class="eyebrow">✦ RESOLUTION PILOT</span><strong>${G.hdPilot ? "HD PIXEL MODE" : "ORIGINAL PIXEL MODE"}</strong>
-        <p>${G.hdPilot ? "2× world detail · same camera, collision, speed, and difficulty" : "Original 320×180 world · comparison baseline"}</p></div>
-      <button data-act="hd-pilot">${G.hdPilot ? "Compare original" : "Try HD pilot"}</button>
     </div>`;
     if (formLabView === "loadout") return html + buildLoadoutLab();
     if (formLabView === "skins") return html + buildSkinsLab();
@@ -1213,6 +1389,13 @@ G.ui = (() => {
       if (!form) return;
       let sprite = G.formPreviewSprite(form.id, canvas.dataset.previewSkin);
       if (canvas.dataset.previewDye === "true" && canvas.dataset.previewSkin === "classic") sprite = G.costumedSprite(form.sprite);
+      const rect = canvas.getBoundingClientRect ? canvas.getBoundingClientRect() : null;
+      const cssW = Math.max(1, Math.round(rect && rect.width ? rect.width : canvas.width));
+      const cssH = Math.max(1, Math.round(rect && rect.height ? rect.height : canvas.height));
+      const previewDensity = G.hdPilot ? 2 : 1;
+      const backingW = cssW * previewDensity, backingH = cssH * previewDensity;
+      if (canvas.width !== backingW) canvas.width = backingW;
+      if (canvas.height !== backingH) canvas.height = backingH;
       const c = canvas.getContext("2d");
       c.imageSmoothingEnabled = false;
       const w = canvas.width, h = canvas.height;
@@ -1656,7 +1839,7 @@ G.ui = (() => {
     <div class="form-card">
       <h2>🏆 Records</h2>
       <div class="tagline">A longer personal best awards one star. A full-roster clear earns the Manyfold Crown: +2 maximum mana, a visible crown, and one Second Wind in every future gauntlet.</div>
-      ${(G.state.items || []).includes("manyfold-crown") ? `<div class="quest-row done"><span>👑 Manyfold Crown</span><span class="prog">12 mana · Second Wind ready</span></div>` : ""}
+      ${(G.state.items || []).includes("manyfold-crown") ? `<div class="quest-row done"><span>👑 Manyfold Crown</span><span class="prog">14 mana · Second Wind ready</span></div>` : ""}
     </div>`;
   }
 
@@ -1706,7 +1889,9 @@ G.ui = (() => {
   return {
     toast, banner, dialogue, update, drawHUD, resizeOverlay,
     openMenu, openMap, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
+    openFormWheel, closeFormWheel, aimFormWheel, commitFormWheel, updateFormWheel,
     get menuOpen() { return menuOpen; },
+    get formWheelOpen() { return formWheelOpen; },
     get dialogueOpen() { return !!dialogueData; },
     get dialogueQueueLength() { return dialogueQueue.length + (dialogueData ? 1 : 0); },
   };

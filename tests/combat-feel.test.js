@@ -793,10 +793,10 @@ G.updatePlayer(0.69);
 assert.equal(G.state.player.mana, 0);
 G.updatePlayer(0.01);
 assert.equal(G.state.player.mana, 1, "one mana should recover every 0.7 seconds");
-G.updatePlayer(6.31);
-assert.equal(G.state.player.mana, 10, "passive recovery must reach the true maximum");
+G.updatePlayer(7.71);
+assert.equal(G.state.player.mana, 12, "passive recovery must reach the expanded true maximum");
 G.updatePlayer(1.4);
-assert.equal(G.state.player.mana, 10, "passive recovery must respect manaMax");
+assert.equal(G.state.player.mana, 12, "passive recovery must respect manaMax");
 
 const reserveTarget = enemy(10, 0);
 G.state.enemies = [reserveTarget];

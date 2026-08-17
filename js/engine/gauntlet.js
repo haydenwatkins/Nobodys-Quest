@@ -93,8 +93,8 @@ function finishGauntlet() {
   }
   if (run.wins === G.gauntletBossPool().length && !(s.items || []).includes("manyfold-crown")) {
     s.items.push("manyfold-crown");
-    s.player.manaMax = 12;
-    s.player.mana = 12;
+    s.player.manaMax = G.playerMaxMana();
+    s.player.mana = s.player.manaMax;
     if (G.checkCostumeUnlocks) G.checkCostumeUnlocks(true);
     G.ui.banner("👑 MANYFOLD CROWN", "+2 max mana · Second Wind · Manyfold Royal costume unlocked");
   }

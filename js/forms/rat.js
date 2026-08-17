@@ -17,7 +17,7 @@ registerForm({
   tagline: "Small, fast, and absolutely covered in germs.",
 
   speed: 105,                  // zoomy! (limit is 140)
-  hearts: 2,                   // but fragile
+  hearts: 5,                   // nimble without being one-shot fragile
   slots: 2,
   passive: { id: "scurry", name: "Scurry",
     description: "Using any ability grants a short burst of movement speed." },

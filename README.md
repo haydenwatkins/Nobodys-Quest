@@ -39,9 +39,9 @@ stats or difficulty; future forms automatically inherit the complete wardrobe.
 
 Double-click `index.html`. Works from the plain filesystem — no server needed.
 
-- Desktop: WASD/arrows, J/K/L abilities, Q swap, Esc menu; Space or Enter advances dialogue
+- Desktop: WASD/arrows, J/K/L abilities, tap Q to quick-swap or hold Q and aim to open the paused form wheel; Esc opens the menu; Space or Enter advances dialogue
 - iPad/touch: virtual joystick; tap ranged attacks to auto-aim, or drag an attack button and release to aim manually; tap the dialogue box to continue
-- Xbox/standard controller: left stick or D-pad moves; A/RT, X/RB, and Y/LB use the three abilities; right stick aims; B or View swaps forms; Menu pauses. A advances dialogue, and every menu is controller-navigable.
+- Xbox/standard controller: left stick or D-pad moves; A/RT, X/RB, and Y/LB use the three abilities; right stick aims; tap B to quick-swap or hold B for the paused form wheel; View opens the Atlas; Menu pauses. A advances dialogue, and every menu is controller-navigable.
 
 For a TV-like Steam Link launch on Windows, `tools/steam-launch.ps1` opens the
 installed Chrome app, raises it above Big Picture, enters fullscreen, and stays

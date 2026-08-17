@@ -78,6 +78,16 @@ G.makeHdSprite2x = function (def, options) {
     }
 
     const w = sourceW * 2, h = sourceH * 2, cx = Math.floor(w / 2);
+    if (alternate) {
+      let placed = false;
+      for (let y = 1; y < h - 1 && !placed; y++) for (let x = 1; x < w - 1; x++) {
+        const sourceKey = grid[y][x];
+        if (!highlight[sourceKey] || grid[y][x + 1] === ".") continue;
+        put(x + 1, y, highlight[sourceKey]);
+        placed = true;
+        break;
+      }
+    }
     if (opts.motif === "hero") {
       put(cx - 1, Math.floor(h * 0.68), accentKey);
       put(cx, Math.floor(h * 0.68) - 1, accentKey);
@@ -212,4 +222,24 @@ G.spriteFrame = function (def, mode, tick) {
   }
   const pace = mode === "idle" ? 0.7 : 1;
   return choices[Math.floor((tick || 0) * pace) % choices.length];
+};
+
+// Complete the renderer migration after every data file has registered its
+// art. Hand-authored pilot sprites remain untouched; everything else receives
+// the same two-pixel-density contour, lighting, and subtle animation pass.
+G.upgradeSpriteCatalog = function () {
+  const visited = new Set();
+  let upgraded = 0;
+  const upgrade = (sprite, motif) => {
+    if (!sprite || visited.has(sprite)) return;
+    visited.add(sprite);
+    if (sprite.hd) return;
+    const accent = Object.values(sprite.palette || {}).find((color) => String(color).toLowerCase() !== "#1a1c2c") || "#73eff7";
+    sprite.hd = G.makeHdSprite2x(sprite, { accent, motif: motif || "detail", animate: true });
+    upgraded++;
+  };
+  for (const form of Object.values(G.forms || {})) upgrade(form.sprite, "detail");
+  for (const enemy of Object.values(G.enemies || {})) upgrade(enemy.sprite, "detail");
+  for (const npc of Object.values(G.NPCS || {})) upgrade(npc.sprite, "detail");
+  return upgraded;
 };

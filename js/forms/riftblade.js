@@ -13,7 +13,7 @@ registerForm({
   tagline: "Throw the horizon, chase it down, and cut your way back out.",
 
   speed: 110,
-  hearts: 4,
+  hearts: 5,
   slots: 2,
   passive: { id: "afterimage", name: "Afterimage",
     description: "Every dash landing leaves a crowd-shoving afterimage." },

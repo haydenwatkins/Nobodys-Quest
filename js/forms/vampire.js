@@ -11,7 +11,7 @@ registerForm({
   tagline: "Polite, relentless, and only one good combo away from feeling better.",
 
   speed: 105,
-  hearts: 3,
+  hearts: 5,
   slots: 2,
   passive: { id: "bloodskin", name: "Bloodskin",
     description: "Healing beyond full health becomes up to two hearts of temporary armor." },
