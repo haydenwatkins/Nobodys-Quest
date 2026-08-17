@@ -123,7 +123,7 @@ G.ui = (() => {
         dialogueData.shown + dt * 48
       );
       const action = dialoguePointerAdvance ||
-        ["a", "b", "c", "swap", "pause"].some((button) => G.input.tapped(button));
+        ["a", "b", "c", "swap", "map", "pause"].some((button) => G.input.tapped(button));
       dialoguePointerAdvance = false;
       if (action) advanceDialogue();
     }
@@ -208,17 +208,33 @@ G.ui = (() => {
   }
 
   function drawLocationChip(c) {
-    if (G.input.isTouch) return;
     const s = G.state;
     const name = s.mapDef && s.mapDef.name ? s.mapDef.name : s.mapId;
-    c.font = `6px ${FONT_HEAD}`;
+    const touch = G.input.isTouch;
+    c.font = `${touch ? 5 : 6}px ${FONT_HEAD}`;
     const enemies = s.enemies.filter((e) => !e.dead).length;
-    const label = `${name}  enemies:${enemies}`;
+    const label = touch ? name.toUpperCase() : `${name}  enemies:${enemies}`;
     const w = c.measureText(label).width + 8;
     c.fillStyle = "rgba(26,28,44,0.72)";
     c.fillRect(Math.round(G.W / 2 - w / 2), 5, w, 11);
-    c.fillStyle = "#c8d8e0";
+    c.fillStyle = touch ? "#73eff7" : "#c8d8e0";
     c.fillText(label, Math.round(G.W / 2 - w / 2) + 4, 8);
+  }
+
+  function drawWayfinderHint(c) {
+    if (!G.nearWayfinderPost || !G.nearWayfinderPost()) return;
+    const label = G.input.isTouch ? "🧭 TAP MAP TO TRAVEL" :
+      G.input.hasGamepad ? "🧭 VIEW · WAYFINDER MAP" : "🧭 M · WAYFINDER MAP";
+    c.font = `5px ${FONT_HEAD}`;
+    const w = c.measureText(label).width + 10;
+    const x = Math.round((G.W - w) / 2);
+    const y = G.H - 16;
+    c.fillStyle = "rgba(26,28,44,0.86)";
+    c.fillRect(x, y, w, 11);
+    c.fillStyle = "#73eff7";
+    c.fillRect(x, y, w, 1);
+    c.fillStyle = "#f4f4f4";
+    c.fillText(label, x + 5, y + 3);
   }
 
   function drawAbilityBar(c, p) {
@@ -513,6 +529,7 @@ G.ui = (() => {
       drawMinimap(c);
       drawQuestTracker(c);
       drawWardHint(c, cam);
+      drawWayfinderHint(c);
       drawTutorial(c);
       drawAbilityBar(c, p);
     }
@@ -632,6 +649,8 @@ G.ui = (() => {
   }
 
   let activeTab = "forms";
+  let atlasView = "world";
+  let atlasSelectedId = null;
 
   function controllerMenuElements() {
     return Array.from(menuEl.querySelectorAll(
@@ -740,6 +759,11 @@ G.ui = (() => {
     if (G.input.hasGamepad) focusControllerDefault();
     G.events.emit("menuOpen", {});
   }
+  function openMap() {
+    activeTab = "map";
+    atlasSelectedId = G.state && G.state.mapId;
+    openMenu();
+  }
   function closeMenu() {
     menuOpen = false;
     menuEl.classList.add("hidden");
@@ -783,7 +807,7 @@ G.ui = (() => {
       ["forms", "Forms"],
       ["style", "Style"],
       ["quests", "Quests"],
-      ["explore", "Explore"],
+      ["map", "Map"],
       ["mix", "Mix"],
     ];
     if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
@@ -797,12 +821,12 @@ G.ui = (() => {
       <div class="menu-tabs">${tabs.map(([id, label]) =>
         `<button data-tab="${id}" class="${activeTab === id ? "active" : ""}">${label}</button>`).join("")}
       </div>
-      <div class="menu-body">`;
+      <div class="menu-body ${activeTab === "map" ? "atlas-body" : ""}">`;
 
     if (activeTab === "forms") html += buildFormsTab();
     if (activeTab === "style") html += buildCostumesTab();
     if (activeTab === "quests") html += buildQuestsTab();
-    if (activeTab === "explore") html += buildWayfinderTab();
+    if (activeTab === "map") html += buildWayfinderTab();
     if (activeTab === "mix") html += buildMixTab();
     if (activeTab === "town") html += buildTownTab();
     if (activeTab === "gauntlet") html += buildGauntletTab();
@@ -817,9 +841,21 @@ G.ui = (() => {
 
     menuEl.innerHTML = html;
 
+    if (activeTab === "map" && atlasView === "local") drawLocalAtlas();
+
     // wire up clicks
     menuEl.querySelectorAll("[data-tab]").forEach((b) =>
       b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); menuEl.scrollTop = 0; }));
+    menuEl.querySelectorAll("[data-atlas-view]").forEach((button) =>
+      button.addEventListener("click", () => {
+        atlasView = button.dataset.atlasView;
+        buildMenu();
+      }));
+    menuEl.querySelectorAll("[data-map-node]").forEach((button) =>
+      button.addEventListener("click", () => {
+        atlasSelectedId = button.dataset.mapNode;
+        buildMenu();
+      }));
     menuEl.querySelectorAll("[data-pin]").forEach((b) =>
       b.addEventListener("click", () => { G.toggleQuestPin(b.dataset.pin); buildMenu(); }));
     const clearPins = menuEl.querySelector('[data-act="clear-pins"]');
@@ -1042,71 +1078,223 @@ G.ui = (() => {
     return html;
   }
 
-  function buildWayfinderTab() {
+  function atlasRegions() {
+    return G.WAYFINDER_REGIONS.concat(G.WORLDWAKE_REGIONS || []);
+  }
+
+  function atlasRegionFound(id) {
+    const legacy = G.wayfinderRegion(id);
+    return legacy ? G.wayfinderDiscovered(id) : G.ensureWorldwake().discovered.includes(id);
+  }
+
+  function atlasCurrentRegion() {
+    if (G.wayfinderRegionInfo(G.state.mapId)) return G.state.mapId;
+    const exit = G.state.mapDef && G.state.mapDef.bossTrial && G.state.mapDef.bossTrial.exit;
+    if (exit && G.wayfinderRegionInfo(exit.map)) return exit.map;
+    if (G.state.mapId === "town" || G.state.mapId === "playerHouse") return "overworld";
+    return "overworld";
+  }
+
+  function atlasSelectedRegion() {
+    const current = atlasCurrentRegion();
+    if (!G.wayfinderRegionInfo(atlasSelectedId)) atlasSelectedId = current;
+    return G.wayfinderRegionInfo(atlasSelectedId) || G.wayfinderRegionInfo(current);
+  }
+
+  function atlasInboundLock(id) {
+    let locked = null;
+    let foundRoute = false;
+    for (const map of Object.values(G.maps)) for (const cell of Object.values(map.legend || {})) {
+      if (!cell.portal || cell.portal.map !== id) continue;
+      foundRoute = true;
+      const reason = G.world.portalBlockReason(cell);
+      if (!reason) return null;
+      if (!locked) locked = reason;
+    }
+    return foundRoute ? locked : null;
+  }
+
+  function atlasLandmarksForRegion(id) {
+    return G.discoveredWayfinderLandmarks().filter((map) =>
+      map.bossTrial && map.bossTrial.exit && map.bossTrial.exit.map === id);
+  }
+
+  function buildWorldAtlas() {
+    const current = atlasCurrentRegion();
+    const selected = atlasSelectedRegion();
+    const canTravel = G.canWayfinderTravel();
+    const nodesById = Object.fromEntries(G.WAYFINDER_ATLAS_NODES.map((node) => [node.id, node]));
+    const lines = G.WAYFINDER_ATLAS_EDGES.map(([from, to]) => {
+      const a = nodesById[from], b = nodesById[to];
+      const open = atlasRegionFound(from) && atlasRegionFound(to);
+      return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="${open ? "known" : "unknown"}"/>`;
+    }).join("");
+    const nodes = G.WAYFINDER_ATLAS_NODES.map((node) => {
+      const region = G.wayfinderRegionInfo(node.id);
+      const found = atlasRegionFound(node.id);
+      const here = current === node.id;
+      const awake = G.wayfinderPostActivated(node.id);
+      const classes = [found ? "known" : "unknown", here ? "here" : "", awake ? "awake" : "",
+        selected.id === node.id ? "selected" : ""].filter(Boolean).join(" ");
+      return `<button class="atlas-node ${classes}" style="left:${node.x}%;top:${node.y}%" data-map-node="${node.id}"
+        aria-label="${found ? escapeHtml(region.name) : "Undiscovered region"}${here ? ", you are here" : ""}">
+        <span class="atlas-icon">${found ? region.icon : "?"}</span>
+        <span class="atlas-name">${found ? escapeHtml(region.name) : "Unknown"}</span>
+        ${here ? `<span class="you-are-here">YOU ARE HERE</span>` : ""}
+      </button>`;
+    }).join("");
+
+    const found = atlasRegionFound(selected.id);
+    const here = current === selected.id;
+    const awake = G.wayfinderPostActivated(selected.id);
+    const isWorldwake = !!(G.worldwakeRegion && G.worldwakeRegion(selected.id));
+    const inboundLock = atlasInboundLock(selected.id);
+    const requirement = inboundLock ? inboundLock.text : selected.stars ? `${selected.stars} stars required` : "Open road";
+    const landmarks = atlasLandmarksForRegion(selected.id);
+    const travelAttr = isWorldwake ? `data-worldwake-region="${selected.id}"` : `data-travel-region="${selected.id}"`;
+    let action = "";
+    if (found && awake) {
+      action = `<button class="atlas-travel" ${travelAttr} ${here || !canTravel ? "disabled" : ""}>${here ?
+        "You are here" : canTravel ? `Travel to ${escapeHtml(selected.name)}` : "Travel unavailable"}</button>`;
+    } else if (found) {
+      action = `<div class="atlas-lock">Find this region's glowing Wayfinder Post to add it to the travel network.</div>`;
+    } else {
+      action = `<div class="atlas-lock">${inboundLock ? escapeHtml(inboundLock.text) : "Discover this region on foot to awaken its route."}</div>`;
+    }
+
+    const purification = isWorldwake && G.worldwakePurified(selected.id)
+      ? `<span class="atlas-status good">WORLD MARK RESTORED</span>` : "";
+    return `<div class="atlas-world" aria-label="World route map">
+        <svg class="atlas-routes" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>
+        <div class="atlas-old-label">THE OLD WORLD</div><div class="atlas-wake-label">THE WORLDWAKE ROAD</div>
+        ${nodes}
+      </div>
+      <div class="atlas-detail form-card ${here ? "current" : ""}">
+        <div class="atlas-detail-heading"><h2>${found ? `${selected.icon} ${escapeHtml(selected.name)}` : "❔ Undiscovered region"}</h2>
+          ${here ? `<span class="atlas-status here">CURRENT REGION</span>` : purification}</div>
+        <div class="tagline">${escapeHtml(selected.clue)}</div>
+        <div class="atlas-facts">
+          <span>🚪 ${escapeHtml(requirement)}</span>
+          <span>${awake ? "🧭 Post awakened" : "◇ Post unknown"}</span>
+        </div>
+        ${landmarks.length ? `<div class="atlas-landmark-chips"><strong>KNOWN LANDMARKS</strong>${landmarks.map((map) =>
+          `<span>◆ ${escapeHtml(map.name)}</span>`).join("")}</div>` : ""}
+        ${action}
+      </div>`;
+  }
+
+  function localMapExits() {
+    const exits = [];
+    const seen = new Set();
+    for (const row of G.state.grid || []) for (const cell of row || []) {
+      if (!cell || !cell.portal || seen.has(cell.portal.map)) continue;
+      seen.add(cell.portal.map);
+      exits.push({
+        name: (G.maps[cell.portal.map] && G.maps[cell.portal.map].name) || cell.portal.map,
+        reason: G.world.portalBlockReason(cell),
+      });
+    }
+    return exits;
+  }
+
+  function drawLocalAtlas() {
+    const canvas = menuEl.querySelector("#local-atlas-canvas");
+    if (!canvas || !G.state.grid) return;
+    const width = 900;
+    const height = Math.max(260, Math.min(520, Math.round(width * G.state.mapH / G.state.mapW)));
+    canvas.width = width;
+    canvas.height = height;
+    const c = canvas.getContext("2d");
+    const sx = width / G.state.mapW;
+    const sy = height / G.state.mapH;
+    const colors = { tree: "#1e5f4e", water: "#3b5dc9", wall: "#333c57", rock: "#566c86",
+      floor: "#4a5b74", path: "#8a6538", grass: "#257179" };
+    c.fillStyle = "#1a1c2c";
+    c.fillRect(0, 0, width, height);
+    for (let y = 0; y < G.state.mapH; y++) for (let x = 0; x < G.state.mapW; x++) {
+      const cell = G.state.grid[y][x];
+      c.fillStyle = colors[cell.tile] || colors.grass;
+      c.fillRect(Math.floor(x * sx), Math.floor(y * sy), Math.ceil(sx) + 1, Math.ceil(sy) + 1);
+      if (cell.portal) {
+        const blocked = G.world.portalBlockReason(cell);
+        c.fillStyle = blocked ? "#b13e53" : "#ffcd75";
+        c.fillRect(Math.floor(x * sx), Math.floor(y * sy), Math.max(3, Math.ceil(sx)), Math.max(3, Math.ceil(sy)));
+      }
+    }
+    const post = G.state.wayfinderPost;
+    if (post) {
+      const x = post.x / G.TILE * sx;
+      const y = post.y / G.TILE * sy;
+      c.fillStyle = "#73eff7";
+      c.beginPath(); c.arc(x, y, Math.max(5, Math.min(sx, sy) * 1.15), 0, Math.PI * 2); c.fill();
+      c.strokeStyle = "#f4f4f4"; c.lineWidth = 2; c.stroke();
+    }
+    const px = G.state.player.x / G.TILE * sx;
+    const py = G.state.player.y / G.TILE * sy;
+    c.fillStyle = "#f4f4f4";
+    c.beginPath(); c.arc(px, py, Math.max(5, Math.min(sx, sy)), 0, Math.PI * 2); c.fill();
+    c.strokeStyle = "#ffcd75"; c.lineWidth = 3; c.stroke();
+  }
+
+  function buildLocalAtlas() {
+    const exits = localMapExits();
+    return `<div class="local-atlas form-card current">
+      <div class="atlas-detail-heading"><h2>📍 ${escapeHtml(G.state.mapDef.name || G.state.mapId)}</h2><span class="atlas-status here">YOU ARE HERE</span></div>
+      <canvas id="local-atlas-canvas" aria-label="Map of the current area"></canvas>
+      <div class="local-map-legend"><span><i class="player"></i>You</span><span><i class="post"></i>Wayfinder Post</span><span><i class="exit"></i>Open exit</span><span><i class="locked-exit"></i>Locked exit</span></div>
+    </div>
+    <div class="form-card"><h2>🚪 Routes from here</h2>
+      ${exits.length ? exits.map((exit) => `<div class="quest-row ${exit.reason ? "" : "done"}"><span>${exit.reason ? "🔒" : "➜"} ${escapeHtml(exit.name)}</span><span class="prog">${exit.reason ? escapeHtml(exit.reason.text) : "Open"}</span></div>`).join("") :
+        `<div class="tagline">This place has no ordinary road out. Use its story exit or return portal.</div>`}
+    </div>`;
+  }
+
+  function buildJourneyNotes() {
     const progress = G.wayfinderProgress();
     const journal = G.ensureWayfinder();
-    const travelUnlocked = G.wayfinderTravelUnlocked();
-    const canTravel = G.canWayfinderTravel();
-    let html = `<div class="form-card current">
-      <h2>🧭 The Long Way Around</h2>
-      <div class="tagline">Discover every major region. Unknown entries give directions without revealing the destination.</div>
-      <div class="quest-row"><span>Major regions</span><span class="prog">${progress.found}/${progress.total}</span></div>
-      <div class="quest-row"><span>Hidden landmarks</span><span class="prog">${progress.landmarksFound}/${progress.landmarksTotal}</span></div>
-    </div>`;
-
-    for (const region of G.WAYFINDER_REGIONS) {
-      const found = journal.discovered.includes(region.id);
-      const here = G.state.mapId === region.id;
-      html += `<div class="form-card ${found ? "current" : "wayfinder-unknown"}">
-        <h2>${found ? `✅ ${region.icon} ${region.name}` : "⬜ Undiscovered region"}</h2>
-        <div class="tagline">${found ? "Entered and recorded in the Journal." : region.clue}</div>
-        ${found ? `<div class="quest-row"><span>Entrance requirement</span><span class="prog">${region.stars ? `${region.stars} ⭐` : "Open"}</span></div>` :
-          `<div class="quest-row"><span>Trail requirement</span><span class="prog">${region.stars ? `${region.stars} ⭐` : "Open"}</span></div>`}
-        ${found && travelUnlocked ? `<button class="travel-btn" data-travel-region="${region.id}" ${here || !canTravel ? "disabled" : ""}>${here ? "You are here" : `Travel to ${region.name}`}</button>` : ""}
-      </div>`;
-    }
-
-    const landmarks = G.discoveredWayfinderLandmarks();
-    html += `<div class="form-card"><h2>📍 Discovered landmarks</h2>`;
-    if (landmarks.length) {
-      for (const map of landmarks) html += `<div class="quest-row done"><span>✅ ${map.name}</span><span class="prog">Recorded</span></div>
-        ${travelUnlocked ? `<button class="travel-btn" data-travel-landmark="${map.id}" ${G.state.mapId === map.id || !canTravel ? "disabled" : ""}>${G.state.mapId === map.id ? "You are here" : "Return for a rematch"}</button>` : ""}`;
-    } else {
-      html += `<div class="tagline">Trials, dens, and the coliseum reveal themselves only after you enter them.</div>`;
-    }
-    html += `</div><div class="form-card ${journal.rewardClaimed ? "current" : ""}">
-      <h2>🎁 Explorer reward</h2>
-      <div class="tagline">${journal.rewardClaimed ? "Wayfinder Whistle earned. Fast travel is available from safe areas." : "Discover every major region to earn +3 stars and the Wayfinder Whistle."}</div>
-      ${journal.rewardClaimed ? `<div class="quest-row done"><span>🎵 Wayfinder Whistle</span><span class="prog">Fast travel unlocked</span></div>` : ""}
-      ${travelUnlocked && !canTravel ? `<div class="tagline">Fast travel pauses during boss trials, gauntlets, and story moments.</div>` : ""}
-    </div>`;
-
     const campaign = G.ensureWorldwake();
-    html += `<div class="form-card current">
-      <h2>🌍 Worldwake</h2>
-      <div class="tagline">Two roads leave the old world. Follow the horizon, befriend the caravan, and purify the six living landmarks.</div>
-      <div class="quest-row"><span>New regions</span><span class="prog">${campaign.discovered.length}/${G.WORLDWAKE_REGIONS.length}</span></div>
-      <div class="quest-row"><span>World Marks</span><span class="prog">${campaign.marks.length}/${Object.keys(G.WORLDWAKE_MARKS).length}</span></div>
-      <div class="quest-row"><span>Caravan level</span><span class="prog">${campaign.caravanLevel}/${G.WORLDWAKE_FAVORS.length}</span></div>
-    </div>`;
-    for (const region of G.WORLDWAKE_REGIONS) {
-      const found = campaign.discovered.includes(region.id);
-      const here = G.state.mapId === region.id;
-      html += `<div class="form-card ${found ? "current" : "wayfinder-unknown"}">
-        <h2>${found ? `✅ ${region.icon} ${region.name}` : `⬜ ${region.icon} ${region.name}`}</h2>
-        <div class="tagline">${found ? "The caravan recorded this stretch of the living world." : region.clue}</div>
-        ${found && travelUnlocked ? `<button class="travel-btn" data-worldwake-region="${region.id}" ${here || !canTravel ? "disabled" : ""}>${here ? "You are here" : `Travel to ${region.name}`}</button>` : ""}
-      </div>`;
+    const landmarks = G.discoveredWayfinderLandmarks();
+    const canTravel = G.canWayfinderTravel();
+    let html = `<details class="atlas-journal"><summary>📖 Journey notes and completion</summary>
+      <div class="form-card">
+        <div class="quest-row"><span>Old-world regions</span><span class="prog">${progress.found}/${progress.total}</span></div>
+        <div class="quest-row"><span>Worldwake regions</span><span class="prog">${campaign.discovered.length}/${G.WORLDWAKE_REGIONS.length}</span></div>
+        <div class="quest-row"><span>Hidden landmarks</span><span class="prog">${progress.landmarksFound}/${progress.landmarksTotal}</span></div>
+        <div class="quest-row"><span>World Marks</span><span class="prog">${campaign.marks.length}/${Object.keys(G.WORLDWAKE_MARKS).length}</span></div>
+      </div>
+      <div class="form-card"><h2>🎁 Wayfinder milestones</h2>
+        <div class="quest-row ${journal.posts.length ? "done" : ""}"><span>Awaken your first post</span><span class="prog">${journal.posts.length ? "Post travel" : "Find one"}</span></div>
+        <div class="quest-row ${journal.whistleClaimed ? "done" : ""}"><span>Discover 4 old-world regions</span><span class="prog">${journal.whistleClaimed ? "Whistle earned" : `${Math.min(4, progress.found)}/4`}</span></div>
+        <div class="quest-row ${journal.rewardClaimed ? "done" : ""}"><span>Discover all 8 old-world regions</span><span class="prog">${journal.rewardClaimed ? "+3 ⭐ · landmark travel" : `${progress.found}/8`}</span></div>
+      </div>
+      <div class="form-card"><h2>📍 Discovered landmarks</h2>`;
+    if (!landmarks.length) html += `<div class="tagline">Trials, dens, and the coliseum appear here after you enter them.</div>`;
+    for (const map of landmarks) {
+      html += `<div class="landmark-route"><span>✅ ${escapeHtml(map.name)}</span>${journal.rewardClaimed ?
+        `<button class="travel-btn" data-travel-landmark="${map.id}" ${G.state.mapId === map.id || !canTravel ? "disabled" : ""}>${G.state.mapId === map.id ? "You are here" : "Travel"}</button>` :
+        `<small>Complete The Long Way Around for direct travel.</small>`}</div>`;
     }
-    html += `<div class="form-card"><h2>🛶 Caravan favors</h2>
-      <div class="tagline">Favors complete naturally while exploring. They add length and stories, never extra combat difficulty.</div>`;
+    html += `</div><div class="form-card"><h2>🛶 Caravan favors</h2>`;
     for (const favor of G.WORLDWAKE_FAVORS) {
       const done = campaign.favorsDone.includes(favor.id);
-      const progress = Math.min(favor.count, G.worldwakeFavorProgress(favor));
-      html += `<div class="quest-row ${done ? "done" : ""}"><span>${done ? "✅" : "⬜"} ${favor.name}<small>${favor.text}</small></span><span class="prog">${progress}/${favor.count}</span></div>`;
+      const value = Math.min(favor.count, G.worldwakeFavorProgress(favor));
+      html += `<div class="quest-row ${done ? "done" : ""}"><span>${done ? "✅" : "⬜"} ${escapeHtml(favor.name)}<small>${escapeHtml(favor.text)}</small></span><span class="prog">${value}/${favor.count}</span></div>`;
     }
-    html += `</div>`;
-    return html;
+    return html + `</div></details>`;
+  }
+
+  function buildWayfinderTab() {
+    const canTravel = G.canWayfinderTravel();
+    return `<div class="atlas-header">
+      <div><h2>🧭 Wayfinder Atlas</h2><div class="tagline">See where you are, follow the roads, and travel between awakened posts.</div></div>
+      <div class="atlas-view-tabs">
+        <button data-atlas-view="world" class="${atlasView === "world" ? "active" : ""}">WORLD</button>
+        <button data-atlas-view="local" class="${atlasView === "local" ? "active" : ""}">LOCAL</button>
+      </div>
+    </div>
+    ${atlasView === "world" ? buildWorldAtlas() : buildLocalAtlas()}
+    <div class="atlas-travel-rule ${canTravel ? "ready" : ""}">🧭 ${escapeHtml(G.wayfinderTravelReason())}</div>
+    ${buildJourneyNotes()}`;
   }
 
   function buildTownTab() {
@@ -1221,7 +1409,7 @@ G.ui = (() => {
 
   return {
     toast, banner, dialogue, update, drawHUD, resizeOverlay,
-    openMenu, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
+    openMenu, openMap, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
     get menuOpen() { return menuOpen; },
     get dialogueOpen() { return !!dialogueData; },
     get dialogueQueueLength() { return dialogueQueue.length + (dialogueData ? 1 : 0); },

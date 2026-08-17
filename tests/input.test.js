@@ -35,7 +35,7 @@ class FakeTarget {
 }
 
 const elements = {};
-for (const id of ["touch-ui", "joy-zone", "btn-a", "btn-b", "btn-c", "btn-swap", "btn-pause"])
+for (const id of ["touch-ui", "joy-zone", "btn-a", "btn-b", "btn-c", "btn-swap", "btn-map", "btn-pause"])
   elements[id] = new FakeTarget(id);
 const windowTarget = new FakeTarget("window");
 windowTarget.ontouchstart = null;
@@ -104,6 +104,10 @@ assertStopped("Safari's final touchend must clear a stale joystick");
 
 const abilityA = elements["btn-a"];
 const abilityB = elements["btn-b"];
+const mapButton = elements["btn-map"];
+mapButton.dispatch("pointerdown", { pointerId: 20 });
+mapButton.dispatch("pointerup", { pointerId: 20 });
+assert.equal(G.input.tapped("map"), true, "touch players should have a dedicated Atlas button");
 abilityA.dispatch("pointerdown", { pointerId: 21, clientX: 200, clientY: 100 });
 assert.equal(G.input.aiming.btn, "a", "pressing an ability should claim the shared aim lock");
 assert.equal(abilityA.classList.contains("held"), true, "the pressed ability should be highlighted");
@@ -175,6 +179,12 @@ pad.buttons[1] = gamepadButton(1);
 G.input.update();
 assert.equal(G.input.tapped("swap"), true, "Xbox B should swap forms during gameplay");
 pad.buttons[1] = gamepadButton();
+G.input.update();
+
+pad.buttons[8] = gamepadButton(1);
+G.input.update();
+assert.equal(G.input.tapped("map"), true, "the controller View button should open the Atlas");
+pad.buttons[8] = gamepadButton();
 G.input.update();
 
 pad.buttons[9] = gamepadButton(1);

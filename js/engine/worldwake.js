@@ -131,7 +131,9 @@ G.worldwakePurified = function (mapId) {
 G.travelToWorldwakeRegion = function (id) {
   const region = G.worldwakeRegion(id);
   const campaign = G.ensureWorldwake();
-  if (!region || !campaign.discovered.includes(id) || !G.canWayfinderTravel || !G.canWayfinderTravel()) return false;
+  if (!region || !campaign.discovered.includes(id) ||
+      !G.wayfinderPostActivated || !G.wayfinderPostActivated(id) ||
+      !G.canWayfinderTravel || !G.canWayfinderTravel()) return false;
   if (G.state.mapId === id) {
     G.ui.toast(`Already in ${region.name}.`, 2);
     return false;
@@ -139,7 +141,7 @@ G.travelToWorldwakeRegion = function (id) {
   G.world.load(id, region.spawn);
   G.sfx.play("door");
   G.spawnFx({ kind: "ring", x: G.state.player.x, y: G.state.player.y - 8, color: "#ffcd75", radius: 28, dur: 0.55 });
-  G.ui.toast(`Wayfinder Whistle: ${region.name}`, 2.5);
+  G.ui.toast(`Wayfinder route: ${region.name}`, 2.5);
   G.saveGame();
   return true;
 };

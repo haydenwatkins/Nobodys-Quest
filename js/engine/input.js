@@ -9,7 +9,7 @@
      G.input.aiming         -> live drag direction for the on-screen guide
 
    Buttons: "a" "b" "c" (abilities), "swap" (change form),
-            "pause" (menu)
+            "map" (Wayfinder Atlas), "pause" (menu)
    ============================================================ */
 
 "use strict";
@@ -45,6 +45,7 @@ G.input = (() => {
     z: "a", x: "b", c: "c", Z: "a", X: "b", C: "c",
     " ": "a",
     q: "swap", Q: "swap", Tab: "swap",
+    m: "map", M: "map",
     Escape: "pause", p: "pause", P: "pause", Enter: "pause",
   };
   const dirsHeld = { up: false, down: false, left: false, right: false };
@@ -168,7 +169,7 @@ G.input = (() => {
     syncGamepadControl("rb", gamepadButton(pad, 5), menuOpen ? "tabNext" : "b");
     syncGamepadControl("lt", gamepadButton(pad, 6, 0.35), menuOpen ? null : "c");
     syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen ? "confirm" : "a");
-    syncGamepadControl("view", gamepadButton(pad, 8), menuOpen ? "back" : "swap");
+    syncGamepadControl("view", gamepadButton(pad, 8), menuOpen ? "back" : "map");
     syncGamepadControl("menu", gamepadButton(pad, 9), "pause");
     syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen ? "confirm" : "a");
 
@@ -362,9 +363,10 @@ G.input = (() => {
     window.addEventListener("touchcancel", cancelAbilityTouches, { passive: true });
 
     /* ---------- simple touch buttons fire as soon as they are tapped ---------- */
-    const simpleBtns = { "btn-swap": "swap", "btn-pause": "pause" };
+    const simpleBtns = { "btn-swap": "swap", "btn-map": "map", "btn-pause": "pause" };
     for (const [id, btn] of Object.entries(simpleBtns)) {
       const el = document.getElementById(id);
+      if (!el) continue;
       el.addEventListener("pointerdown", (e) => { e.preventDefault(); el.classList.add("held"); press(btn); });
       const up = (e) => { e.preventDefault(); el.classList.remove("held"); release(btn); };
       el.addEventListener("pointerup", up);

@@ -163,6 +163,9 @@
     G.state.town.residents = 8;
     G.state.town.spirit = 20;
     G.state.wayfinder.discovered = G.wayfinderAllIds();
+    G.state.wayfinder.posts = G.wayfinderAllPostIds();
+    G.state.wayfinder.introSeen = true;
+    G.state.wayfinder.whistleClaimed = true;
     G.state.wayfinder.rewardClaimed = true;
     if (!G.state.items.includes("wayfinder-whistle")) G.state.items.push("wayfinder-whistle");
   }
@@ -236,6 +239,7 @@
 
     // Dialogue owns every action button while it is open. In particular,
     // Enter/Escape must advance the conversation instead of opening a menu.
+    if (!G.ui.dialogueOpen && G.input.tapped("map")) G.ui.openMap();
     if (!G.ui.dialogueOpen && G.input.tapped("pause")) G.ui.toggleMenu();
 
     if (!G.ui.menuOpen) {

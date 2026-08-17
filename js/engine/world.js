@@ -274,6 +274,7 @@ G.world = (() => {
     s.chests = chests;
     s.npcs = npcs;
     s.portalKeepouts = portalKeepouts;
+    s.wayfinderPost = G.wayfinderPostForMap ? G.wayfinderPostForMap(mapId, grid) : null;
     s.wildlife = G.makeWildlife ? G.makeWildlife(mapId, grid, w, h, spawn || def.playerStart) : [];
     s.restorationDetails = G.makeRestorationDetails ? G.makeRestorationDetails(mapId, grid, w, h) : [];
     s.townDecorations = mapId === "town" && G.makeTownDecorations ? G.makeTownDecorations(grid, w, h) : [];
@@ -1344,6 +1345,43 @@ G.world = (() => {
     for (const fence of G.state.mapDef.fences || []) drawFenceRun(ctx, fence);
   }
 
+  function drawWayfinderPost(ctx, time) {
+    const post = G.state.wayfinderPost;
+    if (!post) return;
+    const awake = G.wayfinderPostActivated && G.wayfinderPostActivated(G.state.mapId);
+    const x = Math.round(post.x);
+    const y = Math.round(post.y);
+    const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    const pulse = 0.28 + Math.abs(Math.sin(time * 3.2)) * 0.28;
+
+    ctx.save();
+    if (awake) {
+      ctx.globalAlpha = near ? pulse + 0.2 : pulse;
+      ctx.fillStyle = "#73eff7";
+      ctx.fillRect(x - 8, y - 12, 17, 16);
+      ctx.fillRect(x - 5, y - 15, 11, 21);
+      ctx.globalAlpha = 1;
+    }
+    ctx.fillStyle = "rgba(26,28,44,0.35)";
+    ctx.fillRect(x - 7, y + 4, 15, 3);
+    ctx.fillStyle = "#6b4a2b";
+    ctx.fillRect(x - 1, y - 9, 3, 15);
+    ctx.fillStyle = awake ? "#d8f3f1" : "#94b0c2";
+    ctx.fillRect(x - 7, y - 14, 15, 8);
+    ctx.fillStyle = awake ? "#257179" : "#566c86";
+    ctx.fillRect(x - 5, y - 12, 11, 4);
+    ctx.fillStyle = awake ? "#ffcd75" : "#333c57";
+    ctx.fillRect(x - 1, y - 12, 3, 1);
+    ctx.fillRect(x, y - 11, 1, 3);
+    if (near) {
+      ctx.fillStyle = "#f4f4f4";
+      ctx.fillRect(x - 9, y - 18, 19, 1);
+      ctx.fillStyle = "#73eff7";
+      ctx.fillRect(x - 4, y - 20, 9, 1);
+    }
+    ctx.restore();
+  }
+
   function draw(ctx, cam, time) {
     const s = G.state;
     const T = G.TILE;
@@ -1363,6 +1401,7 @@ G.world = (() => {
     drawMapFences(ctx);
     drawPlayerHouse(ctx);
     drawWorldwakeState(ctx, time);
+    drawWayfinderPost(ctx, time);
     for (const ch of s.chests) drawChest(ctx, ch, time);
   }
 
