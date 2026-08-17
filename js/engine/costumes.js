@@ -204,6 +204,9 @@ G.costumedSprite = function (sprite) {
     palette[key] = costume.palette[String(color).toLowerCase()] || color;
   }
   const variant = { palette, frames: sprite.frames };
+  if (sprite.hd && G.makeHdSprite2x) variant.hd = G.makeHdSprite2x(variant, {
+    accent: costume.accent || "#73eff7", motif: sprite.hd.hdMotif || "detail", animate: true,
+  });
   variants.set(costume.id, variant);
   return variant;
 };
@@ -454,6 +457,9 @@ G.signatureSprite = function (sprite, skin) {
     palette: skinPalette(sprite, skin),
     frames: sprite.frames.map((rows) => skinFrame(rows, skin.motif)),
   };
+  if (sprite.hd && G.makeHdSprite2x) variant.hd = G.makeHdSprite2x(variant, {
+    accent: skin.colors[3], motif: "hero", animate: true,
+  });
   variants.set(skin.id, variant);
   return variant;
 };

@@ -1178,13 +1178,15 @@ G.drawPlayer = function (ctx) {
     ctx.restore();
   }
   G.drawShadow(ctx, p.x, p.y, 10);
-  const frame = p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0;
+  const animationMode = p.attackPose ? "attack" : p.moving || p.dashing ? "walk" : "idle";
   const poseScale = p.attackPose ? p.attackPose.t / p.attackPose.dur : 0;
   const drawX = p.x + (p.attackPose ? p.attackPose.x * poseScale : 0);
   const gaitLift = p.moving && !p.dashing && Math.floor(p.anim) % 2 ? 1 : 0;
   const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift;
   const dressedSprite = G.playerAppearanceSprite ? G.playerAppearanceSprite(form) :
     (G.costumedSprite ? G.costumedSprite(form.sprite) : form.sprite);
+  const frame = G.spriteFrame ? G.spriteFrame(dressedSprite, animationMode, animationMode === "idle" ? G.state.time : p.anim) :
+    (p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0);
   G.drawSprite(ctx, dressedSprite, frame, drawX, drawY, p.dir.x < 0);
   const hasSignatureEffect = G.drawFormSkinEffect && G.drawFormSkinEffect(ctx, p, form, drawX, drawY);
   if (!hasSignatureEffect && G.drawCostumeAccessory) G.drawCostumeAccessory(ctx, p, form, drawX, drawY);
@@ -1264,7 +1266,7 @@ G.drawEnemy = function (ctx, e) {
     ctx.restore();
   }
   G.drawShadow(ctx, e.x, e.y, e.def.size - 2);
-  const frame = Math.floor(e.anim) % 2;
+  const frame = G.spriteFrame ? G.spriteFrame(e.def.sprite, "walk", e.anim) : Math.floor(e.anim) % 2;
   const drawX = e.x + (e.hitKickX || 0);
   const drawY = e.y + (e.hitKickY || 0);
 

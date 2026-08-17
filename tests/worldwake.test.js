@@ -359,7 +359,8 @@ assert.ok(G.util.dist(G.state.player.x, G.state.player.y, fire.x, fire.y) < G.TI
 const mainSource = fs.readFileSync(path.join(root, "js/engine/main.js"), "utf8");
 assert.match(mainSource, /scrollDuration:\s*0\.96/);
 assert.match(mainSource, /duration:\s*1\.12/);
-assert.match(mainSource, /ctx\.drawImage\(tr\.incoming, newX, newY\)/);
+assert.match(mainSource, /ctx\.drawImage\(tr\.incoming, 0, 0, tr\.incoming\.width, tr\.incoming\.height, newX, newY, G\.W, G\.H\)/,
+  "room buffers should retain the logical viewport while honoring the active render density");
 assert.doesNotMatch(mainSource, /1 - Math\.pow\(1 - raw, 3\)/,
   "classic room scrolling should be linear rather than eased");
 

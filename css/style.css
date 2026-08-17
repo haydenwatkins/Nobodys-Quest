@@ -447,6 +447,19 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .form-lab-tabs { display: flex; gap: 6px; flex: 0 0 auto; }
 .form-lab-tabs button { min-width: 102px; padding: 10px 12px; font-size: 9px; }
 .form-lab-tabs button.active { color: #1a1c2c; border-color: #ffcd75; background: #ffcd75; }
+.hd-pilot-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin: -2px 0 12px; padding: 11px 14px;
+  border: 2px solid #566c86; border-radius: 10px;
+  background: linear-gradient(90deg, #202438, #292d43);
+}
+.hd-pilot-bar.enabled { border-color: #73eff7; background: linear-gradient(90deg, #1c3039, #29366f); }
+.hd-pilot-bar .eyebrow { margin: 0 0 3px; }
+.hd-pilot-bar strong { color: #f4f4f4; font-family: "Press Start 2P", monospace; font-size: 9px; }
+.hd-pilot-bar p { margin: 4px 0 0; color: #94b0c2; font-size: 17px; }
+.hd-pilot-bar.enabled p { color: #c8d8e0; }
+.hd-pilot-bar button { flex: 0 0 auto; padding: 10px 12px; color: #73eff7; border-color: #73eff7; font-size: 8px; }
+.hd-pilot-bar.enabled button { color: #1a1c2c; background: #73eff7; }
 
 .form-roster-grid {
   display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px;
@@ -663,6 +676,8 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .form-lab-header p { font-size: 16px; }
   .form-lab-tabs { display: grid; grid-template-columns: repeat(3, 1fr); }
   .form-lab-tabs button { min-width: 0; min-height: 42px; padding: 7px 5px; font-size: 7px; }
+  .hd-pilot-bar { align-items: stretch; flex-direction: column; gap: 9px; }
+  .hd-pilot-bar button { min-height: 42px; }
   .form-roster-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   .tile-preview { height: 74px; }
   .portrait-name { padding: 6px 5px 1px; font-size: 6px; }

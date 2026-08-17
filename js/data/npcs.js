@@ -274,6 +274,12 @@
     }, "robe"),
   };
 
+  // Pebble is the conversation pilot: the denser sprite gives the recurring
+  // companion finer hair, coat lighting, and a readable little quest badge.
+  if (G.makeHdSprite2x) G.NPCS.pebble.sprite.hd = G.makeHdSprite2x(G.NPCS.pebble.sprite, {
+    accent: "#ffcd75", motif: "marker", animate: true,
+  });
+
   // Coordinates are preferences, not promises. The NPC engine searches nearby
   // for a safe open tile, which lets Ben change map art without burying anyone.
   G.NPC_PLACEMENTS = {

@@ -439,7 +439,9 @@
     const p = G.state.player;
     const bob = Math.sin(npc.anim * Math.PI) * 0.45;
     G.drawShadow(ctx, npc.x, npc.y, 10);
-    G.drawSprite(ctx, npc.def.sprite, Math.floor(npc.anim) % 2, npc.x, npc.y + bob, npc.facingLeft);
+    const mode = npc.path && npc.path.length ? "walk" : "idle";
+    const frame = G.spriteFrame ? G.spriteFrame(npc.def.sprite, mode, mode === "idle" ? G.state.time + npc.seed : npc.anim) : Math.floor(npc.anim) % 2;
+    G.drawSprite(ctx, npc.def.sprite, frame, npc.x, npc.y + bob, npc.facingLeft);
     if (npc.activity) {
       const side = npc.facingLeft ? -7 : 6;
       const ax = Math.round(npc.x + side), ay = Math.round(npc.y + 1 + bob);

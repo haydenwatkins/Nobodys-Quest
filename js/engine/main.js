@@ -8,7 +8,40 @@
 (() => {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
-  ctx.imageSmoothingEnabled = false;
+  const HD_PILOT_KEY = "nobodys-quest-hd-pilot";
+
+  function rememberedHdPilot() {
+    try {
+      const saved = localStorage.getItem(HD_PILOT_KEY);
+      return saved === null ? true : saved === "1";
+    } catch (error) {
+      return true;
+    }
+  }
+
+  G.hdPilot = rememberedHdPilot();
+  G.renderScale = G.hdPilot ? 2 : 1;
+
+  function configureWorldCanvas() {
+    G.renderScale = G.hdPilot ? 2 : 1;
+    canvas.width = G.W * G.renderScale;
+    canvas.height = G.H * G.renderScale;
+    ctx.imageSmoothingEnabled = false;
+    ctx.setTransform(G.renderScale, 0, 0, G.renderScale, 0, 0);
+  }
+
+  G.setHdPilot = function (enabled) {
+    const next = !!enabled;
+    if (G.hdPilot === next) return false;
+    G.hdPilot = next;
+    try { localStorage.setItem(HD_PILOT_KEY, next ? "1" : "0"); } catch (error) {}
+    configureWorldCanvas();
+    resize();
+    if (G.ui) G.ui.toast(next ? "✦ HD pilot enabled" : "▦ Original pixels enabled", 2.2);
+    return true;
+  };
+
+  configureWorldCanvas();
 
   /* ---------- fit the screen, keep pixels chunky ---------- */
   function resize() {
@@ -53,7 +86,8 @@
 
   // Gap portals use the original Zelda's locked, linear screen-to-screen pan:
   // the old room and the incoming room move together while the HUD stays put.
-  // The tiny 320x180 buffers are deliberately inexpensive on mobile Safari.
+  // Buffers follow the active render density while retaining the 320x180
+  // logical room, so cadence and field of view never change.
   G.beginWorldTransition = function (mapId, spawn, movement) {
     if (!G.maps[mapId]) return false;
     if (G.reducedMotion) {
@@ -61,8 +95,8 @@
       return true;
     }
     const snapshot = document.createElement("canvas");
-    snapshot.width = G.W;
-    snapshot.height = G.H;
+    snapshot.width = canvas.width;
+    snapshot.height = canvas.height;
     snapshot.getContext("2d").drawImage(canvas, 0, 0);
     const move = movement || { x: 1, y: 0 };
     const horizontal = Math.abs(move.x) >= Math.abs(move.y);
@@ -350,8 +384,9 @@
     // camera follows the player, clamped to the map edges
     const maxX = Math.max(0, s.mapW * G.TILE - G.W);
     const maxY = Math.max(0, s.mapH * G.TILE - G.H);
-    let camX = Math.round(G.util.clamp(p.x - G.W / 2, 0, maxX));
-    let camY = Math.round(G.util.clamp(p.y - G.H / 2 - 4, 0, maxY));
+    const cameraSnap = G.hdPilot ? (value) => Math.round(value * 2) / 2 : Math.round;
+    let camX = cameraSnap(G.util.clamp(p.x - G.W / 2, 0, maxX));
+    let camY = cameraSnap(G.util.clamp(p.y - G.H / 2 - 4, 0, maxY));
     camX += Math.round(s.cameraKickX);
     camY += Math.round(s.cameraKickY);
     if (s.shake > 0) {
@@ -387,8 +422,8 @@
       const tr = s.zoneTransition;
       if (!tr.incoming) {
         tr.incoming = document.createElement("canvas");
-        tr.incoming.width = G.W;
-        tr.incoming.height = G.H;
+        tr.incoming.width = canvas.width;
+        tr.incoming.height = canvas.height;
         tr.incoming.getContext("2d").drawImage(canvas, 0, 0);
       }
       const raw = G.util.clamp((tr.t - tr.leadIn) / tr.scrollDuration, 0, 1);
@@ -398,8 +433,8 @@
       const newY = oldY + tr.direction.y * G.H;
       ctx.fillStyle = "#1a1c2c";
       ctx.fillRect(0, 0, G.W, G.H);
-      ctx.drawImage(tr.snapshot, oldX, oldY);
-      ctx.drawImage(tr.incoming, newX, newY);
+      ctx.drawImage(tr.snapshot, 0, 0, tr.snapshot.width, tr.snapshot.height, oldX, oldY, G.W, G.H);
+      ctx.drawImage(tr.incoming, 0, 0, tr.incoming.width, tr.incoming.height, newX, newY, G.W, G.H);
     }
     // Pixel-stepped edge shading adds depth without blurring the art or
     // covering the sharp HTML HUD layered above this canvas.
@@ -453,6 +488,14 @@
             ctx.arc(f.x, f.y, r + 1, f.angle - f.arc / 2, f.angle - f.arc / 7);
             ctx.stroke();
           }
+          if (G.hdPilot && prog < 0.65) {
+            ctx.globalAlpha = Math.max(0, alpha * 0.9);
+            ctx.strokeStyle = "#fff3c2";
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, r - 0.75, f.angle - f.arc / 2, f.angle + f.arc / 5);
+            ctx.stroke();
+          }
           break;
         }
         case "ring": {
@@ -466,6 +509,14 @@
             ctx.lineWidth = 3;
             ctx.beginPath();
             ctx.arc(f.x, f.y, 4 + prog * (f.radius || 14), 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          if (G.hdPilot) {
+            ctx.globalAlpha = alpha * 0.8;
+            ctx.strokeStyle = "#f4f4f4";
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, 3.5 + prog * (f.radius || 14), -0.65, 1.15);
             ctx.stroke();
           }
           break;
@@ -482,6 +533,10 @@
           ctx.stroke();
           ctx.fillStyle = "#f4f4f4";
           ctx.fillRect(Math.round(f.x), Math.round(f.y), 1, 1);
+          if (G.hdPilot) {
+            ctx.fillStyle = "#fff3c2";
+            ctx.fillRect(Math.round(f.x * 2) / 2 - 0.25, Math.round(f.y * 2) / 2 - 0.25, 0.5, 0.5);
+          }
           break;
         }
         case "tell": {

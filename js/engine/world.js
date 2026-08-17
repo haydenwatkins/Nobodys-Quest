@@ -809,6 +809,51 @@ G.world = (() => {
         ctx.fillRect(px + 12, py + 4, 1, 9);
       }
     }
+    drawHdPilotDetail(ctx, cell, x, y, time);
+  }
+
+  function drawHdPilotDetail(ctx, cell, x, y, time) {
+    if (!G.hdPilot || !["overworld", "mistwood"].includes(G.state.mapId)) return;
+    const T = G.TILE, px = x * T, py = y * T;
+    const rnd = G.util.hash2(x + 211, y + 307);
+    ctx.save();
+    if (cell.tile === "grass") {
+      ctx.fillStyle = rnd > 0.5 ? "#55c878" : "#31955f";
+      const gx = px + 2.5 + Math.floor(rnd * 10), gy = py + 3.5 + Math.floor(G.util.hash2(y + 17, x + 9) * 9);
+      ctx.fillRect(gx, gy, 0.5, 1.5);
+      ctx.fillRect(gx + 1, gy + 0.5, 0.5, 1);
+      if (rnd > 0.9) {
+        ctx.fillStyle = "#fff3c2";
+        ctx.fillRect(gx + 2.5, gy - 1, 0.5, 0.5);
+        ctx.fillRect(gx + 2, gy - 0.5, 1.5, 0.5);
+      }
+    } else if (cell.tile === "path") {
+      ctx.fillStyle = "rgba(255,243,194,0.28)";
+      ctx.fillRect(px + 2.5 + Math.floor(rnd * 9), py + 4.5 + Math.floor(rnd * 6), 1.5, 0.5);
+      ctx.fillStyle = "rgba(107,74,43,0.32)";
+      ctx.fillRect(px + 10.5 - Math.floor(rnd * 5), py + 11.5, 1, 0.5);
+    } else if (cell.tile === "water") {
+      const drift = ((time * 5 + Math.floor(rnd * 7)) % 4) * 0.5;
+      ctx.fillStyle = "rgba(216,243,241,0.62)";
+      ctx.fillRect(px + 3 + drift, py + 7.5 + Math.floor(rnd * 4), 3.5, 0.5);
+      ctx.fillRect(px + 7 + drift, py + 8, 1, 0.5);
+    } else if (cell.tile === "tree") {
+      ctx.fillStyle = "#55c878";
+      ctx.fillRect(px + 6.5, py + 2.5, 1, 0.5);
+      ctx.fillRect(px + 3.5 + Math.floor(rnd * 7), py + 6.5, 0.5, 1);
+      ctx.fillStyle = "rgba(255,243,194,0.42)";
+      if (rnd > 0.55) ctx.fillRect(px + 9.5, py + 4, 0.5, 0.5);
+      ctx.fillStyle = "#3f2e20";
+      ctx.fillRect(px + 7.5, py + 12, 0.5, 3);
+    }
+    if (cell.message) {
+      ctx.fillStyle = "#fff3c2";
+      ctx.fillRect(px + 5, py + 4.5, 4.5, 0.5);
+      ctx.fillRect(px + 5.5, py + 6.5, 3, 0.5);
+      ctx.fillStyle = "#8a6538";
+      ctx.fillRect(px + 3.5, py + 3.5, 0.5, 4.5);
+    }
+    ctx.restore();
   }
 
   function neighborTile(x, y) {

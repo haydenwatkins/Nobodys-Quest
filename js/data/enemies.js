@@ -404,6 +404,18 @@ registerEnemy({
   },
 });
 
+// The first route supplies both ends of the combat pilot: a common enemy whose
+// glossy body benefits from sub-pixels, and a large boss where bark, leaves,
+// animation, and telegraphs reveal whether the denser style holds together.
+if (G.makeHdSprite2x) {
+  G.enemies.slime.sprite.hd = G.makeHdSprite2x(G.enemies.slime.sprite, {
+    accent: "#d8f3a4", motif: "slime", animate: true,
+  });
+  G.enemies.ancientTreant.sprite.hd = G.makeHdSprite2x(G.enemies.ancientTreant.sprite, {
+    accent: "#ffcd75", motif: "treant", animate: true,
+  });
+}
+
 /* ---- MIRE QUEEN — Sunken Marsh miniboss; DARK breaks her veil ---- */
 registerEnemy({
   id: "mireQueen",

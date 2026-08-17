@@ -938,6 +938,11 @@ G.ui = (() => {
       G.selectFormSkin(labFormId, labSkinId);
       buildMenu();
     });
+    const hdPilot = menuEl.querySelector('[data-act="hd-pilot"]');
+    if (hdPilot) hdPilot.addEventListener("click", () => {
+      G.setHdPilot(!G.hdPilot);
+      buildMenu();
+    });
     menuEl.querySelectorAll("[data-atlas-view]").forEach((button) =>
       button.addEventListener("click", () => {
         atlasView = button.dataset.atlasView;
@@ -1051,6 +1056,11 @@ G.ui = (() => {
       <div><h2>⚗ FORM LAB</h2><p>Choose a form, build its moves, and shape its look.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
         `<button data-formlab-view="${id}" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}</div>
+    </div>
+    <div class="hd-pilot-bar ${G.hdPilot ? "enabled" : ""}">
+      <div><span class="eyebrow">✦ RESOLUTION PILOT</span><strong>${G.hdPilot ? "HD PIXEL MODE" : "ORIGINAL PIXEL MODE"}</strong>
+        <p>${G.hdPilot ? "2× world detail · same camera, collision, speed, and difficulty" : "Original 320×180 world · comparison baseline"}</p></div>
+      <button data-act="hd-pilot">${G.hdPilot ? "Compare original" : "Try HD pilot"}</button>
     </div>`;
     if (formLabView === "loadout") return html + buildLoadoutLab();
     if (formLabView === "skins") return html + buildSkinsLab();
@@ -1214,8 +1224,9 @@ G.ui = (() => {
       c.globalAlpha = 0.12; c.fillStyle = accent; c.beginPath(); c.arc(w / 2, h * 0.54, w * 0.34, 0, Math.PI * 2); c.fill();
       c.globalAlpha = 0.32; c.fillStyle = accent; c.fillRect(w * 0.23, h - 20, w * 0.54, 2);
       c.globalAlpha = 1;
-      const made = G.makeSprite(sprite);
-      const scale = Math.max(2, Math.min(7, Math.floor(Math.min((w - 24) / (made.w + 2), (h - 28) / (made.h + 2)))));
+      const made = G.spriteMetrics ? G.spriteMetrics(sprite) : G.makeSprite(sprite);
+      const logicalW = made.logicalW || made.w, logicalH = made.logicalH || made.h;
+      const scale = Math.max(2, Math.min(7, Math.floor(Math.min((w - 24) / (logicalW + 2), (h - 28) / (logicalH + 2)))));
       G.drawSprite(c, sprite, frame, w / 2, h - 19, false, scale);
       if (canvas.dataset.previewLocked === "true") {
         c.globalCompositeOperation = "source-atop"; c.fillStyle = "#252a40"; c.fillRect(0, 0, w, h); c.globalCompositeOperation = "source-over";

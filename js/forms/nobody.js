@@ -71,3 +71,9 @@ registerForm({
     ],
   },
 });
+
+// HD pilot: denser facial contours, edge lighting, a small cyan heart-mark,
+// and extra idle/walk beats while keeping Nobody's exact gameplay footprint.
+if (G.makeHdSprite2x) G.forms.nobody.sprite.hd = G.makeHdSprite2x(G.forms.nobody.sprite, {
+  accent: "#73eff7", motif: "hero", animate: true,
+});
