@@ -274,6 +274,9 @@ G.world = (() => {
     s.chests = chests;
     s.npcs = npcs;
     s.portalKeepouts = portalKeepouts;
+    s.wildlife = G.makeWildlife ? G.makeWildlife(mapId, grid, w, h, spawn || def.playerStart) : [];
+    s.restorationDetails = G.makeRestorationDetails ? G.makeRestorationDetails(mapId, grid, w, h) : [];
+    s.townDecorations = mapId === "town" && G.makeTownDecorations ? G.makeTownDecorations(grid, w, h) : [];
     s.projectiles = [];
     s.pickups = [];
     s.passiveEchoes = [];
@@ -1353,6 +1356,7 @@ G.world = (() => {
         drawTile(ctx, s.grid[y][x], x, y, time);
     drawTrialFloor(ctx, time);
     drawAmbientDetails(ctx, cam, time);
+    if (G.drawLivingWorldGround) G.drawLivingWorldGround(ctx, cam, time);
     for (let y = y0; y <= y1; y++)
       for (let x = x0; x <= x1; x++)
         drawTrialLandmark(ctx, s.grid[y][x], x, y, time);

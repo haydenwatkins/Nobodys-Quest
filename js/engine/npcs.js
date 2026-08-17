@@ -11,6 +11,47 @@
 (function () {
   const TALK_NEAR = 25;
   const TALK_RESET = 36;
+  const ROUTINE_OFFSETS = [
+    [[3, 0], [1, 3], [-2, 2]],
+    [[-3, 0], [-1, -3], [2, -2]],
+    [[0, 3], [3, 1], [-2, -2]],
+    [[0, -3], [-3, 1], [2, 2]],
+  ];
+  const AMBIENT_EXCHANGES = [
+    ["Lovely day!", "For something."],
+    ["Road clear?", "Clear enough."],
+    ["Need a hand?", "Always."],
+    ["Hear that?", "The world waking."],
+    ["Going far?", "Eventually."],
+    ["Nice outfit.", "It's borrowed."],
+  ];
+  const SOLO_BARKS = ["Hmm...", "All clear.", "♪", "Busy day.", "Oh, hello!", "Good road." ];
+  const ROLE_ACTIVITIES = {
+    pebble: ["watch", "notes"], mayorMaybe: ["notes", "wave"], errata: ["read", "notes"],
+    parcel: ["parcel", "map"], pending: ["polish", "watch"], alias: ["sew", "wave"],
+    provisional: ["mix", "notes"], moss: ["water", "garden"], lastminute: ["map", "watch"],
+    probably: ["glow", "read"],
+  };
+
+  const residentFrames = [
+    [
+      "..hhh..", ".hhhhh.", ".hfff..", "..fff..", "..ccc..",
+      ".accca.", "..ccc..", "..c.c..", ".bb.bb.",
+    ],
+    [
+      ".hhhh..", ".hhhhh.", "..fffh.", "..fff..", "..ccc..",
+      "acccc..", "..ccca.", ".c...c.", "..b..bb",
+    ],
+  ];
+  const residentColors = [
+    ["#6b4a2b", "#e0a17c", "#3b7d6a", "#ffcd75"],
+    ["#d8b06a", "#9b654e", "#596fa3", "#73eff7"],
+    ["#493829", "#c98c72", "#985f79", "#f4f4f4"],
+    ["#b7b1c9", "#d6a17c", "#6f7042", "#a7f070"],
+    ["#70493e", "#8f5f4c", "#8153c1", "#d9a7ff"],
+    ["#f2e4a8", "#694b67", "#426080", "#ef7d57"],
+  ];
+  const residentDefs = [];
 
   G.storyChapter = function () {
     const s = G.state || {};
@@ -58,6 +99,110 @@
     return null;
   }
 
+  function seedFor(text) {
+    let seed = 0;
+    for (let i = 0; i < text.length; i++) seed = (seed * 31 + text.charCodeAt(i)) >>> 0;
+    return seed;
+  }
+
+  function routineAnchors(home, isOpen, seed) {
+    const anchors = [home];
+    const offsets = ROUTINE_OFFSETS[seed % ROUTINE_OFFSETS.length];
+    for (const [dx, dy] of offsets) {
+      const spot = nearestOpen(home.x + dx, home.y + dy, isOpen, anchors);
+      if (spot && !anchors.some((anchor) => anchor.x === spot.x && anchor.y === spot.y)) anchors.push(spot);
+    }
+    return anchors;
+  }
+
+  function activitiesFor(id, ambientOnly) {
+    return ambientOnly ? ["sweep", "garden", "parcel"] : ROLE_ACTIVITIES[id] || ["watch"];
+  }
+
+  function makeNpc(id, def, tile, isOpen, ambientOnly) {
+    const seed = seedFor(id);
+    const activities = activitiesFor(id, ambientOnly);
+    return {
+      id,
+      def,
+      x: tile.x * G.TILE + G.TILE / 2,
+      y: tile.y * G.TILE + G.TILE / 2 + 3,
+      anim: (tile.x * 0.37 + tile.y * 0.19) % 2,
+      near: false,
+      facingLeft: false,
+      ambientOnly: !!ambientOnly,
+      home: tile,
+      anchors: routineAnchors(tile, isOpen, seed),
+      anchorIndex: 0,
+      routineT: 1.5 + (seed % 7) * 0.35,
+      path: [],
+      bubble: null,
+      activity: activities[seed % activities.length],
+      seed,
+    };
+  }
+
+  function residentDef(index) {
+    if (residentDefs[index]) return residentDefs[index];
+    const colors = residentColors[index % residentColors.length];
+    const def = {
+      name: "Town Resident",
+      icon: "•",
+      chapters: {},
+      sprite: {
+        palette: { h: colors[0], f: colors[1], c: colors[2], a: colors[3], b: "#352b42" },
+        frames: residentFrames,
+      },
+    };
+    residentDefs[index] = def;
+    return def;
+  }
+
+  function townPlotTiles() {
+    const map = G.maps && G.maps.town;
+    const plots = {};
+    if (!map) return plots;
+    for (let y = 0; y < map.tiles.length; y++) for (let x = 0; x < map.tiles[y].length; x++) {
+      const cell = map.legend[map.tiles[y][x]];
+      if (cell && cell.townPlot) plots[cell.townPlot] = { x, y };
+    }
+    return plots;
+  }
+
+  G.townVisibleResidentCount = function () {
+    const town = G.state && G.state.town;
+    return town && town.founded ? Math.min(16, Math.max(0, town.residents || 0)) : 0;
+  };
+
+  function makeTownResidents(isOpen, occupied) {
+    const count = G.townVisibleResidentCount();
+    if (!count) return [];
+    const town = G.state.town;
+    const plots = townPlotTiles();
+    const homes = (town.houses || []).map((id) => plots[id]).filter(Boolean);
+    if (!homes.length) homes.push({ x: 14, y: 3 });
+    const residents = [];
+    const residentOpen = (x, y) => {
+      if (!isOpen(x, y)) return false;
+      const row = G.maps.town.tiles[y];
+      const cell = row && G.maps.town.legend[row[x]];
+      return !(cell && cell.townPlot && G.townHouseBuilt && G.townHouseBuilt(cell.townPlot));
+    };
+    for (let i = 0; i < count; i++) {
+      const home = homes[i % homes.length];
+      const ring = 2 + Math.floor(i / Math.max(1, homes.length));
+      const preferred = {
+        x: home.x + (i % 2 ? ring : -ring),
+        y: home.y + (i % 3 === 0 ? 2 : i % 3 === 1 ? -2 : 0),
+      };
+      const tile = nearestOpen(preferred.x, preferred.y, residentOpen, occupied);
+      if (!tile) continue;
+      occupied.push(tile);
+      residents.push(makeNpc(`resident-${i}`, residentDef(i), tile, residentOpen, true));
+    }
+    return residents;
+  }
+
   G.makeMapNpcs = function (mapId, isOpen) {
     const placements = (G.NPC_PLACEMENTS && G.NPC_PLACEMENTS[mapId]) || [];
     const occupied = [];
@@ -69,17 +214,132 @@
       const tile = nearestOpen(placement[1], placement[2], isOpen, occupied);
       if (!tile) continue;
       occupied.push(tile);
-      result.push({
-        id,
-        def,
-        x: tile.x * G.TILE + G.TILE / 2,
-        y: tile.y * G.TILE + G.TILE / 2 + 3,
-        anim: (tile.x * 0.37 + tile.y * 0.19) % 2,
-        near: false,
-        facingLeft: false,
-      });
+      result.push(makeNpc(id, def, tile, isOpen, false));
     }
+    if (mapId === "town") result.push(...makeTownResidents(isOpen, occupied));
     return result;
+  };
+
+  function npcTileOpen(x, y) {
+    const s = G.state;
+    if (x < 1 || y < 1 || x >= s.mapW - 1 || y >= s.mapH - 1) return false;
+    const cell = s.grid[y] && s.grid[y][x];
+    if (!cell || cell.portal || cell.chest || cell.message || cell.rest) return false;
+    if (cell.townPlot && G.townHouseBuilt && G.townHouseBuilt(cell.townPlot)) return false;
+    return !G.world.solid(x * G.TILE + G.TILE / 2, y * G.TILE + G.TILE / 2);
+  }
+
+  function pathTo(npc, target) {
+    const start = { x: Math.floor(npc.x / G.TILE), y: Math.floor(npc.y / G.TILE) };
+    const startKey = `${start.x},${start.y}`;
+    const targetKey = `${target.x},${target.y}`;
+    if (startKey === targetKey) return [];
+    const queue = [start];
+    const parent = new Map([[startKey, null]]);
+    let found = false;
+    for (let head = 0; head < queue.length && head < 700; head++) {
+      const point = queue[head];
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const next = { x: point.x + dx, y: point.y + dy };
+        const key = `${next.x},${next.y}`;
+        if (parent.has(key) || !npcTileOpen(next.x, next.y)) continue;
+        parent.set(key, `${point.x},${point.y}`);
+        if (key === targetKey) { found = true; break; }
+        queue.push(next);
+      }
+      if (found) break;
+    }
+    if (!found) return [];
+    const path = [];
+    let key = targetKey;
+    while (key && key !== startKey) {
+      const [x, y] = key.split(",").map(Number);
+      path.push({ x: x * G.TILE + G.TILE / 2, y: y * G.TILE + G.TILE / 2 + 3 });
+      key = parent.get(key);
+    }
+    return path.reverse();
+  }
+
+  function setBubble(npc, text, delay) {
+    npc.bubble = { text, delay: delay || 0, t: 3.2 + (delay || 0) };
+  }
+
+  G.startNpcExchange = function (first, second, index) {
+    if (!first) return false;
+    if (!second) {
+      setBubble(first, SOLO_BARKS[(index == null ? first.seed : index) % SOLO_BARKS.length], 0);
+      return true;
+    }
+    const exchange = AMBIENT_EXCHANGES[(index == null ? first.seed + second.seed : index) % AMBIENT_EXCHANGES.length];
+    setBubble(first, exchange[0], 0);
+    setBubble(second, exchange[1], 1.7);
+    first.facingLeft = second.x < first.x;
+    second.facingLeft = first.x < second.x;
+    return true;
+  };
+
+  function updateRoutine(npc, dt, player, threats) {
+    const closeThreat = threats.find((enemy) => Math.hypot(enemy.x - npc.x, enemy.y - npc.y) < 66);
+    if (closeThreat) {
+      npc.activity = null;
+      const angle = Math.atan2(npc.y - closeThreat.y, npc.x - closeThreat.x);
+      G.world.moveBox(npc, Math.cos(angle) * 28 * dt, Math.sin(angle) * 28 * dt);
+      npc.facingLeft = Math.cos(angle) < 0;
+      npc.anim += dt * 7;
+      if (!npc.bubble) setBubble(npc, "!", 0);
+      return;
+    }
+
+    const playerDistance = Math.hypot(player.x - npc.x, player.y - npc.y);
+    if (playerDistance < TALK_RESET) {
+      npc.facingLeft = player.x < npc.x;
+      return;
+    }
+
+    if (npc.path.length) {
+      npc.activity = null;
+      const target = npc.path[0];
+      const dx = target.x - npc.x;
+      const dy = target.y - npc.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance < 2) {
+        npc.path.shift();
+        if (!npc.path.length) {
+          npc.routineT = 2.2 + (npc.seed % 9) * 0.35;
+          const activities = activitiesFor(npc.id, npc.ambientOnly);
+          npc.activity = activities[(npc.anchorIndex + npc.seed) % activities.length];
+        }
+        return;
+      }
+      const speed = npc.ambientOnly ? 14 : 12;
+      const step = Math.min(distance, speed * dt);
+      G.world.moveBox(npc, dx / distance * step, dy / distance * step);
+      npc.facingLeft = dx < 0;
+      npc.anim += dt * 6;
+      return;
+    }
+
+    npc.anim += dt * 0.8;
+    npc.routineT -= dt;
+    if (npc.routineT > 0 || npc.anchors.length < 2) return;
+    npc.anchorIndex = (npc.anchorIndex + 1 + (npc.seed % Math.max(1, npc.anchors.length - 1))) % npc.anchors.length;
+    npc.path = pathTo(npc, npc.anchors[npc.anchorIndex]);
+    if (!npc.path.length) npc.routineT = 2.5;
+  }
+
+  G.syncTownResidents = function () {
+    const s = G.state;
+    if (!s || s.mapId !== "town" || !s.grid) return;
+    const named = (s.npcs || []).filter((npc) => !npc.ambientOnly);
+    const occupied = named.map((npc) => ({ x: Math.floor(npc.x / G.TILE), y: Math.floor(npc.y / G.TILE) }));
+    const isOpen = (x, y) => npcTileOpen(x, y);
+    s.npcs = named.concat(makeTownResidents(isOpen, occupied));
+  };
+
+  G.celebrateTown = function () {
+    if (!G.state || G.state.mapId !== "town") return;
+    const residents = (G.state.npcs || []).filter((npc) => npc.ambientOnly);
+    for (let i = 0; i < residents.length; i++) setBubble(residents[i], i % 3 === 0 ? "♪" : i % 3 === 1 ? "Hooray!" : "♥", i * 0.08);
   };
 
   function chapterLines(def, chapter) {
@@ -128,16 +388,36 @@
       !enemy.dead && Math.hypot(enemy.x - p.x, enemy.y - p.y) < 48);
     let candidate = null;
     let candidateDistance = Infinity;
+    const threats = (s.enemies || []).filter((enemy) => !enemy.dead);
 
     for (const npc of npcs) {
-      npc.anim += dt * 2.2;
-      npc.facingLeft = p.x < npc.x;
+      updateRoutine(npc, dt, p, threats);
+      if (npc.bubble) {
+        npc.bubble.t -= dt;
+        npc.bubble.delay = Math.max(0, npc.bubble.delay - dt);
+        if (npc.bubble.t <= 0) npc.bubble = null;
+      }
       const distance = Math.hypot(npc.x - p.x, npc.y - p.y);
       if (distance > TALK_RESET) npc.near = false;
-      if (distance <= TALK_NEAR && !npc.near && distance < candidateDistance) {
+      if (!npc.ambientOnly && distance <= TALK_NEAR && !npc.near && distance < candidateDistance) {
         candidate = npc;
         candidateDistance = distance;
       }
+    }
+
+    s.npcChatterT = (s.npcChatterT == null ? 5.5 : s.npcChatterT) - dt;
+    if (s.npcChatterT <= 0 && !blocked && !danger) {
+      const nearby = npcs.filter((npc) => Math.hypot(npc.x - p.x, npc.y - p.y) < 125 && !npc.bubble);
+      let pair = null;
+      for (let i = 0; i < nearby.length && !pair; i++) for (let j = i + 1; j < nearby.length; j++) {
+        if (Math.hypot(nearby[i].x - nearby[j].x, nearby[i].y - nearby[j].y) < 78) {
+          pair = [nearby[i], nearby[j]];
+          break;
+        }
+      }
+      if (pair) G.startNpcExchange(pair[0], pair[1]);
+      else if (nearby.length) G.startNpcExchange(nearby[0], null);
+      s.npcChatterT = 9 + ((s.time || 0) % 5);
     }
 
     if (candidate && !blocked && !danger) {
@@ -155,7 +435,51 @@
     const bob = Math.sin(npc.anim * Math.PI) * 0.45;
     G.drawShadow(ctx, npc.x, npc.y, 10);
     G.drawSprite(ctx, npc.def.sprite, Math.floor(npc.anim) % 2, npc.x, npc.y + bob, npc.facingLeft);
-    if (Math.hypot(npc.x - p.x, npc.y - p.y) > 44) return;
+    if (npc.activity) {
+      const side = npc.facingLeft ? -7 : 6;
+      const ax = Math.round(npc.x + side), ay = Math.round(npc.y + 1 + bob);
+      ctx.save();
+      if (npc.activity === "water") {
+        ctx.fillStyle = "#566c86"; ctx.fillRect(ax - 2, ay - 2, 5, 4); ctx.fillRect(ax + 2, ay - 4, 3, 1);
+        ctx.fillStyle = "#73eff7"; ctx.fillRect(ax + 5, ay - 2, 1, 1); ctx.fillRect(ax + 7, ay, 1, 1);
+      } else if (npc.activity === "garden") {
+        ctx.fillStyle = "#1e5f4e"; ctx.fillRect(ax, ay - 3, 1, 5);
+        ctx.fillStyle = "#a7f070"; ctx.fillRect(ax - 2, ay - 5, 5, 2);
+      } else if (npc.activity === "parcel") {
+        ctx.fillStyle = "#8a6538"; ctx.fillRect(ax - 3, ay - 3, 7, 6);
+        ctx.fillStyle = "#ffcd75"; ctx.fillRect(ax, ay - 3, 1, 6); ctx.fillRect(ax - 3, ay - 1, 7, 1);
+      } else if (npc.activity === "sweep" || npc.activity === "polish") {
+        ctx.fillStyle = npc.activity === "sweep" ? "#6b4a2b" : "#94b0c2";
+        ctx.fillRect(ax, ay - 7, 1, 9); ctx.fillRect(ax - 2, ay + 1, 5, 2);
+      } else if (npc.activity === "glow" || npc.activity === "mix") {
+        ctx.globalAlpha = 0.55 + Math.sin(npc.anim * 3) * 0.2;
+        ctx.fillStyle = npc.activity === "glow" ? "#d9a7ff" : "#73eff7"; ctx.fillRect(ax - 2, ay - 5, 5, 5);
+      } else if (npc.activity === "wave") {
+        ctx.fillStyle = npc.def.sprite.palette.f; ctx.fillRect(ax, ay - 7, 2, 4);
+      } else {
+        ctx.fillStyle = "#f4f4f4"; ctx.fillRect(ax - 3, ay - 5, 7, 6);
+        ctx.fillStyle = npc.def.sprite.palette.a; ctx.fillRect(ax - 2, ay - 4, 5, 1); ctx.fillRect(ax - 2, ay - 2, 4, 1);
+      }
+      ctx.restore();
+    }
+    const distance = Math.hypot(npc.x - p.x, npc.y - p.y);
+    if (npc.bubble && npc.bubble.delay <= 0 && npc.bubble.t > 0 && distance < 135) {
+      const text = npc.bubble.text;
+      const width = Math.max(12, Math.min(72, text.length * 4 + 6));
+      const bx = Math.round(npc.x - width / 2);
+      const by = Math.round(npc.y - 25 + bob);
+      ctx.save();
+      ctx.fillStyle = "rgba(244,244,244,0.94)";
+      ctx.fillRect(bx, by, width, 10);
+      ctx.fillStyle = "#1a1c2c";
+      ctx.fillRect(Math.round(npc.x - 1), by + 10, 3, 2);
+      ctx.font = "5px monospace";
+      ctx.textBaseline = "top";
+      ctx.textAlign = "center";
+      ctx.fillText(text, Math.round(npc.x), by + 2);
+      ctx.restore();
+    }
+    if (npc.ambientOnly || distance > 44) return;
 
     const y = Math.round(npc.y - 18 + bob);
     ctx.save();

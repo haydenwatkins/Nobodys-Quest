@@ -14,6 +14,7 @@ G.makeTown = function () {
     residents: 0,
     spirit: 0,
     festivals: 0,
+    festivalUntil: 0,
     houses: [],
   };
 };
@@ -25,6 +26,7 @@ G.normalizeTown = function (saved) {
   if (saved && saved.faith !== undefined) town.spirit = saved.faith;
   if (saved && saved.sermons !== undefined) town.festivals = saved.sermons;
   if (!Array.isArray(town.houses)) town.houses = [];
+  town.festivalUntil = Number(town.festivalUntil) || 0;
   if (!town.name || town.name === "The Little Flock") town.name = "Sunrise Town";
   return town;
 };
@@ -49,6 +51,7 @@ G.foundTown = function (name) {
   town.name = (name || town.name || "Sunrise Town").trim().slice(0, 28) || "Sunrise Town";
   G.sfx.play("unlock");
   G.ui.banner("☀️ TOWN FOUNDED!", `${town.name} is your home now.`);
+  if (G.syncTownResidents) G.syncTownResidents();
   G.saveGame();
   return true;
 };
@@ -96,7 +99,15 @@ G.tryBuildTownHouse = function (plotId) {
   G.sfx.play("unlock");
   G.spawnFx({ kind: "ring", x: G.state.player.x, y: G.state.player.y - 8, color: "#ffcd75", dur: 0.55 });
   G.ui.toast(`🏠 Built a house! ${town.houses.length} total`);
+  if (G.syncTownResidents) G.syncTownResidents();
+  if (G.state.mapId === "town" && G.makeTownDecorations)
+    G.state.townDecorations = G.makeTownDecorations(G.state.grid, G.state.mapW, G.state.mapH);
   G.saveGame();
+};
+
+G.townFestivalActive = function (now) {
+  const town = G.ensureTown();
+  return !!town.founded && town.festivalUntil > (now === undefined ? Date.now() : now);
 };
 
 G.holdTownFestival = function () {
@@ -106,8 +117,10 @@ G.holdTownFestival = function () {
   const multiplier = (G.state.items || []).includes("sunrise-banner") ? 2 : 1;
   const earned = Math.max(1, town.residents) * multiplier;
   town.spirit += earned;
+  town.festivalUntil = Date.now() + 5 * 60 * 1000;
   G.sfx.play("quest");
-  G.ui.toast(`🎉 Festival held! +${earned} town spirit${multiplier > 1 ? " · Banner bonus!" : ""}`);
+  G.ui.toast(`🎉 Festival held! ${town.name} will celebrate for five minutes. +${earned} town spirit${multiplier > 1 ? " · Banner bonus!" : ""}`);
+  if (G.celebrateTown) G.celebrateTown();
   G.saveGame();
 };
 
@@ -124,6 +137,7 @@ G.events.on("kill", () => {
   } else if (!addedResident) {
     G.ui.toast(`${town.name} is full. Build houses to welcome more residents.`, 2.5);
   }
+  if (G.syncTownResidents) G.syncTownResidents();
   G.saveGame();
 });
 

@@ -319,6 +319,7 @@
 
     G.updatePlayer(dt);
     G.updateNpcs(dt);
+    if (G.updateLivingWorld) G.updateLivingWorld(dt);
     G.tutorial.update(dt);
     G.updateEnemies(dt);
     G.combat.updateProjectiles(dt);
@@ -359,6 +360,8 @@
 
     // draw everyone in y-order so closer things overlap farther things
     const drawables = s.enemies.filter((e) => !e.dead).map((e) => ({ y: e.y, fn: () => G.drawEnemy(ctx, e) }));
+    for (const creature of s.wildlife || [])
+      drawables.push({ y: creature.y, fn: () => G.drawWildlife(ctx, creature) });
     for (const npc of s.npcs || []) drawables.push({ y: npc.y, fn: () => G.drawNpc(ctx, npc) });
     drawables.push({ y: p.y, fn: () => G.drawPlayer(ctx) });
     drawables.sort((a, b) => a.y - b.y);
