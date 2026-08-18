@@ -401,7 +401,7 @@ G.ui = (() => {
     const boxW = touch ? 158 : 184;
     const boxH = touch ? 20 : 24;
     const x = touch ? 5 : Math.round((G.W - boxW) / 2);
-    const y = touch ? 38 : G.H - boxH - 26;
+    const y = touch ? 60 : G.H - boxH - 26;
     c.fillStyle = "rgba(26,28,44,0.9)";
     c.fillRect(x, y, boxW, boxH);
     c.fillStyle = "#73eff7";
@@ -412,6 +412,24 @@ G.ui = (() => {
     c.font = `${touch ? 8 : 9}px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
     c.fillText(fitText(c, prompt.text, boxW - 10), x + 5, y + (touch ? 10 : 12));
+  }
+
+  function drawStoryTracker(c) {
+    if (!G.storyGoal || G.state.bossCutscene || G.ui.dialogueOpen) return;
+    const goal = G.storyGoal();
+    const boxW = 190;
+    const x = 5;
+    const y = 38;
+    c.fillStyle = "rgba(26,28,44,0.82)";
+    c.fillRect(x, y, boxW, 18);
+    c.fillStyle = goal.act.color;
+    c.fillRect(x, y, 2, 18);
+    c.font = `4px ${FONT_HEAD}`;
+    c.fillStyle = goal.complete ? "#a7f070" : goal.act.color;
+    c.fillText(goal.complete ? "MAIN STORY · COMPLETE" : `ACT ${goal.chapter + 1} · MAIN STORY`, x + 5, y + 3);
+    c.font = `7px ${FONT_BODY}`;
+    c.fillStyle = "#f4f4f4";
+    c.fillText(fitText(c, goal.short, boxW - 10), x + 5, y + 9);
   }
 
   function drawWardHint(c, cam) {
@@ -578,6 +596,7 @@ G.ui = (() => {
 
     if (!G.state.bossCutscene) {
       drawMinimap(c);
+      drawStoryTracker(c);
       drawQuestTracker(c);
       drawWardHint(c, cam);
       drawWayfinderHint(c);
@@ -702,7 +721,7 @@ G.ui = (() => {
     }[ch]));
   }
 
-  let activeTab = "forms";
+  let activeTab = "story";
   let atlasView = "world";
   let atlasSelectedId = null;
   let formLabView = "roster";
@@ -1010,12 +1029,54 @@ G.ui = (() => {
     }
   }
 
+  function buildStoryTab() {
+    const goal = G.storyGoal();
+    const story = G.ensureStory();
+    const progress = goal.progress || { value: 0, total: 1, label: "JOURNEY" };
+    const percent = Math.round(100 * progress.value / Math.max(1, progress.total));
+    const chapterCards = G.STORY_CHAPTERS.map((chapter, index) => {
+      const reached = index <= goal.chapter || story.seenChapters.includes(index);
+      const current = index === goal.chapter;
+      return `<article class="story-chapter ${current ? "current" : reached ? "reached" : "locked"}" style="--chapter-color:${chapter.color}">
+        <span class="story-chapter-icon" style="--chapter-color:${chapter.color}">${reached ? chapter.icon : "◇"}</span>
+        <div><span class="eyebrow">ACT ${index + 1}${current ? " · CURRENT" : reached ? " · REMEMBERED" : " · AHEAD"}</span>
+          <h3>${reached || current ? escapeHtml(chapter.title) : "A road not yet taken"}</h3>
+          <p>${escapeHtml(reached || current ? chapter.summary : "Keep following the main path to reveal this chapter.")}</p></div>
+      </article>`;
+    }).join("");
+    return `<section class="story-hero" style="--chapter-color:${goal.act.color}">
+      <div class="story-act-mark">${goal.act.icon}</div>
+      <div class="story-hero-copy"><span class="eyebrow">ACT ${goal.chapter + 1} · MAIN STORY</span>
+        <h2>${escapeHtml(goal.act.title)}</h2><p class="story-thesis">${escapeHtml(goal.act.thesis)}</p></div>
+      <div class="story-objective">
+        <span class="eyebrow">${goal.complete ? "EPILOGUE" : "NEXT CHAPTER BEAT"}</span>
+        <h3>${escapeHtml(goal.title)}</h3><p>${escapeHtml(goal.objective)}</p>
+        <div class="story-why">${escapeHtml(goal.reason)}</div>
+        <div class="story-progress"><span style="width:${percent}%"></span></div>
+        <div class="story-progress-label"><strong>${escapeHtml(progress.label)}</strong><span>${progress.value}/${progress.total}</span></div>
+        <div class="story-actions"><button data-act="story-map">🧭 Show the way</button><button data-act="story-recap">↺ Story recap</button>
+          ${goal.complete ? `<button data-act="story-ending-replay">☀ Replay ending</button>` : ""}</div>
+      </div>
+    </section>
+    <div class="story-layout"><section><div class="story-section-heading"><span class="eyebrow">THE JOURNEY</span><h2>One story, six acts</h2></div>
+      <div class="story-timeline">${chapterCards}</div></section>
+      <aside class="story-sidequests"><span class="eyebrow">THE LIVING WORLD</span><h2>Adventures around the story</h2>
+        <p>These deepen your hero and remain worthwhile, but they are never disguised as the next plot beat.</p>
+        <div><strong>⭐ Form Mastery</strong><span>Learn how each shape thinks.</span></div>
+        <div><strong>☀ Sunrise Town</strong><span>Build a home from the people you help.</span></div>
+        <div><strong>♢ Manyfold</strong><span>Take rearranging roguelite journeys.</span></div>
+        <div><strong>⚑ Hero Board</strong><span>Answer the world's changing needs.</span></div>
+      </aside>
+    </div>`;
+  }
+
   function buildMenu() {
     const previousControllerElements = controllerMenuElements();
     const previousControllerIndex = previousControllerElements.indexOf(controllerFocusedElement);
     let tabs = [
+      ["story", "Story"],
       ["forms", "Form Lab"],
-      ["quests", "Quests"],
+      ["quests", "Mastery"],
       ["map", "Map"],
     ];
     if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
@@ -1035,8 +1096,9 @@ G.ui = (() => {
       <div class="menu-tabs">${tabs.map(([id, label]) =>
         `<button data-tab="${id}" class="${activeTab === id ? "active" : ""}">${label}</button>`).join("")}
       </div>
-      <div class="menu-body ${activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : ""}">`;
+      <div class="menu-body ${activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : activeTab === "story" ? "story-body" : ""}">`;
 
+    if (activeTab === "story") html += buildStoryTab();
     if (activeTab === "forms") html += buildFormLab();
     if (activeTab === "quests") html += buildQuestsTab();
     if (activeTab === "map") html += buildWayfinderTab();
@@ -1059,6 +1121,25 @@ G.ui = (() => {
     // wire up clicks
     menuEl.querySelectorAll("[data-tab]").forEach((b) =>
       b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); menuEl.scrollTop = 0; }));
+    const storyMap = menuEl.querySelector('[data-act="story-map"]');
+    if (storyMap) storyMap.addEventListener("click", () => {
+      const goal = G.storyGoal();
+      activeTab = "map";
+      atlasView = "world";
+      atlasSelectedId = G.wayfinderRegionInfo(goal.mapId) ? goal.mapId : "overworld";
+      buildMenu();
+      menuEl.scrollTop = 0;
+    });
+    const storyRecap = menuEl.querySelector('[data-act="story-recap"]');
+    if (storyRecap) storyRecap.addEventListener("click", () => {
+      closeMenu();
+      G.playStoryRecap(false);
+    });
+    const endingReplay = menuEl.querySelector('[data-act="story-ending-replay"]');
+    if (endingReplay) endingReplay.addEventListener("click", () => {
+      closeMenu();
+      G.playStoryEnding(true);
+    });
     menuEl.querySelectorAll("[data-formlab-view]").forEach((button) =>
       button.addEventListener("click", () => {
         formLabView = button.dataset.formlabView;
@@ -1227,9 +1308,14 @@ G.ui = (() => {
       if (G.sfx && G.sfx.setSoundEnabled) G.sfx.setSoundEnabled(!G.sfx.soundEnabled);
       buildMenu();
     });
+    const saveSlots = menuEl.querySelector('[data-act="save-slots"]');
+    if (saveSlots) saveSlots.addEventListener("click", () => {
+      closeMenu();
+      G.showSaveSlotScreen(true);
+    });
     const reset = menuEl.querySelector('[data-act="reset"]');
     if (reset) reset.addEventListener("click", () => {
-      if (confirm("Really erase the save and start over?")) G.resetSave();
+      if (confirm(`Delete Slot ${G.activeSaveSlot}? Other adventure slots will be kept.`)) G.resetSave();
     });
     if (menuOpen && G.input.hasGamepad && !menuEl.classList.contains("hidden")) {
       const rebuiltElements = controllerMenuElements();
@@ -1252,10 +1338,11 @@ G.ui = (() => {
         <button data-act="sound"><strong>◖ Sound effects</strong><span>${soundOn ? "ON" : "OFF"}</span></button>
         <button data-act="hd-pilot"><strong>✦ World detail</strong><span>${G.hdPilot ? "HD · 640×360" : "Original · 320×180"}</span></button>
         <button data-act="tutorial"><strong>? Tutorial</strong><span>Replay contextual hints</span></button>
+        <button data-act="save-slots"><strong>▤ Adventure slots</strong><span>Slot ${G.activeSaveSlot} · switch or begin again</span></button>
         ${canFullscreen ? `<button data-act="fullscreen"><strong>⛶ Fullscreen</strong><span>Use more of this screen</span></button>` : ""}
       </div>
-      <details class="save-data"><summary>Save data</summary><p>Erasing removes this device's forms, quests, map discoveries, skins, and town.</p>
-        <button data-act="reset" class="danger" title="Erase this device's save">Erase all progress</button></details>
+      <details class="save-data"><summary>Delete current adventure</summary><p>This permanently erases Slot ${G.activeSaveSlot}. Your other slots are not affected.</p>
+        <button data-act="reset" class="danger" title="Erase the current adventure">Delete Slot ${G.activeSaveSlot}</button></details>
     </section>`;
   }
 
@@ -1648,6 +1735,7 @@ G.ui = (() => {
   function buildWorldAtlas() {
     const current = atlasCurrentRegion();
     const selected = atlasSelectedRegion();
+    const mainGoal = G.storyGoal ? G.storyGoal() : null;
     const canTravel = G.canWayfinderTravel();
     const nodesById = Object.fromEntries(G.WAYFINDER_ATLAS_NODES.map((node) => [node.id, node]));
     const lines = G.WAYFINDER_ATLAS_EDGES.map(([from, to]) => {
@@ -1661,13 +1749,15 @@ G.ui = (() => {
       const here = current === node.id;
       const awake = G.wayfinderPostActivated(node.id);
       const incidentCount = G.incidentsForMap ? G.incidentsForMap(node.id).length : 0;
+      const storyRoute = !!(mainGoal && mainGoal.mapId === node.id && !mainGoal.complete);
       const classes = [found ? "known" : "unknown", here ? "here" : "", awake ? "awake" : "",
-        selected.id === node.id ? "selected" : "", incidentCount ? "incident" : ""].filter(Boolean).join(" ");
+        selected.id === node.id ? "selected" : "", incidentCount ? "incident" : "", storyRoute ? "story-route" : ""].filter(Boolean).join(" ");
       return `<button class="atlas-node ${classes}" style="left:${node.x}%;top:${node.y}%" data-map-node="${node.id}"
         aria-label="${found ? escapeHtml(region.name) : "Undiscovered region"}${here ? ", you are here" : ""}">
         <span class="atlas-icon">${found ? region.icon : "?"}</span>
         <span class="atlas-name">${found ? escapeHtml(region.name) : "Unknown"}</span>
         ${incidentCount ? `<span class="atlas-incident-count">⚑${incidentCount}</span>` : ""}
+        ${storyRoute ? `<span class="atlas-story-badge">MAIN PATH</span>` : ""}
         ${here ? `<span class="you-are-here">YOU ARE HERE</span>` : ""}
       </button>`;
     }).join("");
@@ -1816,6 +1906,7 @@ G.ui = (() => {
 
   function buildWayfinderTab() {
     const canTravel = G.canWayfinderTravel();
+    const goal = G.storyGoal();
     return `<div class="atlas-header">
       <div><h2>🧭 Wayfinder Atlas</h2><div class="tagline">See where you are, follow the roads, and travel between awakened posts.</div></div>
       <div class="atlas-view-tabs">
@@ -1823,6 +1914,7 @@ G.ui = (() => {
         <button data-atlas-view="local" class="${atlasView === "local" ? "active" : ""}">LOCAL</button>
       </div>
     </div>
+    <div class="atlas-story-callout"><span>${goal.act.icon}</span><div><strong>ACT ${goal.chapter + 1} · ${escapeHtml(goal.short)}</strong><small>${escapeHtml(goal.destination)} is marked as the main path.</small></div></div>
     ${atlasView === "world" ? buildWorldAtlas() : buildLocalAtlas()}
     <div class="atlas-travel-rule ${canTravel ? "ready" : ""}">🧭 ${escapeHtml(G.wayfinderTravelReason())}</div>
     ${buildJourneyNotes()}`;

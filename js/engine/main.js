@@ -145,6 +145,8 @@
     expeditionRun: null,
     gauntletBest: 0,
     gauntletIronBest: 0,
+    playSeconds: 0,
+    story: G.makeStory(),
     shake: 0,
     hitStop: 0,
     cameraKickX: 0,
@@ -159,6 +161,8 @@
   const save = G.loadSaveData();
   if (save) {
     const s = G.state;
+    s.playSeconds = Math.max(0, Number(save.playSeconds) || 0);
+    s.story = G.normalizeStory(save.story);
     s.stars = save.stars || 0;
     s.items = save.items || [];
     s.opened = save.opened || [];
@@ -285,6 +289,8 @@
   G.refreshIncidents(true); // restores or creates the three action-driven map situations
   G.tutorial.init(save);
   G.resumeManyfoldExpedition();
+  if (localBuilder) G.beginStorySession(save);
+  else G.showSaveSlotScreen(false);
 
   /* ---------- the loop ---------- */
   let last = 0;
@@ -297,6 +303,15 @@
     // The Gamepad API is polling-based. Read it once at the start of every
     // frame so Steam Link input reaches gameplay and menus without latency.
     G.input.update();
+
+    // Slot selection and the story epilogue are full pauses. They do not
+    // quietly add play time or let held inputs leak back into the world.
+    if (G.saveSlotScreenOpen || G.storyEndingOpen) {
+      G.input.clearTaps();
+      draw();
+      requestAnimationFrame(loop);
+      return;
+    }
 
     // Dialogue owns every action button while it is open. In particular,
     // Enter/Escape must advance the conversation instead of opening a menu.
@@ -319,6 +334,7 @@
 
   function update(dt) {
     const s = G.state;
+    s.playSeconds += dt;
     s.shake = Math.max(0, s.shake - dt);
     s.mapReveal = Math.max(0, (s.mapReveal || 0) - dt);
     s.cameraKickX *= Math.pow(0.002, dt);
