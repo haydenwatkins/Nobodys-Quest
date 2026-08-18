@@ -232,7 +232,7 @@ function titleSlotCard(summary) {
     </span>
     <strong>Continue as ${titleEscape(form ? form.name : "Nobody")}</strong>
     <span>ACT ${summary.chapter + 1} · ${titleEscape(summary.chapterName)}</span>
-    <small>${titleEscape(map ? map.name : "Greenfield")} · ${summary.stars} ⭐ · ${summary.forms} forms · ${titleEscape(summary.playtime)}</small>
+    <small>${titleEscape(map ? map.name : "Greenfield")} · ⭐${summary.stars} · ✦${summary.forms} · ${titleEscape(summary.playtime)}</small>
   </button>`;
 }
 

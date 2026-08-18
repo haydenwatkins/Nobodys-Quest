@@ -1057,9 +1057,13 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .prophecy-book { width: 100%; padding: 19px 13px 22px; border-radius: 16px 16px 28px 28px; background: linear-gradient(90deg,#c7985d 0 3%,#f2d7a0 4% 96%,#c7985d 97%); }
   .book-spine { display: none; }
   .save-slot-grid { grid-template-columns: 1fr; gap: 8px; }
-  .save-slot-card { display: grid; grid-template-columns: 82px minmax(0,1fr); grid-template-rows: auto auto auto auto; align-items: center; min-height: 104px; padding: 8px 10px; text-align: left; }
-  .save-slot-number { grid-column: 2; }.slot-chapter-art { grid-column: 1; grid-row: 1 / 5; width: 70px; height: 77px; margin: 0; }
+  .save-slot-card { display: grid; grid-template-columns: 94px minmax(0,1fr); grid-template-rows: repeat(4,auto); align-items: center; align-content: center; column-gap: 10px; row-gap: 6px; min-height: 154px; padding: 11px 12px; overflow: hidden; text-align: left; }
+  .save-slot-number { grid-column: 2; font-size: 8px; line-height: 1.5; }.slot-chapter-art { grid-column: 1; grid-row: 1 / 5; width: 88px; height: 106px; margin: 0; }
+  .slot-chapter-art canvas { width: 45px; height: 52px; }
   .save-slot-card strong,.save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art),.save-slot-card small { grid-column: 2; }
+  .save-slot-card strong { font-size: 8px; line-height: 1.55; }
+  .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art) { font-size: 16px; line-height: 1.12; }
+  .save-slot-card small { font-size: 15px; line-height: 1.15; overflow-wrap: anywhere; }
   .save-slot-card.empty { justify-content: stretch; }
   .save-slot-card.empty .slot-chapter-art { display: grid; }
   .save-screen-foot { flex-wrap: wrap; padding: 5px 0; }
@@ -1073,10 +1077,10 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .stained-window::before { inset: 32px; }.glass-ring.two { inset: 61px; }
   .prophecy-form { width: 36px; height: 36px; margin: -18px; transform: rotate(var(--form-angle)) translateY(-101px) rotate(calc(-1 * var(--form-angle))); }
   .prophecy-hero { width: 67px; height: 76px; }
-  .title-lockup { margin-top: 8px; }.title-lockup h1 { font-size: 40px; }.title-lockup p { margin-top: 3px; }
+  .title-lockup { margin-top: 14px; }.title-lockup h1 { font-size: 37px; }.title-lockup p { margin-top: 4px; }
   .living-prophecy { height: 58px; }
   .prophecy-book { padding: 12px 14px 14px; }
-  .save-slot-card { min-height: 125px; }.slot-chapter-art { height: 40px; }
-  .save-slot-card small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .save-slot-card { min-height: 128px; }.slot-chapter-art { height: 40px; }
+  .save-slot-card small { font-size: 12px; line-height: 1; white-space: normal; overflow-wrap: anywhere; }
   .save-screen-foot { min-height: 27px; }.save-screen-foot button { min-height: 27px; padding: 4px 8px; }
 }
