@@ -19,7 +19,7 @@ assert.ok(save.includes("G.drawSprite") && save.includes("data-title-form"),
 assert.match(css, /prefers-reduced-motion:\s*reduce/, "title animation should honor reduced-motion preferences");
 assert.match(css, /orientation:\s*portrait/, "the storybook needs a dedicated portrait composition");
 assert.match(css, /orientation:\s*landscape[^}]*max-height:\s*430px/, "short landscape devices need a compact composition");
-assert.ok(index.includes("style.css?v=20260818f") && index.includes("save.js?v=20260818f"),
+assert.ok(index.includes("style.css?v=20260818g") && index.includes("save.js?v=20260818f"),
   "published clients must receive the new title screen instead of cached files");
 assert.match(css, /grid-template-rows:\s*repeat\(4,auto\)/,
   "portrait cards should grow four independent text rows without overlapping the next chapter");
@@ -34,6 +34,12 @@ for (const asset of ["title-world-landscape-v2.webp", "title-world-portrait-v2.w
 assert.match(save, /titleTransformationForms/, "the title should select real forms for Nobody's transformation");
 assert.match(css, /@keyframes\s+title-form-rise/, "form changing should animate out of Nobody");
 assert.match(css, /title-world-portrait-v2\.webp/, "portrait should use its own art-directed world plate");
+assert.match(css, /title-portrait \.title-world-hero\s*\{[^}]*min-height:\s*460px/,
+  "portrait should keep the world and chapters in a balanced single-screen proportion");
+assert.match(css, /title-short-landscape \.title-world-hero\s*\{[^}]*min-height:\s*230px/,
+  "short landscape should reserve most of its height for the title world");
+assert.match(css, /title-short-landscape \.save-slot-card\s*\{[^}]*min-height:\s*100px/,
+  "short landscape chapters should stay compact enough to avoid crushing the hero scene");
 assert.doesNotMatch(save + css, /stained-window|living-prophecy|title-archive|title-world-panorama\.webp/,
   "the failed multi-layered title composition should be fully removed");
 assert.match(save, /visualViewport/, "iPhone rotation should follow the live visual viewport");

@@ -1021,15 +1021,15 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   #save-slots { padding-right: max(7px,env(safe-area-inset-right)); padding-left: max(7px,env(safe-area-inset-left)); }
   #save-slots::before { background-image: url("../assets/title-world-portrait-v2.webp"); }
   .title-world-screen { min-height: 100%; }
-  .title-world-hero { flex-basis: 500px; min-height: 500px; }
+  .title-world-hero { flex-basis: 460px; min-height: 460px; }
   .title-lockup { width: 96%; margin-top: 24px; }
-  .title-lockup h1 { font-size: 47px; }
-  .title-transform-stage { bottom: 7px; width: 360px; height: 200px; }
-  .title-chapter-panel { width: 100%; padding: 19px 13px 22px; border-radius: 8px; }
+  .title-lockup h1 { font-size: 52px; }
+  .title-transform-stage { bottom: 4px; width: 360px; height: 190px; transform:translateX(-50%) scale(.86); transform-origin:bottom center; }
+  .title-chapter-panel { width: 100%; padding: 17px 12px 19px; border-radius: 8px; }
   .save-slot-grid { grid-template-columns: 1fr; gap: 8px; }
-  .save-slot-card { display: grid; grid-template-columns: 94px minmax(0,1fr); grid-template-rows: repeat(4,auto); align-items: center; align-content: center; column-gap: 10px; row-gap: 6px; min-height: 154px; padding: 11px 12px; overflow: hidden; text-align: left; }
-  .save-slot-number { grid-column: 2; font-size: 8px; line-height: 1.5; }.slot-chapter-art { grid-column: 1; grid-row: 1 / 5; width: 88px; height: 106px; margin: 0; }
-  .slot-chapter-art canvas { width: 45px; height: 52px; }
+  .save-slot-card { display: grid; grid-template-columns: 84px minmax(0,1fr); grid-template-rows: repeat(4,auto); align-items: center; align-content: center; column-gap: 9px; row-gap: 5px; min-height: 136px; padding: 9px 10px; overflow: hidden; text-align: left; }
+  .save-slot-number { grid-column: 2; font-size: 8px; line-height: 1.5; }.slot-chapter-art { grid-column: 1; grid-row: 1 / 5; width: 80px; height: 92px; margin: 0; }
+  .slot-chapter-art canvas { width: 42px; height: 48px; }
   .save-slot-card strong,.save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art),.save-slot-card small { grid-column: 2; }
   .save-slot-card strong { font-size: 8px; line-height: 1.55; }
   .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art) { font-size: 16px; line-height: 1.12; }
@@ -1043,12 +1043,14 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 @media (orientation: landscape) and (max-height: 430px) {
   #save-slots { padding-top: 3px; padding-bottom: 3px; }
   #save-slots::before { background-image: url("../assets/title-world-landscape-v2.webp"); }
-  .title-world-hero { flex-basis: 176px; min-height: 176px; }
-  .title-lockup { margin-top: 7px; }.title-lockup h1 { font-size: 37px; }.title-lockup p { margin-top: 4px; }
-  .title-transform-stage { bottom: -12px; width: 400px; height: 132px; transform:translateX(-50%) scale(.72); transform-origin:bottom center; }
-  .title-chapter-panel { padding: 12px 14px 14px; }
-  .save-slot-card { min-height: 128px; }.slot-chapter-art { height: 40px; }
-  .save-slot-card small { font-size: 12px; line-height: 1; white-space: normal; overflow-wrap: anywhere; }
+  .title-world-hero { flex-basis: 230px; min-height: 230px; }
+  .title-lockup { margin-top: 6px; }.title-lockup h1 { font-size: 50px; }.title-lockup p { margin-top: 4px; }
+  .title-transform-stage { bottom: 2px; width: 400px; height: 140px; transform:translateX(-50%) scale(.84); transform-origin:bottom center; }
+  .title-chapter-panel { padding: 8px 10px 10px; }
+  .save-slot-card { min-height: 100px; padding: 6px; gap: 2px; }.slot-chapter-art { height: 34px; }
+  .slot-chapter-art canvas { width: 30px; height: 34px; }
+  .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art) { font-size: 12px; }
+  .save-slot-card small { font-size: 11px; line-height: 1; white-space: normal; overflow-wrap: anywhere; }
   .save-screen-foot { min-height: 27px; }.save-screen-foot button { min-height: 27px; padding: 4px 8px; }
 }
 
@@ -1059,16 +1061,16 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 #save-slots.title-portrait::before { background-image: url("../assets/title-world-portrait-v2.webp"); }
 #save-slots.title-landscape::before { background-image: url("../assets/title-world-landscape-v2.webp"); }
 #save-slots.title-portrait .title-world-screen { min-height: 100%; }
-#save-slots.title-portrait .title-world-hero { flex-basis: 500px; min-height: 500px; }
+#save-slots.title-portrait .title-world-hero { flex-basis: 460px; min-height: 460px; }
 #save-slots.title-portrait .title-lockup { width: 96%; margin-top: 24px; }
-#save-slots.title-portrait .title-lockup h1 { font-size: 47px; }
-#save-slots.title-portrait .title-transform-stage { bottom: 7px; width: 360px; height: 200px; }
-#save-slots.title-portrait .title-chapter-panel { width: 100%; padding: 19px 13px 22px; border-radius: 8px; }
+#save-slots.title-portrait .title-lockup h1 { font-size: 52px; }
+#save-slots.title-portrait .title-transform-stage { bottom: 4px; width: 360px; height: 190px; transform:translateX(-50%) scale(.86); transform-origin:bottom center; }
+#save-slots.title-portrait .title-chapter-panel { width: 100%; padding: 17px 12px 19px; border-radius: 8px; }
 #save-slots.title-portrait .save-slot-grid { grid-template-columns: 1fr; gap: 8px; }
-#save-slots.title-portrait .save-slot-card { display: grid; grid-template-columns: 94px minmax(0,1fr); grid-template-rows: repeat(4,auto); align-items: center; align-content: center; column-gap: 10px; row-gap: 6px; min-height: 154px; padding: 11px 12px; overflow: hidden; text-align: left; }
+#save-slots.title-portrait .save-slot-card { display: grid; grid-template-columns: 84px minmax(0,1fr); grid-template-rows: repeat(4,auto); align-items: center; align-content: center; column-gap: 9px; row-gap: 5px; min-height: 136px; padding: 9px 10px; overflow: hidden; text-align: left; }
 #save-slots.title-portrait .save-slot-number { grid-column: 2; font-size: 8px; line-height: 1.5; }
-#save-slots.title-portrait .slot-chapter-art { grid-column: 1; grid-row: 1 / 5; width: 88px; height: 106px; margin: 0; }
-#save-slots.title-portrait .slot-chapter-art canvas { width: 45px; height: 52px; }
+#save-slots.title-portrait .slot-chapter-art { grid-column: 1; grid-row: 1 / 5; width: 80px; height: 92px; margin: 0; }
+#save-slots.title-portrait .slot-chapter-art canvas { width: 42px; height: 48px; }
 #save-slots.title-portrait .save-slot-card strong,
 #save-slots.title-portrait .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art),
 #save-slots.title-portrait .save-slot-card small { grid-column: 2; }
@@ -1082,20 +1084,22 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 
 #save-slots.title-short-landscape { padding-top: 3px; padding-bottom: 3px; }
 #save-slots.title-short-landscape::before { background-image: url("../assets/title-world-landscape-v2.webp"); }
-#save-slots.title-short-landscape .title-world-hero { flex-basis: 176px; min-height: 176px; }
-#save-slots.title-short-landscape .title-lockup { margin-top: 7px; }
-#save-slots.title-short-landscape .title-lockup h1 { font-size: 37px; }
+#save-slots.title-short-landscape .title-world-hero { flex-basis: 230px; min-height: 230px; }
+#save-slots.title-short-landscape .title-lockup { margin-top: 6px; }
+#save-slots.title-short-landscape .title-lockup h1 { font-size: 50px; }
 #save-slots.title-short-landscape .title-lockup p { margin-top: 4px; }
-#save-slots.title-short-landscape .title-transform-stage { bottom: -12px; width: 400px; height: 132px; transform:translateX(-50%) scale(.72); transform-origin:bottom center; }
-#save-slots.title-short-landscape .title-chapter-panel { padding: 12px 14px 14px; }
+#save-slots.title-short-landscape .title-transform-stage { bottom: 2px; width: 400px; height: 140px; transform:translateX(-50%) scale(.84); transform-origin:bottom center; }
+#save-slots.title-short-landscape .title-chapter-panel { padding: 8px 10px 10px; }
 #save-slots.title-short-landscape .save-slot-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
-#save-slots.title-short-landscape .save-slot-card { display: flex; min-height: 128px; padding: 7px; text-align: center; }
+#save-slots.title-short-landscape .save-slot-card { display: flex; min-height: 100px; padding: 6px; gap: 2px; text-align: center; }
 #save-slots.title-short-landscape .save-slot-number,
 #save-slots.title-short-landscape .save-slot-card strong,
 #save-slots.title-short-landscape .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art),
 #save-slots.title-short-landscape .save-slot-card small { grid-column: auto; }
-#save-slots.title-short-landscape .slot-chapter-art { width: auto; height: 40px; margin: 1px 0 3px; }
-#save-slots.title-short-landscape .save-slot-card small { font-size: 12px; line-height: 1; white-space: normal; overflow-wrap: anywhere; }
+#save-slots.title-short-landscape .slot-chapter-art { width: auto; height: 34px; margin: 1px 0 2px; }
+#save-slots.title-short-landscape .slot-chapter-art canvas { width: 30px; height: 34px; }
+#save-slots.title-short-landscape .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art) { font-size: 12px; }
+#save-slots.title-short-landscape .save-slot-card small { font-size: 11px; line-height: 1; white-space: normal; overflow-wrap:anywhere; }
 #save-slots.title-short-landscape .save-screen-foot { min-height: 27px; flex-wrap: nowrap; padding: 0; }
 #save-slots.title-short-landscape .save-screen-foot span { width: auto; }
 #save-slots.title-short-landscape .save-screen-foot button { min-height: 27px; padding: 4px 8px; }
