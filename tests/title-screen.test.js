@@ -19,7 +19,7 @@ assert.ok(save.includes("G.drawSprite") && save.includes("data-title-form"),
 assert.match(css, /prefers-reduced-motion:\s*reduce/, "title animation should honor reduced-motion preferences");
 assert.match(css, /orientation:\s*portrait/, "the storybook needs a dedicated portrait composition");
 assert.match(css, /orientation:\s*landscape[^}]*max-height:\s*430px/, "short landscape devices need a compact composition");
-assert.ok(index.includes("style.css?v=20260818d") && index.includes("save.js?v=20260818d"),
+assert.ok(index.includes("style.css?v=20260818e") && index.includes("save.js?v=20260818d"),
   "published clients must receive the new title screen instead of cached files");
 assert.match(css, /grid-template-rows:\s*repeat\(4,auto\)/,
   "portrait cards should grow four independent text rows without overlapping the next chapter");
@@ -30,6 +30,16 @@ assert.ok(fs.existsSync(panorama) && fs.statSync(panorama).size > 100000,
   "the title screen should ship its detailed production panorama");
 assert.match(css, /title-world-panorama\.webp/,
   "the visible title world should use the approved pixel-art panorama");
+assert.match(css, /\.living-prophecy\s*\{[^}]*z-index:\s*1/,
+  "the world should read as scenery behind the prophecy instead of a pasted-on banner");
+assert.match(css, /\.glass-ring\s*\{[^}]*z-index:\s*2/,
+  "the prophecy tracery should sit above the world layer");
+assert.match(css, /\.prophecy-form\s*\{[^}]*z-index:\s*3/,
+  "prophecy medallions should remain visible above the world layer");
+assert.match(css, /\.prophecy-hero\s*\{[^}]*z-index:\s*4/,
+  "the prophecy hero should remain visible above the world layer");
+assert.match(css, /mask-image:\s*linear-gradient/,
+  "the world should dissolve into the archive without a hard rectangular top edge");
 assert.doesNotMatch(css, /\.living-prophecy\s*\{[^}]*clip-path/,
   "the panorama container must not clip every landmark into a jagged strip");
 assert.match(save, /visualViewport/, "iPhone rotation should follow the live visual viewport");
