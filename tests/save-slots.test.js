@@ -69,9 +69,13 @@ const overlay = {
 context.document = { activeElement: null, addEventListener() {}, removeEventListener() {},
   getElementById: (id) => id === "save-slots" ? overlay : null };
 assert.equal(G.showSaveSlotScreen(true), true);
-assert.match(overlay.html, /class="stained-window"/, "the selector should open as the stained-glass title screen");
+assert.match(overlay.html, /class="title-world-hero"/, "the selector should open inside the unified game world");
 assert.match(overlay.html, /The prophecy chose the wrong name/);
-assert.match(overlay.html, /class="prophecy-book"/);
+assert.match(overlay.html, /class="title-transform-stage"/, "Nobody's form changing should be part of the title composition");
+assert.match(overlay.html, /data-title-form="nobody"/, "Nobody should be the source of the title transformation");
+assert.match(overlay.html, /class="title-chapter-panel"/);
+assert.doesNotMatch(overlay.html, /stained-window|living-prophecy|title-archive/,
+  "the discarded layered title scene should not survive the rebuild");
 assert.equal((overlay.html.match(/data-save-slot=/g) || []).length, 3, "the storybook needs exactly three live chapters");
 
 console.log("save slot tests passed");

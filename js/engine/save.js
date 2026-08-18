@@ -30,6 +30,7 @@ function bindTitleViewport(overlay) {
     const portrait = height > width;
 
     overlay.classList.toggle("title-portrait", portrait);
+    overlay.classList.toggle("title-landscape", !portrait);
     overlay.classList.toggle("title-short-landscape", !portrait && height <= 430);
     overlay.style.left = `${left}px`;
     overlay.style.top = `${top}px`;
@@ -269,6 +270,35 @@ function renderTitleSprites(overlay) {
     drawTitleSprite(canvas, canvas.dataset.titleForm));
 }
 
+function titleTransformationForms(save) {
+  const preferred = ["samurai", "wizard", "frog", "dragon", "rat", "knight", "vampire", "golem", "jester", "ranger", "turtle"];
+  const unlocked = new Set([save && save.formId].concat(save && Array.isArray(save.claimedForms) ? save.claimedForms : []).filter(Boolean));
+  const featured = preferred.filter((id) => unlocked.has(id) && G.forms && G.forms[id]);
+  unlocked.forEach((id) => {
+    if (id !== "nobody" && G.forms && G.forms[id] && !featured.includes(id)) featured.push(id);
+  });
+  preferred.forEach((id) => {
+    if (featured.length < 4 && G.forms && G.forms[id] && !featured.includes(id)) featured.push(id);
+  });
+  return featured.slice(0, 4);
+}
+
+function titleTransformationStage(save) {
+  const positions = [[-122, -25], [-43, -70], [43, -70], [122, -25]];
+  const echoes = titleTransformationForms(save).map((id, index) => {
+    const position = positions[index] || [0, -55];
+    return `<span class="title-form-echo" style="--echo-x:${position[0]}px;--echo-y:${position[1]}px;--echo-delay:${index * 0.12}s">
+      <canvas width="82" height="94" data-title-form="${titleEscape(id)}"></canvas></span>`;
+  }).join("");
+  const particles = Array.from({ length: 12 }, (_, index) =>
+    `<i style="--bit:${index};--bit-x:${((index * 47) % 150) - 75}px;--bit-y:${-32 - ((index * 31) % 92)}px"></i>`).join("");
+  return `<div class="title-transform-stage" role="img" aria-label="Nobody changing into many forms">
+    <div class="title-form-echoes" aria-hidden="true">${echoes}</div>
+    <span class="title-change-burst" aria-hidden="true">${particles}</span>
+    <span class="title-nobody" aria-hidden="true"><i></i><canvas width="88" height="102" data-title-form="nobody"></canvas></span>
+  </div>`;
+}
+
 function titleSlotCard(summary) {
   if (summary.empty) return `<button class="save-slot-card empty ${summary.active ? "active" : ""}" data-save-slot="${summary.slot}">
     <span class="save-slot-number">CHAPTER ${summary.slot}</span>
@@ -302,22 +332,14 @@ G.showSaveSlotScreen = function (force) {
 
   const summaries = G.saveSlotSummaries();
   const cards = summaries.map(titleSlotCard).join("");
-  const stainedForms = ["rat", "knight", "wizard", "dragon", "frog", "vampire", "golem", "jester", "ranger", "turtle"]
-    .filter((id) => G.forms && G.forms[id]);
-  const medallions = stainedForms.map((id, index) => `<span class="prophecy-form" style="--form-angle:${index * 36}deg">
-    <canvas width="58" height="58" data-title-form="${id}"></canvas></span>`).join("");
 
-  overlay.innerHTML = `<div class="title-archive" aria-hidden="true"><i class="archive-moon"></i><i class="archive-shelf left"></i><i class="archive-shelf right"></i><i class="archive-candle one"></i><i class="archive-candle two"></i></div>
-    <main class="save-screen-panel prophecy-screen" role="dialog" aria-modal="true" aria-label="Nobody's Quest title screen. Choose an adventure.">
+  overlay.innerHTML = `<main class="save-screen-panel title-world-screen" role="dialog" aria-modal="true" aria-label="Nobody's Quest title screen. Choose an adventure.">
       ${force ? `<button class="title-return" data-title-return aria-label="Return to the current game">← Return</button>` : ""}
-      <section class="prophecy-vista">
-        <div class="stained-window" aria-hidden="true"><i class="glass-ring one"></i><i class="glass-ring two"></i>${medallions}
-          <span class="prophecy-hero"><i></i><canvas width="92" height="106" data-title-form="nobody"></canvas></span>
-        </div>
+      <section class="title-world-hero">
         <header class="title-lockup"><span>Nobody's</span><h1>Quest</h1><p>The prophecy chose the wrong name</p></header>
-        <div class="living-prophecy" aria-hidden="true"></div>
+        ${titleTransformationStage(activeSave)}
       </section>
-      <section class="prophecy-book" aria-label="Adventure slots"><i class="book-pages left"></i><i class="book-pages right"></i><i class="book-spine"></i>
+      <section class="title-chapter-panel" aria-label="Adventure slots">
         <div class="save-slot-grid">${cards}</div>
       </section>
       <footer class="save-screen-foot"><button data-title-settings>⚙ Settings</button><span>Choose a chapter · progress saves automatically</span></footer>
