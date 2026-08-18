@@ -60,4 +60,18 @@ G.resetSave();
 assert.equal(G.loadSaveData(2), null, "reset should delete only the active adventure");
 assert.equal(G.loadSaveData(1).stars, 2, "other adventures must survive reset");
 
+const overlay = {
+  html: "", classList: { add() {}, remove() {} },
+  set innerHTML(value) { this.html = value; }, get innerHTML() { return this.html; },
+  querySelectorAll() { return []; },
+  querySelector(selector) { return selector === ".save-slot-card" ? { focus() {} } : null; },
+};
+context.document = { activeElement: null, addEventListener() {}, removeEventListener() {},
+  getElementById: (id) => id === "save-slots" ? overlay : null };
+assert.equal(G.showSaveSlotScreen(true), true);
+assert.match(overlay.html, /class="stained-window"/, "the selector should open as the stained-glass title screen");
+assert.match(overlay.html, /The prophecy chose the wrong name/);
+assert.match(overlay.html, /class="prophecy-book"/);
+assert.equal((overlay.html.match(/data-save-slot=/g) || []).length, 3, "the storybook needs exactly three live chapters");
+
 console.log("save slot tests passed");

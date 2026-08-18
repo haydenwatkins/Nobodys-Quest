@@ -182,6 +182,60 @@ function consumeAutoStart() {
   }
 }
 
+function titleEscape(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[character]));
+}
+
+function titleSceneClass(mapId) {
+  if (/ember|rift|volcan/i.test(mapId)) return "ember";
+  if (/frost|storm|wind|peak/i.test(mapId)) return "frost";
+  if (/marsh|root|mire|hollow/i.test(mapId)) return "mire";
+  if (/star|garden|firmament|titan/i.test(mapId)) return "arcane";
+  return "greenfield";
+}
+
+function drawTitleSprite(canvas, formId) {
+  const form = G.forms && G.forms[formId];
+  if (!canvas || !form || !form.sprite || !G.drawSprite || !G.spriteMetrics) return;
+  const c = canvas.getContext("2d");
+  c.clearRect(0, 0, canvas.width, canvas.height);
+  c.imageSmoothingEnabled = false;
+  const metrics = G.spriteMetrics(form.sprite);
+  const scale = Math.max(1, Math.floor(Math.min(
+    (canvas.width - 10) / Math.max(1, metrics.w),
+    (canvas.height - 8) / Math.max(1, metrics.h)
+  )));
+  G.drawSprite(c, form.sprite, 0, canvas.width / 2, canvas.height - 3, false, scale);
+}
+
+function renderTitleSprites(overlay) {
+  overlay.querySelectorAll("canvas[data-title-form]").forEach((canvas) =>
+    drawTitleSprite(canvas, canvas.dataset.titleForm));
+}
+
+function titleSlotCard(summary) {
+  if (summary.empty) return `<button class="save-slot-card empty ${summary.active ? "active" : ""}" data-save-slot="${summary.slot}">
+    <span class="save-slot-number">CHAPTER ${summary.slot}</span>
+    <span class="slot-chapter-art unwritten" aria-hidden="true"><i class="title-quill">✦</i></span>
+    <strong>Begin a new story</strong>
+    <small>The next page belongs to Nobody.</small>
+  </button>`;
+  const form = G.forms && G.forms[summary.formId];
+  const map = G.maps && G.maps[summary.mapId];
+  return `<button class="save-slot-card ${summary.active ? "active" : ""}" data-save-slot="${summary.slot}">
+    <span class="save-slot-number">CHAPTER ${summary.slot}${summary.complete ? " · COMPLETE" : ""}</span>
+    <span class="slot-chapter-art ${titleSceneClass(summary.mapId)}" aria-hidden="true">
+      <i class="slot-sun"></i><i class="slot-hill far"></i><i class="slot-hill near"></i>
+      <canvas width="64" height="68" data-title-form="${titleEscape(summary.formId)}"></canvas>
+    </span>
+    <strong>Continue as ${titleEscape(form ? form.name : "Nobody")}</strong>
+    <span>ACT ${summary.chapter + 1} · ${titleEscape(summary.chapterName)}</span>
+    <small>${titleEscape(map ? map.name : "Greenfield")} · ${summary.stars} ⭐ · ${summary.forms} forms · ${titleEscape(summary.playtime)}</small>
+  </button>`;
+}
+
 G.showSaveSlotScreen = function (force) {
   if (typeof document === "undefined") return false;
   const overlay = document.getElementById("save-slots");
@@ -193,42 +247,99 @@ G.showSaveSlotScreen = function (force) {
   }
 
   const summaries = G.saveSlotSummaries();
-  const cards = summaries.map((summary) => {
-    if (summary.empty) return `<button class="save-slot-card empty ${summary.active ? "active" : ""}" data-save-slot="${summary.slot}">
-      <span class="save-slot-number">SLOT ${summary.slot}</span><strong>＋ New Adventure</strong>
-      <small>A prophecy with room for a different answer.</small>
-    </button>`;
-    const form = G.forms && G.forms[summary.formId];
-    const map = G.maps && G.maps[summary.mapId];
-    return `<button class="save-slot-card ${summary.active ? "active" : ""}" data-save-slot="${summary.slot}">
-      <span class="save-slot-number">SLOT ${summary.slot}${summary.complete ? " · STORY COMPLETE" : ""}</span>
-      <strong>${form ? form.icon : "👤"} ${form ? form.name : "Nobody"} · ${summary.stars} ⭐</strong>
-      <span>ACT ${summary.chapter + 1} · ${summary.chapterName}</span>
-      <small>${map ? map.name : "Greenfield"} · ${summary.forms} forms · ${summary.playtime}</small>
-    </button>`;
-  }).join("");
+  const cards = summaries.map(titleSlotCard).join("");
+  const stainedForms = ["rat", "knight", "wizard", "dragon", "frog", "vampire", "golem", "jester", "ranger", "turtle"]
+    .filter((id) => G.forms && G.forms[id]);
+  const medallions = stainedForms.map((id, index) => `<span class="prophecy-form" style="--form-angle:${index * 36}deg">
+    <canvas width="58" height="58" data-title-form="${id}"></canvas></span>`).join("");
 
-  overlay.innerHTML = `<div class="save-screen-sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-    <main class="save-screen-panel" role="dialog" aria-modal="true" aria-label="Choose an adventure">
-      <div class="save-screen-mark">○</div><span class="eyebrow">A STORY ABOUT EVERY WAY FORWARD</span>
-      <h1>Nobody's Quest</h1>
-      <p>The world wrote its prophecy for Somebody. Choose who answers.</p>
-      <div class="save-slot-grid">${cards}</div>
-      <div class="save-screen-foot">Progress saves automatically in the selected slot.${force ? " Choose the current slot to return." : ""}</div>
+  overlay.innerHTML = `<div class="title-archive" aria-hidden="true"><i class="archive-moon"></i><i class="archive-shelf left"></i><i class="archive-shelf right"></i><i class="archive-candle one"></i><i class="archive-candle two"></i></div>
+    <main class="save-screen-panel prophecy-screen" role="dialog" aria-modal="true" aria-label="Nobody's Quest title screen. Choose an adventure.">
+      ${force ? `<button class="title-return" data-title-return aria-label="Return to the current game">← Return</button>` : ""}
+      <section class="prophecy-vista">
+        <div class="stained-window" aria-hidden="true"><i class="glass-ring one"></i><i class="glass-ring two"></i>${medallions}
+          <span class="prophecy-hero"><i></i><canvas width="92" height="106" data-title-form="nobody"></canvas></span>
+        </div>
+        <header class="title-lockup"><span>Nobody's</span><h1>Quest</h1><p>The prophecy chose the wrong name</p></header>
+        <div class="living-prophecy" aria-hidden="true"><i class="world-castle"></i><i class="world-tree"></i><i class="world-road"></i><i class="world-volcano"></i><i class="world-island one"></i><i class="world-island two"></i><span class="world-sparks">✦　·　✧　·　✦</span></div>
+      </section>
+      <section class="prophecy-book" aria-label="Adventure slots"><i class="book-pages left"></i><i class="book-pages right"></i><i class="book-spine"></i>
+        <div class="save-slot-grid">${cards}</div>
+      </section>
+      <footer class="save-screen-foot"><button data-title-settings>⚙ Settings</button><span>Choose a chapter · progress saves automatically</span></footer>
+      <aside class="title-settings hidden" data-title-settings-panel aria-label="Title screen settings">
+        <div><span class="eyebrow">SETTINGS</span><h2>Make the story comfortable</h2></div>
+        <button data-title-music>♫ Music <span>${!G.sfx || G.sfx.musicEnabled !== false ? "ON" : "OFF"}</span></button>
+        <button data-title-sound>◖ Sound <span>${!G.sfx || G.sfx.soundEnabled !== false ? "ON" : "OFF"}</span></button>
+        <button data-title-detail>✦ World detail <span>${G.hdPilot ? "HD" : "ORIGINAL"}</span></button>
+        <button data-title-fullscreen>⛶ Fullscreen</button><button data-title-settings-close>Done</button>
+      </aside>
     </main>`;
   overlay.classList.remove("hidden");
   G.saveSlotScreenOpen = true;
+  renderTitleSprites(overlay);
 
-  overlay.querySelectorAll("[data-save-slot]").forEach((button) => button.addEventListener("click", () => {
+  const slotButtons = Array.from(overlay.querySelectorAll("[data-save-slot]"));
+  const preferred = overlay.querySelector(`.save-slot-card[data-save-slot="${G.activeSaveSlot}"]`) || overlay.querySelector(".save-slot-card");
+  if (preferred && preferred.focus) preferred.focus({ preventScroll: true });
+
+  const settingsPanel = overlay.querySelector("[data-title-settings-panel]");
+  const returnButton = overlay.querySelector("[data-title-return]");
+  const closeTitle = () => {
+    overlay.classList.add("hidden");
+    G.saveSlotScreenOpen = false;
+    document.removeEventListener("keydown", titleKeys);
+  };
+  const titleKeys = (event) => {
+    if (event.key === "Escape") {
+      if (settingsPanel && !settingsPanel.classList.contains("hidden")) settingsPanel.classList.add("hidden");
+      else if (returnButton) closeTitle();
+      return;
+    }
+    if (!/^Arrow(Left|Right|Up|Down)$/.test(event.key) || (settingsPanel && !settingsPanel.classList.contains("hidden"))) return;
+    const current = Math.max(0, slotButtons.indexOf(document.activeElement));
+    const direction = /Left|Up/.test(event.key) ? -1 : 1;
+    const next = slotButtons[(current + direction + slotButtons.length) % slotButtons.length];
+    if (next) { event.preventDefault(); next.focus(); }
+  };
+  document.addEventListener("keydown", titleKeys);
+
+  slotButtons.forEach((button) => button.addEventListener("click", () => {
     const slot = slotNumber(button.dataset.saveSlot);
     const save = G.loadSaveData(slot);
     if (slot !== G.activeSaveSlot) {
       G.selectSaveSlot(slot, true);
       return;
     }
-    overlay.classList.add("hidden");
-    G.saveSlotScreenOpen = false;
+    closeTitle();
     G.events.emit("saveSlotReady", { slot, save, isNew: !save });
   }));
+  if (returnButton) returnButton.addEventListener("click", closeTitle);
+  const openSettings = overlay.querySelector("[data-title-settings]");
+  const closeSettings = overlay.querySelector("[data-title-settings-close]");
+  if (openSettings) openSettings.addEventListener("click", () => settingsPanel.classList.remove("hidden"));
+  if (closeSettings) closeSettings.addEventListener("click", () => settingsPanel.classList.add("hidden"));
+  const music = overlay.querySelector("[data-title-music]");
+  if (music) music.addEventListener("click", () => {
+    if (G.sfx && G.sfx.setMusicEnabled) G.sfx.setMusicEnabled(!G.sfx.musicEnabled);
+    music.querySelector("span").textContent = G.sfx.musicEnabled ? "ON" : "OFF";
+  });
+  const sound = overlay.querySelector("[data-title-sound]");
+  if (sound) sound.addEventListener("click", () => {
+    if (G.sfx && G.sfx.setSoundEnabled) G.sfx.setSoundEnabled(!G.sfx.soundEnabled);
+    sound.querySelector("span").textContent = G.sfx.soundEnabled ? "ON" : "OFF";
+  });
+  const detail = overlay.querySelector("[data-title-detail]");
+  if (detail) detail.addEventListener("click", () => {
+    if (G.setHdPilot) G.setHdPilot(!G.hdPilot);
+    detail.querySelector("span").textContent = G.hdPilot ? "HD" : "ORIGINAL";
+    renderTitleSprites(overlay);
+  });
+  const fullscreen = overlay.querySelector("[data-title-fullscreen]");
+  if (fullscreen) fullscreen.addEventListener("click", () => {
+    const root = document.documentElement;
+    const request = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (request) Promise.resolve(request.call(root)).catch(() => {});
+  });
   return true;
 };
