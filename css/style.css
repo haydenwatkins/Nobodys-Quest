@@ -767,7 +767,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 #save-slots, #story-ending { position: fixed; inset: 0; z-index: 60; overflow-y: auto; color: #f4f4f4; touch-action: pan-y; }
 #save-slots { padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(9px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); background: radial-gradient(ellipse at 50% 28%, #314387 0, #17192b 48%, #090b15 100%); }
 .save-screen-panel, .ending-panel { position: relative; z-index: 2; width: min(1120px, 100%); margin: 0 auto; text-align: center; }
-.prophecy-screen { display: flex; flex-direction: column; min-height: calc(100dvh - max(17px, env(safe-area-inset-top))); }
+.prophecy-screen { display: flex; flex-direction: column; min-height: calc(var(--title-vh, 100dvh) - max(17px, env(safe-area-inset-top))); }
 
 .title-archive { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
 .title-archive::before, .title-archive::after { content: ""; position: absolute; top: 0; bottom: 0; width: 16%; min-width: 94px; border-right: 4px solid #29233a; background: repeating-linear-gradient(90deg, rgba(8,9,17,.94) 0 12px, rgba(38,29,48,.92) 13px 16px, rgba(16,17,29,.94) 17px 28px), linear-gradient(#261e35, #090b15); box-shadow: inset -18px 0 38px #080912; }
@@ -799,26 +799,9 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .title-lockup h1 { margin: 0; color: #ffcd75; font: clamp(42px,8vw,88px)/1 "Press Start 2P", monospace; letter-spacing: -5px; text-transform: uppercase; text-shadow: 3px 0 #ef7d57, -3px 0 #fff3c2, 0 7px #5d275d, 0 0 24px rgba(255,205,117,.35); }
 .title-lockup p { display: inline-block; margin: 8px auto 0; padding: 7px 22px; border: 2px solid #8a6538; border-radius: 4px 4px 50% 50%; background: linear-gradient(#fff3c2,#d9aa68); color: #372a33; font: clamp(7px,1.2vw,10px)/1.45 "Press Start 2P", monospace; letter-spacing: .4px; text-transform: uppercase; box-shadow: 0 3px 0 #5b3c35; }
 
-.living-prophecy { position: absolute; z-index: 2; left: 50%; bottom: -1px; width: min(860px, 86%); height: 112px; transform: translateX(-50%); overflow: hidden; border: 2px solid rgba(115,239,247,.22); border-bottom: 5px solid #171323; border-radius: 50% 50% 0 0 / 14% 14% 0 0; background: linear-gradient(180deg,rgba(41,54,111,0) 0 13%,rgba(41,54,111,.5) 48%,rgba(65,166,246,.38) 72%,rgba(115,239,247,.25) 100%); box-shadow: inset 0 -18px 25px rgba(16,54,55,.4),0 -4px 15px rgba(115,239,247,.12); }
-.living-prophecy::before { content: ""; position: absolute; z-index: 0; right: 0; bottom: 10px; left: 0; height: 68%; background: radial-gradient(ellipse at 5% 100%,#257179 0 45%,transparent 46%),radial-gradient(ellipse at 24% 110%,#38b764 0 55%,transparent 56%),radial-gradient(ellipse at 48% 112%,#257179 0 58%,transparent 59%),radial-gradient(ellipse at 72% 108%,#38b764 0 52%,transparent 53%),radial-gradient(ellipse at 98% 105%,#257179 0 56%,transparent 57%); opacity: .92; }
-.living-prophecy::after { content: ""; position: absolute; z-index: 2; right: 0; bottom: 0; left: 0; height: 22px; background: linear-gradient(#257179 0 28%,#183d3f 30% 100%); box-shadow: inset 0 4px #38b764; }
-.world-road { position: absolute; z-index: 5; left: 45%; bottom: -8px; width: 120px; height: 88px; transform: perspective(100px) rotateX(25deg); background: linear-gradient(90deg,transparent 0 30%,#d9aa68 31% 69%,transparent 70%); clip-path: polygon(45% 0,55% 0,90% 100%,10% 100%); }
-.world-volcano { position: absolute; z-index: 3; left: 71%; bottom: 14px; width: 115px; height: 88px; background: linear-gradient(130deg,#333c57,#5b343c 56%,#b13e53 57% 61%,#333c57 62%); clip-path: polygon(50% 0,100% 100%,0 100%); filter: drop-shadow(0 3px 0 #171323); }
-.world-volcano::before { content: ""; position: absolute; left: 31%; top: -25px; width: 45px; height: 31px; background: radial-gradient(circle at 24% 70%,rgba(200,216,224,.65) 0 18%,transparent 20%),radial-gradient(circle at 52% 43%,rgba(148,176,194,.55) 0 25%,transparent 27%),radial-gradient(circle at 78% 68%,rgba(86,108,134,.62) 0 22%,transparent 24%); }
-.world-volcano::after { content: ""; position: absolute; left: 44%; top: 0; width: 12px; height: 55px; background: #ef7d57; clip-path: polygon(35% 0,100% 0,62% 100%,0 100%); animation: lava-glow 1.8s ease-in-out infinite; }
-@keyframes lava-glow { 50% { filter: brightness(1.5); } }
-.world-tree { position: absolute; z-index: 4; left: 24%; bottom: 16px; width: 18px; height: 61px; background: #5b3f32; filter: drop-shadow(0 3px 0 #171323); }
-.world-tree::before { content: ""; position: absolute; left: -38px; top: -29px; width: 92px; height: 62px; border-radius: 48%; background: radial-gradient(circle at 30% 60%,#38b764 0 23%,transparent 24%),radial-gradient(circle at 65% 58%,#257179 0 32%,transparent 33%),radial-gradient(circle at 50% 25%,#38b764 0 32%,transparent 33%); }
-.world-castle { position: absolute; z-index: 4; left: 9%; bottom: 14px; width: 67px; height: 60px; border: 3px solid #171323; background: repeating-linear-gradient(90deg,#c8d8e0 0 12px,#94b0c2 13px 18px); box-shadow: -15px 13px 0 -5px #94b0c2,12px 13px 0 -5px #94b0c2; }
-.world-castle::before { content: ""; position: absolute; left: 18px; top: -30px; width: 27px; height: 35px; background: #c8d8e0; clip-path: polygon(50% 0,100% 35%,84% 35%,84% 100%,16% 100%,16% 35%,0 35%); }
-.world-castle::after { content: ""; position: absolute; left: 26px; bottom: 0; width: 10px; height: 18px; border-radius: 6px 6px 0 0; background: #29366f; box-shadow: -22px -20px 0 -2px #ffcd75,22px -20px 0 -2px #ffcd75; }
-.world-island { position: absolute; z-index: 4; right: 10%; top: 9px; width: 75px; height: 25px; border-radius: 50%; background: #38b764; animation: island-float 3s ease-in-out infinite; filter: drop-shadow(0 3px 0 rgba(23,19,35,.75)); }
-.world-island::before { content: ""; position: absolute; z-index: -1; left: 9px; top: 13px; width: 57px; height: 36px; background: linear-gradient(100deg,#8a6538,#566c86); clip-path: polygon(0 0,100% 0,72% 72%,49% 100%,22% 70%); }
-.world-island::after { content: ""; position: absolute; left: 31px; top: -16px; width: 9px; height: 19px; background: #5b3f32; box-shadow: -10px -5px 0 7px #38b764,9px -7px 0 6px #257179; }
-.world-island.two { right: 3%; top: 50px; transform: scale(.62); animation-delay: -1.5s; }
-@keyframes island-float { 50% { translate: 0 -5px; } }
-.world-sparks { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); color: #73eff7; font-size: 18px; text-shadow: 0 0 8px #73eff7; animation: spark-drift 4s linear infinite; }
-@keyframes spark-drift { 50% { transform: translate(-50%,-8px); opacity: .5; } }
+.living-prophecy { position: absolute; z-index: 2; left: 50%; bottom: -1px; width: min(920px,92%); height: 150px; transform: translateX(-50%); overflow: hidden; border: 3px solid rgba(115,239,247,.38); border-bottom: 5px solid #171323; border-radius: 50% 50% 0 0 / 10% 10% 0 0; background: #1a1c2c url("../assets/title-world-panorama.webp") center 57% / cover no-repeat; box-shadow: inset 0 0 28px rgba(9,11,21,.42),0 -6px 20px rgba(115,239,247,.16); }
+.living-prophecy::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(9,11,21,.35),transparent 16% 84%,rgba(9,11,21,.35)),linear-gradient(180deg,rgba(41,54,111,.08),transparent 55%,rgba(9,11,21,.18)); pointer-events: none; }
+.living-prophecy::after { content: ""; position: absolute; right: 0; bottom: 0; left: 0; height: 7px; background: linear-gradient(#ffcd75,#5d275d 45%,#171323 46%); opacity: .78; }
 
 .prophecy-book { position: relative; z-index: 8; flex: 0 0 auto; width: min(1080px, 98%); margin: -2px auto 0; padding: 27px 34px 30px; border: 5px solid #322037; border-radius: 22px 22px 42px 42px; background: linear-gradient(90deg,#c7985d 0 2%,#f2d7a0 3% 48.6%,#a8764e 49% 51%,#f2d7a0 51.4% 97%,#c7985d 98%); box-shadow: 0 12px 0 #171323, 0 22px 35px rgba(0,0,0,.48), inset 0 0 27px rgba(90,48,40,.38); }
 .prophecy-book::before { content: ""; position: absolute; inset: 10px 14px 14px; border: 2px solid rgba(138,101,56,.5); border-radius: 15px 15px 35px 35px; pointer-events: none; }
@@ -966,7 +949,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .title-lockup > span { margin-bottom: -4px; font-size: 11px; }
   .title-lockup h1 { font-size: clamp(34px,8vw,55px); letter-spacing: -3px; text-shadow: 2px 0 #ef7d57,-2px 0 #fff3c2,0 5px #5d275d; }
   .title-lockup p { margin-top: 6px; padding: 5px 12px; font-size: 6px; }
-  .living-prophecy { height: 76px; }
+  .living-prophecy { height: 100px; }
   .world-tree { transform: scale(.68); transform-origin: bottom; }.world-castle { transform: scale(.7); transform-origin: bottom; }.world-volcano { transform: scale(.72); transform-origin: bottom; }
   .prophecy-book { width: 99%; padding: 18px 17px 20px; border-width: 4px; }
   .save-slot-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
@@ -1059,7 +1042,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .prophecy-form { transform: rotate(var(--form-angle)) translateY(-128px) rotate(calc(-1 * var(--form-angle))); }
   .title-lockup { width: 96%; margin-top: 24px; }
   .title-lockup h1 { font-size: 47px; }
-  .living-prophecy { width: 100%; height: 88px; }
+  .living-prophecy { width: 100%; height: 116px; }
   .prophecy-book { width: 100%; padding: 19px 13px 22px; border-radius: 16px 16px 28px 28px; background: linear-gradient(90deg,#c7985d 0 3%,#f2d7a0 4% 96%,#c7985d 97%); }
   .book-spine { display: none; }
   .save-slot-grid { grid-template-columns: 1fr; gap: 8px; }
@@ -1084,9 +1067,62 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .prophecy-form { width: 36px; height: 36px; margin: -18px; transform: rotate(var(--form-angle)) translateY(-101px) rotate(calc(-1 * var(--form-angle))); }
   .prophecy-hero { width: 67px; height: 76px; }
   .title-lockup { margin-top: 14px; }.title-lockup h1 { font-size: 37px; }.title-lockup p { margin-top: 4px; }
-  .living-prophecy { height: 70px; }
+  .living-prophecy { height: 92px; }
   .prophecy-book { padding: 12px 14px 14px; }
   .save-slot-card { min-height: 128px; }.slot-chapter-art { height: 40px; }
   .save-slot-card small { font-size: 12px; line-height: 1; white-space: normal; overflow-wrap: anywhere; }
   .save-screen-foot { min-height: 27px; }.save-screen-foot button { min-height: 27px; padding: 4px 8px; }
 }
+
+/* visualViewport classes switch in the same frame as an iPhone rotation.
+   Media queries remain as a no-script fallback, while these beat Safari's
+   occasionally stale orientation state during its viewport transition. */
+#save-slots.title-portrait { padding-right: max(7px,env(safe-area-inset-right)); padding-left: max(7px,env(safe-area-inset-left)); }
+#save-slots.title-portrait .prophecy-screen { min-height: 100%; }
+#save-slots.title-portrait .prophecy-vista { flex-basis: 270px; min-height: 270px; }
+#save-slots.title-portrait .stained-window { top: -93px; width: 350px; height: 350px; }
+#save-slots.title-portrait .prophecy-form { transform: rotate(var(--form-angle)) translateY(-128px) rotate(calc(-1 * var(--form-angle))); }
+#save-slots.title-portrait .title-lockup { width: 96%; margin-top: 24px; }
+#save-slots.title-portrait .title-lockup h1 { font-size: 47px; }
+#save-slots.title-portrait .living-prophecy { width: 100%; height: 116px; }
+#save-slots.title-portrait .prophecy-book { width: 100%; padding: 19px 13px 22px; border-radius: 16px 16px 28px 28px; background: linear-gradient(90deg,#c7985d 0 3%,#f2d7a0 4% 96%,#c7985d 97%); }
+#save-slots.title-portrait .book-spine { display: none; }
+#save-slots.title-portrait .save-slot-grid { grid-template-columns: 1fr; gap: 8px; }
+#save-slots.title-portrait .save-slot-card { display: grid; grid-template-columns: 94px minmax(0,1fr); grid-template-rows: repeat(4,auto); align-items: center; align-content: center; column-gap: 10px; row-gap: 6px; min-height: 154px; padding: 11px 12px; overflow: hidden; text-align: left; }
+#save-slots.title-portrait .save-slot-number { grid-column: 2; font-size: 8px; line-height: 1.5; }
+#save-slots.title-portrait .slot-chapter-art { grid-column: 1; grid-row: 1 / 5; width: 88px; height: 106px; margin: 0; }
+#save-slots.title-portrait .slot-chapter-art canvas { width: 45px; height: 52px; }
+#save-slots.title-portrait .save-slot-card strong,
+#save-slots.title-portrait .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art),
+#save-slots.title-portrait .save-slot-card small { grid-column: 2; }
+#save-slots.title-portrait .save-slot-card strong { font-size: 8px; line-height: 1.55; }
+#save-slots.title-portrait .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art) { font-size: 16px; line-height: 1.12; }
+#save-slots.title-portrait .save-slot-card small { font-size: 15px; line-height: 1.15; overflow-wrap: anywhere; }
+#save-slots.title-portrait .save-slot-card.empty { justify-content: stretch; }
+#save-slots.title-portrait .save-slot-card.empty .slot-chapter-art { display: grid; }
+#save-slots.title-portrait .save-screen-foot { flex-wrap: wrap; padding: 5px 0; }
+#save-slots.title-portrait .save-screen-foot span { width: 100%; }
+
+#save-slots.title-short-landscape { padding-top: 3px; padding-bottom: 3px; }
+#save-slots.title-short-landscape .prophecy-vista { flex-basis: 176px; min-height: 176px; }
+#save-slots.title-short-landscape .stained-window { top: -94px; width: 280px; height: 280px; }
+#save-slots.title-short-landscape .stained-window::before { inset: 32px; }
+#save-slots.title-short-landscape .glass-ring.two { inset: 61px; }
+#save-slots.title-short-landscape .prophecy-form { width: 36px; height: 36px; margin: -18px; transform: rotate(var(--form-angle)) translateY(-101px) rotate(calc(-1 * var(--form-angle))); }
+#save-slots.title-short-landscape .prophecy-hero { width: 67px; height: 76px; }
+#save-slots.title-short-landscape .title-lockup { margin-top: 14px; }
+#save-slots.title-short-landscape .title-lockup h1 { font-size: 37px; }
+#save-slots.title-short-landscape .title-lockup p { margin-top: 4px; }
+#save-slots.title-short-landscape .living-prophecy { height: 92px; }
+#save-slots.title-short-landscape .prophecy-book { padding: 12px 14px 14px; }
+#save-slots.title-short-landscape .save-slot-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
+#save-slots.title-short-landscape .save-slot-card { display: flex; min-height: 128px; padding: 7px; text-align: center; }
+#save-slots.title-short-landscape .save-slot-number,
+#save-slots.title-short-landscape .save-slot-card strong,
+#save-slots.title-short-landscape .save-slot-card > span:not(.save-slot-number):not(.slot-chapter-art),
+#save-slots.title-short-landscape .save-slot-card small { grid-column: auto; }
+#save-slots.title-short-landscape .slot-chapter-art { width: auto; height: 40px; margin: 1px 0 3px; }
+#save-slots.title-short-landscape .save-slot-card small { font-size: 12px; line-height: 1; white-space: normal; overflow-wrap: anywhere; }
+#save-slots.title-short-landscape .save-screen-foot { min-height: 27px; flex-wrap: nowrap; padding: 0; }
+#save-slots.title-short-landscape .save-screen-foot span { width: auto; }
+#save-slots.title-short-landscape .save-screen-foot button { min-height: 27px; padding: 4px 8px; }

@@ -14,6 +14,60 @@ const ACTIVE_SLOT_KEY = "nobodys-quest-active-slot";
 const MIGRATION_KEY = "nobodys-quest-slots-migrated";
 const AUTO_START_KEY = "nobodys-quest-auto-start";
 const SAVE_SLOT_COUNT = 3;
+let titleViewportCleanup = null;
+
+function bindTitleViewport(overlay) {
+  if (titleViewportCleanup) titleViewportCleanup();
+  if (typeof window === "undefined") return () => {};
+
+  let settleTimers = [];
+  const sync = () => {
+    const viewport = window.visualViewport;
+    const width = Math.round(viewport ? viewport.width : window.innerWidth);
+    const height = Math.round(viewport ? viewport.height : window.innerHeight);
+    const left = Math.round(viewport ? viewport.offsetLeft : 0);
+    const top = Math.round(viewport ? viewport.offsetTop : 0);
+    const portrait = height > width;
+
+    overlay.classList.toggle("title-portrait", portrait);
+    overlay.classList.toggle("title-short-landscape", !portrait && height <= 430);
+    overlay.style.left = `${left}px`;
+    overlay.style.top = `${top}px`;
+    overlay.style.right = "auto";
+    overlay.style.bottom = "auto";
+    overlay.style.width = `${width}px`;
+    overlay.style.height = `${height}px`;
+    overlay.style.setProperty("--title-vh", `${height}px`);
+  };
+  const settle = () => {
+    sync();
+    window.requestAnimationFrame(() => {
+      sync();
+      window.requestAnimationFrame(sync);
+    });
+    settleTimers.forEach(window.clearTimeout);
+    settleTimers = [window.setTimeout(sync, 80), window.setTimeout(sync, 240)];
+  };
+
+  sync();
+  window.addEventListener("resize", settle);
+  window.addEventListener("orientationchange", settle);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", settle);
+    window.visualViewport.addEventListener("scroll", sync);
+  }
+  titleViewportCleanup = () => {
+    window.removeEventListener("resize", settle);
+    window.removeEventListener("orientationchange", settle);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", settle);
+      window.visualViewport.removeEventListener("scroll", sync);
+    }
+    settleTimers.forEach(window.clearTimeout);
+    titleViewportCleanup = null;
+  };
+  return titleViewportCleanup;
+}
 
 function slotNumber(value) {
   const slot = Number(value);
@@ -261,7 +315,7 @@ G.showSaveSlotScreen = function (force) {
           <span class="prophecy-hero"><i></i><canvas width="92" height="106" data-title-form="nobody"></canvas></span>
         </div>
         <header class="title-lockup"><span>Nobody's</span><h1>Quest</h1><p>The prophecy chose the wrong name</p></header>
-        <div class="living-prophecy" aria-hidden="true"><i class="world-castle"></i><i class="world-tree"></i><i class="world-road"></i><i class="world-volcano"></i><i class="world-island one"></i><i class="world-island two"></i><span class="world-sparks">✦　·　✧　·　✦</span></div>
+        <div class="living-prophecy" aria-hidden="true"></div>
       </section>
       <section class="prophecy-book" aria-label="Adventure slots"><i class="book-pages left"></i><i class="book-pages right"></i><i class="book-spine"></i>
         <div class="save-slot-grid">${cards}</div>
@@ -275,6 +329,7 @@ G.showSaveSlotScreen = function (force) {
         <button data-title-fullscreen>⛶ Fullscreen</button><button data-title-settings-close>Done</button>
       </aside>
     </main>`;
+  const unbindTitleViewport = bindTitleViewport(overlay);
   overlay.classList.remove("hidden");
   G.saveSlotScreenOpen = true;
   renderTitleSprites(overlay);
@@ -286,6 +341,7 @@ G.showSaveSlotScreen = function (force) {
   const settingsPanel = overlay.querySelector("[data-title-settings-panel]");
   const returnButton = overlay.querySelector("[data-title-return]");
   const closeTitle = () => {
+    unbindTitleViewport();
     overlay.classList.add("hidden");
     G.saveSlotScreenOpen = false;
     document.removeEventListener("keydown", titleKeys);
