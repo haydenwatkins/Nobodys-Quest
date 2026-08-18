@@ -19,11 +19,15 @@ assert.ok(save.includes("G.drawSprite") && save.includes("data-title-form"),
 assert.match(css, /prefers-reduced-motion:\s*reduce/, "title animation should honor reduced-motion preferences");
 assert.match(css, /orientation:\s*portrait/, "the storybook needs a dedicated portrait composition");
 assert.match(css, /orientation:\s*landscape[^}]*max-height:\s*430px/, "short landscape devices need a compact composition");
-assert.ok(index.includes("style.css?v=20260818b") && index.includes("save.js?v=20260818b"),
+assert.ok(index.includes("style.css?v=20260818c") && index.includes("save.js?v=20260818b"),
   "published clients must receive the new title screen instead of cached files");
 assert.match(css, /grid-template-rows:\s*repeat\(4,auto\)/,
   "portrait cards should grow four independent text rows without overlapping the next chapter");
 assert.match(css, /min-height:\s*154px/,
   "portrait chapter cards should reserve room for wrapped act names and save statistics");
+assert.match(css, /\.living-prophecy::before/,
+  "the visible title panorama should layer rolling terrain behind its landmarks");
+assert.doesNotMatch(css, /\.living-prophecy\s*\{[^}]*clip-path/,
+  "the panorama container must not clip every landmark into a jagged strip");
 
 console.log("title screen tests passed");
