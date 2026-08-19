@@ -349,6 +349,8 @@ G.showSaveSlotScreen = function (force) {
         <button data-title-music>♫ Music <span>${!G.sfx || G.sfx.musicEnabled !== false ? "ON" : "OFF"}</span></button>
         <button data-title-sound>◖ Sound <span>${!G.sfx || G.sfx.soundEnabled !== false ? "ON" : "OFF"}</span></button>
         <button data-title-detail>✦ World detail <span>${G.hdPilot ? "HD" : "ORIGINAL"}</span></button>
+        <button data-title-boss-assistance aria-pressed="${!!(G.comfortSetting && G.comfortSetting("bossAssistance"))}">♥ Boss Assistance <span>${G.comfortSetting && G.comfortSetting("bossAssistance") ? "ON · retry help" : "OFF · original bosses"}</span></button>
+        <button data-title-easy-mode aria-pressed="${!!(G.comfortSetting && G.comfortSetting("easyMode"))}">🌱 Easy Mode <span>${G.comfortSetting && G.comfortSetting("easyMode") ? "ON · heart regeneration" : "OFF · normal healing"}</span></button>
         <button data-title-fullscreen>⛶ Fullscreen</button><button data-title-settings-close>Done</button>
       </aside>
     </main>`;
@@ -413,6 +415,20 @@ G.showSaveSlotScreen = function (force) {
     if (G.setHdPilot) G.setHdPilot(!G.hdPilot);
     detail.querySelector("span").textContent = G.hdPilot ? "HD" : "ORIGINAL";
     renderTitleSprites(overlay);
+  });
+  const bossAssistance = overlay.querySelector("[data-title-boss-assistance]");
+  if (bossAssistance) bossAssistance.addEventListener("click", () => {
+    if (G.setComfortSetting) G.setComfortSetting("bossAssistance", !G.comfortSetting("bossAssistance"));
+    const enabled = G.comfortSetting("bossAssistance");
+    bossAssistance.setAttribute("aria-pressed", String(enabled));
+    bossAssistance.querySelector("span").textContent = enabled ? "ON · retry help" : "OFF · original bosses";
+  });
+  const easyMode = overlay.querySelector("[data-title-easy-mode]");
+  if (easyMode) easyMode.addEventListener("click", () => {
+    if (G.setComfortSetting) G.setComfortSetting("easyMode", !G.comfortSetting("easyMode"));
+    const enabled = G.comfortSetting("easyMode");
+    easyMode.setAttribute("aria-pressed", String(enabled));
+    easyMode.querySelector("span").textContent = enabled ? "ON · heart regeneration" : "OFF · normal healing";
   });
   const fullscreen = overlay.querySelector("[data-title-fullscreen]");
   if (fullscreen) fullscreen.addEventListener("click", () => {

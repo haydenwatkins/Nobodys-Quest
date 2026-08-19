@@ -369,12 +369,14 @@
   };
 
   G.guidanceAssistHearts = function () {
+    if (!G.comfortSetting || !G.comfortSetting("bossAssistance")) return 0;
     if (!G.state || !G.state.guidance) return 0;
     const retries = Number(G.state.guidance.bossRetries[G.state.mapId]) || 0;
     return retries >= 4 ? 2 : retries >= 2 ? 1 : 0;
   };
 
   G.guidanceProjectileScale = function (projectile) {
+    if (!G.comfortSetting || !G.comfortSetting("bossAssistance")) return 1;
     if (!projectile || projectile.fromPlayer || !projectile.owner || !projectile.owner.def || !projectile.owner.def.miniboss) return 1;
     const retries = Number(G.ensureGuidance().bossRetries[G.state.mapId]) || 0;
     return retries >= 5 ? 0.78 : retries >= 3 ? 0.88 : 1;
@@ -496,7 +498,7 @@
     runtime.targetKey = "";
     runtime.recalcAt = 0;
     const retries = Number(G.ensureGuidance().bossRetries[data.map]) || 0;
-    if (retries >= 2 && G.ui && G.ui.toast) {
+    if (G.comfortSetting && G.comfortSetting("bossAssistance") && retries >= 2 && G.ui && G.ui.toast) {
       const hearts = retries >= 4 ? 2 : 1;
       G.ui.toast(`♥ Pebble's courage: +${hearts} retry heart${hearts === 1 ? "" : "s"} for this challenge`, 4);
     }

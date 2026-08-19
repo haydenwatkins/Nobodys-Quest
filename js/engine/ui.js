@@ -1337,6 +1337,16 @@ G.ui = (() => {
       if (G.sfx && G.sfx.setSoundEnabled) G.sfx.setSoundEnabled(!G.sfx.soundEnabled);
       buildMenu();
     });
+    const bossAssistance = menuEl.querySelector('[data-act="boss-assistance"]');
+    if (bossAssistance) bossAssistance.addEventListener("click", () => {
+      if (G.setComfortSetting) G.setComfortSetting("bossAssistance", !G.comfortSetting("bossAssistance"));
+      buildMenu();
+    });
+    const easyMode = menuEl.querySelector('[data-act="easy-mode"]');
+    if (easyMode) easyMode.addEventListener("click", () => {
+      if (G.setComfortSetting) G.setComfortSetting("easyMode", !G.comfortSetting("easyMode"));
+      buildMenu();
+    });
     const saveSlots = menuEl.querySelector('[data-act="save-slots"]');
     if (saveSlots) saveSlots.addEventListener("click", () => {
       closeMenu();
@@ -1360,12 +1370,16 @@ G.ui = (() => {
     const canFullscreen = !runningFullscreen();
     const musicOn = !G.sfx || G.sfx.musicEnabled !== false;
     const soundOn = !G.sfx || G.sfx.soundEnabled !== false;
+    const bossAssistance = G.comfortSetting && G.comfortSetting("bossAssistance");
+    const easyMode = G.comfortSetting && G.comfortSetting("easyMode");
     return `<section class="settings-panel" aria-label="Settings and help">
       <div class="settings-heading"><div><span class="eyebrow">SETTINGS & HELP</span><h2>Keep the adventure comfortable</h2></div></div>
       <div class="settings-grid">
         <button data-act="music"><strong>♫ Music</strong><span>${musicOn ? "ON · organic regional score" : "OFF"}</span></button>
         <button data-act="sound"><strong>◖ Sound effects</strong><span>${soundOn ? "ON" : "OFF"}</span></button>
         <button data-act="hd-pilot"><strong>✦ World detail</strong><span>${G.hdPilot ? "HD · 640×360" : "Original · 320×180"}</span></button>
+        <button data-act="boss-assistance" aria-pressed="${!!bossAssistance}"><strong>♥ Boss Assistance</strong><span>${bossAssistance ? "ON · retry hearts and gentler shots" : "OFF · original boss rules"}</span></button>
+        <button data-act="easy-mode" aria-pressed="${!!easyMode}"><strong>🌱 Easy Mode</strong><span>${easyMode ? "ON · 1 heart every 6s after a breather" : "OFF · hearts need pickups or rest"}</span></button>
         <button data-act="tutorial"><strong>? Tutorial</strong><span>Replay contextual hints</span></button>
         <button data-act="save-slots"><strong>▤ Adventure slots</strong><span>Slot ${G.activeSaveSlot} · switch or begin again</span></button>
         ${canFullscreen ? `<button data-act="fullscreen"><strong>⛶ Fullscreen</strong><span>Use more of this screen</span></button>` : ""}

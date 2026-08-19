@@ -6,8 +6,13 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
+const comfortStore = new Map();
 const context = vm.createContext({
   console, Math, Date, Map, Set,
+  localStorage: {
+    getItem(key) { return comfortStore.has(key) ? comfortStore.get(key) : null; },
+    setItem(key, value) { comfortStore.set(key, String(value)); },
+  },
   document: { getElementById: () => null },
   window: {},
 });
@@ -16,6 +21,7 @@ function run(file, suffix = "") {
 }
 
 run("js/engine/core.js", ";this.G = G;");
+run("js/engine/comfort.js");
 const G = context.G;
 const toasts = [];
 G.ui = {
@@ -102,6 +108,10 @@ assert.match(toasts.at(-1), /Hammer carries Blunt damage/);
 
 G.state.mapId = "bossRoom";
 G.state.guidance.bossRetries.bossRoom = 2;
+assert.equal(G.guidanceAssistHearts(), 0, "retry assistance should never activate before the player opts in");
+assert.equal(G.guidanceProjectileScale({ owner: { def: { miniboss: true } } }), 1,
+  "boss shots should retain authored speed while assistance is off");
+G.setComfortSetting("bossAssistance", true);
 assert.equal(G.guidanceAssistHearts(), 1, "two failed boss attempts should add one temporary retry heart");
 G.state.guidance.bossRetries.bossRoom = 5;
 assert.equal(G.guidanceAssistHearts(), 2, "repeated attempts should add at most two temporary hearts");

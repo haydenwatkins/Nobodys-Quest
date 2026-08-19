@@ -31,6 +31,8 @@ G.makePlayer = function () {
     pantryHasteT: 0,
     pantryQuickT: 0,
     pantryMagnetT: 0,
+    easyRegenDelay: 0,
+    easyRegenProgress: 0,
     lastSafe: null,
   };
 };
@@ -99,6 +101,7 @@ G.damagePlayer = function (dmg, fromX, fromY) {
   if (passiveResult.prevented) return false;
   dmg = passiveResult.damage;
   p.damageTaken += dmg;
+  if (G.delayEasyModeRecovery) G.delayEasyModeRecovery();
   p.invuln = 1.0;
   G.sfx.play("hurt");
   G.state.shake = 0.25;
@@ -207,6 +210,7 @@ G.updatePlayer = function (dt) {
   p.pantryHasteT = Math.max(0, (p.pantryHasteT || 0) - dt);
   p.pantryQuickT = Math.max(0, (p.pantryQuickT || 0) - dt);
   p.pantryMagnetT = Math.max(0, (p.pantryMagnetT || 0) - dt);
+  if (G.updateComfortRecovery) G.updateComfortRecovery(dt);
   if (G.passives) G.passives.update(dt);
   if (p.attackPose) {
     p.attackPose.t -= dt;
