@@ -37,7 +37,8 @@ G.makePlayer = function () {
 
 G.playerForm = function () { return G.forms[G.state.formId]; };
 G.playerMaxHearts = function () {
-  return G.playerForm().hearts + (G.expeditionHeartBonus ? G.expeditionHeartBonus() : 0);
+  return G.playerForm().hearts + (G.expeditionHeartBonus ? G.expeditionHeartBonus() : 0) +
+    (G.guidanceAssistHearts ? G.guidanceAssistHearts() : 0);
 };
 G.playerHp = function () { return Math.max(0, G.playerMaxHearts() - G.state.player.damageTaken); };
 G.playerMaxMana = function () {

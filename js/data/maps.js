@@ -65,6 +65,7 @@ function makeGreenfieldTiles() {
 
   // Landmarks.
   put(57, 44, "s");
+  put(64, 48, "1"); // one roomy first practice fight beside the starting crossroads
   put(25, 57, "C");
   put(79, 13, "G");
   put(74, 18, "r");
@@ -96,7 +97,7 @@ registerMap({
     "2": { tile: "grass", enemy: "bat" },
     "3": { tile: "grass", enemy: "bones" },
     "4": { tile: "grass", enemy: "wisp" },
-    "s": { tile: "grass", message: "Welcome, little Nobody! Smack baddies with A. Quests live in the ☰ menu!" },
+    "s": { tile: "grass", message: "Gold motes follow the main story. If you lose the road, hold 🧭 and Nobody will look around." },
     "G": { tile: "grass", message: "Beware the wisp grove... wisps only fear the LIGHT." },
     "D": { tile: "tree", portal: { map: "dungeon", x: 15, y: 14 }, stars: 3 },
     "M": { tile: "grass", portal: { map: "mistwood", x: 15, y: 17 }, stars: 1, portalStyle: "gap" },

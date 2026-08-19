@@ -49,10 +49,11 @@ const navigatorTarget = { maxTouchPoints: 5, getGamepads: () => fakeGamepads };
 let inputClock = 0;
 let wheelOpened = 0;
 let wheelCommitted = 0;
+let guidanceRequested = 0;
 
 const context = vm.createContext({
   console, Math, performance: { now: () => inputClock },
-  G: { sfx: { ensure() {} }, ui: {
+  G: { sfx: { ensure() {} }, requestGuidance() { guidanceRequested++; return true; }, ui: {
     menuOpen: false, formWheelOpen: false, toast() {},
     openFormWheel() { wheelOpened++; this.formWheelOpen = true; return true; },
     commitFormWheel() { wheelCommitted++; this.formWheelOpen = false; return true; },
@@ -116,6 +117,12 @@ const mapButton = elements["btn-map"];
 mapButton.dispatch("pointerdown", { pointerId: 20 });
 mapButton.dispatch("pointerup", { pointerId: 20 });
 assert.equal(G.input.tapped("map"), true, "touch players should have a dedicated Atlas button");
+mapButton.dispatch("pointerdown", { pointerId: 25 });
+inputClock += 600;
+G.input.update();
+assert.equal(guidanceRequested, 1, "holding the Atlas button should ask the world for help");
+mapButton.dispatch("pointerup", { pointerId: 25 });
+assert.equal(G.input.tapped("map"), false, "a guidance hold must not also open the Atlas");
 abilityA.dispatch("pointerdown", { pointerId: 21, clientX: 200, clientY: 100 });
 assert.equal(G.input.aiming.btn, "a", "pressing an ability should claim the shared aim lock");
 assert.equal(abilityA.classList.contains("held"), true, "the pressed ability should be highlighted");

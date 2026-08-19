@@ -169,7 +169,14 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   border-color: #73eff7;
   color: #73eff7;
 }
+#btn-map small {
+  position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+  color: inherit; font: 5px "Press Start 2P", monospace; letter-spacing: 0;
+}
 #btn-map:active, #btn-map.held { background: rgba(115,239,247,0.72); color: #1a1c2c; }
+#btn-map.guidance-ready { animation: guidance-map-pulse 1.1s ease-in-out infinite; }
+#btn-swap.suggested { border-color: #d9a7ff; box-shadow: 0 0 0 4px rgba(217,167,255,.25), 0 0 18px rgba(217,167,255,.65); }
+@keyframes guidance-map-pulse { 50% { box-shadow: 0 0 0 5px rgba(115,239,247,.18), 0 0 16px rgba(115,239,247,.5); } }
 
 /* joystick knob drawn by input.js */
 #joy-base, #joy-knob {
@@ -905,6 +912,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .title-settings [data-title-settings-close] { grid-column:1 / 3;border-color:#ffcd75;background:#5d275d; }
 
 @media (prefers-reduced-motion: reduce) {
+  #btn-map.guidance-ready { animation: none; box-shadow: 0 0 0 3px rgba(115,239,247,.24); }
   .title-form-echo { animation:none; opacity:.78; transform:translate(calc(-50% + var(--echo-x)),var(--echo-y)) scale(.92); }
   .title-nobody i,.title-change-burst i,.title-quill { animation:none; }
   .title-change-burst { display:none; }

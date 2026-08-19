@@ -56,6 +56,18 @@
     return ["butterfly", "bird"];
   }
 
+  const OLD_REGION_TROPHIES = {
+    mistwood: "trophy-heartwood-crown",
+    sunkenMarsh: "trophy-mire-pearl",
+    emberRidge: "trophy-eclipse-sigil",
+  };
+
+  function regionRestored(mapId) {
+    if (G.worldwakePurified && G.worldwakePurified(mapId)) return true;
+    const trophy = OLD_REGION_TROPHIES[mapId];
+    return !!(trophy && G.state && (G.state.items || []).includes(trophy));
+  }
+
   function cellSupports(cell, species) {
     if (!cell || cell.portal || cell.chest || cell.message || cell.rest || cell.playerHouse || cell.townPlot) return false;
     if (species.aquatic) return cell.tile === "water";
@@ -91,7 +103,7 @@
   G.makeWildlife = function (mapId, grid, w, h, entry) {
     if (mapId === "playerHouse") return [];
     const map = G.maps[mapId] || {};
-    const purified = !!(G.worldwakePurified && G.worldwakePurified(mapId));
+    const purified = regionRestored(mapId);
     const residentBonus = mapId === "town" && G.townVisibleResidentCount
       ? Math.floor(G.townVisibleResidentCount() / 4) : 0;
     const areaBonus = Math.min(16, Math.floor(w * h / 600));
@@ -252,7 +264,7 @@
   }
 
   G.makeRestorationDetails = function (mapId, grid, w, h) {
-    if (!(G.worldwakePurified && G.worldwakePurified(mapId))) return [];
+    if (!regionRestored(mapId)) return [];
     const details = [];
     for (let i = 0; i < 28; i++) {
       const tile = findDetailSpot(grid, w, h, i + mapId.length * 23);

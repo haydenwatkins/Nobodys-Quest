@@ -374,6 +374,9 @@
     const speaker = npc.def.icon + " " + npc.def.name + chapterTitle;
     if (G.ui.dialogue) G.ui.dialogue(speaker, line, { accent: npc.def.sprite.palette.a });
     else G.ui.toast(speaker + ": " + line, 5.8);
+    const roadHint = G.guidanceNpcHint ? G.guidanceNpcHint(npc) : "";
+    if (roadHint && (count === 0 || (G.guidanceNeedsHint && G.guidanceNeedsHint())) && G.ui.dialogue)
+      G.ui.dialogue("◇ THE ROAD", roadHint, { accent: "#ffcd75" });
     if (G.sfx && G.sfx.play) G.sfx.play("menu");
     if (G.spawnFx) G.spawnFx({
       kind: "ring", x: npc.x, y: npc.y - 8,
@@ -397,6 +400,7 @@
 
     for (const npc of npcs) {
       updateRoutine(npc, dt, p, threats);
+      if (G.applyGuidanceToNpc) G.applyGuidanceToNpc(npc, p);
       if (npc.bubble) {
         npc.bubble.t -= dt;
         npc.bubble.delay = Math.max(0, npc.bubble.delay - dt);
@@ -442,6 +446,18 @@
     const mode = npc.path && npc.path.length ? "walk" : "idle";
     const frame = G.spriteFrame ? G.spriteFrame(npc.def.sprite, mode, mode === "idle" ? G.state.time + npc.seed : npc.anim) : Math.floor(npc.anim) % 2;
     G.drawSprite(ctx, npc.def.sprite, frame, npc.x, npc.y + bob, npc.facingLeft);
+    if (npc.guidancePoint) {
+      const side = npc.facingLeft ? -1 : 1;
+      const pulse = 0.55 + Math.sin((G.state.time || 0) * 5 + npc.seed) * 0.18;
+      ctx.save();
+      ctx.globalAlpha = 0.75 + pulse * 0.2;
+      ctx.fillStyle = "#ffcd75";
+      ctx.fillRect(Math.round(npc.x + side * 8), Math.round(npc.y - 9 + bob), side * 5, 2);
+      ctx.translate(Math.round(npc.x), Math.round(npc.y - 25 - pulse * 2));
+      ctx.rotate(Math.PI / 4);
+      ctx.fillRect(-3, -3, 6, 6);
+      ctx.restore();
+    }
     if (npc.activity) {
       const side = npc.facingLeft ? -7 : 6;
       const ax = Math.round(npc.x + side), ay = Math.round(npc.y + 1 + bob);

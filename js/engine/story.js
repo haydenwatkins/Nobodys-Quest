@@ -143,6 +143,7 @@ G.storyGoal = function () {
     if ((G.state.claimedForms || []).includes("rat")) {
       const ratDone = G.forms.rat ? G.forms.rat.quests.filter((quest) => G.questsDone.includes(quest.id)).length : 0;
       return Object.assign(base, {
+        guide: "mastery", formId: "rat",
         title: "Live inside a borrowed answer", short: "Complete one Rat mastery quest",
         objective: "Become Rat, use its speed and poison, and complete one Rat mastery quest.",
         reason: "Claiming a form is only an introduction. Understanding why its answer works is what makes it part of Nobody.",
@@ -150,12 +151,14 @@ G.storyGoal = function () {
       });
     }
     if (G.formReady && G.formReady("rat")) return Object.assign(base, {
+      guide: "claim", formId: "rat",
       title: "Choose your first new shape", short: "Claim Rat in the Form Lab",
       objective: "Open Form Lab and deliberately claim the Rat form.",
       reason: "The first form proves that Nobody can carry a life beyond the one the prophecy expected.",
       progress: storyProgress(2, 2, "NOBODY MASTERY"),
     });
     return Object.assign(base, {
+      guide: "mastery", formId: "nobody",
       title: "Become more than a blank", short: "Complete two Nobody mastery quests",
       objective: "Explore Greenfield, follow the tutorial, and complete two of Nobody's mastery quests.",
       reason: "Stars record lessons learned. Two lessons reveal the first path into another form.",
@@ -173,12 +176,14 @@ G.storyGoal = function () {
     const next = masters.find((master) => !items.has(master.trophy) && stars >= master.stars) ||
       masters.find((master) => !items.has(master.trophy));
     if (next && stars < next.stars) return Object.assign(base, {
+      guide: "mastery",
       title: "Learn enough to leave Greenfield", short: `Earn ${next.stars - stars} more ⭐ for ${next.destination}`,
       objective: `Complete form mastery until the road to ${next.destination} opens at ${next.stars} stars.`,
       reason: "Every new route tests whether Nobody can combine the lessons already carried.",
       progress: storyProgress(stars, next.stars, "STARS"),
     });
     return Object.assign(base, {
+      guide: "boss",
       mapId: next ? next.mapId : "overworld", destination: next ? next.destination : "Greenfield",
       title: next ? `Challenge the ${next.name}` : "Seek stronger masters",
       short: next ? `Defeat ${next.name} in ${next.destination}` : "Continue mastering forms",
@@ -190,12 +195,14 @@ G.storyGoal = function () {
 
   if (chapter === 2) {
     if (stars < 24) return Object.assign(base, {
+      guide: "mastery",
       title: "Prepare for the waking horizon", short: `Earn ${24 - stars} more ⭐ to wake Sunstep Road`,
       objective: "Challenge specialist masters, complete form mastery, and reach 24 stars.",
       reason: "Rumors describe an eastern road older than Greenfield. It will answer only a hero with many proven shapes.",
       progress: storyProgress(stars, 24, "STARS"),
     });
     return Object.assign(base, {
+      guide: "travel", mapId: "sunstepPrairie", destination: "Sunstep Prairie",
       title: "Find the road that breathes", short: "Take Greenfield's eastern road to Sunstep Prairie",
       objective: "Cross the eastern edge of Greenfield and enter Sunstep Prairie.",
       reason: "The Worldwake has begun. Something beneath the oldest roads is waiting to see who still travels them.",
@@ -216,6 +223,7 @@ G.storyGoal = function () {
     const range = chapter === 3 ? worldbearers.slice(0, 3) : worldbearers.slice(3);
     const next = range.find((guardian) => !marks.includes(guardian.mark)) || worldbearers.find((guardian) => !marks.includes(guardian.mark));
     return Object.assign(base, {
+      guide: "boss",
       mapId: next ? next.mapId : "titanGrave", destination: next ? next.destination : "Titan Grave",
       title: next ? `Wake the ${next.name}` : "Carry the six marks to Titan Grave",
       short: next ? `Purify ${next.name} in ${next.destination}` : "Follow the completed World Path",
@@ -230,6 +238,7 @@ G.storyGoal = function () {
   if (unmastered.length) {
     const form = G.forms[unmastered[0]];
     return Object.assign(base, {
+      guide: "mastery", formId: unmastered[0],
       title: "Bring every lesson to its ending", short: `Master ${unmastered.length} remaining form${unmastered.length === 1 ? "" : "s"}`,
       objective: `Raise every form to level 5. Begin with ${form ? form.name : unmastered[0]}.`,
       reason: "The Final Firmament tests the complete journey. No borrowed lesson can be left unfinished.",
@@ -237,6 +246,7 @@ G.storyGoal = function () {
     });
   }
   return Object.assign(base, {
+    guide: "boss", mapId: "godTrial", destination: "Final Firmament",
     title: "Answer the impossible ideal", short: "Enter the Final Firmament and face God",
     objective: "Find the northern Final Firmament in Greenfield and defeat the God of Every Form.",
     reason: "God is every perfect answer at once. Nobody's final strength is knowing when to become something else.",

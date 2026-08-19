@@ -55,9 +55,9 @@ const combined = G.world.portalBlockReason({
 assert.equal(combined.title, "🔒 THE USEFUL DUNGEON", "the message should name the blocked destination");
 assert.match(combined.text, /Earn 2 more stars/);
 assert.match(combined.text, /3 required; 1 held/);
-assert.match(combined.text, /form quests/);
+assert.match(combined.text, /form challenges in the world/);
 assert.match(combined.text, /Rat \(level 2\).*level 5/);
-assert.match(combined.text, /Forms menu/);
+assert.match(combined.text, /Form Lab keeps the details/);
 assert.match(combined.text, /Worldbearer in Stormspine Peaks/);
 assert.match(combined.text, /Lantern Mark/);
 

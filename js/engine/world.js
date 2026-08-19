@@ -154,7 +154,7 @@ G.world = (() => {
     if (held < need) {
       const remaining = need - held;
       requirements.push(
-        `Earn ${remaining} more ${remaining === 1 ? "star" : "stars"} by finishing form quests ` +
+        `Earn ${remaining} more ${remaining === 1 ? "star" : "stars"} by completing form challenges in the world ` +
         `(${need} required; ${held} held).`
       );
     }
@@ -168,7 +168,7 @@ G.world = (() => {
       if (missing.length > shown.length) shown.push(`${missing.length - shown.length} more forms`);
       requirements.push(
         `Raise ${readableList(shown)} to level ${cell.mastery.level}. ` +
-        `Finish those forms' quests in the Forms menu.`
+        `Practice those forms in the world; the Form Lab keeps the details.`
       );
     }
 
@@ -1582,6 +1582,7 @@ G.world = (() => {
     drawWorldwakeState(ctx, time);
     drawWayfinderPost(ctx, time);
     for (const ch of s.chests) drawChest(ctx, ch, time);
+    if (G.drawWorldGuidance) G.drawWorldGuidance(ctx, cam, time);
   }
 
   return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, portalBlockReason };

@@ -147,6 +147,7 @@
     gauntletIronBest: 0,
     playSeconds: 0,
     story: G.makeStory(),
+    guidance: G.makeGuidance(),
     shake: 0,
     hitStop: 0,
     cameraKickX: 0,
@@ -163,6 +164,7 @@
     const s = G.state;
     s.playSeconds = Math.max(0, Number(save.playSeconds) || 0);
     s.story = G.normalizeStory(save.story);
+    s.guidance = G.normalizeGuidance(save.guidance);
     s.stars = save.stars || 0;
     s.items = save.items || [];
     s.opened = save.opened || [];
@@ -315,6 +317,7 @@
 
     // Dialogue owns every action button while it is open. In particular,
     // Enter/Escape must advance the conversation instead of opening a menu.
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("guide") && G.requestGuidance) G.requestGuidance(false);
     if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("map")) G.ui.openMap();
     if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("pause")) G.ui.toggleMenu();
 
@@ -405,6 +408,7 @@
     G.updateNpcs(dt);
     if (G.updateLivingWorld) G.updateLivingWorld(dt);
     G.tutorial.update(dt);
+    if (G.updateGuidance) G.updateGuidance(dt);
     G.updateEnemies(dt);
     G.combat.updateProjectiles(dt);
     G.updatePickups(dt);

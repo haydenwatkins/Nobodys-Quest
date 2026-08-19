@@ -22,16 +22,16 @@ G.tutorial = (() => {
       touch: "Tap to auto-aim · drag to aim",
     },
     {
-      title: "3/5  OPEN THE MENU",
-      desktop: "Press Esc or Enter",
-      controller: "Press the Menu button",
-      touch: "Tap the menu button",
+      title: "3/5  READ THE WORLD",
+      desktop: "Follow the gold motes to the nearby sign",
+      controller: "Follow the gold motes to the nearby sign",
+      touch: "Follow the gold motes to the nearby sign",
     },
     {
-      title: "4/5  PIN A QUEST",
-      desktop: "Open Quests and choose PIN",
-      controller: "Use the D-pad and A in the Quests menu",
-      touch: "Open Quests and tap PIN",
+      title: "4/5  CHANGE YOUR ANSWER",
+      desktop: "Tap Q to swap · hold Q for any form",
+      controller: "Tap B to swap · hold B for any form",
+      touch: "Tap ⇄ to swap · hold ⇄ for any form",
     },
     {
       title: "5/5  BREAK A WARD",
@@ -86,6 +86,7 @@ G.tutorial = (() => {
 
   function prompt() {
     if (done || visibleFor <= 0) return null;
+    if (step === 3 && G.unlockedForms && G.unlockedForms().length < 2) return null;
     const current = steps[step];
     return {
       title: current.title,
@@ -109,9 +110,10 @@ G.tutorial = (() => {
   }
 
   G.events.on("abilityUse", () => advance(1));
-  G.events.on("menuOpen", () => advance(2));
-  G.events.on("questPin", () => advance(3));
+  G.events.on("sign", () => advance(2));
+  G.events.on("swap", () => advance(3));
   G.events.on("wardBreak", () => advance(4));
+  G.events.on("formUnlock", () => { if (!done && step === 3) visibleFor = 8; });
 
   return {
     init, dismiss, replay,

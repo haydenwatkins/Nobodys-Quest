@@ -32,6 +32,10 @@ G.input = (() => {
   let swapLongTriggered = false;
   let swapOrigin = null;
   const SWAP_HOLD_MS = 360;
+  let mapTouchPressedAt = 0;
+  let mapTouchHeld = false;
+  let mapTouchLongTriggered = false;
+  const MAP_HELP_HOLD_MS = 520;
 
   function inputNow() {
     return typeof performance !== "undefined" && performance.now ? performance.now() : Date.now();
@@ -70,6 +74,7 @@ G.input = (() => {
     " ": "a",
     q: "swap", Q: "swap", Tab: "swap",
     m: "map", M: "map",
+    h: "guide", H: "guide",
     Escape: "pause", p: "pause", P: "pause", Enter: "pause",
   };
   const dirsHeld = { up: false, down: false, left: false, right: false };
@@ -196,6 +201,7 @@ G.input = (() => {
     syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen || wheelOpen ? "confirm" : "a");
     syncGamepadControl("view", gamepadButton(pad, 8), menuOpen || wheelOpen ? "back" : "map");
     syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen ? "back" : "pause");
+    syncGamepadControl("leftStick", gamepadButton(pad, 10), menuOpen || wheelOpen ? null : "guide");
     syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen || wheelOpen ? "confirm" : "a");
 
     const navUp = gamepadButton(pad, 12) || left.y < -GAMEPAD_NAV_THRESHOLD;
@@ -426,7 +432,37 @@ G.input = (() => {
       document.addEventListener("visibilitychange", () => { if (document.hidden) cancelSwap(); });
     }
 
-    const simpleBtns = { "btn-map": "map", "btn-pause": "pause" };
+    const mapButton = document.getElementById("btn-map");
+    if (mapButton) {
+      mapButton.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        if (mapTouchHeld) return;
+        mapTouchHeld = true;
+        mapTouchLongTriggered = false;
+        mapTouchPressedAt = inputNow();
+        held.map = true;
+        mapButton.classList.add("held");
+        G.sfx.ensure();
+      });
+      const endMap = (e, cancelled) => {
+        if (!mapTouchHeld) return;
+        if (e && e.cancelable) e.preventDefault();
+        if (!cancelled && !mapTouchLongTriggered) taps.map = true;
+        mapTouchHeld = false;
+        held.map = false;
+        mapTouchPressedAt = 0;
+        mapButton.classList.remove("held");
+      };
+      mapButton.addEventListener("pointerup", (e) => endMap(e, false));
+      mapButton.addEventListener("pointercancel", (e) => endMap(e, true));
+      mapButton.addEventListener("lostpointercapture", (e) => endMap(e, true));
+      window.addEventListener("blur", () => endMap(null, true));
+      window.addEventListener("pagehide", () => endMap(null, true));
+      window.addEventListener("orientationchange", () => endMap(null, true));
+      document.addEventListener("visibilitychange", () => { if (document.hidden) endMap(null, true); });
+    }
+
+    const simpleBtns = { "btn-pause": "pause" };
     for (const [id, btn] of Object.entries(simpleBtns)) {
       const el = document.getElementById(id);
       if (!el) continue;
@@ -448,6 +484,10 @@ G.input = (() => {
 
   function updateInput() {
     updateGamepad();
+    if (mapTouchHeld && !mapTouchLongTriggered && inputNow() - mapTouchPressedAt >= MAP_HELP_HOLD_MS) {
+      mapTouchLongTriggered = !!(G.requestGuidance && G.requestGuidance(false));
+      if (mapTouchLongTriggered) taps.map = false;
+    }
     if (held.swap && !swapLongTriggered && inputNow() - swapPressedAt >= SWAP_HOLD_MS &&
       G.ui && G.ui.openFormWheel) {
       swapLongTriggered = G.ui.openFormWheel(swapOrigin);

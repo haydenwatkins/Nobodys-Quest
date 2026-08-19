@@ -88,6 +88,7 @@ G.combat = (() => {
           enemy.wardHintAt = G.state.time;
           G.ui.toast(`${needed.icon} Ward: use ${needed.name.toUpperCase()} damage`, 2);
         }
+        G.events.emit("wardBlocked", { enemy, enemyId: enemy.id, damageType: enemy.ward.types[0], ability: opts.ability });
         knockback(enemy, opts, 0.4);
         return false;
       }
@@ -625,8 +626,9 @@ G.combat = (() => {
         pr.trail.length = 0;
       }
       const beforeX = pr.x, beforeY = pr.y;
-      pr.x += pr.vx * dt;
-      pr.y += pr.vy * dt;
+      const guidanceScale = G.guidanceProjectileScale ? G.guidanceProjectileScale(pr) : 1;
+      pr.x += pr.vx * dt * guidanceScale;
+      pr.y += pr.vy * dt * guidanceScale;
       pr.travel = (pr.travel || 0) + G.util.dist(beforeX, beforeY, pr.x, pr.y);
 
       let gone = false;

@@ -114,6 +114,17 @@ G.world.load("windscarCanyon");
 assert.ok(G.state.wildlife.length >= sleepingCount + 5, "restored regions should attract more wildlife");
 assert.ok(G.state.restorationDetails.length >= 20, "restored regions should visibly bloom and relight");
 
+// Earlier victories should also remain legible in the landscape. Returning to
+// an old boss region is a wordless recap of what this save has accomplished.
+G.state = state();
+G.world.load("mistwood");
+const hauntedCount = G.state.wildlife.length;
+assert.equal(G.state.restorationDetails.length, 0);
+G.state.items.push("trophy-heartwood-crown");
+G.world.load("mistwood");
+assert.ok(G.state.wildlife.length >= hauntedCount + 5, "an early boss victory should repopulate its region");
+assert.ok(G.state.restorationDetails.length >= 20, "an early boss victory should permanently restore its landscape");
+
 const ctx = {
   fillStyle: "", globalAlpha: 1,
   save() {}, restore() {}, fillRect() {},

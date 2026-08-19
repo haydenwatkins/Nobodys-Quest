@@ -416,6 +416,7 @@ G.ui = (() => {
 
   function drawStoryTracker(c) {
     if (!G.storyGoal || G.state.bossCutscene || G.ui.dialogueOpen) return;
+    if (G.guidanceShowStoryCard && !G.guidanceShowStoryCard()) return;
     const goal = G.storyGoal();
     const boxW = 190;
     const x = 5;
@@ -447,15 +448,22 @@ G.ui = (() => {
     if (!nearest) return;
     const type = G.DAMAGE_TYPES[nearest.ward.types[0]];
     const label = `${type.icon} ${type.name.toUpperCase()}`;
+    const suggestion = G.guidanceWardSuggestion ? G.guidanceWardSuggestion(nearest) : null;
+    const formLabel = suggestion && suggestion.form ? `⇄ ${suggestion.form.name.toUpperCase()}` : "";
     c.font = `7px ${FONT_BODY}`;
-    const w = c.measureText(label).width + 6;
+    const w = Math.max(c.measureText(label).width, formLabel ? c.measureText(formLabel).width : 0) + 6;
     const x = Math.round(G.util.clamp(nearest.x - cam.x - w / 2, 2, G.W - w - 2));
-    const y = Math.round(G.util.clamp(nearest.y - cam.y - nearest.def.size - 18, 2, G.H - 12));
+    const h = formLabel ? 18 : 10;
+    const y = Math.round(G.util.clamp(nearest.y - cam.y - nearest.def.size - h - 8, 2, G.H - h - 2));
     c.fillStyle = "rgba(26,28,44,0.85)";
-    c.fillRect(x, y, w, 10);
+    c.fillRect(x, y, w, h);
     c.fillStyle = type.color;
-    c.fillRect(x, y, 2, 10);
+    c.fillRect(x, y, 2, h);
     c.fillText(label, x + 4, y + 1);
+    if (formLabel) {
+      c.fillStyle = "#d9a7ff";
+      c.fillText(formLabel, x + 4, y + 9);
+    }
   }
 
   function drawBossBar(c) {
@@ -599,6 +607,7 @@ G.ui = (() => {
       drawStoryTracker(c);
       drawQuestTracker(c);
       drawWardHint(c, cam);
+      if (G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
       drawWayfinderHint(c);
       drawTutorial(c);
       drawAbilityBar(c, p);
