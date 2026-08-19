@@ -370,6 +370,7 @@ G.showSaveSlotScreen = function (force) {
     unbindTitleViewport();
     overlay.classList.add("hidden");
     G.saveSlotScreenOpen = false;
+    G.updateSaveSlotInput = null;
     document.removeEventListener("keydown", titleKeys);
   };
   const titleKeys = (event) => {
@@ -386,6 +387,47 @@ G.showSaveSlotScreen = function (force) {
   };
   document.addEventListener("keydown", titleKeys);
 
+  // Controllers drive this screen through G.input's menu taps: main.js calls
+  // this once per frame while the title is open. On the TV wrapper there is
+  // no keyboard or pointer, so moving focus and clicking IS the interface.
+  // Unlike arrow keys, the controller can also reach Settings and Return.
+  const titleCycle = () => {
+    if (settingsPanel && !settingsPanel.classList.contains("hidden"))
+      return Array.from(settingsPanel.querySelectorAll("button"));
+    const extras = [];
+    const settingsOpener = overlay.querySelector("[data-title-settings]");
+    if (settingsOpener) extras.push(settingsOpener);
+    if (returnButton) extras.push(returnButton);
+    return slotButtons.concat(extras);
+  };
+  G.updateSaveSlotInput = () => {
+    if (!G.saveSlotScreenOpen) return;
+    if (G.input.tapped("back")) {
+      if (settingsPanel && !settingsPanel.classList.contains("hidden")) {
+        settingsPanel.classList.add("hidden");
+        const slot = slotButtons[0];
+        if (slot && slot.focus) slot.focus({ preventScroll: true });
+      } else if (returnButton) closeTitle();
+      return;
+    }
+    const buttons = titleCycle();
+    if (!buttons.length) return;
+    const backward = G.input.tapped("menuUp") || G.input.tapped("menuLeft");
+    const forward = G.input.tapped("menuDown") || G.input.tapped("menuRight");
+    if (backward || forward) {
+      const current = buttons.indexOf(document.activeElement);
+      const step = forward ? 1 : -1;
+      const next = current === -1 ? 0 : (current + step + buttons.length) % buttons.length;
+      const target = buttons[next];
+      if (target && target.focus) target.focus({ preventScroll: true });
+    }
+    if (G.input.tapped("confirm")) {
+      const active = document.activeElement;
+      const target = active && buttons.indexOf(active) !== -1 ? active : buttons[0];
+      if (target && target.click) target.click();
+    }
+  };
+
   slotButtons.forEach((button) => button.addEventListener("click", () => {
     const slot = slotNumber(button.dataset.saveSlot);
     const save = G.loadSaveData(slot);
@@ -399,8 +441,17 @@ G.showSaveSlotScreen = function (force) {
   if (returnButton) returnButton.addEventListener("click", closeTitle);
   const openSettings = overlay.querySelector("[data-title-settings]");
   const closeSettings = overlay.querySelector("[data-title-settings-close]");
-  if (openSettings) openSettings.addEventListener("click", () => settingsPanel.classList.remove("hidden"));
-  if (closeSettings) closeSettings.addEventListener("click", () => settingsPanel.classList.add("hidden"));
+  if (openSettings) openSettings.addEventListener("click", () => {
+    settingsPanel.classList.remove("hidden");
+    // Keep the controller/keyboard highlight with the panel it just opened.
+    const first = settingsPanel.querySelector("button");
+    if (first && first.focus) first.focus({ preventScroll: true });
+  });
+  if (closeSettings) closeSettings.addEventListener("click", () => {
+    settingsPanel.classList.add("hidden");
+    const slot = slotButtons[0];
+    if (slot && slot.focus) slot.focus({ preventScroll: true });
+  });
   const music = overlay.querySelector("[data-title-music]");
   if (music) music.addEventListener("click", () => {
     if (G.sfx && G.sfx.setMusicEnabled) G.sfx.setMusicEnabled(!G.sfx.musicEnabled);

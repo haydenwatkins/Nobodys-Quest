@@ -314,7 +314,11 @@
 
     // Slot selection and the story epilogue are full pauses. They do not
     // quietly add play time or let held inputs leak back into the world.
+    // Both are DOM screens, so controllers reach them here through the same
+    // menu taps the pause menu uses (keyboard and touch use the DOM directly).
     if (G.saveSlotScreenOpen || G.storyEndingOpen) {
+      if (G.saveSlotScreenOpen && G.updateSaveSlotInput) G.updateSaveSlotInput();
+      else if (G.storyEndingOpen && G.updateStoryEndingInput) G.updateStoryEndingInput();
       G.input.clearTaps();
       draw();
       requestAnimationFrame(loop);

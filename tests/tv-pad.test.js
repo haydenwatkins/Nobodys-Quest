@@ -176,6 +176,26 @@ state([0, 0, 0, 0]);
 G.input.update();
 G.ui.menuOpen = false;
 
+/* ---------- the DOM title screen takes menu-style controls ---------- */
+G.saveSlotScreenOpen = true;
+state([0, 0, 0, 0], { 0: 1 });
+G.input.update();
+assert.equal(G.input.tapped("confirm"), true, "Xbox A should confirm on the title screen");
+assert.equal(G.input.tapped("a"), false, "title confirmation must not queue an attack");
+state([0, 0, 0, 0]);
+G.input.update();
+state([0, 0, 0, 0], { 13: 1 });
+G.input.update();
+assert.equal(G.input.tapped("menuDown"), true, "the D-pad should move the title highlight");
+state([0, 0, 0, 0]);
+G.input.update();
+state([0, 0, 0, 0], { 1: 1 });
+G.input.update();
+state([0, 0, 0, 0]);
+G.input.update();
+assert.equal(G.input.tapped("back"), true, "Xbox B should back out on the title screen");
+G.saveSlotScreenOpen = false;
+
 /* ---------- app switch safety: no stuck buttons ---------- */
 state([0.9, 0, 0, 0], { 0: 1 });
 G.input.update();

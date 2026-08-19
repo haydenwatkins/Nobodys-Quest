@@ -239,7 +239,11 @@ G.input = (() => {
       G.ui.toast("Controller ready - left stick moves - right stick aims", 3.2);
     }
 
-    const menuOpen = !!(G.ui && G.ui.menuOpen);
+    // The pause menu, the DOM title screen, and the story epilogue all take
+    // menu-style controls: A confirms, B backs out, stick/D-pad move the
+    // highlight. The DOM screens matter most on TV, where there is no
+    // keyboard or pointer to fall back on.
+    const menuOpen = !!(G.ui && G.ui.menuOpen) || !!G.saveSlotScreenOpen || !!G.storyEndingOpen;
     const wheelOpen = !!(G.ui && G.ui.formWheelOpen);
     const axes = pad.axes || [];
     const left = stickVector(axes[0] || 0, axes[1] || 0, GAMEPAD_DEAD_ZONE);
