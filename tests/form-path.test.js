@@ -33,6 +33,9 @@ run("js/engine/form-path.js");
 const tiered = G.FORM_PATH_TIERS.flat().filter((id) => !id.startsWith("@"));
 assert.deepEqual(new Set(tiered), new Set(G.formOrder), "the curated DAG must contain the complete roster");
 assert.equal(tiered.length, new Set(tiered).size, "every form should appear exactly once in the DAG");
+const chaptered = G.FORM_PATH_CHAPTERS.flatMap((chapter) => chapter.forms);
+assert.deepEqual(new Set(chaptered), new Set(G.formOrder), "the readable journey must contain the complete roster");
+assert.equal(chaptered.length, new Set(chaptered).size, "each form should appear in exactly one journey chapter");
 const layout = G.formPathLayout();
 for (const edge of G.FORM_PATH_EDGES) {
   assert.ok(layout.positions[edge.from] && layout.positions[edge.to], `${edge.from} → ${edge.to} must point to real nodes`);
@@ -71,12 +74,19 @@ const ui = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
 const css = fs.readFileSync(path.join(root, "css/style.css"), "utf8");
 const combat = fs.readFileSync(path.join(root, "js/engine/combat.js"), "utf8");
 assert.match(ui, /data-form-path-map/);
+assert.match(ui, /form-roster-workbench/);
+assert.match(ui, /data-roster-view="path"/);
+assert.match(ui, /buildFormRoadmap/);
 assert.match(ui, /AWAKENING ROUTE/);
 assert.match(ui, /form-route-next/);
-assert.match(css, /\.form-path-edge\.choice/);
-assert.match(css, /\.form-path-edge\.all/);
-assert.match(css, /\.form-path-scroll\s*\{[^}]*overflow:\s*auto/s,
-  "the full DAG should pan cleanly on iPhone-sized screens");
+assert.doesNotMatch(ui, /form-path-lines/, "the phone UI should not render a crossing-wire SVG");
+assert.match(css, /\.form-path-card-grid/);
+assert.match(css, /\.form-roster-workbench\[data-roster-view="path"\]/,
+  "small screens should switch cleanly between the journey and selected form");
+assert.match(css, /\.menu-tabs\s*\{[^}]*overflow-x:\s*auto/s,
+  "phone navigation should use one compact, horizontally scrollable row");
+assert.match(css, /@media \(max-width:\s*520px\)[\s\S]*\.form-path-card-grid\s*\{\s*grid-template-columns:\s*1fr/s,
+  "phone cards should become a readable single-column path");
 assert.match(combat, /FORM PATH UPDATED/,
   "relevant boss victories should explain partial progression immediately");
 

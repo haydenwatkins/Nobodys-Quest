@@ -1,15 +1,26 @@
 /* ============================================================
-   FORM PATH — a truthful, curated progression DAG for the Form Lab.
+   FORM PATH — truthful progression data for the Form Lab.
 
-   The graph is deliberately authored instead of treating registration
-   order as progression. The checklist underneath remains the source of
-   truth: graph lines explain form-to-form mastery, while badges explain
-   boss rewards, stars, roster breadth, and whole-roster gates.
+   The rules below remain the source of truth. Chapters provide a calm,
+   authored reading order for small screens; the legacy edge data remains
+   useful to tests and other systems that need the actual dependency DAG.
    ============================================================ */
 
 "use strict";
 
 (function () {
+  G.FORM_PATH_CHAPTERS = [
+    { id: "origin", number: "I", title: "The First Spark", note: "Every path begins as Nobody.", forms: ["nobody"] },
+    { id: "first-shapes", number: "II", title: "First Shapes", note: "Two simple lessons open the world.", forms: ["rat", "knight"] },
+    { id: "callings", number: "III", title: "Choose a Calling", note: "Magic, precision, or transformation.", forms: ["wizard", "ranger", "frog"] },
+    { id: "crossed-lessons", number: "IV", title: "Crossed Lessons", note: "Combine what the early forms taught you.", forms: ["alchemist", "stormcaller", "dragon"] },
+    { id: "hidden-crowns", number: "V", title: "Hidden Crowns", note: "Boss trophies reveal secret paths.", forms: ["mole", "vampire", "turtle", "druid"] },
+    { id: "masters-beyond", number: "VI", title: "Masters Beyond", note: "Specialists awaken from deeper victories.", forms: ["riftblade", "jester", "samurai", "astronomer"] },
+    { id: "waking-road", number: "VII", title: "The Waking Road", note: "One guardian leads to the next.", forms: ["griffin", "golem", "weaver"] },
+    { id: "last-bells", number: "VIII", title: "The Last Bells", note: "Carry the guardian chain to its end.", forms: ["bellkeeper", "lanternWisp", "colossus"] },
+    { id: "whole-roster", number: "IX", title: "The Whole Roster", note: "Master every shape to approach the final form.", forms: ["god"] },
+  ];
+
   G.FORM_PATH_TIERS = [
     ["nobody"],
     ["rat", "knight"],
