@@ -549,6 +549,7 @@ G.world = (() => {
         if (pickedUpItem) {
           G.events.emit("pickup", { item: pickedUpItem });
           G.checkUnlocks();
+          if (G.leaveReadyFormEchoAt) G.leaveReadyFormEchoAt(cx, cy, "treasure");
         }
         G.saveGame();
       }

@@ -46,6 +46,12 @@ let goal = G.storyGoal();
 assert.equal(goal.chapter, 0);
 assert.match(goal.objective, /Nobody's mastery quests/);
 assert.equal(goal.progress.total, 2);
+G.formReady = (id) => id === "rat";
+goal = G.storyGoal();
+assert.equal(goal.guide, "echo");
+assert.match(goal.objective, /watch for the shape it leaves behind/,
+  "the opening story should teach the in-world form meeting instead of a menu claim");
+G.formReady = () => false;
 G.beginStorySession(null);
 assert.ok(banners[0].title.includes("ACT 1"), "a new adventure should open with its prologue");
 assert.equal(dialogue.length, 4, "the opening scene should breathe across four readable boxes");

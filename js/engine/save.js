@@ -135,6 +135,7 @@ G.saveGame = function () {
       known: s.known,
       claimedForms: s.claimedForms,
       unlockReadyNotified: s.unlockReadyNotified,
+      formEchoes: s.formEchoes,
       loadouts: s.loadouts,
       npcTalk: s.npcTalk,
       town: s.town,

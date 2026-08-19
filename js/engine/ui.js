@@ -1214,8 +1214,12 @@ G.ui = (() => {
     if (clearPins) clearPins.addEventListener("click", () => { G.clearQuestPins(); buildMenu(); });
     menuEl.querySelectorAll("[data-become]").forEach((b) =>
       b.addEventListener("click", () => { G.setForm(b.dataset.become); buildMenu(); }));
-    menuEl.querySelectorAll("[data-claim]").forEach((b) =>
-      b.addEventListener("click", () => { G.claimForm(b.dataset.claim); buildMenu(); }));
+    menuEl.querySelectorAll("[data-form-echo-guide]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const formId = b.dataset.formEchoGuide;
+        closeMenu();
+        G.guideToFormEcho(formId);
+      }));
     menuEl.querySelectorAll("[data-costume]").forEach((b) =>
       b.addEventListener("click", () => { G.selectCostume(b.dataset.costume); buildMenu(); }));
     menuEl.querySelectorAll("select[data-slot]").forEach((sel) =>
@@ -1431,6 +1435,8 @@ G.ui = (() => {
     }).join("");
     const unlocked = G.formUnlocked(selected.id);
     const ready = !unlocked && G.formReady(selected.id);
+    const echo = ready && G.formEchoFor ? G.formEchoFor(selected.id) : null;
+    const echoMap = echo && G.maps[echo.mapId];
     const current = selected.id === G.state.formId;
     const completed = (selected.quests || []).filter((quest) => G.questsDone.includes(quest.id)).length;
     const skin = unlocked && G.selectedFormSkin(selected.id);
@@ -1438,7 +1444,7 @@ G.ui = (() => {
       <section class="form-stage ${unlocked ? "" : "locked"}">
         <div class="form-stage-art">${previewCanvas(selected.id, skin ? skin.id : "classic", "hero-preview", unlocked ? selected.name : "Unknown form", !unlocked, !skin)}</div>
         <div class="form-stage-copy">
-          <div class="eyebrow">${current ? "CURRENT FORM" : ready ? "CHALLENGE COMPLETE" : unlocked ? `FORM LEVEL ${G.formLevel(selected.id)}` : "UNDISCOVERED FORM"}</div>
+          <div class="eyebrow">${current ? "CURRENT FORM" : echo ? "FORM ECHO WAITING" : ready ? "CHALLENGE COMPLETE" : unlocked ? `FORM LEVEL ${G.formLevel(selected.id)}` : "UNDISCOVERED FORM"}</div>
           <h2>${unlocked || ready ? `${selected.icon} ${escapeHtml(selected.name)}` : "❔ UNKNOWN FORM"}</h2>
           <p class="lab-tagline">${unlocked || ready ? escapeHtml(selected.tagline) : "A new way of moving through the world is waiting to be understood."}</p>
           ${unlocked ? `<div class="lab-stat-row"><span>❤️ ${selected.hearts}</span><span>👟 ${selected.speed}</span>${dmgChip(G.abilities[selected.basic]?.type || "blunt")}</div>
@@ -1446,7 +1452,10 @@ G.ui = (() => {
             <div class="mastery-track"><span>MASTERY</span><span class="mastery-pips">${selected.quests.map((quest) => `<i class="${G.questsDone.includes(quest.id) ? "done" : ""}"></i>`).join("")}</span><span>${completed}/${selected.quests.length}</span></div>
             <div class="lab-actions"><button data-become="${selected.id}" ${current ? "disabled" : ""}>${current ? "Equipped" : `Become ${escapeHtml(selected.name)}`}</button>
             <button data-formlab-view="loadout">Build moves</button><button data-formlab-view="skins">View skins</button></div>`
-          : `<div class="unlock-panel">${escapeHtml(G.unlockHint(selected.id))}</div>${ready ? `<button data-claim="${selected.id}">Claim ${escapeHtml(selected.name)}</button>` : ""}`}
+          : `<div class="unlock-panel">${escapeHtml(G.unlockHint(selected.id))}</div>${ready ? echo
+            ? `<div class="unlock-panel">✦ ${escapeHtml(selected.name)} is waiting ${echo.mapId === G.state.mapId ? "nearby" : "in " + escapeHtml(echoMap ? echoMap.name : echo.mapId)}. Meet it in the world to unlock it.</div>
+              <button data-form-echo-guide="${selected.id}">Guide me to the echo</button>`
+            : `<div class="unlock-panel">The lesson is complete. Win a battle and watch what remains.</div>` : ""}`}
         </div>
       </section>`;
   }
@@ -1640,11 +1649,15 @@ G.ui = (() => {
           <button data-become="${id}" ${current ? "disabled" : ""}>${current ? "You are this!" : "Become " + f.name}</button>
         </div>`;
       } else if (ready) {
+        const echo = G.formEchoFor ? G.formEchoFor(id) : null;
+        const echoMap = echo && G.maps[echo.mapId];
         html += `<div class="form-card ready">
           <h2>${f.icon} ${f.name} <span class="ready-label">CHALLENGE COMPLETE</span></h2>
           <div class="tagline">${f.tagline}</div>
           <div class="unlock-progress">${G.unlockHint(id)}</div>
-          <button data-claim="${id}">Claim ${f.name}</button>
+          ${echo ? `<div class="unlock-progress">✦ Echo waiting ${echo.mapId === G.state.mapId ? "nearby" : "in " + (echoMap ? echoMap.name : echo.mapId)}</div>
+            <button data-form-echo-guide="${id}">Guide me to the echo</button>`
+          : `<div class="unlock-progress">Win a battle and watch what remains.</div>`}
         </div>`;
       } else {
         html += `<div class="form-card locked">

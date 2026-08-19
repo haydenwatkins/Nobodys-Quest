@@ -165,6 +165,10 @@ G.combat = (() => {
     });
     if (G.passives) G.passives.onKill(enemy, opts);
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);
+    // Quest and trophy listeners run synchronously above, so this exact
+    // defeated enemy can leave behind any form challenge they completed.
+    if (G.leaveReadyFormEchoAt)
+      G.leaveReadyFormEchoAt(enemy.x, enemy.y, enemy.def.miniboss ? "victory" : "battle");
     if (enemy.def.miniboss && G.state.gauntletRun && G.gauntletBossDefeated) {
       G.gauntletBossDefeated(enemy);
       return;

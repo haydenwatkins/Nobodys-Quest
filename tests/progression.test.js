@@ -119,5 +119,9 @@ assert.deepEqual(Array.from(G.defaultLoadout("rat")), ["bite", "squeakDash", nul
 const uiSource = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
 assert.match(uiSource, /data-act="restore-default-loadout"/,
   "the graphical Form Lab should expose native-kit restoration");
+assert.doesNotMatch(uiSource, /data-claim/,
+  "completed form challenges must not collapse back into a passive menu claim button");
+assert.match(uiSource, /data-form-echo-guide/,
+  "the Form Lab should complement the world by guiding players to a waiting echo");
 
 console.log("progression tests passed");

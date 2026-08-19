@@ -120,9 +120,16 @@ assert.equal(G.guidanceProjectileScale({ owner: { def: { miniboss: true } } }), 
 assert.equal(G.guidanceProjectileScale({ owner: { def: { miniboss: false } } }), 1,
   "ordinary encounters should keep their authored timing");
 
-goal = { guide: "claim", formId: "hammer" };
+goal = { guide: "echo", formId: "hammer" };
 G.state.mapId = "alpha";
+G.formEchoFor = () => null;
 assert.equal(G.requestGuidance(false), true);
-assert.match(toasts.at(-1), /Form Lab/, "non-spatial unlock help should explain the complementary menu action");
+assert.match(toasts.at(-1), /Win a battle/, "a ready form should teach the in-world echo trigger");
+G.formEchoFor = () => ({ formId: "hammer", mapId: "alpha", x: 2.5 * G.TILE, y: 1.5 * G.TILE });
+const echoTarget = G.guidanceTarget();
+assert.equal(echoTarget.kind, "form");
+assert.equal(echoTarget.spatial, undefined, "a local echo should become a physical purple destination");
+assert.equal(echoTarget.color, G.GUIDANCE_COLORS.form);
+assert.match(echoTarget.text, /waiting nearby/);
 
 console.log("guidance tests passed");

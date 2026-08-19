@@ -182,9 +182,10 @@ G.validateCrossRefs = function () {
 };
 
 /* ---------- unlocking ----------
-   Completing a challenge makes a form READY. The player then claims it
-   deliberately in the Forms menu. Requirements are composable data, so a
-   future roster can grow without hard-coding another unlock system.       */
+   Completing a challenge makes a form READY. A persistent Form Echo then
+   appears after a victory so the actual discovery happens in the world.
+   Requirements stay composable so the roster can grow without hard-coding
+   another unlock system.                                                  */
 function unlockRules(form) {
   if (!form || !form.unlock) return [];
   return form.unlock.type === "challenge" ? (form.unlock.requirements || []) : [form.unlock];
@@ -238,16 +239,44 @@ G.formReady = function (id) {
   return requirementsMet(id);
 };
 
-G.claimForm = function (id) {
+G.claimForm = function (id, options) {
   if (!G.formReady(id)) return false;
+  const opts = options || {};
   G.state.claimedForms = G.state.claimedForms || [];
   G.state.known = G.state.known || [];
   G.state.claimedForms.push(id);
   if (!G.state.known.includes(id)) G.state.known.push(id);
+  if (Array.isArray(G.state.formEchoes))
+    G.state.formEchoes = G.state.formEchoes.filter((echo) => echo.formId !== id);
   const f = G.forms[id];
   G.sfx.play("unlock");
-  G.ui.banner(`${f.icon} ${f.name.toUpperCase()} CLAIMED!`, f.tagline);
+  if (opts.worldEcho) {
+    const p = G.state.player;
+    G.state.formId = id;
+    p.damageTaken = Math.min(p.damageTaken, Math.max(0, G.playerMaxHearts() - 1));
+    p.dashing = null;
+    if (G.playerMaxMana) {
+      p.manaMax = G.playerMaxMana();
+      p.mana = Math.min(p.mana, p.manaMax);
+    }
+    if (G.passives) G.passives.onFormChange(p);
+    G.state.hitStop = Math.max(G.state.hitStop || 0, G.reducedMotion ? 0.08 : 0.2);
+    G.state.shake = Math.max(G.state.shake || 0, G.reducedMotion ? 0.12 : 0.42);
+    const x = Number.isFinite(opts.x) ? opts.x : p.x;
+    const y = Number.isFinite(opts.y) ? opts.y : p.y;
+    G.spawnFx({ kind: "ring", x, y: y - 7, color: "#d9a7ff", dur: 0.9 });
+    G.spawnFx({ kind: "ring", x, y: y - 7, color: "#f4f4f4", dur: 0.55 });
+    for (let i = 0; i < 16; i++) {
+      const angle = (Math.PI * 2 * i) / 16;
+      G.spawnFx({ kind: "spark", x, y: y - 8, vx: Math.cos(angle) * 42, vy: Math.sin(angle) * 42,
+        color: i % 2 ? "#d9a7ff" : "#fff3ff", dur: 0.45 });
+    }
+    G.ui.banner(`✦ ${f.name.toUpperCase()} AWAKENED`, `${f.tagline} · You are ${f.name} now.`);
+  } else {
+    G.ui.banner(`${f.icon} ${f.name.toUpperCase()} CLAIMED!`, f.tagline);
+  }
   G.events.emit("formUnlock", { form: id });
+  G.checkUnlocks();
   G.saveGame();
   return true;
 };
@@ -268,7 +297,7 @@ G.unlockHint = function (id) {
     }
     if (u.type === "item") return `${done}${u.hint || "Find a special treasure"}`;
     if (u.type === "stars") return `${done}${G.state.stars}/${u.stars} stars`;
-    if (u.type === "claimedForms") return `${done}${(G.state.claimedForms || []).length}/${u.count} forms claimed`;
+    if (u.type === "claimedForms") return `${done}${(G.state.claimedForms || []).length}/${u.count} forms awakened`;
     if (u.type === "allFormsLevel") return `${done}Every other form at level ${u.level}`;
     if (u.type === "previousFormsLevel") return `${done}Every previous form at level ${u.level}`;
     if (u.type === "any") return `${done}One of: ${(u.options || []).map((option) => describe(option).replace(/^✓ /, "")).join(" or ")}`;
@@ -292,7 +321,7 @@ G.checkUnlocks = function () {
     if (G.formReady(id) && !G.state.unlockReadyNotified.includes(id)) {
       G.state.unlockReadyNotified.push(id);
       G.sfx.play("unlock");
-      G.ui.toast(`${f.icon} ${f.name} challenge complete — claim it in Forms!`, 4);
+      G.ui.toast(`${f.icon} ${f.name} challenge complete — a victory will leave its Form Echo in the world.`, 4);
       changed = true;
     }
   }

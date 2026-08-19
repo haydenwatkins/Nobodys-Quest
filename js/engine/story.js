@@ -146,14 +146,14 @@ G.storyGoal = function () {
         guide: "mastery", formId: "rat",
         title: "Live inside a borrowed answer", short: "Complete one Rat mastery quest",
         objective: "Become Rat, use its speed and poison, and complete one Rat mastery quest.",
-        reason: "Claiming a form is only an introduction. Understanding why its answer works is what makes it part of Nobody.",
+        reason: "Meeting a form is only an introduction. Understanding why its answer works is what makes it part of Nobody.",
         progress: storyProgress(ratDone, 1, "RAT MASTERY"),
       });
     }
     if (G.formReady && G.formReady("rat")) return Object.assign(base, {
-      guide: "claim", formId: "rat",
-      title: "Choose your first new shape", short: "Claim Rat in the Form Lab",
-      objective: "Open Form Lab and deliberately claim the Rat form.",
+      guide: "echo", formId: "rat",
+      title: "Meet your first new shape", short: "Find the Rat Form Echo",
+      objective: "Win a battle, watch for the shape it leaves behind, and approach Rat's echo.",
       reason: "The first form proves that Nobody can carry a life beyond the one the prophecy expected.",
       progress: storyProgress(2, 2, "NOBODY MASTERY"),
     });

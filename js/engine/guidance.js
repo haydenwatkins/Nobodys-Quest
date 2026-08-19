@@ -125,13 +125,39 @@
     if (!target) return null;
     const destination = G.maps[nextMap] && G.maps[nextMap].name || goal.destination || nextMap;
     const travel = goal.guide === "travel";
+    const formEcho = goal.guide === "echo";
     return Object.assign(target, {
-      kind: travel ? "travel" : "story",
-      color: travel ? G.GUIDANCE_COLORS.travel : G.GUIDANCE_COLORS.story,
-      icon: travel ? "↗" : "◇",
+      kind: formEcho ? "form" : travel ? "travel" : "story",
+      color: formEcho ? G.GUIDANCE_COLORS.form : travel ? G.GUIDANCE_COLORS.travel : G.GUIDANCE_COLORS.story,
+      icon: formEcho && goal.formId && G.forms[goal.formId] ? G.forms[goal.formId].icon : travel ? "↗" : "◇",
       destination,
-      text: `Follow the ${travel ? "blue" : "gold"} trail toward ${destination}.`,
+      text: formEcho
+        ? `Follow the purple trail toward ${G.forms[goal.formId] ? G.forms[goal.formId].name : "the form"} echo in ${G.maps[goal.mapId] ? G.maps[goal.mapId].name : goal.mapId}.`
+        : `Follow the ${travel ? "blue" : "gold"} trail toward ${destination}.`,
     });
+  }
+
+  function formEchoTarget(echo) {
+    if (!echo) return null;
+    const form = G.forms[echo.formId];
+    if (echo.mapId !== G.state.mapId) {
+      const routed = routeTarget({
+        guide: "echo", mapId: echo.mapId, formId: echo.formId,
+        destination: form ? `${form.name} echo` : "form echo",
+      });
+      return routed || {
+        kind: "form", color: G.GUIDANCE_COLORS.form, icon: form ? form.icon : "✦", spatial: false,
+        destination: form ? `${form.name} echo` : "form echo",
+        text: `${form ? form.name : "The form"} is waiting in ${G.maps[echo.mapId] ? G.maps[echo.mapId].name : echo.mapId}.`,
+      };
+    }
+    return {
+      x: echo.x, y: echo.y,
+      tileX: Math.floor(echo.x / G.TILE), tileY: Math.floor(echo.y / G.TILE),
+      kind: "form", color: G.GUIDANCE_COLORS.form, icon: form ? form.icon : "✦",
+      destination: form ? `${form.name} echo` : "form echo",
+      text: `${form ? form.name : "The form"} is waiting nearby. Follow the purple motes and approach its echo.`,
+    };
   }
 
   function firstOpenQuest(formId) {
@@ -179,15 +205,22 @@
 
   G.guidanceTarget = function () {
     const s = G.state;
-    if (!s || !s.player || !G.storyGoal) return null;
+    if (!s || !s.player) return null;
+    const guidedEcho = G.guidedFormEcho && G.guidedFormEcho();
+    if (guidedEcho) return formEchoTarget(guidedEcho);
+    if (!G.storyGoal) return null;
     const goal = G.storyGoal();
     if (!goal || goal.complete) return null;
 
-    if (goal.guide === "claim") return {
-      kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦", spatial: false,
-      destination: `${goal.formId ? G.forms[goal.formId].name : "a new form"}`,
-      text: `${goal.formId ? G.forms[goal.formId].name : "A new form"} is ready. Open the Form Lab and claim the glowing portrait.`,
-    };
+    if (goal.guide === "echo") {
+      const echo = G.formEchoFor && G.formEchoFor(goal.formId);
+      if (echo) return formEchoTarget(echo);
+      return {
+        kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦", spatial: false,
+        destination: `${goal.formId ? G.forms[goal.formId].name : "a new form"}`,
+        text: `${goal.formId ? G.forms[goal.formId].name : "A new form"} is ready. Win a battle and watch what the enemy leaves behind.`,
+      };
+    }
     if (goal.guide === "mastery") return masteryTarget(goal);
 
     if (goal.mapId && goal.mapId !== s.mapId) return routeTarget(goal);

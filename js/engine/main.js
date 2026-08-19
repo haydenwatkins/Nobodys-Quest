@@ -132,6 +132,7 @@
     known: [],
     claimedForms: [],
     unlockReadyNotified: [],
+    formEchoes: [],
     loadouts: {},
     npcTalk: {},
     pinnedQuestIds: [],
@@ -175,6 +176,7 @@
     s.claimedForms = Array.isArray(save.claimedForms) ? save.claimedForms : s.known.slice();
     s.claimedForms = s.claimedForms.filter((id) => G.forms[id] && !G.forms[id].start && !G.forms[id].invalid);
     s.unlockReadyNotified = Array.isArray(save.unlockReadyNotified) ? save.unlockReadyNotified : [];
+    s.formEchoes = G.normalizeFormEchoes(save.formEchoes);
     s.loadouts = save.loadouts || {};
     s.npcTalk = save.npcTalk && typeof save.npcTalk === "object" ? save.npcTalk : {};
     const wardrobe = G.normalizeCostumes(save.costumesUnlocked, save.costumeId);
@@ -287,6 +289,10 @@
   G.costumeBooting = false;
 
   G.checkUnlocks(); // quietly registers starting forms as "known"
+  // Existing saves may already have completed a challenge under the old
+  // menu-claim system. Give that earned form a real meeting in the world.
+  G.state.formEchoes = G.normalizeFormEchoes(G.state.formEchoes);
+  G.seedLegacyFormEcho();
   G.checkTownIntroduction(false); // puts the shared home into the early game
   G.refreshIncidents(true); // restores or creates the three action-driven map situations
   G.tutorial.init(save);
@@ -412,6 +418,7 @@
     G.updateEnemies(dt);
     G.combat.updateProjectiles(dt);
     G.updatePickups(dt);
+    if (G.updateFormEcho) G.updateFormEcho(dt);
     G.updateFx(dt);
     G.ui.update(dt);
 
@@ -452,6 +459,8 @@
     for (const creature of s.wildlife || [])
       drawables.push({ y: creature.y, fn: () => G.drawWildlife(ctx, creature) });
     for (const npc of s.npcs || []) drawables.push({ y: npc.y, fn: () => G.drawNpc(ctx, npc) });
+    for (const formEcho of G.formEchoesHere ? G.formEchoesHere() : [])
+      drawables.push({ y: formEcho.y, fn: () => G.drawFormEcho(ctx, formEcho) });
     drawables.push({ y: p.y, fn: () => G.drawPlayer(ctx) });
     drawables.sort((a, b) => a.y - b.y);
     for (const d of drawables) d.fn();
