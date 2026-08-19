@@ -58,6 +58,12 @@ For a TV-like Steam Link launch on Windows, `tools/steam-launch.ps1` opens the
 installed Chrome app, raises it above Big Picture, enters fullscreen, and stays
 alive until the game closes so Steam keeps the correct game/controller context.
 
+For Google TV / Android TV, [android-tv/](android-tv/) contains a small
+sideloadable wrapper app: a fullscreen WebView pointed at the GitHub Pages
+build plus a native Xbox-controller bridge feeding the game's existing input
+system. Game updates still arrive by `git push` — no APK rebuild. See
+[android-tv/README.md](android-tv/README.md).
+
 ## Project layout
 
 ```

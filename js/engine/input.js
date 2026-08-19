@@ -99,6 +99,68 @@ G.input = (() => {
     keyVec.y = (dirsHeld.down ? 1 : 0) - (dirsHeld.up ? 1 : 0);
   }
 
+  /* ---------- Android TV wrapper: native controller bridge ----------
+     The Kotlin shell in android-tv/ intercepts Xbox controller input
+     (Android WebView never delivers it as browser gamepad events) and
+     streams raw standard-gamepad state here. Shaping that state like a
+     browser Gamepad object and feeding it through the same updateGamepad()
+     path keeps this file the ONE owner of the Xbox action mapping. */
+  const isTVWrapper = /\bNobodysQuestTV\//.test(navigator.userAgent || "");
+  const virtualPad = {
+    id: "Android TV Controller",
+    index: 0,
+    connected: false,
+    mapping: "standard",
+    axes: [0, 0, 0, 0],
+    buttons: Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })),
+  };
+
+  function neutralizeVirtualPad() {
+    for (let i = 0; i < virtualPad.axes.length; i++) virtualPad.axes[i] = 0;
+    for (const button of virtualPad.buttons) { button.pressed = false; button.value = 0; }
+  }
+
+  // Native messages: {"t":"c","id":name} connect · {"t":"d"} disconnect ·
+  // {"t":"s","a":[lx,ly,rx,ry],"b":[17 button values 0..1]} state snapshot.
+  // The pad object is mutated in place so a 60Hz stream allocates nothing.
+  function tvPadMessage(text) {
+    let msg;
+    try { msg = JSON.parse(text); } catch (error) { return; }
+    if (!msg || typeof msg !== "object") return;
+    if (msg.t === "c") {
+      virtualPad.id = typeof msg.id === "string" && msg.id ? msg.id : "Android TV Controller";
+      virtualPad.connected = true;
+    } else if (msg.t === "d") {
+      virtualPad.connected = false;
+      neutralizeVirtualPad();
+    } else if (msg.t === "s" && virtualPad.connected) {
+      const a = msg.a, b = msg.b;
+      if (Array.isArray(a)) {
+        for (let i = 0; i < virtualPad.axes.length && i < a.length; i++) virtualPad.axes[i] = +a[i] || 0;
+      }
+      if (Array.isArray(b)) {
+        for (let i = 0; i < virtualPad.buttons.length && i < b.length; i++) {
+          const value = +b[i] || 0;
+          virtualPad.buttons[i].value = value;
+          virtualPad.buttons[i].pressed = value >= 0.5;
+        }
+      }
+    }
+  }
+
+  // The wrapper injects window.nqTvBridge (a WebMessageListener object)
+  // before any page script runs. Posting "ready" hands native the reply
+  // channel it needs to start streaming controller state to us.
+  if (window.nqTvBridge && window.nqTvBridge.postMessage) {
+    try {
+      window.nqTvBridge.onmessage = (event) => tvPadMessage(event && event.data);
+      window.nqTvBridge.postMessage("ready");
+    } catch (error) { /* bridge unavailable; the fallback below still works */ }
+  }
+  // Fallback entry point for wrapper builds whose WebView lacks
+  // WebMessageListener (native calls this via evaluateJavascript).
+  window.__nqTvPad = tvPadMessage;
+
   /* ---------- gamepad: Xbox layout + Steam Link standard mapping ---------- */
   const GAMEPAD_DEAD_ZONE = 0.22;
   const GAMEPAD_NAV_THRESHOLD = 0.62;
@@ -143,17 +205,28 @@ G.input = (() => {
     controllerAim = null;
     gamepadIndex = null;
     gamepadName = "";
+    // Also drop any TV-bridge state so a blur/app-switch can never leave a
+    // button "held". Native re-sends fresh state when the app resumes.
+    neutralizeVirtualPad();
   }
 
-  function updateGamepad() {
-    if (!navigator.getGamepads) return;
+  function findBrowserPad() {
+    if (!navigator.getGamepads) return null;
     let pads;
     try { pads = navigator.getGamepads() || []; }
-    catch (error) { return; }
+    catch (error) { return null; }
     let pad = gamepadIndex === null ? null : pads[gamepadIndex];
     if (!pad || !pad.connected) {
       pad = Array.from(pads).find((candidate) => candidate && candidate.connected) || null;
     }
+    return pad;
+  }
+
+  function updateGamepad() {
+    // The Android TV wrapper's virtual pad wins while it is connected: on TV
+    // the native shell consumes controller events before WebView sees them,
+    // so the browser Gamepad API stays silent there.
+    const pad = virtualPad.connected ? virtualPad : findBrowserPad();
     if (!pad) {
       if (gamepadIndex !== null) resetGamepad();
       return;
@@ -227,7 +300,9 @@ G.input = (() => {
   });
 
   /* ---------- touch: virtual joystick on the left half ---------- */
-  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  // Android TV WebView can report misleading touch capability; the wrapper's
+  // UA signal keeps the iPad buttons off the television screen.
+  const isTouch = !isTVWrapper && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
   function setupTouch() {
     document.getElementById("touch-ui").style.display = "block";
@@ -523,5 +598,7 @@ G.input = (() => {
     get hasGamepad() { return gamepadIndex !== null; },
     get gamepadName() { return gamepadName; },
     isTouch,
+    isTV: isTVWrapper,
+    get tvPadActive() { return virtualPad.connected; },
   };
 })();
