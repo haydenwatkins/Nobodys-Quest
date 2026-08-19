@@ -104,6 +104,28 @@ G.state.player.dashing = { t: 0.1 };
 G.updateLivingWorld(0.016);
 assert.ok(startled.fleeT > 1, "wildlife should scatter from a nearby dash");
 
+// Entering the Old Dungeon should feel like arriving in a room, not stepping
+// into a stack of props and automatic conversations.
+G.state = state();
+G.world.load("dungeon");
+assert.ok(G.state.npcs.every((npc) => Math.hypot(npc.x - G.state.player.x, npc.y - G.state.player.y) > G.TILE * 5),
+  "the dungeon cast should live beyond the arrival foyer");
+let arrivalDialogues = 0;
+G.ui.dialogue = () => { arrivalDialogues++; };
+G.state.enemies = [];
+const arrivalNpc = G.state.npcs[0];
+arrivalNpc.x = G.state.player.x + 5;
+arrivalNpc.y = G.state.player.y;
+arrivalNpc.near = false;
+G.events.emit("mapEnter", { map: "dungeon" });
+G.updateNpcs(2);
+assert.equal(arrivalDialogues, 0, "a nearby character must not ambush the player with dialogue on arrival");
+G.state.player.x += 100;
+G.updateNpcs(0.1);
+G.state.player.x -= 100;
+G.updateNpcs(0.1);
+assert.equal(arrivalDialogues, 1, "stepping away and deliberately returning should restore normal conversation");
+
 // Purification must visibly repopulate a region, not merely remove its boss.
 G.state = state();
 G.world.load("windscarCanyon");

@@ -344,6 +344,7 @@ registerMap({
   id: "dungeon",
   name: "The Old Dungeon",
   playerStart: { x: 15, y: 14 },
+  wayfinderPost: { x: 13, y: 15 },
 
   legend: {
     "2": { tile: "floor", enemy: "bat" },
@@ -371,10 +372,10 @@ registerMap({
     "#ffffffffffff3ffffffffffffff#",
     "#ffffffffffffffffff2ffffffff#",
     "#fff3ffffffffffffffffff3ffff#",
-    "#ffffffffffffffmffffffffffff#",
-    "###############f#############",
-    "###############f#############",
-    "###############x#############",
+    "#ffffffmffffffffffffffffffff#",
+    "###########fffffffff#########",
+    "###########fffffffff#########",
+    "###########ffffxffff#########",
     "#############################",
   ],
 });

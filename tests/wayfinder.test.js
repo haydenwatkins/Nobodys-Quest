@@ -90,6 +90,16 @@ assert.ok(G.wayfinderPostActivated("overworld"), "the arrival post awakens on th
 assert.ok(G.nearWayfinderPost(), "regional arrivals place the player beside their post");
 assert.equal(G.canWayfinderTravel(), true, "an awakened post allows early station travel");
 
+G.world.load("dungeon");
+assert.deepEqual({ x: G.state.wayfinderPost.tileX, y: G.state.wayfinderPost.tileY }, { x: 13, y: 15 },
+  "the Old Dungeon post should sit beside the foyer instead of in its entrance lane");
+assert.ok(G.nearWayfinderPost(), "the side-mounted dungeon post should remain convenient for travel");
+for (let y = 14; y <= 15; y++) for (let x = 11; x <= 19; x++)
+  assert.equal(G.world.solid(x * G.TILE + G.TILE / 2, y * G.TILE + G.TILE / 2), false,
+    "the Old Dungeon should have a broad, unobstructed arrival foyer");
+assert.equal(G.maps.dungeon.tiles[13].indexOf("m"), 7,
+  "the dungeon warning should be readable from a side alcove instead of the arrival path");
+
 G.discoverWayfinderMap("mistwood", true);
 assert.equal(G.travelToWayfinderRegion("mistwood"), false, "a destination needs an awakened post");
 G.activateWayfinderPost("mistwood", true);

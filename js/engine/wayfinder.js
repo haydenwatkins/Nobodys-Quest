@@ -177,7 +177,17 @@ G.wayfinderPostActivated = function (id) {
 G.wayfinderPostForMap = function (mapId, grid) {
   const region = G.wayfinderRegionInfo(mapId);
   if (!region || !grid || !grid.length) return null;
-  const target = region.spawn || (G.maps[mapId] && G.maps[mapId].playerStart);
+  const map = G.maps[mapId] || {};
+  const authored = map.wayfinderPost;
+  if (authored) {
+    const cell = grid[authored.y] && grid[authored.y][authored.x];
+    if (cell && !["tree", "water", "wall", "rock"].includes(cell.tile) &&
+        !cell.portal && !cell.chest && !cell.enemy && !cell.message && !cell.rest) {
+      return { mapId, tileX: authored.x, tileY: authored.y,
+        x: authored.x * G.TILE + G.TILE / 2, y: authored.y * G.TILE + G.TILE / 2 };
+    }
+  }
+  const target = region.spawn || map.playerStart;
   if (!target) return null;
   const offsets = [
     [0, -1], [1, 0], [0, 1], [-1, 0], [1, -1], [1, 1], [-1, 1], [-1, -1],

@@ -391,6 +391,7 @@
     const p = s && s.player;
     const npcs = (s && s.npcs) || [];
     if (!p || !npcs.length) return;
+    s.npcArrivalGrace = Math.max(0, (s.npcArrivalGrace || 0) - (dt || 0));
     const blocked = s.bossCutscene || s.zoneTransition || s.playerKnockout || s.gauntletBetween;
     const danger = (s.enemies || []).some((enemy) =>
       !enemy.dead && Math.hypot(enemy.x - p.x, enemy.y - p.y) < 48);
@@ -408,14 +409,14 @@
       }
       const distance = Math.hypot(npc.x - p.x, npc.y - p.y);
       if (distance > TALK_RESET) npc.near = false;
-      if (!npc.ambientOnly && distance <= TALK_NEAR && !npc.near && distance < candidateDistance) {
+      if (s.npcArrivalGrace <= 0 && !npc.ambientOnly && distance <= TALK_NEAR && !npc.near && distance < candidateDistance) {
         candidate = npc;
         candidateDistance = distance;
       }
     }
 
     s.npcChatterT = (s.npcChatterT == null ? 12 + ((s.time || 0) % 5) : s.npcChatterT) - dt;
-    if (s.npcChatterT <= 0 && !blocked && !danger) {
+    if (s.npcChatterT <= 0 && s.npcArrivalGrace <= 0 && !blocked && !danger) {
       const nearby = npcs.filter((npc) => Math.hypot(npc.x - p.x, npc.y - p.y) < 108 && !npc.bubble);
       let pair = null;
       for (let i = 0; i < nearby.length && !pair; i++) for (let j = i + 1; j < nearby.length; j++) {
@@ -499,4 +500,15 @@
     ctx.fillText("...", Math.round(npc.x), y);
     ctx.restore();
   };
+
+  G.events.on("mapEnter", () => {
+    const s = G.state;
+    if (!s || !s.player) return;
+    s.npcArrivalGrace = 1.25;
+    // Anyone already inside the arrival circle waits for the player to step
+    // away and deliberately return before beginning a conversation.
+    for (const npc of s.npcs || []) {
+      if (Math.hypot(npc.x - s.player.x, npc.y - s.player.y) <= TALK_RESET) npc.near = true;
+    }
+  });
 })();
