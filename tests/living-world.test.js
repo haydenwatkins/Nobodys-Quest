@@ -61,6 +61,14 @@ assert.ok(residents.every((npc) => npc.anchors.length >= 2), "residents should h
 assert.equal(G.state.townDecorations.length, 4, "each built home should gain a mailbox and garden");
 assert.equal(G.townFestivalActive(), true);
 
+G.state.town.projects.lanternWalk = true;
+G.state.town.projects.hallOfForms = true;
+G.state.town.beautifications = 2;
+const upgradedTown = G.makeTownDecorations(G.state.grid, G.state.mapW, G.state.mapH);
+assert.ok(upgradedTown.some((detail) => detail.kind === "lantern"), "the Lantern Walk should appear in town");
+assert.ok(upgradedTown.some((detail) => detail.kind === "monument"), "the Hall of Forms should add its monument");
+assert.ok(upgradedTown.length > G.state.townDecorations.length, "beautification spending should visibly fill the town");
+
 G.startNpcExchange(residents[0], residents[1], 0);
 assert.equal(residents[0].bubble.text, "Lovely day!");
 assert.equal(residents[1].bubble.text, "For something.");

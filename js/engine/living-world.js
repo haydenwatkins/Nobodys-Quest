@@ -269,6 +269,8 @@
 
   G.makeTownDecorations = function (grid, w, h) {
     if (!G.state.town || !G.state.town.founded) return [];
+    const town = G.state.town;
+    const projects = town.projects || {};
     const details = [];
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       const cell = grid[y] && grid[y][x];
@@ -277,6 +279,37 @@
       details.push({ kind: "mailbox", x: x * G.TILE + 8 + side * 10, y: y * G.TILE + 13 });
       details.push({ kind: "garden", x: x * G.TILE + 8 - side * 10, y: y * G.TILE + 13,
         color: details.length % 3 ? "#ffcd75" : "#d9a7ff" });
+    }
+    if (projects.welcomeLodge) {
+      details.push({ kind: "sign", x: 17 * G.TILE, y: 4 * G.TILE, color: "#fff3c2" });
+      details.push({ kind: "bench", x: 13 * G.TILE, y: 4 * G.TILE, color: "#8a6538" });
+    }
+    if (projects.buildersYard) {
+      details.push({ kind: "crates", x: 9 * G.TILE, y: 5 * G.TILE, color: "#d9aa68" });
+      details.push({ kind: "sign", x: 8 * G.TILE, y: 5 * G.TILE, color: "#ffcd75" });
+    }
+    if (projects.festivalStage)
+      details.push({ kind: "stage", x: 15 * G.TILE, y: 8 * G.TILE, color: "#b13e53" });
+    if (projects.lanternWalk) {
+      for (let y = 5; y <= 15; y += 2) {
+        details.push({ kind: "lantern", x: 13 * G.TILE, y: y * G.TILE, color: y % 4 ? "#73eff7" : "#ffcd75" });
+        details.push({ kind: "lantern", x: 17 * G.TILE, y: y * G.TILE, color: y % 4 ? "#d9a7ff" : "#a7f070" });
+      }
+    }
+    if (projects.hallOfForms) {
+      details.push({ kind: "monument", x: 15 * G.TILE, y: 6 * G.TILE, color: "#73eff7" });
+      details.push({ kind: "banner", x: 12 * G.TILE, y: 6 * G.TILE, color: "#ffcd75" });
+      details.push({ kind: "banner", x: 18 * G.TILE, y: 6 * G.TILE, color: "#d9a7ff" });
+    }
+    const beautySpots = [
+      ["garden", 10, 3], ["bench", 20, 4], ["lantern", 3, 9], ["banner", 26, 9],
+      ["garden", 10, 9], ["bench", 20, 10], ["lantern", 8, 13], ["banner", 22, 13],
+      ["garden", 11, 16], ["bench", 19, 16], ["lantern", 2, 16], ["banner", 27, 16],
+    ];
+    for (let i = 0; i < Math.min(town.beautifications || 0, beautySpots.length); i++) {
+      const spot = beautySpots[i];
+      details.push({ kind: spot[0], x: spot[1] * G.TILE, y: spot[2] * G.TILE,
+        color: ["#ffcd75", "#73eff7", "#d9a7ff", "#a7f070"][i % 4] });
     }
     return details;
   };
@@ -306,10 +339,35 @@
         ctx.fillStyle = "#6b4a2b"; ctx.fillRect(x, y - 5, 2, 7);
         ctx.fillStyle = "#b13e53"; ctx.fillRect(x - 2, y - 8, 7, 5);
         ctx.fillStyle = "#f4f4f4"; ctx.fillRect(x + 3, y - 7, 1, 2);
-      } else {
+      } else if (detail.kind === "garden") {
         ctx.fillStyle = "#493829"; ctx.fillRect(x - 5, y - 2, 10, 3);
         ctx.fillStyle = detail.color; ctx.fillRect(x - 3, y - 4, 2, 2); ctx.fillRect(x + 1, y - 5, 2, 3);
         ctx.fillStyle = "#a7f070"; ctx.fillRect(x - 1, y - 3, 2, 2);
+      } else if (detail.kind === "lantern") {
+        ctx.fillStyle = "#493829"; ctx.fillRect(x - 1, y - 11, 2, 13); ctx.fillRect(x - 3, y - 11, 6, 2);
+        ctx.globalAlpha = 0.35; ctx.fillStyle = detail.color; ctx.fillRect(x - 5, y - 10, 10, 9); ctx.globalAlpha = 1;
+        ctx.fillStyle = "#fff3c2"; ctx.fillRect(x - 2, y - 9, 5, 6); ctx.fillStyle = detail.color; ctx.fillRect(x - 1, y - 8, 3, 4);
+      } else if (detail.kind === "sign") {
+        ctx.fillStyle = "#6b4a2b"; ctx.fillRect(x - 1, y - 8, 2, 10); ctx.fillRect(x - 7, y - 11, 14, 7);
+        ctx.fillStyle = detail.color; ctx.fillRect(x - 5, y - 9, 10, 2);
+      } else if (detail.kind === "bench") {
+        ctx.fillStyle = "#493829"; ctx.fillRect(x - 8, y - 5, 16, 3); ctx.fillRect(x - 7, y - 1, 14, 2);
+        ctx.fillRect(x - 6, y + 1, 2, 3); ctx.fillRect(x + 4, y + 1, 2, 3);
+        ctx.fillStyle = detail.color; ctx.fillRect(x - 7, y - 4, 14, 1);
+      } else if (detail.kind === "crates") {
+        ctx.fillStyle = "#6b4a2b"; ctx.fillRect(x - 8, y - 9, 10, 10); ctx.fillRect(x + 2, y - 6, 8, 7);
+        ctx.fillStyle = detail.color; ctx.fillRect(x - 6, y - 7, 6, 1); ctx.fillRect(x - 6, y - 3, 6, 1); ctx.fillRect(x + 4, y - 4, 4, 1);
+      } else if (detail.kind === "stage") {
+        ctx.fillStyle = "#493829"; ctx.fillRect(x - 24, y - 6, 48, 8); ctx.fillRect(x - 22, y + 2, 4, 4); ctx.fillRect(x + 18, y + 2, 4, 4);
+        ctx.fillStyle = detail.color; ctx.fillRect(x - 23, y - 8, 46, 3);
+        ctx.fillStyle = "#ffcd75"; for (let i = -18; i <= 18; i += 9) ctx.fillRect(x + i, y - 7, 3, 2);
+      } else if (detail.kind === "banner") {
+        ctx.fillStyle = "#493829"; ctx.fillRect(x - 1, y - 14, 2, 16); ctx.fillRect(x - 2, y - 14, 7, 2);
+        ctx.fillStyle = detail.color; ctx.fillRect(x + 1, y - 12, 7, 8); ctx.fillStyle = "#fff3c2"; ctx.fillRect(x + 3, y - 10, 3, 3);
+      } else if (detail.kind === "monument") {
+        ctx.fillStyle = "#566c86"; ctx.fillRect(x - 10, y - 5, 20, 6); ctx.fillRect(x - 7, y - 10, 14, 5);
+        ctx.fillStyle = "#94b0c2"; ctx.fillRect(x - 4, y - 17, 8, 8); ctx.fillRect(x - 7, y - 14, 14, 3);
+        ctx.fillStyle = detail.color; ctx.fillRect(x - 1, y - 15, 3, 3);
       }
     }
 

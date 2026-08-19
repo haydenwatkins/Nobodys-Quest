@@ -1236,6 +1236,26 @@ G.ui = (() => {
       G.holdTownFestival();
       buildMenu();
     });
+    menuEl.querySelectorAll("[data-town-project]").forEach((button) =>
+      button.addEventListener("click", () => {
+        G.buyTownProject(button.dataset.townProject);
+        buildMenu();
+      }));
+    const sponsorResident = menuEl.querySelector('[data-act="sponsor-resident"]');
+    if (sponsorResident) sponsorResident.addEventListener("click", () => {
+      G.sponsorTownResident();
+      buildMenu();
+    });
+    const beautifyTown = menuEl.querySelector('[data-act="beautify-town"]');
+    if (beautifyTown) beautifyTown.addEventListener("click", () => {
+      G.beautifyTown();
+      buildMenu();
+    });
+    const townFeast = menuEl.querySelector('[data-act="town-feast"]');
+    if (townFeast) townFeast.addEventListener("click", () => {
+      G.hostTownFeast();
+      buildMenu();
+    });
     const visitTown = menuEl.querySelector('[data-act="visit-town"]');
     if (visitTown) visitTown.addEventListener("click", () => {
       G.world.load("town", { x: 15, y: 14 });
@@ -1931,33 +1951,58 @@ G.ui = (() => {
       </div>`;
     }
 
-    return `<div class="form-card current">
-      <h2>☀️ ${townName}</h2>
-      <div class="tagline">Forms, good deeds, incidents, Rivals, and Expeditions all help this shared home grow.</div>
-      <div class="quest-row"><span>Town level</span><span class="prog">${G.townLevel ? G.townLevel() : 1}</span></div>
-      <div class="quest-row"><span>Residents</span><span class="prog">${town.residents}</span></div>
-      <div class="quest-row"><span>Capacity</span><span class="prog">${G.townCapacity ? G.townCapacity() : "?"}</span></div>
-      <div class="quest-row"><span>Town spirit</span><span class="prog">${town.spirit}</span></div>
-      <div class="quest-row"><span>Houses</span><span class="prog">${town.houses.length}</span></div>
-      <div class="quest-row"><span>Next house cost</span><span class="prog">${G.townHouseCost()} spirit</span></div>
-      <div class="quest-row"><span>Festivals held</span><span class="prog">${town.festivals}</span></div>
-      <div class="quest-row"><span>Hero renown</span><span class="prog">${G.ensureHeroBoard ? G.ensureHeroBoard().renown : 0}</span></div>
-      <button data-act="visit-town">Visit town</button>
-      <button data-act="festival">Hold festival</button>
-      <button data-act="rename-town">Rename town</button>
-    </div>
-    <div class="form-card">
-      <h2>🏠 Town rules</h2>
-      <div class="quest-row"><span>Visit town</span><span class="prog">walk onto empty plots</span></div>
-      <div class="quest-row"><span>Build house</span><span class="prog">spend town spirit</span></div>
+    const capacity = G.townCapacity();
+    const festivalCost = G.townFestivalCost();
+    const festivalActive = G.townFestivalActive();
+    const projectCards = G.TOWN_PROJECTS.map((project) => {
+      const built = G.townProjectBuilt(project.id);
+      const affordable = town.spirit >= project.cost;
+      return `<article class="town-project ${built ? "built" : affordable ? "affordable" : ""}">
+        <div class="town-project-icon">${project.icon}</div>
+        <div class="town-project-copy"><h3>${escapeHtml(project.name)}</h3><p>${escapeHtml(project.text)}</p><small>${escapeHtml(project.effect)}</small></div>
+        ${built ? `<span class="town-built">BUILT</span>` : `<button data-town-project="${project.id}" ${affordable ? "" : "disabled"}>${project.cost} spirit</button>`}
+      </article>`;
+    }).join("");
+    const beautyComplete = town.beautifications >= G.TOWN_BEAUTIFICATION_LIMIT;
+    const feastReady = G.state.mapId === "town" &&
+      (G.state.player.damageTaken > 0 || G.state.player.mana < G.playerMaxMana());
+
+    return `<section class="town-hero form-card current">
+      <div><span class="eyebrow">A HOME BUILT TOGETHER</span><h2>☀️ ${townName}</h2>
+        <div class="tagline">Earn spirit out in the world. Choose what kind of town it becomes.</div></div>
+      <div class="town-spirit-purse"><strong>${town.spirit}</strong><span>TOWN SPIRIT</span></div>
+      <div class="town-stat-strip">
+        <span><strong>LV ${G.townLevel()}</strong> town</span><span><strong>${town.residents}/${capacity}</strong> residents</span>
+        <span><strong>${town.houses.length}</strong> houses</span><span><strong>${G.townProjectCount()}/5</strong> projects</span>
+      </div>
+      <div class="town-main-actions"><button data-act="visit-town">Visit town</button><button data-act="rename-town">Rename</button></div>
+    </section>
+    <section class="form-card town-works">
+      <span class="eyebrow">PERMANENT UPGRADES</span><h2>🏗️ Civic Works</h2>
+      <div class="tagline">Every project changes Sunrise Town permanently, raises its level, and appears in the town itself.</div>
+      <div class="town-project-grid">${projectCards}</div>
+    </section>
+    <section class="form-card town-services">
+      <span class="eyebrow">REPEATABLE CHOICES</span><h2>🤝 Community Fund</h2>
+      <div class="town-service-grid">
+        <article><div><strong>🎉 Hold a festival</strong><small>${G.townFestivalMinutes()} minutes · attracts ${G.townProjectBuilt("festivalStage") ? 2 : 1} resident${G.townProjectBuilt("festivalStage") ? "s" : ""} · every third raises town level</small></div>
+          <button data-act="festival" ${festivalActive || town.spirit < festivalCost ? "disabled" : ""}>${festivalActive ? "Celebrating" : `${festivalCost} spirit`}</button></article>
+        <article><div><strong>📨 Sponsor a newcomer</strong><small>${town.residents >= capacity ? "Build more capacity first" : "Invite one visible resident immediately"}</small></div>
+          <button data-act="sponsor-resident" ${town.residents >= capacity || town.spirit < G.townSponsorCost() ? "disabled" : ""}>${G.townSponsorCost()} spirit</button></article>
+        <article><div><strong>🌷 Beautify the town</strong><small>${beautyComplete ? "Every planned corner is complete" : `Add lanterns, gardens, benches, and banners · ${town.beautifications}/${G.TOWN_BEAUTIFICATION_LIMIT}`}</small></div>
+          <button data-act="beautify-town" ${beautyComplete || town.spirit < G.townBeautificationCost() ? "disabled" : ""}>${beautyComplete ? "Complete" : `${G.townBeautificationCost()} spirit`}</button></article>
+        <article><div><strong>🍲 Host a town feast</strong><small>At home only · fully restore hearts and mana · never usable mid-battle</small></div>
+          <button data-act="town-feast" ${!feastReady || town.spirit < 5 ? "disabled" : ""}>5 spirit</button></article>
+      </div>
+    </section>
+    <section class="form-card town-guide">
+      <h2>How spirit moves</h2>
+      <div class="quest-row"><span>Build on an empty town plot</span><span class="prog">${G.townHouseCost()} spirit</span></div>
       <div class="quest-row"><span>Five ordinary victories</span><span class="prog">+2 spirit</span></div>
-      <div class="quest-row"><span>Claim a form</span><span class="prog">resident + spirit</span></div>
-      <div class="quest-row"><span>Resolve Atlas incident</span><span class="prog">major growth</span></div>
-      <div class="quest-row"><span>Complete Expedition</span><span class="prog">major growth</span></div>
-      <div class="quest-row"><span>Break any ward</span><span class="prog">+1 spirit</span></div>
-      <div class="quest-row"><span>Hold festival</span><span class="prog">+residents spirit</span></div>
-      ${(G.state.items || []).includes("sunrise-banner") ? `<div class="quest-row done"><span>🚩 Sunrise Banner</span><span class="prog">festival spirit ×2</span></div>` : ""}
-    </div>`;
+      <div class="quest-row"><span>Claim a form / break a ward</span><span class="prog">+3 / +1</span></div>
+      <div class="quest-row"><span>Incidents, Expeditions, Hero Board</span><span class="prog">major rewards</span></div>
+      ${(G.state.items || []).includes("sunrise-banner") ? `<div class="quest-row done"><span>🚩 Sunrise Banner</span><span class="prog">festival duration ×2</span></div>` : ""}
+    </section>`;
   }
 
   function buildExpeditionTab() {

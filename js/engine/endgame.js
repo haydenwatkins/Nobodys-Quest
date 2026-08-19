@@ -140,7 +140,7 @@ G.heroContractProgress = function () {
 function awardHeroMilestones(board) {
   const milestones = [
     { at: 3, item: "wayfarer-ribbon", title: "WAYFARER RIBBON", text: "A bright trail now follows your adventures." },
-    { at: 6, item: "sunrise-banner", title: "SUNRISE BANNER", text: "Town festivals now earn double spirit." },
+    { at: 6, item: "sunrise-banner", title: "SUNRISE BANNER", text: "Town festivals now last twice as long." },
     { at: 10, item: "heroic-halo", title: "HEROIC HALO", text: "Your renown is visible in every form." },
   ];
   for (const reward of milestones) {
@@ -193,4 +193,3 @@ G.events.on("kill", (data) => trackHeroContract("kill", data));
 G.events.on("wardBreak", (data) => trackHeroContract("wardBreak", data));
 G.events.on("abilityUse", (data) => trackHeroContract("abilityUse", data));
 G.events.on("mapEnter", (data) => trackHeroContract("mapEnter", data));
-

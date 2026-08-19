@@ -271,6 +271,87 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .trophy-card { border-color: #ffcd75; }
 .trophy-place { color: #94b0c2; white-space: nowrap; }
 
+/* ---------- Sunrise Town ---------- */
+.town-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 18px;
+  background: linear-gradient(135deg, #24283b 0%, #253c44 100%);
+}
+.town-hero h2 { margin-top: 3px; color: #fff3c2; }
+.town-spirit-purse {
+  min-width: 112px;
+  align-self: center;
+  padding: 9px 12px;
+  border: 2px solid #ffcd75;
+  border-radius: 10px;
+  background: #5d275d;
+  text-align: center;
+  box-shadow: 0 3px 0 #1a1c2c;
+}
+.town-spirit-purse strong { display: block; color: #fff3c2; font-size: 21px; }
+.town-spirit-purse span { display: block; margin-top: 3px; color: #ffcd75; font-size: 7px; }
+.town-stat-strip {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.town-stat-strip span {
+  padding: 7px;
+  border: 1px solid #566c86;
+  border-radius: 7px;
+  background: rgba(26, 28, 44, 0.55);
+  color: #94b0c2;
+  font-size: 15px;
+  text-align: center;
+}
+.town-stat-strip strong { color: #f4f4f4; }
+.town-main-actions { grid-column: 1 / -1; display: flex; gap: 7px; }
+.town-main-actions button:last-child { border-color: #566c86; background: #333c57; color: #f4f4f4; }
+.town-works { border-color: #ffcd75; }
+.town-project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 9px; }
+.town-project {
+  position: relative;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 8px;
+  min-height: 110px;
+  padding: 9px;
+  border: 2px solid #333c57;
+  border-radius: 9px;
+  background: #1d2033;
+}
+.town-project.affordable { border-color: #ffcd75; }
+.town-project.built { border-color: #38b764; background: rgba(56, 183, 100, 0.08); }
+.town-project-icon { font-size: 25px; line-height: 1; text-align: center; }
+.town-project-copy h3 { color: #f4f4f4; font-size: 10px; line-height: 1.35; }
+.town-project-copy p { margin-top: 4px; color: #94b0c2; font-size: 15px; line-height: 1.2; }
+.town-project-copy small { display: block; margin-top: 5px; color: #73eff7; font-size: 13px; line-height: 1.25; }
+.town-project button { grid-column: 1 / -1; width: 100%; margin-top: auto; }
+.town-built {
+  grid-column: 1 / -1;
+  align-self: end;
+  color: #a7f070;
+  font-size: 8px;
+  text-align: right;
+}
+.town-service-grid { display: grid; gap: 7px; margin-top: 8px; }
+.town-service-grid article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 9px;
+  border-left: 3px solid #73eff7;
+  border-radius: 4px 8px 8px 4px;
+  background: #1d2033;
+}
+.town-service-grid strong { display: block; color: #f4f4f4; font-size: 10px; line-height: 1.4; }
+.town-service-grid small { display: block; margin-top: 3px; color: #94b0c2; font-size: 14px; line-height: 1.3; }
+.town-service-grid button { min-width: 104px; margin: 0; }
+.town-guide { border-style: dashed; }
+
 /* ---------- Wayfinder Atlas ---------- */
 
 .atlas-header {
@@ -906,6 +987,14 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .quest-row { align-items: flex-start; flex-wrap: wrap; }
   .quest-row .prog { margin-left: auto; }
   .quest-actions { width: 100%; justify-content: flex-end; }
+  .town-hero { grid-template-columns: minmax(0, 1fr) 92px; gap: 8px; }
+  .town-spirit-purse { min-width: 0; padding: 8px 5px; }
+  .town-spirit-purse strong { font-size: 17px; }
+  .town-stat-strip { grid-template-columns: repeat(2, 1fr); }
+  .town-project-grid { grid-template-columns: 1fr; }
+  .town-project { min-height: 0; }
+  .town-service-grid article { grid-template-columns: 1fr; }
+  .town-service-grid button { width: 100%; }
   .form-card .pin-btn { min-height: 38px; }
   .pin-summary { align-items: stretch; flex-direction: column; }
   .form-card .clear-pins { width: 100%; }
