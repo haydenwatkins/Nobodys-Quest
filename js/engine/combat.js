@@ -211,6 +211,8 @@ G.combat = (() => {
     else G.ui.banner(`🏆 MINIBOSS DEFEATED: ${enemy.def.name}!`, rewardLine + (defeatLine ? ` · “${defeatLine}”` : ""));
     G.events.emit("pickup", { item: trophy });
     G.checkUnlocks();
+    const pathUpdate = G.formPathItemUpdate && G.formPathItemUpdate(trophy);
+    if (pathUpdate && G.ui.dialogue) G.ui.dialogue("✦ FORM PATH UPDATED", pathUpdate.text, { accent: "#d9a7ff" });
     if (G.checkGuardianCollectionReward) G.checkGuardianCollectionReward(false);
     G.saveGame();
   }

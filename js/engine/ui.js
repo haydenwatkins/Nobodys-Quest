@@ -1125,7 +1125,10 @@ G.ui = (() => {
     menuEl.innerHTML = html;
 
     if (activeTab === "map" && atlasView === "local") drawLocalAtlas();
-    if (activeTab === "forms") drawFormPreviews(true);
+    if (activeTab === "forms") {
+      drawFormPreviews(true);
+      if (formLabView === "roster") centerSelectedFormPath();
+    }
 
     // wire up clicks
     menuEl.querySelectorAll("[data-tab]").forEach((b) =>
@@ -1418,21 +1421,84 @@ G.ui = (() => {
     return html + buildRosterLab();
   }
 
-  function buildRosterLab() {
-    const selected = labSelectedForm(false);
-    const tiles = G.formOrder.filter((id) => G.forms[id] && !G.forms[id].invalid).map((id) => {
+  function buildFormPathGraph() {
+    const layout = G.formPathLayout();
+    const edges = G.FORM_PATH_EDGES.map((edge) => {
+      const from = layout.positions[edge.from], to = layout.positions[edge.to];
+      if (!from || !to) return "";
+      const startY = from.y + layout.nodeHeight;
+      const bendY = startY + (to.y - startY) * 0.5;
+      const classes = ["form-path-edge", edge.kind || "direct", G.formPathEdgeMet(edge) ? "met" : "pending"].join(" ");
+      return `<path class="${classes}" d="M ${from.x} ${startY} C ${from.x} ${bendY}, ${to.x} ${bendY}, ${to.x} ${to.y}" />`;
+    }).join("");
+    const nodes = G.formOrder.filter((id) => layout.positions[id] && G.forms[id] && !G.forms[id].invalid).map((id) => {
       const form = G.forms[id];
+      const position = layout.positions[id];
       const unlocked = G.formUnlocked(id);
       const ready = !unlocked && G.formReady(id);
       const current = id === G.state.formId;
-      const skin = unlocked && G.selectedFormSkin(id);
-      return `<button class="form-portrait-tile ${labFormId === id ? "selected" : ""} ${current ? "current" : ""} ${ready ? "ready" : ""} ${unlocked ? "" : "locked"}"
-        data-form-select="${id}" aria-label="${unlocked ? escapeHtml(form.name) : "Locked form"}">
-        ${previewCanvas(id, skin ? skin.id : "classic", "tile-preview", unlocked ? form.name : "Unknown form silhouette", !unlocked, !skin)}
-        <span class="portrait-name">${unlocked || ready ? `${form.icon} ${escapeHtml(form.name)}` : "❔ UNKNOWN"}</span>
-        <span class="portrait-status">${current ? "CURRENT" : ready ? "READY" : unlocked ? `LV ${G.formLevel(id)}` : "LOCKED"}</span>
+      const progress = G.formPathProgress(id);
+      const steps = G.formUnlockSteps(id);
+      const status = current ? "CURRENT" : ready ? "ECHO READY" : unlocked ? `LV ${G.formLevel(id)}` : `${progress.done}/${progress.total}`;
+      const gates = steps.map((step) => `<i class="${step.met ? "met" : "pending"}" title="${escapeHtml(`${step.label}: ${step.detail}`)}">${step.icon}</i>`).join("");
+      return `<button class="form-path-node ${labFormId === id ? "selected" : ""} ${current ? "current" : ""} ${ready ? "ready" : ""} ${unlocked ? "unlocked" : "locked"}"
+        style="--path-x:${position.x / 10};--path-y:${position.y}px" data-form-select="${id}"
+        aria-label="${escapeHtml(`${form.name}, ${status}, ${progress.done} of ${progress.total} requirements`)}">
+        <span class="form-path-identity"><b>${form.icon}</b><strong>${escapeHtml(form.name)}</strong></span>
+        <span class="form-path-status">${status}</span>
+        ${gates ? `<span class="form-path-gates">${gates}</span>` : ""}
       </button>`;
     }).join("");
+    const gates = Object.entries(G.FORM_PATH_GATES).map(([id, gate]) => {
+      const position = layout.positions[id];
+      const step = G.formUnlockSteps(gate.target).find((entry) => entry.kind === "all");
+      return `<div class="form-path-gate ${step && step.met ? "met" : "pending"}" style="--path-x:${position.x / 10};--path-y:${position.y}px">
+        <span>✦</span><strong>${gate.label}</strong><small>${step ? step.detail : gate.short}</small>
+      </div>`;
+    }).join("");
+    return `<section class="form-path-shell">
+      <div class="form-path-heading"><div><span class="eyebrow">AWAKENING PATH</span><h2>Every form has a visible route</h2></div>
+        <div class="form-path-legend"><span><i class="met"></i> complete</span><span><i class="choice"></i> either path</span><span><i class="all"></i> all paths</span></div></div>
+      <div class="form-path-scroll" data-form-path-map>
+        <div class="form-path-canvas" style="width:${layout.width}px;height:${layout.height}px">
+          <svg class="form-path-lines" viewBox="0 0 ${layout.width} ${layout.height}" preserveAspectRatio="none" aria-hidden="true">
+            <defs><marker id="form-path-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L8,4 L0,8 z" /></marker></defs>
+            ${edges}
+          </svg>
+          ${nodes}
+          ${gates}
+        </div>
+      </div>
+    </section>`;
+  }
+
+  function centerSelectedFormPath() {
+    const viewport = menuEl.querySelector("[data-form-path-map]");
+    const node = viewport && viewport.querySelector(".form-path-node.selected");
+    if (!node) return;
+    const viewRect = viewport.getBoundingClientRect();
+    const nodeRect = node.getBoundingClientRect();
+    viewport.scrollLeft += nodeRect.left + nodeRect.width / 2 - viewRect.left - viewRect.width / 2;
+    viewport.scrollTop += nodeRect.top + nodeRect.height / 2 - viewRect.top - viewRect.height / 2;
+  }
+
+  function buildUnlockRoute(form) {
+    const steps = G.formUnlockSteps(form.id);
+    if (!steps.length) return "";
+    const progress = G.formPathProgress(form.id);
+    const next = steps.find((step) => !step.met);
+    return `<section class="form-route-card">
+      <div class="form-route-title"><span>AWAKENING ROUTE</span><strong>${progress.done}/${progress.total} COMPLETE</strong></div>
+      <p>${escapeHtml(form.unlock.hint || "Complete this form's path")}</p>
+      <div class="form-route-steps">${steps.map((step) => `<div class="form-route-step ${step.met ? "met" : "pending"}">
+        <span class="route-step-icon">${step.met ? "✓" : step.icon}</span><span><strong>${escapeHtml(step.label)}</strong><small>${escapeHtml(step.detail)}</small></span>
+      </div>`).join("")}</div>
+      ${next ? `<div class="form-route-next"><span>NEXT</span><strong>${escapeHtml(next.label)}</strong><small>${escapeHtml(next.detail)}</small></div>` : ""}
+    </section>`;
+  }
+
+  function buildRosterLab() {
+    const selected = labSelectedForm(false);
     const unlocked = G.formUnlocked(selected.id);
     const ready = !unlocked && G.formReady(selected.id);
     const echo = ready && G.formEchoFor ? G.formEchoFor(selected.id) : null;
@@ -1440,19 +1506,19 @@ G.ui = (() => {
     const current = selected.id === G.state.formId;
     const completed = (selected.quests || []).filter((quest) => G.questsDone.includes(quest.id)).length;
     const skin = unlocked && G.selectedFormSkin(selected.id);
-    return `<div class="form-roster-grid">${tiles}</div>
+    return `${buildFormPathGraph()}
       <section class="form-stage ${unlocked ? "" : "locked"}">
-        <div class="form-stage-art">${previewCanvas(selected.id, skin ? skin.id : "classic", "hero-preview", unlocked ? selected.name : "Unknown form", !unlocked, !skin)}</div>
+        <div class="form-stage-art">${previewCanvas(selected.id, skin ? skin.id : "classic", "hero-preview", selected.name, !unlocked, !skin)}</div>
         <div class="form-stage-copy">
           <div class="eyebrow">${current ? "CURRENT FORM" : echo ? "FORM ECHO WAITING" : ready ? "CHALLENGE COMPLETE" : unlocked ? `FORM LEVEL ${G.formLevel(selected.id)}` : "UNDISCOVERED FORM"}</div>
-          <h2>${unlocked || ready ? `${selected.icon} ${escapeHtml(selected.name)}` : "❔ UNKNOWN FORM"}</h2>
-          <p class="lab-tagline">${unlocked || ready ? escapeHtml(selected.tagline) : "A new way of moving through the world is waiting to be understood."}</p>
+          <h2>${selected.icon} ${escapeHtml(selected.name)}</h2>
+          <p class="lab-tagline">${escapeHtml(selected.tagline)}</p>
           ${unlocked ? `<div class="lab-stat-row"><span>❤️ ${selected.hearts}</span><span>👟 ${selected.speed}</span>${dmgChip(G.abilities[selected.basic]?.type || "blunt")}</div>
             <div class="passive-rule"><strong>◆ ${escapeHtml(selected.passive.name)}</strong><span>${escapeHtml(selected.passive.description)}</span></div>
             <div class="mastery-track"><span>MASTERY</span><span class="mastery-pips">${selected.quests.map((quest) => `<i class="${G.questsDone.includes(quest.id) ? "done" : ""}"></i>`).join("")}</span><span>${completed}/${selected.quests.length}</span></div>
             <div class="lab-actions"><button data-become="${selected.id}" ${current ? "disabled" : ""}>${current ? "Equipped" : `Become ${escapeHtml(selected.name)}`}</button>
             <button data-formlab-view="loadout">Build moves</button><button data-formlab-view="skins">View skins</button></div>`
-          : `<div class="unlock-panel">${escapeHtml(G.unlockHint(selected.id))}</div>${ready ? echo
+          : `${buildUnlockRoute(selected)}${ready ? echo
             ? `<div class="unlock-panel">✦ ${escapeHtml(selected.name)} is waiting ${echo.mapId === G.state.mapId ? "nearby" : "in " + escapeHtml(echoMap ? echoMap.name : echo.mapId)}. Meet it in the world to unlock it.</div>
               <button data-form-echo-guide="${selected.id}">Guide me to the echo</button>`
             : `<div class="unlock-panel">The lesson is complete. Win a battle and watch what remains.</div>` : ""}`}
