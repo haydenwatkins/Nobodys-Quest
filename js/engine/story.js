@@ -375,13 +375,17 @@ G.showStoryEnding = function () {
     overlay.classList.add("hidden");
     G.storyEndingOpen = false;
     G.updateStoryEndingInput = null;
+    if (G.menuController) G.menuController.reset(overlay);
     G.ui.banner("THE END · AND EVERY ROAD AFTER", "The main story is complete. The world, town, mastery, and expeditions remain yours.");
   });
   // Controller path (main.js calls this per frame): A or B turns the page —
   // on TV this DOM button can't be reached any other way.
-  G.updateStoryEndingInput = () => {
+  G.updateStoryEndingInput = (dt) => {
     if (!G.storyEndingOpen) return;
-    if (G.input.tapped("confirm") || G.input.tapped("back")) closeButton.click();
+    G.menuController.update(overlay, {
+      preferred: closeButton,
+      onBack: () => closeButton.click(),
+    }, dt);
   };
 };
 

@@ -371,6 +371,7 @@ G.showSaveSlotScreen = function (force) {
     overlay.classList.add("hidden");
     G.saveSlotScreenOpen = false;
     G.updateSaveSlotInput = null;
+    if (G.menuController) G.menuController.reset(overlay);
     document.removeEventListener("keydown", titleKeys);
   };
   const titleKeys = (event) => {
@@ -400,32 +401,19 @@ G.showSaveSlotScreen = function (force) {
     if (returnButton) extras.push(returnButton);
     return slotButtons.concat(extras);
   };
-  G.updateSaveSlotInput = () => {
+  G.updateSaveSlotInput = (dt) => {
     if (!G.saveSlotScreenOpen) return;
-    if (G.input.tapped("back")) {
+    G.menuController.update(overlay, {
+      elements: titleCycle,
+      preferred,
+      onBack: () => {
       if (settingsPanel && !settingsPanel.classList.contains("hidden")) {
         settingsPanel.classList.add("hidden");
         const slot = slotButtons[0];
         if (slot && slot.focus) slot.focus({ preventScroll: true });
       } else if (returnButton) closeTitle();
-      return;
-    }
-    const buttons = titleCycle();
-    if (!buttons.length) return;
-    const backward = G.input.tapped("menuUp") || G.input.tapped("menuLeft");
-    const forward = G.input.tapped("menuDown") || G.input.tapped("menuRight");
-    if (backward || forward) {
-      const current = buttons.indexOf(document.activeElement);
-      const step = forward ? 1 : -1;
-      const next = current === -1 ? 0 : (current + step + buttons.length) % buttons.length;
-      const target = buttons[next];
-      if (target && target.focus) target.focus({ preventScroll: true });
-    }
-    if (G.input.tapped("confirm")) {
-      const active = document.activeElement;
-      const target = active && buttons.indexOf(active) !== -1 ? active : buttons[0];
-      if (target && target.click) target.click();
-    }
+      },
+    }, dt);
   };
 
   slotButtons.forEach((button) => button.addEventListener("click", () => {

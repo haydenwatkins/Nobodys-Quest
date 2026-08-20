@@ -312,13 +312,15 @@
     // frame so Steam Link input reaches gameplay and menus without latency.
     G.input.update();
 
-    // Slot selection and the story epilogue are full pauses. They do not
+    // The workshop recovery panel, slot selection, and the story epilogue
+    // are full pauses. They do not
     // quietly add play time or let held inputs leak back into the world.
     // Both are DOM screens, so controllers reach them here through the same
     // menu taps the pause menu uses (keyboard and touch use the DOM directly).
-    if (G.saveSlotScreenOpen || G.storyEndingOpen) {
-      if (G.saveSlotScreenOpen && G.updateSaveSlotInput) G.updateSaveSlotInput();
-      else if (G.storyEndingOpen && G.updateStoryEndingInput) G.updateStoryEndingInput();
+    if (G.ui.workshopOpen || G.saveSlotScreenOpen || G.storyEndingOpen) {
+      if (G.ui.workshopOpen) G.ui.updateWorkshopController(dt);
+      else if (G.saveSlotScreenOpen && G.updateSaveSlotInput) G.updateSaveSlotInput(dt);
+      else if (G.storyEndingOpen && G.updateStoryEndingInput) G.updateStoryEndingInput(dt);
       G.input.clearTaps();
       draw();
       requestAnimationFrame(loop);
@@ -337,7 +339,7 @@
     } else if (!G.ui.menuOpen) {
       update(dt);
     } else {
-      G.ui.updateControllerMenu();
+      G.ui.updateControllerMenu(dt);
       G.input.clearTaps(); // don't queue up attacks while in the menu
     }
 

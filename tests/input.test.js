@@ -240,7 +240,37 @@ G.input.update();
 pad.axes[1] = -1;
 G.input.update();
 assert.equal(G.input.tapped("menuUp"), true, "the left stick should navigate menus");
+inputClock += 320;
+G.input.update();
+assert.equal(G.input.tapped("menuUp"), true, "holding the stick should repeat after a deliberate delay");
 pad.axes[1] = 0;
+G.input.update();
+
+pad.axes[3] = 0.8;
+G.input.update();
+assert.ok(G.input.menuScroll.y > 0.6, "the right stick should remain analog for menu scrolling");
+pad.axes[3] = 0;
+G.input.update();
+
+pad.buttons[4] = gamepadButton(1);
+G.input.update();
+assert.equal(G.input.tapped("pageLeft"), true, "L1 should navigate to the previous menu page");
+pad.buttons[4] = gamepadButton();
+G.input.update();
+pad.buttons[5] = gamepadButton(1);
+G.input.update();
+assert.equal(G.input.tapped("pageRight"), true, "R1 should navigate to the next menu page");
+pad.buttons[5] = gamepadButton();
+G.input.update();
+pad.buttons[6] = gamepadButton(0.5);
+G.input.update();
+assert.equal(G.input.tapped("pageLeft"), true, "L2 should also navigate left in menus");
+pad.buttons[6] = gamepadButton();
+G.input.update();
+pad.buttons[7] = gamepadButton(0.5);
+G.input.update();
+assert.equal(G.input.tapped("pageRight"), true, "R2 should also navigate right in menus");
+pad.buttons[7] = gamepadButton();
 G.input.update();
 
 fakeGamepads[0] = null;

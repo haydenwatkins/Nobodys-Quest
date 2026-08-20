@@ -90,16 +90,21 @@ const tvDoc = {
 
 function fakeButton(name, dataset = {}) {
   return {
-    name, dataset, listeners: {},
+    name, dataset, listeners: {}, rect: { left: 0, top: 0, width: 100, height: 40 },
+    classList: { add() {}, remove() {} },
     addEventListener(type, fn) { (this.listeners[type] = this.listeners[type] || []).push(fn); },
     click() { for (const fn of this.listeners.click || []) fn({}); },
     focus() { tvDoc.activeElement = this; },
+    getBoundingClientRect() { return this.rect; },
   };
 }
 
 const slots = [1, 2, 3].map((n) => fakeButton(`slot${n}`, { saveSlot: String(n) }));
 const opener = fakeButton("settings-opener");
 const returnBtn = fakeButton("return");
+slots.forEach((slot, index) => { slot.rect.left = index * 120; });
+opener.rect = { left: 120, top: 80, width: 100, height: 40 };
+returnBtn.rect = { left: 0, top: -60, width: 100, height: 40 };
 const panel = {
   hiddenClass: true,
   buttons: [fakeButton("music"), fakeButton("sound"), fakeButton("done")],
@@ -116,6 +121,7 @@ const tvOverlay = {
   set innerHTML(value) { this.html = value; }, get innerHTML() { return this.html; },
   classList: { add() {}, remove() {}, toggle() {} },
   style: {},
+  contains: () => true,
   querySelectorAll: (sel) => sel === "[data-save-slot]" ? slots : [],
   querySelector(sel) {
     if (sel.startsWith(".save-slot-card")) {
@@ -132,11 +138,14 @@ const tvOverlay = {
 const taps = {};
 const tap = (btn) => { taps[btn] = true; };
 context.G.input = {
+  hasGamepad: true,
+  menuScroll: { x: 0, y: 0 },
   tapped(btn) {
     if (taps[btn]) { taps[btn] = false; return true; }
     return false;
   },
 };
+vm.runInContext(fs.readFileSync(path.join(root, "js/engine/menu-controller.js"), "utf8"), context, { filename: "menu-controller.js" });
 const emitted = [];
 context.G.events.emit = (name) => emitted.push(name);
 
@@ -145,11 +154,11 @@ assert.equal(G.showSaveSlotScreen(true), true);
 assert.equal(typeof G.updateSaveSlotInput, "function", "the title screen should expose a controller updater");
 assert.equal(tvDoc.activeElement, slots[1], "the active adventure should start highlighted");
 
-tap("menuDown");
-G.updateSaveSlotInput();
-assert.equal(tvDoc.activeElement, slots[2], "controller down should move the chapter highlight");
-
 tap("menuRight");
+G.updateSaveSlotInput();
+assert.equal(tvDoc.activeElement, slots[2], "controller right should move the chapter highlight");
+
+tap("menuDown");
 G.updateSaveSlotInput();
 assert.equal(tvDoc.activeElement, opener, "the controller should be able to reach Settings");
 

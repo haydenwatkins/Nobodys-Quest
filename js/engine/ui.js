@@ -19,8 +19,8 @@ G.ui = (() => {
   let dialogueData = null;     // {speaker, text, accent, shown, age, onClose}
   let dialoguePointerAdvance = false;
   let menuOpen = false;
+  let workshopOpen = false;
   let btnCache = "";
-  let controllerFocusedElement = null;
 
   /* ---------- the full-resolution overlay canvas ---------- */
   const uiCanvas = document.getElementById("ui");
@@ -884,75 +884,16 @@ G.ui = (() => {
   }
 
   function controllerMenuElements() {
-    return Array.from(menuEl.querySelectorAll(
-      "button:not(:disabled), select:not(:disabled), input:not(:disabled)"
-    )).filter((element) => {
-      const rect = element.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
-    });
+    return G.menuController.elements(menuEl);
   }
 
   function focusControllerElement(element) {
-    if (!element) return;
-    if (controllerFocusedElement) controllerFocusedElement.classList.remove("controller-focus");
-    controllerFocusedElement = element;
-    element.classList.add("controller-focus");
-    try { element.focus({ preventScroll: true }); } catch (error) { element.focus(); }
-    if (element.scrollIntoView) element.scrollIntoView({ block: "nearest", inline: "nearest" });
+    G.menuController.setFocus(menuEl, element);
   }
 
   function focusControllerDefault() {
     const active = menuEl.querySelector("[data-tab].active");
-    focusControllerElement(active || controllerMenuElements()[0]);
-  }
-
-  function moveControllerFocus(dx, dy) {
-    const elements = controllerMenuElements();
-    if (!elements.length) return;
-    if (!controllerFocusedElement || !elements.includes(controllerFocusedElement)) {
-      focusControllerElement(elements[0]);
-      return;
-    }
-    const from = controllerFocusedElement.getBoundingClientRect();
-    const fx = from.left + from.width / 2;
-    const fy = from.top + from.height / 2;
-    let best = null;
-    let bestScore = Infinity;
-    for (const element of elements) {
-      if (element === controllerFocusedElement) continue;
-      const rect = element.getBoundingClientRect();
-      const ex = rect.left + rect.width / 2;
-      const ey = rect.top + rect.height / 2;
-      const along = dx ? (ex - fx) * dx : (ey - fy) * dy;
-      if (along <= 2) continue;
-      const across = dx ? Math.abs(ey - fy) : Math.abs(ex - fx);
-      const score = along * 3 + across + Math.max(0, across - along * 1.5) * 4;
-      if (score < bestScore) { best = element; bestScore = score; }
-    }
-    if (!best) {
-      // Wrap at the edge, favoring the same row or column.
-      best = elements.reduce((choice, element) => {
-        if (element === controllerFocusedElement) return choice;
-        const rect = element.getBoundingClientRect();
-        const ex = rect.left + rect.width / 2;
-        const ey = rect.top + rect.height / 2;
-        const edge = dx ? ex * dx : ey * dy;
-        const across = dx ? Math.abs(ey - fy) : Math.abs(ex - fx);
-        const score = edge + across * 2;
-        return !choice || score < choice.score ? { element, score } : choice;
-      }, null)?.element;
-    }
-    focusControllerElement(best);
-  }
-
-  function adjustControllerField(direction) {
-    const element = controllerFocusedElement;
-    if (!element || element.tagName !== "SELECT") return false;
-    const count = element.options.length;
-    if (!count) return true;
-    element.selectedIndex = (element.selectedIndex + direction + count) % count;
-    element.dispatchEvent(new Event("change", { bubbles: true }));
-    return true;
+    G.menuController.focusDefault(menuEl, active);
   }
 
   function cycleControllerTab(direction) {
@@ -964,22 +905,14 @@ G.ui = (() => {
     focusControllerDefault();
   }
 
-  function updateControllerMenu() {
-    if (!menuOpen || !G.input.hasGamepad) return;
-    if (G.input.tapped("back")) {
-      closeMenu();
-      return;
-    }
-    if (G.input.tapped("tabPrev")) cycleControllerTab(-1);
-    if (G.input.tapped("tabNext")) cycleControllerTab(1);
-    if (G.input.tapped("menuUp")) moveControllerFocus(0, -1);
-    if (G.input.tapped("menuDown")) moveControllerFocus(0, 1);
-    if (G.input.tapped("menuLeft") && !adjustControllerField(-1)) moveControllerFocus(-1, 0);
-    if (G.input.tapped("menuRight") && !adjustControllerField(1)) moveControllerFocus(1, 0);
-    if (G.input.tapped("confirm")) {
-      if (!controllerFocusedElement) focusControllerDefault();
-      else if (!adjustControllerField(1)) controllerFocusedElement.click();
-    }
+  function updateControllerMenu(dt) {
+    if (!menuOpen) return;
+    G.menuController.update(menuEl, {
+      preferred: menuEl.querySelector("[data-tab].active"),
+      onBack: closeMenu,
+      onPageLeft: () => cycleControllerTab(-1),
+      onPageRight: () => cycleControllerTab(1),
+    }, dt);
   }
 
   function openMenu() {
@@ -1002,8 +935,7 @@ G.ui = (() => {
   function closeMenu() {
     menuOpen = false;
     menuEl.classList.add("hidden");
-    if (controllerFocusedElement) controllerFocusedElement.classList.remove("controller-focus");
-    controllerFocusedElement = null;
+    G.menuController.reset(menuEl);
     G.input.clearTaps();
   }
   function toggleMenu() { menuOpen ? closeMenu() : openMenu(); }
@@ -1082,7 +1014,7 @@ G.ui = (() => {
 
   function buildMenu() {
     const previousControllerElements = controllerMenuElements();
-    const previousControllerIndex = previousControllerElements.indexOf(controllerFocusedElement);
+    const previousControllerIndex = previousControllerElements.indexOf(G.menuController.current(menuEl));
     let tabs = [
       ["story", "Story"],
       ["forms", "Form Lab"],
@@ -2211,6 +2143,14 @@ G.ui = (() => {
   }
 
   /* ---------- Form Workshop error panel ---------- */
+  function closeWorkshop() {
+    const el = document.getElementById("workshop-errors");
+    workshopOpen = false;
+    el.classList.add("hidden");
+    G.menuController.reset(el);
+    G.input.clearTaps();
+  }
+
   function showWorkshop() {
     if (!G.workshopErrors.length) return;
     const el = document.getElementById("workshop-errors");
@@ -2221,15 +2161,28 @@ G.ui = (() => {
       <ul>${G.workshopErrors.map((e) => `<li><b>${e.where}:</b> ${e.msg}</li>`).join("")}</ul>
       <button id="workshop-ok">Got it — play anyway with the working forms ▶</button>
     </div>`;
+    workshopOpen = true;
     el.classList.remove("hidden");
-    document.getElementById("workshop-ok").addEventListener("click", () => el.classList.add("hidden"));
+    document.getElementById("workshop-ok").addEventListener("click", closeWorkshop);
+    if (G.input.hasGamepad) G.menuController.focusDefault(el, document.getElementById("workshop-ok"));
+  }
+
+  function updateWorkshopController(dt) {
+    if (!workshopOpen) return;
+    const el = document.getElementById("workshop-errors");
+    G.menuController.update(el, {
+      preferred: document.getElementById("workshop-ok"),
+      onBack: closeWorkshop,
+    }, dt);
   }
 
   return {
     toast, banner, dialogue, update, drawHUD, resizeOverlay,
-    openMenu, openMap, openExpedition, closeMenu, toggleMenu, updateControllerMenu, showWorkshop,
+    openMenu, openMap, openExpedition, closeMenu, toggleMenu, updateControllerMenu,
+    showWorkshop, updateWorkshopController,
     openFormWheel, closeFormWheel, aimFormWheel, commitFormWheel, updateFormWheel,
     get menuOpen() { return menuOpen; },
+    get workshopOpen() { return workshopOpen; },
     get formWheelOpen() { return formWheelOpen; },
     get dialogueOpen() { return !!dialogueData; },
     get dialogueQueueLength() { return dialogueQueue.length + (dialogueData ? 1 : 0); },

@@ -45,6 +45,12 @@ mutates it from these messages, and feeds it through the **same
 commands like "cast ability" — `StandardGamepad.kt` only translates Android
 keycodes/axes (which vary by manufacturer) into standard indices.
 
+Menu behavior is likewise owned by the shared web game: left stick/D-pad move
+focus with console-style hold repeat, right stick scrolls continuously, A
+confirms, B returns, L1/L2 navigate left, and R1/R2 navigate right. Because
+this lives in JavaScript, iPhone/iPad browser controllers and the TV bridge
+behave alike, and changing menu behavior does not require rebuilding the APK.
+
 Transport is androidx `WebMessageListener`, allow-listed to
 `https://haydenwatkins.github.io` only. The page posts `"ready"` once per
 load; the reply proxy that produces is the native→JS push channel. Ancient

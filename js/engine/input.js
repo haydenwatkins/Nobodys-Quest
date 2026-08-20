@@ -20,6 +20,7 @@ G.input = (() => {
   const keyVec = { x: 0, y: 0 };
   const joyVec = { x: 0, y: 0 };
   const gamepadVec = { x: 0, y: 0 };
+  const menuScrollVec = { x: 0, y: 0 };
   const releasedAims = {};
   const gamepadControls = {};
   let liveAim = null;
@@ -164,6 +165,8 @@ G.input = (() => {
   /* ---------- gamepad: Xbox layout + Steam Link standard mapping ---------- */
   const GAMEPAD_DEAD_ZONE = 0.22;
   const GAMEPAD_NAV_THRESHOLD = 0.62;
+  const MENU_REPEAT_DELAY_MS = 310;
+  const MENU_REPEAT_INTERVAL_MS = 92;
 
   function stickVector(x, y, deadZone) {
     const len = Math.sqrt(x * x + y * y);
@@ -184,16 +187,27 @@ G.input = (() => {
       : { x: 0, y: 0, dragged: false };
   }
 
-  function syncGamepadControl(id, down, action) {
-    const previous = gamepadControls[id] || { down: false, action: null };
+  function syncGamepadControl(id, down, action, repeat) {
+    const previous = gamepadControls[id] || { down: false, action: null, repeatAt: 0 };
+    const changed = !previous.down || previous.action !== action;
     if (previous.down && (!down || previous.action !== action) && previous.action) {
       release(previous.action);
     }
-    if (down && (!previous.down || previous.action !== action) && action) {
+    if (down && changed && action) {
       if (action === "a" || action === "b" || action === "c") prepareControllerAim(action);
       press(action);
     }
-    gamepadControls[id] = { down, action };
+    let repeatAt = previous.repeatAt || 0;
+    if (!down || !action) repeatAt = 0;
+    else if (changed) repeatAt = inputNow() + MENU_REPEAT_DELAY_MS;
+    else if (repeat && repeatAt && inputNow() >= repeatAt) {
+      // Gamepads do not emit keyboard-style repeat events. Synthesize a
+      // measured repeat so holding the stick/D-pad feels like a console UI
+      // without racing through several controls on the first press.
+      taps[action] = true;
+      repeatAt = inputNow() + MENU_REPEAT_INTERVAL_MS;
+    }
+    gamepadControls[id] = { down, action, repeatAt };
   }
 
   function resetGamepad() {
@@ -202,6 +216,7 @@ G.input = (() => {
     }
     for (const id in gamepadControls) delete gamepadControls[id];
     gamepadVec.x = gamepadVec.y = 0;
+    menuScrollVec.x = menuScrollVec.y = 0;
     controllerAim = null;
     gamepadIndex = null;
     gamepadName = "";
@@ -243,7 +258,8 @@ G.input = (() => {
     // menu-style controls: A confirms, B backs out, stick/D-pad move the
     // highlight. The DOM screens matter most on TV, where there is no
     // keyboard or pointer to fall back on.
-    const menuOpen = !!(G.ui && G.ui.menuOpen) || !!G.saveSlotScreenOpen || !!G.storyEndingOpen;
+    const menuOpen = !!(G.ui && (G.ui.menuOpen || G.ui.workshopOpen)) ||
+      !!G.saveSlotScreenOpen || !!G.storyEndingOpen;
     const wheelOpen = !!(G.ui && G.ui.formWheelOpen);
     const axes = pad.axes || [];
     const left = stickVector(axes[0] || 0, axes[1] || 0, GAMEPAD_DEAD_ZONE);
@@ -253,7 +269,12 @@ G.input = (() => {
 
     if (menuOpen) {
       gamepadVec.x = gamepadVec.y = 0;
+      // Console menus conventionally reserve the right stick for free
+      // scrolling while the left stick/D-pad moves focus item by item.
+      menuScrollVec.x = right.x;
+      menuScrollVec.y = right.y;
     } else {
+      menuScrollVec.x = menuScrollVec.y = 0;
       gamepadVec.x = dpadX || left.x;
       gamepadVec.y = dpadY || left.y;
       const moveLen = Math.sqrt(gamepadVec.x * gamepadVec.x + gamepadVec.y * gamepadVec.y);
@@ -262,7 +283,7 @@ G.input = (() => {
         gamepadVec.y /= moveLen;
       }
     }
-    controllerAim = right.x || right.y
+    controllerAim = !menuOpen && (right.x || right.y)
       ? { btn: controllerAimButton, x: right.x, y: right.y, dragged: true }
       : null;
 
@@ -272,10 +293,10 @@ G.input = (() => {
     syncGamepadControl("b", gamepadButton(pad, 1), menuOpen ? "back" : "swap");
     syncGamepadControl("x", gamepadButton(pad, 2), menuOpen || wheelOpen ? null : "b");
     syncGamepadControl("y", gamepadButton(pad, 3), menuOpen || wheelOpen ? null : "c");
-    syncGamepadControl("lb", gamepadButton(pad, 4), wheelOpen ? "wheelPrev" : menuOpen ? "tabPrev" : "c");
-    syncGamepadControl("rb", gamepadButton(pad, 5), wheelOpen ? "wheelNext" : menuOpen ? "tabNext" : "b");
-    syncGamepadControl("lt", gamepadButton(pad, 6, 0.35), menuOpen || wheelOpen ? null : "c");
-    syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen || wheelOpen ? "confirm" : "a");
+    syncGamepadControl("lb", gamepadButton(pad, 4), wheelOpen ? "wheelPrev" : menuOpen ? "pageLeft" : "c", menuOpen);
+    syncGamepadControl("rb", gamepadButton(pad, 5), wheelOpen ? "wheelNext" : menuOpen ? "pageRight" : "b", menuOpen);
+    syncGamepadControl("lt", gamepadButton(pad, 6, 0.35), menuOpen ? "pageLeft" : wheelOpen ? null : "c", menuOpen);
+    syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen ? "pageRight" : wheelOpen ? "confirm" : "a", menuOpen);
     syncGamepadControl("view", gamepadButton(pad, 8), menuOpen || wheelOpen ? "back" : "map");
     syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen ? "back" : "pause");
     syncGamepadControl("leftStick", gamepadButton(pad, 10), menuOpen || wheelOpen ? null : "guide");
@@ -285,10 +306,10 @@ G.input = (() => {
     const navDown = gamepadButton(pad, 13) || left.y > GAMEPAD_NAV_THRESHOLD;
     const navLeft = gamepadButton(pad, 14) || left.x < -GAMEPAD_NAV_THRESHOLD;
     const navRight = gamepadButton(pad, 15) || left.x > GAMEPAD_NAV_THRESHOLD;
-    syncGamepadControl("navUp", menuOpen && navUp, "menuUp");
-    syncGamepadControl("navDown", menuOpen && navDown, "menuDown");
-    syncGamepadControl("navLeft", menuOpen && navLeft, "menuLeft");
-    syncGamepadControl("navRight", menuOpen && navRight, "menuRight");
+    syncGamepadControl("navUp", menuOpen && navUp, "menuUp", true);
+    syncGamepadControl("navDown", menuOpen && navDown, "menuDown", true);
+    syncGamepadControl("navLeft", menuOpen && navLeft, "menuLeft", true);
+    syncGamepadControl("navRight", menuOpen && navRight, "menuRight", true);
   }
 
   window.addEventListener("gamepadconnected", (event) => {
@@ -594,6 +615,7 @@ G.input = (() => {
       return aim;
     },
     get aiming() { return liveAim || controllerAim; },
+    get menuScroll() { return { x: menuScrollVec.x, y: menuScrollVec.y }; },
     clearTaps() {
       for (const k in taps) taps[k] = false;
       for (const k in releasedAims) delete releasedAims[k];
