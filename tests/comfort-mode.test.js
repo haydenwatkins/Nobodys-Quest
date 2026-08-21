@@ -38,8 +38,8 @@ assert.equal(G.state.player.damageTaken, 3, "hearts must not regenerate while ea
 assert.equal(G.setComfortSetting("easyMode", true), true);
 assert.equal(JSON.parse(settingsStore.getItem("nobodys-quest-comfort-v1")).easyMode, true,
   "comfort choices should persist across adventure slots and reloads");
-G.updateComfortRecovery(4);
-assert.equal(G.state.player.damageTaken, 3, "the four-second safety breather should not count as regeneration time");
+G.updateComfortRecovery(2);
+assert.equal(G.state.player.damageTaken, 3, "the two-second safety breather should not count as regeneration time");
 G.updateComfortRecovery(5.9);
 assert.equal(G.state.player.damageTaken, 3);
 assert.equal(G.updateComfortRecovery(0.1), 1);
@@ -48,9 +48,12 @@ assert.equal(G.updateComfortRecovery(12), 2);
 assert.equal(G.state.player.damageTaken, 0, "regeneration should stop cleanly at full health");
 
 G.state.player.damageTaken = 2;
+G.state.player.easyRegenDelay = 0;
+G.state.player.easyRegenProgress = 5;
 G.delayEasyModeRecovery();
-G.updateComfortRecovery(9.9);
-assert.equal(G.state.player.damageTaken, 2, "taking damage should restart the full breather and recovery cadence");
+assert.equal(G.state.player.easyRegenProgress, 5, "taking damage must retain earned regeneration progress");
+G.updateComfortRecovery(2.9);
+assert.equal(G.state.player.damageTaken, 2, "taking damage should pause recovery for two seconds");
 G.updateComfortRecovery(0.1);
 assert.equal(G.state.player.damageTaken, 1);
 

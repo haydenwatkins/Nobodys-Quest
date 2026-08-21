@@ -144,6 +144,7 @@
     rivalState: G.makeRivalState(),
     expedition: G.makeExpeditionProgress(),
     expeditionRun: null,
+    legends: G.makeLegends(),
     gauntletBest: 0,
     gauntletIronBest: 0,
     playSeconds: 0,
@@ -194,6 +195,7 @@
     s.rivalState = G.normalizeRivalState(save.rivalState);
     s.expedition = G.normalizeExpeditionProgress(save.expedition);
     s.expeditionRun = G.normalizeExpeditionRun(save.expeditionRun);
+    s.legends = G.normalizeLegends(save.legends);
     s.gauntletBest = save.gauntletBest || 0;
     s.gauntletIronBest = save.gauntletIronBest || 0;
     G.questCounts = save.questCounts || {};
@@ -225,6 +227,8 @@
     G.state.wayfinder.whistleClaimed = true;
     G.state.wayfinder.rewardClaimed = true;
     G.state.skinsUnlocked = G.FORM_SKINS.map((skin) => skin.id);
+    G.state.legends.ranks = Object.fromEntries(G.formOrder.map((id) => [id, 3]));
+    G.state.legends.charge = Object.fromEntries(G.formOrder.map((id) => [id, 100]));
     if (!G.state.items.includes("wayfinder-whistle")) G.state.items.push("wayfinder-whistle");
   }
   if (builderParams && builderParams.get("playtestWayfinder") === "early") {
@@ -280,6 +284,9 @@
 
   G.state.player.manaMax = G.playerMaxMana();
   G.state.player.mana = Math.min(G.state.player.mana, G.state.player.manaMax);
+  // A legacy save may have been missing more hearts than a newly rebalanced
+  // form now owns. Preserve the adventure and always load it alive.
+  G.state.player.damageTaken = Math.min(G.state.player.damageTaken, Math.max(0, G.playerMaxHearts() - 1));
   G.checkGuardianCollectionReward(true); // migrates completed collections from older saves
   if (G.state.wayfinder.rewardClaimed && !G.state.items.includes("wayfinder-whistle"))
     G.state.items.push("wayfinder-whistle");

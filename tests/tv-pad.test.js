@@ -32,7 +32,7 @@ class FakeTarget {
 }
 
 const elements = {};
-for (const id of ["touch-ui", "joy-zone", "btn-a", "btn-b", "btn-c", "btn-swap", "btn-map", "btn-pause"])
+for (const id of ["touch-ui", "joy-zone", "btn-a", "btn-b", "btn-c", "btn-swap", "btn-map", "btn-pause", "btn-ultimate"])
   elements[id] = new FakeTarget(id);
 
 const windowTarget = new FakeTarget("window");

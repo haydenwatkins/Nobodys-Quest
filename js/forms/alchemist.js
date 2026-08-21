@@ -11,7 +11,7 @@ registerForm({
   tagline: "Every bottle is labeled, and every label says probably explosive.",
 
   speed: 75,
-  hearts: 5,
+  hearts: 4,
   slots: 2,
   passive: { id: "catalyst", name: "Catalyst",
     description: "Area abilities cover more ground and explosive projectiles burst wider." },

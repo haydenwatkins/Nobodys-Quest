@@ -11,7 +11,7 @@
   const STORAGE_KEY = "nobodys-quest-comfort-v1";
   const DEFAULTS = { bossAssistance: false, easyMode: false };
 
-  G.EASY_HEART_REGEN_DELAY = 4;
+  G.EASY_HEART_REGEN_DELAY = 2;
   G.EASY_HEART_REGEN_SECONDS = 6;
 
   function readSettings() {
@@ -65,7 +65,8 @@
     const p = G.state && G.state.player;
     if (!p) return;
     p.easyRegenDelay = G.EASY_HEART_REGEN_DELAY;
-    p.easyRegenProgress = 0;
+    // A hit creates a short dramatic pause, but never deletes progress. This
+    // makes Easy Mode genuinely help during a sustained boss battle.
   };
 
   G.updateComfortRecovery = function (dt) {

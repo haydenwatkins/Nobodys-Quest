@@ -11,7 +11,7 @@ registerForm({
   tagline: "Treats the battlefield like a floor with a very loose definition.",
 
   speed: 75,
-  hearts: 5,
+  hearts: 6,
   slots: 2,
   passive: { id: "aftershock", name: "Aftershock",
     description: "Area abilities and dash landings echo as delayed stunning tremors." },

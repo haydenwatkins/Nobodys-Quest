@@ -12,7 +12,7 @@ registerForm({
   tagline: "Clank clank clank. Big sword, bigger heart(s).",
 
   speed: 60,                   // slow (the lowest allowed is 40)...
-  hearts: 5,                   // ...but SO tanky
+  hearts: 7,                   // ...and built to stay beside the enemy
   slots: 2,
   passive: { id: "steadfast", name: "Steadfast",
     description: "Melee abilities guard you from the moment their swing begins." },

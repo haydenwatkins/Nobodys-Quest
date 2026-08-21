@@ -11,7 +11,7 @@ registerForm({
   tagline: "Wins every argument by throwing the punchline at somebody else.",
 
   speed: 90,
-  hearts: 5,
+  hearts: 4,
   slots: 2,
   passive: { id: "trickTrajectory", name: "Trick Trajectory",
     description: "Projectile abilities ricochet to one extra target." },

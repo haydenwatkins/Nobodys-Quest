@@ -28,8 +28,11 @@ for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alch
 run("js/engine/quests.js");
 G.validateCrossRefs();
 assert.equal(G.workshopErrors.length, 0, "new forms must obey Ben's workshop rules");
-assert.ok(G.formOrder.every((id) => G.forms[id].hearts >= 5),
-  "the registration boundary should guarantee at least five hearts for every present and future form");
+assert.ok(G.formOrder.every((id) => G.forms[id].hearts >= 1 && G.forms[id].hearts <= 8),
+  "the registration boundary should preserve the full exposure-based 1–8 heart range");
+assert.equal(G.forms.ranger.hearts, 3, "the long-range specialist should trade durability for safe reach");
+assert.ok(G.forms.turtle.hearts > G.forms.rat.hearts && G.forms.golem.hearts > G.forms.samurai.hearts,
+  "pure tanks should outlast mobile close-range forms");
 
 // Native specials should keep combat moving. B is the frequent utility move;
 // C may be stronger, but never earns a multi-second lockout or an entire mana

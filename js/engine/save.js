@@ -146,6 +146,7 @@ G.saveGame = function () {
       rivalState: s.rivalState,
       expedition: s.expedition,
       expeditionRun: s.expeditionRun,
+      legends: s.legends,
       gauntletBest: s.gauntletBest || 0,
       gauntletIronBest: s.gauntletIronBest || 0,
       questCounts: G.questCounts,
@@ -351,7 +352,7 @@ G.showSaveSlotScreen = function (force) {
         <button data-title-sound>◖ Sound <span>${!G.sfx || G.sfx.soundEnabled !== false ? "ON" : "OFF"}</span></button>
         <button data-title-detail>✦ World detail <span>${G.hdPilot ? "HD" : "ORIGINAL"}</span></button>
         <button data-title-boss-assistance aria-pressed="${!!(G.comfortSetting && G.comfortSetting("bossAssistance"))}">♥ Boss Assistance <span>${G.comfortSetting && G.comfortSetting("bossAssistance") ? "ON · retry help" : "OFF · original bosses"}</span></button>
-        <button data-title-easy-mode aria-pressed="${!!(G.comfortSetting && G.comfortSetting("easyMode"))}">🌱 Easy Mode <span>${G.comfortSetting && G.comfortSetting("easyMode") ? "ON · heart regeneration" : "OFF · normal healing"}</span></button>
+        <button data-title-easy-mode aria-pressed="${!!(G.comfortSetting && G.comfortSetting("easyMode"))}">🌱 Easy Mode <span>${G.comfortSetting && G.comfortSetting("easyMode") ? "ON · in-battle heart regeneration" : "OFF · normal healing"}</span></button>
         <button data-title-fullscreen>⛶ Fullscreen</button><button data-title-settings-close>Done</button>
       </aside>
     </main>`;
@@ -468,7 +469,7 @@ G.showSaveSlotScreen = function (force) {
     if (G.setComfortSetting) G.setComfortSetting("easyMode", !G.comfortSetting("easyMode"));
     const enabled = G.comfortSetting("easyMode");
     easyMode.setAttribute("aria-pressed", String(enabled));
-    easyMode.querySelector("span").textContent = enabled ? "ON · heart regeneration" : "OFF · normal healing";
+    easyMode.querySelector("span").textContent = enabled ? "ON · in-battle heart regeneration" : "OFF · normal healing";
   });
   const fullscreen = overlay.querySelector("[data-title-fullscreen]");
   if (fullscreen) fullscreen.addEventListener("click", () => {

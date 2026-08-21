@@ -4,7 +4,7 @@
 registerForm({
   id: "astronomer", name: "Astronomer", icon: "🔭",
   tagline: "Charts six impossible stars and politely asks gravity to tidy the battlefield.",
-  speed: 86, hearts: 5, slots: 2,
+  speed: 86, hearts: 4, slots: 2,
   passive: { id: "gravityTouch", name: "Gravity Touch",
     description: "Area bursts and explosions draw enemies toward their center." },
   basic: "starNeedle",

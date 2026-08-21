@@ -4,7 +4,7 @@
 registerForm({
   id: "druid", name: "Druid", icon: "🌳",
   tagline: "Plants first, asks questions later, and considers every arena excellent soil.",
-  speed: 82, hearts: 5, slots: 2,
+  speed: 82, hearts: 4, slots: 2,
   passive: { id: "seedbed", name: "Seedbed",
     description: "Status effects leap to a nearby enemy when their victim falls." },
   basic: "thornLash",

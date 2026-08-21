@@ -1,9 +1,8 @@
 /* ============================================================
    NPC STORY ENGINE - safe placement, changing dialogue, and drawing.
 
-   Talking is intentionally proximity-based: it works with keyboard,
-   controller, and touch without adding another mobile HUD button.
-   Walk up to someone, then step away and return to hear their next line.
+   Proximity selects one speaker; an explicit interaction starts dialogue.
+   Walking into a character never interrupts play.
    ============================================================ */
 
 "use strict";
@@ -386,6 +385,33 @@
     if (G.saveGame) G.saveGame();
   }
 
+  function talkBlocked() {
+    const s = G.state;
+    if (!s || s.bossCutscene || s.zoneTransition || s.playerKnockout || s.gauntletBetween) return true;
+    return (s.enemies || []).some((enemy) =>
+      !enemy.dead && Math.hypot(enemy.x - s.player.x, enemy.y - s.player.y) < 64);
+  }
+
+  G.npcTalkCandidate = function () {
+    const s = G.state;
+    if (!s || !s.player || s.npcArrivalGrace > 0 || talkBlocked()) return null;
+    let chosen = null, best = Infinity;
+    for (const npc of s.npcs || []) {
+      if (npc.ambientOnly) continue;
+      const distance = Math.hypot(npc.x - s.player.x, npc.y - s.player.y);
+      if (distance <= TALK_NEAR && distance < best) { chosen = npc; best = distance; }
+    }
+    return chosen;
+  };
+
+  G.tryNpcTalk = function () {
+    const npc = G.npcTalkCandidate();
+    if (!npc) return false;
+    talk(npc);
+    if (G.input && G.input.clearTaps) G.input.clearTaps();
+    return true;
+  };
+
   G.updateNpcs = function (dt) {
     const s = G.state;
     const p = s && s.player;
@@ -395,8 +421,6 @@
     const blocked = s.bossCutscene || s.zoneTransition || s.playerKnockout || s.gauntletBetween;
     const danger = (s.enemies || []).some((enemy) =>
       !enemy.dead && Math.hypot(enemy.x - p.x, enemy.y - p.y) < 48);
-    let candidate = null;
-    let candidateDistance = Infinity;
     const threats = (s.enemies || []).filter((enemy) => !enemy.dead);
 
     for (const npc of npcs) {
@@ -409,10 +433,6 @@
       }
       const distance = Math.hypot(npc.x - p.x, npc.y - p.y);
       if (distance > TALK_RESET) npc.near = false;
-      if (s.npcArrivalGrace <= 0 && !npc.ambientOnly && distance <= TALK_NEAR && !npc.near && distance < candidateDistance) {
-        candidate = npc;
-        candidateDistance = distance;
-      }
     }
 
     s.npcChatterT = (s.npcChatterT == null ? 12 + ((s.time || 0) % 5) : s.npcChatterT) - dt;
@@ -430,14 +450,6 @@
       s.npcChatterT = 21 + ((s.time || 0) % 8);
     }
 
-    if (candidate && !blocked && !danger) {
-      // Mark everyone in the same little conversation circle so a crowd does
-      // not fire three speeches on consecutive frames.
-      for (const npc of npcs) {
-        if (Math.hypot(npc.x - p.x, npc.y - p.y) <= TALK_NEAR) npc.near = true;
-      }
-      talk(candidate);
-    }
   };
 
   G.drawNpc = function (ctx, npc) {
@@ -489,15 +501,19 @@
     const distance = Math.hypot(npc.x - p.x, npc.y - p.y);
     if (npc.ambientOnly || distance > 44) return;
 
+    const selected = G.npcTalkCandidate && G.npcTalkCandidate() === npc;
+
     const y = Math.round(npc.y - 18 + bob);
     ctx.save();
     ctx.fillStyle = "rgba(26,28,44,0.9)";
-    ctx.fillRect(Math.round(npc.x - 5), y, 10, 8);
+    const prompt = selected ? (G.input.hasGamepad ? "A TALK" : G.input.isTouch ? "TALK" : "E TALK") : "...";
+    const width = selected ? Math.max(22, prompt.length * 4 + 4) : 10;
+    ctx.fillRect(Math.round(npc.x - width / 2), y, width, 8);
     ctx.fillStyle = npc.def.sprite.palette.a;
     ctx.font = "6px monospace";
     ctx.textBaseline = "top";
     ctx.textAlign = "center";
-    ctx.fillText("...", Math.round(npc.x), y);
+    ctx.fillText(prompt, Math.round(npc.x), y);
     ctx.restore();
   };
 
@@ -505,10 +521,6 @@
     const s = G.state;
     if (!s || !s.player) return;
     s.npcArrivalGrace = 1.25;
-    // Anyone already inside the arrival circle waits for the player to step
-    // away and deliberately return before beginning a conversation.
-    for (const npc of s.npcs || []) {
-      if (Math.hypot(npc.x - s.player.x, npc.y - s.player.y) <= TALK_RESET) npc.near = true;
-    }
+    // The short grace keeps the contextual prompt out of arrival cutscenes.
   });
 })();

@@ -124,7 +124,11 @@ G.state.player.x += 100;
 G.updateNpcs(0.1);
 G.state.player.x -= 100;
 G.updateNpcs(0.1);
-assert.equal(arrivalDialogues, 1, "stepping away and deliberately returning should restore normal conversation");
+assert.equal(arrivalDialogues, 0, "bumping into an NPC must never open modal dialogue");
+G.state.npcArrivalGrace = 0;
+assert.ok(G.npcTalkCandidate(), "proximity should select one explicit talk target");
+G.tryNpcTalk();
+assert.equal(arrivalDialogues, 1, "the explicit talk action should open the selected conversation");
 
 // Purification must visibly repopulate a region, not merely remove its boss.
 G.state = state();

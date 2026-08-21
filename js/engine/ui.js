@@ -123,7 +123,7 @@ G.ui = (() => {
         dialogueData.shown + dt * 48
       );
       const action = dialoguePointerAdvance ||
-        ["a", "b", "c", "swap", "map", "pause"].some((button) => G.input.tapped(button));
+        ["a", "b", "c", "swap", "map", "pause", "interact"].some((button) => G.input.tapped(button));
       dialoguePointerAdvance = false;
       if (action) advanceDialogue();
     }
@@ -306,6 +306,10 @@ G.ui = (() => {
       c.fillRect(x + 28, y, 1, 15);
       c.fillStyle = "#ffcd75";
       c.fillText(labels[i], x + 3, y + 5);
+      if (i === 0 && G.npcTalkCandidate && G.npcTalkCandidate()) {
+        c.fillText("TALK", x + 10, y + 5);
+        continue;
+      }
       if (!ab) {
         c.fillStyle = "#94b0c2";
         c.fillText("-", x + 17, y + 5);
@@ -319,6 +323,14 @@ G.ui = (() => {
         c.fillStyle = "rgba(26,28,44,0.75)";
         c.fillRect(x + 1, y + 1, 27, Math.min(13, Math.ceil(cd / Math.max(0.1, ab.cooldown || 1) * 13)));
       }
+    }
+    const rank = G.legendRank ? G.legendRank(G.state.formId) : 0;
+    if (rank >= 3) {
+      const charge = G.legendCharge(G.state.formId), x = 108, y = G.H - 20;
+      c.fillStyle = "rgba(26,28,44,0.8)"; c.fillRect(x, y, 53, 15);
+      c.fillStyle = charge >= 100 ? "#fff3c2" : "#566c86"; c.fillRect(x + 1, y + 1, Math.round(51 * charge / 100), 13);
+      c.fillStyle = charge >= 100 ? "#1a1c2c" : "#f4f4f4";
+      c.fillText(G.input.hasGamepad ? "LT+RT ✦" : "R ✦", x + 4, y + 5);
     }
   }
 
@@ -687,12 +699,17 @@ G.ui = (() => {
     const ids = ["btn-a", "btn-b", "btn-c"];
     let sig = "";
     const labels = ids.map((elId, i) => {
+      if (i === 0 && G.npcTalkCandidate && G.npcTalkCandidate()) {
+        sig += "talk";
+        return "TALK";
+      }
       const ab = G.abilities[lo[i]];
       if (!ab) return "·";
       const ready = (p.cooldowns[lo[i]] || 0) <= 0 && ab.mana <= p.mana;
       sig += lo[i] + ready;
       return ab.icon;
     });
+    sig += `legend${G.legendRank ? G.legendRank(G.state.formId) : 0}:${Math.floor(G.legendCharge ? G.legendCharge(G.state.formId) : 0)}`;
     if (sig === btnCache) return;
     btnCache = sig;
     labels.forEach((txt, i) => {
@@ -701,6 +718,15 @@ G.ui = (() => {
       const ab = G.abilities[lo[i]];
       el.style.opacity = ab && (ab.mana > p.mana) ? 0.4 : 1;
     });
+    const ultimate = document.getElementById("btn-ultimate");
+    if (ultimate) {
+      const rank = G.legendRank ? G.legendRank(G.state.formId) : 0;
+      const charge = G.legendCharge ? G.legendCharge(G.state.formId) : 0;
+      ultimate.style.display = rank >= 3 ? "block" : "none";
+      ultimate.style.setProperty("--legend-charge", `${charge}%`);
+      ultimate.textContent = charge >= 100 ? "✦" : `${Math.floor(charge)}`;
+      ultimate.style.opacity = charge >= 100 ? 1 : 0.62;
+    }
   }
 
   /* ---------- pause menu ---------- */
@@ -1104,6 +1130,12 @@ G.ui = (() => {
         labAbilityId = null;
         buildMenu();
       }));
+    menuEl.querySelectorAll("[data-legend-facet]").forEach((button) =>
+      button.addEventListener("click", () => {
+        G.setLegendFacet(labFormId, button.dataset.legendFacet);
+        G.sfx.play("menu");
+        buildMenu();
+      }));
     menuEl.querySelectorAll("[data-loadout-slot]").forEach((button) =>
       button.addEventListener("click", () => { labSlot = Number(button.dataset.loadoutSlot); buildMenu(); }));
     const restoreDefaultLoadout = menuEl.querySelector('[data-act="restore-default-loadout"]');
@@ -1324,7 +1356,7 @@ G.ui = (() => {
         <button data-act="sound"><strong>◖ Sound effects</strong><span>${soundOn ? "ON" : "OFF"}</span></button>
         <button data-act="hd-pilot"><strong>✦ World detail</strong><span>${G.hdPilot ? "HD · 640×360" : "Original · 320×180"}</span></button>
         <button data-act="boss-assistance" aria-pressed="${!!bossAssistance}"><strong>♥ Boss Assistance</strong><span>${bossAssistance ? "ON · retry hearts and gentler shots" : "OFF · original boss rules"}</span></button>
-        <button data-act="easy-mode" aria-pressed="${!!easyMode}"><strong>🌱 Easy Mode</strong><span>${easyMode ? "ON · 1 heart every 6s after a breather" : "OFF · hearts need pickups or rest"}</span></button>
+        <button data-act="easy-mode" aria-pressed="${!!easyMode}"><strong>🌱 Easy Mode</strong><span>${easyMode ? "ON · in-battle heart regeneration" : "OFF · hearts need pickups or rest"}</span></button>
         <button data-act="tutorial"><strong>? Tutorial</strong><span>Replay contextual hints</span></button>
         <button data-act="save-slots"><strong>▤ Adventure slots</strong><span>Slot ${G.activeSaveSlot} · switch or begin again</span></button>
         ${canFullscreen ? `<button data-act="fullscreen"><strong>⛶ Fullscreen</strong><span>Use more of this screen</span></button>` : ""}
@@ -1348,15 +1380,49 @@ G.ui = (() => {
   }
 
   function buildFormLab() {
-    const labels = { roster: "Roster", loadout: "Loadout", skins: "Skins" };
+    const labels = { roster: "Roster", loadout: "Loadout", legends: "Legends", skins: "Skins" };
     let html = `<div class="form-lab-header">
       <div><h2>⚗ FORM LAB</h2><p>Choose a form, build its moves, and shape its look.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
         `<button data-formlab-view="${id}" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}</div>
     </div>`;
     if (formLabView === "loadout") return html + buildLoadoutLab();
+    if (formLabView === "legends") return html + buildLegendsLab();
     if (formLabView === "skins") return html + buildSkinsLab();
     return html + buildRosterLab();
+  }
+
+  function buildLegendsLab() {
+    const form = labSelectedForm(true);
+    const def = G.LEGEND_DEFS[form.id];
+    const rank = G.legendRank(form.id);
+    const objective = G.legendObjective(form.id);
+    const percent = Math.round(100 * objective.value / Math.max(1, objective.goal));
+    const chosen = G.state.legends.facets[form.id] || "original";
+    const technique = G.abilities[def.techniqueId];
+    const stages = [
+      [1, "FACET", def.facet.name, "An alternate passive that changes handling, not damage."],
+      [2, "TECHNIQUE", def.techniqueName, "A new native move for the shared ability tray."],
+      [3, "LEGEND ARM", def.armName, `${def.ultimateName} · charged through active combat.`],
+    ];
+    return `<div class="lab-form-switcher">${G.unlockedForms().map((id) =>
+      `<button data-form-select="${id}" class="${id === form.id ? "active" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span></button>`).join("")}</div>
+      <section class="legend-hero" style="--legend:${def.color}">
+        <div>${previewCanvas(form.id, G.selectedFormSkin(form.id)?.id || "classic", "loadout-preview", form.name, false, !G.selectedFormSkin(form.id))}</div>
+        <div><span class="eyebrow">${escapeHtml(def.survivalText)}</span><h2>${form.icon} ${escapeHtml(form.name)} Legend</h2>
+          <p>Mastery continues sideways: more choices and a new climax, without raising the level cap or invalidating early battles.</p>
+          <div class="legend-objective"><strong>${escapeHtml(objective.label)}</strong><span>${objective.value}/${objective.goal}</span><i><b style="width:${percent}%"></b></i></div>
+        </div>
+        <div class="legend-meter"><strong>${Math.floor(G.legendCharge(form.id))}%</strong><span>ULTIMATE</span></div>
+      </section>
+      <div class="legend-track">${stages.map(([need, label, name, copy]) => `<article class="${rank >= need ? "earned" : need === rank + 1 ? "next" : "locked"}">
+        <span>LEGEND ${["I", "II", "III"][need - 1]} · ${label}</span><h3>${rank >= need || need === rank + 1 ? escapeHtml(name) : "Unrevealed"}</h3>
+        <p>${escapeHtml(copy)}</p>${rank >= need ? `<strong class="legend-earned">✓ AWAKENED</strong>` : ""}</article>`).join("")}</div>
+      ${rank >= 1 ? `<section class="facet-picker"><div><span class="eyebrow">ACTIVE FACET</span><h2>Choose how ${escapeHtml(form.name)} handles</h2></div>
+        <button data-legend-facet="original" class="${chosen === "original" ? "active" : ""}"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></button>
+        <button data-legend-facet="legend" class="${chosen === "legend" ? "active" : ""}"><strong>✦ ${escapeHtml(def.facet.name)}</strong><span>${escapeHtml(def.facet.description)}</span></button></section>` : ""}
+      ${rank >= 2 ? `<section class="legend-reward"><span>${technique.icon}</span><div><small>AVAILABLE IN LOADOUT</small><h2>${escapeHtml(technique.name)}</h2><p>${escapeHtml(G.passives.styleLabel(technique.style))} · ${technique.mana} mana · ${technique.cooldown}s recovery</p></div><button data-formlab-view="loadout">Equip technique</button></section>` : ""}
+      ${rank >= 3 ? `<section class="legend-reward ultimate"><span>✦</span><div><small>VISIBLE LEGEND ARM</small><h2>${escapeHtml(def.armName)}</h2><p>${escapeHtml(def.ultimateName)} · R key, both triggers, or the glowing touch button at 100%.</p></div></section>` : ""}`;
   }
 
   function buildFormPathCard(id) {
@@ -1421,6 +1487,7 @@ G.ui = (() => {
 
   function buildRosterLab() {
     const selected = labSelectedForm(false);
+    const selectedPassive = G.legendPassiveFor ? G.legendPassiveFor(selected) : selected.passive;
     const unlocked = G.formUnlocked(selected.id);
     const ready = !unlocked && G.formReady(selected.id);
     const echo = ready && G.formEchoFor ? G.formEchoFor(selected.id) : null;
@@ -1436,7 +1503,8 @@ G.ui = (() => {
           <h2>${selected.icon} ${escapeHtml(selected.name)}</h2>
           <p class="lab-tagline">${escapeHtml(selected.tagline)}</p>
           ${unlocked ? `<div class="lab-stat-row"><span>❤️ ${selected.hearts}</span><span>👟 ${selected.speed}</span>${dmgChip(G.abilities[selected.basic]?.type || "blunt")}</div>
-            <div class="passive-rule"><strong>◆ ${escapeHtml(selected.passive.name)}</strong><span>${escapeHtml(selected.passive.description)}</span></div>
+            <div class="survival-rule">${escapeHtml((G.FORM_SURVIVAL[selected.id] || {}).text || "BALANCED · mixed range and exposure")}</div>
+            <div class="passive-rule"><strong>◆ ${escapeHtml(selectedPassive.name)}</strong><span>${escapeHtml(selectedPassive.description)}</span></div>
             <div class="mastery-track"><span>MASTERY</span><span class="mastery-pips">${selected.quests.map((quest) => `<i class="${G.questsDone.includes(quest.id) ? "done" : ""}"></i>`).join("")}</span><span>${completed}/${selected.quests.length}</span></div>
             <div class="lab-actions"><button data-become="${selected.id}" ${current ? "disabled" : ""}>${current ? "Equipped" : `Become ${escapeHtml(selected.name)}`}</button>
             <button data-formlab-view="loadout">Build moves</button><button data-formlab-view="skins">View skins</button></div>`
@@ -1464,6 +1532,7 @@ G.ui = (() => {
 
   function buildLoadoutLab() {
     const form = labSelectedForm(true);
+    const activePassive = G.legendPassiveFor ? G.legendPassiveFor(form) : form.passive;
     const lo = G.getLoadout(form.id);
     const defaults = G.defaultLoadout(form.id);
     const usingDefaults = defaults.every((abilityId, slot) => lo[slot] === abilityId);
@@ -1486,7 +1555,7 @@ G.ui = (() => {
         <section class="loadout-form-panel">
           <div class="eyebrow">BUILDING FOR</div><h2>${form.icon} ${escapeHtml(form.name)}</h2>
           ${previewCanvas(form.id, skin ? skin.id : "classic", "loadout-preview", form.name, false, !skin)}
-          <div class="passive-rule"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></div>
+          <div class="passive-rule"><strong>◆ ${escapeHtml(activePassive.name)}</strong><span>${escapeHtml(activePassive.description)}</span></div>
           <button class="restore-loadout" data-act="restore-default-loadout" ${usingDefaults ? "disabled" : ""}>
             <strong>↺ ${usingDefaults ? "Native moves equipped" : "Restore native moves"}</strong>
             <span>${usingDefaults ? "This is the form's original kit." : "Put this form's own B and C moves back."}</span>
@@ -1517,7 +1586,7 @@ G.ui = (() => {
         ${selected ? `<div class="ability-inspector">
           <div class="ability-inspector-icon">${selected.icon}</div><div><span class="eyebrow">${source ? `${source.icon} ${escapeHtml(source.name)} MOVE` : "DISCOVERED MOVE"}</span>
           <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${selected.mana} mana` : " · no mana"} · ${selected.cooldown}s recovery</p>
-          <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(form.passive.name)} will not modify it.`}</div></div>
+          <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(activePassive.name)} will not modify it.`}</div></div>
           <button data-act="equip-ability" ${lo[labSlot] === selected.id ? "disabled" : ""}>${lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
         </div>` : `<div class="empty-tray">No moves match this filter yet.</div>`}
       </section>`;

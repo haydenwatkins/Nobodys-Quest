@@ -35,7 +35,7 @@ class FakeTarget {
 }
 
 const elements = {};
-for (const id of ["touch-ui", "joy-zone", "btn-a", "btn-b", "btn-c", "btn-swap", "btn-map", "btn-pause"])
+for (const id of ["touch-ui", "joy-zone", "btn-a", "btn-b", "btn-c", "btn-swap", "btn-map", "btn-pause", "btn-ultimate"])
   elements[id] = new FakeTarget(id);
 const windowTarget = new FakeTarget("window");
 windowTarget.ontouchstart = null;
@@ -189,6 +189,22 @@ G.input.update();
 assert.equal(G.input.tapped("c"), true, "Xbox Y should fire the third ability");
 pad.buttons[3] = gamepadButton();
 G.input.update();
+
+pad.buttons[6] = gamepadButton(1);
+pad.buttons[7] = gamepadButton(1);
+G.input.update();
+assert.equal(G.input.tapped("ultimate"), true, "both triggers should fire the Legend ultimate");
+assert.equal(G.input.tapped("a"), false, "the ultimate chord must not also fire A");
+assert.equal(G.input.tapped("c"), false, "the ultimate chord must not also fire C");
+pad.buttons[6] = gamepadButton();
+G.input.update();
+assert.equal(G.input.tapped("a"), false, "releasing one trigger must not leak a regular attack");
+pad.buttons[7] = gamepadButton();
+G.input.update();
+
+elements["btn-ultimate"].dispatch("pointerdown", { pointerId: 90 });
+elements["btn-ultimate"].dispatch("pointerup", { pointerId: 90 });
+assert.equal(G.input.tapped("ultimate"), true, "the dedicated touch button should fire the Legend ultimate");
 
 pad.buttons[1] = gamepadButton(1);
 G.input.update();

@@ -29,6 +29,7 @@ G.input = (() => {
   let gamepadIndex = null;
   let gamepadName = "";
   let gamepadNoticeShown = false;
+  let ultimateChordLatched = false;
   let swapPressedAt = 0;
   let swapLongTriggered = false;
   let swapOrigin = null;
@@ -73,10 +74,12 @@ G.input = (() => {
     j: "a", k: "b", l: "c", J: "a", K: "b", L: "c",
     z: "a", x: "b", c: "c", Z: "a", X: "b", C: "c",
     " ": "a",
+    e: "interact", E: "interact",
+    r: "ultimate", R: "ultimate",
     q: "swap", Q: "swap", Tab: "swap",
     m: "map", M: "map",
     h: "guide", H: "guide",
-    Escape: "pause", p: "pause", P: "pause", Enter: "pause",
+    Escape: "pause", p: "pause", P: "pause", Enter: "interact",
   };
   const dirsHeld = { up: false, down: false, left: false, right: false };
 
@@ -218,6 +221,7 @@ G.input = (() => {
     gamepadVec.x = gamepadVec.y = 0;
     menuScrollVec.x = menuScrollVec.y = 0;
     controllerAim = null;
+    ultimateChordLatched = false;
     gamepadIndex = null;
     gamepadName = "";
     // Also drop any TV-bridge state so a blur/app-switch can never leave a
@@ -295,8 +299,15 @@ G.input = (() => {
     syncGamepadControl("y", gamepadButton(pad, 3), menuOpen || wheelOpen ? null : "c");
     syncGamepadControl("lb", gamepadButton(pad, 4), wheelOpen ? "wheelPrev" : menuOpen ? "pageLeft" : "c", menuOpen);
     syncGamepadControl("rb", gamepadButton(pad, 5), wheelOpen ? "wheelNext" : menuOpen ? "pageRight" : "b", menuOpen);
-    syncGamepadControl("lt", gamepadButton(pad, 6, 0.35), menuOpen ? "pageLeft" : wheelOpen ? null : "c", menuOpen);
-    syncGamepadControl("rt", gamepadButton(pad, 7, 0.35), menuOpen ? "pageRight" : wheelOpen ? "confirm" : "a", menuOpen);
+    const leftTrigger = gamepadButton(pad, 6, 0.35);
+    const rightTrigger = gamepadButton(pad, 7, 0.35);
+    const bothTriggers = !menuOpen && !wheelOpen && leftTrigger && rightTrigger;
+    if (bothTriggers) ultimateChordLatched = true;
+    const suppressChordTriggers = ultimateChordLatched;
+    syncGamepadControl("ultimate", bothTriggers, "ultimate");
+    syncGamepadControl("lt", leftTrigger && !suppressChordTriggers, menuOpen ? "pageLeft" : wheelOpen ? null : "c", menuOpen);
+    syncGamepadControl("rt", rightTrigger && !suppressChordTriggers, menuOpen ? "pageRight" : wheelOpen ? "confirm" : "a", menuOpen);
+    if (!leftTrigger && !rightTrigger) ultimateChordLatched = false;
     syncGamepadControl("view", gamepadButton(pad, 8), menuOpen || wheelOpen ? "back" : "map");
     syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen ? "back" : "pause");
     syncGamepadControl("leftStick", gamepadButton(pad, 10), menuOpen || wheelOpen ? null : "guide");
@@ -562,7 +573,7 @@ G.input = (() => {
       document.addEventListener("visibilitychange", () => { if (document.hidden) endMap(null, true); });
     }
 
-    const simpleBtns = { "btn-pause": "pause" };
+    const simpleBtns = { "btn-pause": "pause", "btn-ultimate": "ultimate" };
     for (const [id, btn] of Object.entries(simpleBtns)) {
       const el = document.getElementById(id);
       if (!el) continue;

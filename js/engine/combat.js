@@ -162,6 +162,7 @@ G.combat = (() => {
       poisoned: !!(enemy.status && enemy.status.poison),
       rival: !!enemy.rival,
       expeditionChampion: !!enemy.expeditionChampion,
+      miniboss: !!enemy.def.miniboss,
     });
     if (G.passives) G.passives.onKill(enemy, opts);
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);

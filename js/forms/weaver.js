@@ -4,7 +4,7 @@
 registerForm({
   id: "weaver", name: "Weaver", icon: "🕷️",
   tagline: "A silk duelist who turns scattered crowds into one beautifully tangled problem.",
-  speed: 94, hearts: 5, slots: 2,
+  speed: 94, hearts: 4, slots: 2,
   passive: { id: "lifeline", name: "Lifeline",
     description: "Successive hits on two different enemies bind and tug them together; bosses gain stagger instead of being dragged." },
   basic: "silkNeedle",

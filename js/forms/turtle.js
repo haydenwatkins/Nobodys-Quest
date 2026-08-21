@@ -4,7 +4,7 @@
 registerForm({
   id: "turtle", name: "Turtle", icon: "🐢",
   tagline: "Turns patience into momentum and incoming trouble into somebody else's problem.",
-  speed: 62, hearts: 7, slots: 2,
+  speed: 62, hearts: 8, slots: 2,
   passive: { id: "shellback", name: "Shellback",
     description: "Your shell removes one damage and all knockback from attacks behind you." },
   basic: "shellJab",

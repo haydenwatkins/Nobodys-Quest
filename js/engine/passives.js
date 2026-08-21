@@ -21,7 +21,8 @@ G.passives = (() => {
 
   function current(user) {
     if (!G.state || user !== G.state.player || !G.playerForm) return null;
-    return G.playerForm().passive || null;
+    const form = G.playerForm();
+    return G.legendPassiveFor ? G.legendPassiveFor(form) : form.passive || null;
   }
 
   function ability(abilityId) { return abilityId && G.abilities[abilityId]; }
@@ -36,8 +37,9 @@ G.passives = (() => {
 
   function formMatches(form, ab) {
     if (!form || !form.passive || !ab) return false;
-    if (form.passive.effects && form.passive.effects[ab.style]) return true;
-    const id = form.passive.id;
+    const passive = G.legendPassiveFor ? G.legendPassiveFor(form) : form.passive;
+    if (passive.effects && passive.effects[ab.style]) return true;
+    const id = passive.id;
     if (["scurry", "conductor", "slipstream", "resonance", "lifeline"].includes(id)) return true;
     if (id === "improviser") return isBorrowed(form.id, ab.id);
     if (["steadfast", "elastic", "unstoppable", "flowingDraw"].includes(id)) return ab.style === "melee";
@@ -53,7 +55,8 @@ G.passives = (() => {
 
   function synergyText(form, ab) {
     if (!formMatches(form, ab)) return "";
-    const id = form.passive.id;
+    const passive = G.legendPassiveFor ? G.legendPassiveFor(form) : form.passive;
+    const id = passive.id;
     const text = {
       improviser: "Adaptive handling",
       scurry: "Triggers Scurry",
@@ -80,7 +83,7 @@ G.passives = (() => {
       safeLight: "Leaves a Safe Light",
       worldweight: "Unflinching force",
     };
-    return text[id] || form.passive.name;
+    return text[id] || passive.name;
   }
 
   function prepare(kind, user, original) {

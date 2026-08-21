@@ -201,6 +201,13 @@ G.updatePlayer = function (dt) {
   const p = G.state.player;
   const form = G.playerForm();
 
+  // Interaction wins only when the world is safe. In combat the same A/touch
+  // input remains an attack, so a nearby NPC can never steal a button press.
+  if (G.input.tapped("interact")) G.tryNpcTalk && G.tryNpcTalk();
+  const talkWithA = G.npcTalkCandidate && G.npcTalkCandidate() && G.input.tapped("a");
+  if (talkWithA && G.tryNpcTalk) G.tryNpcTalk();
+  if (G.input.tapped("ultimate") && G.useLegendUltimate) G.useLegendUltimate();
+
   p.manaMax = G.playerMaxMana();
   p.mana = Math.min(p.mana, p.manaMax);
 
@@ -281,7 +288,7 @@ G.updatePlayer = function (dt) {
   // A tap just before cooldown ends waits briefly instead of disappearing.
   // This makes a fast rhythm reliable on both touchscreens and keyboards.
   for (const button of buttons) {
-    if (G.input.tapped(button)) {
+    if (G.input.tapped(button) && !(button === "a" && talkWithA)) {
       p.abilityBuffer[button] = { t: 0.12, aim: G.input.takeAim(button) };
     } else if (p.abilityBuffer[button]) {
       p.abilityBuffer[button].t -= dt;
@@ -1211,6 +1218,7 @@ G.drawPlayer = function (ctx) {
   const frame = G.spriteFrame ? G.spriteFrame(dressedSprite, animationMode, animationMode === "idle" ? G.state.time : p.anim) :
     (p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0);
   G.drawSprite(ctx, dressedSprite, frame, drawX, drawY, p.dir.x < 0);
+  if (G.drawLegendArm) G.drawLegendArm(ctx, p, form, drawX, drawY);
   const hasSignatureEffect = G.drawFormSkinEffect && G.drawFormSkinEffect(ctx, p, form, drawX, drawY);
   if (!hasSignatureEffect && G.drawCostumeAccessory) G.drawCostumeAccessory(ctx, p, form, drawX, drawY);
 

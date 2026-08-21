@@ -11,7 +11,7 @@ registerForm({
   tagline: "All wings, horns, sweeping tail, and responsibly rationed fire.",
 
   speed: 65,
-  hearts: 6,
+  hearts: 7,
   slots: 2,
   passive: { id: "unstoppable", name: "Unstoppable",
     description: "Melee abilities sweep wider, reach farther, and throw enemies harder." },
