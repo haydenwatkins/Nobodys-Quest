@@ -432,6 +432,7 @@
     G.combat.updateProjectiles(dt);
     G.updatePickups(dt);
     if (G.updateFormEcho) G.updateFormEcho(dt);
+    if (G.updateLegendQuest) G.updateLegendQuest(dt);
     G.updateFx(dt);
     G.ui.update(dt);
 
@@ -474,6 +475,8 @@
     for (const npc of s.npcs || []) drawables.push({ y: npc.y, fn: () => G.drawNpc(ctx, npc) });
     for (const formEcho of G.formEchoesHere ? G.formEchoesHere() : [])
       drawables.push({ y: formEcho.y, fn: () => G.drawFormEcho(ctx, formEcho) });
+    for (const legendEcho of G.legendEchoesHere ? G.legendEchoesHere() : [])
+      drawables.push({ y: legendEcho.y, fn: () => G.drawLegendEcho(ctx, legendEcho) });
     drawables.push({ y: p.y, fn: () => G.drawPlayer(ctx) });
     drawables.sort((a, b) => a.y - b.y);
     for (const d of drawables) d.fn();

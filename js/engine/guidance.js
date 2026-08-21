@@ -160,6 +160,28 @@
     };
   }
 
+  function legendEchoTarget(echo) {
+    if (!echo) return null;
+    const form = G.forms[echo.formId];
+    const destination = echo.name || `${form ? form.name : "Legend"} Echo`;
+    if (echo.mapId !== G.state.mapId) {
+      const routed = routeTarget({ mapId: echo.mapId, destination });
+      return routed ? Object.assign(routed, {
+        kind: "legend", color: G.LEGEND_DEFS[echo.formId].color, icon: "✦",
+        text: `Follow the road toward ${destination} in ${G.maps[echo.mapId] ? G.maps[echo.mapId].name : echo.mapId}.`,
+      }) : {
+        kind: "legend", color: G.LEGEND_DEFS[echo.formId].color, icon: "✦", spatial: false, destination,
+        text: `${destination} is waiting in ${G.maps[echo.mapId] ? G.maps[echo.mapId].name : echo.mapId}.`,
+      };
+    }
+    return {
+      x: echo.x, y: echo.y,
+      tileX: Math.floor(echo.x / G.TILE), tileY: Math.floor(echo.y / G.TILE),
+      kind: "legend", color: G.LEGEND_DEFS[echo.formId].color, icon: "✦", destination,
+      text: `${destination} is nearby. Follow the Legend motes to the Echo.`,
+    };
+  }
+
   function firstOpenQuest(formId) {
     const order = formId && G.forms[formId] ? [formId] : (G.unlockedForms ? G.unlockedForms() : G.formOrder || []);
     for (const id of order) {
@@ -208,6 +230,8 @@
     if (!s || !s.player) return null;
     const guidedEcho = G.guidedFormEcho && G.guidedFormEcho();
     if (guidedEcho) return formEchoTarget(guidedEcho);
+    const guidedLegend = G.guidedLegendEcho && G.guidedLegendEcho();
+    if (guidedLegend) return legendEchoTarget(guidedLegend);
     if (!G.storyGoal) return null;
     const goal = G.storyGoal();
     if (!goal || goal.complete) return null;

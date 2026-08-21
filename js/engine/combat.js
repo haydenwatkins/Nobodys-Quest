@@ -163,6 +163,9 @@ G.combat = (() => {
       rival: !!enemy.rival,
       expeditionChampion: !!enemy.expeditionChampion,
       miniboss: !!enemy.def.miniboss,
+      x: enemy.x,
+      y: enemy.y,
+      legendTrial: enemy.legendTrial || null,
     });
     if (G.passives) G.passives.onKill(enemy, opts);
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);

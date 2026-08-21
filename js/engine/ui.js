@@ -306,6 +306,10 @@ G.ui = (() => {
       c.fillRect(x + 28, y, 1, 15);
       c.fillStyle = "#ffcd75";
       c.fillText(labels[i], x + 3, y + 5);
+      if (i === 0 && G.legendEchoCandidate && G.legendEchoCandidate()) {
+        c.fillText("ECHO", x + 10, y + 5);
+        continue;
+      }
       if (i === 0 && G.npcTalkCandidate && G.npcTalkCandidate()) {
         c.fillText("TALK", x + 10, y + 5);
         continue;
@@ -699,6 +703,10 @@ G.ui = (() => {
     const ids = ["btn-a", "btn-b", "btn-c"];
     let sig = "";
     const labels = ids.map((elId, i) => {
+      if (i === 0 && G.legendEchoCandidate && G.legendEchoCandidate()) {
+        sig += "echo";
+        return "ECHO";
+      }
       if (i === 0 && G.npcTalkCandidate && G.npcTalkCandidate()) {
         sig += "talk";
         return "TALK";
@@ -1138,6 +1146,12 @@ G.ui = (() => {
         G.sfx.play("menu");
         buildMenu();
       }));
+    const legendGuide = menuEl.querySelector("[data-legend-guide]");
+    if (legendGuide) legendGuide.addEventListener("click", () => {
+      const formId = legendGuide.dataset.legendGuide;
+      closeMenu();
+      G.guideToLegendEcho(formId);
+    });
     menuEl.querySelectorAll("[data-loadout-slot]").forEach((button) =>
       button.addEventListener("click", () => { labSlot = Number(button.dataset.loadoutSlot); buildMenu(); }));
     const restoreDefaultLoadout = menuEl.querySelector('[data-act="restore-default-loadout"]');
@@ -1386,7 +1400,8 @@ G.ui = (() => {
   }
 
   function buildFormLab() {
-    const labels = { roster: "Forms", loadout: "Arts", legends: "Legends", skins: "Looks" };
+    const legendReady = G.legendReadyForms && G.legendReadyForms().length > 0;
+    const labels = { roster: "Forms", loadout: "Arts", legends: `Legends${legendReady ? " ✦" : ""}`, skins: "Looks" };
     let html = `<div class="form-lab-header">
       <div><h2>⚗ FORM LAB</h2><p>Choose a shape, mix its arts, and make it your own.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
@@ -1403,28 +1418,34 @@ G.ui = (() => {
     const def = G.LEGEND_DEFS[form.id];
     const rank = G.legendRank(form.id);
     const objective = G.legendObjective(form.id);
-    const percent = Math.round(100 * objective.value / Math.max(1, objective.goal));
+    const ready = G.legendAvailable(form.id);
+    const echo = ready ? G.legendEchoFor(form.id) : null;
+    const active = G.state.legends.active && G.state.legends.active.formId === form.id ? G.state.legends.active : null;
+    const percent = Math.min(100, Math.round(100 * objective.value / Math.max(1, objective.goal)));
     const chosen = G.state.legends.facets[form.id] || "original";
     const technique = G.abilities[def.techniqueId];
     const ultimateControl = G.input.hasGamepad ? "Press LT + RT" : G.input.isTouch ? "Tap ✦" : "Press R";
-    const stages = [
-      [1, "NATURE", def.facet.name, "Awaken a second nature within this form."],
-      [2, "SECRET ART", def.techniqueName, "Uncover an art that any form can carry."],
-      [3, "LEGEND ARM", def.armName, `Call forth ${def.ultimateName} when the Legend meter is full.`],
-    ];
+    const stages = G.LEGEND_PATHS[form.id];
+    const rewards = [["NATURE", def.facet.name], ["SECRET ART", def.techniqueName], ["LEGEND ARM", def.armName]];
     return `<div class="lab-form-switcher">${G.unlockedForms().map((id) =>
-      `<button data-form-select="${id}" class="${id === form.id ? "active" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span></button>`).join("")}</div>
+      `<button data-form-select="${id}" class="${id === form.id ? "active" : ""} ${G.legendReady(id) ? "legend-ready" : ""}" aria-label="${escapeHtml(G.forms[id].name)}${G.legendReady(id) ? ", Legend ready" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span>${G.legendReady(id) ? `<i aria-hidden="true">✦</i>` : ""}</button>`).join("")}</div>
       <section class="legend-hero" style="--legend:${def.color}">
         <div>${previewCanvas(form.id, G.selectedFormSkin(form.id)?.id || "classic", "loadout-preview", form.name, false, !G.selectedFormSkin(form.id))}</div>
         <div><span class="eyebrow">${escapeHtml(def.survivalText)}</span><h2>${form.icon} ${escapeHtml(form.name)} Legend</h2>
           <p>A mastered form still has secrets. Follow its legend to awaken a hidden nature, a forbidden technique, and the arm that remembers its name.</p>
-          <div class="legend-objective"><strong>${escapeHtml(objective.label)}</strong><span>${objective.value}/${objective.goal}</span><i><b style="width:${percent}%"></b></i></div>
+          <div class="legend-objective ${active || echo && echo.reward ? "ready" : ""}"><strong>${escapeHtml(objective.label)}</strong><span>${Math.floor(Math.min(objective.value, objective.goal))}/${objective.goal}</span><i><b style="width:${percent}%"></b></i></div>
         </div>
         <div class="legend-meter"><strong>${Math.floor(G.legendCharge(form.id))}%</strong><span>LEGEND</span></div>
       </section>
-      <div class="legend-track">${stages.map(([need, label, name, copy]) => `<article class="${rank >= need ? "earned" : need === rank + 1 ? "next" : "locked"}">
-        <span>LEGEND ${["I", "II", "III"][need - 1]} · ${label}</span><h3>${rank >= need || need === rank + 1 ? escapeHtml(name) : "Unrevealed"}</h3>
-        <p>${escapeHtml(copy)}</p>${rank >= need ? `<strong class="legend-earned">✓ AWAKENED</strong>` : ""}</article>`).join("")}</div>
+      <div class="legend-track" style="--legend:${def.color}">${stages.map((stage, index) => {
+        const need = index + 1, known = rank >= need || need === rank + 1;
+        return `<article class="${rank >= need ? "earned" : need === rank + 1 ? active || echo && echo.reward ? "next ready" : "next" : "locked"}">
+          <span>LEGEND ${["I", "II", "III"][index]} · ${rewards[index][0]}</span><h3>${known ? escapeHtml(rewards[index][1]) : "Unrevealed"}</h3>
+          <p>${known ? escapeHtml(stage.name) : "Its place remains hidden."}</p>${rank >= need ? `<strong class="legend-earned">✓ AWAKENED</strong>` : need === rank + 1 && G.formLevel(form.id) >= 5 ? `<strong class="legend-site-name">✦ ${escapeHtml(G.maps[stage.mapId]?.name || stage.mapId)}</strong>` : ""}</article>`;
+      }).join("")}</div>
+      ${echo ? `<section class="legend-quest-callout" style="--legend:${def.color}"><span class="legend-quest-icon">${echo.reward ? "✦" : form.icon}</span><div><small>${echo.reward ? "RELIC WAITING" : active ? "TRIAL UNDERWAY" : `LEGEND ${["I","II","III"][echo.rank - 1]} SIDE QUEST`}</small>
+        <h2>${escapeHtml(echo.name)}</h2><p>${escapeHtml(echo.clue)}</p><strong>${escapeHtml(echo.reward ? "Return and awaken what remains." : active ? `${echo.objective} ${echo.rule}` : `${G.maps[echo.mapId]?.name || echo.mapId} · ${echo.objective}`)}</strong></div>
+        <button data-legend-guide="${form.id}">Track this Echo</button></section>` : ""}
       ${rank >= 1 ? `<section class="facet-picker"><div><span class="eyebrow">ACTIVE NATURE</span><h2>Choose what stirs within ${escapeHtml(form.name)}</h2></div>
         <button data-legend-facet="original" class="${chosen === "original" ? "active" : ""}"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></button>
         <button data-legend-facet="legend" class="${chosen === "legend" ? "active" : ""}"><strong>✦ ${escapeHtml(def.facet.name)}</strong><span>${escapeHtml(def.facet.description)}</span></button></section>` : ""}
@@ -1834,6 +1855,15 @@ G.ui = (() => {
     return "overworld";
   }
 
+  function atlasRegionForMap(mapId) {
+    if (G.wayfinderRegionInfo(mapId)) return mapId;
+    const map = G.maps[mapId];
+    const exit = map && map.bossTrial && map.bossTrial.exit;
+    if (exit && G.wayfinderRegionInfo(exit.map)) return exit.map;
+    if (mapId === "town" || mapId === "playerHouse" || mapId === "dungeon") return "overworld";
+    return "overworld";
+  }
+
   function atlasSelectedRegion() {
     const current = atlasCurrentRegion();
     if (!G.wayfinderRegionInfo(atlasSelectedId)) atlasSelectedId = current;
@@ -1863,6 +1893,8 @@ G.ui = (() => {
     const selected = atlasSelectedRegion();
     const mainGoal = G.storyGoal ? G.storyGoal() : null;
     const canTravel = G.canWayfinderTravel();
+    const legendEcho = G.legendEchoFor && G.legendEchoFor(G.state.formId);
+    const legendRegion = legendEcho ? atlasRegionForMap(legendEcho.mapId) : null;
     const nodesById = Object.fromEntries(G.WAYFINDER_ATLAS_NODES.map((node) => [node.id, node]));
     const lines = G.WAYFINDER_ATLAS_EDGES.map(([from, to]) => {
       const a = nodesById[from], b = nodesById[to];
@@ -1876,14 +1908,17 @@ G.ui = (() => {
       const awake = G.wayfinderPostActivated(node.id);
       const incidentCount = G.incidentsForMap ? G.incidentsForMap(node.id).length : 0;
       const storyRoute = !!(mainGoal && mainGoal.mapId === node.id && !mainGoal.complete);
+      const legendRoute = legendRegion === node.id;
       const classes = [found ? "known" : "unknown", here ? "here" : "", awake ? "awake" : "",
-        selected.id === node.id ? "selected" : "", incidentCount ? "incident" : "", storyRoute ? "story-route" : ""].filter(Boolean).join(" ");
+        selected.id === node.id ? "selected" : "", incidentCount ? "incident" : "", storyRoute ? "story-route" : "",
+        legendRoute ? "legend-route" : ""].filter(Boolean).join(" ");
       return `<button class="atlas-node ${classes}" style="left:${node.x}%;top:${node.y}%" data-map-node="${node.id}"
         aria-label="${found ? escapeHtml(region.name) : "Undiscovered region"}${here ? ", you are here" : ""}">
         <span class="atlas-icon">${found ? region.icon : "?"}</span>
         <span class="atlas-name">${found ? escapeHtml(region.name) : "Unknown"}</span>
         ${incidentCount ? `<span class="atlas-incident-count">⚑${incidentCount}</span>` : ""}
         ${storyRoute ? `<span class="atlas-story-badge">MAIN PATH</span>` : ""}
+        ${legendRoute ? `<span class="atlas-legend-badge">✦ LEGEND</span>` : ""}
         ${here ? `<span class="you-are-here">YOU ARE HERE</span>` : ""}
       </button>`;
     }).join("");
@@ -1976,6 +2011,16 @@ G.ui = (() => {
       c.beginPath(); c.arc(x, y, Math.max(5, Math.min(sx, sy) * 1.15), 0, Math.PI * 2); c.fill();
       c.strokeStyle = "#f4f4f4"; c.lineWidth = 2; c.stroke();
     }
+    const legendEcho = G.currentLegendEcho && G.currentLegendEcho();
+    if (legendEcho) {
+      const x = legendEcho.x / G.TILE * sx;
+      const y = legendEcho.y / G.TILE * sy;
+      const color = G.LEGEND_DEFS[legendEcho.formId].color;
+      c.save(); c.translate(x, y); c.rotate(Math.PI / 4);
+      c.fillStyle = color; c.fillRect(-7, -7, 14, 14);
+      c.fillStyle = "#fff3c2"; c.fillRect(-3, -3, 6, 6);
+      c.restore();
+    }
     const px = G.state.player.x / G.TILE * sx;
     const py = G.state.player.y / G.TILE * sy;
     c.fillStyle = "#f4f4f4";
@@ -1988,7 +2033,7 @@ G.ui = (() => {
     return `<div class="local-atlas form-card current">
       <div class="atlas-detail-heading"><h2>📍 ${escapeHtml(G.state.mapDef.name || G.state.mapId)}</h2><span class="atlas-status here">YOU ARE HERE</span></div>
       <canvas id="local-atlas-canvas" aria-label="Map of the current area"></canvas>
-      <div class="local-map-legend"><span><i class="player"></i>You</span><span><i class="post"></i>Wayfinder Post</span><span><i class="exit"></i>Open exit</span><span><i class="locked-exit"></i>Locked exit</span></div>
+      <div class="local-map-legend"><span><i class="player"></i>You</span><span><i class="legend-echo"></i>Legend Echo</span><span><i class="post"></i>Wayfinder Post</span><span><i class="exit"></i>Open exit</span><span><i class="locked-exit"></i>Locked exit</span></div>
     </div>
     <div class="form-card"><h2>🚪 Routes from here</h2>
       ${exits.length ? exits.map((exit) => `<div class="quest-row ${exit.reason ? "" : "done"}"><span>${exit.reason ? "🔒" : "➜"} ${escapeHtml(exit.name)}</span><span class="prog">${exit.reason ? escapeHtml(exit.reason.text) : "Open"}</span></div>`).join("") :

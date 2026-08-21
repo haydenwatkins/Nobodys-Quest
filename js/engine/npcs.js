@@ -376,6 +376,12 @@
     const roadHint = G.guidanceNpcHint ? G.guidanceNpcHint(npc) : "";
     if (roadHint && (count === 0 || (G.guidanceNeedsHint && G.guidanceNeedsHint())) && G.ui.dialogue)
       G.ui.dialogue("◇ THE ROAD", roadHint, { accent: "#ffcd75" });
+    const rumor = G.legendRumor && G.legendRumor(s.formId);
+    const heardRumors = s.legends && Array.isArray(s.legends.rumorsHeard) ? s.legends.rumorsHeard : null;
+    if (rumor && heardRumors && !heardRumors.includes(rumor.key) && G.ui.dialogue) {
+      heardRumors.push(rumor.key);
+      G.ui.dialogue(`${npc.def.icon} ${npc.def.name} · A RUMOR`, rumor.text, { accent: npc.def.sprite.palette.a });
+    }
     if (G.sfx && G.sfx.play) G.sfx.play("menu");
     if (G.spawnFx) G.spawnFx({
       kind: "ring", x: npc.x, y: npc.y - 8,

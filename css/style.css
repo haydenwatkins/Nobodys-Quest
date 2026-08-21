@@ -120,15 +120,23 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .legend-objective { display:grid; grid-template-columns:1fr auto; gap:8px; margin-top:15px; color:#ffcd75; }
 .legend-objective i { grid-column:1/-1; height:8px; overflow:hidden; border-radius:8px; background:#1a1c2c; }
 .legend-objective b { display:block; height:100%; background:var(--legend); }
+.legend-objective.ready strong { color:#fff3c2; text-shadow:0 0 10px var(--legend); }
+.legend-objective.ready b { animation:legend-ready-pulse 1.25s ease-in-out infinite alternate; }
 .legend-meter { width:94px; aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
   border:3px solid var(--legend); border-radius:50%; color:#fff3c2; box-shadow:0 0 22px color-mix(in srgb,var(--legend) 45%,transparent); }
 .legend-meter strong { font:18px "Press Start 2P",monospace; }.legend-meter span { margin-top:7px; font-size:9px; }
 .legend-track { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
 .legend-track article { min-height:145px; padding:17px; border:2px solid #566c86; border-radius:14px; background:#202438; }
 .legend-track article.next { border-color:#ffcd75; box-shadow:0 0 0 3px rgba(255,205,117,.12); }
+.legend-track article.ready { border-color:var(--legend,#ffcd75); background:linear-gradient(145deg,color-mix(in srgb,var(--legend,#ffcd75) 20%,#202438),#202438); box-shadow:0 0 22px color-mix(in srgb,var(--legend,#ffcd75) 28%,transparent); }
 .legend-track article.earned { border-color:#38b764; background:linear-gradient(145deg,#203d3a,#202438); }
 .legend-track article.locked { opacity:.58; }.legend-track article>span,.legend-reward small { color:#d9a7ff; font:9px "Press Start 2P",monospace; }
 .legend-track h3 { color:#f4f4f4; }.legend-earned { color:#a7f070; font-size:10px; }
+.legend-site-name { display:block; margin-top:9px; color:#73eff7; font-size:10px; }
+.legend-quest-callout { display:grid; grid-template-columns:70px minmax(0,1fr) auto; gap:16px; align-items:center; margin-top:16px; padding:18px; border:2px solid var(--legend); border-radius:14px; background:linear-gradient(135deg,color-mix(in srgb,var(--legend) 16%,#202438),#202438); box-shadow:0 0 20px color-mix(in srgb,var(--legend) 18%,transparent); }
+.legend-quest-callout small { color:#ffcd75; font:8px "Press Start 2P",monospace; }.legend-quest-callout h2 { margin:7px 0; color:#f4f4f4; }.legend-quest-callout p { margin:0 0 7px; color:#c8d8e0; }.legend-quest-callout strong { color:#fff3c2; line-height:1.4; }
+.legend-quest-icon { display:flex; width:60px; height:60px; align-items:center; justify-content:center; border:2px solid var(--legend); border-radius:50%; color:#fff3c2; background:#29366f; font-size:29px; box-shadow:0 0 18px color-mix(in srgb,var(--legend) 40%,transparent); }
+.legend-quest-callout button { min-width:150px; border-color:var(--legend); background:#29366f; color:#f4f4f4; }
 .facet-picker { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:stretch; margin-top:18px; padding:18px;
   border:2px solid #566c86; border-radius:14px; background:#202438; }
 .facet-picker button { display:flex; flex-direction:column; gap:8px; text-align:left; padding:14px; border:2px solid #566c86; border-radius:12px; }
@@ -136,11 +144,16 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .legend-reward { display:grid; grid-template-columns:58px 1fr auto; gap:16px; align-items:center; margin-top:14px; padding:16px;
   border:2px solid #566c86; border-radius:14px; background:#202438; }.legend-reward>span { font-size:32px; text-align:center; }
 .legend-reward.ultimate { border-color:#ffcd75; background:linear-gradient(135deg,#49365f,#202438); }
+.lab-form-switcher button { position:relative; }
+.lab-form-switcher button.legend-ready { border-color:#ffcd75; }
+.lab-form-switcher button.legend-ready>i { display:flex; position:absolute; top:-4px; right:-4px; width:17px; height:17px; align-items:center; justify-content:center; border:1px solid #fff3c2; border-radius:50%; color:#1a1c2c; background:#ffcd75; font:8px "Press Start 2P",monospace; animation:legend-ready-pulse 1s ease-in-out infinite alternate; }
+@keyframes legend-ready-pulse { from { opacity:.62; filter:brightness(.9); } to { opacity:1; filter:brightness(1.35); } }
 
 @media (max-width:700px) {
   .legend-hero { grid-template-columns:90px 1fr; gap:12px; padding:13px; }.legend-hero .legend-meter { grid-column:1/-1; width:100%; height:50px; aspect-ratio:auto; border-radius:12px; }
   .legend-track { grid-template-columns:1fr; }.legend-track article { min-height:0; }.facet-picker { grid-template-columns:1fr; padding:12px; }
   .legend-reward { grid-template-columns:45px 1fr; }.legend-reward button { grid-column:1/-1; }.form-lab-tabs { overflow-x:auto; }
+  .legend-quest-callout { grid-template-columns:52px 1fr; padding:13px; }.legend-quest-icon { width:44px; height:44px; font-size:22px; }.legend-quest-callout button { grid-column:1/-1; width:100%; }
 }
 
 /* ---------- Paused radial form selector ---------- */
@@ -597,6 +610,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .local-map-legend span { display: flex; align-items: center; gap: 5px; }
 .local-map-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; }
 .local-map-legend .player { background: #f4f4f4; border: 2px solid #ffcd75; }
+.local-map-legend .legend-echo { border:2px solid #fff3c2; border-radius:1px; background:#d9a7ff; transform:rotate(45deg); box-shadow:0 0 7px #d9a7ff; }
 .local-map-legend .post { background: #73eff7; border: 2px solid #f4f4f4; }
 .local-map-legend .exit { border-radius: 2px; background: #ffcd75; }
 .local-map-legend .locked-exit { border-radius: 2px; background: #b13e53; }
@@ -987,6 +1001,8 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .atlas-story-callout small { display: block; margin-top: 3px; color: #c8d8e0; font-size: 15px; }
 .atlas-node.story-route { border-color: #d9a7ff; box-shadow: 0 0 0 5px rgba(217,167,255,.2), 0 4px 0 rgba(10,12,22,.45); }
 .atlas-story-badge { position: absolute; right: -12px; bottom: -9px; padding: 3px 5px; border: 2px solid #1a1c2c; border-radius: 5px; background: #d9a7ff; color: #1a1c2c; white-space: nowrap; font: 5px "Press Start 2P", monospace; }
+.atlas-node.legend-route { border-color:#ffcd75; box-shadow:0 0 0 5px rgba(255,205,117,.18),0 4px 0 rgba(10,12,22,.45); }
+.atlas-legend-badge { position:absolute; left:-12px; top:-9px; padding:3px 5px; border:2px solid #1a1c2c; border-radius:5px; background:#ffcd75; color:#1a1c2c; white-space:nowrap; font:5px "Press Start 2P",monospace; }
 
 /* ---------- Adventure slots and story ending ---------- */
 
@@ -1059,6 +1075,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .title-form-echo { animation:none; opacity:.78; transform:translate(calc(-50% + var(--echo-x)),var(--echo-y)) scale(.92); }
   .title-nobody i,.title-change-burst i,.title-quill { animation:none; }
   .title-change-burst { display:none; }
+  .legend-objective.ready b,.lab-form-switcher button.legend-ready>i { animation:none; }
 }
 #story-ending { z-index: 70; display: grid; place-items: center; background: radial-gradient(circle, #5d4963 0, #29366f 30%, #1a1c2c 72%); }
 .ending-panel { max-width: 760px; margin: auto; padding: 28px; border: 2px solid #fff3c2; border-radius: 16px; background: rgba(26,28,44,.92); box-shadow: 0 0 60px rgba(255,243,194,.18); }

@@ -101,6 +101,7 @@ G.damagePlayer = function (dmg, fromX, fromY) {
   if (passiveResult.prevented) return false;
   dmg = passiveResult.damage;
   p.damageTaken += dmg;
+  G.events.emit("playerHurt", { damage: dmg, fromX, fromY, form: G.state.formId });
   if (G.delayEasyModeRecovery) G.delayEasyModeRecovery();
   p.invuln = 1.0;
   G.sfx.play("hurt");
@@ -203,9 +204,17 @@ G.updatePlayer = function (dt) {
 
   // Interaction wins only when the world is safe. In combat the same A/touch
   // input remains an attack, so a nearby NPC can never steal a button press.
-  if (G.input.tapped("interact")) G.tryNpcTalk && G.tryNpcTalk();
-  const talkWithA = G.npcTalkCandidate && G.npcTalkCandidate() && G.input.tapped("a");
-  if (talkWithA && G.tryNpcTalk) G.tryNpcTalk();
+  if (G.input.tapped("interact")) {
+    const awakened = G.tryLegendEcho && G.tryLegendEcho();
+    if (!awakened && G.tryNpcTalk) G.tryNpcTalk();
+  }
+  const worldInteraction = (G.legendEchoCandidate && G.legendEchoCandidate()) ||
+    (G.npcTalkCandidate && G.npcTalkCandidate());
+  const talkWithA = worldInteraction && G.input.tapped("a");
+  if (talkWithA) {
+    const awakened = G.tryLegendEcho && G.tryLegendEcho();
+    if (!awakened && G.tryNpcTalk) G.tryNpcTalk();
+  }
   if (G.input.tapped("ultimate") && G.useLegendUltimate) G.useLegendUltimate();
 
   p.manaMax = G.playerMaxMana();
@@ -1281,7 +1290,7 @@ G.drawEnemy = function (ctx, e) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 4 + e.anim) * 0.5;
     ctx.save();
     ctx.globalAlpha = 0.25 + pulse * 0.2;
-    ctx.strokeStyle = e.rival ? "#d9a7ff" : e.expeditionChampion ? "#ffcd75" : "#73eff7";
+    ctx.strokeStyle = e.legendColor || (e.rival ? "#d9a7ff" : e.expeditionChampion ? "#ffcd75" : "#73eff7");
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(e.x, e.y - e.def.size / 2, e.def.size / 2 + 4 + pulse * 2, 0, Math.PI * 2);
@@ -1311,6 +1320,14 @@ G.drawEnemy = function (ctx, e) {
   const frame = G.spriteFrame ? G.spriteFrame(e.def.sprite, "walk", e.anim) : Math.floor(e.anim) % 2;
   const drawX = e.x + (e.hitKickX || 0);
   const drawY = e.y + (e.hitKickY || 0);
+
+  if (e.legendTrial && e.legendTrial.champion) {
+    const width = Math.max(22, e.def.size + 10);
+    ctx.fillStyle = "rgba(26,28,44,.92)";
+    ctx.fillRect(Math.round(e.x - width / 2), Math.round(e.y - e.def.size - 11), width, 4);
+    ctx.fillStyle = e.legendColor || "#ffcd75";
+    ctx.fillRect(Math.round(e.x - width / 2 + 1), Math.round(e.y - e.def.size - 10), Math.max(0, Math.round((width - 2) * e.hp / Math.max(1, e.def.hp))), 2);
+  }
 
   if (e.flash > 0) {
     // white flash when hurt — redraw sprite silhouette in white
