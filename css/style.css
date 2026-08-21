@@ -810,9 +810,15 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .ability-slot.selected .slot-copy small { color: #ffcd75; }
 .ability-tray { padding: 14px; }
 .tray-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 15px; margin-bottom: 10px; }
-.ability-filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+.ability-result-count { color: #94b0c2; font: 15px "VT323", monospace; white-space: nowrap; }
+.ability-filter-panel { display: grid; gap: 7px; margin-bottom: 12px; padding: 9px; border: 1px solid #3e4762; border-radius: 8px; background: #1d2233; }
+.ability-filter-row { display: grid; grid-template-columns: 62px 1fr; align-items: center; gap: 8px; }
+.ability-filter-row > strong { color: #c8d8e0; font-size: 7px; letter-spacing: .5px; text-transform: uppercase; }
+.ability-filters { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 5px; }
 .ability-filters button { padding: 7px 8px; font-size: 7px; }
 .ability-filters button.active { color: #1a1c2c; border-color: #73eff7; background: #73eff7; }
+.ability-boost-filter { justify-self: start; margin-left: 70px; padding: 7px 9px; color: #a7f070; border-color: #457960; font-size: 7px; }
+.ability-boost-filter.active { color: #1a1c2c; border-color: #a7f070; background: #a7f070; }
 .ability-card-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; max-height: 320px; overflow-y: auto; padding: 2px; }
 .ability-card { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; min-width: 0; min-height: 130px; padding: 9px; text-align: left; }
 .ability-card.boosted { border-color: #457960; }
@@ -827,7 +833,9 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .ability-inspector button { padding: 12px; color: #1a1c2c; border-color: #a7f070; background: #38b764; font-size: 8px; }
 .synergy-callout { margin-top: 7px; padding: 7px; color: #94b0c2; border-left: 3px solid #566c86; background: #1d2233; font-size: 17px; }
 .synergy-callout.good { color: #a7f070; border-color: #a7f070; }
-.empty-tray { padding: 22px; color: #94b0c2; text-align: center; }
+.empty-tray { display: flex; flex-direction: column; gap: 7px; padding: 28px 22px; color: #94b0c2; text-align: center; }
+.empty-tray strong { color: #f4f4f4; font-size: 9px; }
+.empty-tray span { font: 17px "VT323", monospace; }
 
 /* ---------- Manyfold Expeditions ---------- */
 
@@ -1201,8 +1209,11 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .ability-slot { grid-template-columns: 40px 44px 1fr; min-height: 65px; }
   .slot-icon { font-size: 25px; }
   .tray-heading { align-items: stretch; flex-direction: column; }
-  .ability-filters { justify-content: flex-start; }
+  .ability-result-count { align-self: flex-start; }
+  .ability-filter-panel { padding: 8px; }
+  .ability-filter-row { grid-template-columns: 1fr; gap: 5px; }
   .ability-filters button { min-height: 36px; }
+  .ability-boost-filter { min-height: 36px; margin-left: 0; }
   .ability-card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .ability-card { min-height: 118px; }
   .ability-inspector { grid-template-columns: 55px 1fr; }

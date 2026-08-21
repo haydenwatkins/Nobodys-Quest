@@ -412,3 +412,11 @@ G.availableAbilities = function () {
   }
   return out;
 };
+
+G.knownArtMatchesFilters = function (ability, damageFilter, styleFilter) {
+  if (!ability) return false;
+  const damage = damageFilter || "all";
+  const style = styleFilter || "all";
+  return (damage === "all" || ability.type === damage) &&
+    (style === "all" || ability.style === style);
+};

@@ -765,7 +765,9 @@ G.ui = (() => {
   let labFormId = null;
   let labSlot = 1;
   let labAbilityId = null;
-  let labAbilityFilter = "boosted";
+  let labDamageFilter = "all";
+  let labStyleFilter = "all";
+  let labBoostedOnly = false;
   let labSkinId = "classic";
   let lastFormPreviewDraw = 0;
   let formWheelOpen = false;
@@ -1147,8 +1149,12 @@ G.ui = (() => {
       G.ui.toast(`↺ ${G.forms[labFormId].name}'s own moves restored.`, 2.2);
       buildMenu();
     });
-    menuEl.querySelectorAll("[data-ability-filter]").forEach((button) =>
-      button.addEventListener("click", () => { labAbilityFilter = button.dataset.abilityFilter; buildMenu(); }));
+    menuEl.querySelectorAll("[data-ability-damage]").forEach((button) =>
+      button.addEventListener("click", () => { labDamageFilter = button.dataset.abilityDamage; buildMenu(); }));
+    menuEl.querySelectorAll("[data-ability-style]").forEach((button) =>
+      button.addEventListener("click", () => { labStyleFilter = button.dataset.abilityStyle; buildMenu(); }));
+    const boostedArts = menuEl.querySelector("[data-ability-boosted]");
+    if (boostedArts) boostedArts.addEventListener("click", () => { labBoostedOnly = !labBoostedOnly; buildMenu(); });
     menuEl.querySelectorAll("[data-ability-select]").forEach((button) =>
       button.addEventListener("click", () => { labAbilityId = button.dataset.abilitySelect; buildMenu(); }));
     const equipAbility = menuEl.querySelector('[data-act="equip-ability"]');
@@ -1524,13 +1530,6 @@ G.ui = (() => {
       </div>`;
   }
 
-  function abilityMatchesFilter(form, ability, filter) {
-    if (filter === "all") return true;
-    if (filter === "boosted") return !!(G.passives && G.passives.formMatches(form, ability));
-    if (["sharp", "blunt", "light", "dark"].includes(filter)) return ability.type === filter;
-    return ability.style === filter;
-  }
-
   function buildLoadoutLab() {
     const form = labSelectedForm(true);
     const activePassive = G.legendPassiveFor ? G.legendPassiveFor(form) : form.passive;
@@ -1539,12 +1538,11 @@ G.ui = (() => {
     const usingDefaults = defaults.every((abilityId, slot) => lo[slot] === abilityId);
     const slots = [0, 1, 2].filter((slot) => slot === 0 || slot <= form.slots);
     if (!slots.includes(labSlot) || labSlot === 0) labSlot = Math.min(1, form.slots);
-    const filters = [["boosted", "★ Boosted"], ["all", "All"], ["sharp", "Sharp"], ["blunt", "Blunt"],
-      ["light", "Light"], ["dark", "Dark"], ["melee", "Melee"], ["projectile", "Ranged"], ["area", "Area"]];
+    const damageFilters = [["all", "Any"], ["sharp", "Sharp"], ["blunt", "Blunt"], ["light", "Light"], ["dark", "Dark"]];
+    const styleFilters = [["all", "Any"], ["melee", "Melee"], ["projectile", "Ranged"], ["dash", "Dash"], ["area", "Area"], ["chain", "Chain"]];
     const all = G.availableAbilities();
-    const visible = all.filter((id) => abilityMatchesFilter(form, G.abilities[id], labAbilityFilter));
-    if (!visible.length) labAbilityFilter = "all";
-    const filtered = all.filter((id) => abilityMatchesFilter(form, G.abilities[id], labAbilityFilter));
+    const filtered = all.filter((id) => G.knownArtMatchesFilters(G.abilities[id], labDamageFilter, labStyleFilter) &&
+      (!labBoostedOnly || !!(G.passives && G.passives.formMatches(form, G.abilities[id]))));
     if (!labAbilityId || !filtered.includes(labAbilityId)) labAbilityId = lo[labSlot] && filtered.includes(lo[labSlot]) ? lo[labSlot] : filtered[0];
     const selected = G.abilities[labAbilityId];
     const source = selected && G.forms[selected.nativeForm];
@@ -1573,7 +1571,14 @@ G.ui = (() => {
       </div>
       <section class="ability-tray">
         <div class="tray-heading"><div><span class="eyebrow">KNOWN ARTS</span><h2>Choose an art for ${["A", "B", "C"][labSlot]}</h2></div>
-          <div class="ability-filters">${filters.map(([id, label]) => `<button data-ability-filter="${id}" class="${labAbilityFilter === id ? "active" : ""}">${label}</button>`).join("")}</div></div>
+          <span class="ability-result-count">${filtered.length} of ${all.length} arts</span></div>
+        <div class="ability-filter-panel" role="group" aria-label="Known Arts filters">
+          <div class="ability-filter-row" role="group" aria-label="Damage type"><strong>Damage</strong><div class="ability-filters">${damageFilters.map(([id, label]) =>
+            `<button data-ability-damage="${id}" class="${labDamageFilter === id ? "active" : ""}" aria-pressed="${labDamageFilter === id}">${label}</button>`).join("")}</div></div>
+          <div class="ability-filter-row" role="group" aria-label="Attack type"><strong>Attack</strong><div class="ability-filters">${styleFilters.map(([id, label]) =>
+            `<button data-ability-style="${id}" class="${labStyleFilter === id ? "active" : ""}" aria-pressed="${labStyleFilter === id}">${label}</button>`).join("")}</div></div>
+          <button class="ability-boost-filter ${labBoostedOnly ? "active" : ""}" data-ability-boosted aria-pressed="${labBoostedOnly}">★ ${escapeHtml(activePassive.name)} arts only</button>
+        </div>
         <div class="ability-card-grid">${filtered.map((id) => {
           const ability = G.abilities[id];
           const origin = G.forms[ability.nativeForm];
@@ -1589,7 +1594,7 @@ G.ui = (() => {
           <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${selected.mana} mana` : " · no mana"} · ${selected.cooldown}s recovery</p>
           <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(activePassive.name)} will not modify it.`}</div></div>
           <button data-act="equip-ability" ${lo[labSlot] === selected.id ? "disabled" : ""}>${lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
-        </div>` : `<div class="empty-tray">No known arts match this filter yet.</div>`}
+        </div>` : `<div class="empty-tray"><strong>No arts found</strong><span>Try another damage or attack combination.</span></div>`}
       </section>`;
   }
 
