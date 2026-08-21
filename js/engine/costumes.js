@@ -350,7 +350,7 @@ G.selectFormSkin = function (formId, id) {
     skins.equipped[formId] = id;
   }
   if (G.sfx) G.sfx.play("pickup");
-  if (G.ui) G.ui.toast(id === "classic" ? `✨ ${G.forms[formId].name}: Classic` : `${G.skinById(id).icon} ${G.skinById(id).name} equipped`, 2.2);
+  if (G.ui) G.ui.toast(id === "classic" ? `✨ ${G.forms[formId].name}: Classic` : `${G.skinById(id).icon} Wearing ${G.skinById(id).name}`, 2.2);
   G.saveGame();
   return true;
 };

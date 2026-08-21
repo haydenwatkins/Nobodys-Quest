@@ -77,7 +77,7 @@ G.STORY_CHAPTERS = [
     scene: [
       ["THE LAST WORLDBEARER", "I carried every road here for you. I cannot carry the final step."],
       ["ARCHIVIST ERRATA", "The God of Every Form was built from our demand for one answer to every problem."],
-      ["PEBBLE", "Fortunately, you have never been one thing for more than a few buttons."],
+      ["PEBBLE", "Fortunately, you have never been one thing for more than a few heartbeats."],
       ["THE STORY", "At the northern edge of Greenfield, the Final Firmament opens."],
     ],
   },
@@ -160,7 +160,7 @@ G.storyGoal = function () {
     return Object.assign(base, {
       guide: "mastery", formId: "nobody",
       title: "Become more than a blank", short: "Complete two Nobody mastery quests",
-      objective: "Explore Greenfield, follow the tutorial, and complete two of Nobody's mastery quests.",
+      objective: "Explore Greenfield, follow the gold motes, and complete two of Nobody's mastery quests.",
       reason: "Stars record lessons learned. Two lessons reveal the first path into another form.",
       progress: storyProgress(nobodyDone, 2, "NOBODY MASTERY"),
     });
@@ -188,7 +188,7 @@ G.storyGoal = function () {
       title: next ? `Challenge the ${next.name}` : "Seek stronger masters",
       short: next ? `Defeat ${next.name} in ${next.destination}` : "Continue mastering forms",
       objective: next ? `Travel to ${next.destination} and defeat the ${next.name}.` : "Complete more form challenges.",
-      reason: "The old masters each protect one perfect answer. Your changing loadout is the answer they cannot predict.",
+      reason: "The old masters each protect one perfect answer. Your changing arts are the answer they cannot predict.",
       progress: storyProgress(defeated, 2, "OLD MASTERS"),
     });
   }
@@ -376,7 +376,7 @@ G.showStoryEnding = function () {
     G.storyEndingOpen = false;
     G.updateStoryEndingInput = null;
     if (G.menuController) G.menuController.reset(overlay);
-    G.ui.banner("THE END · AND EVERY ROAD AFTER", "The main story is complete. The world, town, mastery, and expeditions remain yours.");
+    G.ui.banner("THE END · AND EVERY ROAD AFTER", "The prophecy is complete. The roads, the town, and every unfinished promise remain yours.");
   });
   // Controller path (main.js calls this per frame): A or B turns the page —
   // on TV this DOM button can't be reached any other way.

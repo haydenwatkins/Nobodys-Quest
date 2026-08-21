@@ -321,7 +321,7 @@ G.checkUnlocks = function () {
     if (G.formReady(id) && !G.state.unlockReadyNotified.includes(id)) {
       G.state.unlockReadyNotified.push(id);
       G.sfx.play("unlock");
-      G.ui.toast(`${f.icon} ${f.name} challenge complete — a victory will leave its Form Echo in the world.`, 4);
+      G.ui.toast(`${f.icon} ${f.name}'s path is complete. Win a battle and watch for its Form Echo.`, 4);
       changed = true;
     }
   }

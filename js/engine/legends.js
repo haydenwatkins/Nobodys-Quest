@@ -49,11 +49,11 @@
     colossus: "cleave", god: "nova",
   };
   const survivalCopy = {
-    ranged: "RANGED · low exposure, fragile",
-    skirmisher: "SKIRMISHER · fast close-range, sturdy",
-    balanced: "BALANCED · mixed range and exposure",
-    bruiser: "BRUISER · sustained close-range pressure",
-    tank: "TANK · built to remain in danger",
+    ranged: "DISTANT · deadly from afar, vulnerable when cornered",
+    skirmisher: "SWIFT · thrives up close, built to escape",
+    balanced: "VERSATILE · ready at any distance",
+    bruiser: "BOLD · strongest in the thick of battle",
+    tank: "UNYIELDING · made to stand where danger gathers",
   };
 
   G.FORM_SURVIVAL = {};
@@ -65,6 +65,14 @@
     if (style === "area") return { area: { rangeScale: 1.14 } };
     if (style === "chain") return { chain: { jumpRangeScale: 1.14 } };
     return { melee: { guard: 0.18, arcBonus: 18 } };
+  }
+
+  function facetDescription(name, style) {
+    if (style === "projectile") return `${name} sends every ranged art farther and faster.`;
+    if (style === "dash") return `${name} carries every rushing art beyond its usual reach.`;
+    if (style === "area") return `${name} widens the circle of every bursting art.`;
+    if (style === "chain") return `${name} teaches leaping arts to seek more distant foes.`;
+    return `${name} broadens close strikes and guards you through the swing.`;
   }
 
   function techniqueUse(id, index, style, type, color) {
@@ -96,7 +104,7 @@
     const form = G.forms[formId];
     const facet = {
       id: `legend-${formId}-facet`, name: names[0],
-      description: `${names[0]} remixes ${style} moves for control and positioning, never raw damage.`,
+      description: facetDescription(names[0], style),
       effects: facetEffects(style),
     };
     G.LEGEND_DEFS[formId] = {
@@ -167,7 +175,7 @@
     st.ranks[id] = rank;
     if (rank === 1) st.facets[id] = "legend";
     const title = rank === 1 ? `LEGEND I · ${def.facet.name}` : rank === 2 ? `LEGEND II · ${def.techniqueName}` : `LEGEND III · ${def.armName}`;
-    const body = rank === 1 ? def.facet.description : rank === 2 ? "A new native technique is ready in the Loadout tray." : `${def.ultimateName} awakened. Fill the gold meter and unleash it.`;
+    const body = rank === 1 ? def.facet.description : rank === 2 ? "A secret technique may now be carried by any form." : `${def.ultimateName} awakened. Fill the Legend meter and set it free.`;
     G.state.shake = Math.max(G.state.shake || 0, rank === 3 ? 0.65 : 0.3);
     G.sfx.play(rank === 3 ? "bossPhase" : "unlock");
     for (let i = 0; i < (rank === 3 ? 28 : 14); i++) {
@@ -208,8 +216,8 @@
 
   G.useLegendUltimate = function () {
     const id = G.state.formId, def = G.LEGEND_DEFS[id], p = G.state.player;
-    if (!def || G.legendRank(id) < 3) { G.ui.toast("Complete this form's Legend path first.", 1.7); return false; }
-    if (G.legendCharge(id) < 100) { G.ui.toast(`${def.armName}: ${Math.floor(G.legendCharge(id))}% charged`, 1.4); return false; }
+    if (!def || G.legendRank(id) < 3) { G.ui.toast("This form has not awakened its Legend Arm.", 1.7); return false; }
+    if (G.legendCharge(id) < 100) { G.ui.toast(`${def.armName} · ${Math.floor(G.legendCharge(id))}%`, 1.4); return false; }
     state().charge[id] = 0;
     p.invuln = Math.max(p.invuln, 1.15);
     G.state.hitStop = Math.max(G.state.hitStop || 0, G.reducedMotion ? 0.08 : 0.24);

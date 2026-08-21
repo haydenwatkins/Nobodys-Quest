@@ -54,7 +54,7 @@ run("js/engine/form-echo.js");
 assert.equal(G.formReady("rat"), true);
 G.checkUnlocks();
 assert.equal(G.formUnlocked("rat"), false, "challenge completion should remain a world encounter");
-assert.match(toasts.at(-1), /victory will leave its Form Echo/);
+assert.match(toasts.at(-1), /Win a battle and watch for its Form Echo/);
 
 const echo = G.leaveReadyFormEchoAt(40, 40, "battle");
 assert.equal(echo.formId, "rat");
@@ -69,8 +69,8 @@ G.state.player.x = 40;
 G.updateFormEcho();
 assert.equal(dialogues.length, 3, "a form meeting should breathe across discovery, description, and choice");
 assert.match(dialogues[0].text, /not as a trophy/);
-assert.match(dialogues[1].text, /swift, close-range form/);
-assert.match(dialogues[1].text, /Bite deals .*Sharp damage/);
+assert.match(dialogues[1].text, /swift and fights at close range/);
+assert.match(dialogues[1].text, /Bite carries .*Sharp damage/);
 assert.match(dialogues[1].text, /Scurry:/);
 assert.match(dialogues[2].text, /carry what it knows/);
 

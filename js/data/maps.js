@@ -309,7 +309,7 @@ registerMap({
   bossTrial: { exit: { map: "shattercoast", x: 23, y: 14 }, delay: 1.7 },
   legend: {
     "x": { tile: "floor", portal: { map: "shattercoast", x: 23, y: 14 } },
-    "m": { tile: "floor", message: "Open the menu's Gauntlet tab to choose a run. Recovery campfires fully heal you and restore three mana." },
+    "m": { tile: "floor", message: "Choose your procession from the Gauntlet page. A recovery fire restores every heart and three mana between duels." },
     "R": { tile: "rock", on: "floor" },
   },
   tiles: [
@@ -325,7 +325,7 @@ registerMap({
 registerMap({
   id: "manyfoldExpedition", name: "The Shifting Path", visualTheme: "riftblade", playerStart: { x: 6, y: 8 },
   legend: {
-    "m": { tile: "floor", message: "The path rearranges after every room. Routes, forms, moves, and boons last only until the expedition ends." },
+    "m": { tile: "floor", message: "The Manyfold rearranges after every chamber. Every borrowed form, art, and blessing fades when you return home." },
     "R": { tile: "rock", on: "floor" },
   },
   tiles: [
@@ -409,7 +409,7 @@ registerMap({
     "P": { tile: "grass", playerHouse: true },
     "H": { tile: "path", portal: { map: "playerHouse", x: 7, y: 7 } },
     "s": { tile: "grass", message: "Walk onto an empty plot to build a house. Houses cost town spirit." },
-    "B": { tile: "grass", message: "The Hero Board keeps adventures coming after the guardian collection. Open its menu tab to accept a contract." },
+    "B": { tile: "grass", message: "Requests from across the world gather on the Hero Board. Choose one whenever the road calls again." },
     "x": { tile: "grass", portal: { map: "overworld", x: 60, y: 45 } },
   },
 
@@ -620,7 +620,7 @@ registerMap({
     "4": { tile: "floor", enemy: "wisp" },
     "5": { tile: "floor", enemy: "brute" },
     "8": { tile: "floor", enemy: "shade" },
-    "s": { tile: "floor", message: "Starfall tests every ward. Match the four damage colors — or retreat and mix a new loadout." },
+    "s": { tile: "floor", message: "Starfall tests every ward. Match the four damage colors—or return to the Form Lab and mix different arts." },
     "m": { tile: "floor", message: "A cracked tablet points west: THE FALLEN STAR STILL SHINES. The vault was built with a door, thankfully." },
     "x": { tile: "floor", portal: { map: "overworld", x: 90, y: 78 }, portalStyle: "gap", seamless: true },
     "H": { tile: "floor", chest: { item: "starfall-thread", heal: true, name: "the Fallen Star Thread" } },

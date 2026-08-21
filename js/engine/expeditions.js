@@ -13,10 +13,10 @@ const EXPEDITION_ENEMIES = [
 ];
 
 const EXPEDITION_BOONS = {
-  heartThread: { icon: "❤️", name: "Heart Thread", text: "+1 maximum heart for this run and heal one heart" },
-  deepWell: { icon: "💧", name: "Deep Well", text: "+2 maximum mana for this run" },
-  quickBoots: { icon: "👟", name: "Quick Boots", text: "+10% movement speed for this run" },
-  wardCake: { icon: "🛡", name: "Ward Cake", text: "Block the first hit in every remaining room" },
+  heartThread: { icon: "❤️", name: "Heart Thread", text: "+1 maximum heart and heal one heart until you return" },
+  deepWell: { icon: "💧", name: "Deep Well", text: "+2 maximum mana until you return" },
+  quickBoots: { icon: "👟", name: "Quick Boots", text: "+10% movement speed until you return" },
+  wardCake: { icon: "🛡", name: "Ward Cake", text: "Block the first hit in every chamber ahead" },
 };
 
 // The menu renders the same catalogue used by the run logic. Exposing this
@@ -102,16 +102,16 @@ function routeChoices(run) {
   }
   const pairs = [
     [
-      { id: "skirmish", icon: "⚔", name: "Crossroads Skirmish", risk: "Three ordinary foes", reward: "Choose one draft" },
-      { id: "elite", icon: "◆", name: "Elite Trail", risk: "Two strengthened foes", reward: "Stronger draft choice" },
+      { id: "skirmish", icon: "⚔", name: "Crossroads Skirmish", risk: "Three ordinary foes", reward: "Choose one gift" },
+      { id: "elite", icon: "◆", name: "Elite Trail", risk: "Two strengthened foes", reward: "A rarer gift" },
     ],
     [
       { id: "ambush", icon: "‼", name: "Crowded Shortcut", risk: "Five quick foes", reward: "Extra town spirit on victory" },
-      { id: "camp", icon: "🔥", name: "Quiet Camp", risk: "No combat", reward: "Full heal, then draft" },
+      { id: "camp", icon: "🔥", name: "Quiet Camp", risk: "No combat", reward: "Full healing, then a gift" },
     ],
     [
-      { id: "elite", icon: "◆", name: "Marked Trail", risk: "Two strengthened foes", reward: "Stronger draft choice" },
-      { id: "cache", icon: "🎁", name: "Unfinished Cache", risk: "No healing", reward: "Choose from four drafts" },
+      { id: "elite", icon: "◆", name: "Marked Trail", risk: "Two strengthened foes", reward: "A rarer gift" },
+      { id: "cache", icon: "🎁", name: "Unfinished Cache", risk: "No healing", reward: "Choose from four gifts" },
     ],
   ];
   const pair = pairs[(run.room + runIndex(run, run.room + 1)) % pairs.length].slice();
@@ -132,7 +132,7 @@ function draftOptions(run, bonusChoice) {
   if (abilityId) {
     const ability = G.abilities[abilityId];
     options.push({ kind: "ability", id: abilityId, icon: ability.icon, name: ability.name,
-      text: `Temporarily equip this ${ability.style} move in your last mix slot` });
+      text: `Carry this ${ability.style} art in your last mix slot until you return` });
   } else {
     options.push({ kind: "recovery", id: "recovery", icon: "🍪", name: "Trail Biscuit",
       text: "Recover two hearts and three mana" });
@@ -222,7 +222,7 @@ G.startManyfoldExpedition = function (length) {
   p.damageTaken = 0;
   p.mana = G.playerMaxMana();
   G.sfx.play("unlock");
-  G.ui.banner("◇ MANYFOLD EXPEDITION", `${runLength} rooms · temporary drafts · failure is safe`);
+  G.ui.banner("◇ THE MANYFOLD OPENS", `${runLength} chambers · borrowed gifts · defeat returns you home`);
   G.saveGame();
   return true;
 };
@@ -330,8 +330,8 @@ G.failManyfoldExpedition = function (message, abandoned) {
   restoreCampaign(run, false);
   if (consolation && G.addTownReward) G.addTownReward(consolation, 0, "Expedition lessons", true);
   G.sfx.play(abandoned ? "door" : "stagger");
-  G.ui.banner(abandoned ? "◇ EXPEDITION LEFT" : "◇ EXPEDITION ENDED",
-    message || (abandoned ? "The route will rearrange for next time." : `The town remembers ${run.wins} cleared room${run.wins === 1 ? "" : "s"}.`));
+  G.ui.banner(abandoned ? "◇ THE ROAD RELEASES YOU" : "◇ THE MANYFOLD CLOSES",
+    message || (abandoned ? "It will take a different shape when you return." : `The town remembers ${run.wins} cleared chamber${run.wins === 1 ? "" : "s"}.`));
   G.saveGame();
   return true;
 };

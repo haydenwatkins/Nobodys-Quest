@@ -116,7 +116,7 @@ assert.ok(G.costumeUnlocked("starstrider"), "legacy saves that opened the old co
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.ok(index.indexOf("js/engine/costumes.js") < index.indexOf("js/engine/main.js"));
 const ui = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
-for (const text of ["Form Lab", "Roster", "Loadout", "Skins", "ABILITY TRAY", "Global dyes"])
+for (const text of ["Form Lab", "Forms", "Arts", "Looks", "KNOWN ARTS", "Global dyes"])
   assert.ok(ui.includes(text), `graphical form UI should include '${text}'`);
 assert.ok(!ui.includes('["style", "Style"]'), "the old standalone Style list should leave the main navigation");
 assert.ok(!ui.includes('["mix", "Mix"]'), "the old dropdown Mix tab should leave the main navigation");

@@ -58,11 +58,11 @@
       hair: "#ddd4ba", skin: "#f2c7a5", coat: "#6377a8", accent: "#d9b45d",
     }, {
       0: [
-        "I was a quest marker. Then my quest was cancelled. I kept the marker.",
+        "I was told to wait beside the road and point toward danger. Nobody remembered to tell me when to stop.",
         "If anyone asks, I am a licensed companion. Please do not ask the license.",
       ],
       1: [
-        "You change jobs whenever one gets difficult. At last, a management strategy I understand.",
+        "You change shape whenever one answer fails. At last, a heroic habit I understand.",
         "Every form fits you because Nobody comes with very generous empty space.",
       ],
       3: [
@@ -84,7 +84,7 @@
         "Monsters are unfinished chores with teeth. This is why I never floss near paperwork.",
       ],
       1: [
-        "Every abandoned job left a shape behind. You call them forms. I call them staffing.",
+        "Every abandoned duty left a shape behind. You call them forms. I call them unfinished business.",
         "Please rescue the world before election day. I have promised the world that you will.",
       ],
       2: [
@@ -106,7 +106,7 @@
       ],
       1: [
         "A form is a story about what someone can be. You borrow the story, not the person.",
-        "That makes ability swapping scholarship. Violent, airborne scholarship.",
+        "Borrowing their arts is scholarship. Violent, airborne scholarship.",
       ],
       2: [
         "The old guardians were masters who mistook mastery for ownership.",
@@ -155,7 +155,7 @@
         "A duty left undone becomes Unfinished. Mine have formed a very orderly queue.",
       ],
       2: [
-        "The masters taunt you because asking politely would make a very short boss intro.",
+        "The masters taunt you because asking politely would make a disappointingly brief duel.",
         "A duel is a conversation where every rebuttal has knockback.",
       ],
       4: [
@@ -177,7 +177,7 @@
       ],
       2: [
         "The form masters became excellent at one thing and suspicious of all other things.",
-        "A passive trait is who a form is while no one is pressing buttons. Listen to that part.",
+        "A form's nature is what remains between one strike and the next. Listen to that part.",
       ],
       5: [
         "You did not become everything. You let everything become useful together.",
@@ -189,7 +189,7 @@
       hair: "#3b414f", skin: "#d6a17c", coat: "#e5e4d2", accent: "#65a0a0",
     }, {
       0: [
-        "Diagnosis: the world has acute narrative buildup and several inflamed side quests.",
+        "Diagnosis: the world has acute destiny and several dangerously swollen promises.",
         "The Unfinished feed on neglected promises. Also crumbs. Mostly promises, but sweep anyway.",
       ],
       1: [
@@ -219,7 +219,7 @@
       ],
       2: [
         "Guardians grew around old responsibilities, like moss around a statue with opinions.",
-        "Beat them, but pay attention. A good fight is a lesson wearing a large health bar.",
+        "Face them, but pay attention. A good fight is a lesson wearing a crown and shouting.",
       ],
       3: [
         "Rootdeep remembers when roots held the world together. It mentions this constantly.",
@@ -235,7 +235,7 @@
         "We named the coast after its rocks, its waves, and our evacuation plan.",
       ],
       2: [
-        "Mini-bosses are bosses with efficient branding. Never say that where they can hear.",
+        "Lesser guardians are only lesser from very far away. Never say it where they can hear.",
         "A gauntlet is several emergencies agreeing to stand in one line.",
       ],
       3: [
@@ -256,7 +256,7 @@
         "My visions are never wrong. Their relationship with reality is merely informal.",
       ],
       1: [
-        "The stars do not choose forms. They are stickers on the universe's reward chart.",
+        "The stars do not choose forms. They merely keep count while you choose for yourself.",
         "You will master every shape except punctuality. This prophecy is already complete.",
       ],
       3: [
@@ -265,10 +265,10 @@
       ],
       4: [
         "The God of Every Form is not divine. It is everyone wishing for a hero who never needs help.",
-        "Perfection has no friends, no loadout, and a truly exhausting final phase.",
+        "Perfection has no friends, no spare answers, and a truly exhausting temper.",
       ],
       5: [
-        "The future survived. It is untidy, overgrown, and requesting a sequel.",
+        "The future survived. It is untidy, overgrown, and already requesting help.",
         "Nobody saved the world. Everybody else can start cleaning up after lunch.",
       ],
     }, "robe"),

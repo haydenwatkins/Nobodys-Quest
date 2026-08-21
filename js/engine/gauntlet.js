@@ -54,7 +54,7 @@ G.startGauntlet = function (requestedCount, recovery) {
     index: 0, wins: 0, recovery: !!recovery,
   };
   G.state.gauntletBetween = { t: 1.1, opening: true };
-  G.ui.banner("🏟 MANYFOLD GAUNTLET", `${count} bosses · ${recovery ? "campfire recovery" : "iron run"}`);
+  G.ui.banner("🏟 MANYFOLD GAUNTLET", `${count} guardians · ${recovery ? "campfires lit" : "unbroken procession"}`);
   return true;
 };
 

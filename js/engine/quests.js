@@ -62,7 +62,7 @@ G.toggleQuestPin = function (questId) {
   const index = pins.indexOf(questId);
   if (index >= 0) {
     pins.splice(index, 1);
-    G.ui.toast("Quest removed from the HUD");
+    G.ui.toast("Quest no longer tracked");
   } else {
     if (!G.questById(questId)) return;
     if (pins.length >= 3) pins.shift();
@@ -77,7 +77,7 @@ G.toggleQuestPin = function (questId) {
 G.clearQuestPins = function () {
   if (!G.state || !G.state.pinnedQuestIds.length) return;
   G.state.pinnedQuestIds.length = 0;
-  G.ui.toast("All quests removed from the HUD");
+  G.ui.toast("No quests are being tracked");
   G.saveGame();
 };
 

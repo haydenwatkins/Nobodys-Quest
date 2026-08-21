@@ -976,7 +976,7 @@ G.ui = (() => {
     // game while Android enters fullscreen or iOS shows its fallback tip.
     closeMenu();
     if (runningFullscreen()) {
-      toast("Already running full screen", 2);
+      toast("Fullscreen is already on", 2);
       return;
     }
 
@@ -1017,7 +1017,7 @@ G.ui = (() => {
       <div class="story-hero-copy"><span class="eyebrow">ACT ${goal.chapter + 1} · MAIN STORY</span>
         <h2>${escapeHtml(goal.act.title)}</h2><p class="story-thesis">${escapeHtml(goal.act.thesis)}</p></div>
       <div class="story-objective">
-        <span class="eyebrow">${goal.complete ? "EPILOGUE" : "NEXT CHAPTER BEAT"}</span>
+        <span class="eyebrow">${goal.complete ? "EPILOGUE" : "NEXT STEP"}</span>
         <h3>${escapeHtml(goal.title)}</h3><p>${escapeHtml(goal.objective)}</p>
         <div class="story-why">${escapeHtml(goal.reason)}</div>
         <div class="story-progress"><span style="width:${percent}%"></span></div>
@@ -1029,10 +1029,10 @@ G.ui = (() => {
     <div class="story-layout"><section><div class="story-section-heading"><span class="eyebrow">THE JOURNEY</span><h2>One story, six acts</h2></div>
       <div class="story-timeline">${chapterCards}</div></section>
       <aside class="story-sidequests"><span class="eyebrow">THE LIVING WORLD</span><h2>Adventures around the story</h2>
-        <p>These deepen your hero and remain worthwhile, but they are never disguised as the next plot beat.</p>
+        <p>The main road is marked in gold. These paths are yours to follow whenever curiosity calls.</p>
         <div><strong>⭐ Form Mastery</strong><span>Learn how each shape thinks.</span></div>
         <div><strong>☀ Sunrise Town</strong><span>Build a home from the people you help.</span></div>
-        <div><strong>♢ Manyfold</strong><span>Take rearranging roguelite journeys.</span></div>
+        <div><strong>♢ Manyfold</strong><span>Brave a road that changes with every crossing.</span></div>
         <div><strong>⚑ Hero Board</strong><span>Answer the world's changing needs.</span></div>
       </aside>
     </div>`;
@@ -1350,14 +1350,14 @@ G.ui = (() => {
     const bossAssistance = G.comfortSetting && G.comfortSetting("bossAssistance");
     const easyMode = G.comfortSetting && G.comfortSetting("easyMode");
     return `<section class="settings-panel" aria-label="Settings and help">
-      <div class="settings-heading"><div><span class="eyebrow">SETTINGS & HELP</span><h2>Keep the adventure comfortable</h2></div></div>
+      <div class="settings-heading"><div><span class="eyebrow">SETTINGS & HELP</span><h2>Make the journey yours</h2></div></div>
       <div class="settings-grid">
-        <button data-act="music"><strong>♫ Music</strong><span>${musicOn ? "ON · organic regional score" : "OFF"}</span></button>
+        <button data-act="music"><strong>♫ Music</strong><span>${musicOn ? "ON" : "OFF"}</span></button>
         <button data-act="sound"><strong>◖ Sound effects</strong><span>${soundOn ? "ON" : "OFF"}</span></button>
         <button data-act="hd-pilot"><strong>✦ World detail</strong><span>${G.hdPilot ? "HD · 640×360" : "Original · 320×180"}</span></button>
-        <button data-act="boss-assistance" aria-pressed="${!!bossAssistance}"><strong>♥ Boss Assistance</strong><span>${bossAssistance ? "ON · retry hearts and gentler shots" : "OFF · original boss rules"}</span></button>
-        <button data-act="easy-mode" aria-pressed="${!!easyMode}"><strong>🌱 Easy Mode</strong><span>${easyMode ? "ON · in-battle heart regeneration" : "OFF · hearts need pickups or rest"}</span></button>
-        <button data-act="tutorial"><strong>? Tutorial</strong><span>Replay contextual hints</span></button>
+        <button data-act="boss-assistance" aria-pressed="${!!bossAssistance}"><strong>♥ Boss Assistance</strong><span>${bossAssistance ? "ON · extra retry hearts and gentler attacks" : "OFF"}</span></button>
+        <button data-act="easy-mode" aria-pressed="${!!easyMode}"><strong>🌱 Easy Mode</strong><span>${easyMode ? "ON · hearts slowly return, even in battle" : "OFF"}</span></button>
+        <button data-act="tutorial"><strong>? Tutorial</strong><span>Show the first lessons again</span></button>
         <button data-act="save-slots"><strong>▤ Adventure slots</strong><span>Slot ${G.activeSaveSlot} · switch or begin again</span></button>
         ${canFullscreen ? `<button data-act="fullscreen"><strong>⛶ Fullscreen</strong><span>Use more of this screen</span></button>` : ""}
       </div>
@@ -1380,9 +1380,9 @@ G.ui = (() => {
   }
 
   function buildFormLab() {
-    const labels = { roster: "Roster", loadout: "Loadout", legends: "Legends", skins: "Skins" };
+    const labels = { roster: "Forms", loadout: "Arts", legends: "Legends", skins: "Looks" };
     let html = `<div class="form-lab-header">
-      <div><h2>⚗ FORM LAB</h2><p>Choose a form, build its moves, and shape its look.</p></div>
+      <div><h2>⚗ FORM LAB</h2><p>Choose a shape, mix its arts, and make it your own.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
         `<button data-formlab-view="${id}" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}</div>
     </div>`;
@@ -1400,29 +1400,30 @@ G.ui = (() => {
     const percent = Math.round(100 * objective.value / Math.max(1, objective.goal));
     const chosen = G.state.legends.facets[form.id] || "original";
     const technique = G.abilities[def.techniqueId];
+    const ultimateControl = G.input.hasGamepad ? "Press LT + RT" : G.input.isTouch ? "Tap ✦" : "Press R";
     const stages = [
-      [1, "FACET", def.facet.name, "An alternate passive that changes handling, not damage."],
-      [2, "TECHNIQUE", def.techniqueName, "A new native move for the shared ability tray."],
-      [3, "LEGEND ARM", def.armName, `${def.ultimateName} · charged through active combat.`],
+      [1, "NATURE", def.facet.name, "Awaken a second nature within this form."],
+      [2, "SECRET ART", def.techniqueName, "Uncover an art that any form can carry."],
+      [3, "LEGEND ARM", def.armName, `Call forth ${def.ultimateName} when the Legend meter is full.`],
     ];
     return `<div class="lab-form-switcher">${G.unlockedForms().map((id) =>
       `<button data-form-select="${id}" class="${id === form.id ? "active" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span></button>`).join("")}</div>
       <section class="legend-hero" style="--legend:${def.color}">
         <div>${previewCanvas(form.id, G.selectedFormSkin(form.id)?.id || "classic", "loadout-preview", form.name, false, !G.selectedFormSkin(form.id))}</div>
         <div><span class="eyebrow">${escapeHtml(def.survivalText)}</span><h2>${form.icon} ${escapeHtml(form.name)} Legend</h2>
-          <p>Mastery continues sideways: more choices and a new climax, without raising the level cap or invalidating early battles.</p>
+          <p>A mastered form still has secrets. Follow its legend to awaken a hidden nature, a forbidden technique, and the arm that remembers its name.</p>
           <div class="legend-objective"><strong>${escapeHtml(objective.label)}</strong><span>${objective.value}/${objective.goal}</span><i><b style="width:${percent}%"></b></i></div>
         </div>
-        <div class="legend-meter"><strong>${Math.floor(G.legendCharge(form.id))}%</strong><span>ULTIMATE</span></div>
+        <div class="legend-meter"><strong>${Math.floor(G.legendCharge(form.id))}%</strong><span>LEGEND</span></div>
       </section>
       <div class="legend-track">${stages.map(([need, label, name, copy]) => `<article class="${rank >= need ? "earned" : need === rank + 1 ? "next" : "locked"}">
         <span>LEGEND ${["I", "II", "III"][need - 1]} · ${label}</span><h3>${rank >= need || need === rank + 1 ? escapeHtml(name) : "Unrevealed"}</h3>
         <p>${escapeHtml(copy)}</p>${rank >= need ? `<strong class="legend-earned">✓ AWAKENED</strong>` : ""}</article>`).join("")}</div>
-      ${rank >= 1 ? `<section class="facet-picker"><div><span class="eyebrow">ACTIVE FACET</span><h2>Choose how ${escapeHtml(form.name)} handles</h2></div>
+      ${rank >= 1 ? `<section class="facet-picker"><div><span class="eyebrow">ACTIVE NATURE</span><h2>Choose what stirs within ${escapeHtml(form.name)}</h2></div>
         <button data-legend-facet="original" class="${chosen === "original" ? "active" : ""}"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></button>
         <button data-legend-facet="legend" class="${chosen === "legend" ? "active" : ""}"><strong>✦ ${escapeHtml(def.facet.name)}</strong><span>${escapeHtml(def.facet.description)}</span></button></section>` : ""}
-      ${rank >= 2 ? `<section class="legend-reward"><span>${technique.icon}</span><div><small>AVAILABLE IN LOADOUT</small><h2>${escapeHtml(technique.name)}</h2><p>${escapeHtml(G.passives.styleLabel(technique.style))} · ${technique.mana} mana · ${technique.cooldown}s recovery</p></div><button data-formlab-view="loadout">Equip technique</button></section>` : ""}
-      ${rank >= 3 ? `<section class="legend-reward ultimate"><span>✦</span><div><small>VISIBLE LEGEND ARM</small><h2>${escapeHtml(def.armName)}</h2><p>${escapeHtml(def.ultimateName)} · R key, both triggers, or the glowing touch button at 100%.</p></div></section>` : ""}`;
+      ${rank >= 2 ? `<section class="legend-reward"><span>${technique.icon}</span><div><small>SECRET ART AWAKENED</small><h2>${escapeHtml(technique.name)}</h2><p>${escapeHtml(G.passives.styleLabel(technique.style))} · ${technique.mana} mana · ${technique.cooldown}s recovery</p></div><button data-formlab-view="loadout">Carry this art</button></section>` : ""}
+      ${rank >= 3 ? `<section class="legend-reward ultimate"><span>✦</span><div><small>LEGEND ARM AWAKENED</small><h2>${escapeHtml(def.armName)}</h2><p>${escapeHtml(def.ultimateName)} · Fill the Legend meter in battle. ${ultimateControl} when it shines.</p></div></section>` : ""}`;
   }
 
   function buildFormPathCard(id) {
@@ -1464,7 +1465,7 @@ G.ui = (() => {
     }).join("");
     const total = G.formOrder.filter((id) => G.formUnlocked(id)).length;
     return `<section class="form-path-shell" data-form-path-map>
-      <div class="form-path-heading"><div><span class="eyebrow">AWAKENING JOURNEY</span><h2>Every form has a readable next step</h2></div>
+      <div class="form-path-heading"><div><span class="eyebrow">AWAKENING JOURNEY</span><h2>Every shape leaves a trail</h2></div>
         <div class="form-path-total"><strong>${total}/${G.formOrder.length}</strong><span>FORMS AWAKENED</span></div></div>
       <div class="form-path-scroll">${chapters}</div>
     </section>`;
@@ -1506,8 +1507,8 @@ G.ui = (() => {
             <div class="survival-rule">${escapeHtml((G.FORM_SURVIVAL[selected.id] || {}).text || "BALANCED · mixed range and exposure")}</div>
             <div class="passive-rule"><strong>◆ ${escapeHtml(selectedPassive.name)}</strong><span>${escapeHtml(selectedPassive.description)}</span></div>
             <div class="mastery-track"><span>MASTERY</span><span class="mastery-pips">${selected.quests.map((quest) => `<i class="${G.questsDone.includes(quest.id) ? "done" : ""}"></i>`).join("")}</span><span>${completed}/${selected.quests.length}</span></div>
-            <div class="lab-actions"><button data-become="${selected.id}" ${current ? "disabled" : ""}>${current ? "Equipped" : `Become ${escapeHtml(selected.name)}`}</button>
-            <button data-formlab-view="loadout">Build moves</button><button data-formlab-view="skins">View skins</button></div>`
+            <div class="lab-actions"><button data-become="${selected.id}" ${current ? "disabled" : ""}>${current ? "Current form" : `Become ${escapeHtml(selected.name)}`}</button>
+            <button data-formlab-view="loadout">Mix arts</button><button data-formlab-view="skins">Choose a look</button></div>`
           : `${buildUnlockRoute(selected)}${ready ? echo
             ? `<div class="unlock-panel">✦ ${escapeHtml(selected.name)} is waiting ${echo.mapId === G.state.mapId ? "nearby" : "in " + escapeHtml(echoMap ? echoMap.name : echo.mapId)}. Meet it in the world to unlock it.</div>
               <button data-form-echo-guide="${selected.id}">Guide me to the echo</button>`
@@ -1553,12 +1554,12 @@ G.ui = (() => {
         `<button data-form-select="${id}" class="${id === form.id ? "active" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span></button>`).join("")}</div>
       <div class="loadout-workbench">
         <section class="loadout-form-panel">
-          <div class="eyebrow">BUILDING FOR</div><h2>${form.icon} ${escapeHtml(form.name)}</h2>
+          <div class="eyebrow">MIXING FOR</div><h2>${form.icon} ${escapeHtml(form.name)}</h2>
           ${previewCanvas(form.id, skin ? skin.id : "classic", "loadout-preview", form.name, false, !skin)}
           <div class="passive-rule"><strong>◆ ${escapeHtml(activePassive.name)}</strong><span>${escapeHtml(activePassive.description)}</span></div>
           <button class="restore-loadout" data-act="restore-default-loadout" ${usingDefaults ? "disabled" : ""}>
-            <strong>↺ ${usingDefaults ? "Native moves equipped" : "Restore native moves"}</strong>
-            <span>${usingDefaults ? "This is the form's original kit." : "Put this form's own B and C moves back."}</span>
+            <strong>↺ ${usingDefaults ? "Native arts ready" : "Restore native arts"}</strong>
+            <span>${usingDefaults ? "This form carries its own arts." : "Return this form's own B and C arts."}</span>
           </button>
         </section>
         <section class="loadout-slots" aria-label="Ability slots">${slots.map((slot) => {
@@ -1566,12 +1567,12 @@ G.ui = (() => {
           const match = ability && G.passives && G.passives.formMatches(form, ability);
           return `<button class="ability-slot ${slot === labSlot ? "selected" : ""} ${slot === 0 ? "fixed" : ""}" ${slot === 0 ? "disabled" : `data-loadout-slot="${slot}"`}>
             <span class="slot-letter">${["A", "B", "C"][slot]}</span><span class="slot-icon">${ability?.icon || "＋"}</span>
-            <span class="slot-copy"><strong>${escapeHtml(ability?.name || "Empty")}</strong><small>${slot === 0 ? "FORM BASIC · FIXED" : match ? "★ PASSIVE BOOSTED" : "OPEN MIX SLOT"}</small></span>
+            <span class="slot-copy"><strong>${escapeHtml(ability?.name || "Empty")}</strong><small>${slot === 0 ? "NATIVE ART · ALWAYS READY" : match ? "★ NATURE AWAKENED" : "MIXED ART"}</small></span>
           </button>`;
         }).join("")}</section>
       </div>
       <section class="ability-tray">
-        <div class="tray-heading"><div><span class="eyebrow">ABILITY TRAY</span><h2>Choose a move for slot ${["A", "B", "C"][labSlot]}</h2></div>
+        <div class="tray-heading"><div><span class="eyebrow">KNOWN ARTS</span><h2>Choose an art for ${["A", "B", "C"][labSlot]}</h2></div>
           <div class="ability-filters">${filters.map(([id, label]) => `<button data-ability-filter="${id}" class="${labAbilityFilter === id ? "active" : ""}">${label}</button>`).join("")}</div></div>
         <div class="ability-card-grid">${filtered.map((id) => {
           const ability = G.abilities[id];
@@ -1580,15 +1581,15 @@ G.ui = (() => {
           return `<button data-ability-select="${id}" class="ability-card ${id === labAbilityId ? "selected" : ""} ${match ? "boosted" : ""}">
             <span class="ability-card-icon">${ability.icon}</span><strong>${escapeHtml(ability.name)}</strong>
             <span>${dmgChip(ability.type)} <small>${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}</small></span>
-            <small>${origin ? `${origin.icon} ${escapeHtml(origin.name)}` : "Discovered move"}${match ? " · ★" : ""}</small>
+            <small>${origin ? `${origin.icon} ${escapeHtml(origin.name)}` : "Found art"}${match ? " · ★" : ""}</small>
           </button>`;
         }).join("")}</div>
         ${selected ? `<div class="ability-inspector">
-          <div class="ability-inspector-icon">${selected.icon}</div><div><span class="eyebrow">${source ? `${source.icon} ${escapeHtml(source.name)} MOVE` : "DISCOVERED MOVE"}</span>
+          <div class="ability-inspector-icon">${selected.icon}</div><div><span class="eyebrow">${source ? `${source.icon} ${escapeHtml(source.name)} ART` : "FOUND ART"}</span>
           <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${selected.mana} mana` : " · no mana"} · ${selected.cooldown}s recovery</p>
           <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(activePassive.name)} will not modify it.`}</div></div>
           <button data-act="equip-ability" ${lo[labSlot] === selected.id ? "disabled" : ""}>${lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
-        </div>` : `<div class="empty-tray">No moves match this filter yet.</div>`}
+        </div>` : `<div class="empty-tray">No known arts match this filter yet.</div>`}
       </section>`;
   }
 
@@ -1604,22 +1605,22 @@ G.ui = (() => {
         `<button data-form-select="${id}" class="${id === form.id ? "active" : ""}">${G.forms[id].icon}<span>${escapeHtml(G.forms[id].name)}</span></button>`).join("")}</div>
       <section class="skin-stage">
         <div class="skin-spotlight">${previewCanvas(form.id, previewSkin?.id || "classic", "skin-hero-preview", previewSkin?.name || `${form.name} Classic`, false, !previewSkin)}
-          <span>COSMETIC ONLY · STATS UNCHANGED</span></div>
-        <div class="skin-stage-copy"><span class="eyebrow">${previewSkin ? "SIGNATURE SKIN" : dyes.selected === "classic" ? "ORIGINAL LOOK" : "CLASSIC + GLOBAL DYE"}</span>
+          <span>A NEW LOOK · THE SAME FORM WITHIN</span></div>
+        <div class="skin-stage-copy"><span class="eyebrow">${previewSkin ? "SIGNATURE LOOK" : dyes.selected === "classic" ? "CLASSIC LOOK" : "CLASSIC LOOK + DYE"}</span>
           <h2>${previewSkin ? `${previewSkin.icon} ${escapeHtml(previewSkin.name)}` : `✨ ${escapeHtml(form.name)} Classic`}</h2>
           <p>${previewSkin ? escapeHtml(previewSkin.tagline) : `The original ${escapeHtml(form.name)} silhouette${dyes.selected === "classic" ? " and colors." : ` wearing the ${escapeHtml(G.costumeById(dyes.selected).name)} dye.`}`}</p>
           ${previewSkin && !owned ? `<div class="unlock-panel">🔒 Reach ${escapeHtml(form.name)} level ${previewSkin.unlockLevel}. Current level: ${G.formLevel(form.id)}.</div>` : ""}
-          <button data-act="equip-skin" ${previewSkin && !owned || (previewSkin ? equipped?.id === previewSkin.id : !equipped) ? "disabled" : ""}>${previewSkin && !owned ? "Mastery required" : previewSkin ? equipped?.id === previewSkin.id ? "Signature equipped" : "Equip signature" : !equipped ? "Classic equipped" : "Equip classic"}</button>
+          <button data-act="equip-skin" ${previewSkin && !owned || (previewSkin ? equipped?.id === previewSkin.id : !equipped) ? "disabled" : ""}>${previewSkin && !owned ? "Mastery required" : previewSkin ? equipped?.id === previewSkin.id ? "Signature worn" : "Wear signature" : !equipped ? "Classic worn" : "Wear classic"}</button>
         </div>
       </section>
       <div class="skin-tile-grid">
         <button data-skin-preview="classic" class="skin-tile ${labSkinId === "classic" ? "selected" : ""} ${!equipped ? "equipped" : ""}">
           ${previewCanvas(form.id, "classic", "skin-tile-preview", `${form.name} Classic`, false, true)}<strong>✨ Classic</strong><small>${dyes.selected === "classic" ? "Original colors" : G.costumeById(dyes.selected).name + " dye"}</small></button>
         <button data-skin-preview="${signature.id}" class="skin-tile ${labSkinId === signature.id ? "selected" : ""} ${equipped?.id === signature.id ? "equipped" : ""} ${owned ? "" : "locked"}">
-          ${previewCanvas(form.id, signature.id, "skin-tile-preview", signature.name, !owned, false)}<strong>${signature.icon} ${escapeHtml(signature.name)}</strong><small>${owned ? equipped?.id === signature.id ? "EQUIPPED" : "Signature skin" : `🔒 Level ${signature.unlockLevel}`}</small></button>
+          ${previewCanvas(form.id, signature.id, "skin-tile-preview", signature.name, !owned, false)}<strong>${signature.icon} ${escapeHtml(signature.name)}</strong><small>${owned ? equipped?.id === signature.id ? "WORN" : "Signature look" : `🔒 Level ${signature.unlockLevel}`}</small></button>
       </div>
       <details class="dye-drawer"><summary>🎨 Global dyes <span>${escapeHtml(G.costumeById(dyes.selected).name)} selected</span></summary>
-        <p>Dyes recolor every form's Classic look. Signature skins keep their authored colors and silhouette.</p>
+        <p>Dyes recolor each classic shape. Signature looks keep their own colors and silhouette.</p>
         <div class="dye-grid">${G.COSTUMES.map((costume) => {
           const unlocked = dyes.unlocked.includes(costume.id);
           const wearing = dyes.selected === costume.id;
@@ -1737,7 +1738,7 @@ G.ui = (() => {
   function buildQuestsTab() {
     const pins = G.pinnedQuests();
     let html = pins.length ? `<div class="form-card pin-summary">
-      <h2>📌 ${pins.length} quest${pins.length === 1 ? "" : "s"} on the HUD</h2>
+      <h2>📌 ${pins.length} quest${pins.length === 1 ? "" : "s"} tracked on screen</h2>
       <button data-act="clear-pins" class="clear-pins">✕ Unpin all</button>
     </div>` : "";
     for (const id of G.unlockedForms()) {
@@ -1770,7 +1771,7 @@ G.ui = (() => {
       if (found === bosses.length) {
         html += `<div class="quest-row done"><span>🧭 Guardian Compass</span><span class="prog">Hero Board unlocked</span></div>`;
       } else {
-        html += `<div class="tagline">Collect every trophy to earn the Guardian Compass, bonus stars, town spirit, and repeatable Hero Board contracts.</div>`;
+        html += `<div class="tagline">Collect every trophy to earn the Guardian Compass, bonus stars, town spirit, and a place on the Hero Board.</div>`;
       }
       html += `</div>`;
     }
@@ -2078,25 +2079,25 @@ G.ui = (() => {
       <div class="town-main-actions"><button data-act="visit-town">Visit town</button><button data-act="rename-town">Rename</button></div>
     </section>
     <section class="form-card town-works">
-      <span class="eyebrow">PERMANENT UPGRADES</span><h2>🏗️ Civic Works</h2>
-      <div class="tagline">Every project changes Sunrise Town permanently, raises its level, and appears in the town itself.</div>
+      <span class="eyebrow">LANDMARK PROJECTS</span><h2>🏗️ Civic Works</h2>
+      <div class="tagline">Each project changes Sunrise Town, helps it flourish, and takes its place among the streets.</div>
       <div class="town-project-grid">${projectCards}</div>
     </section>
     <section class="form-card town-services">
-      <span class="eyebrow">REPEATABLE CHOICES</span><h2>🤝 Community Fund</h2>
+      <span class="eyebrow">FOR THE NEIGHBOURS</span><h2>🤝 Community Fund</h2>
       <div class="town-service-grid">
         <article><div><strong>🎉 Hold a festival</strong><small>${G.townFestivalMinutes()} minutes · attracts ${G.townProjectBuilt("festivalStage") ? 2 : 1} resident${G.townProjectBuilt("festivalStage") ? "s" : ""} · every third raises town level</small></div>
           <button data-act="festival" ${festivalActive || town.spirit < festivalCost ? "disabled" : ""}>${festivalActive ? "Celebrating" : `${festivalCost} spirit`}</button></article>
-        <article><div><strong>📨 Sponsor a newcomer</strong><small>${town.residents >= capacity ? "Build more capacity first" : "Invite one visible resident immediately"}</small></div>
+        <article><div><strong>📨 Sponsor a newcomer</strong><small>${town.residents >= capacity ? "Build more capacity first" : "Welcome a new neighbour to town"}</small></div>
           <button data-act="sponsor-resident" ${town.residents >= capacity || town.spirit < G.townSponsorCost() ? "disabled" : ""}>${G.townSponsorCost()} spirit</button></article>
         <article><div><strong>🌷 Beautify the town</strong><small>${beautyComplete ? "Every planned corner is complete" : `Add lanterns, gardens, benches, and banners · ${town.beautifications}/${G.TOWN_BEAUTIFICATION_LIMIT}`}</small></div>
           <button data-act="beautify-town" ${beautyComplete || town.spirit < G.townBeautificationCost() ? "disabled" : ""}>${beautyComplete ? "Complete" : `${G.townBeautificationCost()} spirit`}</button></article>
-        <article><div><strong>🍲 Host a town feast</strong><small>At home only · fully restore hearts and mana · never usable mid-battle</small></div>
+        <article><div><strong>🍲 Host a town feast</strong><small>Served at home · fully restores hearts and mana</small></div>
           <button data-act="town-feast" ${!feastReady || town.spirit < 5 ? "disabled" : ""}>5 spirit</button></article>
       </div>
     </section>
     <section class="form-card town-guide">
-      <h2>How spirit moves</h2>
+      <h2>Where spirit flows</h2>
       <div class="quest-row"><span>Build on an empty town plot</span><span class="prog">${G.townHouseCost()} spirit</span></div>
       <div class="quest-row"><span>Five ordinary victories</span><span class="prog">+2 spirit</span></div>
       <div class="quest-row"><span>Claim a form / break a ward</span><span class="prog">+3 / +1</span></div>
@@ -2111,21 +2112,21 @@ G.ui = (() => {
     if (!run) {
       const longUnlocked = G.unlockedForms().length >= 5;
       return `<div class="form-card current expedition-intro">
-        <span class="eyebrow">ROGUELITE-INSPIRED ADVENTURE</span><h2>◇ Manyfold Expeditions</h2>
-        <div class="tagline">Choose branching routes, clear hand-built combat rooms, and draft temporary forms, moves, and boons. Losing safely returns you home.</div>
-        <div class="quest-row"><span>Runs entered</span><span class="prog">${progress.runs}</span></div>
+        <span class="eyebrow">THE EVER-CHANGING ROAD</span><h2>◇ Manyfold Expeditions</h2>
+        <div class="tagline">Choose a route, overcome each chamber, and gather borrowed forms, arts, and blessings. If the road defeats you, it returns you home unchanged.</div>
+        <div class="quest-row"><span>Crossings begun</span><span class="prog">${progress.runs}</span></div>
         <div class="quest-row"><span>Victories</span><span class="prog">${progress.victories}</span></div>
-        <div class="quest-row"><span>Best room</span><span class="prog">${progress.bestRoom}</span></div>
-        <div class="quest-row"><span>Longest clear</span><span class="prog">${progress.longestWin || "—"}</span></div>
-        <div class="slot-row"><span class="slot-label">Route length</span><select data-expedition-length>
-          <option value="5">Trail · 5 rooms</option>${longUnlocked ? `<option value="7">Deep path · 7 rooms</option>` : ""}
-          ${G.unlockedForms().length >= 10 ? `<option value="9">Worldfold · 9 rooms</option>` : ""}
+        <div class="quest-row"><span>Farthest chamber</span><span class="prog">${progress.bestRoom}</span></div>
+        <div class="quest-row"><span>Longest crossing</span><span class="prog">${progress.longestWin || "—"}</span></div>
+        <div class="slot-row"><span class="slot-label">Path length</span><select data-expedition-length>
+          <option value="5">Trail · 5 chambers</option>${longUnlocked ? `<option value="7">Deep path · 7 chambers</option>` : ""}
+          ${G.unlockedForms().length >= 10 ? `<option value="9">Worldfold · 9 chambers</option>` : ""}
         </select></div>
         <button data-act="start-expedition">Enter the shifting path</button>
-      </div><div class="form-card"><h2>How a run works</h2>
-        <div class="quest-row"><span>① Pick a route</span><span class="prog">risk vs reward</span></div>
-        <div class="quest-row"><span>② Win the room</span><span class="prog">campaign is safe</span></div>
-        <div class="quest-row"><span>③ Draft one reward</span><span class="prog">run-only power</span></div>
+      </div><div class="form-card"><h2>Crossing the Manyfold</h2>
+        <div class="quest-row"><span>① Choose a route</span><span class="prog">danger and treasure</span></div>
+        <div class="quest-row"><span>② Overcome the chamber</span><span class="prog">your adventure is untouched</span></div>
+        <div class="quest-row"><span>③ Claim one gift</span><span class="prog">fades when you return</span></div>
         <div class="quest-row"><span>④ Defeat the final champion</span><span class="prog">town rewards</span></div></div>`;
     }
 
@@ -2134,23 +2135,23 @@ G.ui = (() => {
       const boon = boonCatalog[id];
       return boon ? `${boon.icon} ${boon.name}${count > 1 ? ` ×${count}` : ""}` : id;
     });
-    let body = `<div class="form-card current"><span class="eyebrow">RUN IN PROGRESS</span>
-      <h2>◇ Room ${Math.min(run.room + 1, run.length)}/${run.length}</h2>
-      <div class="quest-row"><span>Rooms cleared</span><span class="prog">${run.wins}</span></div>
-      <div class="tagline">${boonNames.length ? boonNames.join(" · ") : "No boons yet. The first draft is ahead."}</div></div>`;
+    let body = `<div class="form-card current"><span class="eyebrow">CROSSING IN PROGRESS</span>
+      <h2>◇ Chamber ${Math.min(run.room + 1, run.length)}/${run.length}</h2>
+      <div class="quest-row"><span>Chambers cleared</span><span class="prog">${run.wins}</span></div>
+      <div class="tagline">${boonNames.length ? boonNames.join(" · ") : "No gifts yet. The first waits ahead."}</div></div>`;
     if (run.phase === "route") {
       body += `<div class="expedition-choice-grid">${run.routeChoices.map((route) => `<button class="expedition-choice" data-expedition-route="${route.id}">
         <span class="choice-icon">${route.icon}</span><strong>${escapeHtml(route.name)}</strong><small>${escapeHtml(route.risk)}</small><em>${escapeHtml(route.reward)}</em>
       </button>`).join("")}</div>`;
     } else if (run.phase === "reward") {
-      body += `<div class="form-card"><h2>Choose one draft</h2><div class="tagline">Everything here lasts only for this expedition.</div></div>
+      body += `<div class="form-card"><h2>Choose one gift</h2><div class="tagline">The Manyfold lends its power only until you return home.</div></div>
         <div class="expedition-choice-grid draft-grid">${run.draftOptions.map((option, index) => `<button class="expedition-choice" data-expedition-draft="${index}">
-          <span class="choice-icon">${option.icon}</span><strong>${escapeHtml(option.name)}</strong><small>${escapeHtml(option.text)}</small><em>TAKE THIS</em>
+          <span class="choice-icon">${option.icon}</span><strong>${escapeHtml(option.name)}</strong><small>${escapeHtml(option.text)}</small><em>CLAIM</em>
         </button>`).join("")}</div>`;
     } else {
-      body += `<div class="form-card"><h2>Battle underway</h2><div class="tagline">Close this menu and clear the room. Your draft appears after the last foe falls.</div></div>`;
+      body += `<div class="form-card"><h2>The chamber is waiting</h2><div class="tagline">Return to battle. A new gift will appear when the last foe falls.</div></div>`;
     }
-    return body + `<div class="form-card"><button data-act="abandon-expedition" class="danger">Leave expedition safely</button></div>`;
+    return body + `<div class="form-card"><button data-act="abandon-expedition" class="danger">Return home</button></div>`;
   }
 
   function buildGauntletTab() {
@@ -2159,7 +2160,7 @@ G.ui = (() => {
     if (current) {
       return `<div class="form-card current">
         <h2>🏟 Gauntlet in progress</h2>
-        <div class="tagline">Round ${Math.min(current.index + 1, current.bosses.length)}/${current.bosses.length} · ${current.recovery ? "campfire recovery" : "iron run"}</div>
+        <div class="tagline">Round ${Math.min(current.index + 1, current.bosses.length)}/${current.bosses.length} · ${current.recovery ? "campfires lit" : "unbroken procession"}</div>
         <div class="quest-row"><span>Guardians defeated</span><span class="prog">${current.wins}</span></div>
       </div>`;
     }
@@ -2168,7 +2169,7 @@ G.ui = (() => {
       `<option value="all">All ${pool.length} defeated bosses</option>`;
     return `<div class="form-card current">
       <h2>🏟 Manyfold Gauntlet</h2>
-      <div class="tagline">Choose how many previously defeated guardians to fight back-to-back. The order changes every run.</div>
+      <div class="tagline">Choose how many defeated guardians to face in succession. Their order changes with every procession.</div>
       <div class="quest-row"><span>Available guardians</span><span class="prog">${pool.length}</span></div>
       <div class="quest-row"><span>Recovery record</span><span class="prog">${G.state.gauntletBest || 0}</span></div>
       <div class="quest-row"><span>Iron record</span><span class="prog">${G.state.gauntletIronBest || 0}</span></div>
@@ -2178,7 +2179,7 @@ G.ui = (() => {
     </div>
     <div class="form-card">
       <h2>🏆 Records</h2>
-      <div class="tagline">A longer personal best awards one star. A full-roster clear earns the Manyfold Crown: +2 maximum mana, a visible crown, and one Second Wind in every future gauntlet.</div>
+      <div class="tagline">A new personal best awards one star. Defeat the full procession to earn the Manyfold Crown: +2 maximum mana and one Second Wind in every gauntlet.</div>
       ${(G.state.items || []).includes("manyfold-crown") ? `<div class="quest-row done"><span>👑 Manyfold Crown</span><span class="prog">14 mana · Second Wind ready</span></div>` : ""}
     </div>`;
   }
@@ -2187,27 +2188,27 @@ G.ui = (() => {
     const board = G.ensureHeroBoard();
     const progress = G.heroContractProgress();
     const milestones = [
-      [3, "🎗 Wayfarer Ribbon", "visible travel trail"],
-      [6, "🚩 Sunrise Banner", "double festival spirit"],
-      [10, "✨ Heroic Halo", "visible in every form"],
+      [3, "🎗 Wayfarer Ribbon", "leaves a shining trail"],
+      [6, "🚩 Sunrise Banner", "festivals earn double spirit"],
+      [10, "✨ Heroic Halo", "shines above every form"],
     ];
     let html = `<div class="form-card current">
       <h2>🧭 Hero Board</h2>
-      <div class="tagline">Repeatable adventures that reward exploring the world, mixing abilities, changing forms, and revisiting guardians.</div>
+      <div class="tagline">Answer calls from across the world: explore forgotten roads, mix unlikely arts, change form, and face old guardians anew.</div>
       <div class="quest-row"><span>Renown</span><span class="prog">${board.renown}</span></div>
       <div class="quest-row"><span>Contracts completed</span><span class="prog">${board.completed}</span></div>`;
     if (progress) {
       html += `<div class="quest-row"><span>${progress.def.icon} ${progress.def.name}</span><span class="prog">${progress.label}</span></div>
         <div class="tagline">${progress.def.text}</div>`;
     } else {
-      html += `<div class="tagline">The next job rotates through patrols, exploration, ward breaking, ability variety, form variety, and guardian rematches.</div>
-        <button data-act="accept-contract">Accept next contract</button>`;
+      html += `<div class="tagline">A fresh request waits: patrols, lost roads, broken wards, strange combinations, or a guardian seeking another duel.</div>
+        <button data-act="accept-contract">Take the next request</button>`;
     }
     html += `</div><div class="form-card"><h2>🏅 Renown rewards</h2>`;
     for (const [at, name, effect] of milestones) {
       html += `<div class="quest-row ${board.renown >= at ? "done" : ""}"><span>${name}</span><span class="prog">${board.renown >= at ? effect : `${board.renown}/${at}`}</span></div>`;
     }
-    html += `<div class="tagline">Every contract also awards +1 star and 11–20 town spirit. Contracts continue after the milestone rewards.</div></div>`;
+    html += `<div class="tagline">Every completed request awards +1 star and 11–20 town spirit. The board never stays empty for long.</div></div>`;
     return html;
   }
 
@@ -2224,11 +2225,10 @@ G.ui = (() => {
     if (!G.workshopErrors.length) return;
     const el = document.getElementById("workshop-errors");
     el.innerHTML = `<div class="panel">
-      <h1>🛠 The Form Workshop found some problems!</h1>
-      <p>These forms/abilities are benched until they follow the rules
-      (the rules are at the top of <b>js/engine/forms.js</b>):</p>
+      <h1>🛠 The Form Workshop needs attention</h1>
+      <p>Some forms or arts could not awaken. The rest of the adventure is ready:</p>
       <ul>${G.workshopErrors.map((e) => `<li><b>${e.where}:</b> ${e.msg}</li>`).join("")}</ul>
-      <button id="workshop-ok">Got it — play anyway with the working forms ▶</button>
+      <button id="workshop-ok">Continue with the forms that are ready ▶</button>
     </div>`;
     workshopOpen = true;
     el.classList.remove("hidden");

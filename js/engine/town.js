@@ -110,7 +110,7 @@ G.addTownReward = function (spirit, residents, reason, quiet) {
     const parts = [];
     if (gainedSpirit) parts.push(`+${gainedSpirit} town spirit`);
     if (gainedResidents) parts.push(`+${gainedResidents} resident${gainedResidents === 1 ? "" : "s"}`);
-    G.ui.toast(`☀️ ${reason || "Town progress"}: ${parts.join(" · ")}`, 3);
+    G.ui.toast(`☀️ ${reason || "Sunrise Town"}: ${parts.join(" · ")}`, 3);
   }
   if (G.syncTownResidents) G.syncTownResidents();
   G.saveGame();

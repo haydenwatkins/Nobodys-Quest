@@ -18,7 +18,7 @@ const HERO_CONTRACTS = [
   },
   {
     id: "mixed-arsenal", name: "Mixed Arsenal", icon: "🧰",
-    text: "Use 10 different abilities. Build a loadout, then swap forms to reach the rest.",
+    text: "Use 10 different arts. Mix your favorites, then change forms to reach the rest.",
     event: "abilityUse", goal: 10, uniqueGoal: 10, unique: "abilities",
     accepts() { return true; },
     uniqueValue(data) { return data.ability; },
@@ -141,7 +141,7 @@ function awardHeroMilestones(board) {
   const milestones = [
     { at: 3, item: "wayfarer-ribbon", title: "WAYFARER RIBBON", text: "A bright trail now follows your adventures." },
     { at: 6, item: "sunrise-banner", title: "SUNRISE BANNER", text: "Town festivals now last twice as long." },
-    { at: 10, item: "heroic-halo", title: "HEROIC HALO", text: "Your renown is visible in every form." },
+    { at: 10, item: "heroic-halo", title: "HEROIC HALO", text: "A bright halo now follows every form you wear." },
   ];
   for (const reward of milestones) {
     if (board.renown < reward.at || G.state.items.includes(reward.item)) continue;

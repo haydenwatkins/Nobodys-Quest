@@ -119,7 +119,7 @@
       const met = (G.state.items || []).includes(rule.item);
       return {
         kind: "trophy", icon: "♛", label: rule.hint || "Find the key item",
-        detail: met ? "Boss reward secured" : "Boss reward missing",
+        detail: met ? "Trophy held" : "Trophy still missing",
         met, itemId: rule.item,
       };
     }

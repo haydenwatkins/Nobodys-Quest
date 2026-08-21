@@ -117,13 +117,13 @@
     if (!form) return "This shape has not found its name yet.";
     const basic = G.abilities && G.abilities[form.basic];
     const damage = basic && G.DAMAGE_TYPES && G.DAMAGE_TYPES[basic.type];
-    const pace = form.speed >= 100 ? "swift" : form.speed <= 70 ? "sturdy and deliberate" : "balanced";
-    const style = basic && basic.style === "projectile" ? "ranged"
-      : basic && basic.style === "dash" ? "mobile"
-        : basic && basic.style === "area" ? "crowd-control"
-          : basic && basic.style === "chain" ? "target-linking" : "close-range";
+    const pace = form.speed >= 100 ? "swift" : form.speed <= 70 ? "deliberate" : "steady";
+    const style = basic && basic.style === "projectile" ? "fights best at a distance"
+      : basic && basic.style === "dash" ? "closes distance in a flash"
+        : basic && basic.style === "area" ? "commands the space around it"
+          : basic && basic.style === "chain" ? "binds one foe to the next" : "fights at close range";
     const attack = basic ? `${basic.icon || ""} ${basic.name}`.trim() : "Its basic attack";
-    return `${form.name} is a ${pace}, ${style} form. ${attack} deals ${damage ? `${damage.icon} ${damage.name}` : "direct"} damage. ` +
+    return `${form.name} is ${pace} and ${style}. ${attack} carries ${damage ? `${damage.icon} ${damage.name}` : "direct"} damage. ` +
       `${form.passive.name}: ${form.passive.description}`;
   };
 

@@ -6,7 +6,7 @@ registerForm({
   tagline: "A mountain-sized promise: once a swing begins, nothing in the world can make it flinch.",
   speed: 48, hearts: 8, slots: 2,
   passive: { id: "worldweight", name: "Worldweight",
-    description: "Attacking prevents knockback and interruption; melee and area moves push farther but deal normal damage." },
+    description: "While attacking, Colossus cannot be shoved or interrupted; melee and area arts hurl foes farther." },
   basic: "pillarFist",
   abilities: [{ id: "earthShoulder", level: 1 }, { id: "worldBreak", level: 2 }],
   unlock: { type: "challenge", hint: "Reach the heartbeat beneath Titan Grave", requirements: [

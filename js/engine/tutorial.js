@@ -67,12 +67,12 @@ G.tutorial = (() => {
     if (step >= steps.length - 1) {
       done = true;
       G.sfx.play("quest");
-      G.ui.banner("TUTORIAL COMPLETE!", "Explore, mix abilities, and finish quests your way.");
+      G.ui.banner("FIRST LESSONS COMPLETE", "Explore freely, mix unlikely arts, and choose your own road.");
     } else {
       step++;
       visibleFor = 5;
       G.sfx.play("pickup");
-      G.ui.toast("Tutorial step complete!");
+      G.ui.toast("Lesson learned.");
     }
     G.saveGame();
   }

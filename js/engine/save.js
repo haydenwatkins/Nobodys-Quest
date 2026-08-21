@@ -337,7 +337,7 @@ G.showSaveSlotScreen = function (force) {
   const cards = summaries.map(titleSlotCard).join("");
 
   overlay.innerHTML = `<main class="save-screen-panel title-world-screen" role="dialog" aria-modal="true" aria-label="Nobody's Quest title screen. Choose an adventure.">
-      ${force ? `<button class="title-return" data-title-return aria-label="Return to the current game">← Return</button>` : ""}
+      ${force ? `<button class="title-return" data-title-return aria-label="Return to the current adventure">← Return</button>` : ""}
       <section class="title-world-hero">
         <header class="title-lockup"><span>Nobody's</span><h1>Quest</h1><p>The prophecy chose the wrong name</p></header>
         ${titleTransformationStage(activeSave)}
@@ -347,12 +347,12 @@ G.showSaveSlotScreen = function (force) {
       </section>
       <footer class="save-screen-foot"><button data-title-settings>⚙ Settings</button><span>Choose a chapter · progress saves automatically</span></footer>
       <aside class="title-settings hidden" data-title-settings-panel aria-label="Title screen settings">
-        <div><span class="eyebrow">SETTINGS</span><h2>Make the story comfortable</h2></div>
+        <div><span class="eyebrow">SETTINGS</span><h2>Make the journey yours</h2></div>
         <button data-title-music>♫ Music <span>${!G.sfx || G.sfx.musicEnabled !== false ? "ON" : "OFF"}</span></button>
         <button data-title-sound>◖ Sound <span>${!G.sfx || G.sfx.soundEnabled !== false ? "ON" : "OFF"}</span></button>
         <button data-title-detail>✦ World detail <span>${G.hdPilot ? "HD" : "ORIGINAL"}</span></button>
-        <button data-title-boss-assistance aria-pressed="${!!(G.comfortSetting && G.comfortSetting("bossAssistance"))}">♥ Boss Assistance <span>${G.comfortSetting && G.comfortSetting("bossAssistance") ? "ON · retry help" : "OFF · original bosses"}</span></button>
-        <button data-title-easy-mode aria-pressed="${!!(G.comfortSetting && G.comfortSetting("easyMode"))}">🌱 Easy Mode <span>${G.comfortSetting && G.comfortSetting("easyMode") ? "ON · in-battle heart regeneration" : "OFF · normal healing"}</span></button>
+        <button data-title-boss-assistance aria-pressed="${!!(G.comfortSetting && G.comfortSetting("bossAssistance"))}">♥ Boss Assistance <span>${G.comfortSetting && G.comfortSetting("bossAssistance") ? "ON · extra retry hearts and gentler attacks" : "OFF"}</span></button>
+        <button data-title-easy-mode aria-pressed="${!!(G.comfortSetting && G.comfortSetting("easyMode"))}">🌱 Easy Mode <span>${G.comfortSetting && G.comfortSetting("easyMode") ? "ON · hearts slowly return, even in battle" : "OFF"}</span></button>
         <button data-title-fullscreen>⛶ Fullscreen</button><button data-title-settings-close>Done</button>
       </aside>
     </main>`;
@@ -462,14 +462,14 @@ G.showSaveSlotScreen = function (force) {
     if (G.setComfortSetting) G.setComfortSetting("bossAssistance", !G.comfortSetting("bossAssistance"));
     const enabled = G.comfortSetting("bossAssistance");
     bossAssistance.setAttribute("aria-pressed", String(enabled));
-    bossAssistance.querySelector("span").textContent = enabled ? "ON · retry help" : "OFF · original bosses";
+    bossAssistance.querySelector("span").textContent = enabled ? "ON · extra retry hearts and gentler attacks" : "OFF";
   });
   const easyMode = overlay.querySelector("[data-title-easy-mode]");
   if (easyMode) easyMode.addEventListener("click", () => {
     if (G.setComfortSetting) G.setComfortSetting("easyMode", !G.comfortSetting("easyMode"));
     const enabled = G.comfortSetting("easyMode");
     easyMode.setAttribute("aria-pressed", String(enabled));
-    easyMode.querySelector("span").textContent = enabled ? "ON · in-battle heart regeneration" : "OFF · normal healing";
+    easyMode.querySelector("span").textContent = enabled ? "ON · hearts slowly return, even in battle" : "OFF";
   });
   const fullscreen = overlay.querySelector("[data-title-fullscreen]");
   if (fullscreen) fullscreen.addEventListener("click", () => {
