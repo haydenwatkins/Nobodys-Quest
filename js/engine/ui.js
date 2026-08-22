@@ -919,33 +919,72 @@ G.ui = (() => {
     if (G.input.tapped("back") || G.input.tapped("pause")) closeFormWheel();
   }
 
-  function controllerMenuElements() {
-    return G.menuController.elements(menuEl);
-  }
-
-  function focusControllerElement(element) {
-    G.menuController.setFocus(menuEl, element);
-  }
-
   function focusControllerDefault() {
-    const active = menuEl.querySelector("[data-tab].active");
+    const active = settingsOpen ? menuEl.querySelector(".settings-panel button")
+      : menuEl.querySelector("[data-menu-section].active");
     G.menuController.focusDefault(menuEl, active);
   }
 
+  function menuSections() {
+    const sections = [
+      { id: "journey", icon: "◆", label: "Journey", routes: [["story", "Story"], ["quests", "Mastery"]] },
+      { id: "forms", icon: "⚗", label: "Forms", routes: [["forms", "Form Lab"]] },
+      { id: "world", icon: "🧭", label: "World", routes: [["map", "Atlas"]] },
+    ];
+    const world = sections[2].routes;
+    if (G.townUnlocked && G.townUnlocked()) world.push(["town", "Town"]);
+    if (G.heroBoardUnlocked && G.heroBoardUnlocked()) world.push(["board", "Hero Board"]);
+    const challenges = [];
+    if (G.expeditionUnlocked && G.expeditionUnlocked()) challenges.push(["expedition", "Manyfold"]);
+    if (G.gauntletUnlocked && G.gauntletUnlocked()) challenges.push(["gauntlet", "Gauntlet"]);
+    if (challenges.length) sections.push({ id: "challenges", icon: "♢", label: "Challenges", routes: challenges });
+    if (G.state.expeditionRun) return [{ id: "challenges", icon: "♢", label: "Expedition", routes: [["expedition", "Manyfold"]] }];
+    return sections;
+  }
+
+  function activeMenuSection(sections) {
+    return sections.find((section) => section.routes.some(([route]) => route === activeTab)) || sections[0];
+  }
+
+  function changeMenuRoute(route) {
+    activeTab = route;
+    settingsOpen = false;
+    buildMenu();
+    menuEl.scrollTop = 0;
+  }
+
   function cycleControllerTab(direction) {
-    const tabs = Array.from(menuEl.querySelectorAll("[data-tab]"));
-    if (!tabs.length) return;
-    let index = tabs.findIndex((tab) => tab.classList.contains("active"));
-    index = (index + direction + tabs.length) % tabs.length;
-    tabs[index].click();
-    focusControllerDefault();
+    if (settingsOpen) return;
+    const sections = menuSections();
+    if (!sections.length) return;
+    let index = sections.indexOf(activeMenuSection(sections));
+    index = (index + direction + sections.length) % sections.length;
+    changeMenuRoute(sections[index].routes[0][0]);
+  }
+
+  function controllerBack() {
+    if (settingsOpen) { settingsOpen = false; buildMenu(); return; }
+    if (activeTab === "forms" && formLabView === "roster" && formRosterView === "detail") {
+      formRosterView = "path"; buildMenu(); menuEl.scrollTop = 0; return;
+    }
+    if (activeTab === "forms" && formLabView !== "roster") {
+      formLabView = "roster"; formRosterView = "path"; buildMenu(); menuEl.scrollTop = 0; return;
+    }
+    if (activeTab === "map" && atlasView === "local") {
+      atlasView = "world"; buildMenu(); menuEl.scrollTop = 0; return;
+    }
+    const section = activeMenuSection(menuSections());
+    if (section && section.routes[0] && activeTab !== section.routes[0][0]) {
+      changeMenuRoute(section.routes[0][0]); return;
+    }
+    closeMenu();
   }
 
   function updateControllerMenu(dt) {
     if (!menuOpen) return;
     G.menuController.update(menuEl, {
-      preferred: menuEl.querySelector("[data-tab].active"),
-      onBack: closeMenu,
+      preferred: settingsOpen ? menuEl.querySelector(".settings-panel button") : menuEl.querySelector("[data-menu-section].active"),
+      onBack: controllerBack,
       onPageLeft: () => cycleControllerTab(-1),
       onPageRight: () => cycleControllerTab(1),
     }, dt);
@@ -1049,46 +1088,41 @@ G.ui = (() => {
   }
 
   function buildMenu() {
-    const previousControllerElements = controllerMenuElements();
-    const previousControllerIndex = previousControllerElements.indexOf(G.menuController.current(menuEl));
-    let tabs = [
-      ["story", "Story"],
-      ["forms", "Form Lab"],
-      ["quests", "Mastery"],
-      ["map", "Map"],
-    ];
-    if (G.townUnlocked && G.townUnlocked()) tabs.push(["town", "Town"]);
-    if (G.expeditionUnlocked && G.expeditionUnlocked()) tabs.push(["expedition", "Expedition"]);
-    if (G.gauntletUnlocked && G.gauntletUnlocked()) tabs.push(["gauntlet", "Gauntlet"]);
-    if (G.heroBoardUnlocked && G.heroBoardUnlocked()) tabs.push(["board", "Hero Board"]);
+    const focusMemory = G.menuController.snapshot(menuEl);
     if (G.state.expeditionRun) {
-      tabs = [["expedition", "Expedition"]];
       activeTab = "expedition";
     }
     if (activeTab === "town" && !(G.townUnlocked && G.townUnlocked())) activeTab = "forms";
     if (activeTab === "gauntlet" && !(G.gauntletUnlocked && G.gauntletUnlocked())) activeTab = "forms";
     if (activeTab === "expedition" && !(G.expeditionUnlocked && G.expeditionUnlocked())) activeTab = "forms";
     if (activeTab === "board" && !(G.heroBoardUnlocked && G.heroBoardUnlocked())) activeTab = "forms";
-    let html = `<h1>Nobody's Quest</h1>
-      <div class="stars">⭐ ${G.state.stars} stars</div>
-      <div class="menu-tabs">${tabs.map(([id, label]) =>
-        `<button data-tab="${id}" class="${activeTab === id ? "active" : ""}">${label}</button>`).join("")}
-      </div>
-      <div class="menu-body ${activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : activeTab === "story" ? "story-body" : ""}">`;
+    const sections = menuSections();
+    const section = activeMenuSection(sections);
+    const routeTabs = section.routes;
+    let html = `<header class="menu-console-header"><div class="menu-title"><h1>Nobody's Quest</h1><span>⭐ ${G.state.stars}</span></div>
+      <div class="menu-tabs" aria-label="Pause menu sections">${sections.map((item) =>
+        `<button data-menu-section="${item.id}" data-menu-route="${item.routes[0][0]}" class="${section.id === item.id && !settingsOpen ? "active" : ""}"><span>${item.icon}</span>${item.label}</button>`).join("")}
+      </div>${!settingsOpen && routeTabs.length > 1 ? `<div class="menu-route-tabs" aria-label="${escapeHtml(section.label)} pages">${routeTabs.map(([route, label]) =>
+        `<button data-menu-route="${route}" class="${activeTab === route ? "active" : ""}">${label}</button>`).join("")}</div>` : ""}</header>
+      <div class="menu-body ${settingsOpen ? "settings-body" : activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : activeTab === "story" ? "story-body" : ""}">`;
 
-    if (activeTab === "story") html += buildStoryTab();
-    if (activeTab === "forms") html += buildFormLab();
-    if (activeTab === "quests") html += buildQuestsTab();
-    if (activeTab === "map") html += buildWayfinderTab();
-    if (activeTab === "town") html += buildTownTab();
-    if (activeTab === "gauntlet") html += buildGauntletTab();
-    if (activeTab === "expedition") html += buildExpeditionTab();
-    if (activeTab === "board") html += buildHeroBoardTab();
+    if (settingsOpen) html += buildSettingsPanel();
+    else {
+      if (activeTab === "story") html += buildStoryTab();
+      if (activeTab === "forms") html += buildFormLab();
+      if (activeTab === "quests") html += buildQuestsTab();
+      if (activeTab === "map") html += buildWayfinderTab();
+      if (activeTab === "town") html += buildTownTab();
+      if (activeTab === "gauntlet") html += buildGauntletTab();
+      if (activeTab === "expedition") html += buildExpeditionTab();
+      if (activeTab === "board") html += buildHeroBoardTab();
+    }
 
-    html += `</div>${settingsOpen ? buildSettingsPanel() : ""}
+    html += `</div>
       <div class="menu-footer">
         <button data-act="resume">▶ Resume</button>
-        <button data-act="settings" class="settings-btn">⚙ Settings</button>
+        <div class="controller-hints" aria-hidden="true"><span>LB/RB PAGE</span><span>✚ MOVE</span><span>A SELECT</span><span>B BACK</span><span>R-STICK SCROLL</span></div>
+        <button data-act="settings" class="settings-btn">${settingsOpen ? "← Back" : "⚙ Settings"}</button>
       </div>`;
 
     menuEl.innerHTML = html;
@@ -1096,9 +1130,12 @@ G.ui = (() => {
     if (activeTab === "map" && atlasView === "local") drawLocalAtlas();
     if (activeTab === "forms") drawFormPreviews(true);
 
-    // wire up clicks
-    menuEl.querySelectorAll("[data-tab]").forEach((b) =>
-      b.addEventListener("click", () => { activeTab = b.dataset.tab; buildMenu(); menuEl.scrollTop = 0; }));
+    // Major sections stay few and stable; their smaller route row contains
+    // related destinations such as Story/Mastery or Atlas/Town/Hero Board.
+    menuEl.querySelectorAll("[data-menu-section]").forEach((button) =>
+      button.addEventListener("click", () => changeMenuRoute(button.dataset.menuRoute)));
+    menuEl.querySelectorAll(".menu-route-tabs [data-menu-route]").forEach((button) =>
+      button.addEventListener("click", () => changeMenuRoute(button.dataset.menuRoute)));
     const storyMap = menuEl.querySelector('[data-act="story-map"]');
     if (storyMap) storyMap.addEventListener("click", () => {
       const goal = G.storyGoal();
@@ -1315,7 +1352,11 @@ G.ui = (() => {
     const resume = menuEl.querySelector('[data-act="resume"]');
     if (resume) resume.addEventListener("click", closeMenu);
     const settings = menuEl.querySelector('[data-act="settings"]');
-    if (settings) settings.addEventListener("click", () => { settingsOpen = !settingsOpen; buildMenu(); });
+    if (settings) settings.addEventListener("click", () => {
+      settingsOpen = !settingsOpen;
+      buildMenu();
+      if (menuOpen && G.input.hasGamepad) focusControllerDefault();
+    });
     const fullscreen = menuEl.querySelector('[data-act="fullscreen"]');
     if (fullscreen) fullscreen.addEventListener("click", enterFullscreen);
     const tutorial = menuEl.querySelector('[data-act="tutorial"]');
@@ -1354,12 +1395,9 @@ G.ui = (() => {
       if (confirm(`Delete Slot ${G.activeSaveSlot}? Other adventure slots will be kept.`)) G.resetSave();
     });
     if (menuOpen && G.input.hasGamepad && !menuEl.classList.contains("hidden")) {
-      const rebuiltElements = controllerMenuElements();
-      if (previousControllerIndex >= 0 && rebuiltElements.length) {
-        focusControllerElement(rebuiltElements[Math.min(previousControllerIndex, rebuiltElements.length - 1)]);
-      } else {
-        focusControllerDefault();
-      }
+      const preferred = settingsOpen ? menuEl.querySelector(".settings-panel button")
+        : menuEl.querySelector("[data-menu-section].active");
+      G.menuController.restore(menuEl, focusMemory, preferred);
     }
   }
 

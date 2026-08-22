@@ -116,6 +116,7 @@ const panel = {
   querySelectorAll(sel) { return sel === "button" ? panel.buttons : []; },
   querySelector(sel) { return sel === "button" ? panel.buttons[0] : null; },
 };
+panel.buttons.forEach((button, index) => { button.rect.top = index * 50; });
 const tvOverlay = {
   html: "",
   set innerHTML(value) { this.html = value; }, get innerHTML() { return this.html; },

@@ -255,33 +255,38 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   -webkit-overflow-scrolling: touch;
 }
 
-#menu h1 { font-size: 20px; color: #ffcd75; text-align: center; margin-bottom: 8px; }
-#menu .stars { text-align: center; font-size: 22px; margin-bottom: 12px; color: #ffcd75; }
+#menu h1 { margin:0; color:#ffcd75; font-size:15px; text-align:left; }
+.menu-console-header { position:sticky; top:calc(-16px - env(safe-area-inset-top)); z-index:8; max-width:1000px; margin:0 auto 14px; padding:calc(12px + env(safe-area-inset-top)) 10px 10px; border-bottom:2px solid #566c86; background:linear-gradient(to bottom,rgba(26,28,44,.99) 78%,rgba(26,28,44,.94)); box-shadow:0 10px 18px rgba(10,12,22,.28); }
+.menu-title { display:flex; align-items:center; justify-content:space-between; gap:14px; max-width:980px; margin:0 auto 9px; }
+.menu-title>span { color:#ffcd75; font:18px "VT323",monospace; }
 
 .menu-tabs {
-  display: flex; gap: 8px; justify-content: safe center; overflow-x: auto; flex-wrap: nowrap;
-  margin-bottom: 14px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:7px; max-width:980px; margin:0 auto;
+  overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
 }
 .menu-tabs::-webkit-scrollbar { display: none; }
 .menu-tabs button {
-  flex: 0 0 auto;
-  font-size: 11px;
-  padding: 10px 14px; border-radius: 8px;
+  min-height:48px; padding:9px 12px; border-radius:8px; font-size:9px;
   border: 2px solid #566c86; background: #333c57; color: #94b0c2;
 }
+.menu-tabs button>span { margin-right:7px; font-size:16px; vertical-align:middle; }
 .menu-tabs button.active { border-color: #ffcd75; background: #566c86; color: #f4f4f4; }
+.menu-route-tabs { display:flex; justify-content:center; gap:6px; max-width:700px; margin:8px auto 0; }
+.menu-route-tabs button { min-width:110px; padding:7px 12px; border:1px solid #566c86; border-radius:18px; color:#94b0c2; background:#202438; font:7px "Press Start 2P",monospace; }
+.menu-route-tabs button.active { color:#1a1c2c; border-color:#73eff7; background:#73eff7; }
 
 #menu .controller-focus,
 #save-slots .controller-focus,
 #story-ending .controller-focus,
 #workshop-errors .controller-focus {
-  outline: 3px solid #73eff7;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(115, 239, 247, 0.24);
+  position:relative; z-index:3; outline:4px solid #fff3c2; outline-offset:3px;
+  box-shadow:0 0 0 7px rgba(115,239,247,.4),0 0 24px rgba(115,239,247,.55);
+  filter:brightness(1.18); transform:scale(1.015);
 }
 
-.menu-body { max-width: 640px; margin: 0 auto; }
+.menu-body { max-width:640px; margin:0 auto; padding-bottom:82px; }
 .menu-body.atlas-body { max-width: 980px; }
+.menu-body.settings-body { max-width:720px; }
 
 .form-card {
   border: 2px solid #566c86; border-radius: 10px;
@@ -935,6 +940,23 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 }
 .menu-footer button.settings-btn { border-color: #566c86; background: #333c57; color: #c8d8e0; font-size: 9px; }
 .menu-footer button.danger { border-color: #b13e53; background: transparent; color: #b13e53; font-size: 9px; padding: 8px 10px; }
+.controller-hints { display:none; flex:1 1 auto; align-items:center; justify-content:center; gap:13px; min-width:0; color:#94b0c2; font:6px "Press Start 2P",monospace; }
+.controller-hints span { white-space:nowrap; }
+#menu.controller-active .controller-hints { display:flex; }
+
+/* The native TV shell announces itself in input.js. This is intentionally a
+   layout treatment, not a second menu implementation, so browser, iOS and TV
+   keep identical actions and save behavior. */
+.tv-mode #menu { padding:12px 28px 16px; }
+.tv-mode .menu-console-header { top:-12px; max-width:1180px; padding:12px 12px 11px; }
+.tv-mode .menu-title,.tv-mode .menu-tabs { max-width:1140px; }
+.tv-mode .menu-tabs button { min-height:56px; font-size:11px; }
+.tv-mode .menu-route-tabs button { min-height:42px; font-size:8px; }
+.tv-mode .menu-body { max-width:900px; }
+.tv-mode .menu-body.atlas-body,.tv-mode .menu-body.story-body,.tv-mode .menu-body.form-lab-body { max-width:1140px; }
+.tv-mode .menu-footer { bottom:-16px; margin-right:-28px; margin-left:-28px; padding-right:28px; padding-left:28px; }
+.tv-mode .menu-footer button { min-width:190px; min-height:54px; }
+.tv-mode #menu .controller-focus { outline-width:5px; outline-offset:4px; box-shadow:0 0 0 9px rgba(115,239,247,.46),0 0 30px rgba(115,239,247,.64); }
 
 .settings-panel {
   max-width: 720px; margin: 14px auto 0; padding: 14px;
@@ -1127,13 +1149,14 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   #menu > h1, #menu > .stars { display: none; }
 
   .menu-tabs {
-    position: sticky;
-    top: calc(-10px - env(safe-area-inset-top));
-    z-index: 3;
-    margin: 0 calc(-10px - env(safe-area-inset-right)) 10px calc(-10px - env(safe-area-inset-left));
-    padding: 10px calc(10px + env(safe-area-inset-right)) 8px calc(10px + env(safe-area-inset-left));
-    background: rgba(26, 28, 44, 0.97);
+    margin: 0;
+    padding: 0;
   }
+
+  .menu-console-header { top:calc(-10px - env(safe-area-inset-top)); margin:0 calc(-10px - env(safe-area-inset-right)) 10px calc(-10px - env(safe-area-inset-left)); padding:calc(9px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) 8px calc(10px + env(safe-area-inset-left)); }
+  .menu-title { margin-bottom:7px; }
+  .menu-title h1 { font-size:11px; }
+  .menu-route-tabs { justify-content:flex-start; overflow-x:auto; scrollbar-width:none; }
 
   .menu-tabs button,
   .form-card button,
@@ -1264,6 +1287,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   }
   .menu-footer button { flex: 1 1 0; min-width: 0; padding: 8px 6px; font-size: 9px; }
   .menu-footer button.danger { flex: 0 0 auto; min-width: 58px; padding: 8px 6px; }
+  .controller-hints { display:none !important; }
 
   #workshop-errors {
     padding: calc(12px + env(safe-area-inset-top))

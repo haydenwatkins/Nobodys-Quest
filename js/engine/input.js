@@ -110,6 +110,7 @@ G.input = (() => {
      browser Gamepad object and feeding it through the same updateGamepad()
      path keeps this file the ONE owner of the Xbox action mapping. */
   const isTVWrapper = /\bNobodysQuestTV\//.test(navigator.userAgent || "");
+  if (typeof document !== "undefined" && document.documentElement) document.documentElement.classList.toggle("tv-mode", isTVWrapper);
   const virtualPad = {
     id: "Android TV Controller",
     index: 0,
@@ -168,8 +169,8 @@ G.input = (() => {
   /* ---------- gamepad: Xbox layout + Steam Link standard mapping ---------- */
   const GAMEPAD_DEAD_ZONE = 0.22;
   const GAMEPAD_NAV_THRESHOLD = 0.62;
-  const MENU_REPEAT_DELAY_MS = 310;
-  const MENU_REPEAT_INTERVAL_MS = 92;
+  const MENU_REPEAT_DELAY_MS = 360;
+  const MENU_REPEAT_INTERVAL_MS = 135;
 
   function stickVector(x, y, deadZone) {
     const len = Math.sqrt(x * x + y * y);
@@ -255,7 +256,7 @@ G.input = (() => {
     gamepadName = pad.id || "Gamepad";
     if (!gamepadNoticeShown && G.ui && G.ui.toast) {
       gamepadNoticeShown = true;
-      G.ui.toast("Controller ready - left stick moves - right stick aims", 3.2);
+      G.ui.toast("Controller ready · A select · B back · shoulders change pages", 3.2);
     }
 
     // The pause menu, the DOM title screen, and the story epilogue all take
@@ -297,21 +298,21 @@ G.input = (() => {
     syncGamepadControl("b", gamepadButton(pad, 1), menuOpen ? "back" : "swap");
     syncGamepadControl("x", gamepadButton(pad, 2), menuOpen || wheelOpen ? null : "b");
     syncGamepadControl("y", gamepadButton(pad, 3), menuOpen || wheelOpen ? null : "c");
-    syncGamepadControl("lb", gamepadButton(pad, 4), wheelOpen ? "wheelPrev" : menuOpen ? "pageLeft" : "c", menuOpen);
-    syncGamepadControl("rb", gamepadButton(pad, 5), wheelOpen ? "wheelNext" : menuOpen ? "pageRight" : "b", menuOpen);
+    syncGamepadControl("lb", gamepadButton(pad, 4), wheelOpen ? "wheelPrev" : menuOpen ? "pageLeft" : "c", false);
+    syncGamepadControl("rb", gamepadButton(pad, 5), wheelOpen ? "wheelNext" : menuOpen ? "pageRight" : "b", false);
     const leftTrigger = gamepadButton(pad, 6, 0.35);
     const rightTrigger = gamepadButton(pad, 7, 0.35);
     const bothTriggers = !menuOpen && !wheelOpen && leftTrigger && rightTrigger;
     if (bothTriggers) ultimateChordLatched = true;
     const suppressChordTriggers = ultimateChordLatched;
     syncGamepadControl("ultimate", bothTriggers, "ultimate");
-    syncGamepadControl("lt", leftTrigger && !suppressChordTriggers, menuOpen ? "pageLeft" : wheelOpen ? null : "c", menuOpen);
-    syncGamepadControl("rt", rightTrigger && !suppressChordTriggers, menuOpen ? "pageRight" : wheelOpen ? "confirm" : "a", menuOpen);
+    syncGamepadControl("lt", leftTrigger && !suppressChordTriggers, menuOpen ? "pageLeft" : wheelOpen ? null : "c", false);
+    syncGamepadControl("rt", rightTrigger && !suppressChordTriggers, menuOpen ? "pageRight" : wheelOpen ? "confirm" : "a", false);
     if (!leftTrigger && !rightTrigger) ultimateChordLatched = false;
     syncGamepadControl("view", gamepadButton(pad, 8), menuOpen || wheelOpen ? "back" : "map");
     syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen ? "back" : "pause");
     syncGamepadControl("leftStick", gamepadButton(pad, 10), menuOpen || wheelOpen ? null : "guide");
-    syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen || wheelOpen ? "confirm" : "a");
+    syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen || wheelOpen ? null : "a");
 
     const navUp = gamepadButton(pad, 12) || left.y < -GAMEPAD_NAV_THRESHOLD;
     const navDown = gamepadButton(pad, 13) || left.y > GAMEPAD_NAV_THRESHOLD;

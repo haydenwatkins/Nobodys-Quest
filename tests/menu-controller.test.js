@@ -22,14 +22,14 @@ const classes = () => {
 const doc = { activeElement: null };
 function button(name, left, top) {
   return {
-    name, tagName: "BUTTON", classList: classes(), parentElement: null, clicks: 0,
+    name, dataset: { navId: name }, tagName: "BUTTON", classList: classes(), parentElement: null, clicks: 0,
     getBoundingClientRect: () => ({ left, top, width: 90, height: 40 }),
     focus() { doc.activeElement = this; },
     scrollIntoView() { this.scrolledIntoView = true; },
     click() { this.clicks++; },
   };
 }
-const buttons = [button("one", 0, 0), button("two", 120, 0), button("three", 0, 70), button("four", 120, 70)];
+let buttons = [button("one", 0, 0), button("two", 120, 0), button("three", 0, 70), button("four", 120, 70)];
 const root = {
   classList: classes(), scrollTop: 0, scrollLeft: 0, scrollHeight: 900, clientHeight: 240,
   scrollWidth: 500, clientWidth: 300, parentElement: null,
@@ -76,6 +76,17 @@ controller.update(root, { onPageLeft: () => { pages--; } }, .016);
 taps.pageRight = true;
 controller.update(root, { onPageRight: () => { pages++; } }, .016);
 assert.equal(pages, 0, "shoulder/trigger paging should invoke explicit menu routes");
+
+const memory = controller.snapshot(root);
+const rebuilt = buttons.map((item, index) => button(item.name, index % 2 * 120, Math.floor(index / 2) * 70));
+buttons = rebuilt;
+buttons.forEach((item) => { item.parentElement = root; });
+controller.restore(root, memory);
+assert.equal(doc.activeElement.name, "four", "a rebuilt menu should restore the same command by stable identity");
+
+taps.menuDown = true;
+controller.update(root, {}, .016);
+assert.equal(doc.activeElement.name, "four", "focus should stop at a menu edge instead of wrapping to an unrelated header");
 
 input.menuScroll.y = 0.75;
 clock += 16;
