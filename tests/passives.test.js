@@ -116,6 +116,17 @@ G.state.enemies = [ordinaryTarget];
 G.abilities.slash.use(p);
 assert.equal(ordinaryTarget.hp, 7,
   "ordinary Oathblade should stay modest so the earned riposte does not create passive power creep");
+assert.equal(G.abilities.shieldBash.mana, 0,
+  "Shield Advance should be governed by its cooldown instead of competing for mana");
+
+const wardedTarget = enemy(22, 0);
+wardedTarget.ward = { types: ["light"], hp: 2, hpMax: 2 };
+G.state.enemies = [wardedTarget];
+p.knightRiposteT = 2;
+G.abilities.slash.use(p);
+assert.ok(wardedTarget.ward.hp <= 0,
+  "an earned Oathblade combo should shatter a ward even when its damage type does not match");
+assert.equal(wardedTarget.hp, 8, "breaking a ward should not also deal health damage");
 
 p = useForm("knight");
 G.passives.prepare("melee", p, { ability: "slash", range: 20, damage: 1 });

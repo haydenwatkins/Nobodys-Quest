@@ -356,7 +356,7 @@ G.combat = (() => {
       if (damageEnemy(e, {
         damage: o.damage, type, ability: o.ability,
         knockback: o.knockback, status: o.status,
-        breaksAnyWard: breaksAnyWard(user),
+        breaksAnyWard: breaksAnyWard(user) || !!o.breaksAnyWard,
         fromX: user.x, fromY: user.y,
         hitStop: o.hitStop, shake: o.shake, combo: o.combo,
       })) {

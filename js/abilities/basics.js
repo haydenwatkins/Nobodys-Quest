@@ -153,6 +153,7 @@ registerAbility({
       lunge: riposte ? 7 : 3, hitStop: riposte ? 0.065 : 0.032,
       shake: riposte ? 0.24 : 0.11, weight: riposte ? 7 : 3,
       stagger: riposte ? 2 : 1, combo: riposte ? "riposte" : "oathblade",
+      breaksAnyWard: riposte,
     });
     if (riposte) {
       G.state.hitStop = Math.max(G.state.hitStop || 0, 0.045);
@@ -170,7 +171,7 @@ registerAbility({
   type: "blunt",
   style: "melee",
   traits: ["guard", "status"],
-  mana: 3, cooldown: 0.82,
+  mana: 0, cooldown: 0.82,
   use(user) {
     if (G.state.formId === "knight") {
       user.knightGuardT = Math.max(user.knightGuardT || 0, 0.58);
