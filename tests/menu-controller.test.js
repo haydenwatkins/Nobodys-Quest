@@ -94,6 +94,14 @@ controller.update(root, {}, .1);
 assert.ok(root.scrollTop > 20, "the right stick should continuously scroll the nearest menu viewport");
 input.menuScroll.y = 0;
 
+controller.setFocus(root, buttons[0]);
+buttons[0].dataset.navZone = "header";
+buttons[1].dataset.navZone = "body";
+buttons[3].dataset.navZone = "header";
+taps.menuRight = true;
+controller.update(root, {}, .016);
+assert.equal(doc.activeElement, buttons[3], "horizontal navigation should remain inside an explicit console row");
+
 controller.reset(root);
 input.hasGamepad = false;
 taps.menuLeft = true;

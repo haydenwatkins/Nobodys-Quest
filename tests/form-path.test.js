@@ -74,15 +74,15 @@ const ui = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
 const css = fs.readFileSync(path.join(root, "css/style.css"), "utf8");
 const combat = fs.readFileSync(path.join(root, "js/engine/combat.js"), "utf8");
 assert.match(ui, /data-form-path-map/);
-assert.match(ui, /form-roster-workbench/);
+assert.match(ui, /console-roster-workbench/);
 assert.match(ui, /data-roster-view="path"/);
 assert.match(ui, /buildFormRoadmap/);
 assert.match(ui, /AWAKENING ROUTE/);
 assert.match(ui, /form-route-next/);
 assert.doesNotMatch(ui, /form-path-lines/, "the phone UI should not render a crossing-wire SVG");
 assert.match(css, /\.form-path-card-grid/);
-assert.match(css, /\.form-roster-workbench\[data-roster-view="path"\]/,
-  "small screens should switch cleanly between the journey and selected form");
+assert.match(css, /\.console-roster-workbench\s*\{[^}]*grid-template-columns:\s*1fr/s,
+  "small screens should stack the tappable roster and selected form cleanly");
 assert.match(css, /\.menu-tabs\s*\{[^}]*overflow-x:\s*auto/s,
   "phone navigation should use one compact, horizontally scrollable row");
 assert.match(css, /@media \(max-width:\s*520px\)[\s\S]*\.form-path-card-grid\s*\{\s*grid-template-columns:\s*1fr/s,

@@ -768,7 +768,8 @@ G.ui = (() => {
   let atlasView = "world";
   let atlasSelectedId = null;
   let formLabView = "roster";
-  let formRosterView = "path";
+  let formRosterView = "roster";
+  let masteryFormId = null;
   let settingsOpen = false;
   let labFormId = null;
   let labSlot = 1;
@@ -964,11 +965,11 @@ G.ui = (() => {
 
   function controllerBack() {
     if (settingsOpen) { settingsOpen = false; buildMenu(); return; }
-    if (activeTab === "forms" && formLabView === "roster" && formRosterView === "detail") {
-      formRosterView = "path"; buildMenu(); menuEl.scrollTop = 0; return;
+    if (activeTab === "forms" && formLabView === "roster" && formRosterView === "path") {
+      formRosterView = "roster"; buildMenu(); menuEl.scrollTop = 0; return;
     }
     if (activeTab === "forms" && formLabView !== "roster") {
-      formLabView = "roster"; formRosterView = "path"; buildMenu(); menuEl.scrollTop = 0; return;
+      formLabView = "roster"; formRosterView = "roster"; buildMenu(); menuEl.scrollTop = 0; return;
     }
     if (activeTab === "map" && atlasView === "local") {
       atlasView = "world"; buildMenu(); menuEl.scrollTop = 0; return;
@@ -984,6 +985,7 @@ G.ui = (() => {
     if (!menuOpen) return;
     G.menuController.update(menuEl, {
       preferred: settingsOpen ? menuEl.querySelector(".settings-panel button") : menuEl.querySelector("[data-menu-section].active"),
+      scrollRoot: menuEl.querySelector(".menu-body"),
       onBack: controllerBack,
       onPageLeft: () => cycleControllerTab(-1),
       onPageRight: () => cycleControllerTab(1),
@@ -1054,18 +1056,15 @@ G.ui = (() => {
     const chapterCards = G.STORY_CHAPTERS.map((chapter, index) => {
       const reached = index <= goal.chapter || story.seenChapters.includes(index);
       const current = index === goal.chapter;
-      return `<article class="story-chapter ${current ? "current" : reached ? "reached" : "locked"}" style="--chapter-color:${chapter.color}">
-        <span class="story-chapter-icon" style="--chapter-color:${chapter.color}">${reached ? chapter.icon : "◇"}</span>
-        <div><span class="eyebrow">ACT ${index + 1}${current ? " · CURRENT" : reached ? " · REMEMBERED" : " · AHEAD"}</span>
-          <h3>${reached || current ? escapeHtml(chapter.title) : "A road not yet taken"}</h3>
-          <p>${escapeHtml(reached || current ? chapter.summary : "Keep following the main path to reveal this chapter.")}</p></div>
+      return `<article class="story-chapter-chip ${current ? "current" : reached ? "reached" : "locked"}" style="--chapter-color:${chapter.color}">
+        <span>${reached ? chapter.icon : "◇"}</span><div><small>ACT ${index + 1}</small>
+        <strong>${current ? escapeHtml(chapter.title) : reached ? escapeHtml(chapter.title) : "Unwritten"}</strong></div>
       </article>`;
     }).join("");
-    return `<section class="story-hero" style="--chapter-color:${goal.act.color}">
-      <div class="story-act-mark">${goal.act.icon}</div>
-      <div class="story-hero-copy"><span class="eyebrow">ACT ${goal.chapter + 1} · MAIN STORY</span>
-        <h2>${escapeHtml(goal.act.title)}</h2><p class="story-thesis">${escapeHtml(goal.act.thesis)}</p></div>
-      <div class="story-objective">
+    return `<section class="journey-dashboard" style="--chapter-color:${goal.act.color}">
+      <div class="journey-current"><div class="story-act-mark">${goal.act.icon}</div><div><span class="eyebrow">ACT ${goal.chapter + 1} · MAIN STORY</span>
+        <h2>${escapeHtml(goal.act.title)}</h2><p>${escapeHtml(goal.act.thesis)}</p></div></div>
+      <div class="story-objective journey-next">
         <span class="eyebrow">${goal.complete ? "EPILOGUE" : "NEXT STEP"}</span>
         <h3>${escapeHtml(goal.title)}</h3><p>${escapeHtml(goal.objective)}</p>
         <div class="story-why">${escapeHtml(goal.reason)}</div>
@@ -1075,16 +1074,14 @@ G.ui = (() => {
           ${goal.complete ? `<button data-act="story-ending-replay">☀ Replay ending</button>` : ""}</div>
       </div>
     </section>
-    <div class="story-layout"><section><div class="story-section-heading"><span class="eyebrow">THE JOURNEY</span><h2>One story, six acts</h2></div>
-      <div class="story-timeline">${chapterCards}</div></section>
-      <aside class="story-sidequests"><span class="eyebrow">THE LIVING WORLD</span><h2>Adventures around the story</h2>
-        <p>The main road is marked in gold. These paths are yours to follow whenever curiosity calls.</p>
-        <div><strong>⭐ Form Mastery</strong><span>Learn how each shape thinks.</span></div>
-        <div><strong>☀ Sunrise Town</strong><span>Build a home from the people you help.</span></div>
-        <div><strong>♢ Manyfold</strong><span>Brave a road that changes with every crossing.</span></div>
-        <div><strong>⚑ Hero Board</strong><span>Answer the world's changing needs.</span></div>
-      </aside>
-    </div>`;
+    <section class="journey-strip"><div class="story-section-heading"><span class="eyebrow">YOUR STORY</span><h2>Six acts, one road</h2></div>
+      <div class="story-chapter-strip">${chapterCards}</div></section>
+    <section class="journey-shortcuts" aria-label="Other adventures">
+      <button data-menu-route="quests"><span>⭐</span><strong>Mastery</strong><small>Lessons from every form</small></button>
+      <button data-menu-route="map"><span>🧭</span><strong>World</strong><small>Roads, posts, and echoes</small></button>
+      ${G.townUnlocked && G.townUnlocked() ? `<button data-menu-route="town"><span>☀</span><strong>Town</strong><small>Build a place together</small></button>` : ""}
+      ${G.expeditionUnlocked && G.expeditionUnlocked() ? `<button data-menu-route="expedition"><span>♢</span><strong>Manyfold</strong><small>A road that changes</small></button>` : ""}
+    </section>`;
   }
 
   function buildMenu() {
@@ -1101,9 +1098,9 @@ G.ui = (() => {
     const routeTabs = section.routes;
     let html = `<header class="menu-console-header"><div class="menu-title"><h1>Nobody's Quest</h1><span>⭐ ${G.state.stars}</span></div>
       <div class="menu-tabs" aria-label="Pause menu sections">${sections.map((item) =>
-        `<button data-menu-section="${item.id}" data-menu-route="${item.routes[0][0]}" class="${section.id === item.id && !settingsOpen ? "active" : ""}"><span>${item.icon}</span>${item.label}</button>`).join("")}
+        `<button data-menu-section="${item.id}" data-menu-route="${item.routes[0][0]}" data-nav-zone="sections" class="${section.id === item.id && !settingsOpen ? "active" : ""}"><span>${item.icon}</span>${item.label}</button>`).join("")}
       </div>${!settingsOpen && routeTabs.length > 1 ? `<div class="menu-route-tabs" aria-label="${escapeHtml(section.label)} pages">${routeTabs.map(([route, label]) =>
-        `<button data-menu-route="${route}" class="${activeTab === route ? "active" : ""}">${label}</button>`).join("")}</div>` : ""}</header>
+        `<button data-menu-route="${route}" data-nav-zone="routes" class="${activeTab === route ? "active" : ""}">${label}</button>`).join("")}</div>` : ""}</header>
       <div class="menu-body ${settingsOpen ? "settings-body" : activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : activeTab === "story" ? "story-body" : ""}">`;
 
     if (settingsOpen) html += buildSettingsPanel();
@@ -1120,9 +1117,9 @@ G.ui = (() => {
 
     html += `</div>
       <div class="menu-footer">
-        <button data-act="resume">▶ Resume</button>
+        <button data-act="resume" data-nav-zone="footer">▶ Resume</button>
         <div class="controller-hints" aria-hidden="true"><span>LB/RB PAGE</span><span>✚ MOVE</span><span>A SELECT</span><span>B BACK</span><span>R-STICK SCROLL</span></div>
-        <button data-act="settings" class="settings-btn">${settingsOpen ? "← Back" : "⚙ Settings"}</button>
+        <button data-act="settings" data-nav-zone="footer" class="settings-btn">${settingsOpen ? "← Back" : "⚙ Settings"}</button>
       </div>`;
 
     menuEl.innerHTML = html;
@@ -1134,7 +1131,7 @@ G.ui = (() => {
     // related destinations such as Story/Mastery or Atlas/Town/Hero Board.
     menuEl.querySelectorAll("[data-menu-section]").forEach((button) =>
       button.addEventListener("click", () => changeMenuRoute(button.dataset.menuRoute)));
-    menuEl.querySelectorAll(".menu-route-tabs [data-menu-route]").forEach((button) =>
+    menuEl.querySelectorAll("[data-menu-route]:not([data-menu-section])").forEach((button) =>
       button.addEventListener("click", () => changeMenuRoute(button.dataset.menuRoute)));
     const storyMap = menuEl.querySelector('[data-act="story-map"]');
     if (storyMap) storyMap.addEventListener("click", () => {
@@ -1158,7 +1155,7 @@ G.ui = (() => {
     menuEl.querySelectorAll("[data-formlab-view]").forEach((button) =>
       button.addEventListener("click", () => {
         formLabView = button.dataset.formlabView;
-        if (formLabView === "roster") formRosterView = "path";
+        if (formLabView === "roster") formRosterView = "roster";
         labFormId = G.formUnlocked(labFormId) ? labFormId : G.state.formId;
         labSkinId = G.selectedFormSkin(labFormId)?.id || "classic";
         buildMenu();
@@ -1172,11 +1169,13 @@ G.ui = (() => {
     menuEl.querySelectorAll("[data-form-select]").forEach((button) =>
       button.addEventListener("click", () => {
         labFormId = button.dataset.formSelect;
-        if (formLabView === "roster") formRosterView = "detail";
+        if (formLabView === "roster" && formRosterView === "path") formRosterView = "roster";
         labSkinId = G.selectedFormSkin(labFormId)?.id || "classic";
         labAbilityId = null;
         buildMenu();
       }));
+    menuEl.querySelectorAll("[data-mastery-form]").forEach((button) =>
+      button.addEventListener("click", () => { masteryFormId = button.dataset.masteryForm; buildMenu(); }));
     menuEl.querySelectorAll("[data-legend-facet]").forEach((button) =>
       button.addEventListener("click", () => {
         G.setLegendFacet(labFormId, button.dataset.legendFacet);
@@ -1443,7 +1442,7 @@ G.ui = (() => {
     let html = `<div class="form-lab-header">
       <div><h2>⚗ FORM LAB</h2><p>Choose a shape, mix its arts, and make it your own.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
-        `<button data-formlab-view="${id}" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}</div>
+        `<button data-formlab-view="${id}" data-nav-zone="form-pages" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}</div>
     </div>`;
     if (formLabView === "loadout") return html + buildLoadoutLab();
     if (formLabView === "legends") return html + buildLegendsLab();
@@ -1551,6 +1550,21 @@ G.ui = (() => {
     </section>`;
   }
 
+  function buildRosterTile(id) {
+    const form = G.forms[id];
+    const unlocked = G.formUnlocked(id);
+    const ready = !unlocked && G.formReady(id);
+    const current = id === G.state.formId;
+    const selected = id === labFormId;
+    const progress = G.formPathProgress(id);
+    const status = current ? "CURRENT" : ready ? "ECHO READY" : unlocked ? `LV ${G.formLevel(id)}` : `${progress.done}/${progress.total}`;
+    return `<button class="form-portrait-tile ${selected ? "selected" : ""} ${current ? "current" : ""} ${ready ? "ready" : ""} ${unlocked ? "unlocked" : "locked"}"
+      data-form-select="${id}" aria-label="${escapeHtml(`${form.name}, ${status}`)}">
+      ${previewCanvas(id, unlocked ? G.selectedFormSkin(id)?.id : "classic", "tile-preview", form.name, !unlocked, unlocked && !G.selectedFormSkin(id))}
+      <strong class="portrait-name">${unlocked || ready ? escapeHtml(form.name) : "Unknown form"}</strong>
+      <span class="portrait-status">${status}</span></button>`;
+  }
+
   function buildRosterLab() {
     const selected = labSelectedForm(false);
     const selectedPassive = G.legendPassiveFor ? G.legendPassiveFor(selected) : selected.passive;
@@ -1562,7 +1576,6 @@ G.ui = (() => {
     const completed = (selected.quests || []).filter((quest) => G.questsDone.includes(quest.id)).length;
     const skin = unlocked && G.selectedFormSkin(selected.id);
     const inspector = `<section class="form-stage ${unlocked ? "" : "locked"}">
-        <button class="form-stage-back" data-roster-view="path">‹ Awakening journey</button>
         <div class="form-stage-art">${previewCanvas(selected.id, skin ? skin.id : "classic", "hero-preview", selected.name, !unlocked, !skin)}</div>
         <div class="form-stage-copy">
           <div class="eyebrow">${current ? "CURRENT FORM" : echo ? "FORM ECHO WAITING" : ready ? "CHALLENGE COMPLETE" : unlocked ? `FORM LEVEL ${G.formLevel(selected.id)}` : "UNDISCOVERED FORM"}</div>
@@ -1580,13 +1593,16 @@ G.ui = (() => {
             : `<div class="unlock-panel">The lesson is complete. Win a battle and watch what remains.</div>` : ""}`}
         </div>
       </section>`;
-    return `<div class="form-roster-mobile-tabs" aria-label="Roster view">
-        <button data-roster-view="path" class="${formRosterView === "path" ? "active" : ""}">‹ Journey</button>
-        <button data-roster-view="detail" class="${formRosterView === "detail" ? "active" : ""}">${selected.icon} ${escapeHtml(selected.name)}</button>
-      </div>
-      <div class="form-roster-workbench" data-roster-view="${formRosterView}">
-        ${buildFormRoadmap()}${inspector}
-      </div>`;
+    const total = G.formOrder.filter((id) => G.formUnlocked(id)).length;
+    const switcher = `<div class="roster-view-switcher" aria-label="Forms view">
+      <button data-roster-view="roster" data-nav-zone="roster-views" class="${formRosterView === "roster" ? "active" : ""}">▦ Roster</button>
+      <button data-roster-view="path" data-nav-zone="roster-views" class="${formRosterView === "path" ? "active" : ""}">⌁ Awakening Path</button></div>`;
+    if (formRosterView === "path") return `${switcher}${buildFormRoadmap()}`;
+    return `${switcher}<div class="console-roster-workbench">
+      <section class="roster-library"><div class="roster-library-heading"><div><span class="eyebrow">YOUR FORMS</span><h2>Choose a shape</h2></div>
+        <strong>${total}/${G.formOrder.length}</strong></div>
+        <div class="form-roster-grid">${G.formOrder.filter((id) => G.forms[id] && !G.forms[id].invalid).map(buildRosterTile).join("")}</div></section>
+      ${inspector}</div>`;
   }
 
   function buildLoadoutLab() {
@@ -1800,47 +1816,36 @@ G.ui = (() => {
   }
 
   function buildQuestsTab() {
+    const forms = G.unlockedForms();
+    if (!masteryFormId || !forms.includes(masteryFormId)) masteryFormId = forms.includes(G.state.formId) ? G.state.formId : forms[0];
+    const form = G.forms[masteryFormId];
     const pins = G.pinnedQuests();
-    let html = pins.length ? `<div class="form-card pin-summary">
-      <h2>📌 ${pins.length} quest${pins.length === 1 ? "" : "s"} tracked on screen</h2>
-      <button data-act="clear-pins" class="clear-pins">✕ Unpin all</button>
-    </div>` : "";
-    for (const id of G.unlockedForms()) {
-      const f = G.forms[id];
-      html += `<div class="form-card"><h2>${f.icon} ${f.name} <span class="lvl">Lv${G.formLevel(id)}</span></h2>`;
-      for (const q of f.quests) {
-        const prog = G.questProgress(q);
-        const done = G.questsDone.includes(q.id);
-        html += `<div class="quest-row ${done ? "done" : ""}">
-          <span>${done ? "✅" : "⬜"} ${q.text}</span>
-          <span class="quest-actions">
-            <span class="prog">${done ? "⭐" : prog + "/" + q.count}</span>
-            ${done ? "" : `<button data-pin="${q.id}" class="pin-btn ${G.isQuestPinned(q.id) ? "pinned" : ""}">${G.isQuestPinned(q.id) ? "✕ UNPIN" : "PIN"}</button>`}
-          </span>
-        </div>`;
-      }
-      html += `</div>`;
-    }
+    const completed = form.quests.filter((quest) => G.questsDone.includes(quest.id)).length;
+    let html = `<section class="mastery-console">
+      <div class="mastery-picker" aria-label="Choose a form">${forms.map((id) => {
+        const candidate = G.forms[id];
+        const done = candidate.quests.filter((quest) => G.questsDone.includes(quest.id)).length;
+        return `<button data-mastery-form="${id}" data-nav-zone="mastery-forms" class="${id === masteryFormId ? "active" : ""}"><span>${candidate.icon}</span><strong>${escapeHtml(candidate.name)}</strong><small>${done}/${candidate.quests.length}</small></button>`;
+      }).join("")}</div>
+      <div class="mastery-focus">
+        <header><div><span class="eyebrow">FORM MASTERY</span><h2>${form.icon} ${escapeHtml(form.name)}</h2></div><strong>LV ${G.formLevel(form.id)}</strong></header>
+        <p>${escapeHtml(form.tagline)}</p>
+        <div class="mastery-progress"><i style="width:${Math.round(100 * completed / Math.max(1, form.quests.length))}%"></i></div>
+        <div class="mastery-quest-list">${form.quests.map((quest) => {
+          const prog = G.questProgress(quest);
+          const done = G.questsDone.includes(quest.id);
+          return `<article class="mastery-quest ${done ? "done" : ""}"><span>${done ? "✓" : "◇"}</span><div><strong>${escapeHtml(quest.text)}</strong><small>${done ? "Lesson complete" : `${prog}/${quest.count}`}</small></div>
+            ${done ? "" : `<button data-pin="${quest.id}" class="pin-btn ${G.isQuestPinned(quest.id) ? "pinned" : ""}">${G.isQuestPinned(quest.id) ? "Untrack" : "Track"}</button>`}</article>`;
+        }).join("")}</div>
+      </div>
+    </section>`;
+    if (pins.length) html += `<div class="mastery-tracked"><span>📌 ${pins.length} tracked</span><button data-act="clear-pins">Clear tracking</button></div>`;
     const bosses = Object.values(G.enemies).filter((enemy) => enemy.miniboss);
     if (bosses.length) {
       const found = bosses.filter((enemy) => (G.state.items || []).includes(enemy.trophy)).length;
-      html += `<div class="form-card trophy-card"><h2>🏆 Miniboss trophies ${found}/${bosses.length}</h2>`;
-      for (const boss of bosses) {
-        const collected = (G.state.items || []).includes(boss.trophy);
-        html += `<div class="quest-row ${collected ? "done" : ""}">
-          <span>${collected ? "✅ " + boss.trophyName : "⬜ ???"}</span>
-          <span class="trophy-place">${boss.location}</span>
-        </div>`;
-      }
-      if (found === bosses.length) {
-        html += `<div class="quest-row done"><span>🧭 Guardian Compass</span><span class="prog">Hero Board unlocked</span></div>`;
-      } else {
-        html += `<div class="tagline">Collect every trophy to earn the Guardian Compass, bonus stars, town spirit, and a place on the Hero Board.</div>`;
-      }
-      html += `</div>`;
+      html += `<section class="trophy-summary"><span>🏆</span><div><strong>Guardian trophies · ${found}/${bosses.length}</strong><small>${found === bosses.length ? "The Guardian Compass is yours." : "Defeat hidden guardians to reveal the Hero Board."}</small></div>
+        <div>${bosses.map((boss) => `<i class="${(G.state.items || []).includes(boss.trophy) ? "found" : ""}" title="${escapeHtml((G.state.items || []).includes(boss.trophy) ? boss.trophyName : "Unknown trophy")}"></i>`).join("")}</div></section>`;
     }
-    html += `<div style="text-align:center;color:#94b0c2;font-size:18px;margin-top:8px">
-      Quests count no matter which form you're wearing — mix abilities to finish them faster!</div>`;
     return html;
   }
 

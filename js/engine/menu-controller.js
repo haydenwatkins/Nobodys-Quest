@@ -16,7 +16,7 @@ G.menuController = (() => {
     "navId", "tab", "menuSection", "menuRoute", "act", "formlabView", "rosterView", "formSelect",
     "loadoutSlot", "abilityDamage", "abilityStyle", "abilitySelect", "skinPreview", "atlasView", "mapNode",
     "pin", "become", "costume", "townProject", "travelRegion", "worldwakeRegion", "travelLandmark",
-    "expeditionRoute", "expeditionDraft", "formEchoGuide", "legendGuide", "saveSlot", "titleSettings",
+    "expeditionRoute", "expeditionDraft", "formEchoGuide", "legendGuide", "masteryForm", "saveSlot", "titleSettings",
   ];
   let focused = null;
   let lastTime = 0;
@@ -115,7 +115,9 @@ G.menuController = (() => {
     const fy = from.top + from.height / 2;
     let best = null;
     let bestScore = Infinity;
-    for (const element of list) {
+    const zone = dx && active.dataset && active.dataset.navZone;
+    const candidates = zone ? list.filter((element) => element.dataset && element.dataset.navZone === zone) : list;
+    for (const element of candidates) {
       if (element === active) continue;
       const rect = box(element.getBoundingClientRect());
       const ex = rect.left + rect.width / 2;
