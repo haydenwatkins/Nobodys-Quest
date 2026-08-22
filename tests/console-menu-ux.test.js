@@ -29,5 +29,9 @@ assert.match(menuController, /data\.navZone|dataset\.navZone/,
   "controller rows should be explicit navigation zones rather than unrestricted geometry");
 assert.ok(ui.includes('data-nav-zone="sections"') && ui.includes('data-nav-zone="footer"'),
   "the console shell should define stable controller rows");
+assert.ok(!ui.includes("<details") && !ui.includes("<select") && !ui.includes('type="checkbox"'),
+  "pause-menu choices should use the same focusable buttons on controller and touch");
+assert.ok(ui.includes('data-nav-zone="dyes"') && ui.includes("data-expedition-length") && ui.includes("data-gauntlet-count"),
+  "dyes and run setup should expose explicit controller navigation rows");
 
 console.log("console menu UX tests passed");

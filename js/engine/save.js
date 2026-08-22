@@ -155,6 +155,7 @@ G.saveGame = function () {
       tutorialStep: G.tutorial ? G.tutorial.step : 0,
       tutorialDone: G.tutorial ? G.tutorial.done : false,
       tutorialSeen: G.tutorial ? G.tutorial.seen : false,
+      tutorialHints: G.tutorial ? G.tutorial.hintsShown : [],
     }));
     localStorage.setItem(ACTIVE_SLOT_KEY, String(G.activeSaveSlot));
   } catch (error) {

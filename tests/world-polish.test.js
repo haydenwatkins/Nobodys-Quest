@@ -16,7 +16,7 @@ const index = source("index.html");
 
 assert.ok(ui.includes("getBoundingClientRect") && ui.includes("backingW = cssW * previewDensity"),
   "Form Lab previews should match their real CSS box instead of stretching a fixed canvas");
-assert.ok(ui.includes("SETTINGS & HELP") && ui.includes("Adventure slots") && ui.includes("Delete current adventure"));
+assert.ok(ui.includes("SETTINGS & HELP") && ui.includes("Adventure slots") && ui.includes("Adventure tools"));
 assert.ok(!/menu-footer[\s\S]{0,240}data-act="reset"/.test(ui), "reset must stay out of the permanent footer");
 assert.ok(index.includes('id="form-wheel"') && input.includes("SWAP_HOLD_MS"));
 assert.ok(ui.includes("for (let i = 0; i < forms.length; i += 8)"), "the wheel should scale as stable pages of eight");

@@ -450,6 +450,7 @@ G.ui = (() => {
   }
 
   function drawWardHint(c, cam) {
+    if (!G.tutorial || !G.tutorial.coaching("ward")) return;
     const p = G.state.player;
     let nearest = null;
     let nearestDist = Infinity;
@@ -778,6 +779,11 @@ G.ui = (() => {
   let labStyleFilter = "all";
   let labBoostedOnly = false;
   let labSkinId = "classic";
+  let atlasNotesOpen = false;
+  let settingsDangerOpen = false;
+  let expeditionLengthChoice = "5";
+  let gauntletCountChoice = null;
+  let gauntletRecoveryChoice = true;
   let lastFormPreviewDraw = 0;
   let formWheelOpen = false;
   let formWheelPage = 0;
@@ -1251,14 +1257,6 @@ G.ui = (() => {
       }));
     menuEl.querySelectorAll("[data-costume]").forEach((b) =>
       b.addEventListener("click", () => { G.selectCostume(b.dataset.costume); buildMenu(); }));
-    menuEl.querySelectorAll("select[data-slot]").forEach((sel) =>
-      sel.addEventListener("change", () => {
-        const lo = G.getLoadout(G.state.formId);
-        lo[parseInt(sel.dataset.slot, 10)] = sel.value;
-        btnCache = "";
-        G.saveGame();
-        buildMenu();
-      }));
     const foundTown = menuEl.querySelector('[data-act="found-town"]');
     if (foundTown) foundTown.addEventListener("click", () => {
       const town = G.ensureTown();
@@ -1306,15 +1304,21 @@ G.ui = (() => {
     });
     const startGauntlet = menuEl.querySelector('[data-act="start-gauntlet"]');
     if (startGauntlet) startGauntlet.addEventListener("click", () => {
-      const count = menuEl.querySelector('[data-gauntlet-count]').value;
-      const recovery = menuEl.querySelector('[data-gauntlet-recovery]').checked;
-      if (G.startGauntlet(count, recovery)) closeMenu();
+      if (G.startGauntlet(gauntletCountChoice, gauntletRecoveryChoice)) closeMenu();
+    });
+    menuEl.querySelectorAll('[data-gauntlet-count]').forEach((button) =>
+      button.addEventListener("click", () => { gauntletCountChoice = button.dataset.gauntletCount; buildMenu(); }));
+    const gauntletRecovery = menuEl.querySelector('[data-gauntlet-recovery]');
+    if (gauntletRecovery) gauntletRecovery.addEventListener("click", () => {
+      gauntletRecoveryChoice = !gauntletRecoveryChoice;
+      buildMenu();
     });
     const startExpedition = menuEl.querySelector('[data-act="start-expedition"]');
     if (startExpedition) startExpedition.addEventListener("click", () => {
-      const length = menuEl.querySelector('[data-expedition-length]').value;
-      if (G.startManyfoldExpedition(length)) { activeTab = "expedition"; buildMenu(); }
+      if (G.startManyfoldExpedition(expeditionLengthChoice)) { activeTab = "expedition"; buildMenu(); }
     });
+    menuEl.querySelectorAll('[data-expedition-length]').forEach((button) =>
+      button.addEventListener("click", () => { expeditionLengthChoice = button.dataset.expeditionLength; buildMenu(); }));
     menuEl.querySelectorAll("[data-expedition-route]").forEach((button) =>
       button.addEventListener("click", () => {
         if (!G.chooseExpeditionRoute(button.dataset.expeditionRoute)) return;
@@ -1393,6 +1397,16 @@ G.ui = (() => {
     if (reset) reset.addEventListener("click", () => {
       if (confirm(`Delete Slot ${G.activeSaveSlot}? Other adventure slots will be kept.`)) G.resetSave();
     });
+    const advancedSettings = menuEl.querySelector('[data-act="advanced-settings"]');
+    if (advancedSettings) advancedSettings.addEventListener("click", () => {
+      settingsDangerOpen = !settingsDangerOpen;
+      buildMenu();
+    });
+    const atlasNotes = menuEl.querySelector('[data-act="atlas-notes"]');
+    if (atlasNotes) atlasNotes.addEventListener("click", () => {
+      atlasNotesOpen = !atlasNotesOpen;
+      buildMenu();
+    });
     if (menuOpen && G.input.hasGamepad && !menuEl.classList.contains("hidden")) {
       const preferred = settingsOpen ? menuEl.querySelector(".settings-panel button")
         : menuEl.querySelector("[data-menu-section].active");
@@ -1418,8 +1432,9 @@ G.ui = (() => {
         <button data-act="save-slots"><strong>▤ Adventure slots</strong><span>Slot ${G.activeSaveSlot} · switch or begin again</span></button>
         ${canFullscreen ? `<button data-act="fullscreen"><strong>⛶ Fullscreen</strong><span>Use more of this screen</span></button>` : ""}
       </div>
-      <details class="save-data"><summary>Delete current adventure</summary><p>This permanently erases Slot ${G.activeSaveSlot}. Your other slots are not affected.</p>
-        <button data-act="reset" class="danger" title="Erase the current adventure">Delete Slot ${G.activeSaveSlot}</button></details>
+      <button data-act="advanced-settings" class="advanced-settings-toggle" aria-expanded="${settingsDangerOpen}">${settingsDangerOpen ? "− Hide adventure tools" : "+ Adventure tools"}</button>
+      ${settingsDangerOpen ? `<section class="save-data"><p>This permanently erases Slot ${G.activeSaveSlot}. Your other slots are not affected.</p>
+        <button data-act="reset" class="danger" title="Erase the current adventure">Delete Slot ${G.activeSaveSlot}</button></section>` : ""}
     </section>`;
   }
 
@@ -1699,15 +1714,14 @@ G.ui = (() => {
         <button data-skin-preview="${signature.id}" class="skin-tile ${labSkinId === signature.id ? "selected" : ""} ${equipped?.id === signature.id ? "equipped" : ""} ${owned ? "" : "locked"}">
           ${previewCanvas(form.id, signature.id, "skin-tile-preview", signature.name, !owned, false)}<strong>${signature.icon} ${escapeHtml(signature.name)}</strong><small>${owned ? equipped?.id === signature.id ? "WORN" : "Signature look" : `🔒 Level ${signature.unlockLevel}`}</small></button>
       </div>
-      <details class="dye-drawer"><summary>🎨 Global dyes <span>${escapeHtml(G.costumeById(dyes.selected).name)} selected</span></summary>
-        <p>Dyes recolor each classic shape. Signature looks keep their own colors and silhouette.</p>
-        <div class="dye-grid">${G.COSTUMES.map((costume) => {
+      <section class="dye-drawer" aria-label="Classic dyes"><header><div><strong>🎨 Classic dyes</strong><p>Recolor every classic form. Signature looks keep their own palette.</p></div><span>${escapeHtml(G.costumeById(dyes.selected).name)}</span></header>
+        <div class="dye-grid" data-nav-scroll>${G.COSTUMES.map((costume) => {
           const unlocked = dyes.unlocked.includes(costume.id);
           const wearing = dyes.selected === costume.id;
-          return `<button data-costume="${costume.id}" class="dye-tile ${wearing ? "selected" : ""}" ${unlocked ? "" : "disabled"}>
+          return `<button data-costume="${costume.id}" data-nav-zone="dyes" class="dye-tile ${wearing ? "selected" : ""}" ${unlocked ? "" : "disabled"}>
             <span>${costume.swatches.map((color) => `<i style="background:${color}"></i>`).join("")}</span><strong>${costume.icon} ${escapeHtml(costume.name)}</strong><small>${unlocked ? wearing ? "SELECTED" : "Apply dye" : `🔒 ${escapeHtml(costume.hint)}`}</small></button>`;
         }).join("")}</div>
-      </details>`;
+      </section>`;
   }
 
   function drawFormPreviews(force) {
@@ -1846,38 +1860,6 @@ G.ui = (() => {
       html += `<section class="trophy-summary"><span>🏆</span><div><strong>Guardian trophies · ${found}/${bosses.length}</strong><small>${found === bosses.length ? "The Guardian Compass is yours." : "Defeat hidden guardians to reveal the Hero Board."}</small></div>
         <div>${bosses.map((boss) => `<i class="${(G.state.items || []).includes(boss.trophy) ? "found" : ""}" title="${escapeHtml((G.state.items || []).includes(boss.trophy) ? boss.trophyName : "Unknown trophy")}"></i>`).join("")}</div></section>`;
     }
-    return html;
-  }
-
-  function buildMixTab() {
-    const fid = G.state.formId;
-    const f = G.forms[fid];
-    const lo = G.getLoadout(fid);
-    const avail = G.availableAbilities();
-    const ranked = avail.slice().sort((a, b) => {
-      const aMatch = G.passives && G.passives.formMatches(f, G.abilities[a]) ? 1 : 0;
-      const bMatch = G.passives && G.passives.formMatches(f, G.abilities[b]) ? 1 : 0;
-      return bMatch - aMatch;
-    });
-    const letters = ["A", "B", "C"];
-
-    let html = `<div class="form-card current"><h2>${f.icon} ${f.name}'s moves</h2>
-      <div class="tagline">B and C can hold any unlocked ability. ★ marks moves transformed by this form.</div>
-      <div class="passive-rule"><strong>◆ ${f.passive.name}</strong><span>${f.passive.description}</span></div>`;
-    html += `<div class="slot-row"><span class="slot-label">A (basic)</span><span class="fixed">${abilityLabel(lo[0], f)}</span></div>`;
-    for (let s = 1; s <= f.slots; s++) {
-      const selected = G.abilities[lo[s]];
-      const synergy = selected && G.passives ? G.passives.synergyText(f, selected) : "";
-      html += `<div class="slot-row"><span class="slot-label">${letters[s]}</span>
-        <select data-slot="${s}">
-          ${ranked.map((id) => `<option value="${id}" ${lo[s] === id ? "selected" : ""}>${abilityLabel(id, f)}</option>`).join("")}
-        </select>${synergy ? `<span class="synergy-note">★ ${synergy}</span>` : `<span class="synergy-note quiet">No passive bonus — still useful for its ward type.</span>`}</div>`;
-    }
-    html += `</div>`;
-
-    html += `<div class="form-card"><h2>🧪 Your ability collection</h2>` +
-      ranked.map((id) => `<div class="quest-row"><span>${abilityLabel(id, f)}</span></div>`).join("") +
-      `</div>`;
     return html;
   }
 
@@ -2090,7 +2072,9 @@ G.ui = (() => {
     const campaign = G.ensureWorldwake();
     const landmarks = G.discoveredWayfinderLandmarks();
     const canTravel = G.canWayfinderTravel();
-    let html = `<details class="atlas-journal"><summary>📖 Journey notes and completion</summary>
+    let html = `<button data-act="atlas-notes" class="atlas-notes-toggle" aria-expanded="${atlasNotesOpen}">📖 ${atlasNotesOpen ? "Hide journey notes" : "Journey notes & completion"}</button>`;
+    if (!atlasNotesOpen) return html;
+    html += `<section class="atlas-journal">
       <div class="form-card">
         <div class="quest-row"><span>Old-world regions</span><span class="prog">${progress.found}/${progress.total}</span></div>
         <div class="quest-row"><span>Worldwake regions</span><span class="prog">${campaign.discovered.length}/${G.WORLDWAKE_REGIONS.length}</span></div>
@@ -2115,7 +2099,7 @@ G.ui = (() => {
       const value = Math.min(favor.count, G.worldwakeFavorProgress(favor));
       html += `<div class="quest-row ${done ? "done" : ""}"><span>${done ? "✅" : "⬜"} ${escapeHtml(favor.name)}<small>${escapeHtml(favor.text)}</small></span><span class="prog">${value}/${favor.count}</span></div>`;
     }
-    return html + `</div></details>`;
+    return html + `</div></section>`;
   }
 
   function buildWayfinderTab() {
@@ -2211,10 +2195,11 @@ G.ui = (() => {
         <div class="quest-row"><span>Victories</span><span class="prog">${progress.victories}</span></div>
         <div class="quest-row"><span>Farthest chamber</span><span class="prog">${progress.bestRoom}</span></div>
         <div class="quest-row"><span>Longest crossing</span><span class="prog">${progress.longestWin || "—"}</span></div>
-        <div class="slot-row"><span class="slot-label">Path length</span><select data-expedition-length>
-          <option value="5">Trail · 5 chambers</option>${longUnlocked ? `<option value="7">Deep path · 7 chambers</option>` : ""}
-          ${G.unlockedForms().length >= 10 ? `<option value="9">Worldfold · 9 chambers</option>` : ""}
-        </select></div>
+        <div class="choice-setting"><span>Path length</span><div class="choice-strip">
+          <button data-expedition-length="5" data-nav-zone="expedition-length" class="${expeditionLengthChoice === "5" ? "active" : ""}">Trail · 5</button>
+          ${longUnlocked ? `<button data-expedition-length="7" data-nav-zone="expedition-length" class="${expeditionLengthChoice === "7" ? "active" : ""}">Deep · 7</button>` : ""}
+          ${G.unlockedForms().length >= 10 ? `<button data-expedition-length="9" data-nav-zone="expedition-length" class="${expeditionLengthChoice === "9" ? "active" : ""}">Worldfold · 9</button>` : ""}
+        </div></div>
         <button data-act="start-expedition">Enter the shifting path</button>
       </div><div class="form-card"><h2>Crossing the Manyfold</h2>
         <div class="quest-row"><span>① Choose a route</span><span class="prog">danger and treasure</span></div>
@@ -2258,16 +2243,16 @@ G.ui = (() => {
       </div>`;
     }
     const choices = [3, 5, 8].filter((count) => count <= pool.length);
-    const options = choices.map((count) => `<option value="${count}">${count} bosses</option>`).join("") +
-      `<option value="all">All ${pool.length} defeated bosses</option>`;
+    const runChoices = choices.map(String).concat("all");
+    if (!runChoices.includes(String(gauntletCountChoice))) gauntletCountChoice = runChoices[0];
     return `<div class="form-card current">
       <h2>🏟 Manyfold Gauntlet</h2>
       <div class="tagline">Choose how many defeated guardians to face in succession. Their order changes with every procession.</div>
       <div class="quest-row"><span>Available guardians</span><span class="prog">${pool.length}</span></div>
       <div class="quest-row"><span>Recovery record</span><span class="prog">${G.state.gauntletBest || 0}</span></div>
       <div class="quest-row"><span>Iron record</span><span class="prog">${G.state.gauntletIronBest || 0}</span></div>
-      <div class="slot-row"><span class="slot-label">Run length</span><select data-gauntlet-count>${options}</select></div>
-      <label class="quest-row"><span>Campfire between rounds<br><small>Restore all health and 3 mana</small></span><input data-gauntlet-recovery type="checkbox" checked></label>
+      <div class="choice-setting"><span>Run length</span><div class="choice-strip">${runChoices.map((value) => `<button data-gauntlet-count="${value}" data-nav-zone="gauntlet-length" class="${String(gauntletCountChoice) === value ? "active" : ""}">${value === "all" ? `All ${pool.length}` : value} bosses</button>`).join("")}</div></div>
+      <button data-gauntlet-recovery data-nav-zone="gauntlet-options" class="choice-toggle ${gauntletRecoveryChoice ? "active" : ""}" aria-pressed="${gauntletRecoveryChoice}"><span>🔥 Campfires between rounds</span><small>${gauntletRecoveryChoice ? "ON · restore all hearts and 3 mana" : "OFF · one unbroken procession"}</small></button>
       <button data-act="start-gauntlet">Enter the gauntlet</button>
     </div>
     <div class="form-card">

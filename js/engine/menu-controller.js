@@ -16,7 +16,8 @@ G.menuController = (() => {
     "navId", "tab", "menuSection", "menuRoute", "act", "formlabView", "rosterView", "formSelect",
     "loadoutSlot", "abilityDamage", "abilityStyle", "abilitySelect", "skinPreview", "atlasView", "mapNode",
     "pin", "become", "costume", "townProject", "travelRegion", "worldwakeRegion", "travelLandmark",
-    "expeditionRoute", "expeditionDraft", "formEchoGuide", "legendGuide", "masteryForm", "saveSlot", "titleSettings",
+    "expeditionRoute", "expeditionDraft", "expeditionLength", "gauntletCount", "gauntletRecovery",
+    "formEchoGuide", "legendGuide", "masteryForm", "saveSlot", "titleSettings",
   ];
   let focused = null;
   let lastTime = 0;

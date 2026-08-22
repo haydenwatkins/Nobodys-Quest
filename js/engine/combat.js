@@ -84,10 +84,7 @@ G.combat = (() => {
         const needed = G.DAMAGE_TYPES[enemy.ward.types[0]];
         G.sfx.play("wardDing");
         G.damageNumber(enemy.x, enemy.y - enemy.h(), `NEEDS ${needed.name.toUpperCase()}!`, needed.color);
-        if (!enemy.wardHintAt || G.state.time - enemy.wardHintAt > 1.5) {
-          enemy.wardHintAt = G.state.time;
-          G.ui.toast(`${needed.icon} Ward: use ${needed.name.toUpperCase()} damage`, 2);
-        }
+        if (G.tutorial) G.tutorial.hint("wrong-ward", `${needed.icon} Match the ward with ${needed.name.toUpperCase()} damage.`, 3);
         G.events.emit("wardBlocked", { enemy, enemyId: enemy.id, damageType: enemy.ward.types[0], ability: opts.ability });
         knockback(enemy, opts, 0.4);
         return false;
@@ -103,7 +100,6 @@ G.combat = (() => {
         G.state.hitStop = Math.max(G.state.hitStop, 0.05);
         G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: wardHitColor, dur: 0.45 });
         burst(enemy.x, enemy.y - 6, wardHitColor, 8);
-        G.ui.toast("💥 Ward broken!");
         G.events.emit("wardBreak", { damageType: type, ability: opts.ability, enemy: enemy.id });
       }
       return true;
@@ -311,9 +307,9 @@ G.combat = (() => {
     if (enemy.bossStaggerT > 0 || enemy.bossStaggerResistT > 0) return;
     enemy.bossStagger = Math.min(G.BOSS_STAGGER_HITS, (enemy.bossStagger || 0) + (amount || 1));
     enemy.bossStaggerDecayT = 2.25;
-    if (!staggerHelpShown) {
+    if (!staggerHelpShown && G.tutorial && G.tutorial.coaching()) {
       staggerHelpShown = true;
-      G.ui.toast("⚔ Melee pressure fills the gold STAGGER meter!", 2.8);
+      G.tutorial.hint("boss-stagger", "⚔ Keep close pressure on a guardian to fill its gold Stagger meter.", 3.2);
     }
     if (enemy.bossStagger < G.BOSS_STAGGER_HITS) return;
 

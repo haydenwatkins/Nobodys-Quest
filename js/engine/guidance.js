@@ -578,8 +578,8 @@
     const count = runtime.ward && runtime.ward.enemy === data.enemy ? runtime.ward.count + 1 : 1;
     const form = G.guidanceFormForType(data.damageType);
     runtime.ward = { enemy: data.enemy, damageType: data.damageType, form, count, until: now() + 9 };
-    if (count === 2 && form && G.ui && G.ui.toast)
-      G.ui.toast(`⇄ ${form.name} carries ${G.DAMAGE_TYPES[data.damageType].name} damage — hold the form button to choose it.`, 4);
+    if (count === 2 && form && G.tutorial)
+      G.tutorial.hint("ward-form", `⇄ ${form.name} carries ${G.DAMAGE_TYPES[data.damageType].name} damage — hold the form button to choose it.`, 4);
   });
 
   G.events.on("swap", () => { runtime.ward = null; });

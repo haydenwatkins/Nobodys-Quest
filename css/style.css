@@ -591,16 +591,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 }
 .atlas-travel-rule.ready { border-color: #a7f070; color: #a7f070; }
 .atlas-journal { margin: 10px 0; }
-.atlas-journal summary {
-  cursor: pointer;
-  padding: 12px;
-  border: 2px solid #566c86;
-  border-radius: 9px;
-  background: #24283b;
-  color: #ffcd75;
-  font: 10px "Press Start 2P", "Courier New", monospace;
-}
-.atlas-journal[open] summary { margin-bottom: 10px; }
+.atlas-notes-toggle { margin-bottom:10px; color:#ffcd75; }
 .landmark-route { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 0; color: #a7f070; }
 .landmark-route small { color: #94b0c2; text-align: right; }
 .landmark-route .travel-btn { margin: 0; }
@@ -910,17 +901,29 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .skin-tile-preview { grid-row: 1 / 3; height: 130px; margin-right: 10px; border-right: 1px solid #3e4762; }
 .skin-tile strong { align-self: end; color: #f4f4f4; font-size: 9px; line-height: 1.45; }
 .skin-tile small { align-self: start; color: #94b0c2; font-family: "VT323", monospace; font-size: 18px; }
-.dye-drawer { border: 2px solid #566c86; border-radius: 12px; background: #24283b; }
-.dye-drawer summary { padding: 13px; color: #f4f4f4; font-family: "Press Start 2P", monospace; font-size: 10px; cursor: pointer; }
-.dye-drawer summary span { float: right; color: #94b0c2; font-family: "VT323", monospace; font-size: 18px; }
-.dye-drawer > p { margin: 0; padding: 0 13px 10px; color: #94b0c2; font-size: 18px; }
-.dye-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; padding: 0 12px 12px; }
-.dye-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 9px; text-align: left; }
+.dye-drawer { overflow:hidden; border: 2px solid #566c86; border-radius: 12px; background: #24283b; }
+.dye-drawer>header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 13px 9px; }
+.dye-drawer>header strong { color:#f4f4f4; font:10px "Press Start 2P",monospace; }
+.dye-drawer>header p { margin:5px 0 0; color:#94b0c2; font-size:17px; }
+.dye-drawer>header>span { flex:0 0 auto; color:#73eff7; font:17px "VT323",monospace; }
+.dye-grid { display:flex; gap:7px; overflow-x:auto; padding:0 12px 12px; scroll-snap-type:x proximity; touch-action:pan-x; scrollbar-color:#566c86 #24283b; }
+.dye-tile { display:flex; flex:0 0 145px; flex-direction:column; align-items:flex-start; gap:5px; min-height:76px; padding:9px; text-align:left; scroll-snap-align:start; }
 .dye-tile.selected { border-color: #73eff7; }
 .dye-tile > span { display: flex; gap: 3px; }
 .dye-tile i { display: block; width: 20px; height: 10px; border: 1px solid #1a1c2c; }
 .dye-tile strong { color: #f4f4f4; font-size: 8px; line-height: 1.4; }
 .dye-tile small { color: #94b0c2; font-family: "VT323", monospace; font-size: 15px; }
+
+.choice-setting { margin:12px 0; }
+.choice-setting>span { display:block; margin-bottom:7px; color:#94b0c2; font-size:17px; }
+.choice-strip { display:flex; gap:7px; overflow-x:auto; padding:3px; touch-action:pan-x; scroll-snap-type:x proximity; }
+.choice-strip button { flex:1 0 112px; min-height:44px; padding:8px; scroll-snap-align:start; border:2px solid #566c86; border-radius:8px; background:#2c3148; color:#c8d8e0; font:7px "Press Start 2P",monospace; }
+.choice-strip button.active { border-color:#ffcd75; background:#ffcd75; color:#1a1c2c; }
+.choice-toggle { display:flex; align-items:flex-start; flex-direction:column; gap:5px; width:100%; min-height:58px; margin:10px 0; padding:10px 12px; text-align:left; }
+.choice-toggle span { color:#f4f4f4; font:8px "Press Start 2P",monospace; }
+.choice-toggle small { color:#94b0c2; font:16px "VT323",monospace; }
+.choice-toggle.active { border-color:#a7f070; }
+.choice-toggle.active small { color:#a7f070; }
 
 .menu-footer {
   position: relative;
@@ -975,9 +978,12 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .settings-grid button strong { font-size: 9px; }
 .settings-grid button span { color: #94b0c2; font-family: "VT323", monospace; font-size: 17px; }
 .save-data { margin-top: 10px; border-top: 1px solid #3e4762; color: #94b0c2; }
-.save-data summary { padding: 11px 2px 5px; cursor: pointer; font-family: "Press Start 2P", monospace; font-size: 8px; }
 .save-data p { margin: 7px 0; font-size: 17px; }
 .save-data button.danger { padding: 9px 11px; border: 2px solid #b13e53; border-radius: 8px; background: transparent; color: #ef7d57; font-family: "Press Start 2P", monospace; font-size: 8px; }
+.advanced-settings-toggle,.atlas-notes-toggle {
+  width:100%; min-height:42px; margin-top:10px; padding:10px 12px; border:2px solid #566c86; border-radius:9px;
+  background:#24283b; color:#c8d8e0; font:8px "Press Start 2P",monospace; text-align:left;
+}
 
 /* ---------- Main story journal ---------- */
 

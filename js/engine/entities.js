@@ -323,13 +323,14 @@ G.updatePlayer = function (dt) {
         p.dir = { x: Math.cos(angle), y: Math.sin(angle) };
         G.spawnFx({ kind: "ring", x: target.x, y: target.y - 4, color: "#73eff7", radius: 6, dur: 0.18 });
       }
-      if (!touchAimHelpShown) {
+      if (!touchAimHelpShown && G.tutorial && G.tutorial.coaching()) {
         touchAimHelpShown = true;
-        G.ui.toast("🎯 Tap ranged attacks to auto-aim · drag to aim yourself", 3.5);
+        G.tutorial.hint("touch-aim", "🎯 Tap ranged attacks to auto-aim · drag to aim yourself", 3.5);
       }
     }
     if (ab.mana > p.mana) {
-      G.ui.toast("💧 Mana is recharging — land hits to fill it even faster!", 1.8);
+      if (G.tutorial) G.tutorial.hint("low-mana", "💧 Mana returns over time, and successful hits refill it faster.", 3);
+      G.sfx.play("wardDing");
       delete p.abilityBuffer[button];
       continue;
     }

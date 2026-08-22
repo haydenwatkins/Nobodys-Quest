@@ -100,11 +100,13 @@ assert.ok(trailMarks > 1, "requested guidance should draw physical breadcrumb mo
 assert.doesNotThrow(() => G.drawGuidanceHud(ctx, { x: 0, y: 0 }));
 
 const warded = { id: "bones" };
+const wardToastCount = toasts.length;
 G.events.emit("wardBlocked", { enemy: warded, damageType: "blunt" });
 G.events.emit("wardBlocked", { enemy: warded, damageType: "blunt" });
 assert.equal(G.guidanceWardSuggestion(warded).form.id, "hammer",
   "repeated ward mistakes should recommend an unlocked form with the right damage");
-assert.match(toasts.at(-1), /Hammer carries Blunt damage/);
+assert.equal(toasts.length, wardToastCount,
+  "ward guidance should remain visual after onboarding instead of adding combat toasts");
 
 G.state.mapId = "bossRoom";
 G.state.guidance.bossRetries.bossRoom = 2;

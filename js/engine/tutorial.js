@@ -47,11 +47,13 @@ G.tutorial = (() => {
   let visibleFor = 0;
   let startX = 0;
   let startY = 0;
+  let hintsShown = new Set();
 
   function init(save) {
     step = save && Number.isInteger(save.tutorialStep) ? save.tutorialStep : 0;
     done = !!(save && save.tutorialDone);
     const previouslySeen = !!(save && save.tutorialSeen);
+    hintsShown = new Set(save && Array.isArray(save.tutorialHints) ? save.tutorialHints : []);
     seen = true;
     // Existing adventures migrate quietly. A genuinely new adventure gets a
     // brief first hint, then later lessons appear only when they are reached.
@@ -104,9 +106,28 @@ G.tutorial = (() => {
     done = false;
     seen = true;
     visibleFor = 8;
+    hintsShown.clear();
     startX = G.state.player.x;
     startY = G.state.player.y;
     G.saveGame();
+  }
+
+  // Combat already communicates through meters, colors, sounds and hit text.
+  // These explanatory toasts exist only for a first adventure (or an explicit
+  // tutorial replay), and each topic appears once so coaching never becomes a
+  // second permanent HUD.
+  function hint(key, text, duration) {
+    if (done || hintsShown.has(key) || !G.ui || !G.ui.toast) return false;
+    hintsShown.add(key);
+    G.ui.toast(text, duration || 2.8);
+    G.saveGame();
+    return true;
+  }
+
+  function coaching(topic) {
+    if (done) return false;
+    if (topic === "ward") return step === 4;
+    return true;
   }
 
   G.events.on("abilityUse", () => advance(1));
@@ -116,11 +137,12 @@ G.tutorial = (() => {
   G.events.on("formUnlock", () => { if (!done && step === 3) visibleFor = 8; });
 
   return {
-    init, dismiss, replay,
+    init, dismiss, replay, hint, coaching,
     update,
     prompt,
     get step() { return step; },
     get done() { return done; },
     get seen() { return seen; },
+    get hintsShown() { return Array.from(hintsShown); },
   };
 })();
