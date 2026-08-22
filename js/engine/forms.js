@@ -108,7 +108,7 @@ function registerForm(def) {
   else {
     def.quests.forEach((q, i) => {
       if (!q.text) err(`Quest #${i + 1} needs a text, like "Poison 8 baddies".`);
-      if (!q.event) err(`Quest #${i + 1} needs an event to listen for: kill, hit, status, wardBreak, multiHit, sign, or pickup.`);
+      if (!q.event) err(`Quest #${i + 1} needs an event to listen for: kill, hit, status, wardBreak, multiHit, parry, sign, or pickup.`);
       if (typeof q.count !== "number" || q.count < 1) err(`Quest #${i + 1} needs a count (how many times).`);
       q.id = q.id || `${def.id}-q${i}`;
     });

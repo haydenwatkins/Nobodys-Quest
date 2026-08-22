@@ -42,7 +42,7 @@ G.passives = (() => {
     const id = passive.id;
     if (["scurry", "conductor", "slipstream", "resonance", "lifeline"].includes(id)) return true;
     if (id === "improviser") return isBorrowed(form.id, ab.id);
-    if (["steadfast", "elastic", "unstoppable", "flowingDraw"].includes(id)) return ab.style === "melee";
+    if (["oathguard", "elastic", "unstoppable", "flowingDraw"].includes(id)) return ab.style === "melee";
     if (["clearShot", "trickTrajectory"].includes(id)) return ab.style === "projectile";
     if (["catalyst", "aftershock", "gravityTouch"].includes(id)) return ab.style === "area";
     if (id === "afterimage") return ab.style === "dash";
@@ -60,7 +60,7 @@ G.passives = (() => {
     const text = {
       improviser: "Adaptive handling",
       scurry: "Triggers Scurry",
-      steadfast: "Guarded melee",
+      oathguard: "Oathguard timing",
       clearShot: "Larger, faster shot",
       hexcraft: "Longer status",
       elastic: "Long reach + pull",
@@ -134,9 +134,10 @@ G.passives = (() => {
       }
     }
 
-    if (passive.id === "steadfast" && style === "melee" && kind === "melee") {
-      user.meleeGuard = Math.max(user.meleeGuard || 0, 0.28);
-      o.passiveGuard = true;
+    if (passive.id === "oathguard" && style === "melee" && kind === "melee") {
+      user.knightGuardT = Math.max(user.knightGuardT || 0, o.guardWindow || 0.2);
+      user.knightPerfectT = Math.max(user.knightPerfectT || 0, o.perfectWindow || 0.11);
+      o.passiveGuard = false;
     }
 
     if (passive.id === "clearShot" && style === "projectile" && kind === "projectile") {
@@ -345,6 +346,9 @@ G.passives = (() => {
     p.passiveHaste = Math.max(0, (p.passiveHaste || 0) - dt);
     p.slipstreamT = Math.max(0, (p.slipstreamT || 0) - dt);
     p.passiveBarrierT = Math.max(0, (p.passiveBarrierT || 0) - dt);
+    p.knightGuardT = Math.max(0, (p.knightGuardT || 0) - dt);
+    p.knightPerfectT = Math.max(0, (p.knightPerfectT || 0) - dt);
+    p.knightRiposteT = Math.max(0, (p.knightRiposteT || 0) - dt);
     if (p.passiveBarrierT <= 0) p.passiveBarrier = 0;
 
     const echoes = G.state.passiveEchoes || [];
@@ -386,6 +390,30 @@ G.passives = (() => {
       G.damageNumber(p.x, p.y - 18, "BLOODSKIN!", "#ef7d57");
       G.spawnFx({ kind: "ring", x: p.x, y: p.y - 7, color: "#b13e53", radius: 13, dur: 0.28 });
       if (result.damage <= 0) result.prevented = true;
+    }
+
+    if (!result.prevented && passive && passive.id === "oathguard" && p.knightGuardT > 0 && fromX !== undefined) {
+      const toSource = G.util.angleTo(p.x, p.y, fromX, fromY);
+      const facing = Math.atan2(p.dir.y, p.dir.x);
+      if (Math.cos(G.util.angleDiff(facing, toSource)) > 0.12) {
+        const perfect = p.knightPerfectT > 0;
+        p.knightGuardT = 0;
+        p.knightPerfectT = 0;
+        p.knightRiposteT = perfect ? 3 : 2.25;
+        p.spriteAction = { frame: 2, t: 0.2 };
+        result.damage = 0;
+        result.knockback = false;
+        result.prevented = true;
+        G.damageNumber(p.x, p.y - 20, perfect ? "PERFECT!" : "PARRY!", perfect ? "#fff3c2" : "#ffcd75");
+        G.spawnFx({ kind: "ring", x: p.x + p.dir.x * 7, y: p.y + p.dir.y * 7 - 7,
+          color: perfect ? "#fff3c2" : "#ffcd75", radius: perfect ? 18 : 14, dur: 0.32 });
+        G.spawnFx({ kind: "impact", x: p.x + p.dir.x * 8, y: p.y + p.dir.y * 8 - 7,
+          color: "#f4f4f4", size: perfect ? 8 : 6, dur: 0.2 });
+        G.state.hitStop = Math.max(G.state.hitStop || 0, perfect ? 0.075 : 0.05);
+        G.state.shake = Math.max(G.state.shake || 0, perfect ? 0.22 : 0.14);
+        G.sfx.play("stagger");
+        G.events.emit("parry", { form: "knight", perfect, fromX, fromY });
+      }
     }
 
     if (!result.prevented && passive && passive.id === "shellback" && fromX !== undefined) {
@@ -445,6 +473,10 @@ G.passives = (() => {
     user.slipstreamT = 0;
     user.resonanceStyle = null;
     user.lifelineTarget = null;
+    user.knightGuardT = 0;
+    user.knightPerfectT = 0;
+    user.knightRiposteT = 0;
+    user.spriteAction = null;
   }
 
   function drawFields(ctx) {

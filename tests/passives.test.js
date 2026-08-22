@@ -92,7 +92,43 @@ assert.deepEqual([mixed.speed, mixed.range, mixed.size, mixed.damage], [122, 108
 
 p = useForm("knight");
 mixed = G.passives.prepare("melee", p, { ability: "slash", range: 20, damage: 1 });
-assert.ok(p.meleeGuard >= 0.28 && mixed.passiveGuard, "Knight should be protected during borrowed melee commitment");
+assert.ok(p.knightGuardT >= 0.2 && p.knightPerfectT > 0 && !mixed.passiveGuard,
+  "Knight melee should open a readable frontal timing guard instead of hidden all-direction invulnerability");
+
+// Oathguard is deliberate, directional and self-balancing: a correct read
+// prevents one hit and earns damage that the ordinary basic no longer has.
+let parries = 0;
+G.events.on("parry", () => { parries++; });
+p.meleeGuard = 0;
+G.damagePlayer(1, 10, 0);
+assert.equal(p.damageTaken, 0, "a frontal hit inside Oathguard should be turned aside");
+assert.equal(parries, 1);
+assert.ok(p.knightRiposteT > 2, "a successful guard should create a short counter opportunity");
+const riposteTarget = enemy(22, 0);
+G.state.enemies = [riposteTarget];
+G.abilities.slash.use(p);
+assert.equal(riposteTarget.hp, 5, "the earned Oathblade riposte should hit for three");
+assert.equal(p.knightRiposteT, 0, "the counter opportunity must be spent by one Oathblade");
+assert.equal(p.spriteAction.frame, 3, "the riposte should use its hand-authored thrust frame");
+
+const ordinaryTarget = enemy(22, 0);
+G.state.enemies = [ordinaryTarget];
+G.abilities.slash.use(p);
+assert.equal(ordinaryTarget.hp, 7,
+  "ordinary Oathblade should stay modest so the earned riposte does not create passive power creep");
+
+p = useForm("knight");
+G.passives.prepare("melee", p, { ability: "slash", range: 20, damage: 1 });
+p.meleeGuard = 0;
+G.damagePlayer(1, 10, 0);
+G.damagePlayer(1, 10, 0);
+assert.equal(p.damageTaken, 1, "Oathguard should turn aside one blow, not grant a period of invulnerability");
+
+p = useForm("knight");
+G.passives.prepare("melee", p, { ability: "slash", range: 20, damage: 1 });
+p.meleeGuard = 0;
+G.damagePlayer(1, -10, 0);
+assert.equal(p.damageTaken, 1, "Oathguard should not erase attacks that get behind the shield");
 
 p = useForm("wizard");
 mixed = G.passives.prepare("projectile", p, {

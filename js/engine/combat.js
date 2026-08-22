@@ -127,7 +127,7 @@ G.combat = (() => {
       dist: G.util.dist(G.state.player.x, G.state.player.y, enemy.x, enemy.y),
     });
 
-    if (opts.status) applyStatus(enemy, opts.status.name, opts.status);
+    if (opts.status) applyStatus(enemy, opts.status.name, { ...opts.status, ability: opts.ability });
 
     if (G.passives) G.passives.onHit(enemy, opts);
 
@@ -240,7 +240,7 @@ G.combat = (() => {
     enemy.status[name] = { dur: opts.dur || 3, dps: opts.dps || 0.7, tick: 0 };
     if (isNew) {
       if (name === "poison") G.sfx.play("poison");
-      G.events.emit("status", { status: name, enemy: enemy.id });
+      G.events.emit("status", { status: name, enemy: enemy.id, ability: opts.ability });
     }
   }
 
@@ -358,7 +358,7 @@ G.combat = (() => {
         knockback: o.knockback, status: o.status,
         breaksAnyWard: breaksAnyWard(user),
         fromX: user.x, fromY: user.y,
-        hitStop: o.hitStop, shake: o.shake,
+        hitStop: o.hitStop, shake: o.shake, combo: o.combo,
       })) {
         hits++;
         if (o.passivePull) {
@@ -519,7 +519,7 @@ G.combat = (() => {
         knockback: o.pull ? 0 : o.knockback,
         status: o.status, breaksAnyWard: breaksAnyWard(user),
         fromX: user.x, fromY: user.y,
-        hitStop: o.hitStop, shake: o.shake,
+        hitStop: o.hitStop, shake: o.shake, combo: o.combo,
       })) {
         hits++;
         if (o.pull) {

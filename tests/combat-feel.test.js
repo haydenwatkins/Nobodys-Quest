@@ -98,7 +98,7 @@ G.abilities = {};
 context.registerAbility = (ability) => { G.abilities[ability.id] = ability; };
 run("js/abilities/basics.js");
 const expectedBasics = {
-  slap: [0, 0.35], bite: [0, 0.3], slash: [0, 0.5], arrow: [0, 0.45],
+  slap: [0, 0.35], bite: [0, 0.3], slash: [0, 0.46], arrow: [0, 0.45],
   curse: [0, 0.55], tongueLash: [0, 0.45], bottleBonk: [0, 0.4],
   stormSpark: [0, 0.45], tailSweep: [0, 0.55], divineSpark: [0, 0.5],
   drillTap: [0, 0.38], bloodBite: [0, 0.34], wildCard: [0, 0.45],

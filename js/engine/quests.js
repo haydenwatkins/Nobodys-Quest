@@ -14,6 +14,7 @@
      "multiHit"  { ability, hits, combo } (one swing, many bonks; combo is optional)
      "sign"      { message }
      "pickup"    { item }
+     "parry"     { form, perfect, fromX, fromY }
 
    MATCH RULES: every key in `match` must line up with the event.
      match: { ability: "bite" }      -> exactly "bite"

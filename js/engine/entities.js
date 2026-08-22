@@ -22,6 +22,10 @@ G.makePlayer = function () {
     cooldowns: {},             // abilityId -> seconds left
     abilityBuffer: {},         // button -> recent tap waiting on cooldown
     attackPose: null,
+    spriteAction: null,
+    knightGuardT: 0,
+    knightPerfectT: 0,
+    knightRiposteT: 0,
     swapCd: 0,
     dashing: null,
     passiveBarrier: 0,
@@ -86,7 +90,7 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     enemy: sourceEnemy.enemy.id,
     rival: !!sourceEnemy.enemy.rival,
   } : {};
-  if (p.invuln > 0 || p.meleeGuard > 0 || p.dashing) return false;
+  if (p.invuln > 0 || (p.meleeGuard > 0 && !(p.knightGuardT > 0)) || p.dashing) return false;
   if (p.pantryGuard > 0) {
     p.pantryGuard--;
     p.invuln = Math.max(p.invuln, 0.3);
@@ -231,6 +235,10 @@ G.updatePlayer = function (dt) {
   if (p.attackPose) {
     p.attackPose.t -= dt;
     if (p.attackPose.t <= 0) p.attackPose = null;
+  }
+  if (p.spriteAction) {
+    p.spriteAction.t -= dt;
+    if (p.spriteAction.t <= 0) p.spriteAction = null;
   }
   const cooldownRate = p.pantryQuickT > 0 ? 1.35 : 1;
   for (const k in p.cooldowns) p.cooldowns[k] = Math.max(0, p.cooldowns[k] - dt * cooldownRate);
@@ -1207,6 +1215,30 @@ G.drawPlayer = function (ctx) {
   const form = G.playerForm();
   if (p.invuln > 0 && Math.floor(p.invuln * 12) % 2 === 0 && !p.dashing) return; // hurt blink
   G.drawPlayerAura(ctx, p, form);
+  if (form.id === "knight" && (p.knightGuardT > 0 || p.knightRiposteT > 0)) {
+    const facing = Math.atan2(p.dir.y, p.dir.x);
+    ctx.save();
+    if (p.knightGuardT > 0) {
+      ctx.globalAlpha = 0.65 + Math.min(0.3, p.knightGuardT);
+      ctx.strokeStyle = p.knightPerfectT > 0 ? "#fff3c2" : "#94b0c2";
+      ctx.lineWidth = p.knightPerfectT > 0 ? 3 : 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 7, 13, facing - 0.82, facing + 0.82);
+      ctx.stroke();
+    }
+    if (p.knightRiposteT > 0) {
+      const pulse = 1 + Math.sin(G.state.time * 12) * 0.18;
+      const tipX = p.x + p.dir.x * 18 * pulse;
+      const tipY = p.y - 7 + p.dir.y * 18 * pulse;
+      ctx.fillStyle = "#ffcd75";
+      ctx.translate(Math.round(tipX), Math.round(tipY));
+      ctx.rotate(facing + Math.PI / 4);
+      ctx.fillRect(-3, -3, 6, 6);
+      ctx.fillStyle = "#fff3c2";
+      ctx.fillRect(-1, -1, 2, 2);
+    }
+    ctx.restore();
+  }
   if (p.meleeGuard > 0) {
     ctx.save();
     ctx.globalAlpha = Math.min(0.8, p.meleeGuard / G.MELEE_GUARD_SECONDS);
@@ -1225,7 +1257,8 @@ G.drawPlayer = function (ctx) {
   const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift;
   const dressedSprite = G.playerAppearanceSprite ? G.playerAppearanceSprite(form) :
     (G.costumedSprite ? G.costumedSprite(form.sprite) : form.sprite);
-  const frame = G.spriteFrame ? G.spriteFrame(dressedSprite, animationMode, animationMode === "idle" ? G.state.time : p.anim) :
+  const frame = p.spriteAction ? p.spriteAction.frame : G.spriteFrame ?
+    G.spriteFrame(dressedSprite, animationMode, animationMode === "idle" ? G.state.time : p.anim) :
     (p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0);
   G.drawSprite(ctx, dressedSprite, frame, drawX, drawY, p.dir.x < 0);
   if (G.drawLegendArm) G.drawLegendArm(ctx, p, form, drawX, drawY);

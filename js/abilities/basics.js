@@ -133,58 +133,86 @@ registerAbility({
 
 registerAbility({
   id: "slash",
-  name: "Sword Slash",
+  name: "Oathblade",
   icon: "⚔️",
   type: "sharp",
   style: "melee",
   mana: 0,
-  cooldown: 0.5,
+  cooldown: 0.46,
   use(user) {
+    const knight = G.state.formId === "knight";
+    const riposte = knight && (user.knightRiposteT || 0) > 0;
+    if (riposte) user.knightRiposteT = 0;
+    if (knight) user.spriteAction = { frame: 3, t: riposte ? 0.24 : 0.14 };
     G.combat.meleeArc(user, {
       ability: "slash",
-      range: 23, arcDeg: 150,
-      damage: 2, type: "sharp",
-      knockback: 120,
-      lunge: 3, hitStop: 0.045, shake: 0.16, weight: 4,
+      range: riposte ? 35 : 23, arcDeg: riposte ? 82 : 135,
+      damage: riposte ? 3 : 1, type: "sharp",
+      knockback: riposte ? 205 : 95,
+      color: riposte ? "#ffcd75" : "#f4f4f4",
+      lunge: riposte ? 7 : 3, hitStop: riposte ? 0.065 : 0.032,
+      shake: riposte ? 0.24 : 0.11, weight: riposte ? 7 : 3,
+      stagger: riposte ? 2 : 1, combo: riposte ? "riposte" : "oathblade",
     });
+    if (riposte) {
+      G.state.hitStop = Math.max(G.state.hitStop || 0, 0.045);
+      G.spawnFx({ kind: "bolt", x: user.x - user.dir.x * 5, y: user.y - user.dir.y * 5 - 7,
+        x2: user.x + user.dir.x * 35, y2: user.y + user.dir.y * 35 - 7, color: "#fff3c2", dur: 0.2 });
+      G.sfx.play("stagger");
+    }
   },
 });
 
 registerAbility({
   id: "shieldBash",
-  name: "Shield Bash",
+  name: "Shield Advance",
   icon: "🛡️",
   type: "blunt",
   style: "melee",
-  mana: 3,
-  cooldown: 0.85,
+  traits: ["guard", "status"],
+  mana: 3, cooldown: 0.82,
   use(user) {
+    if (G.state.formId === "knight") {
+      user.knightGuardT = Math.max(user.knightGuardT || 0, 0.58);
+      user.knightPerfectT = Math.max(user.knightPerfectT || 0, 0.24);
+      user.spriteAction = { frame: 2, t: 0.58 };
+    }
+    const beforeX = user.x, beforeY = user.y;
+    G.world.moveBox(user, user.dir.x * 9, user.dir.y * 9);
+    G.spawnFx({ kind: "puff", x: beforeX, y: beforeY - 3, color: "#94b0c2", dur: 0.18 });
     G.combat.meleeArc(user, {
       ability: "shieldBash",
-      range: 18, arcDeg: 120,
-      damage: 2, type: "blunt",
-      knockback: 240,                          // sends 'em FLYING
-      status: { name: "stun", dur: 1.3 },      // and leaves 'em dizzy
-      color: "#ef7d57",
+      range: 21, arcDeg: 105,
+      damage: 1, type: "blunt", knockback: 220,
+      status: { name: "stun", dur: 0.95 },
+      color: "#94b0c2", lunge: 5, hitStop: 0.045, shake: 0.17, weight: 6,
+      guardWindow: 0.58, perfectWindow: 0.24,
     });
   },
 });
 
 registerAbility({
   id: "spinSlash",
-  name: "Spin Slash",
-  icon: "🌀",
-  type: "sharp",
+  name: "Hold the Line",
+  icon: "🏰",
+  type: "blunt",
   style: "area",
-  mana: 4,
-  cooldown: 1.0,
+  traits: ["guard", "status"],
+  mana: 5, cooldown: 1.18,
   use(user) {
-    G.combat.meleeArc(user, {
-      ability: "spinSlash",
-      range: 26, arcDeg: 360,                  // all the way around!
-      damage: 2, type: "sharp",
-      knockback: 150,
+    if (G.state.formId === "knight") {
+      user.knightGuardT = Math.max(user.knightGuardT || 0, 0.9);
+      user.knightPerfectT = Math.max(user.knightPerfectT || 0, 0.2);
+      user.spriteAction = { frame: 2, t: 0.72 };
+    }
+    G.combat.areaBurst(user, {
+      ability: "spinSlash", range: 33, damage: 1, type: "blunt",
+      knockback: 285, status: { name: "stun", dur: 0.3 },
+      color: "#ffcd75", hitStop: 0.05, shake: 0.24, combo: "hold-line",
     });
+    G.damageNumber(user.x, user.y - 20, "HOLD!", "#ffcd75");
+    G.spawnFx({ kind: "impact", x: user.x, y: user.y - 5, color: "#fff3c2", size: 8, dur: 0.22 });
+    G.state.shake = Math.max(G.state.shake || 0, 0.22);
   },
 });
 
