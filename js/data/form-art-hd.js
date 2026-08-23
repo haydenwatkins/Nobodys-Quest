@@ -120,6 +120,11 @@
     return { palette: dense.palette, frames, animations: dense.animations, hd: dense, rebuilt: true };
   }
 
+  // World-sized characters (bosses, set-piece guardians) use the same authored
+  // pixel grammar as the forms. Keeping one renderer prevents the roster and
+  // its enemies from drifting into visibly different art styles.
+  G.authoredPixelArt = { grid, palette, authored, compactSprite, ink: K };
+
   const art = {
     nobody: () => authored(30, 34, palette({ a: "#596275", b: "#f6f0e8", c: "#ffffff", d: "#79d6d2", e: "#c6cbd5", f: "#ece5dc", g: "#293243", h: "#a9f0e7" }), (g, f) => {
       const { cx, bob } = humanoid(g, f, { body: "b", trim: "e", legs: "a", skin: "b", eye: "g" });
@@ -202,17 +207,29 @@
       g.put(cx - reach - 1, 17, "e"); g.put(cx + reach + 1, 17, "e");
     }),
 
-    dragon: () => authored(48, 34, palette({ a: "#472b38", b: "#7b364b", c: "#b84f5f", d: "#e87967", e: "#f2b56b", f: "#ffe09a", g: "#ffffff", h: "#5a2536", i: "#66c6d1" }), (g, f) => {
-      const wingLift = f === 3 ? -3 : f === 1 ? 2 : 0;
-      g.poly([[21, 17], [11, 3 + wingLift], [8, 19], [3, 8 + wingLift], [4, 25], [22, 26]], K);
-      g.poly([[20, 18], [12, 6 + wingLift], [11, 20], [6, 12 + wingLift], [7, 23], [21, 24]], "c");
-      g.line(12, 9 + wingLift, 11, 20, "e", 2); g.line(6, 12 + wingLift, 18, 21, "e", 2);
-      g.ellipse(27, 21, 13, 8, K); g.ellipse(27, 21, 12, 7, "b");
-      g.poly([[32, 18], [39, 10], [46, 14], [43, 22], [35, 23]], K); g.poly([[34, 18], [40, 12], [44, 14], [42, 20], [35, 21]], "d");
-      g.line(39, 11, 38, 5, "f", 2); g.line(43, 12, 46, 7, "f", 2); g.rect(41, 15, 2, 2, "g");
-      g.line(17, 23, 4, 30, "c", 4); g.line(5, 29, 1, 25, "e", 2);
-      const stride = f === 1 ? 2 : f === 3 ? -2 : 0; g.line(22, 26, 19 - stride, 32, K, 3); g.line(33, 26, 36 + stride, 32, K, 3);
-      if (f === 2) { g.line(45, 18, 47, 18, "f", 2); g.put(47, 17, "g"); }
+    dragon: () => authored(56, 38, palette({ a: "#352033", b: "#6d3045", c: "#a83f50", d: "#db5a54", e: "#ef8b58", f: "#ffd58a", g: "#fff5dc", h: "#432a55", i: "#65d4d0" }), (g, f) => {
+      const flap = f === 1 ? -3 : f === 3 ? 2 : 0;
+      const stride = f === 1 ? 2 : f === 3 ? -2 : 0;
+      // Long, tapered reptile tail — deliberately not a mammal's curled tail.
+      g.line(20, 24, 10, 27, K, 7); g.line(11, 27, 3, 34, K, 5); g.line(20, 24, 10, 27, "c", 4); g.line(10, 27, 3, 34, "d", 2); g.put(1, 35, "f");
+      // Far wing and far legs sit behind the torso.
+      g.poly([[28, 20], [20, 4 + flap], [13, 1 + flap], [16, 13 + flap], [7, 9 + flap], [14, 24]], K);
+      g.poly([[27, 20], [20, 7 + flap], [15, 4 + flap], [18, 16 + flap], [10, 12 + flap], [16, 22]], "h");
+      g.line(19, 6 + flap, 18, 18 + flap, "e", 2); g.line(11, 11 + flap, 22, 20, "e", 2);
+      g.line(22, 27, 19 + stride, 35, "a", 4); g.line(34, 27, 32 - stride, 35, "a", 4);
+      // Low barrel chest and armored belly.
+      g.ellipse(31, 23, 14, 8, K); g.ellipse(31, 23, 13, 7, "b");
+      g.ellipse(35, 24, 8, 5, "c"); g.line(23, 27, 40, 28, "e", 2);
+      // Four independent legs: rear haunches and forward, clawed forelegs.
+      g.line(24, 27, 22 - stride, 35, "c", 4); g.line(36, 27, 39 + stride, 35, "d", 4);
+      for (const x of [18 + stride, 21 - stride, 31 - stride, 38 + stride]) { g.line(x, 35, x + 4, 35, K, 2); g.put(x + 4, 34, "f"); }
+      // S-curved neck, long snout, brow horns and jaw give a dragon profile.
+      g.line(39, 22, 43, 12, K, 8); g.line(40, 21, 44, 12, "c", 6);
+      g.ellipse(47, 10, 7, 5, K); g.ellipse(47, 10, 6, 4, "d");
+      g.poly([[49, 9], [55, 11], [54, 15], [47, 14]], K); g.poly([[49, 10], [54, 11], [53, 13], [48, 13]], "e");
+      g.line(43, 7, 39, 1, "f", 2); g.line(48, 6, 50, 0, "f", 2); g.put(49, 9, "g"); g.put(53, 12, "a");
+      g.poly([[39, 17], [36, 14], [40, 13]], "f"); g.poly([[40, 21], [36, 19], [40, 17]], "e");
+      if (f === 2) { g.poly([[54, 12], [55, 9], [55, 15]], "f"); g.put(53, 8, "i"); g.put(55, 6, "i"); g.put(51, 5, "e"); }
     }),
 
     riftblade: () => authored(38, 38, palette({ a: "#1e2142", b: "#38356f", c: "#6851ad", d: "#cf4ecf", e: "#54e1e6", f: "#e9b574", g: "#ffffff", h: "#202a54", i: "#ff8ae8" }), (g, f) => {
@@ -291,15 +308,30 @@
       if (f === 2) { g.line(cx + 8, 21, 39, 8, "e", 2); g.ellipse(39, 7, 3, 4, "i"); }
     }),
 
-    griffin: () => authored(48, 34, palette({ a: "#3b3440", b: "#6d5961", c: "#aa7a62", d: "#d4a267", e: "#f0d28b", f: "#f5eee0", g: "#ffffff", h: "#55758c", i: "#7fd7e0" }), (g, f) => {
-      const wing = f === 1 ? -2 : f === 3 ? 2 : 0;
-      g.ellipse(26, 21, 12, 7, K); g.ellipse(26, 21, 11, 6, "c");
-      g.poly([[22, 19], [12, 3 + wing], [9, 18], [4, 8 + wing], [6, 24]], K); g.poly([[20, 19], [13, 6 + wing], [12, 20], [7, 11 + wing], [8, 22]], "f");
-      g.line(12, 7 + wing, 12, 20, "h", 2);
-      g.poly([[33, 18], [39, 9], [46, 12], [42, 20]], K); g.poly([[35, 17], [40, 11], [44, 12], [41, 18]], "f");
-      g.poly([[43, 13], [48, 16], [43, 18]], "e"); g.rect(40, 12, 2, 2, "g");
-      const stride = f === 1 ? 2 : f === 3 ? -2 : 0; g.line(22, 25, 18 - stride, 32, "d", 3); g.line(32, 25, 36 + stride, 32, "d", 3);
-      g.line(15, 22, 4, 29, "b", 3); if (f === 2) g.line(39, 9, 36, 3, "i", 2);
+    griffin: () => authored(56, 38, palette({ a: "#342d39", b: "#6a4c48", c: "#a86e4b", d: "#d69a58", e: "#f0c76d", f: "#f4e7ca", g: "#ffffff", h: "#738fa0", i: "#72d4dc" }), (g, f) => {
+      const wing = f === 1 ? -3 : f === 3 ? 2 : 0;
+      const stride = f === 1 ? 2 : f === 3 ? -2 : 0;
+      // Lion tail and tuft, behind the hindquarters.
+      g.line(20, 24, 8, 28, K, 4); g.line(8, 28, 4, 23, "c", 2); g.ellipse(3, 22, 3, 4, K); g.ellipse(3, 22, 2, 3, "b");
+      // A broad layered eagle wing, each lower point a separate flight feather.
+      g.poly([[29, 21], [21, 3 + wing], [15, 1 + wing], [16, 12 + wing], [10, 6 + wing], [12, 18 + wing], [5, 14 + wing], [13, 27]], K);
+      g.poly([[28, 20], [21, 6 + wing], [17, 4 + wing], [19, 15 + wing], [13, 10 + wing], [15, 21 + wing], [9, 18 + wing], [15, 25]], "f");
+      g.line(20, 6 + wing, 18, 22, "h", 2); g.line(14, 11 + wing, 19, 23, "e", 2); g.line(9, 17 + wing, 16, 25, "d", 2);
+      // Golden lion body and haunches.
+      g.ellipse(30, 24, 14, 7, K); g.ellipse(29, 24, 13, 6, "c"); g.ellipse(22, 24, 7, 7, "b");
+      // Far hind paw and far eagle foreleg.
+      g.line(22, 28, 19 + stride, 35, "b", 4); g.line(38, 27, 36 - stride, 35, "e", 3);
+      // Eagle ruff and unmistakably hooked beak.
+      g.poly([[36, 22], [39, 12], [45, 7], [51, 11], [48, 20], [42, 25]], K);
+      g.poly([[37, 21], [40, 13], [45, 9], [49, 11], [47, 18], [42, 23]], "f");
+      g.poly([[48, 11], [55, 13], [51, 17], [47, 16]], K); g.poly([[49, 12], [54, 13], [51, 15], [48, 15]], "e");
+      g.poly([[40, 11], [37, 6], [43, 9]], "h"); g.put(46, 11, "a"); g.put(47, 11, "g");
+      // Lion hind leg ends in a paw; eagle foreleg ends in three long talons.
+      g.line(25, 28, 24 - stride, 35, "c", 4); g.rect(21 - stride, 34, 8, 3, K);
+      g.line(40, 26, 42 + stride, 34, "e", 3);
+      for (const x of [39 + stride, 42 + stride, 45 + stride]) g.line(42 + stride, 34, x, 36, "e", 1);
+      g.line(36 - stride, 35, 33 - stride, 36, "e", 1);
+      if (f === 2) { g.line(38, 15, 32, 7, "i", 2); g.poly([[17, 9], [8, 2], [12, 15]], "g"); }
     }),
 
     golem: () => authored(44, 42, palette({ a: "#303d42", b: "#4f6264", c: "#718283", d: "#9ba59c", e: "#c8c5aa", f: "#6fa84e", g: "#e8f3dc", h: "#55d6c2", i: "#bd84e6" }), (g, f) => {

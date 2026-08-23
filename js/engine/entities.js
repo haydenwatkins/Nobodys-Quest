@@ -1351,7 +1351,11 @@ G.drawEnemy = function (ctx, e) {
     ctx.restore();
   }
   G.drawShadow(ctx, e.x, e.y, e.def.size - 2);
-  const frame = G.spriteFrame ? G.spriteFrame(e.def.sprite, "walk", e.anim) : Math.floor(e.anim) % 2;
+  // Boss action poses are authored to make the dangerous beat readable. The
+  // telegraph and charge select that pose; ordinary movement still uses the
+  // full stride cycle.
+  const animationMode = e.def.miniboss && (e.bossTelegraphT > 0 || e.bossChargeT > 0) ? "attack" : "walk";
+  const frame = G.spriteFrame ? G.spriteFrame(e.def.sprite, animationMode, e.anim) : Math.floor(e.anim) % 2;
   const drawX = e.x + (e.hitKickX || 0);
   const drawY = e.y + (e.hitKickY || 0);
 

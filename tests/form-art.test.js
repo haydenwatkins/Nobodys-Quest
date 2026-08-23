@@ -47,8 +47,12 @@ for (const id of G.formOrder) {
 
 const dragon = G.forms.dragon.sprite.hd.frames[0];
 const occupiedDragonRows = dragon.filter((row) => /[^. ]/.test(row)).length;
-assert.ok(G.forms.dragon.sprite.hd.frames[0][0].length / 2 >= 20 && occupiedDragonRows / 2 <= 17,
+assert.ok(G.forms.dragon.sprite.hd.frames[0][0].length / occupiedDragonRows >= 1.4,
   "Dragon should read as a long creature rather than a face squeezed into a humanoid tile");
+const griffin = G.forms.griffin.sprite.hd.frames[0];
+const occupiedGriffinRows = griffin.filter((row) => /[^. ]/.test(row)).length;
+assert.ok(griffin[0].length / occupiedGriffinRows >= 1.4,
+  "Griffin should keep a broad lion-and-eagle profile rather than a humanoid tile");
 
 G.state = { costumeId: "trailblazer", costumesUnlocked: ["classic", "trailblazer"], skinsUnlocked: [], skinByForm: {} };
 run("js/engine/costumes.js");
