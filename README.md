@@ -72,7 +72,8 @@ css/style.css       layout, touch buttons, menus
 js/engine/          THE ENGINE — kids don't need to touch this
 js/abilities/       the shared pool of moves (very copy-paste friendly)
 js/forms/           one file per form ← where Ben adds classes
-js/data/            enemies + maps (ASCII tilemaps)
+js/data/            enemies, maps, and authored high-density form art
+tools/render-form-atlas.js  renders every form pose for visual review
 FOR-BEN.md          the kid-facing guide
 ```
 

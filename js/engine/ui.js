@@ -830,7 +830,7 @@ G.ui = (() => {
       const form = G.forms[id];
       return `<button class="form-wheel-choice ${id === G.state.formId ? "current" : ""} ${index === formWheelAimIndex ? "aimed" : ""}"
         style="--x:${x}%;--y:${y}%" data-wheel-form="${id}" data-wheel-index="${index}" aria-label="Become ${escapeHtml(form.name)}">
-        <span class="icon">${form.icon}</span><span class="name">${escapeHtml(form.name)}</span></button>`;
+        <canvas class="icon" width="52" height="44" data-wheel-form-preview="${id}" aria-hidden="true"></canvas><span class="name">${escapeHtml(form.name)}</span></button>`;
     }).join("");
     formWheelEl.style.setProperty("--wheel-x", `${formWheelCenter.x}px`);
     formWheelEl.style.setProperty("--wheel-y", `${formWheelCenter.y}px`);
@@ -839,6 +839,7 @@ G.ui = (() => {
       ${pages.length > 1 ? `<div class="form-wheel-pages"><button data-wheel-page="-1" aria-label="Previous forms">◀</button>
         <span>${formWheelPage + 1} / ${pages.length}</span><button data-wheel-page="1" aria-label="Next forms">▶</button></div>` : ""}
       <button class="form-wheel-cancel" data-wheel-cancel aria-label="Close form selector">×</button>`;
+    drawWheelFormPreviews();
     formWheelEl.querySelectorAll("[data-wheel-form]").forEach((button) => {
       button.addEventListener("click", () => chooseWheelForm(button.dataset.wheelForm));
       button.addEventListener("pointerenter", () => {
@@ -859,6 +860,21 @@ G.ui = (() => {
       ring.addEventListener("pointermove", (event) => aimFormWheel(event.clientX, event.clientY));
       ring.addEventListener("pointerup", () => commitFormWheel());
     }
+  }
+
+  function drawWheelFormPreviews() {
+    if (!G.drawSprite || !G.spriteMetrics) return;
+    formWheelEl.querySelectorAll("[data-wheel-form-preview]").forEach((canvas) => {
+      const form = G.forms[canvas.dataset.wheelFormPreview];
+      if (!form || !canvas.getContext) return;
+      const c = canvas.getContext("2d");
+      c.clearRect(0, 0, canvas.width, canvas.height);
+      c.imageSmoothingEnabled = false;
+      const sprite = G.playerAppearanceSprite ? G.playerAppearanceSprite(form) : form.sprite;
+      const metrics = G.spriteMetrics(sprite);
+      const scale = Math.max(1, Math.min(2, Math.floor(Math.min((canvas.width - 4) / metrics.w, (canvas.height - 2) / metrics.h))));
+      G.drawSprite(c, sprite, 0, canvas.width / 2, canvas.height - 1, false, scale);
+    });
   }
 
   function openFormWheel(origin) {

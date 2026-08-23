@@ -189,6 +189,36 @@ for (const event of ["mapEnter", "pickup", "questDone", "formUnlock"]) {
 
 const costumeSpriteCache = new WeakMap();
 
+function colorBrightness(hex) {
+  const value = parseInt(String(hex || "#000000").replace("#", ""), 16);
+  return ((value >> 16) * 299 + ((value >> 8) & 255) * 587 + (value & 255) * 114) / 1000;
+}
+
+// Authored dense sprites keep their contours and animation when dyed. The
+// old path regenerated them from the tiny legacy sprite, quietly throwing
+// away every hand-drawn pixel as soon as an outfit was equipped.
+function dyeAuthoredSprite(def, costume) {
+  const tones = (costume.swatches || ["#f4f4f4", "#94b0c2", "#566c86"])
+    .slice().sort((a, b) => colorBrightness(a) - colorBrightness(b));
+  const visible = Object.entries(def.palette || {}).filter(([, color]) => String(color).toLowerCase() !== "#151522");
+  const values = visible.map(([, color]) => colorBrightness(color));
+  const low = Math.min(...values), high = Math.max(...values);
+  const palette = {};
+  for (const [key, color] of Object.entries(def.palette || {})) {
+    if (String(color).toLowerCase() === "#151522") { palette[key] = color; continue; }
+    const t = high === low ? 0.5 : (colorBrightness(color) - low) / (high - low);
+    palette[key] = t < 0.34 ? tones[0] : t < 0.72 ? tones[Math.floor((tones.length - 1) / 2)] : tones[tones.length - 1];
+  }
+  // Preserve one magical highlight so dyes remain a costume rather than
+  // erasing a form's readable focus (eyes, rune, flame, blade, etc.).
+  const brightest = visible.sort((a, b) => colorBrightness(b[1]) - colorBrightness(a[1]))[0];
+  if (brightest && costume.accent) palette[brightest[0]] = costume.accent;
+  return {
+    palette, frames: def.frames, density: def.density || 2,
+    animations: def.animations, authored: def.authored,
+  };
+}
+
 G.costumedSprite = function (sprite) {
   if (!sprite || !G.state || !G.state.costumeId || G.state.costumeId === "classic") return sprite;
   const costume = G.costumeById(G.state.costumeId);
@@ -204,7 +234,8 @@ G.costumedSprite = function (sprite) {
     palette[key] = costume.palette[String(color).toLowerCase()] || color;
   }
   const variant = { palette, frames: sprite.frames };
-  if (sprite.hd && G.makeHdSprite2x) variant.hd = G.makeHdSprite2x(variant, {
+  if (sprite.hd && sprite.hd.authored) variant.hd = dyeAuthoredSprite(sprite.hd, costume);
+  else if (sprite.hd && G.makeHdSprite2x) variant.hd = G.makeHdSprite2x(variant, {
     accent: costume.accent || "#73eff7", motif: sprite.hd.hdMotif || "detail", animate: true,
   });
   variants.set(costume.id, variant);
@@ -215,9 +246,10 @@ G.drawCostumeAccessory = function (ctx, p, form, drawX, drawY) {
   if (!G.state || G.state.costumeId === "classic") return;
   const costume = G.costumeById(G.state.costumeId);
   if (!costume.accessory || !form || !form.sprite || !form.sprite.frames.length) return;
+  const metrics = G.spriteMetrics ? G.spriteMetrics(form.sprite) : null;
   const rows = form.sprite.frames[0];
-  const height = rows.length;
-  const width = rows.reduce((best, row) => Math.max(best, row.length), 1);
+  const height = metrics ? metrics.h : rows.length;
+  const width = metrics ? metrics.w : rows.reduce((best, row) => Math.max(best, row.length), 1);
   const left = Math.round(drawX - width / 2);
   const top = Math.round(drawY - height);
   const mid = top + Math.max(3, Math.floor(height * 0.48));
@@ -399,13 +431,19 @@ function skinPalette(sprite, skin) {
 function skinFrame(rows, motif) {
   const sourceW = rows.reduce((width, row) => Math.max(width, row.length), 1);
   const sourceH = rows.length;
+  let minX = sourceW, maxX = 0, minY = sourceH, maxY = 0;
+  for (let y = 0; y < sourceH; y++) for (let x = 0; x < rows[y].length; x++) {
+    if (rows[y][x] === "." || rows[y][x] === " ") continue;
+    minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+  }
   const pad = 5;
   const w = sourceW + pad * 2;
   const h = sourceH + pad * 2;
   const grid = Array.from({ length: h }, () => Array(w).fill("."));
   for (let y = 0; y < sourceH; y++) for (let x = 0; x < rows[y].length; x++)
     if (rows[y][x] !== "." && rows[y][x] !== " ") grid[y + pad][x + pad] = rows[y][x];
-  const cx = Math.floor(w / 2), top = pad, bottom = pad + sourceH - 1;
+  const cx = Math.floor(w / 2), top = pad + minY, bottom = pad + maxY;
+  const left = pad + minX, right = pad + maxX;
   const put = (x, y, ch = "X") => {
     x = Math.round(x); y = Math.round(y);
     if (x >= 0 && x < w && y >= 0 && y < h) grid[y][x] = ch;
@@ -415,7 +453,10 @@ function skinFrame(rows, motif) {
     for (let i = 0; i <= steps; i++) put(Math.round(x1 + (x2 - x1) * i / steps), Math.round(y1 + (y2 - y1) * i / steps), ch);
   };
   const crown = (wide) => { for (let x = cx - wide; x <= cx + wide; x++) put(x, top - 1, "X"); put(cx - wide, top - 2, "Y"); put(cx, top - 3, "Y"); put(cx + wide, top - 2, "Y"); };
-  const cape = () => { line(pad - 1, top + 5, pad - 2, bottom - 1, "X"); line(w - pad, top + 5, w - pad + 1, bottom - 1, "X"); };
+  const cape = () => {
+    line(left + 2, top + 5, left - 2, bottom - 2, "X");
+    line(right - 2, top + 5, right + 2, bottom - 2, "X");
+  };
   switch (motif) {
     case "boxhero":
       for (let x = cx - 5; x <= cx + 5; x++) { put(x, top - 2, "K"); put(x, top + 2, "K"); }
@@ -439,7 +480,7 @@ function skinFrame(rows, motif) {
     case "antlers": line(cx - 3, top, cx - 7, top - 5, "X"); line(cx + 3, top, cx + 7, top - 5, "X"); put(cx - 8, top - 4, "Y"); put(cx + 8, top - 4, "Y"); break;
     case "feathercrest": line(cx - 4, top, cx + 4, top - 5, "Y"); line(cx, top - 1, cx + 6, top - 3, "X"); break;
     case "ruin": line(cx - 6, top + 2, cx - 7, bottom - 2, "X"); line(cx + 6, top + 2, cx + 7, bottom - 2, "X"); put(cx - 6, top - 1, "Y"); put(cx + 5, top - 2, "Y"); put(cx + 7, top, "Y"); break;
-    case "clockwork": crown(3); put(cx + 6, top + 2, "X"); put(cx + 7, top + 1, "Y"); put(cx + 7, top + 3, "Y"); line(pad - 2, bottom - 3, pad + 2, bottom - 5, "X"); line(w - pad + 1, bottom - 3, w - pad - 2, bottom - 5, "X"); break;
+    case "clockwork": crown(3); put(cx + 6, top + 2, "X"); put(cx + 7, top + 1, "Y"); put(cx + 7, top + 3, "Y"); line(left - 2, bottom - 3, left + 2, bottom - 5, "X"); line(right + 2, bottom - 3, right - 2, bottom - 5, "X"); break;
     case "cathedral": line(cx - 5, top + 2, cx, top - 5, "X"); line(cx, top - 5, cx + 5, top + 2, "X"); put(cx, top - 3, "Y"); put(cx - 2, top - 1, "Y"); put(cx + 2, top - 1, "Y"); break;
     case "lanternribbons": crown(4); line(cx - 5, top + 1, cx - 8, bottom - 2, "X"); line(cx + 5, top + 1, cx + 8, bottom - 2, "Y"); break;
     case "crystaltitan": for (let x = cx - 7; x <= cx + 7; x += 4) line(x, top + 3, x + (x < cx ? -2 : 2), top - 4, x === cx - 3 ? "Y" : "X"); break;
@@ -457,7 +498,14 @@ G.signatureSprite = function (sprite, skin) {
     palette: skinPalette(sprite, skin),
     frames: sprite.frames.map((rows) => skinFrame(rows, skin.motif)),
   };
-  if (sprite.hd && G.makeHdSprite2x) variant.hd = G.makeHdSprite2x(variant, {
+  if (sprite.hd && sprite.hd.authored) variant.hd = {
+    palette: skinPalette(sprite.hd, skin),
+    frames: sprite.hd.frames.map((rows) => skinFrame(rows, skin.motif)),
+    density: sprite.hd.density || 2,
+    animations: sprite.hd.animations,
+    authored: true,
+  };
+  else if (sprite.hd && G.makeHdSprite2x) variant.hd = G.makeHdSprite2x(variant, {
     accent: skin.colors[3], motif: "hero", animate: true,
   });
   variants.set(skin.id, variant);

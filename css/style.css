@@ -182,7 +182,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   border: 2px solid #566c86; border-radius: 13px; background: rgba(44,49,72,0.96); color: #f4f4f4;
   font-family: "Press Start 2P", monospace; touch-action: none;
 }
-.form-wheel-choice .icon { font-size: 20px; line-height: 1; }
+.form-wheel-choice .icon { display:block; width:34px; height:29px; image-rendering:pixelated; }
 .form-wheel-choice .name { overflow: hidden; max-width: 66px; margin-top: 4px; font-size: 6px; line-height: 1.35; white-space: nowrap; text-overflow: ellipsis; }
 .form-wheel-choice.current { border-color: #a7f070; }
 .form-wheel-choice.aimed { border-color: #ffcd75; background: #5d4963; color: #fff3c2; transform: translate(-50%, -50%) scale(1.1); }

@@ -165,15 +165,19 @@ sprite: {
 ```
 
 Draw right in the code, or use [Piskel](https://www.piskelapp.com)
-(free, in the browser) to sketch it visually. Two frames = walking
-animation. Keep a dark outline — it's what makes sprites pop.
+(free, in the browser) to sketch it visually. Two frames are enough for a
+new form to work. The finished roster uses four poses—idle, two strides, and
+an action silhouette—and richer half-pixel art in `js/data/form-art-hd.js`.
+The game creates a clean base-resolution version of that art automatically.
+Keep a dark outline so the form stays readable over busy terrain.
 
 **Want to start from an existing sprite instead of a blank canvas?**
 Open [tools/sprite-lab.html](tools/sprite-lab.html) (double-click it,
 just like index.html) — pick any character, download it as a picture,
 edit it in Piskel, then upload your edit back in and it hands you the
-game code to paste in. Your Wizard is currently wearing the Rat's
-sprite — that's a perfect one to grab and make your own!
+game code to paste in. For a full-roster art check, run
+`node tools/render-form-atlas.js forms.ppm`; add `--base` to inspect the
+original-resolution version or `--skins` to inspect signature looks.
 
 ## 👹 New enemies & new places
 
