@@ -92,6 +92,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 }
 
 .abtn {
+  position: relative;
   width: 56px; height: 56px;
   border-radius: 50%;
   border: 3px solid #f4f4f4;
@@ -155,6 +156,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .legend-reward { grid-template-columns:45px 1fr; }.legend-reward button { grid-column:1/-1; }.form-lab-tabs { overflow-x:auto; }
   .legend-quest-callout { grid-template-columns:52px 1fr; padding:13px; }.legend-quest-icon { width:44px; height:44px; font-size:22px; }.legend-quest-callout button { grid-column:1/-1; width:100%; }
 }
+#btn-b::after { content:"HOLD MIX"; position:absolute; left:50%; bottom:-9px; transform:translateX(-50%); color:#73eff7; font:4px "Press Start 2P",monospace; white-space:nowrap; text-shadow:0 1px 2px #1a1c2c; }
 
 /* ---------- Paused radial form selector ---------- */
 #form-wheel {
@@ -267,6 +269,62 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .menu-tabs {
   display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:7px; max-width:980px; margin:0 auto;
   overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+
+/* ---------- Quick Mix: frequent build changes stay in play ---------- */
+#art-mixer {
+  position:fixed; inset:0; z-index:19; overflow:auto; padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));
+  background:radial-gradient(circle at 50% 35%,rgba(41,54,111,.88),rgba(10,13,24,.96) 64%); touch-action:pan-y;
+}
+.art-mixer-panel { width:min(980px,100%); min-height:min(610px,calc(100dvh - 36px)); margin:auto; padding:18px; border:2px solid #73eff7; border-radius:18px;
+  background:linear-gradient(145deg,rgba(32,36,56,.98),rgba(20,23,36,.99)); box-shadow:0 22px 70px rgba(0,0,0,.58),inset 0 0 40px rgba(115,239,247,.04); }
+.art-mixer-panel>header { display:grid; grid-template-columns:1fr 46px; gap:16px; align-items:start; }
+.art-mixer-panel h1 { margin:6px 0 8px; color:#ffcd75; font-size:22px; }.art-mixer-panel header p { max-width:760px; color:#94b0c2; font-size:17px; line-height:1.25; }
+.art-mixer-panel header p strong { color:#d9a7ff; }.art-mixer-panel [data-mix-close] { width:44px; height:44px; padding:0; border:2px solid #566c86; border-radius:50%; background:#24283b; color:#f4f4f4; font-size:20px; }
+.art-mixer-slots { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:15px 0; }
+.art-mixer-slots button { display:grid; grid-template-columns:36px 1fr; align-items:center; gap:10px; min-height:58px; padding:10px 13px; border:2px solid #566c86; border-radius:11px; background:#292e45; color:#c8d8e0; text-align:left; }
+.art-mixer-slots button>span { display:flex; width:32px; height:32px; align-items:center; justify-content:center; border-radius:8px; background:#1a1c2c; color:#ffcd75; font:10px "Press Start 2P",monospace; }
+.art-mixer-slots button strong { overflow:hidden; font:9px/1.35 "Press Start 2P",monospace; text-overflow:ellipsis; white-space:nowrap; }.art-mixer-slots button.active { border-color:#ffcd75; background:#4b4660; color:#fff3c2; }
+.art-mixer-heading { display:flex; align-items:end; justify-content:space-between; gap:14px; margin:11px 2px; }.art-mixer-heading h2 { margin-top:5px; color:#f4f4f4; font-size:14px; }.art-mixer-heading>span { color:#94b0c2; font-size:16px; }
+.art-mixer-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; }
+.art-mixer-card { display:grid; grid-template-columns:42px minmax(0,1fr); gap:10px; align-items:center; min-height:94px; padding:11px; border:2px solid #3e4762; border-radius:12px; background:#24283b; color:#f4f4f4; text-align:left; }
+.art-mixer-card .art-mixer-icon { font-size:29px; text-align:center; }.art-mixer-copy { min-width:0; }.art-mixer-copy strong,.art-mixer-copy small,.art-mixer-copy em { display:block; }
+.art-mixer-copy strong { overflow:hidden; font:8px/1.45 "Press Start 2P",monospace; text-overflow:ellipsis; white-space:nowrap; }.art-mixer-copy small { margin-top:6px; color:#c8d8e0; font-size:14px; line-height:1.1; }
+.art-mixer-copy em { margin-top:4px; overflow:hidden; color:#94b0c2; font-size:13px; font-style:normal; text-overflow:ellipsis; white-space:nowrap; }.art-mixer-card>b { grid-column:1/-1; color:#a7f070; font:6px "Press Start 2P",monospace; }
+.art-mixer-card.boosted { border-color:#8465a6; background:linear-gradient(145deg,#302d4c,#24283b); }.art-mixer-card.equipped { border-color:#a7f070; box-shadow:inset 0 0 0 2px rgba(167,240,112,.12); }
+.art-mixer-card.controller-focus { border-color:#ffcd75; transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35),0 0 0 3px rgba(255,205,117,.16); }
+.art-mixer-panel>footer { display:grid; grid-template-columns:130px 1fr 130px; gap:12px; align-items:center; margin-top:14px; }.art-mixer-panel>footer button { min-height:44px; }
+.art-mixer-controls { color:#94b0c2; text-align:center; font:6px "Press Start 2P",monospace; line-height:1.6; }.controller-only,.touch-only { display:none; }
+#art-mixer.controller-active .controller-only { display:inline; }
+@media (pointer:coarse) { #art-mixer:not(.controller-active) .touch-only { display:inline; } }
+
+/* ---------- The pause menu opens on one useful field summary ---------- */
+.field-body { display:flex; justify-content:center; }.field-dashboard { display:grid; grid-template-columns:1fr 1fr; gap:12px; width:min(980px,100%); margin:auto; }
+.field-dashboard>header { grid-column:1/-1; padding:3px 4px 7px; }.field-dashboard>header h2 { margin:5px 0; color:#ffcd75; font-size:20px; }.field-dashboard>header p { color:#94b0c2; font-size:17px; }
+.field-card { display:grid; grid-template-columns:48px minmax(0,1fr) auto; gap:12px; align-items:center; min-height:132px; padding:16px; border:2px solid #566c86; border-radius:14px; background:linear-gradient(145deg,#292d44,#202438); }
+.field-card small { color:#ffcd75; font:7px/1.4 "Press Start 2P",monospace; }.field-card h3 { margin:6px 0; color:#f4f4f4; font-size:14px; }.field-card p { color:#c8d8e0; font-size:17px; line-height:1.18; }
+.field-card-icon { font-size:30px; text-align:center; }.field-card>button,.field-card-heading button { min-height:42px; padding:8px 11px; white-space:nowrap; }
+.field-mastery,.field-build { display:block; }.field-card-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }.field-card-heading>span { color:#73eff7; font:6px "Press Start 2P",monospace; }
+.field-lesson { display:grid; grid-template-columns:40px 1fr; gap:10px; align-items:center; margin-top:11px; padding:11px; border-radius:10px; background:#1b2032; }.field-lesson>span { font-size:26px; text-align:center; }
+.field-lesson strong,.field-lesson small { display:block; }.field-lesson strong { color:#f4f4f4; font:8px/1.45 "Press Start 2P",monospace; }.field-lesson small { margin-top:5px; color:#94b0c2; font:14px "VT323",monospace; }
+.field-lesson i { display:block; height:5px; margin-top:8px; overflow:hidden; border-radius:4px; background:#10131f; }.field-lesson i b { display:block; height:100%; background:#ffcd75; }.field-lesson.complete { color:#a7f070; }
+.field-arts { display:grid; gap:8px; margin-top:11px; }.field-art { display:grid; grid-template-columns:34px minmax(0,1fr) auto; gap:10px; align-items:center; min-height:58px; padding:9px 11px; border:2px solid #3e4762; border-radius:10px; background:#24283b; color:#f4f4f4; text-align:left; }
+.field-art>span { display:flex; width:30px; height:30px; align-items:center; justify-content:center; border-radius:8px; background:#1a1c2c; color:#ffcd75; font:9px "Press Start 2P",monospace; }.field-art strong,.field-art small { display:block; }.field-art strong { font:8px "Press Start 2P",monospace; }.field-art small { margin-top:4px; color:#94b0c2; font:14px "VT323",monospace; }.field-art>b { color:#73eff7; font:6px "Press Start 2P",monospace; }.field-art.boosted { border-color:#8465a6; }
+.mastery-intro { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:11px; padding:14px 17px; border:2px solid #8465a6; border-radius:12px; background:linear-gradient(135deg,#302d4c,#202438); }.mastery-intro h2 { margin:5px 0; color:#f4f4f4; }.mastery-intro p { color:#c8d8e0; font-size:17px; }.mastery-intro>span { color:#ffcd75; font:7px "Press Start 2P",monospace; white-space:nowrap; }
+.mastery-quest.active { border-color:#ffcd75; background:#323047; }.mastery-quest>b { color:#ffcd75; font:6px "Press Start 2P",monospace; }
+
+@media (max-width:760px) {
+  #art-mixer { padding:8px max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
+  .art-mixer-panel { min-height:calc(100dvh - 16px); padding:12px; border-radius:13px; }.art-mixer-panel h1 { font-size:16px; }.art-mixer-panel header p { font-size:14px; }
+  .art-mixer-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.art-mixer-card { min-height:82px; padding:8px; }.art-mixer-panel>footer { grid-template-columns:92px 1fr 92px; }
+  .field-dashboard { grid-template-columns:1fr; }.field-dashboard>header { grid-column:auto; }.field-card { min-height:0; padding:12px; }.mastery-intro { align-items:flex-start; flex-direction:column; }
+}
+@media (orientation:landscape) and (max-height:500px) {
+  #art-mixer { padding:6px max(8px,env(safe-area-inset-right)) 6px max(8px,env(safe-area-inset-left)); }
+  .art-mixer-panel { min-height:calc(100dvh - 12px); padding:8px 11px; }.art-mixer-panel>header { grid-template-columns:1fr 38px; }.art-mixer-panel h1 { margin:3px 0; font-size:14px; }.art-mixer-panel header p { display:none; }
+  .art-mixer-panel [data-mix-close] { width:36px; height:36px; }.art-mixer-slots { gap:7px; margin:5px 0; }.art-mixer-slots button { min-height:40px; padding:5px 8px; }.art-mixer-slots button>span { width:27px; height:27px; }
+  .art-mixer-heading { margin:5px 2px; }.art-mixer-heading h2 { margin-top:2px; font-size:10px; }.art-mixer-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }.art-mixer-card { min-height:68px; padding:6px; grid-template-columns:31px minmax(0,1fr); gap:6px; }.art-mixer-card .art-mixer-icon { font-size:22px; }.art-mixer-copy strong { font-size:6px; }.art-mixer-copy small,.art-mixer-copy em { margin-top:2px; font-size:11px; }
+  .art-mixer-panel>footer { margin-top:6px; grid-template-columns:95px 1fr 95px; }.art-mixer-panel>footer button { min-height:34px; }
 }
 .menu-tabs::-webkit-scrollbar { display: none; }
 .menu-tabs button {

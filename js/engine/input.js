@@ -38,6 +38,8 @@ G.input = (() => {
   let mapTouchHeld = false;
   let mapTouchLongTriggered = false;
   const MAP_HELP_HOLD_MS = 520;
+  let abilityHold = null;
+  const ART_MIX_HOLD_MS = 520;
 
   function inputNow() {
     return typeof performance !== "undefined" && performance.now ? performance.now() : Date.now();
@@ -79,6 +81,7 @@ G.input = (() => {
     q: "swap", Q: "swap", Tab: "swap",
     m: "map", M: "map",
     h: "guide", H: "guide",
+    f: "mix", F: "mix",
     Escape: "pause", p: "pause", P: "pause", Enter: "interact",
   };
   const dirsHeld = { up: false, down: false, left: false, right: false };
@@ -263,7 +266,8 @@ G.input = (() => {
     // menu-style controls: A confirms, B backs out, stick/D-pad move the
     // highlight. The DOM screens matter most on TV, where there is no
     // keyboard or pointer to fall back on.
-    const menuOpen = !!(G.ui && (G.ui.menuOpen || G.ui.workshopOpen)) ||
+    const quickMix = !!(G.ui && G.ui.artMixerOpen);
+    const menuOpen = !!(G.ui && (G.ui.menuOpen || G.ui.workshopOpen || quickMix)) ||
       !!G.saveSlotScreenOpen || !!G.storyEndingOpen;
     const wheelOpen = !!(G.ui && G.ui.formWheelOpen);
     const axes = pad.axes || [];
@@ -296,8 +300,8 @@ G.input = (() => {
     // bumpers duplicate combat actions so either grip feels comfortable.
     syncGamepadControl("a", gamepadButton(pad, 0), menuOpen || wheelOpen ? "confirm" : "a");
     syncGamepadControl("b", gamepadButton(pad, 1), menuOpen ? "back" : "swap");
-    syncGamepadControl("x", gamepadButton(pad, 2), menuOpen || wheelOpen ? null : "b");
-    syncGamepadControl("y", gamepadButton(pad, 3), menuOpen || wheelOpen ? null : "c");
+    syncGamepadControl("x", gamepadButton(pad, 2), quickMix ? "mixSlotB" : menuOpen || wheelOpen ? null : "b");
+    syncGamepadControl("y", gamepadButton(pad, 3), quickMix ? "mixSlotC" : menuOpen || wheelOpen ? null : "c");
     syncGamepadControl("lb", gamepadButton(pad, 4), wheelOpen ? "wheelPrev" : menuOpen ? "pageLeft" : "c", false);
     syncGamepadControl("rb", gamepadButton(pad, 5), wheelOpen ? "wheelNext" : menuOpen ? "pageRight" : "b", false);
     const leftTrigger = gamepadButton(pad, 6, 0.35);
@@ -310,9 +314,9 @@ G.input = (() => {
     syncGamepadControl("rt", rightTrigger && !suppressChordTriggers, menuOpen ? "pageRight" : wheelOpen ? "confirm" : "a", false);
     if (!leftTrigger && !rightTrigger) ultimateChordLatched = false;
     syncGamepadControl("view", gamepadButton(pad, 8), menuOpen || wheelOpen ? "back" : "map");
-    syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen ? "back" : "pause");
+    syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen || quickMix ? "back" : "pause");
     syncGamepadControl("leftStick", gamepadButton(pad, 10), menuOpen || wheelOpen ? null : "guide");
-    syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen || wheelOpen ? null : "a");
+    syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen || wheelOpen ? null : "mix");
 
     const navUp = gamepadButton(pad, 12) || left.y < -GAMEPAD_NAV_THRESHOLD;
     const navDown = gamepadButton(pad, 13) || left.y > GAMEPAD_NAV_THRESHOLD;
@@ -442,6 +446,9 @@ G.input = (() => {
         try { el.setPointerCapture(e.pointerId); } catch (error) { /* use fallbacks */ }
         el.classList.add("held");
         liveAim = { btn, x: 0, y: 0, dragged: false };
+        if (btn === "b" || btn === "c") {
+          abilityHold = { btn, slot: btn === "b" ? 1 : 2, started: inputNow(), moved: false, triggered: false, el };
+        }
         G.sfx.ensure();
       });
       el.addEventListener("pointermove", (e) => {
@@ -452,6 +459,7 @@ G.input = (() => {
           liveAim = { btn, x: 0, y: 0, dragged: false };
           return;
         }
+        if (abilityHold && abilityHold.btn === btn) abilityHold.moved = true;
         dx /= len; dy /= len;
         liveAim = { btn, x: dx, y: dy, dragged: true };
       });
@@ -459,7 +467,8 @@ G.input = (() => {
         if (pointerId === null || (e && e.pointerId !== undefined && e.pointerId !== pointerId)) return;
         if (e && e.cancelable) e.preventDefault();
         const capturedId = pointerId;
-        if (fire) {
+        const openedMixer = abilityHold && abilityHold.btn === btn && abilityHold.triggered;
+        if (fire && !openedMixer) {
           releasedAims[btn] = liveAim && liveAim.btn === btn
             ? { x: liveAim.x, y: liveAim.y, dragged: liveAim.dragged }
             : { x: 0, y: 0, dragged: false };
@@ -468,12 +477,14 @@ G.input = (() => {
         // lostpointercapture synchronously in Safari and in the test harness.
         pointerId = null;
         liveAim = null;
+        if (abilityHold && abilityHold.btn === btn) abilityHold = null;
         el.classList.remove("held");
+        el.classList.remove("mixing");
         try {
           if (el.hasPointerCapture && el.hasPointerCapture(capturedId))
             el.releasePointerCapture(capturedId);
         } catch (error) { /* capture was already lost */ }
-        if (fire) { press(btn); release(btn); }
+        if (fire && !openedMixer) { press(btn); release(btn); }
       };
       resetAbilityTouches.push(() => resetAim(false));
       el.addEventListener("pointerup", (e) => resetAim(true, e));
@@ -491,6 +502,7 @@ G.input = (() => {
     const cancelAbilityTouches = () => {
       for (const reset of resetAbilityTouches) reset();
       liveAim = null;
+      abilityHold = null;
     };
     window.addEventListener("blur", cancelAbilityTouches);
     window.addEventListener("pagehide", cancelAbilityTouches);
@@ -590,12 +602,20 @@ G.input = (() => {
   // Stop Safari from moving the game page, but leave scrollable overlays alone.
   // Blocking every touchmove also blocks the pause menu on iPhone.
   document.addEventListener("touchmove", (e) => {
-    if (e.target.closest("#menu, #workshop-errors")) return;
+    if (e.target.closest("#menu, #workshop-errors, #art-mixer")) return;
     e.preventDefault();
   }, { passive: false });
 
   function updateInput() {
     updateGamepad();
+    if (abilityHold && !abilityHold.moved && !abilityHold.triggered &&
+      inputNow() - abilityHold.started >= ART_MIX_HOLD_MS && G.ui && G.ui.openArtMixer) {
+      abilityHold.triggered = !!G.ui.openArtMixer(abilityHold.slot);
+      if (abilityHold.triggered) {
+        liveAim = null;
+        abilityHold.el.classList.add("mixing");
+      }
+    }
     if (mapTouchHeld && !mapTouchLongTriggered && inputNow() - mapTouchPressedAt >= MAP_HELP_HOLD_MS) {
       mapTouchLongTriggered = !!(G.requestGuidance && G.requestGuidance(false));
       if (mapTouchLongTriggered) taps.map = false;

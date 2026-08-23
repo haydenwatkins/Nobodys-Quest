@@ -50,9 +50,9 @@ stats or difficulty; future forms automatically inherit the complete wardrobe.
 
 Double-click `index.html`. Works from the plain filesystem — no server needed.
 
-- Desktop: WASD/arrows, J/K/L abilities, tap Q to quick-swap or hold Q and aim to open the paused form wheel; Esc opens the menu; Space or Enter advances dialogue
-- iPad/touch: virtual joystick; tap ranged attacks to auto-aim, or drag an attack button and release to aim manually; tap the dialogue box to continue
-- Xbox/standard controller: left stick or D-pad moves; A/RT, X/RB, and Y/LB use the three abilities; hold LT+RT together for a charged Legend ultimate; right stick aims; tap B to quick-swap or hold B for the paused form wheel; View opens the Atlas; Menu pauses. In menus, the left stick/D-pad moves focus with hold-repeat, the right stick scrolls, A confirms, B returns, L1/L2 go left, and R1/R2 go right. This same menu mapping works through the browser Gamepad API on iOS and through the Android TV bridge.
+- Desktop: WASD/arrows, J/K/L abilities, F opens the paused Quick Mix, tap Q to quick-swap or hold Q and aim to open the paused form wheel; Esc opens the menu; Space or Enter advances dialogue
+- iPad/touch: virtual joystick; tap ranged attacks to auto-aim, drag and release to aim manually, or hold B/C without dragging to replace that slot through Quick Mix; tap the dialogue box to continue
+- Xbox/standard controller: left stick or D-pad moves; A/RT, X/RB, and Y/LB use the three abilities; R3 opens the paused Quick Mix; hold LT+RT together for a charged Legend ultimate; right stick aims; tap B to quick-swap or hold B for the paused form wheel; View opens the Atlas; Menu pauses. Quick Mix uses X/Y for its slot, shoulders for pages, A to equip, and B to return. In menus, the left stick/D-pad moves focus with hold-repeat, the right stick scrolls, A confirms, B returns, L1/L2 go left, and R1/R2 go right. This same menu mapping works through the browser Gamepad API on iOS and through the Android TV bridge.
 
 For a TV-like Steam Link launch on Windows, `tools/steam-launch.ps1` opens the
 installed Chrome app, raises it above Big Picture, enters fullscreen, and stays

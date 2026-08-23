@@ -116,6 +116,8 @@ G.ui = (() => {
       bannerData.t += dt;
       if (bannerData.t > 3.2) bannerData = null;
     }
+    if (G.state && G.state.masteryHudPulse > 0)
+      G.state.masteryHudPulse = Math.max(0, G.state.masteryHudPulse - dt);
     if (dialogueData) {
       dialogueData.age += dt;
       dialogueData.shown = Math.min(
@@ -336,6 +338,14 @@ G.ui = (() => {
       c.fillStyle = charge >= 100 ? "#1a1c2c" : "#f4f4f4";
       c.fillText(G.input.hasGamepad ? "LT+RT ✦" : "R ✦", x + 4, y + 5);
     }
+    const mixX = rank >= 3 ? 166 : 108;
+    const mixLabel = G.input.hasGamepad ? "R3 MIX" : "F MIX";
+    c.fillStyle = "rgba(26,28,44,0.72)";
+    c.fillRect(mixX, G.H - 20, 43, 15);
+    c.fillStyle = "#73eff7";
+    c.fillRect(mixX, G.H - 20, 43, 1);
+    c.fillStyle = "#f4f4f4";
+    c.fillText(mixLabel, mixX + 4, G.H - 15);
   }
 
   function drawMinimap(c) {
@@ -381,33 +391,39 @@ G.ui = (() => {
   }
 
   function drawQuestTracker(c) {
-    const pins = G.pinnedQuests();
-    if (!pins.length) return;
-    const boxW = 108;
+    const lessons = G.relevantMasteryQuests ? G.relevantMasteryQuests(3) : [];
+    if (!lessons.length) return;
+    const active = lessons[0];
+    const { form, quest, progress, slot } = active;
+    const boxW = 118;
     const x = G.W - boxW - 5;
-    const lineH = 9;
     const y = G.input.isTouch ? 45 : 67;
+    const pulse = G.state.masteryHudPulse > 0;
 
     c.fillStyle = "rgba(26,28,44,0.78)";
-    c.fillRect(x, y, boxW, 7 + pins.length * lineH);
-    c.fillStyle = "#ffcd75";
+    c.fillRect(x, y, boxW, 27);
+    c.fillStyle = pulse ? "#a7f070" : "#ffcd75";
     c.fillRect(x, y, boxW, 1);
     c.font = `4px ${FONT_HEAD}`;
-    c.fillText("PINNED QUESTS", x + 3, y + 2);
+    c.fillText(`${form.icon} ${form.name.toUpperCase()} · MASTERY`, x + 4, y + 3);
+    if (lessons.length > 1) {
+      const more = `+${lessons.length - 1}`;
+      c.fillStyle = "#94b0c2";
+      c.fillText(more, x + boxW - c.measureText(more).width - 4, y + 3);
+    }
 
     c.font = `7px ${FONT_BODY}`;
-    pins.forEach(({ form, quest }, i) => {
-      const done = G.questsDone.includes(quest.id);
-      const progress = G.questProgress(quest);
-      const suffix = done ? "✓" : `${progress}/${quest.count}`;
-      const suffixW = c.measureText(suffix).width;
-      const label = fitText(c, `${form.icon} ${quest.text}`, boxW - suffixW - 10);
-      const rowY = y + 7 + i * lineH;
-      c.fillStyle = done ? "#a7f070" : "#f4f4f4";
-      c.fillText(label, x + 3, rowY);
-      c.fillStyle = done ? "#a7f070" : "#ffcd75";
-      c.fillText(suffix, x + boxW - suffixW - 3, rowY);
-    });
+    const suffix = `${progress}/${quest.count}`;
+    const suffixW = c.measureText(suffix).width;
+    const slotLabel = slot > 0 ? `${["A", "B", "C"][slot]} · ` : "";
+    c.fillStyle = "#f4f4f4";
+    c.fillText(fitText(c, `${slotLabel}${quest.text}`, boxW - suffixW - 11), x + 4, y + 10);
+    c.fillStyle = pulse ? "#a7f070" : "#ffcd75";
+    c.fillText(suffix, x + boxW - suffixW - 4, y + 10);
+    c.fillStyle = "#141724";
+    c.fillRect(x + 4, y + 21, boxW - 8, 3);
+    c.fillStyle = pulse ? "#a7f070" : "#ffcd75";
+    c.fillRect(x + 4, y + 21, Math.round((boxW - 8) * progress / Math.max(1, quest.count)), 3);
   }
 
   function drawTutorial(c) {
@@ -633,7 +649,7 @@ G.ui = (() => {
 
     /* toasts (word-wrapped so long messages fit) */
     c.font = `9px ${FONT_BODY}`;
-    let ty = G.input.isTouch ? 5 : (G.pinnedQuests().length ? 105 : 67);
+    let ty = G.input.isTouch ? 5 : (G.fieldMasteryQuest && G.fieldMasteryQuest() ? 99 : 67);
     for (const t of G.state.bossCutscene ? [] : toasts) {
       const alpha = t.t > t.dur - 0.3 ? (t.dur - t.t) / 0.3 : 1;
       c.globalAlpha = Math.max(0, alpha) * 0.95;
@@ -741,6 +757,7 @@ G.ui = (() => {
   /* ---------- pause menu ---------- */
   const menuEl = document.getElementById("menu");
   const formWheelEl = document.getElementById("form-wheel");
+  const artMixerEl = document.getElementById("art-mixer");
 
   function dmgChip(type) {
     const t = G.DAMAGE_TYPES[type];
@@ -765,7 +782,7 @@ G.ui = (() => {
     }[ch]));
   }
 
-  let activeTab = "story";
+  let activeTab = "field";
   let atlasView = "world";
   let atlasSelectedId = null;
   let formLabView = "roster";
@@ -789,6 +806,10 @@ G.ui = (() => {
   let formWheelPage = 0;
   let formWheelAimIndex = -1;
   let formWheelCenter = { x: 0, y: 0 };
+  let artMixerOpen = false;
+  let artMixerSlot = 1;
+  let artMixerPage = 0;
+  const ART_MIXER_PAGE_SIZE = 8;
 
   function wheelPages() {
     const forms = G.unlockedForms ? G.unlockedForms() : [];
@@ -841,7 +862,7 @@ G.ui = (() => {
   }
 
   function openFormWheel(origin) {
-    if (formWheelOpen || menuOpen || dialogueData || !G.unlockedForms || G.unlockedForms().length < 2) return false;
+    if (formWheelOpen || artMixerOpen || menuOpen || dialogueData || !G.unlockedForms || G.unlockedForms().length < 2) return false;
     const vw = window.innerWidth || document.documentElement.clientWidth || 800;
     const vh = window.innerHeight || document.documentElement.clientHeight || 450;
     const size = Math.min(310, Math.max(224, Math.min(vw, vh) * 0.78));
@@ -926,6 +947,136 @@ G.ui = (() => {
     if (G.input.tapped("back") || G.input.tapped("pause")) closeFormWheel();
   }
 
+  /* ---------- paused field mixer ---------- */
+  function rankedMixerArts() {
+    const form = G.playerForm();
+    const loadout = G.getLoadout(G.state.formId);
+    const current = loadout[artMixerSlot];
+    const questArts = new Set((G.relevantMasteryQuests ? G.relevantMasteryQuests(8) : [])
+      .map((entry) => entry.quest.match && entry.quest.match.ability).filter(Boolean));
+    return G.availableAbilities().slice().sort((leftId, rightId) => {
+      const left = G.abilities[leftId], right = G.abilities[rightId];
+      const score = (ability, id) => (id === current ? 1000 : 0) +
+        (ability.nativeForm === form.id ? 320 : 0) +
+        (G.passives && G.passives.formMatches(form, ability) ? 220 : 0) +
+        (questArts.has(id) ? 110 : 0);
+      return score(right, rightId) - score(left, leftId) || left.name.localeCompare(right.name);
+    });
+  }
+
+  function renderArtMixer() {
+    if (!artMixerOpen) return;
+    const form = G.playerForm();
+    const loadout = G.getLoadout(form.id);
+    const arts = rankedMixerArts();
+    const pages = Math.max(1, Math.ceil(arts.length / ART_MIXER_PAGE_SIZE));
+    artMixerPage = (artMixerPage % pages + pages) % pages;
+    const shown = arts.slice(artMixerPage * ART_MIXER_PAGE_SIZE, (artMixerPage + 1) * ART_MIXER_PAGE_SIZE);
+    const currentId = loadout[artMixerSlot];
+    const slotButtons = [1, 2].filter((slot) => slot <= form.slots).map((slot) => {
+      const ability = G.abilities[loadout[slot]];
+      return `<button data-mix-slot="${slot}" class="${slot === artMixerSlot ? "active" : ""}">
+        <span>${["A", "B", "C"][slot]}</span><strong>${ability ? `${ability.icon} ${escapeHtml(ability.name)}` : "Empty"}</strong></button>`;
+    }).join("");
+    artMixerEl.innerHTML = `<section class="art-mixer-panel" role="dialog" aria-modal="true" aria-label="Quick Mix">
+      <header><div><span class="eyebrow">FIELD MIXER · GAME PAUSED</span><h1>⚗ ${escapeHtml(form.name)} Arts</h1>
+        <p><strong>◆ ${escapeHtml(form.passive.name)}</strong> · ${escapeHtml(form.passive.description)}</p></div>
+        <button data-mix-close aria-label="Close Quick Mix">×</button></header>
+      <div class="art-mixer-slots" aria-label="Choose ability slot">${slotButtons}</div>
+      <div class="art-mixer-heading"><div><span class="eyebrow">CHOOSE ${["A", "B", "C"][artMixerSlot]}</span><h2>Equip an art and return instantly</h2></div>
+        <span>${arts.length} known · ${artMixerPage + 1}/${pages}</span></div>
+      <div class="art-mixer-grid">${shown.map((id) => {
+        const ability = G.abilities[id];
+        const origin = G.forms[ability.nativeForm];
+        const synergy = G.passives && G.passives.formMatches(form, ability);
+        const quest = G.relevantMasteryQuests && G.relevantMasteryQuests(8)
+          .some((entry) => entry.quest.match && entry.quest.match.ability === id);
+        return `<button data-quick-art="${id}" class="art-mixer-card ${id === currentId ? "equipped" : ""} ${synergy ? "boosted" : ""}">
+          <span class="art-mixer-icon">${ability.icon}</span><span class="art-mixer-copy"><strong>${escapeHtml(ability.name)}</strong>
+          <small>${escapeHtml(G.DAMAGE_TYPES[ability.type].name)} · ${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}${ability.mana ? ` · ${ability.mana} mana` : ""} · ${ability.cooldown}s</small>
+          <em>${origin ? `${origin.icon} ${escapeHtml(origin.name)}` : "Found art"}${synergy ? ` · ★ ${escapeHtml(form.passive.name)}` : ""}${quest ? " · ◇ Lesson" : ""}</em></span>
+          ${id === currentId ? `<b>IN ${["A", "B", "C"][artMixerSlot]}</b>` : ""}</button>`;
+      }).join("")}</div>
+      <footer><button data-mix-page="-1" ${pages <= 1 ? "disabled" : ""}>◀ Previous</button>
+        <div class="art-mixer-controls"><span class="controller-only">X/Y SLOT · LB/RB PAGE · A EQUIP · B BACK</span><span class="touch-only">TAP AN ART · HOLD B OR C ANYTIME TO RETURN</span></div>
+        <button data-mix-page="1" ${pages <= 1 ? "disabled" : ""}>Next ▶</button></footer>
+    </section>`;
+    artMixerEl.querySelectorAll("[data-mix-slot]").forEach((button) => button.addEventListener("click", () => changeArtMixerSlot(Number(button.dataset.mixSlot))));
+    artMixerEl.querySelectorAll("[data-quick-art]").forEach((button) => button.addEventListener("click", () => equipArtFromMixer(button.dataset.quickArt)));
+    artMixerEl.querySelectorAll("[data-mix-page]").forEach((button) => button.addEventListener("click", () => changeArtMixerPage(Number(button.dataset.mixPage))));
+    artMixerEl.querySelector("[data-mix-close]").addEventListener("click", closeArtMixer);
+    if (G.input.hasGamepad) {
+      const preferred = artMixerEl.querySelector(`[data-quick-art="${currentId}"]`) || artMixerEl.querySelector("[data-quick-art]");
+      G.menuController.focusDefault(artMixerEl, preferred);
+    }
+  }
+
+  function openArtMixer(slot) {
+    const form = G.state && G.playerForm && G.playerForm();
+    if (!form || menuOpen || formWheelOpen || dialogueData || artMixerOpen || form.slots < 1) return false;
+    artMixerSlot = G.util.clamp(Number(slot) || 1, 1, form.slots);
+    artMixerPage = 0;
+    artMixerOpen = true;
+    artMixerEl.classList.remove("hidden");
+    artMixerEl.setAttribute("aria-hidden", "false");
+    renderArtMixer();
+    if (G.sfx) G.sfx.play("menu");
+    return true;
+  }
+
+  function closeArtMixer() {
+    if (!artMixerOpen) return;
+    artMixerOpen = false;
+    artMixerEl.classList.add("hidden");
+    artMixerEl.setAttribute("aria-hidden", "true");
+    artMixerEl.innerHTML = "";
+    G.menuController.reset(artMixerEl);
+    G.input.clearTaps();
+  }
+
+  function changeArtMixerSlot(slot) {
+    const form = G.playerForm();
+    if (slot < 1 || slot > form.slots) return;
+    artMixerSlot = slot;
+    artMixerPage = 0;
+    renderArtMixer();
+    if (G.sfx) G.sfx.play("menu");
+  }
+
+  function changeArtMixerPage(direction) {
+    const pages = Math.max(1, Math.ceil(rankedMixerArts().length / ART_MIXER_PAGE_SIZE));
+    artMixerPage = (artMixerPage + direction + pages) % pages;
+    renderArtMixer();
+    if (G.sfx) G.sfx.play("menu");
+  }
+
+  function equipArtFromMixer(abilityId) {
+    if (!artMixerOpen || !G.availableAbilities().includes(abilityId)) return false;
+    const loadout = G.getLoadout(G.state.formId);
+    loadout[artMixerSlot] = abilityId;
+    btnCache = "";
+    G.saveGame();
+    const ability = G.abilities[abilityId];
+    const slot = ["A", "B", "C"][artMixerSlot];
+    closeArtMixer();
+    toast(`${ability.icon} ${ability.name} ready on ${slot}`, 1.8);
+    G.sfx.play("pickup");
+    return true;
+  }
+
+  function updateArtMixer(dt) {
+    if (!artMixerOpen) return;
+    if (G.input.tapped("mixSlotB")) { changeArtMixerSlot(1); return; }
+    if (G.input.tapped("mixSlotC")) { changeArtMixerSlot(2); return; }
+    G.menuController.update(artMixerEl, {
+      preferred: artMixerEl.querySelector(".art-mixer-card.equipped") || artMixerEl.querySelector("[data-quick-art]"),
+      onBack: closeArtMixer,
+      onPageLeft: () => changeArtMixerPage(-1),
+      onPageRight: () => changeArtMixerPage(1),
+    }, dt);
+    if (G.input.tapped("pause")) closeArtMixer();
+  }
+
   function focusControllerDefault() {
     const active = settingsOpen ? menuEl.querySelector(".settings-panel button")
       : menuEl.querySelector("[data-menu-section].active");
@@ -934,7 +1085,7 @@ G.ui = (() => {
 
   function menuSections() {
     const sections = [
-      { id: "journey", icon: "◆", label: "Journey", routes: [["story", "Story"], ["quests", "Mastery"]] },
+      { id: "journey", icon: "◆", label: "Now", routes: [["field", "Now"], ["story", "Story"], ["quests", "Mastery"]] },
       { id: "forms", icon: "⚗", label: "Forms", routes: [["forms", "Form Lab"]] },
       { id: "world", icon: "🧭", label: "World", routes: [["map", "Atlas"]] },
     ];
@@ -955,6 +1106,7 @@ G.ui = (() => {
 
   function changeMenuRoute(route) {
     activeTab = route;
+    if (route === "quests" && G.state) masteryFormId = G.state.formId;
     settingsOpen = false;
     buildMenu();
     menuEl.scrollTop = 0;
@@ -998,7 +1150,8 @@ G.ui = (() => {
     }, dt);
   }
 
-  function openMenu() {
+  function openMenu(preserveRoute) {
+    if (!preserveRoute) activeTab = G.state && G.state.expeditionRun ? "expedition" : "field";
     menuOpen = true;
     buildMenu();
     menuEl.classList.remove("hidden");
@@ -1009,11 +1162,11 @@ G.ui = (() => {
   function openMap() {
     activeTab = G.state && G.state.expeditionRun ? "expedition" : "map";
     atlasSelectedId = G.state && G.state.mapId;
-    openMenu();
+    openMenu(true);
   }
   function openExpedition() {
     activeTab = "expedition";
-    openMenu();
+    openMenu(true);
   }
   function closeMenu() {
     menuOpen = false;
@@ -1052,6 +1205,35 @@ G.ui = (() => {
     } catch (error) {
       toast("Use Share → Add to Home Screen for full screen", 4);
     }
+  }
+
+  function buildFieldTab() {
+    const form = G.playerForm();
+    const loadout = G.getLoadout(form.id);
+    const goal = G.storyGoal();
+    const lesson = G.fieldMasteryQuest && G.fieldMasteryQuest();
+    const mapName = G.state.mapDef && G.state.mapDef.name || G.state.mapId || "Unknown road";
+    const artButtons = [1, 2].filter((slot) => slot <= form.slots).map((slot) => {
+      const ability = G.abilities[loadout[slot]];
+      const synergy = ability && G.passives && G.passives.formMatches(form, ability);
+      return `<button data-quick-mix="${slot}" class="field-art ${synergy ? "boosted" : ""}"><span>${["A", "B", "C"][slot]}</span>
+        <div><strong>${ability ? `${ability.icon} ${escapeHtml(ability.name)}` : "Choose an art"}</strong>
+        <small>${ability ? `${escapeHtml(G.DAMAGE_TYPES[ability.type].name)} · ${escapeHtml(G.passives.styleLabel(ability.style))}${synergy ? ` · ★ ${escapeHtml(form.passive.name)}` : ""}` : "Open Quick Mix"}</small></div><b>CHANGE</b></button>`;
+    }).join("");
+    const lessonHtml = lesson ? `<div class="field-lesson"><span>${lesson.form.icon}</span><div><strong>${escapeHtml(lesson.quest.text)}</strong>
+      <small>${escapeHtml(lesson.form.name)} mastery · ${lesson.progress}/${lesson.quest.count}${lesson.slot > 0 ? ` · Slot ${["A", "B", "C"][lesson.slot]}` : ""}</small>
+      <i><b style="width:${Math.round(100 * lesson.progress / Math.max(1, lesson.quest.count))}%"></b></i></div></div>`
+      : `<div class="field-lesson complete"><span>✓</span><div><strong>Every known lesson is complete</strong><small>Your forms remember everything you taught them.</small></div></div>`;
+    return `<section class="field-dashboard">
+      <header><span class="eyebrow">FIELD GUIDE</span><h2>What matters now</h2><p>The game follows your journey, build, and mastery automatically.</p></header>
+      <article class="field-card field-story"><span class="field-card-icon">${goal.act.icon}</span><div><small>ACT ${goal.chapter + 1} · NEXT STEP</small>
+        <h3>${escapeHtml(goal.title)}</h3><p>${escapeHtml(goal.objective)}</p></div><button data-menu-route="story">Story details</button></article>
+      <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
+        <button data-menu-route="quests">All lessons</button></div>${lessonHtml}</article>
+      <article class="field-card field-build"><div class="field-card-heading"><div><small>QUICK MIX</small><h3>Change arts without leaving play</h3></div><span class="field-input-hint">${G.input.isTouch ? "HOLD B OR C" : G.input.hasGamepad ? "PRESS R3" : "PRESS F"}</span></div>
+        <div class="field-arts">${artButtons}</div></article>
+      <article class="field-card field-place"><span class="field-card-icon">🧭</span><div><small>YOU ARE HERE</small><h3>${escapeHtml(mapName)}</h3><p>${escapeHtml(goal.short)}</p></div><button data-menu-route="map">Open Atlas</button></article>
+    </section>`;
   }
 
   function buildStoryTab() {
@@ -1107,10 +1289,11 @@ G.ui = (() => {
         `<button data-menu-section="${item.id}" data-menu-route="${item.routes[0][0]}" data-nav-zone="sections" class="${section.id === item.id && !settingsOpen ? "active" : ""}"><span>${item.icon}</span>${item.label}</button>`).join("")}
       </div>${!settingsOpen && routeTabs.length > 1 ? `<div class="menu-route-tabs" aria-label="${escapeHtml(section.label)} pages">${routeTabs.map(([route, label]) =>
         `<button data-menu-route="${route}" data-nav-zone="routes" class="${activeTab === route ? "active" : ""}">${label}</button>`).join("")}</div>` : ""}</header>
-      <div class="menu-body ${settingsOpen ? "settings-body" : activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : activeTab === "story" ? "story-body" : ""}">`;
+      <div class="menu-body ${settingsOpen ? "settings-body" : activeTab === "map" ? "atlas-body" : activeTab === "forms" ? "form-lab-body" : activeTab === "story" ? "story-body" : activeTab === "field" ? "field-body" : ""}">`;
 
     if (settingsOpen) html += buildSettingsPanel();
     else {
+      if (activeTab === "field") html += buildFieldTab();
       if (activeTab === "story") html += buildStoryTab();
       if (activeTab === "forms") html += buildFormLab();
       if (activeTab === "quests") html += buildQuestsTab();
@@ -1139,6 +1322,12 @@ G.ui = (() => {
       button.addEventListener("click", () => changeMenuRoute(button.dataset.menuRoute)));
     menuEl.querySelectorAll("[data-menu-route]:not([data-menu-section])").forEach((button) =>
       button.addEventListener("click", () => changeMenuRoute(button.dataset.menuRoute)));
+    menuEl.querySelectorAll("[data-quick-mix]").forEach((button) =>
+      button.addEventListener("click", () => {
+        const slot = Number(button.dataset.quickMix);
+        closeMenu();
+        openArtMixer(slot);
+      }));
     const storyMap = menuEl.querySelector('[data-act="story-map"]');
     if (storyMap) storyMap.addEventListener("click", () => {
       const goal = G.storyGoal();
@@ -1830,12 +2019,20 @@ G.ui = (() => {
   }
 
   function buildQuestsTab() {
-    const forms = G.unlockedForms();
+    const forms = G.unlockedForms().slice().sort((a, b) => {
+      if (a === G.state.formId) return -1;
+      if (b === G.state.formId) return 1;
+      const aLeft = G.forms[a].quests.some((quest) => !G.questsDone.includes(quest.id));
+      const bLeft = G.forms[b].quests.some((quest) => !G.questsDone.includes(quest.id));
+      return Number(bLeft) - Number(aLeft) || G.formOrder.indexOf(a) - G.formOrder.indexOf(b);
+    });
     if (!masteryFormId || !forms.includes(masteryFormId)) masteryFormId = forms.includes(G.state.formId) ? G.state.formId : forms[0];
     const form = G.forms[masteryFormId];
-    const pins = G.pinnedQuests();
+    const activeLessons = new Set((G.relevantMasteryQuests ? G.relevantMasteryQuests(3) : []).map((entry) => entry.quest.id));
     const completed = form.quests.filter((quest) => G.questsDone.includes(quest.id)).length;
-    let html = `<section class="mastery-console">
+    let html = `<section class="mastery-intro"><div><span class="eyebrow">MASTERY</span><h2>Learn by playing</h2>
+      <p>Your most relevant unfinished lesson appears automatically in the field. Changing form or mixing an art changes what the game follows.</p></div>
+      <span>NO TRACKING REQUIRED</span></section><section class="mastery-console">
       <div class="mastery-picker" aria-label="Choose a form">${forms.map((id) => {
         const candidate = G.forms[id];
         const done = candidate.quests.filter((quest) => G.questsDone.includes(quest.id)).length;
@@ -1848,12 +2045,12 @@ G.ui = (() => {
         <div class="mastery-quest-list">${form.quests.map((quest) => {
           const prog = G.questProgress(quest);
           const done = G.questsDone.includes(quest.id);
-          return `<article class="mastery-quest ${done ? "done" : ""}"><span>${done ? "✓" : "◇"}</span><div><strong>${escapeHtml(quest.text)}</strong><small>${done ? "Lesson complete" : `${prog}/${quest.count}`}</small></div>
-            ${done ? "" : `<button data-pin="${quest.id}" class="pin-btn ${G.isQuestPinned(quest.id) ? "pinned" : ""}">${G.isQuestPinned(quest.id) ? "Untrack" : "Track"}</button>`}</article>`;
+          const active = activeLessons.has(quest.id);
+          return `<article class="mastery-quest ${done ? "done" : ""} ${active ? "active" : ""}"><span>${done ? "✓" : active ? "◆" : "◇"}</span><div><strong>${escapeHtml(quest.text)}</strong><small>${done ? "Lesson complete" : `${prog}/${quest.count}${active ? " · Shown while playing" : ""}`}</small></div>
+            ${active && !done ? `<b>ACTIVE</b>` : ""}</article>`;
         }).join("")}</div>
       </div>
     </section>`;
-    if (pins.length) html += `<div class="mastery-tracked"><span>📌 ${pins.length} tracked</span><button data-act="clear-pins">Clear tracking</button></div>`;
     const bosses = Object.values(G.enemies).filter((enemy) => enemy.miniboss);
     if (bosses.length) {
       const found = bosses.filter((enemy) => (G.state.items || []).includes(enemy.trophy)).length;
@@ -2328,9 +2525,11 @@ G.ui = (() => {
     openMenu, openMap, openExpedition, closeMenu, toggleMenu, updateControllerMenu,
     showWorkshop, updateWorkshopController,
     openFormWheel, closeFormWheel, aimFormWheel, commitFormWheel, updateFormWheel,
+    openArtMixer, closeArtMixer, updateArtMixer,
     get menuOpen() { return menuOpen; },
     get workshopOpen() { return workshopOpen; },
     get formWheelOpen() { return formWheelOpen; },
+    get artMixerOpen() { return artMixerOpen; },
     get dialogueOpen() { return !!dialogueData; },
     get dialogueQueueLength() { return dialogueQueue.length + (dialogueData ? 1 : 0); },
   };

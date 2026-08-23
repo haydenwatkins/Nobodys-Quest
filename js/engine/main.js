@@ -336,11 +336,15 @@
 
     // Dialogue owns every action button while it is open. In particular,
     // Enter/Escape must advance the conversation instead of opening a menu.
-    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("guide") && G.requestGuidance) G.requestGuidance(false);
-    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("map")) G.ui.openMap();
-    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && G.input.tapped("pause")) G.ui.toggleMenu();
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("guide") && G.requestGuidance) G.requestGuidance(false);
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("map")) G.ui.openMap();
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("mix")) G.ui.openArtMixer(1);
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("pause")) G.ui.toggleMenu();
 
-    if (G.ui.formWheelOpen) {
+    if (G.ui.artMixerOpen) {
+      G.ui.updateArtMixer(dt);
+      G.input.clearTaps();
+    } else if (G.ui.formWheelOpen) {
       G.ui.updateFormWheel();
       G.input.clearTaps();
     } else if (!G.ui.menuOpen) {

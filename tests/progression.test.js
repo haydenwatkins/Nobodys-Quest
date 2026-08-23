@@ -90,6 +90,17 @@ assert.equal(G.formUnlocked("rat"), false, "checking unlocks must never surprise
 assert.equal(G.claimForm("rat"), true);
 assert.equal(G.formUnlocked("rat"), true, "a deliberate claim unlocks the form");
 
+// The field guide follows what the player can act on now. A started lesson
+// for an equipped art should surface automatically without pin management.
+G.state.formId = "rat";
+G.state.loadouts.rat = ["bite", "squeakDash"];
+const biteLesson = G.forms.rat.quests.find((quest) => quest.match && quest.match.ability === "bite");
+G.questCounts[biteLesson.id] = 2;
+const fieldLesson = G.fieldMasteryQuest();
+assert.equal(fieldLesson.quest.id, biteLesson.id);
+assert.equal(fieldLesson.progress, 2);
+assert.equal(fieldLesson.slot, 0);
+
 G.state.stars = 20;
 assert.match(G.unlockHint("stormcaller"), /One of:/, "unlock hints should describe alternate challenge paths");
 assert.equal(G.formReady("stormcaller"), false, "stars alone do not bypass a composite challenge");

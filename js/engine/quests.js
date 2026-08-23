@@ -89,6 +89,42 @@ G.pinnedQuests = function () {
   return G.state.pinnedQuestIds.map((id) => G.questById(id));
 };
 
+// Field mastery is automatic. The most useful unfinished lesson is chosen
+// from the form being worn and the arts currently equipped, so routine play
+// never depends on visiting a menu and manually managing a tracker.
+G.relevantMasteryQuests = function (limit) {
+  if (!G.state || !G.state.formId) return [];
+  const formId = G.state.formId;
+  const loadout = G.getLoadout ? G.getLoadout(formId) : [];
+  const equipped = new Map(loadout.map((ability, slot) => [ability, slot]));
+  const candidates = [];
+  for (let formIndex = 0; formIndex < G.formOrder.length; formIndex++) {
+    const id = G.formOrder[formIndex];
+    if (!G.formUnlocked(id)) continue;
+    const form = G.forms[id];
+    for (let questIndex = 0; questIndex < (form.quests || []).length; questIndex++) {
+      const quest = form.quests[questIndex];
+      if (G.questsDone.includes(quest.id)) continue;
+      const match = quest.match || {};
+      const slot = match.ability && equipped.has(match.ability) ? equipped.get(match.ability) : -1;
+      const progress = G.questProgress(quest);
+      let score = id === formId ? 60 : 0;
+      if (slot >= 0) score += 90 + (slot === 0 ? 2 : 4 - slot);
+      if (match.form === formId) score += 70;
+      if (progress > 0) score += 25 + Math.min(12, progress / Math.max(1, quest.count) * 12);
+      // Keep unlocked but unrelated forms available as a final fallback,
+      // while strongly preferring lessons the player's current build can do.
+      candidates.push({ form, quest, progress, slot, score, formIndex, questIndex });
+    }
+  }
+  candidates.sort((a, b) => b.score - a.score || a.formIndex - b.formIndex || a.questIndex - b.questIndex);
+  return candidates.slice(0, limit === undefined ? 3 : Math.max(0, limit));
+};
+
+G.fieldMasteryQuest = function () {
+  return G.relevantMasteryQuests(1)[0] || null;
+};
+
 function questMatches(match, data) {
   if (!match) return true;
   for (const key in match) {
@@ -119,6 +155,7 @@ G.events.on("*", (type, data) => {
       // multiHit counts as done in one go if hits >= the match
       G.questCounts[q.id] = (G.questCounts[q.id] || 0) + 1;
       const prog = G.questCounts[q.id];
+      G.state.masteryHudPulse = 1.4;
 
       if (prog >= q.count) {
         G.questsDone.push(q.id);
@@ -130,12 +167,6 @@ G.events.on("*", (type, data) => {
         G.events.emit("questDone", { quest: q.id, form: fid });
         G.checkUnlocks();
         G.saveGame();
-      } else {
-        // little progress nudge (not too spammy — every hit at low
-        // counts, every ~25% for big counts)
-        if (q.count <= 5 || prog % Math.ceil(q.count / 4) === 0) {
-          G.ui.toast(`${f.icon} ${q.text} — ${prog}/${q.count}`);
-        }
       }
     }
   }

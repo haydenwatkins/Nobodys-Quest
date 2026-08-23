@@ -50,14 +50,17 @@ let inputClock = 0;
 let wheelOpened = 0;
 let wheelCommitted = 0;
 let guidanceRequested = 0;
+let mixerOpened = 0;
+let mixerSlot = 0;
 
 const context = vm.createContext({
   console, Math, performance: { now: () => inputClock },
   G: { sfx: { ensure() {} }, requestGuidance() { guidanceRequested++; return true; }, ui: {
-    menuOpen: false, formWheelOpen: false, toast() {},
+    menuOpen: false, formWheelOpen: false, artMixerOpen: false, toast() {},
     openFormWheel() { wheelOpened++; this.formWheelOpen = true; return true; },
     commitFormWheel() { wheelCommitted++; this.formWheelOpen = false; return true; },
     closeFormWheel() { this.formWheelOpen = false; },
+    openArtMixer(slot) { mixerOpened++; mixerSlot = slot; this.artMixerOpen = true; return true; },
   } },
   window: windowTarget,
   document: documentTarget,
@@ -133,6 +136,15 @@ assert.equal(abilityA.classList.contains("held"), false, "lost capture must remo
 abilityB.dispatch("pointerdown", { pointerId: 22, clientX: 220, clientY: 100 });
 abilityB.dispatch("pointerup", { pointerId: 22, clientX: 220, clientY: 100 });
 assert.equal(G.input.tapped("b"), true, "another attack must work after ability capture is lost");
+
+abilityB.dispatch("pointerdown", { pointerId: 26, clientX: 220, clientY: 100 });
+inputClock += 600;
+G.input.update();
+assert.equal(mixerOpened, 1, "holding a touch ability should open Quick Mix from the field");
+assert.equal(mixerSlot, 1, "holding B should edit B without asking for another slot choice");
+abilityB.dispatch("pointerup", { pointerId: 26, clientX: 220, clientY: 100 });
+assert.equal(G.input.tapped("b"), false, "opening Quick Mix must not also fire the held ability");
+G.ui.artMixerOpen = false;
 
 abilityA.dispatch("pointerdown", { pointerId: 23, clientX: 200, clientY: 100 });
 windowTarget.dispatch("orientationchange");
@@ -233,6 +245,26 @@ G.input.update();
 assert.equal(G.input.tapped("pause"), true, "the Xbox Menu button should pause");
 pad.buttons[9] = gamepadButton();
 G.input.update();
+
+pad.buttons[11] = gamepadButton(1);
+G.input.update();
+assert.equal(G.input.tapped("mix"), true, "R3 should open Quick Mix without entering the pause menu");
+pad.buttons[11] = gamepadButton();
+G.input.update();
+
+G.ui.artMixerOpen = true;
+pad.buttons[2] = gamepadButton(1);
+G.input.update();
+assert.equal(G.input.tapped("mixSlotB"), true, "X should choose slot B inside Quick Mix");
+assert.equal(G.input.tapped("b"), false, "slot selection must not fire the equipped art");
+pad.buttons[2] = gamepadButton();
+G.input.update();
+pad.buttons[3] = gamepadButton(1);
+G.input.update();
+assert.equal(G.input.tapped("mixSlotC"), true, "Y should choose slot C inside Quick Mix");
+pad.buttons[3] = gamepadButton();
+G.input.update();
+G.ui.artMixerOpen = false;
 
 pad.axes[2] = 1;
 pad.buttons[0] = gamepadButton(1);

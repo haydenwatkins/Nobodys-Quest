@@ -21,6 +21,12 @@ assert.ok(ui.includes("masteryFormId") && ui.includes("data-mastery-form"),
   "Mastery should show one chosen form instead of dumping every quest at once");
 assert.ok(ui.includes("journey-dashboard") && ui.includes("story-chapter-strip"),
   "Journey should use a compact dashboard and act strip");
+assert.ok(ui.includes("buildFieldTab") && ui.includes('activeTab = "field"'),
+  "Pause should open on a concise field summary instead of remembering a buried destination");
+assert.ok(ui.includes("openArtMixer") && ui.includes("data-quick-art") && css.includes(".art-mixer-grid"),
+  "frequent ability mixing should have a dedicated paused field interface");
+assert.doesNotMatch(ui, /data-pin="\$\{quest\.id\}"/,
+  "Mastery should surface relevant lessons automatically instead of requiring tracking chores");
 assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.mastery-picker\s*\{[^}]*flex-direction:\s*row;[^}]*overflow-x:\s*auto/s,
   "touch layouts should keep form selection swipeable rather than copying the TV column");
 assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.console-roster-workbench\s*\{[^}]*grid-template-columns:\s*1fr/s,
