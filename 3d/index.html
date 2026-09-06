@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#183d46">
+  <meta name="description" content="Explore a small world with a big unfinished story. A separate 3D adventure in Nobody’s Quest.">
+  <title>Nobody’s Quest — Greenfield 3D</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="world" aria-label="Greenfield adventure world"></canvas>
+  <div id="loading"><span class="spark">✦</span><p>Waking up Greenfield…</p></div>
+  <div id="error" class="hidden"><h1>A world worth coming back to.</h1><p id="error-text">This browser could not open the 3D world.</p><a class="primary" href="../">Play the original game</a><button onclick="location.reload()">Try again</button></div>
+  <section id="welcome" class="hidden">
+    <div class="title-block"><span class="eyebrow">THE GREENFIELD ADVENTURE</span><h1>Nobody’s<br><em>Quest.</em></h1><p>The world is a little rounder.<br>It still needs somebody like you.</p><button class="primary" id="start">Enter Greenfield <span>↗</span></button><a href="../">Play the original 2D game</a><small>Separate adventure. Separate saves.</small></div>
+    <div class="welcome-note"><span>✦</span> A small world.<br><strong>Many ways to be somebody.</strong></div>
+  </section>
+  <main id="hud" class="hidden">
+    <div class="top-left"><div class="brand">NQ<span>GREENFIELD</span></div><div class="vitals"><strong id="form-name">Nobody</strong><span id="health-label">100 / 100</span><div class="health-track"><div id="health"></div></div></div></div>
+    <div class="top-right"><button id="map-button" aria-label="Open world map">◎ <span>World</span></button><button id="pause-button" aria-label="Pause game">Ⅱ</button></div>
+    <div id="quest"><span class="eyebrow">AN UNFINISHED PROMISE</span><h2 id="quest-title">A town looking for Somebody</h2><p id="quest-detail">Speak to Mayor Maybe beside the fountain.</p><span id="quest-count"></span></div>
+    <div id="area"><span>YOU HAVE ARRIVED</span><h2>Sunrise Town</h2></div>
+    <div id="boss" class="hidden"><span>The Unfinished Warden</span><div><i id="boss-health"></i></div></div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <button id="interact" class="hidden"><span class="key">E</span><span id="interact-label">Talk</span></button>
+    <div id="forms" aria-label="Choose your form"><button data-form="nobody" class="selected"><span class="form-symbol">◉</span><span>Nobody<small>THE POSSIBILITY</small></span><kbd>1</kbd></button><button data-form="rat" disabled><span class="form-symbol">◒</span><span>Rat<small id="rat-hint">DEFEAT 3 FOES</small></span><kbd>2</kbd></button><button data-form="knight" disabled><span class="form-symbol">♜</span><span>Knight<small id="knight-hint">LIGHT THE HOLLOW</small></span><kbd>3</kbd></button></div>
+    <div id="desktop-hint">WASD move <b>·</b> J attack <b>·</b> K borrowed art <b>·</b> Space dodge <b>·</b> Drag to look</div>
+    <div id="actions"><button id="dodge" aria-label="Dodge"><strong>↠</strong><small>Dodge</small></button><button id="special" aria-label="Use borrowed art"><strong>✦</strong><small id="special-name">Cartwheel</small><i></i></button><button id="attack" aria-label="Attack"><strong>✧</strong><small id="attack-name">Slap</small><i></i></button></div>
+    <div id="joystick" aria-label="Movement joystick"><div></div></div>
+    <div id="bottom-meta"><span id="save-status">Saved on this device</span><button id="mix-button">Borrow an art <span>↗</span></button></div>
+  </main>
+  <dialog id="dialogue"><span class="eyebrow" id="speaker">MAYOR MAYBE</span><p id="speech"></p><button class="primary" id="continue">Continue <span>↵</span></button></dialog>
+  <dialog id="menu"><div class="dialog-heading"><span class="eyebrow">TAKE A BREATHER</span><button data-close aria-label="Close menu">×</button></div><h2>Nobody’s in a hurry.</h2><p>Your adventure saves as you go. The original game and its saves are untouched.</p><button class="primary" id="resume">Keep exploring</button><button id="journal-button">Quest journal</button><button id="sound-button" aria-pressed="true">Sound: on</button><button id="quality-button">Graphics: balanced</button><button id="comfort-button" aria-pressed="false">Gentle mode: off</button><a href="../">Play original 2D game ↗</a><details><summary>Controls &amp; progress</summary><p>Move: WASD / arrows / left stick.<br>Attack: J / A or RT. Art: K / X.<br>Dodge: Space / B. Interact: E / Y.<br>Change form: 1–3 / LB or RB.<br>Camera: drag / right stick. Map: M / View.<br>Pause: Escape / Menu.</p><button id="restart">Start a fresh 3D adventure</button></details></dialog>
+  <dialog id="map-dialog"><div class="dialog-heading"><span class="eyebrow">THE WAYFINDER ATLAS</span><button data-close aria-label="Close map">×</button></div><h2>A world worth wandering.</h2><canvas id="map" width="640" height="560" aria-label="Map showing your position and landmarks"></canvas><div id="map-legend">● You <span>◆ Beacons</span><span>✦ Warden</span></div><p id="map-quest"></p><button id="globe-button">Look at the whole planet</button></dialog>
+  <dialog id="mix-dialog"><div class="dialog-heading"><span class="eyebrow">KNOWN ARTS</span><button data-close aria-label="Close borrowed arts">×</button></div><h2>A little of somebody else.</h2><p>Keep your form’s basic attack. Borrow one extra art from any unlocked form.</p><div id="art-list"></div></dialog>
+  <dialog id="reset-dialog"><span class="eyebrow">A FRESH START</span><h2>Begin this adventure again?</h2><p>This resets only Greenfield 3D. Your original 2D saves stay safe.</p><button id="confirm-reset">Start again</button><button class="primary" data-close>Keep my adventure</button></dialog>
+  <script type="module" src="main.mjs"></script>
+  <script>window.addEventListener('error',function(e){if(!window.nq3dReady){document.getElementById('loading').classList.add('hidden');document.getElementById('error').classList.remove('hidden')}});</script>
+</body>
+</html>
