@@ -1,9 +1,9 @@
 // Project-authored world geometry and encounter data. No source-game content is loaded.
 export const RADIUS=76, SAVE_KEY='veyr.storm-engine.v1';
 export const WEAPONS={
- shear:{name:'Cinder edge',tag:'CUT / CARRY',damage:22,reach:4.5,width:3.3,windup:.10,recovery:.26,speed:8.7,color:0xff9b54,vent:'Furnace cut',description:'Three sweeping cuts. The final strike breaks posture. Vent pressure into a blazing cross-cut.'},
- pike:{name:'Arc lance',tag:'LINE / PIERCE',damage:29,reach:7.4,width:1.1,windup:.17,recovery:.35,speed:8.2,color:0x6fe6ed,vent:'Rail discharge',description:'Long, narrow thrusts pierce a line of enemies. Vent a bolt through the entire lane.'},
- maul:{name:'Keel hammer',tag:'WEIGHT / BREAK',damage:57,reach:4.8,width:3,windup:.32,recovery:.53,speed:7.4,color:0xffca72,vent:'Fault driver',description:'Commit to a heavy overhead blow. Vent a chain of ground fractures straight ahead.'}
+ shear:{name:'Cinder edge',tag:'CUT / CARRY',damage:22,reach:4.5,width:3.3,windup:.10,recovery:.26,speed:8.7,color:0xff9b54,vent:'Furnace cut',description:'Fast draw cut, returning sweep, then a wide spinning finisher. Control a crowd. Vent a blazing cross-cut.'},
+ pike:{name:'Arc lance',tag:'LINE / PIERCE',damage:29,reach:7.4,width:1.1,windup:.17,recovery:.35,speed:8.2,color:0x6fe6ed,vent:'Rail discharge',description:'Three increasingly committed piercing thrusts. The outer third deals 40% bonus damage and extra posture damage. Keep your distance. Vent a rail discharge.'},
+ maul:{name:'Keel hammer',tag:'WEIGHT / BREAK',damage:57,reach:4.8,width:3,windup:.32,recovery:.53,speed:7.4,color:0xffca72,vent:'Fault driver',description:'Three escalating ground impacts hit an area around the hammer head. Slow recovery, heavy knockback and exceptional posture damage. Vent a fracture line.'}
 };
 export const ENEMIES={
  mite:{name:'Scissor mite',hp:65,damage:10,speed:4.4,reach:3.4,width:2,windup:.7,recovery:.6,cooldown:1.4,aggro:13,posture:42,radius:.8},

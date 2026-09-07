@@ -1,4 +1,5 @@
-import {SAVE_KEY,WEAPONS,ENEMIES,SPAWNS,LANDMARKS,clamp,distance,walkable,inStrike} from './world-data.mjs?v=20260907-authored';
+import {SAVE_KEY,WEAPONS,ENEMIES,SPAWNS,LANDMARKS,clamp,distance,walkable,inStrike} from './world-data.mjs?v=20260907-battle';
+import {resolveMove,contact} from './battle.mjs?v=20260907-battle';
 
 export function freshProgress(){return {version:1,x:0,z:25,weapon:'shear',hp:120,teeth:[],defeated:[],caches:[],briefed:false,won:false,returned:false,rescueBriefed:false,rescueWon:false,rescueDone:false,relayStarted:[],relays:[],gentle:false,sound:true,quality:'balanced',shake:true};}
 export function readProgress(storage){try{const p=JSON.parse(storage.getItem(SAVE_KEY));if(!p||p.version!==1)return freshProgress();const d=freshProgress();for(const k of ['briefed','won','returned','rescueBriefed','rescueWon','rescueDone','gentle','sound','shake'])if(typeof p[k]==='boolean')d[k]=p[k];d.teeth=Array.isArray(p.teeth)?[...new Set(p.teeth.filter(v=>['west','north','east'].includes(v)))]:[];d.caches=Array.isArray(p.caches)?[...new Set(p.caches.filter(v=>LANDMARKS.some(l=>l.type==='cache'&&l.id===v)))]:[];d.defeated=Array.isArray(p.defeated)?[...new Set(p.defeated.filter(v=>Number.isInteger(v)&&v>=0&&v<SPAWNS.length))]:[];for(const k of ['relayStarted','relays'])d[k]=Array.isArray(p[k])?[...new Set(p[k].filter(v=>['relay-west','relay-east'].includes(v)))]:[];if(WEAPONS[p.weapon])d.weapon=p.weapon;if(Number.isFinite(p.x)&&Number.isFinite(p.z)&&walkable(p.x,p.z)){d.x=p.x;d.z=p.z;}if(Number.isFinite(p.hp))d.hp=clamp(p.hp,1,120+d.caches.length*10+(d.rescueDone?20:0));if(['balanced','low','high'].includes(p.quality))d.quality=p.quality;return d;}catch{return freshProgress();}}
@@ -17,27 +18,27 @@ export class Game {
  active(e){if(!e.alive)return false;if(e.relay)return this.progress.rescueBriefed&&this.progress.relayStarted.includes(e.relay)&&e.wave<=this.relayWave(e.relay);if(e.type==='harrow')return this.progress.rescueBriefed&&this.progress.relays.length===2;return e.type!=='engine'||this.progress.teeth.length===3;}
 
  nearestEnemy(range=10){return this.enemies.filter(e=>this.active(e)&&distance(e,this.player)<range).sort((a,b)=>distance(a,this.player)-distance(b,this.player))[0];}
- setWeapon(id){if(!WEAPONS[id]||this.player.attack||this.player.weapon===id)return false;this.player.weapon=id;this.player.combo=0;this.emit('equip',{weapon:id});this.emit('save');return true;}
+ setWeapon(id){if(!WEAPONS[id]||this.player.attack||this.player.weapon===id)return false;this.player.weapon=id;this.player.combo=0;this.player.comboWindow=0;this.emit('equip',{weapon:id});this.emit('save');return true;}
  attack(){
   const p=this.player;if(p.attack||p.recovery>0||p.dash>0){if(p.attack&&p.attack.duration-p.attack.age<.18&&p.buffer?.type!=='vent')p.buffer={type:'attack',until:this.time+.2};return false;}const w=WEAPONS[p.weapon];
   const target=this.nearestEnemy(w.reach+1);if(target&&!p.move)p.yaw=Math.atan2(target.x-p.x,target.z-p.z);
-  p.combo=p.comboWindow>0?(p.combo+1)%3:0;p.comboWindow=1.45;
-  p.attack={weapon:p.weapon,yaw:p.yaw,combo:p.combo,age:0,hit:false,vent:false,duration:w.windup+w.recovery,windup:w.windup};this.emit('windup',{weapon:p.weapon});return true;
+  const form=p.form||'runner',count=resolveMove(form,p.weapon).chainLength;
+  p.combo=p.comboWindow>0?(p.combo+1)%count:0;
+  const move=resolveMove(form,p.weapon,p.combo);p.comboWindow=move.duration+.75;
+  p.attack={...move,weapon:p.weapon,yaw:p.yaw,combo:p.combo,age:0,hit:false,vent:false};this.emit('windup',{weapon:p.weapon});return true;
  }
  vent(){
   const p=this.player;if(p.attack||p.recovery>0||p.dash>0){if(p.attack&&p.attack.duration-p.attack.age<.18)p.buffer={type:'vent',until:this.time+.2};return false;}if(p.charge<this.ventCost){this.emit('toast',{text:`Land hits or dodge through a strike to build ${this.ventCost} pressure.`});return false;}
   p.charge-=this.ventCost;const w=WEAPONS[p.weapon],target=this.nearestEnemy(14);if(target&&!p.move)p.yaw=Math.atan2(target.x-p.x,target.z-p.z);
-  p.attack={weapon:p.weapon,yaw:p.yaw,combo:2,age:0,hit:false,vent:true,duration:.7,windup:.2};this.emit('windup',{weapon:p.weapon});return true;
+  p.attack={...resolveMove(p.form||'runner',p.weapon,0,true),weapon:p.weapon,yaw:p.yaw,combo:2,age:0,hit:false,vent:true};this.emit('windup',{weapon:p.weapon});return true;
  }
  resolveAttack(a){
   const p=this.player,w=WEAPONS[a.weapon],origin={x:p.x,z:p.z,yaw:a.yaw};
-  let reach=w.reach,width=w.width,damage=w.damage*(a.combo===2?1.6:1),posture=a.weapon==='maul'?55:a.combo===2?28:12;
-  if(a.vent){reach=a.weapon==='pike'?20:a.weapon==='maul'?13:7;width=a.weapon==='pike'?1.6:a.weapon==='maul'?2.5:5;damage=a.weapon==='maul'?125:a.weapon==='pike'?100:80;posture=80;}
-  this.move(p,Math.sin(a.yaw)*.55,Math.cos(a.yaw)*.55);this.fx(a.vent?'vent':'strike',p.x,p.z,a.vent?.5:.23,{weapon:a.weapon,yaw:a.yaw,combo:a.combo,reach,width});this.emit('swing',{weapon:a.weapon,vent:a.vent,combo:a.combo});
-  for(const e of this.enemies.filter(e=>this.active(e)))if(inStrike(origin,e,reach+ENEMIES[e.type].radius*.4,width+ENEMIES[e.type].radius*.35))this.hurtEnemy(e,damage,posture,a.weapon==='maul'?8:3,origin);
+  this.move(p,Math.sin(a.yaw)*a.lunge,Math.cos(a.yaw)*a.lunge);this.fx(a.vent?'vent':'strike',origin.x,origin.z,a.weapon==='maul'?.48:.23,{weapon:a.weapon,yaw:a.yaw,combo:a.combo,reach:a.reach,width:a.width,shape:a.shape});this.emit('swing',{weapon:a.weapon,vent:a.vent,combo:a.combo});
+  for(const e of this.enemies.filter(e=>this.active(e))){const hit=contact(a,origin,e,ENEMIES[e.type].radius*.35);if(hit.hit){this.hurtEnemy(e,hit.damage,hit.posture,a.weapon==='maul'?8:3,origin);if(hit.precise){this.emit('precision');this.fx('perfect',e.x,e.z,.35);}}}
  }
  dodge(){
-  const p=this.player;if(p.dodge>0||p.attack?.hit)return false;p.attack=null;p.buffer=null;p.vx=0;p.vz=0;p.dodge=.8;p.dash=.23;p.invulnerable=.28;
+  const p=this.player;if(p.dodge>0||p.attack?.hit)return false;p.attack=null;p.buffer=null;p.comboWindow=0;p.vx=0;p.vz=0;p.dodge=.8;p.dash=.23;p.invulnerable=.28;
   const threatened=this.enemies.some(e=>this.active(e)&&e.state==='windup'&&e.timer<.38&&inStrike({x:e.attackX,z:e.attackZ,yaw:e.attackYaw},p,ENEMIES[e.type].reach,ENEMIES[e.type].width));
   if(threatened){p.charge=Math.min(100,p.charge+20);this.emit('perfect');this.fx('perfect',p.x,p.z,.6,{yaw:p.yaw});}
   this.fx('dash',p.x,p.z,.3,{yaw:p.yaw});this.emit('dodge');return true;
