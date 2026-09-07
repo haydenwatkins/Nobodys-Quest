@@ -1,2 +1,3 @@
 # local editor/assistant settings — every machine keeps its own
 .claude/settings.local.json
+dist/
