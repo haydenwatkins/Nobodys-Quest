@@ -12,7 +12,7 @@ The chapter includes three field stations in any order, four mechanical enemy ty
 
 Keyboard: WASD/arrows move, J strike, K vent, Space evade, E interact, 1–3 or Q change weapon, M chart, I weapon briefing, Escape pause. Drag the world to look; scroll to zoom.
 
-Touch: left stick to move; right buttons to strike, vent, and evade; bottom weapon selector. Gamepad: left stick move, A/RT strike, X vent, B evade, Y interact, LB/RB weapon, right stick camera, View chart, Menu pause.
+Touch: touch anywhere on the left to place the movement stick, then drag anywhere across the screen; the stick follows your thumb. Lift to stop. Drag the right side with another finger to look; right buttons to strike, vent, and evade; bottom weapon selector. Gamepad: left stick move, A/RT strike, X vent, B evade, Y interact, LB/RB weapon, right stick camera, View chart, Menu pause.
 
 Progress saves on this browser/device. The new chapter has its own save key and does not load or erase previous versions' saves. Gentle mode reduces damage and restores health out of combat. Impact shake and sound can be disabled; low graphics disables shadows.
 
@@ -20,7 +20,7 @@ Progress saves on this browser/device. The new chapter has its own save key and 
 
 No package install or build required. Use a static HTTP server from the repository root (for example `python -m http.server 4173`), then open `/3d/`. A current WebGL2 browser is required.
 
-Run `node --test 3d/tests/game.test.mjs`. Run `node tools/package-release.mjs` to create the distributable `dist/` folder with only approved runtime files and dependency notices. Do not package an older repository archive or backup branch.
+Run `node --test 3d/tests/*.test.mjs`. Run `node tools/package-release.mjs` to create the distributable `dist/` folder with only approved runtime files and dependency notices. Do not package an older repository archive or backup branch.
 
 This is one playable prototype chapter, not a finished commercial release. Physical phone/controller performance and subjective combat balance still need player testing.
 
