@@ -1,6 +1,6 @@
-import {makeRunner,buildHomes,buildAuthoredWorld,placeArt} from './art.mjs?v=20260907-authored';
+import {makeRunner,buildHomes,buildAuthoredWorld,placeArt} from './art.mjs?v=20260907-battle';
 import * as T from './vendor/three.module.min.js';
-import {RADIUS,LANDMARKS,STRUCTURES,WEAPONS,ENEMIES,DECORATIONS,landHeight,roadDistance,random,clamp} from './world-data.mjs?v=20260907-authored';
+import {RADIUS,LANDMARKS,STRUCTURES,WEAPONS,ENEMIES,DECORATIONS,landHeight,roadDistance,random,clamp} from './world-data.mjs?v=20260907-battle';
 const UP=new T.Vector3(0,1,0),V=new T.Vector3();
 const GEO={box:new T.BoxGeometry(1,1,1),ball:new T.IcosahedronGeometry(1,0),soft:new T.IcosahedronGeometry(1,1),cone:new T.ConeGeometry(1,1,5),cyl:new T.CylinderGeometry(1,1,1,8),ring:new T.TorusGeometry(1,.06,5,32)};
 // Uneven, broad-sided outcrops share one geometry for instancing.
@@ -43,7 +43,7 @@ export function makeEnemy(type){const root=g(),body=g(root),legs=[];
  }
  root.userData={...root.userData,body,legs,type};return root;}
 function batch(root,scene){root.updateMatrixWorld(true);const buckets=new Map();root.traverse(o=>{if(!o.isMesh)return;const key=o.geometry.uuid+o.material.uuid;if(!buckets.has(key))buckets.set(key,{geo:o.geometry,mat:o.material,transforms:[]});buckets.get(key).transforms.push(o.matrixWorld.clone());});for(const b of buckets.values()){const m=new T.InstancedMesh(b.geo,b.mat,b.transforms.length);b.transforms.forEach((v,i)=>m.setMatrixAt(i,v));m.castShadow=true;m.receiveShadow=true;m.computeBoundingSphere();scene.add(m);}}
-function crescent(color,reach,combo){const vertices=[],count=22;for(let i=0;i<count;i++){const a=-1.15+i/count*2.3,b=-1.15+(i+1)/count*2.3;const r=reach*(.83+.08*Math.sin(i/count*Math.PI)),inner=r-.65;for(const [ang,rad]of [[a,r],[a,inner],[b,r],[b,r],[a,inner],[b,inner]])vertices.push(Math.sin(ang)*rad,.9+Math.cos(ang)*.18,Math.cos(ang)*rad);}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));return new T.Mesh(geo,new T.MeshBasicMaterial({color,transparent:true,opacity:.9,side:T.DoubleSide,depthWrite:false}));}
+function crescent(color,reach,combo,spread=1.15){const vertices=[],count=22;for(let i=0;i<count;i++){const a=-spread+i/count*spread*2,b=-spread+(i+1)/count*spread*2;const r=reach*(.83+.08*Math.sin(i/count*Math.PI)),inner=r-.65;for(const [ang,rad]of [[a,r],[a,inner],[b,r],[b,r],[a,inner],[b,inner]])vertices.push(Math.sin(ang)*rad,.9+Math.cos(ang)*.18,Math.cos(ang)*rad);}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));return new T.Mesh(geo,new T.MeshBasicMaterial({color,transparent:true,opacity:.9,side:T.DoubleSide,depthWrite:false}));}
 export class WorldView {
  constructor(canvas,game,{renderer=null}={}){
   this.game=game;this.renderer=renderer||new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.05;this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=T.PCFSoftShadowMap;
@@ -99,7 +99,7 @@ export class WorldView {
  for(let i=0;i<2;i++){const leg=d.legs[i],s=Math.sin(phase+i*Math.PI);leg.rotation.x=s*speed*.58;leg.userData.shin.rotation.x=Math.max(0,-s)*speed*.65;}
  d.armL.rotation.set(-Math.sin(phase)*speed*.27,0,.12);d.armR.rotation.set(Math.sin(phase)*speed*.27,0,-.12);d.armR.position.z=0;d.armL.userData.elbow.rotation.x=-.18;d.armR.userData.elbow.rotation.x=-.25;
  if(p.attack){const a=p.attack,wind=Math.min(1,a.age/a.windup),t=Math.max(0,(a.age-a.windup)/(a.duration-a.windup)),snap=1-Math.pow(1-Math.min(1,t*4),3),relax=Math.max(0,(t-.35)/.65);b.position.y-=.12*(a.age<a.windup?wind:1-relax);
- if(a.weapon==='shear'){const side=a.combo%2?-1:1,bias=a.age<a.windup?-wind: -1+snap*2;b.rotation.y=side*bias*.85*(1-relax*.65);d.armR.rotation.set(.7,side*bias*.9,-.65);d.armR.userData.elbow.rotation.x=-.15;d.armL.rotation.x=-.8;d.legs[0].rotation.x=-.25;d.legs[1].rotation.x=.3;}
+ if(a.weapon==='shear'){const side=a.combo%2?-1:1,bias=a.age<a.windup?-wind: -1+snap*2;b.rotation.y=side*bias*.85*(1-relax*.65);d.armR.rotation.set(.7,side*bias*.9,-.65);d.armR.userData.elbow.rotation.x=-.15;d.armL.rotation.x=-.8;d.legs[0].rotation.x=-.25;d.legs[1].rotation.x=.3;if(a.combo===2&&!a.vent){b.rotation.y=a.age<a.windup?-wind*.7:-.7+snap*Math.PI*2;d.armR.rotation.z=-1.1;}}
  if(a.weapon==='pike'){d.armR.rotation.x=a.age<a.windup?.4:.55;d.armR.position.z=a.age<a.windup?-.3*wind:1.05*snap*(1-relax);d.armR.userData.elbow.rotation.x=a.age<a.windup?-1.1*wind:-1.1+snap*1.3;b.rotation.y=-.4*(1-snap);b.rotation.x=.15*snap*(1-relax);}
  if(a.weapon==='maul'){d.armR.rotation.x=a.age<a.windup?-2.3*wind:-2.3+snap*3.2;d.armR.userData.elbow.rotation.x=a.age<a.windup?-.6*wind:-.6+snap*.8;d.armL.rotation.x=d.armR.rotation.x*.7;b.rotation.x=a.age<a.windup?-.25*wind:.4*snap*(1-relax);}}
  if(p.dash>0){b.rotation.x=.8;b.position.y=-.35;d.legs[0].rotation.x=-.7;d.legs[1].rotation.x=.85;d.armL.rotation.x=1;}
@@ -118,8 +118,9 @@ export class WorldView {
   this.syncEffects();this.syncItems(this.game.pickups,this.pickups,false);this.syncItems(this.game.shots,this.shots,true);this.updateCamera(dt);this.renderer.render(this.scene,this.camera);
  }
  createEffect(f){const o=g(this.scene),color=WEAPONS[f.weapon]?.color||0xffc17d;
-  if(f.type==='strike'||f.type==='vent'){
-   if(f.weapon==='shear'){o.add(crescent(color,f.reach,f.combo));if(f.type==='vent'){const c=crescent(0xffe3a4,f.reach*.85,0);c.rotation.z=.22;c.rotation.y=.22;o.add(c);}}
+  if(f.shape==='impact'){const center=f.reach-f.width;for(let i=0;i<14;i++){const angle=i*2.4,r=f.width*(.4+(i%3)*.25);part(o,'rock',i%2?0x797455:0xbda279,Math.sin(angle)*r,.15+(i%3)*.17,center+Math.cos(angle)*r,.15,.3+(i%4)*.12,.18,[0,angle,.4]);}for(let i=0;i<6;i++)glow(o,'box',0xe3b260,Math.sin(i)*f.width*.5,.09,center+Math.cos(i)*f.width*.5,.07,.04,f.width,[0,i,0]);}
+  else if(f.type==='strike'||f.type==='vent'){
+   if(f.weapon==='shear'){o.add(crescent(color,f.reach,f.combo,f.width||1.15));if(f.type==='vent'){const c=crescent(0xffe3a4,f.reach*.85,0);c.rotation.z=.22;c.rotation.y=.22;o.add(c);}}
    else if(f.weapon==='pike'){glow(o,'cone',color,0,1.1,f.reach/2,.16,f.reach,.16,[Math.PI/2,0,0]);for(const s of [-1,1])part(o,'box',0xdbfaf4,s*.2,1.1,f.reach*.4,.025,.03,f.reach*.5);}
    else{for(let i=0;i<(f.type==='vent'?6:3);i++){const z=1+i*f.reach/(f.type==='vent'?6:3);part(o,'cone',0xe6a765,(i%2?1:-1)*.3,.2,z,.4,1.2-i*.1,.3,[.2,0,i%2?.3:-.3]);glow(o,'box',0xffca76,0,.1,z,.16,.05,1.3,[0,i%2?.3:-.3,0]);}}
   }else if(f.type==='enemy-strike'){for(let i=0;i<6;i++)part(o,'box',0xe9845d,(i%2?1:-1)*.5,.12,1+i*f.reach/6,.13,.15,1.2,[0,i%2?.5:-.5,0]);}

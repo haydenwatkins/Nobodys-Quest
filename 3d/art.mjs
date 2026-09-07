@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.min.js';
-import {RADIUS,landHeight,ROADS,STRUCTURES,BARRIERS,random,roadDistance,LANDMARKS} from './world-data.mjs?v=20260907-authored';
+import {RADIUS,landHeight,ROADS,STRUCTURES,BARRIERS,random,roadDistance,LANDMARKS} from './world-data.mjs?v=20260907-battle';
 const UP=new T.Vector3(0,1,0),geos={box:new T.BoxGeometry(1,1,1),sphere:new T.SphereGeometry(1,16,10),cyl:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,5)};
 const materials=new Map();
 export function material(color,metalness=0){const key=color+':'+metalness;if(!materials.has(key))materials.set(key,new T.MeshStandardMaterial({color,roughness:metalness?.53:.92,metalness}));return materials.get(key);}

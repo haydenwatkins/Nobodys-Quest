@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#26352f"><meta name="description" content="A salvage runner. A falling island. Three weapons against a living storm. Veyr and the Storm Engine, an original action-adventure prototype.">
-<title>Veyr and the Storm Engine</title><link rel="stylesheet" href="style.css?v=20260907-authored">
+<title>Veyr and the Storm Engine</title><link rel="stylesheet" href="style.css?v=20260907-battle"><link rel="stylesheet" href="conversation.css?v=20260907-battle">
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" class="symbol-sheet" aria-hidden="true"><defs>
@@ -36,10 +36,10 @@
 <div id="joystick" aria-label="Floating movement joystick"><div></div></div>
 <div id="bottom-meta"><span id="save-status">Progress secured</span><button id="rig-button" aria-label="Weapon journal"><svg aria-hidden="true"><use href="#rig-icon"/></svg></button></div>
 </main>
-<dialog id="dialogue"><span class="eyebrow" id="speaker">SERA VALE</span><p id="speech"></p><button class="primary" id="continue">Continue</button></dialog>
+<dialog id="dialogue" aria-labelledby="speaker" aria-describedby="speech-full"><div id="crew-portrait" aria-hidden="true"></div><div class="conversation-paper"><div class="speaker-pennant"><span id="speaker">Sera Vale</span><small id="speaker-role">PILOT · LAST ANCHORAGE</small></div><p id="speech" aria-hidden="true"></p><p id="speech-full" class="sr-only"></p><button id="continue">Read on <span aria-hidden="true">➜</span></button></div></dialog>
 <dialog id="menu"><div class="dialog-heading"><span class="eyebrow"></span><button data-close aria-label="Close menu">×</button></div><h2>Paused</h2><button class="primary" id="resume">Resume</button><button id="journal-button">Field chart</button><button id="sound-button" aria-pressed="true">Sound: on</button><button id="quality-button">Graphics: balanced</button><button id="comfort-button" aria-pressed="false">Gentle mode: off</button><button id="shake-button" aria-pressed="true">Impact shake: on</button><details><summary>Controls &amp; progress</summary><p>Move: WASD / arrows / left stick.<br>Strike: J / A or RT. Vent: K / X.<br>Evade: Space / B. Interact: E / Y.<br>Weapon: 1–3 / LB or RB.<br>Touch: start a drag anywhere on the left; the stick follows your thumb across the screen. Drag the right side to look.<br>Look: drag / right stick. Chart: M / View.<br>Pause: Escape / Menu.</p><p>Hits build pressure. The rig meter shows your vent cost. Break enemy posture for bonus damage. Survey cases reinforce maximum health.</p><button id="restart">Start this chapter again</button></details></dialog>
 <dialog id="map-dialog"><div class="dialog-heading"><span class="eyebrow"></span><button data-close aria-label="Close chart">×</button></div><h2>The falling island</h2><canvas id="map" width="640" height="560" aria-label="Field chart showing Veyr, field stations, and engine"></canvas><div id="map-legend">● Veyr <span>◆ Governor teeth</span><span>✦ Engine</span></div><p id="map-quest"></p><button id="globe-button">Survey the whole island</button></dialog>
 <dialog id="rig-dialog"><div class="dialog-heading"><span class="eyebrow"></span><button data-close aria-label="Close weapon briefing">×</button></div><h2>Tools of the trade</h2><p>All three are fitted from the start. Land hits to build pressure, then vent it through your weapon. Heavy blows break enemy posture.</p><div id="weapon-list"></div></dialog>
 <dialog id="reset-dialog"><span class="eyebrow">RESTART CHAPTER</span><h2>Begin again?</h2><p>This restarts only this adventure’s progress.</p><button id="confirm-reset">Start again</button><button class="primary" data-close>Keep my progress</button></dialog>
-<script type="module" src="main.mjs?v=20260907-authored"></script><script>window.addEventListener('error',function(){if(!window.stormEngineReady){document.getElementById('loading').classList.add('hidden');document.getElementById('error').classList.remove('hidden')}});</script>
+<script type="module" src="main.mjs?v=20260907-battle"></script><script>window.addEventListener('error',function(){if(!window.stormEngineReady){document.getElementById('loading').classList.add('hidden');document.getElementById('error').classList.remove('hidden')}});</script>
 </body></html>
