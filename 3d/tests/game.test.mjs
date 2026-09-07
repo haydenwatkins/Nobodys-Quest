@@ -21,3 +21,38 @@ test('pre-expansion saves keep their first 20 enemy IDs and unlock the next miss
 test('Stormline Rescue requires both waves at each relay, gates its boss, and grants a persistent reward',()=>{const g=new Game();Object.assign(g.progress,{briefed:true,won:true,returned:true});const visit=id=>{const l=LANDMARKS.find(l=>l.id===id);Object.assign(g.player,{x:l.x,z:l.z});g.interact();};const boss=g.enemies.find(e=>e.type==='harrow');assert.equal(g.active(boss),false);visit('relay-west');assert.equal(g.progress.relayStarted.length,0);visit('iona');assert.equal(g.progress.rescueBriefed,true);for(const id of ['relay-west','relay-east']){visit(id);const foes=g.enemies.filter(e=>e.relay===id);assert.equal(foes.filter(e=>g.active(e)).length,3);visit(id);assert.equal(g.progress.relays.includes(id),false);for(const e of foes.filter(e=>e.wave===1))g.hurtEnemy(e,9999);assert.equal(foes.filter(e=>g.active(e)).length,3);for(const e of foes.filter(e=>e.wave===2))g.hurtEnemy(e,9999);visit(id);assert.equal(g.progress.relays.includes(id),true);}assert.equal(g.active(boss),true);assert.equal(g.quest().target.id,'harrow');g.hurtEnemy(boss,9999);assert.equal(g.progress.rescueWon,true);visit('iona');assert.equal(g.maxHP,140);assert.equal(g.ventCost,20);g.player.charge=20;assert.equal(g.vent(),true);assert.equal(g.player.charge,0);visit('iona');assert.equal(g.maxHP,140);let data;saveProgress({setItem:(_,v)=>data=v},g);const restored=new Game(readProgress({getItem:()=>data}));assert.equal(restored.maxHP,140);assert.equal(restored.ventCost,20);assert.equal(restored.enemies.find(e=>e.type==='harrow').alive,false);});
 test('a partially cleared relay resumes without reviving defeated patrols',()=>{const g=new Game();Object.assign(g.progress,{returned:true,rescueBriefed:true,relayStarted:['relay-west']});const wave=g.enemies.filter(e=>e.relay==='relay-west'&&e.wave===1);g.hurtEnemy(wave[0],9999);let data;saveProgress({setItem:(_,v)=>data=v},g);const restored=new Game(readProgress({getItem:()=>data}));assert.equal(restored.enemies.filter(e=>e.relay==='relay-west'&&restored.active(e)).length,2);assert.equal(restored.relayWave('relay-west'),1);restored.hurtPlayer(9999);assert.equal(restored.enemies[wave[0].id].alive,false);assert.deepEqual(restored.progress.relayStarted,['relay-west']);});
 test('Harrow telegraphs a three-shot volley, expands to five below half health, and exposes its core',()=>{const g=new Game();Object.assign(g.progress,{rescueBriefed:true,relays:['relay-west','relay-east']});const boss=g.enemies.find(e=>e.type==='harrow');g.player.x=0;g.player.z=25;Object.assign(boss,{state:'windup',timer:.01,attackYaw:0});g.update(.02);assert.equal(g.shots.length,3);g.shots=[];Object.assign(boss,{hp:400,state:'windup',timer:.01});g.update(.02);assert.equal(g.shots.length,5);g.hurtEnemy(boss,1,120);assert.equal(boss.state,'stagger');});
+
+
+test('a late strike tap buffers exactly one combo, including through impact freeze',()=>{
+ for(const id of Object.keys(WEAPONS)){
+  const [g,e]=duel(id);e.alive=false;g.attack();
+  while(g.player.attack.duration-g.player.attack.age>.14)g.update(.01);
+  assert.equal(g.attack(),false);g.hitstop=.09;tick(g,17);
+  assert.equal(g.player.attack.combo,1);assert.equal(g.player.buffer,null);
+  tick(g,90);assert.equal(g.player.attack,null);
+  assert.equal(g.events.filter(e=>e.type==='windup').length,2);
+ }
+});
+test('a requested vent takes priority over held strikes in the recovery buffer',()=>{
+ const [g,e]=duel();e.alive=false;g.attack();tick(g,15);g.vent();
+ for(let i=0;i<8;i++){g.attack();g.update(1/60);}
+ assert.equal(g.player.attack.vent,true);assert.equal(g.player.charge,0);
+});
+test('shots stop at solid cover and still damage the player in open ground',()=>{
+ const g=new Game();for(const e of g.enemies)e.alive=false;
+ Object.assign(g.player,{x:0,z:0});
+ g.shots=[{id:1,x:0,z:15,vx:0,vz:100,life:1,damage:40}];
+ g.update(.05);assert.equal(g.shots.length,0);assert.equal(g.player.hp,120);
+ g.shots=[{id:2,x:0,z:-2,vx:0,vz:30,life:1,damage:40}];
+ g.update(.05);assert.equal(g.player.hp,80);assert.equal(g.shots.length,0);
+});
+test('crowds reserve at most two simultaneous windups near the player',()=>{
+ const g=new Game();for(const e of g.enemies)e.alive=false;Object.assign(g.player,{x:0,z:0});
+ for(let i=0;i<4;i++)Object.assign(g.enemies[i],{type:'mite',alive:true,x:(i-1.5)*.4,z:2,homeX:0,homeZ:2,cooldown:0});
+ g.update(.01);assert.equal(g.enemies.filter(e=>e.state==='windup').length,2);
+});
+test('movement settles quickly when the stick is released',()=>{
+ const g=new Game();for(const e of g.enemies)e.alive=false;Object.assign(g.player,{x:0,z:0});
+ for(let i=0;i<30;i++)g.update(1/60,{x:1,z:0});const x=g.player.x;
+ tick(g,15);assert.ok(g.player.x-x<.4);assert.ok(Math.abs(g.player.vx)<.03);
+});

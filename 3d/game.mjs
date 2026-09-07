@@ -6,7 +6,7 @@ export function saveProgress(storage,game){try{storage.setItem(SAVE_KEY,JSON.str
 export class Game {
  constructor(progress=freshProgress()){
   this.progress=progress;this.time=0;this.events=[];this.effects=[];this.shots=[];this.pickups=[];this.serial=0;this.hitstop=0;this.relayWaves=new Map();
-  this.player={x:progress.x,z:progress.z,hp:progress.hp,weapon:progress.weapon,yaw:Math.PI,charge:30,combo:0,comboWindow:0,attack:null,recovery:0,dodge:0,dash:0,invulnerable:0,flash:0,move:0,lastHit:-20};
+  this.player={x:progress.x,z:progress.z,hp:progress.hp,weapon:progress.weapon,yaw:Math.PI,charge:30,combo:0,comboWindow:0,attack:null,recovery:0,dodge:0,dash:0,invulnerable:0,flash:0,move:0,lastHit:-20,vx:0,vz:0,buffer:null};
   this.enemies=SPAWNS.map(([type,x,z,relay,wave],id)=>({id,type,x,z,relay,wave,homeX:x,homeZ:z,hp:ENEMIES[type].hp,posture:0,alive:!progress.defeated.includes(id),yaw:0,state:'idle',timer:0,cooldown:1+id*.1,flash:0,knockX:0,knockZ:0,attackX:x,attackZ:z,attackYaw:0,attackCount:0,exposed:0}));
  }
  get maxHP(){return 120+this.progress.caches.length*10+(this.progress.rescueDone?20:0);}
@@ -19,13 +19,13 @@ export class Game {
  nearestEnemy(range=10){return this.enemies.filter(e=>this.active(e)&&distance(e,this.player)<range).sort((a,b)=>distance(a,this.player)-distance(b,this.player))[0];}
  setWeapon(id){if(!WEAPONS[id]||this.player.attack||this.player.weapon===id)return false;this.player.weapon=id;this.player.combo=0;this.emit('equip',{weapon:id});this.emit('save');return true;}
  attack(){
-  const p=this.player;if(p.attack||p.recovery>0||p.dash>0)return false;const w=WEAPONS[p.weapon];
+  const p=this.player;if(p.attack||p.recovery>0||p.dash>0){if(p.attack&&p.attack.duration-p.attack.age<.18&&p.buffer?.type!=='vent')p.buffer={type:'attack',until:this.time+.2};return false;}const w=WEAPONS[p.weapon];
   const target=this.nearestEnemy(w.reach+1);if(target&&!p.move)p.yaw=Math.atan2(target.x-p.x,target.z-p.z);
-  p.combo=p.comboWindow>0?(p.combo+1)%3:0;p.comboWindow=1.3;
+  p.combo=p.comboWindow>0?(p.combo+1)%3:0;p.comboWindow=1.45;
   p.attack={weapon:p.weapon,yaw:p.yaw,combo:p.combo,age:0,hit:false,vent:false,duration:w.windup+w.recovery,windup:w.windup};this.emit('windup',{weapon:p.weapon});return true;
  }
  vent(){
-  const p=this.player;if(p.attack||p.recovery>0||p.dash>0)return false;if(p.charge<this.ventCost){this.emit('toast',{text:`Land hits or dodge through a strike to build ${this.ventCost} pressure.`});return false;}
+  const p=this.player;if(p.attack||p.recovery>0||p.dash>0){if(p.attack&&p.attack.duration-p.attack.age<.18)p.buffer={type:'vent',until:this.time+.2};return false;}if(p.charge<this.ventCost){this.emit('toast',{text:`Land hits or dodge through a strike to build ${this.ventCost} pressure.`});return false;}
   p.charge-=this.ventCost;const w=WEAPONS[p.weapon],target=this.nearestEnemy(14);if(target&&!p.move)p.yaw=Math.atan2(target.x-p.x,target.z-p.z);
   p.attack={weapon:p.weapon,yaw:p.yaw,combo:2,age:0,hit:false,vent:true,duration:.7,windup:.2};this.emit('windup',{weapon:p.weapon});return true;
  }
@@ -37,19 +37,19 @@ export class Game {
   for(const e of this.enemies.filter(e=>this.active(e)))if(inStrike(origin,e,reach+ENEMIES[e.type].radius*.4,width+ENEMIES[e.type].radius*.35))this.hurtEnemy(e,damage,posture,a.weapon==='maul'?8:3,origin);
  }
  dodge(){
-  const p=this.player;if(p.dodge>0||p.attack?.hit)return false;p.attack=null;p.dodge=.95;p.dash=.23;p.invulnerable=.28;
+  const p=this.player;if(p.dodge>0||p.attack?.hit)return false;p.attack=null;p.buffer=null;p.vx=0;p.vz=0;p.dodge=.8;p.dash=.23;p.invulnerable=.28;
   const threatened=this.enemies.some(e=>this.active(e)&&e.state==='windup'&&e.timer<.38&&inStrike({x:e.attackX,z:e.attackZ,yaw:e.attackYaw},p,ENEMIES[e.type].reach,ENEMIES[e.type].width));
   if(threatened){p.charge=Math.min(100,p.charge+20);this.emit('perfect');this.fx('perfect',p.x,p.z,.6,{yaw:p.yaw});}
   this.fx('dash',p.x,p.z,.3,{yaw:p.yaw});this.emit('dodge');return true;
  }
  hurtEnemy(e,damage,posture=0,knock=0,origin=this.player){
-  if(!this.active(e))return;const broken=e.state==='stagger';const amount=damage*(broken?1.45:1);e.hp-=amount;e.flash=.16;e.posture+=posture;
+  if(!this.active(e))return;const broken=e.state==='stagger';const amount=damage*(broken?1.45:1);e.hp-=amount;e.flash=.16;e.recoil=.22;e.posture+=posture;
   const d=Math.max(.1,distance(e,origin));e.knockX=(e.x-origin.x)/d*knock;e.knockZ=(e.z-origin.z)/d*knock;
   this.player.charge=clamp(this.player.charge+7,0,100);this.hitstop=Math.max(this.hitstop,damage>50?.075:.045);this.fx('impact',e.x,e.z,.45,{amount:Math.round(amount),heavy:damage>50,yaw:origin.yaw||0});this.emit('hit',{heavy:damage>50,amount});
   if(e.posture>=ENEMIES[e.type].posture){e.posture=0;e.state='stagger';e.timer=['engine','harrow'].includes(e.type)?2.6:1.6;this.emit('stagger');this.fx('break',e.x,e.z,.7);}
   if(e.hp<=0){e.alive=false;this.progress.defeated.push(e.id);this.fx('shatter',e.x,e.z,.8,{heavy:e.type==='engine'});this.emit('kill');this.pickups.push({id:++this.serial,x:e.x,z:e.z,life:120});if(e.type==='engine'){this.progress.won=true;this.emit('victory');}if(e.type==='harrow'){this.progress.rescueWon=true;this.emit('rescue-victory');}this.emit('save');}
  }
- hurtPlayer(amount){const p=this.player;if(p.invulnerable>0)return;p.hp-=amount*(this.progress.gentle?.45:1);p.invulnerable=.7;p.flash=.28;p.lastHit=this.time;this.emit('damage');if(p.hp<=0){p.x=0;p.z=25;p.hp=this.maxHP;p.charge=Math.max(30,p.charge);p.invulnerable=3;p.attack=null;p.dash=0;for(const e of this.enemies)if(e.alive){e.x=e.homeX;e.z=e.homeZ;e.hp=ENEMIES[e.type].hp;e.state='idle';e.cooldown=2;e.posture=0;}this.shots=[];this.emit('respawn');this.emit('save');}}
+ hurtPlayer(amount){const p=this.player;if(p.invulnerable>0)return;p.hp-=amount*(this.progress.gentle?.45:1);p.invulnerable=.7;p.flash=.28;p.lastHit=this.time;this.emit('damage');if(p.hp<=0){p.x=0;p.z=25;p.hp=this.maxHP;p.charge=Math.max(30,p.charge);p.invulnerable=3;p.attack=null;p.buffer=null;p.vx=0;p.vz=0;p.dash=0;for(const e of this.enemies)if(e.alive){e.x=e.homeX;e.z=e.homeZ;e.hp=ENEMIES[e.type].hp;e.state='idle';e.cooldown=2;e.posture=0;}this.shots=[];this.emit('respawn');this.emit('save');}}
  move(e,dx,dz,radius=.5){const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.3));for(let i=0;i<steps;i++){if(walkable(e.x+dx/steps,e.z,radius))e.x+=dx/steps;if(walkable(e.x,e.z+dz/steps,radius))e.z+=dz/steps;}}
  nearby(){return LANDMARKS.filter(l=>l.type!=='boss'&&((l.type!=='relay'&&l.id!=='iona')||this.progress.returned)&&distance(l,this.player)<l.radius&&!(l.type==='cache'&&this.progress.caches.includes(l.id))).sort((a,b)=>distance(a,this.player)-distance(b,this.player))[0];}
  interact(){
@@ -95,16 +95,19 @@ export class Game {
  update(dt,input={x:0,z:0}){
   dt=clamp(dt,0,.05);this.time+=dt;const p=this.player;
   // Impact freeze stops motion briefly while the renderer continues the impact flash.
-  if(this.hitstop>0){this.hitstop=Math.max(0,this.hitstop-dt);return;}
+  if(this.hitstop>0){this.hitstop=Math.max(0,this.hitstop-dt);if(p.buffer)p.buffer.until+=dt;return;}
   for(const k of ['recovery','dodge','dash','invulnerable','flash','comboWindow'])p[k]=Math.max(0,p[k]-dt);
   const len=Math.hypot(input.x||0,input.z||0);p.move=Math.min(1,len);
-  if(len>.08&&!p.attack){p.yaw=Math.atan2(input.x,input.z);if(p.dash===0)this.move(p,input.x/Math.max(1,len)*WEAPONS[p.weapon].speed*dt,input.z/Math.max(1,len)*WEAPONS[p.weapon].speed*dt);}
+  const speed=WEAPONS[p.weapon].speed,blend=1-Math.exp(-dt*24);p.vx+=((input.x||0)/Math.max(1,len)*speed-p.vx)*blend;p.vz+=((input.z||0)/Math.max(1,len)*speed-p.vz)*blend;
+  if(!p.attack&&p.dash===0){if(len>.08)p.yaw=Math.atan2(input.x,input.z);this.move(p,p.vx*dt,p.vz*dt);}
+
   if(p.attack){const a=p.attack;a.age+=dt;if(!a.hit&&a.age>=a.windup){a.hit=true;this.resolveAttack(a);}if(a.age>=a.duration)p.attack=null;}
+  if(p.buffer&&!p.attack){const queued=p.buffer;p.buffer=null;if(this.time<=queued.until)this[queued.type]();}
   if(p.dash>0)this.move(p,Math.sin(p.yaw)*27*dt,Math.cos(p.yaw)*27*dt);
   if(this.progress.gentle&&this.time-p.lastHit>5)p.hp=Math.min(this.maxHP,p.hp+6*dt);
   for(const id of this.progress.relayStarted){const wave=this.relayWave(id);if(!this.progress.relays.includes(id)&&this.relayWaves.get(id)!==wave){this.relayWaves.set(id,wave);if(wave===2&&this.enemies.some(e=>e.relay===id&&e.alive))this.emit('relay-wave',{id});}}
   for(const e of this.enemies){
-   if(!this.active(e))continue;const s=ENEMIES[e.type];e.flash=Math.max(0,e.flash-dt);e.cooldown=Math.max(0,e.cooldown-dt);e.posture=Math.max(0,e.posture-dt*3);
+   if(!this.active(e))continue;const s=ENEMIES[e.type];e.flash=Math.max(0,e.flash-dt);e.recoil=Math.max(0,(e.recoil||0)-dt);e.cooldown=Math.max(0,e.cooldown-dt);e.posture=Math.max(0,e.posture-dt*3);
    if(Math.abs(e.knockX)+Math.abs(e.knockZ)>.1){this.move(e,e.knockX*dt,e.knockZ*dt);e.knockX*=Math.exp(-7*dt);e.knockZ*=Math.exp(-7*dt);}
    const d=distance(e,p),home=distance(e,{x:e.homeX,z:e.homeZ});
    if(e.state==='windup'){
@@ -115,10 +118,10 @@ export class Game {
      e.state='recover';e.timer=s.recovery;e.cooldown=s.cooldown;e.attackCount++;this.emit('enemy-strike');
     }
    }else if(e.state==='recover'||e.state==='stagger'){e.timer-=dt;if(e.timer<=0)e.state='idle';}
-   else if(d<s.aggro&&home<24){e.yaw=Math.atan2(p.x-e.x,p.z-e.z);if(d<s.reach-.5&&e.cooldown===0){e.state='windup';e.timer=s.windup;e.attackX=e.x;e.attackZ=e.z;e.attackYaw=e.yaw;}else if(d>Math.max(2,s.reach*.55))this.move(e,(p.x-e.x)/d*s.speed*dt,(p.z-e.z)/d*s.speed*dt,s.radius*.45);}
+   else if(d<s.aggro&&home<24){e.yaw=Math.atan2(p.x-e.x,p.z-e.z);if(d<s.reach-.5&&e.cooldown===0&&this.enemies.filter(other=>other!==e&&this.active(other)&&other.state==='windup'&&distance(other,p)<20).length<2){e.state='windup';e.timer=s.windup;e.attackX=e.x;e.attackZ=e.z;e.attackYaw=e.yaw;}else if(d>Math.max(2,s.reach*.55))this.move(e,(p.x-e.x)/d*s.speed*dt,(p.z-e.z)/d*s.speed*dt,s.radius*.45);}
    else if(home>.3)this.move(e,(e.homeX-e.x)/home*s.speed*dt,(e.homeZ-e.z)/home*s.speed*dt);
   }
-  for(const shot of this.shots){shot.x+=shot.vx*dt;shot.z+=shot.vz*dt;shot.life-=dt;if(distance(shot,p)<1.1){if(p.invulnerable>0&&p.dash>0){p.charge=Math.min(100,p.charge+10);this.emit('perfect');}this.hurtPlayer(shot.damage);shot.life=0;}}
+  for(const shot of this.shots){const steps=Math.max(1,Math.ceil(Math.hypot(shot.vx,shot.vz)*dt/.3));for(let i=0;i<steps;i++){const nx=shot.x+shot.vx*dt/steps,nz=shot.z+shot.vz*dt/steps;if(!walkable(nx,nz,.1)){shot.life=0;break;}shot.x=nx;shot.z=nz;}shot.life-=dt;if(shot.life>0&&distance(shot,p)<1.1){if(p.invulnerable>0&&p.dash>0){p.charge=Math.min(100,p.charge+10);this.emit('perfect');}this.hurtPlayer(shot.damage);shot.life=0;}}
   this.shots=this.shots.filter(s=>s.life>0);
   for(const f of this.effects)f.life-=dt;this.effects=this.effects.filter(f=>f.life>0);
   for(const item of this.pickups){item.life-=dt;const d=distance(item,p);if(d<9){item.x+=(p.x-item.x)*dt*5;item.z+=(p.z-item.z)*dt*5;}if(d<1.3){p.hp=Math.min(this.maxHP,p.hp+12);p.charge=Math.min(100,p.charge+8);item.life=0;this.fx('repair',p.x,p.z,.4);this.emit('pickup');}}
