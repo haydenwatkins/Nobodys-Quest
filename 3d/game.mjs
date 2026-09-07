@@ -1,18 +1,21 @@
 import {SAVE_KEY,WEAPONS,ENEMIES,SPAWNS,LANDMARKS,clamp,distance,walkable,inStrike} from './world-data.mjs';
 
-export function freshProgress(){return {version:1,x:0,z:25,weapon:'shear',hp:120,teeth:[],defeated:[],caches:[],briefed:false,won:false,returned:false,gentle:false,sound:true,quality:'balanced',shake:true};}
-export function readProgress(storage){try{const p=JSON.parse(storage.getItem(SAVE_KEY));if(!p||p.version!==1)return freshProgress();const d=freshProgress();for(const k of ['briefed','won','returned','gentle','sound','shake'])if(typeof p[k]==='boolean')d[k]=p[k];d.teeth=Array.isArray(p.teeth)?[...new Set(p.teeth.filter(v=>['west','north','east'].includes(v)))]:[];d.caches=Array.isArray(p.caches)?[...new Set(p.caches.filter(v=>LANDMARKS.some(l=>l.type==='cache'&&l.id===v)))]:[];d.defeated=Array.isArray(p.defeated)?[...new Set(p.defeated.filter(v=>Number.isInteger(v)&&v>=0&&v<SPAWNS.length))]:[];if(WEAPONS[p.weapon])d.weapon=p.weapon;if(Number.isFinite(p.x)&&Number.isFinite(p.z)&&walkable(p.x,p.z)){d.x=p.x;d.z=p.z;}if(Number.isFinite(p.hp))d.hp=clamp(p.hp,1,120+d.caches.length*10);if(['balanced','low','high'].includes(p.quality))d.quality=p.quality;return d;}catch{return freshProgress();}}
+export function freshProgress(){return {version:1,x:0,z:25,weapon:'shear',hp:120,teeth:[],defeated:[],caches:[],briefed:false,won:false,returned:false,rescueBriefed:false,rescueWon:false,rescueDone:false,relayStarted:[],relays:[],gentle:false,sound:true,quality:'balanced',shake:true};}
+export function readProgress(storage){try{const p=JSON.parse(storage.getItem(SAVE_KEY));if(!p||p.version!==1)return freshProgress();const d=freshProgress();for(const k of ['briefed','won','returned','rescueBriefed','rescueWon','rescueDone','gentle','sound','shake'])if(typeof p[k]==='boolean')d[k]=p[k];d.teeth=Array.isArray(p.teeth)?[...new Set(p.teeth.filter(v=>['west','north','east'].includes(v)))]:[];d.caches=Array.isArray(p.caches)?[...new Set(p.caches.filter(v=>LANDMARKS.some(l=>l.type==='cache'&&l.id===v)))]:[];d.defeated=Array.isArray(p.defeated)?[...new Set(p.defeated.filter(v=>Number.isInteger(v)&&v>=0&&v<SPAWNS.length))]:[];for(const k of ['relayStarted','relays'])d[k]=Array.isArray(p[k])?[...new Set(p[k].filter(v=>['relay-west','relay-east'].includes(v)))]:[];if(WEAPONS[p.weapon])d.weapon=p.weapon;if(Number.isFinite(p.x)&&Number.isFinite(p.z)&&walkable(p.x,p.z)){d.x=p.x;d.z=p.z;}if(Number.isFinite(p.hp))d.hp=clamp(p.hp,1,120+d.caches.length*10+(d.rescueDone?20:0));if(['balanced','low','high'].includes(p.quality))d.quality=p.quality;return d;}catch{return freshProgress();}}
 export function saveProgress(storage,game){try{storage.setItem(SAVE_KEY,JSON.stringify({...game.progress,x:game.player.x,z:game.player.z,hp:game.player.hp,weapon:game.player.weapon}));return true;}catch{return false;}}
 export class Game {
  constructor(progress=freshProgress()){
-  this.progress=progress;this.time=0;this.events=[];this.effects=[];this.shots=[];this.pickups=[];this.serial=0;this.hitstop=0;
+  this.progress=progress;this.time=0;this.events=[];this.effects=[];this.shots=[];this.pickups=[];this.serial=0;this.hitstop=0;this.relayWaves=new Map();
   this.player={x:progress.x,z:progress.z,hp:progress.hp,weapon:progress.weapon,yaw:Math.PI,charge:30,combo:0,comboWindow:0,attack:null,recovery:0,dodge:0,dash:0,invulnerable:0,flash:0,move:0,lastHit:-20};
-  this.enemies=SPAWNS.map(([type,x,z],id)=>({id,type,x,z,homeX:x,homeZ:z,hp:ENEMIES[type].hp,posture:0,alive:!progress.defeated.includes(id),yaw:0,state:'idle',timer:0,cooldown:1+id*.1,flash:0,knockX:0,knockZ:0,attackX:x,attackZ:z,attackYaw:0,attackCount:0,exposed:0}));
+  this.enemies=SPAWNS.map(([type,x,z,relay,wave],id)=>({id,type,x,z,relay,wave,homeX:x,homeZ:z,hp:ENEMIES[type].hp,posture:0,alive:!progress.defeated.includes(id),yaw:0,state:'idle',timer:0,cooldown:1+id*.1,flash:0,knockX:0,knockZ:0,attackX:x,attackZ:z,attackYaw:0,attackCount:0,exposed:0}));
  }
- get maxHP(){return 120+this.progress.caches.length*10;}
+ get maxHP(){return 120+this.progress.caches.length*10+(this.progress.rescueDone?20:0);}
  emit(type,detail={}){this.events.push({type,...detail});}
  fx(type,x,z,life=.4,extra={}){this.effects.push({id:++this.serial,type,x,z,life,maxLife:life,...extra});}
- active(e){return e.alive&&(e.type!=='engine'||this.progress.teeth.length===3);}
+ get ventCost(){return this.progress.rescueDone?20:30;}
+ relayWave(id){return this.enemies.some(e=>e.relay===id&&e.wave===1&&e.alive)?1:2;}
+ active(e){if(!e.alive)return false;if(e.relay)return this.progress.rescueBriefed&&this.progress.relayStarted.includes(e.relay)&&e.wave<=this.relayWave(e.relay);if(e.type==='harrow')return this.progress.rescueBriefed&&this.progress.relays.length===2;return e.type!=='engine'||this.progress.teeth.length===3;}
+
  nearestEnemy(range=10){return this.enemies.filter(e=>this.active(e)&&distance(e,this.player)<range).sort((a,b)=>distance(a,this.player)-distance(b,this.player))[0];}
  setWeapon(id){if(!WEAPONS[id]||this.player.attack||this.player.weapon===id)return false;this.player.weapon=id;this.player.combo=0;this.emit('equip',{weapon:id});this.emit('save');return true;}
  attack(){
@@ -22,8 +25,8 @@ export class Game {
   p.attack={weapon:p.weapon,yaw:p.yaw,combo:p.combo,age:0,hit:false,vent:false,duration:w.windup+w.recovery,windup:w.windup};this.emit('windup',{weapon:p.weapon});return true;
  }
  vent(){
-  const p=this.player;if(p.attack||p.recovery>0||p.dash>0)return false;if(p.charge<30){this.emit('toast',{text:'Land hits or dodge through a strike to build 30 pressure.'});return false;}
-  p.charge-=30;const w=WEAPONS[p.weapon],target=this.nearestEnemy(14);if(target&&!p.move)p.yaw=Math.atan2(target.x-p.x,target.z-p.z);
+  const p=this.player;if(p.attack||p.recovery>0||p.dash>0)return false;if(p.charge<this.ventCost){this.emit('toast',{text:`Land hits or dodge through a strike to build ${this.ventCost} pressure.`});return false;}
+  p.charge-=this.ventCost;const w=WEAPONS[p.weapon],target=this.nearestEnemy(14);if(target&&!p.move)p.yaw=Math.atan2(target.x-p.x,target.z-p.z);
   p.attack={weapon:p.weapon,yaw:p.yaw,combo:2,age:0,hit:false,vent:true,duration:.7,windup:.2};this.emit('windup',{weapon:p.weapon});return true;
  }
  resolveAttack(a){
@@ -31,7 +34,7 @@ export class Game {
   let reach=w.reach,width=w.width,damage=w.damage*(a.combo===2?1.6:1),posture=a.weapon==='maul'?55:a.combo===2?28:12;
   if(a.vent){reach=a.weapon==='pike'?20:a.weapon==='maul'?13:7;width=a.weapon==='pike'?1.6:a.weapon==='maul'?2.5:5;damage=a.weapon==='maul'?125:a.weapon==='pike'?100:80;posture=80;}
   this.move(p,Math.sin(a.yaw)*.55,Math.cos(a.yaw)*.55);this.fx(a.vent?'vent':'strike',p.x,p.z,a.vent?.5:.23,{weapon:a.weapon,yaw:a.yaw,combo:a.combo,reach,width});this.emit('swing',{weapon:a.weapon,vent:a.vent,combo:a.combo});
-  for(const e of this.enemies)if(this.active(e)&&inStrike(origin,e,reach+ENEMIES[e.type].radius*.4,width+ENEMIES[e.type].radius*.35))this.hurtEnemy(e,damage,posture,a.weapon==='maul'?8:3,origin);
+  for(const e of this.enemies.filter(e=>this.active(e)))if(inStrike(origin,e,reach+ENEMIES[e.type].radius*.4,width+ENEMIES[e.type].radius*.35))this.hurtEnemy(e,damage,posture,a.weapon==='maul'?8:3,origin);
  }
  dodge(){
   const p=this.player;if(p.dodge>0||p.attack?.hit)return false;p.attack=null;p.dodge=.95;p.dash=.23;p.invulnerable=.28;
@@ -43,17 +46,26 @@ export class Game {
   if(!this.active(e))return;const broken=e.state==='stagger';const amount=damage*(broken?1.45:1);e.hp-=amount;e.flash=.16;e.posture+=posture;
   const d=Math.max(.1,distance(e,origin));e.knockX=(e.x-origin.x)/d*knock;e.knockZ=(e.z-origin.z)/d*knock;
   this.player.charge=clamp(this.player.charge+7,0,100);this.hitstop=Math.max(this.hitstop,damage>50?.075:.045);this.fx('impact',e.x,e.z,.45,{amount:Math.round(amount),heavy:damage>50,yaw:origin.yaw||0});this.emit('hit',{heavy:damage>50,amount});
-  if(e.posture>=ENEMIES[e.type].posture){e.posture=0;e.state='stagger';e.timer=e.type==='engine'?2.6:1.6;this.emit('stagger');this.fx('break',e.x,e.z,.7);}
-  if(e.hp<=0){e.alive=false;this.progress.defeated.push(e.id);this.fx('shatter',e.x,e.z,.8,{heavy:e.type==='engine'});this.emit('kill');this.pickups.push({id:++this.serial,x:e.x,z:e.z,life:120});if(e.type==='engine'){this.progress.won=true;this.emit('victory');}this.emit('save');}
+  if(e.posture>=ENEMIES[e.type].posture){e.posture=0;e.state='stagger';e.timer=['engine','harrow'].includes(e.type)?2.6:1.6;this.emit('stagger');this.fx('break',e.x,e.z,.7);}
+  if(e.hp<=0){e.alive=false;this.progress.defeated.push(e.id);this.fx('shatter',e.x,e.z,.8,{heavy:e.type==='engine'});this.emit('kill');this.pickups.push({id:++this.serial,x:e.x,z:e.z,life:120});if(e.type==='engine'){this.progress.won=true;this.emit('victory');}if(e.type==='harrow'){this.progress.rescueWon=true;this.emit('rescue-victory');}this.emit('save');}
  }
  hurtPlayer(amount){const p=this.player;if(p.invulnerable>0)return;p.hp-=amount*(this.progress.gentle?.45:1);p.invulnerable=.7;p.flash=.28;p.lastHit=this.time;this.emit('damage');if(p.hp<=0){p.x=0;p.z=25;p.hp=this.maxHP;p.charge=Math.max(30,p.charge);p.invulnerable=3;p.attack=null;p.dash=0;for(const e of this.enemies)if(e.alive){e.x=e.homeX;e.z=e.homeZ;e.hp=ENEMIES[e.type].hp;e.state='idle';e.cooldown=2;e.posture=0;}this.shots=[];this.emit('respawn');this.emit('save');}}
  move(e,dx,dz,radius=.5){const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.3));for(let i=0;i<steps;i++){if(walkable(e.x+dx/steps,e.z,radius))e.x+=dx/steps;if(walkable(e.x,e.z+dz/steps,radius))e.z+=dz/steps;}}
- nearby(){return LANDMARKS.filter(l=>l.type!=='boss'&&distance(l,this.player)<l.radius&&!(l.type==='cache'&&this.progress.caches.includes(l.id))).sort((a,b)=>distance(a,this.player)-distance(b,this.player))[0];}
+ nearby(){return LANDMARKS.filter(l=>l.type!=='boss'&&((l.type!=='relay'&&l.id!=='iona')||this.progress.returned)&&distance(l,this.player)<l.radius&&!(l.type==='cache'&&this.progress.caches.includes(l.id))).sort((a,b)=>distance(a,this.player)-distance(b,this.player))[0];}
  interact(){
   const l=this.nearby();if(!l)return;const p=this.progress;
   if(l.id==='sera'){
-   p.briefed=true;if(p.won){p.returned=true;this.emit('dialogue',{speaker:'Sera Vale',lines:['The pressure is falling. Look at the sky, Veyr. For the first time in six years, it is only weather.','I thought you came back for the engine. You came back for us.','The causeway is holding. We can bring the scattered crews home. This is where we start.']});}
+   p.briefed=true;if(p.rescueDone){this.emit('dialogue',{speaker:'Sera Vale',lines:['I counted every skiff. Every crew. For once, every berth is accounted for.','Iona has the radio running day and night. We are going to need a bigger anchorage.']});}else if(p.returned&&!p.rescueDone){this.emit('dialogue',{speaker:'Sera Vale',lines:['Iona made it back with a cracked receiver. She is waiting by the southern shelters.','The engine is quiet, but our crews are still out there. Help her bring the stormline back.']});}else if(p.won){p.returned=true;this.emit('dialogue',{speaker:'Sera Vale',lines:['The pressure is falling. Look at the sky, Veyr. For the first time in six years, it is only weather.','I thought you came back for the engine. You came back for us.','Iona is waiting by the southern shelters. Her receiver caught a distress call. We still have people out there.']});}
    else this.emit('dialogue',{speaker:'Sera Vale',lines:['You made it through the breach. I kept your rig running, but the island is losing altitude.','The Storm Engine tore its governor apart. Three teeth are scattered across the field stations. Recover them before we approach its heart.','Your tools are already fitted: an edge, a lance, and a hammer. Strike to build pressure. Vent it when you need to break a line. I will keep the anchorage lit.']});
+  }else if(l.id==='iona'){
+   if(p.rescueWon){p.rescueDone=true;this.player.hp=this.maxHP;this.player.charge=100;this.emit('dialogue',{speaker:'Iona Rusk',lines:['Three skiffs on approach. I can hear them laughing over the radio. You did it.','I fitted the recovered regulator to your rig. Your vents now cost 20 pressure, and the reinforced harness gives you 20 more health.','Sera says we should call this place home again. I think she is right.']});this.emit('crew-home');}
+   else{p.rescueBriefed=true;this.emit('dialogue',{speaker:'Iona Rusk',lines:['I heard your engine cut from the far side of the storm. Then I heard our missing crews. They are alive, Veyr.','Bring up the western and eastern relays. The signal will pull in two patrols at each tower. Clear them, then lock the transmitter.','Once both relays are broadcasting, we can find the Tempest Harrow. It is hunting the skiffs. Cut it down and I can guide everyone home.']});}
+  }else if(l.type==='relay'){
+   if(!p.rescueBriefed){this.emit('toast',{text:'Iona at the anchorage has the transmitter codes.'});return;}
+   if(p.relays.includes(l.id)){this.emit('toast',{text:'The relay is broadcasting. The crews can hear us.'});return;}
+   if(!p.relayStarted.includes(l.id)){p.relayStarted.push(l.id);this.player.charge=100;this.player.hp=Math.min(this.maxHP,this.player.hp+25);this.emit('relay-start',{id:l.id});}
+   else if(this.enemies.some(e=>e.relay===l.id&&e.alive)){this.emit('toast',{text:'Clear both patrols, then return to lock the transmitter.'});return;}
+   else{p.relays.push(l.id);this.player.hp=this.maxHP;this.player.charge=100;this.emit('relay-secured',{count:p.relays.length});this.fx('salvage',l.x,l.z,1.3);}
   }else if(l.id==='oren')this.emit('dialogue',{speaker:'Oren Flint',lines:['I used to maintain those dredgers. The engine has put a storm inside every one of them.','Their joints still lock under impact. Break their posture with the hammer, then drive the lance through the exposed core.','The governor case is up the cut. Clear its patrol before you touch the clamps.']});
   else if(l.type==='chart')this.emit('dialogue',{speaker:'Crew field chart',lines:['BLACKGLASS CUT: west. SEVERED SPIRE: northeast. COPPER REACHES: east. Each field station holds a governor tooth.','Amber pressure builds with each hit. A last-moment dodge through a marked attack supplies an extra burst.','Find survey cases to reinforce your rig. Repairs are available at the anchorage.']});
   else if(l.type==='bench'){this.player.hp=this.maxHP;this.player.charge=Math.max(30,this.player.charge);this.fx('repair',l.x,l.z,1);this.emit('toast',{text:'Rig repaired. Pressure primed.'});}
@@ -66,7 +78,15 @@ export class Game {
   this.emit('save');
  }
  quest(){const p=this.progress;
-  if(p.returned)return {title:'A sky worth fighting for',detail:'Find the remaining survey cases. The anchorage is safe.',count:p.caches.length+' / 3 rig reinforcements',target:null};
+  if(p.rescueDone)return {title:'The crews are home',detail:'Regulator fitted: vents cost 20. Find any remaining survey cases.',count:p.caches.length+' / 3 survey cases',target:null};
+  if(p.rescueWon)return {title:'Bring the skiffs home',detail:'Return to Iona for your upgraded pressure regulator.',count:'Harrow destroyed',target:LANDMARKS.find(l=>l.id==='iona')};
+  if(p.returned){
+   if(!p.rescueBriefed)return {title:'A voice beyond the storm',detail:'Iona caught a distress call. Meet her by the southern shelters.',count:'STORMLINE RESCUE',target:LANDMARKS.find(l=>l.id==='iona')};
+   if(p.relays.length===2)return {title:'Clear the stormline',detail:'Destroy the Tempest Harrow in the northwest. Evade its volleys and break its core.',count:'Both relays online',target:LANDMARKS.find(l=>l.id==='harrow')};
+   const relay=LANDMARKS.filter(l=>l.type==='relay'&&!p.relays.includes(l.id)).sort((a,b)=>Number(p.relayStarted.includes(b.id))-Number(p.relayStarted.includes(a.id))||distance(a,this.player)-distance(b,this.player))[0];const remaining=this.enemies.filter(e=>e.relay===relay.id&&e.alive).length;
+   return {title:'Restore the stormline',detail:p.relayStarted.includes(relay.id)?remaining?`Clear ${relay.area}: ${remaining} defenders left across both patrols.`:'Patrols cleared. Return to the relay to lock its transmitter.':'Activate either relay. Hold off two patrols, then secure the transmitter.',count:p.relays.length+' / 2 relays online',target:relay};
+  }
+
   if(p.won)return {title:'Bring the crew home',detail:'Return to Sera at the Last Anchorage.',count:'Engine severed',target:LANDMARKS[0]};
   if(!p.briefed)return {title:'Report to Sera',detail:'Find the pilot beside the mooring engine.',count:'The Last Anchorage',target:LANDMARKS[0]};
   if(p.teeth.length===3)return {title:'Sever the storm',detail:'Face the Keelbreaker at the northern engine scar. Break its posture, then strike its core.',count:'Governor complete',target:LANDMARKS.find(l=>l.id==='engine')};
@@ -82,13 +102,15 @@ export class Game {
   if(p.attack){const a=p.attack;a.age+=dt;if(!a.hit&&a.age>=a.windup){a.hit=true;this.resolveAttack(a);}if(a.age>=a.duration)p.attack=null;}
   if(p.dash>0)this.move(p,Math.sin(p.yaw)*27*dt,Math.cos(p.yaw)*27*dt);
   if(this.progress.gentle&&this.time-p.lastHit>5)p.hp=Math.min(this.maxHP,p.hp+6*dt);
+  for(const id of this.progress.relayStarted){const wave=this.relayWave(id);if(!this.progress.relays.includes(id)&&this.relayWaves.get(id)!==wave){this.relayWaves.set(id,wave);if(wave===2&&this.enemies.some(e=>e.relay===id&&e.alive))this.emit('relay-wave',{id});}}
   for(const e of this.enemies){
    if(!this.active(e))continue;const s=ENEMIES[e.type];e.flash=Math.max(0,e.flash-dt);e.cooldown=Math.max(0,e.cooldown-dt);e.posture=Math.max(0,e.posture-dt*3);
    if(Math.abs(e.knockX)+Math.abs(e.knockZ)>.1){this.move(e,e.knockX*dt,e.knockZ*dt);e.knockX*=Math.exp(-7*dt);e.knockZ*=Math.exp(-7*dt);}
    const d=distance(e,p),home=distance(e,{x:e.homeX,z:e.homeZ});
    if(e.state==='windup'){
     e.timer-=dt;if(e.timer<=0){
-     if(e.type==='kite'){this.shots.push({id:++this.serial,x:e.x,z:e.z,vx:Math.sin(e.attackYaw)*14,vz:Math.cos(e.attackYaw)*14,life:2.5,damage:s.damage});}
+     if(e.type==='harrow'){for(const offset of (e.hp<s.hp*.5?[-.6,-.3,0,.3,.6]:[-.3,0,.3]))this.shots.push({id:++this.serial,x:e.x,z:e.z,vx:Math.sin(e.attackYaw+offset)*12,vz:Math.cos(e.attackYaw+offset)*12,life:2.3,damage:s.damage});}
+     else if(e.type==='kite'){this.shots.push({id:++this.serial,x:e.x,z:e.z,vx:Math.sin(e.attackYaw)*14,vz:Math.cos(e.attackYaw)*14,life:2.5,damage:s.damage});}
      else{if(inStrike({x:e.attackX,z:e.attackZ,yaw:e.attackYaw},p,s.reach,s.width))this.hurtPlayer(s.damage);this.fx('enemy-strike',e.attackX,e.attackZ,.4,{yaw:e.attackYaw,reach:s.reach,width:s.width,heavy:e.type==='engine'});if(e.type==='engine'&&e.hp<s.hp*.5)for(const offset of [-.5,.5])this.shots.push({id:++this.serial,x:e.x,z:e.z,vx:Math.sin(e.attackYaw+offset)*10,vz:Math.cos(e.attackYaw+offset)*10,life:2,damage:15});}
      e.state='recover';e.timer=s.recovery;e.cooldown=s.cooldown;e.attackCount++;this.emit('enemy-strike');
     }

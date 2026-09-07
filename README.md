@@ -8,6 +8,14 @@ A copper visor, a torn red scarf, storm-blue machinery, and an angular field int
 
 The chapter includes three field stations in any order, four mechanical enemy types, a boss with a second-phase projectile pattern, two crew characters, three hidden rig upgrades, a repair bench, and a curved island you can survey from above.
 
+## Stormline Rescue
+
+After defeating the Keelbreaker and reporting to Sera, meet **Iona Rusk** by the southern shelters. Existing completed saves receive this objective automatically.
+
+Restore the relays at the Broken Span and Coil Shelf in either order. Activating each draws two patrols; defeat all six defenders, then interact again to lock the transmitter. Both relays reveal the **Tempest Harrow**, a new flying turbine boss with aimed fan volleys that widen below half health. Evade the marked lanes and use heavy blows to expose its core.
+
+Return to Iona to bring a rescued skiff into the anchorage and receive the **crew regulator**: permanent vent cost reduction from 30 to 20, plus 20 maximum health. Partially cleared patrols, completed relays, the boss and reward all persist in the existing save.
+
 ## Play
 
 Keyboard: WASD/arrows move, J strike, K vent, Space evade, E interact, 1–3 or Q change weapon, M chart, I weapon briefing, Escape pause. Drag the world to look; scroll to zoom.

@@ -9,6 +9,7 @@ export const ENEMIES={
  mite:{name:'Scissor mite',hp:65,damage:10,speed:4.4,reach:3.4,width:2,windup:.7,recovery:.6,cooldown:1.4,aggro:13,posture:42,radius:.8},
  dredger:{name:'Iron dredger',hp:145,damage:19,speed:2.7,reach:5,width:3.5,windup:1.05,recovery:.8,cooldown:2.2,aggro:14,posture:65,radius:1.3},
  kite:{name:'Coil kite',hp:75,damage:12,speed:3.7,reach:13,width:1,windup:.9,recovery:.45,cooldown:2.1,aggro:16,posture:35,radius:.8},
+ harrow:{name:'The Tempest Harrow',hp:850,damage:17,speed:3.2,reach:18,width:2,windup:1.15,recovery:1,cooldown:1.9,aggro:25,posture:110,radius:2},
  engine:{name:'The Keelbreaker',hp:1050,damage:27,speed:2.8,reach:10,width:5,windup:1.4,recovery:1.2,cooldown:2.2,aggro:24,posture:160,radius:2.2}
 };
 export const LANDMARKS=[
@@ -22,14 +23,25 @@ export const LANDMARKS=[
  {id:'oren',name:'Oren Flint',area:'Blackglass Cut',x:-23,z:0,type:'npc',radius:3},
  {id:'cache-a',name:'Salvage the survey case',area:'The Soot Garden',x:-24,z:24,type:'cache',radius:3},
  {id:'cache-b',name:'Salvage the signal case',area:'The Severed Spire',x:40,z:-7,type:'cache',radius:3},
+ {id:'iona',name:'Iona Rusk',area:'The Last Anchorage',x:-4,z:29,type:'npc',radius:3},
+ {id:'relay-west',name:'Restore the western relay',area:'The Broken Span',x:-39,z:15,type:'relay',radius:4},
+ {id:'relay-east',name:'Restore the eastern relay',area:'The Coil Shelf',x:39,z:-1,type:'relay',radius:4},
+ {id:'harrow',name:'The Tempest Harrow',area:'The Stormline',x:-24,z:-34,type:'boss',radius:7},
  {id:'cache-c',name:'Salvage the flight case',area:'The Engine Scar',x:-19,z:-30,type:'cache',radius:3}
 ];
-export const ROADS=[[[0,29],[0,13],[0,0],[0,-16],[0,-36]],[[0,6],[-15,5],[-25,-2],[-33,-7]],[[0,0],[13,-5],[26,-17]],[[0,13],[15,19],[30,22]],[[-13,20],[0,20],[13,20]],[[0,20],[-15,24],[-24,24]]];
+export const ROADS=[[[ -33,-7],[-35,3],[-39,15]],[[26,-17],[35,-9],[39,-1]],[[-15,-22],[-24,-34]],[[0,29],[0,13],[0,0],[0,-16],[0,-36]],[[0,6],[-15,5],[-25,-2],[-33,-7]],[[0,0],[13,-5],[26,-17]],[[0,13],[15,19],[30,22]],[[-13,20],[0,20],[13,20]],[[0,20],[-15,24],[-24,24]]];
 export const STRUCTURES=[{x:-15,z:17,w:6,d:5,angle:.15},{x:-13,z:29,w:6,d:5,angle:-.2},{x:12,z:28,w:6,d:5,angle:.1},{x:13,z:13,w:5,d:5,angle:-.22},{x:-9,z:9,w:4,d:4,angle:.25}];
 export const SPAWNS=[
  ['mite',-7,3],['mite',4,1],['mite',8,6],['mite',-14,9],['mite',-20,14],['mite',-26,16],['mite',19,12],['mite',23,27],['mite',34,15],
  ['dredger',-28,-8],['mite',-34,-13],['dredger',-36,1],['dredger',-23,-23],['dredger',12,-10],['dredger',29,-13],
- ['kite',21,-23],['kite',33,-21],['kite',-10,-25],['kite',10,-27],['engine',0,-36]
+ ['kite',21,-23],['kite',33,-21],['kite',-10,-25],['kite',10,-27],['engine',0,-36],
+ // Append encounter IDs so every earlier save keeps its defeated enemy mapping.
+ ['mite',-34,18,'relay-west',1],['mite',-36,10,'relay-west',1],['dredger',-42,12,'relay-west',1],
+ ['kite',-34,20,'relay-west',2],['dredger',-40,9,'relay-west',2],['mite',-34,12,'relay-west',2],
+ ['kite',35,-6,'relay-east',1],['mite',35,3,'relay-east',1],['mite',43,-4,'relay-east',1],
+ ['dredger',40,5,'relay-east',2],['kite',34,-6,'relay-east',2],['kite',43,-3,'relay-east',2],
+ ['harrow',-24,-34]
+
 ];
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
@@ -47,5 +59,5 @@ export const DECORATIONS=(()=>{const rng=random(63109),items=[];for(let i=0;i<60
  const kind=rng()<.55?'spire':'tree',scale=.6+rng()*1.5;items.push({x,z,kind,scale,yaw:rng()*6.28,radius:kind==='tree'?.25*scale:.65*scale});}return items;})();
 const cells=new Map();for(const o of [...DECORATIONS,{x:0,z:19,radius:2}])for(let gx=Math.floor((o.x-o.radius-1)/5);gx<=Math.floor((o.x+o.radius+1)/5);gx++)for(let gz=Math.floor((o.z-o.radius-1)/5);gz<=Math.floor((o.z+o.radius+1)/5);gz++){const key=gx+','+gz;if(!cells.has(key))cells.set(key,[]);cells.get(key).push(o);}
 export function walkable(x,z,radius=.5){if(landHeight(x,z)<.25)return false;for(const h of STRUCTURES){const dx=x-h.x,dz=z-h.z,c=Math.cos(h.angle),s=Math.sin(h.angle);if(Math.abs(dx*c+dz*s)<h.w/2+radius&&Math.abs(-dx*s+dz*c)<h.d/2+radius)return false;}for(const o of cells.get(Math.floor(x/5)+','+Math.floor(z/5))||[])if(distance(o,{x,z})<o.radius+radius)return false;return true;}
-export function region(x,z){if(z<-28)return 'The Engine Scar';if(x<-19&&z<8)return 'Blackglass Cut';if(x>17&&z<0)return 'The Severed Spire';if(x>22&&z>9)return 'The Copper Reaches';if(x<-18&&z>14)return 'The Soot Garden';if(z>12&&Math.abs(x)<21)return 'The Last Anchorage';return 'The Cinder March';}
+export function region(x,z){if(x<-16&&z<-27)return 'The Stormline';if(x<-34&&z>8)return 'The Broken Span';if(x>34&&z>-8&&z<8)return 'The Coil Shelf';if(z<-28)return 'The Engine Scar';if(x<-19&&z<8)return 'Blackglass Cut';if(x>17&&z<0)return 'The Severed Spire';if(x>22&&z>9)return 'The Copper Reaches';if(x<-18&&z>14)return 'The Soot Garden';if(z>12&&Math.abs(x)<21)return 'The Last Anchorage';return 'The Cinder March';}
 export function inStrike(origin,target,reach,width){const dx=target.x-origin.x,dz=target.z-origin.z,forward=dx*Math.sin(origin.yaw)+dz*Math.cos(origin.yaw),side=dx*Math.cos(origin.yaw)-dz*Math.sin(origin.yaw);return forward>-.4&&forward<reach&&Math.abs(side)<width;}
