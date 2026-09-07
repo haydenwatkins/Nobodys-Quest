@@ -1,8 +1,8 @@
-import {Soundscape} from './audio.mjs';
-import {installPointerControls,installGameplayGestures} from './touch-controls.mjs';
-import {Game,readProgress,saveProgress,freshProgress} from './game.mjs';
-import {WorldView} from './scene.mjs';
-import {WEAPONS,LANDMARKS,STRUCTURES,ROADS,ENEMIES,SAVE_KEY,landHeight,region,clamp,distance} from './world-data.mjs';
+import {Soundscape} from './audio.mjs?v=20260907-authored';
+import {installPointerControls,installGameplayGestures} from './touch-controls.mjs?v=20260907-authored';
+import {Game,readProgress,saveProgress,freshProgress} from './game.mjs?v=20260907-authored';
+import {WorldView} from './scene.mjs?v=20260907-authored';
+import {WEAPONS,LANDMARKS,STRUCTURES,ROADS,ENEMIES,SAVE_KEY,landHeight,region,clamp,distance} from './world-data.mjs?v=20260907-authored';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let storage;try{storage=window.localStorage;}catch{storage={getItem:()=>null,setItem:()=>{throw Error('Storage unavailable');}};}

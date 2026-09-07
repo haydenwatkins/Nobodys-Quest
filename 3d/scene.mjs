@@ -1,6 +1,6 @@
-import {makeRunner,buildHomes,buildAuthoredWorld,placeArt} from './art.mjs';
+import {makeRunner,buildHomes,buildAuthoredWorld,placeArt} from './art.mjs?v=20260907-authored';
 import * as T from './vendor/three.module.min.js';
-import {RADIUS,LANDMARKS,STRUCTURES,WEAPONS,ENEMIES,DECORATIONS,landHeight,roadDistance,random,clamp} from './world-data.mjs';
+import {RADIUS,LANDMARKS,STRUCTURES,WEAPONS,ENEMIES,DECORATIONS,landHeight,roadDistance,random,clamp} from './world-data.mjs?v=20260907-authored';
 const UP=new T.Vector3(0,1,0),V=new T.Vector3();
 const GEO={box:new T.BoxGeometry(1,1,1),ball:new T.IcosahedronGeometry(1,0),soft:new T.IcosahedronGeometry(1,1),cone:new T.ConeGeometry(1,1,5),cyl:new T.CylinderGeometry(1,1,1,8),ring:new T.TorusGeometry(1,.06,5,32)};
 // Uneven, broad-sided outcrops share one geometry for instancing.
