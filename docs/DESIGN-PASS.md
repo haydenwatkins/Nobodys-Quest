@@ -36,6 +36,8 @@ The available cloud browser reports WebGL disabled. It could load the live page 
 
 Optional composition study dependencies: Python with numpy, Pillow and numba. Run `node tools/render-study.mjs /tmp/veyr-study play`, then `python tools/render-study.py /tmp/veyr-study`. Other modes: `title`, `field`, `hero`. These development tools are excluded from the distributable game.
 
+The post-deployment browser check observed new HTML alongside a cached previous stylesheet. Runtime styles and local module imports now carry a shared release query so returning players fetch this pass together. The unchanged vendored Three.js remains cacheable.
+
 ## Restore the previous build
 
 `backup/before-authored-world-pass` preserves commit `f82347c50cffd202003c1fdb584986f48174c3d9`. Restore its tree in a new main-branch commit to reverse this pass without deleting later history. The existing save key, objective IDs and enemy IDs are unchanged.
