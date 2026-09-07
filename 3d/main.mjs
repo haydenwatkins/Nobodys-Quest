@@ -1,3 +1,4 @@
+import {installPointerControls,installGameplayGestures} from './touch-controls.mjs';
 import {Game,readProgress,saveProgress,freshProgress} from './game.mjs';
 import {WorldView} from './scene.mjs';
 import {WEAPONS,LANDMARKS,STRUCTURES,ROADS,ENEMIES,SAVE_KEY,landHeight,region,clamp,distance} from './world-data.mjs';
@@ -5,7 +6,8 @@ import {WEAPONS,LANDMARKS,STRUCTURES,ROADS,ENEMIES,SAVE_KEY,landHeight,region,cl
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let storage;try{storage=window.localStorage;}catch{storage={getItem:()=>null,setItem:()=>{throw Error('Storage unavailable');}};}
 let game=new Game(readProgress(storage)),view,started=false,heldAttack=false,joy={x:0,z:0},keys=new Set(),lastRegion='',areaUntil=0,lastSaved=0,toastUntil=0,toastQueue=[],lastUI=0,wasPad={},padPresent=false,dialogueLines=[],musicStep=0,musicTime=0;
-let audioContext,master;
+let audioContext,master,pointerControls,gameplayGestures;
+function clearInput(){keys.clear();heldAttack=false;joy={x:0,z:0};pointerControls?.reset();gameplayGestures?.reset();}
 const save=()=>{const ok=saveProgress(storage,game);$('#save-status').textContent=ok?'Saved on this device':'Saving unavailable in this browser';lastSaved=game.time;return ok;};
 function initAudio(){if(!audioContext){const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;audioContext=new Audio();master=audioContext.createGain();master.gain.value=game.progress.sound?.13:0;master.connect(audioContext.destination);}if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});}
 function tone(freq,duration=.15,type='sine',volume=.3,delay=0){if(!audioContext||!master||!game.progress.sound)return;const now=audioContext.currentTime+delay,osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type=type;osc.frequency.value=freq;gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(volume,now+.01);gain.gain.exponentialRampToValueAtTime(.001,now+duration);osc.connect(gain);gain.connect(master);osc.start(now);osc.stop(now+duration+.01);}
@@ -13,8 +15,8 @@ function noise(duration=.1,volume=.3){if(!audioContext||!game.progress.sound)ret
 function sound(e){const name=e.type;if(name==='swing'){const heavy=e.weapon==='maul';noise(heavy?.22:.09,heavy?.6:.2);tone(heavy?57:e.weapon==='pike'?430:180,heavy?.3:.12,'triangle',.4);if(e.vent)tone(82,.5,'sawtooth',.15);}if(name==='hit'){noise(.07,e.heavy?.65:.35);tone(e.heavy?48:94,.13,'triangle',.5);tone(670,.06,'square',.055);}if(name==='damage'){noise(.15,.4);tone(55,.25,'sawtooth',.15);}if(name==='dodge')noise(.14,.1);if(name==='perfect'){tone(880,.3,'sine',.2);tone(1320,.25,'sine',.1,.06);}if(name==='pickup')tone(640,.12,'sine',.1);if(name==='equip')noise(.055,.17);if(name==='stagger'){noise(.18,.4);tone(110,.35,'square',.09);}if(['tooth','salvage','victory'].includes(name))for(const [i,n]of [164.81,220,329.63,440].entries())tone(n,.9,'triangle',.16,i*.16);}
 function music(dt){if(!audioContext||!game.progress.sound)return;musicTime-=dt;if(musicTime<=0){musicTime=.42;const notes=[82.41,0,82.41,110,0,82.41,0,123.47];const n=notes[musicStep%8];if(n)tone(n,.3,'triangle',.06);if(musicStep%16===0){tone(82.41,5,'sine',.07);tone(123.47,4,'sine',.025);}musicStep++;}}
 function toast(text,duration=3.5){toastQueue.push({text,duration});}
-function openDialog(id){for(const d of $$('dialog[open]'))d.close();heldAttack=false;keys.clear();joy={x:0,z:0};$('#joystick>div').style.transform='';const d=$(id);d.showModal();const first=d.querySelector('button:not([disabled]),a');if(first)first.focus();save();}
-function closeDialogs(){for(const d of $$('dialog[open]'))d.close();keys.clear();heldAttack=false;}
+function openDialog(id){for(const d of $$('dialog[open]'))d.close();clearInput();const d=$(id);d.showModal();const first=d.querySelector('button:not([disabled]),a');if(first)first.focus();save();}
+function closeDialogs(){for(const d of $$('dialog[open]'))d.close();clearInput();}
 function speak(speaker,lines){$('#speaker').textContent=speaker.toUpperCase();dialogueLines=[...lines];$('#speech').textContent=dialogueLines.shift();$('#continue').textContent=dialogueLines.length?'Continue ↵':'Return to the field ↗';openDialog('#dialogue');}
 function nextSpeech(){if(dialogueLines.length){$('#speech').textContent=dialogueLines.shift();$('#continue').textContent=dialogueLines.length?'Continue ↵':'Return to the field ↗';}else closeDialogs();}
 function paused(){return !started||!!$('dialog[open]')||view.overview||document.hidden;}
@@ -54,13 +56,8 @@ function wire(){
     const stop=()=>{if(action==='attack')heldAttack=false;};b.addEventListener('pointerup',stop);b.addEventListener('pointercancel',stop);b.addEventListener('lostpointercapture',stop);
     b.addEventListener('click',e=>{if(e.detail===0&&!paused())game[action]();});
   }
-  let joyId=null;
-  const stick=$('#joystick');const moveStick=e=>{if(e.pointerId!==joyId)return;const r=stick.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,len=Math.hypot(dx,dy),max=36;joy={x:dx/Math.max(max,len),z:dy/Math.max(max,len)};stick.firstElementChild.style.transform=`translate(${joy.x*max}px,${joy.z*max}px)`;};
-  stick.addEventListener('pointerdown',e=>{if(joyId!==null)return;joyId=e.pointerId;stick.setPointerCapture(e.pointerId);moveStick(e);initAudio();});stick.addEventListener('pointermove',moveStick);const stopStick=e=>{if(e.pointerId===joyId){joyId=null;joy={x:0,z:0};stick.firstElementChild.style.transform='';}};stick.addEventListener('pointerup',stopStick);stick.addEventListener('pointercancel',stopStick);stick.addEventListener('lostpointercapture',stopStick);
-  let drag=null;
-  $('#world').addEventListener('pointerdown',e=>{drag={id:e.pointerId,x:e.clientX,y:e.clientY};e.target.setPointerCapture(e.pointerId);});
-  $('#world').addEventListener('pointermove',e=>{if(drag&&e.pointerId===drag.id){view.yaw-=(e.clientX-drag.x)*.006;drag.x=e.clientX;drag.y=e.clientY;}});
-  for(const type of ['pointerup','pointercancel','lostpointercapture'])$('#world').addEventListener(type,()=>drag=null);
+  pointerControls=installPointerControls({world:$('#world'),stick:$('#joystick'),canMove:()=>!paused(),canLook:()=>!$('dialog[open]')&&!document.hidden,width:()=>innerWidth,onMove:value=>joy=value,onLook:dx=>view.yaw-=dx*.006,onStart:initAudio});
+  gameplayGestures=installGameplayGestures(document,()=>started&&!$('dialog[open]')&&!document.hidden);
   $('#world').addEventListener('wheel',e=>{e.preventDefault();view.zoom=clamp(view.zoom+e.deltaY*.0008,.7,1.65);},{passive:false});
   window.addEventListener('keydown',e=>{
     if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)&&!$('dialog[open]'))e.preventDefault();
@@ -71,10 +68,10 @@ function wire(){
     if(e.code==='KeyM'){mapOpen();return;}if(e.code==='KeyI'){rigOpen();return;}if(paused())return;
     if(e.code==='KeyE')game.interact();if(e.code==='Space')game.dodge();if(e.code==='KeyQ')cycleWeapon(1);if(e.code==='KeyK')game.vent();if(e.code==='Digit1')game.setWeapon('shear');if(e.code==='Digit2')game.setWeapon('pike');if(e.code==='Digit3')game.setWeapon('maul');
   });window.addEventListener('keyup',e=>keys.delete(e.code));
-  window.addEventListener('blur',()=>{keys.clear();heldAttack=false;joy={x:0,z:0};stick.firstElementChild.style.transform='';});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){keys.clear();heldAttack=false;joy={x:0,z:0};save();}});
-  window.addEventListener('pagehide',save);window.addEventListener('resize',()=>view.resize());
-  $('#world').addEventListener('webglcontextlost',e=>{e.preventDefault();save();$('#error-text').textContent='The graphics connection paused. Your progress was saved; try reloading, then choose low graphics in the pause menu.';$('#error').classList.remove('hidden');});
+  window.addEventListener('blur',clearInput);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();save();}});
+  window.addEventListener('pagehide',()=>{clearInput();save();});window.addEventListener('resize',()=>{clearInput();view.resize();});
+  $('#world').addEventListener('webglcontextlost',e=>{e.preventDefault();clearInput();save();$('#error-text').textContent='The graphics connection paused. Your progress was saved; try reloading, then choose low graphics in the pause menu.';$('#error').classList.remove('hidden');});
 }
 function gamepad(dt){
   const pads=navigator.getGamepads?navigator.getGamepads():[],pad=[...pads].find(p=>p&&p.connected);if(!pad){wasPad={};return {x:0,z:0};}padPresent=true;
