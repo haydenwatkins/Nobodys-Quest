@@ -1,6 +1,6 @@
-import {makeRunner,buildHomes,buildAuthoredWorld,placeArt} from './art.mjs?v=20260907-battle';
+import {makeRunner,buildHomes,buildAuthoredWorld,placeArt} from './art.mjs?v=20260908-last-light-reviewed';
 import * as T from './vendor/three.module.min.js';
-import {RADIUS,LANDMARKS,STRUCTURES,WEAPONS,ENEMIES,DECORATIONS,landHeight,roadDistance,random,clamp} from './world-data.mjs?v=20260907-battle';
+import {RADIUS,LANDMARKS,STRUCTURES,WEAPONS,ENEMIES,DECORATIONS,landHeight,roadDistance,random,clamp} from './world-data.mjs?v=20260908-last-light-reviewed';
 const UP=new T.Vector3(0,1,0),V=new T.Vector3();
 const GEO={box:new T.BoxGeometry(1,1,1),ball:new T.IcosahedronGeometry(1,0),soft:new T.IcosahedronGeometry(1,1),cone:new T.ConeGeometry(1,1,5),cyl:new T.CylinderGeometry(1,1,1,8),ring:new T.TorusGeometry(1,.06,5,32)};
 // Uneven, broad-sided outcrops share one geometry for instancing.
@@ -49,8 +49,8 @@ export class WorldView {
   this.game=game;this.renderer=renderer||new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});this.renderer.outputColorSpace=T.SRGBColorSpace;this.renderer.toneMapping=T.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.05;this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=T.PCFSoftShadowMap;
   this.scene=new T.Scene();this.scene.background=new T.Color(0xadb7a8);this.scene.fog=new T.Fog(0xbfc5b1,65,195);this.camera=new T.PerspectiveCamera(43,1,.1,700);this.yaw=-.22;this.zoom=1;this.overview=false;this.started=false;this.elapsed=0;this.shake=0;
   this.scene.add(new T.HemisphereLight(0xd7e4ce,0x4d5740,2.0));this.sun=new T.DirectionalLight(0xffe4b6,3.0);this.sun.position.set(-60,150,80);this.sun.castShadow=true;Object.assign(this.sun.shadow.camera,{left:-42,right:42,top:42,bottom:-42,near:1,far:240});this.sun.shadow.mapSize.set(1024,1024);this.sun.shadow.bias=-.0003;this.sun.shadow.normalBias=.07;this.scene.add(this.sun,this.sun.target);
-  this.static=g();this.animated=[];this.stations=new Map();this.enemyViews=new Map();this.effects=new Map();this.pickups=new Map();this.shots=new Map();this.buildTerrain();this.buildLandscape();this.buildAnchorage();this.buildStations();buildAuthoredWorld(this.static,this.scene,this.animated);batch(this.static,this.scene);
-  this.player=makeHero(game.player.weapon);this.weapon=game.player.weapon;this.scene.add(this.player);for(const e of game.enemies){const mesh=makeEnemy(e.type),danger=g(this.scene);for(let i=0;i<(e.type==='harrow'?5:1);i++){const lane=g(danger),mark=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshBasicMaterial({color:e.type==='harrow'?0x86dfdf:0xf3774c,side:T.DoubleSide,transparent:true,opacity:.24,depthWrite:false}));mark.rotation.x=-Math.PI/2;lane.add(mark);}this.scene.add(mesh);const health=g(this.scene),back=new T.Mesh(new T.PlaneGeometry(1.6,.12),new T.MeshBasicMaterial({color:0x27392e,depthTest:false})),fill=new T.Mesh(new T.PlaneGeometry(1.5,.06),new T.MeshBasicMaterial({color:0xd6bc82,depthTest:false}));health.add(back,fill);health.renderOrder=9;back.renderOrder=9;fill.renderOrder=10;fill.position.z=.01;this.enemyViews.set(e.id,{mesh,danger,health,fill});}
+  this.static=g();this.animated=[];this.prologue=null;this.stations=new Map();this.enemyViews=new Map();this.effects=new Map();this.pickups=new Map();this.shots=new Map();this.buildTerrain();this.buildLandscape();this.buildAnchorage();this.buildStations();buildAuthoredWorld(this.static,this.scene,this.animated);batch(this.static,this.scene);
+  this.player=makeHero(game.player.weapon);this.weapon=game.player.weapon;this.scene.add(this.player);this.fitRegulators(false);for(const e of game.enemies){const mesh=makeEnemy(e.type),danger=g(this.scene);for(let i=0;i<(e.type==='harrow'?5:1);i++){const lane=g(danger),mark=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshBasicMaterial({color:e.type==='harrow'?0x86dfdf:0xf3774c,side:T.DoubleSide,transparent:true,opacity:.24,depthWrite:false}));mark.rotation.x=-Math.PI/2;lane.add(mark);}this.scene.add(mesh);const health=g(this.scene),back=new T.Mesh(new T.PlaneGeometry(1.6,.12),new T.MeshBasicMaterial({color:0x27392e,depthTest:false})),fill=new T.Mesh(new T.PlaneGeometry(1.5,.06),new T.MeshBasicMaterial({color:0xd6bc82,depthTest:false}));health.add(back,fill);health.renderOrder=9;back.renderOrder=9;fill.renderOrder=10;fill.position.z=.01;this.enemyViews.set(e.id,{mesh,danger,health,fill});}
 
   this.target=g(this.scene);part(this.target,'cone',0xffc377,0,0,0,.23,.55,.23,[Math.PI,0,0]);this.look=new T.Vector3(0,40,0);this.camera.position.set(80,155,160);this.resize();this.setQuality(game.progress.quality);
  }
@@ -75,9 +75,17 @@ export class WorldView {
  }
  buildAnchorage(){
   buildHomes(this.static);
-  const engine=g(this.static);place(engine,0,19);part(engine,'cyl',0x384e5c,0,.5,0,2,.7,2);part(engine,'box',0xb19469,0,1.35,0,1.5,1.3,1.4);const wheel=g(this.scene);place(wheel,0,19,2.6);for(let i=0;i<8;i++){const a=i*Math.PI/4;part(wheel,'box',0xb69663,Math.sin(a)*1.3,Math.cos(a)*1.3,0,.3,.55,.2,[0,0,-a]);}part(wheel,'ring',0x557a8b,0,0,0,1.3);glow(wheel,'ball',0x8fe0df,0,0,0,.4);this.animated.push({type:'wheel',mesh:wheel,baseQ:wheel.quaternion.clone()});
+  const engine=g(this.static);place(engine,0,19);part(engine,'cyl',0x384e5c,0,.5,0,2,.7,2);part(engine,'box',0xb19469,0,1.35,0,1.5,1.3,1.4);const wheel=g(this.scene);place(wheel,0,19,2.6);for(let i=0;i<8;i++){const a=i*Math.PI/4;part(wheel,'box',0xb69663,Math.sin(a)*1.3,Math.cos(a)*1.3,0,.3,.55,.2,[0,0,-a]);}part(wheel,'ring',0x557a8b,0,0,0,1.3);glow(wheel,'ball',0x8fe0df,0,0,0,.4);const wheelBaseQ=wheel.quaternion.clone();
   const ship=g(this.static);place(ship,-23,34,.6,-.5);part(ship,'ball',0x2b4658,0,2,0,3.4,2.1,7);part(ship,'box',0xb18b58,0,3.3,0,3.7,.35,8);part(ship,'box',0x485f6d,0,4.2,-1,2.7,1.6,3);for(const s of [-1,1])part(ship,'box',0xa84e34,s*3.9,2.4,-1,5,.16,3,[0,0,s*.2]);rod(ship,[0,3.5,2],[.4,8,1.2],.1,0xc6ad77);part(ship,'box',0xc08051,.6,6.7,1.2,2.2,2.5,.07,[0,.2,-.2]);
   const rescueShip=g(this.scene);place(rescueShip,19,32,7,-.5);part(rescueShip,'ball',0x3a687c,0,0,0,1.8,1,4);part(rescueShip,'box',0xbb9563,0,.8,0,2,.2,4.7);for(const side of [-1,1])part(rescueShip,'box',0xc16945,side*2,.2,0,2.4,.13,1.8,[0,0,side*.12]);glow(rescueShip,'box',0x99e8df,0,1,-1,1.3,.2,.6);this.animated.push({type:'crewship',mesh:rescueShip,base:rescueShip.position.clone()});
+  // The Last Light occupies the anchorage itself: boat, cable and stranded crew stay in view.
+  const lastLightBoat=g(this.scene);place(lastLightBoat,7.6,14.4,2.1,-.34);part(lastLightBoat,'ball',0x294d5a,0,0,0,1.55,.76,3.6);part(lastLightBoat,'box',0xc09967,0,.63,0,1.85,.17,4.1);for(const side of [-1,1])part(lastLightBoat,'box',0xae533b,side*1.72,.13,0,2.1,.1,1.45,[0,0,side*.12]);glow(lastLightBoat,'box',0xa8ece2,0,.78,-1.12,.62,.08,.24);
+  const stranded=makeHero('shear',true);lastLightBoat.add(stranded);stranded.position.set(0,.86,.65);stranded.rotation.set(0,Math.PI*.82,0);
+  const cable=new T.Line(new T.BufferGeometry(),new T.LineBasicMaterial({color:0xd9c998,transparent:true,opacity:.9}));cable.frustumCulled=false;this.scene.add(cable);
+  const jam=g(this.scene);place(jam,2.7,18.1,.58,.2);part(jam,'box',0x6b4533,0,0,0,1.15,.6,.74,[.2,.35,.12]);part(jam,'cyl',0xb06b46,.16,.26,.04,.42,.2,.42,[0,0,Math.PI/2]);glow(jam,'box',0xffb56e,0,.32,.42,.45,.05,.04);
+  const lampMat=new T.MeshStandardMaterial({color:0x7b7359,emissive:0xffbc72,emissiveIntensity:.16,roughness:.7}),lamps=[];for(const [x,z] of [[-3,18],[3,20],[5,16]]){const lamp=new T.Mesh(GEO.ball,lampMat);place(lamp,x,z,1.6);lamp.scale.set(.18,.18,.18);this.scene.add(lamp);lamps.push(lamp);}
+  const distantEngine=g(this.scene);place(distantEngine,0,-46,22,.14);const ring=new T.Mesh(new T.TorusGeometry(14.5,.62,6,48),mat(0x7d4738));ring.castShadow=true;distantEngine.add(ring);for(let i=0;i<9;i++){const a=i*Math.PI*2/9;rod(distantEngine,[0,0,0],[Math.sin(a)*13.6,Math.cos(a)*13.6,0],.24,0x5d4b39);}const engineGlow=glow(distantEngine,'ball',0xb86c43,0,0,.18,2.4,2.4,.5);const vents=g(distantEngine),ventGlow=[];for(const x of [-2.2,0,2.2]){part(vents,'cyl',0x314956,x,-4.4,0,.52,3.2,.52);ventGlow.push(glow(vents,'cone',0x8eddd7,x,-2.7,0,.34,1.5,.34));}
+  const crewPath=[[5.8,21.5],[5.2,23],[2.7,23.2],[0,23.25],[-3,23.1],[-5,22.8]],gangway=g(this.scene);for(let i=0;i<8;i++){const u=i/7,x=3.45+(5.8-3.45)*u,z=17.25+(21.5-17.25)*u,step=g(gangway);place(step,x,z,.15+(1-u)*2.45,Math.atan2(5.8-3.45,21.5-17.25));part(step,'box',0xb58a59,0,0,0,.72,.12,.42);part(step,'box',0x3d5760,-.58,-.16,0,.05,.2,.44);part(step,'box',0x3d5760,.58,-.16,0,.05,.2,.44);}this.prologue={boat:lastLightBoat,crew:stranded,cable,jam,lamps,reel:wheel,reelBaseQ:wheelBaseQ,reelAngle:0,distantEngine,engineGlow,vents,ventGlow,engineKick:0,ventFalter:0,pieceFlight:null,crewPath,crewDestination:{x:-5,z:22.8},gangway,crewDeckWorld:null};
   for(const [x,z,npc]of [[-7,20,true],[-23,0,true],[-4,29,true]]){const mesh=makeHero('shear',npc);place(mesh,x,z,0,1);this.scene.add(mesh);if(x===-4){mesh.userData.scarf.children.forEach(m=>m.material=mat(0x45aeb2));part(mesh.userData.body,'box',0x96764a,0,1.5,-.5,.85,.9,.4);rod(mesh.userData.body,[.3,1.8,-.5],[.3,3.5,-.5],.035,0xc3b892);}this.animated.push({type:'npc',mesh,x,z});const signal=g(this.scene);place(signal,x,z,3.6);part(signal,'box',0xefbd7a,0,0,0,.24,.4,.24,[0,0,Math.PI/4]);this.animated.push({type:'signal',mesh:signal,base:signal.position.clone()});}
  }
  buildStations(){for(const l of LANDMARKS){const o=g(this.static);place(o,l.x,l.z);
@@ -93,6 +101,55 @@ export class WorldView {
   else if(l.type==='chart'){rod(o,[0,0,0],[0,1.5,0],.12,0x8b7759);part(o,'box',0x344d5f,0,1.65,0,1.7,1,.12,[.2,0,0]);part(o,'box',0xcda973,0,1.7,.1,1.3,.06,.05);}
   else if(l.type==='boss'){for(let i=0;i<12;i++){const a=i*Math.PI/6,p=g(this.static);place(p,l.x+Math.sin(a)*12,l.z+Math.cos(a)*12,0,-a);part(p,'box',0x3a5363,0,1.4,0,1.5,2.8,1.8);part(p,'box',0xbb945d,0,2.9,0,1.8,.3,2);glow(p,'box',0xffb66b,0,1.6,1,.5,.16,.05);}for(let i=0;i<5;i++){const a=g(this.static);place(a,l.x+(i-2)*3.3,l.z-9);part(a,'box',0x4a5a49,0,3.5,-1,.7,7+(i%2)*2,1.4,[0,0,(i-2)*.2]);part(a,'box',0x9e704b,.6,6.8,-1,2,.4,1.5,[0,0,(i-2)*.15]);}}
  }}
+ fitRegulators(animate=false){
+  const old=this.regulators?.root;if(old)old.parent.remove(old);
+  const root=g(this.player.userData.body),sockets=[],pieces=[];
+  root.position.set(0,1.15,-.72);root.rotation.x=-.08;
+  for(const [i,x] of [-.34,0,.34].entries()){
+   const socket=g(root);socket.position.set(x,0,0);part(socket,'cyl',0x263e4d,0,0,0,.13,.11,.13,[Math.PI/2,0,0]);part(socket,'ring',0x86a59c,0,0,.07,.14,.14,.14,[Math.PI/2,0,0]);sockets.push(socket);
+   const piece=g(socket);part(piece,'cyl',[0xc17b4e,0x8fd7d5,0xe3ba69][i],0,0,.1,.095,.18,.095,[Math.PI/2,0,0]);part(piece,'box',0xd7e5d3,0,.03,.18,.13,.05,.055,[0,0,Math.PI/4]);piece.visible=false;pieces.push(piece);
+  }
+  this.regulators={root,sockets,pieces,flight:null};
+  for(const id of this.game.progress.teeth)this.showRegulator(id);
+  if(animate)this.regulators.root.visible=true;
+ }
+ regulatorIndex(id){return ['west','north','east'].indexOf(id);}
+ showRegulator(id){const i=this.regulatorIndex(id);if(i>=0&&this.regulators)this.regulators.pieces[i].visible=true;}
+ reducedMotion(){return typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;}
+ resetPresentation(){
+  this.elapsed=0;this.shake=0;if(this.prologue){this.prologue.engineKick=0;this.prologue.ventFalter=0;this.prologue.pieceFlight=null;this.prologue.victory=!!this.game.progress.won;this.prologue.reelAngle=0;this.prologue.reel.quaternion.copy(this.prologue.reelBaseQ);}
+  this.fitRegulators();
+ }
+ prologueEvent(type,detail={}){
+  if(!this.prologue)return;
+  if(type==='engine-answer'){this.prologue.engineKick=1.25;this.prologue.ventFalter=1;if(!this.reducedMotion())this.shake=Math.max(this.shake,.16);}
+  if(type==='coupling-cleared'&&!this.reducedMotion())this.shake=Math.max(this.shake,.18);
+  if(type==='tooth'){
+   const id=detail.id||this.game.progress.teeth[(detail.count||this.game.progress.teeth.length)-1],i=this.regulatorIndex(id);
+   if(i>=0&&this.regulators){const piece=this.regulators.pieces[i];piece.visible=true;piece.position.set((i-1)*.75,.65,.65);piece.scale.setScalar(.55);this.regulators.flight={id,age:0};}
+  }
+  if(type==='victory'){this.prologue.engineKick=0;this.prologue.victory=true;}
+ }
+ updatePrologue(dt){
+  const p=this.prologue;if(!p)return;const state=this.game.progress.prologue,cross=state==='crossing',timer=this.game.prologueTimer||0;
+  const dockT=cross?clamp(timer/2,0,1):['briefing','complete'].includes(state)?1:0,bx=7.6+(3.45-7.6)*dockT,bz=14.4+(17.25-14.4)*dockT;
+  place(p.boat,bx,bz,2.1,-.34);p.boat.rotation.z=Math.sin(this.elapsed*2.2)*(cross?.03:.012);
+  const walkT=cross?clamp((timer-2)/2.5,0,1):['briefing','complete'].includes(state)?1:0,wantsDeck=walkT===0;
+  if(wantsDeck){if(p.crew.parent!==p.boat){p.boat.add(p.crew);p.crew.position.set(0,.86,.65);p.crew.rotation.set(0,Math.PI*.82,0);}p.crewDeckWorld=null;}
+  else{
+   if(p.crew.parent===p.boat){p.boat.updateMatrixWorld(true);p.crew.getWorldPosition(V);p.crewDeckWorld=V.clone();this.scene.attach(p.crew);}
+   const rampT=clamp(walkT/.28,0,1),pathT=clamp((walkT-.28)/.72,0,1);let cx,cz;
+   if(rampT<1){const from=p.crewDeckWorld||surface(3.45,17.25,2.9),to=surface(...p.crewPath[0],.08),at=from.clone().lerp(to,rampT);p.crew.position.copy(at);p.crew.quaternion.setFromUnitVectors(UP,at.clone().normalize());p.crew.rotateY(.48);}
+   else{const f=pathT*(p.crewPath.length-1),i=Math.min(p.crewPath.length-2,Math.floor(f)),u=f-i,[a,b]=[p.crewPath[i],p.crewPath[i+1]];cx=a[0]+(b[0]-a[0])*u;cz=a[1]+(b[1]-a[1])*u;place(p.crew,cx,cz,.08,Math.atan2(b[0]-a[0],b[1]-a[1]));}
+  }
+  p.crew.userData.body.position.y=Math.sin(this.elapsed*2)*(wantsDeck?.025:.045);p.jam.visible=state==='coupling';
+  const pulling=cross&&timer<2,slack=this.game.progress.won?-1.25:(pulling?-.05:-.55),reel=surface(0,19,2.6),boat=surface(bx,bz,2.55),mid=reel.clone().lerp(boat,.5);mid.addScaledVector(mid.clone().normalize(),slack);p.cable.geometry.setFromPoints([reel,mid,boat]);
+  if(pulling)p.reelAngle+=dt*4.4;p.reel.quaternion.copy(p.reelBaseQ).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),p.reelAngle));
+  const steady=this.game.progress.won||p.victory,flinch=p.engineKick>0?(p.engineKick>.7?.28:.7):1,lit=steady?1.35:['briefing','complete'].includes(state)?1.25:cross?.85:.16;for(const lamp of p.lamps)lamp.material.emissiveIntensity=lit*flinch;
+  p.engineGlow.material.emissiveIntensity=steady?2.1:(p.engineKick>0?.35:1.6);p.ventFalter=Math.max(0,p.ventFalter-dt*1.8);p.vents.scale.y=1-p.ventFalter*.62;for(const vent of p.ventGlow)vent.material.emissiveIntensity=steady?1.8:(p.ventFalter?.22:1.35);
+  if(p.engineKick>0){p.engineKick=Math.max(0,p.engineKick-dt);p.distantEngine.rotation.z+=dt*(p.engineKick>.55?1.9:-.55);}
+  if(this.regulators?.flight){const f=this.regulators.flight,piece=this.regulators.pieces[this.regulatorIndex(f.id)];f.age+=dt;const u=clamp(f.age/.7,0,1);piece.position.lerp(new T.Vector3(),u);piece.scale.setScalar(.55+.45*u);if(u===1){piece.position.set(0,0,0);piece.scale.setScalar(1);this.regulators.flight=null;}}
+ }
  orientCameraMove(x,z){return {x:x*Math.cos(this.yaw)+z*Math.sin(this.yaw),z:-x*Math.sin(this.yaw)+z*Math.cos(this.yaw)};}
  animateHero(mesh,p,time){place(mesh,p.x,p.z,.02,p.yaw);const d=mesh.userData,b=d.body,moving=p.move>0&&!p.attack,speed=moving?Math.min(1,p.move):0,phase=time*12;
  b.position.y=Math.abs(Math.sin(phase))*speed*.08;b.rotation.set(0,0,0);d.head.rotation.y=Math.sin(time*.7)*.035;
@@ -107,13 +164,13 @@ export class WorldView {
  }
 
  update(dt){this.elapsed+=dt;const time=this.elapsed,p=this.game.player;
-  if(this.weapon!==p.weapon){this.scene.remove(this.player);this.player=makeHero(p.weapon);this.scene.add(this.player);this.weapon=p.weapon;}this.animateHero(this.player,p,time);
-  for(const e of this.game.enemies){const {mesh,danger,health,fill}=this.enemyViews.get(e.id);mesh.visible=e.alive&&(!e.relay||this.game.active(e))&&(e.type!=='harrow'||this.game.active(e));if(mesh.visible){place(mesh,e.x,e.z,.05,e.yaw);const d=mesh.userData;d.body.position.y=['kite','harrow'].includes(e.type)?Math.sin(time*3+e.id)*.22:0;if(d.rotor)d.rotor.rotation.z=time*(e.state==='windup'?9:3);for(let i=0;i<d.legs.length;i++)d.legs[i].rotation.x=e.state==='idle'?Math.sin(time*9+i)*.17:0;d.body.rotation.x=e.state==='windup'?-.42*(1-e.timer/ENEMIES[e.type].windup):e.state==='stagger'?.15:0;d.body.rotation.z=e.state==='stagger'?Math.sin(time*20)*.025:0;d.body.position.z=-(e.recoil||0)*1.6;d.body.rotation.x+=(e.recoil||0)*1.2;}
+  if(this.weapon!==p.weapon){this.scene.remove(this.player);this.player=makeHero(p.weapon);this.scene.add(this.player);this.weapon=p.weapon;this.fitRegulators();}this.animateHero(this.player,p,time);this.updatePrologue(dt);
+  for(const e of this.game.enemies){const {mesh,danger,health,fill}=this.enemyViews.get(e.id);mesh.visible=e.alive&&(!e.prologue||this.game.progress.prologue==='landingThreat')&&(!e.relay||this.game.active(e))&&(e.type!=='harrow'||this.game.active(e));if(mesh.visible){place(mesh,e.x,e.z,.05,e.yaw);const d=mesh.userData;d.body.position.y=['kite','harrow'].includes(e.type)?Math.sin(time*3+e.id)*.22:0;if(d.rotor)d.rotor.rotation.z=time*(e.state==='windup'?9:3);for(let i=0;i<d.legs.length;i++)d.legs[i].rotation.x=e.state==='idle'?Math.sin(time*9+i)*.17:0;d.body.rotation.x=e.state==='windup'?-.42*(1-e.timer/ENEMIES[e.type].windup):e.state==='stagger'?.15:0;d.body.rotation.z=e.state==='stagger'?Math.sin(time*20)*.025:0;d.body.position.z=-(e.recoil||0)*1.6;d.body.rotation.x+=(e.recoil||0)*1.2;}
    health.visible=mesh.visible&&e.hp<ENEMIES[e.type].hp&&Math.hypot(e.x-p.x,e.z-p.z)<15&&!['engine','harrow'].includes(e.type);if(health.visible){health.position.copy(surface(e.x,e.z,e.type==='dredger'?2.9:2.5));health.quaternion.copy(this.camera.quaternion);const ratio=Math.max(0,e.hp/ENEMIES[e.type].hp);fill.scale.x=ratio;fill.position.x=-(1-ratio)*.75;}
-   danger.visible=this.game.active(e)&&e.state==='windup';if(danger.visible){const s=ENEMIES[e.type],offsets=e.type==='harrow'?(e.hp<s.hp*.5?[-.6,-.3,0,.3,.6]:[-.3,0,.3]):[0];place(danger,e.attackX,e.attackZ,.1,e.attackYaw);danger.children.forEach((lane,i)=>{lane.visible=i<offsets.length;lane.rotation.y=offsets[i]||0;const mark=lane.children[0];mark.position.z=s.reach/2;mark.scale.set(s.width*2,s.reach,1);mark.material.opacity=.15+.28*(1-e.timer/s.windup);});}}
+   danger.visible=mesh.visible&&this.game.active(e)&&e.state==='windup';if(danger.visible){const s=ENEMIES[e.type],offsets=e.type==='harrow'?(e.hp<s.hp*.5?[-.6,-.3,0,.3,.6]:[-.3,0,.3]):[0];place(danger,e.attackX,e.attackZ,.1,e.attackYaw);danger.children.forEach((lane,i)=>{lane.visible=i<offsets.length;lane.rotation.y=offsets[i]||0;const mark=lane.children[0];mark.position.z=s.reach/2;mark.scale.set(s.width*2,s.reach,1);mark.material.opacity=.15+.28*(1-e.timer/s.windup);});}}
 
   for(const [id,mesh]of this.stations){mesh.visible=!this.game.progress.teeth.includes(id);mesh.rotateY(dt*.7);}
-  for(const a of this.animated){if(a.type==='npc'){a.mesh.userData.head.rotation.y=Math.sin(time*.7+a.x)*.12;a.mesh.userData.body.position.y=Math.sin(time*1.7+a.x)*.02;}if(a.type==='cloth')a.mesh.rotation.z=Math.sin(time*2+a.phase)*.045;if(a.type==='bird'){const angle=time*.065+a.phase;placeArt(a.mesh,Math.cos(angle)*53,Math.sin(angle)*57,12+Math.sin(angle*2)*3,-angle);a.mesh.children.forEach((wing,i)=>wing.rotation.z=(i?1:-1)*(.15+Math.sin(time*4+a.phase)*.25));}if(a.type==='cloud')a.mesh.position.copy(a.base).addScaledVector(new T.Vector3(1,0,0),Math.sin(time*.04+a.phase)*2);if(a.type==='flag')a.mesh.children.forEach((m,i)=>m.rotation.y=Math.sin(time*4-i*.6)*.2);if(a.type==='wheel')a.mesh.quaternion.copy(a.baseQ).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(0,0,1),time*.35));if(a.type==='signal')a.mesh.position.copy(a.base).addScaledVector(a.base.clone().normalize(),Math.sin(time*2)*.12);if(a.type==='relay'){a.mesh.rotation.z=Math.sin(time*(this.game.progress.relays.includes(a.id)?1.8:.25))*.15;}if(a.type==='crewship'){a.mesh.visible=this.game.progress.rescueDone;a.mesh.position.copy(a.base).addScaledVector(a.base.clone().normalize(),Math.sin(time)*.3);}if(a.type==='cache')a.mesh.visible=!this.game.progress.caches.includes(a.id);}
+  for(const a of this.animated){if(a.type==='npc'){a.mesh.userData.head.rotation.y=Math.sin(time*.7+a.x)*.12;a.mesh.userData.body.position.y=Math.sin(time*1.7+a.x)*.02;}if(a.type==='cloth')a.mesh.rotation.z=Math.sin(time*2+a.phase)*.045;if(a.type==='bird'){const angle=time*.065+a.phase;placeArt(a.mesh,Math.cos(angle)*53,Math.sin(angle)*57,12+Math.sin(angle*2)*3,-angle);a.mesh.children.forEach((wing,i)=>wing.rotation.z=(i?1:-1)*(.15+Math.sin(time*4+a.phase)*.25));}if(a.type==='cloud')a.mesh.position.copy(a.base).addScaledVector(new T.Vector3(1,0,0),Math.sin(time*.04+a.phase)*2);if(a.type==='flag')a.mesh.children.forEach((m,i)=>m.rotation.y=Math.sin(time*4-i*.6)*.2);if(a.type==='signal')a.mesh.position.copy(a.base).addScaledVector(a.base.clone().normalize(),Math.sin(time*2)*.12);if(a.type==='relay'){a.mesh.rotation.z=Math.sin(time*(this.game.progress.relays.includes(a.id)?1.8:.25))*.15;}if(a.type==='crewship'){a.mesh.visible=this.game.progress.rescueDone;a.mesh.position.copy(a.base).addScaledVector(a.base.clone().normalize(),Math.sin(time)*.3);}if(a.type==='cache')a.mesh.visible=!this.game.progress.caches.includes(a.id);}
   const q=this.game.quest();this.target.visible=!!q.target&&this.started&&!this.overview;if(q.target)place(this.target,q.target.x,q.target.z,5+Math.sin(time*2)*.2);
   this.syncEffects();this.syncItems(this.game.pickups,this.pickups,false);this.syncItems(this.game.shots,this.shots,true);this.updateCamera(dt);this.renderer.render(this.scene,this.camera);
  }
