@@ -16,9 +16,9 @@ export const LANDMARKS=[
  {id:'sera',name:'Sera Vale',area:'The Last Anchorage',x:-7,z:20,type:'npc',radius:3.5},
  {id:'bench',name:'Repair rig',area:'The Last Anchorage',x:5,z:25,type:'bench',radius:3},
  {id:'chart',name:'Read the field chart',area:'The Cinder March',x:5,z:9,type:'chart',radius:3},
- {id:'west',name:'Recover the governor tooth',area:'Blackglass Cut',x:-33,z:-7,type:'station',radius:3.3},
- {id:'north',name:'Recover the governor tooth',area:'The Severed Spire',x:26,z:-17,type:'station',radius:3.3},
- {id:'east',name:'Recover the governor tooth',area:'The Copper Reaches',x:30,z:22,type:'station',radius:3.3},
+ {id:'west',name:'Recover the regulator piece',area:'Blackglass Cut',x:-33,z:-7,type:'station',radius:3.3},
+ {id:'north',name:'Recover the regulator piece',area:'The Severed Spire',x:26,z:-17,type:'station',radius:3.3},
+ {id:'east',name:'Recover the regulator piece',area:'The Copper Reaches',x:30,z:22,type:'station',radius:3.3},
  {id:'engine',name:'The Keelbreaker',area:'The Engine Scar',x:0,z:-36,type:'boss',radius:8},
  {id:'oren',name:'Oren Flint',area:'Blackglass Cut',x:-23,z:0,type:'npc',radius:3},
  {id:'cache-a',name:'Salvage the survey case',area:'The Soot Garden',x:-24,z:24,type:'cache',radius:3},
@@ -40,7 +40,9 @@ export const SPAWNS=[
  ['kite',-34,20,'relay-west',2],['dredger',-40,9,'relay-west',2],['mite',-34,12,'relay-west',2],
  ['kite',35,-6,'relay-east',1],['mite',35,3,'relay-east',1],['mite',43,-4,'relay-east',1],
  ['dredger',40,5,'relay-east',2],['kite',34,-6,'relay-east',2],['kite',43,-3,'relay-east',2],
- ['harrow',-24,-34]
+ ['harrow',-24,-34],
+ // The Last Light encounter IDs are appended: existing defeated-ID saves remain stable.
+ ['mite',-2,14,null,null,'landingThreat'],['mite',4,15,null,null,'landingThreat']
 
 ];
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
