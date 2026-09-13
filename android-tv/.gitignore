@@ -1,0 +1,16 @@
+# Machine-local Android SDK location
+local.properties
+
+# Build output
+build/
+app/build/
+.gradle/
+
+# Signing — the release keystore and its passwords must NEVER be committed.
+# Back them up somewhere private instead (see README.md).
+keystore.properties
+keystore/
+
+# IDE noise
+.idea/
+*.iml

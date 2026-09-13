@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <WebView
+        android:id="@+id/game_web_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <!-- Native loading / error screen. Visible only until the page is up,
+         or when the main frame fails to load. -->
+    <LinearLayout
+        android:id="@+id/status_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/status_loading"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/retry"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Controller diagnostics. Toggled by clicking both sticks together or
+         launching with the "debug" intent extra. Normally GONE. -->
+    <TextView
+        android:id="@+id/debug_overlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="24dp"
+        android:background="#B0000000"
+        android:fontFamily="monospace"
+        android:padding="10dp"
+        android:textColor="#7CFC00"
+        android:textSize="12sp"
+        android:visibility="gone" />
+</FrameLayout>
