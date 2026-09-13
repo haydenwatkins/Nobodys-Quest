@@ -243,6 +243,21 @@
         text(c,goal.short,105,20,'#f3e4bd',9);
       }else text(c,s.mapDef.deliveryLandscape?'A place to return to':'The road is open',102,20,'#d2dda8',9);
     }
+    if(!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
+      const lesson=G.fieldMasteryReward();
+      if(lesson){
+        c.font="8px 'VT323', monospace";
+        const count=lesson.progress+'/'+lesson.total,countWidth=c.measureText(count).width;
+        const x=7,y=39,w=Math.min(199,Math.max(120,Math.ceil(c.measureText(lesson.quest.text).width+countWidth+19)));
+        panel(c,x,y,w,23);
+        let label=lesson.quest.text;
+        while(label.length&&c.measureText(label).width>w-countWidth-19)label=label.slice(0,-1);
+        if(label!==lesson.quest.text)label=label.slice(0,-1)+'…';
+        text(c,label,x+5,y+3,'#ece0bf',8);text(c,count,x+w-countWidth-5,y+3,'#edc988',8);
+        text(c,lesson.reward,x+5,y+13,'#b4c5a3',7);
+        c.fillStyle='#425852';c.fillRect(x+4,y+22,w-8,1);c.fillStyle='#b5c28c';c.fillRect(x+4,y+22,(w-8)*lesson.progress/lesson.total,1);
+      }
+    }
     // Keep the lower corners free for the touch joystick and ability buttons.
     if(!G.input.isTouch&&!G.ui.dialogueOpen&&!s.bossCutscene){
       const loadout=G.getLoadout(s.formId),keys=G.input.hasGamepad?['A','X','Y']:['J','K','L'];

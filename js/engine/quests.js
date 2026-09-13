@@ -125,6 +125,20 @@ G.fieldMasteryQuest = function () {
   return G.relevantMasteryQuests(1)[0] || null;
 };
 
+// One immediate lesson and the concrete move it is leading toward. Uses the
+// actual quest/ability registries, so borrowed arts and edited forms stay true.
+G.fieldMasteryReward = function () {
+  const entry=G.fieldMasteryQuest();if(!entry)return null;
+  const level=G.formLevel(entry.form.id),next=level+1;
+  const move=(entry.form.abilities||[]).find(a=>a.level===next&&G.abilities[a.id]);
+  let reward=move?'Next: '+G.abilities[move.id].name:entry.form.name+' Lv '+next+' + 1 star';
+  if(!move&&G.formUnlockSteps){
+    const child=G.formOrder.find(id=>!G.formUnlocked(id)&&G.formUnlockSteps(id).some(step=>(step.options||[]).some(o=>o.formId===entry.form.id&&!o.met&&o.target===next)));
+    if(child)reward='Toward '+G.forms[child].name+' + 1 star';
+  }
+  return {...entry,reward,total:Math.max(1,entry.quest.count),progress:Math.min(entry.quest.count,entry.progress)};
+};
+
 function questMatches(match, data) {
   if (!match) return true;
   for (const key in match) {

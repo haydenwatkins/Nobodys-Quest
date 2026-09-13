@@ -22,6 +22,9 @@ building system. A small storm drain hides a Rat discovery along the way.
 Once the deliveries are finished, Parcel's cart offers free return trips
 between Orchard Road and Sunrise Quay. Adventure slots name the current
 authored chapter so returning players can recognize where they left off.
+The quay's map stand opens Manyfold Expeditions after the deliveries, with a
+short three-chamber first crossing. The field HUD shows one relevant mastery
+lesson and its next reward, including progress earned with borrowed moves.
 
 Lanterns, partially cleared encounters, parcels, and rewards persist between
 visits. Failed guardian attempts reset the fight while preserving the road.

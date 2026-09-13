@@ -19,6 +19,14 @@
     const s=G.state,p=d(),quay=s.mapId==='sunriseQuay';
     if(kind==='departure'){if(s.opening.complete){lamp(c,x,y,true,t);rect(c,x-18,y-23,37,10,C.wood);rect(c,x-16,y-22,32,7,C.paper);rect(c,x-11,y-19,21,1,C.wood);poly(c,[[x+10,y-21],[x+14,y-19],[x+10,y-17]],C.wood);}return true;}
     if(!here())return false;
+    if(kind==='trailhead'){
+      if(!p.complete)return true;
+      glow(c,x,y-5,18);rect(c,x-12,y-5,3,8,C.wood);rect(c,x+10,y-5,3,8,C.wood);
+      poly(c,[[x-18,y-13],[x+15,y-13],[x+19,y-3],[x-15,y-3]],C.ink);
+      poly(c,[[x-16,y-12],[x-4,y-15],[x+4,y-11],[x+14,y-13],[x+16,y-5],[x+4,y-3],[x-4,y-7],[x-13,y-4]],C.paper);
+      c.strokeStyle='#64877f';c.lineWidth=1;c.beginPath();c.moveTo(x-10,y-7);c.lineTo(x-5,y-11);c.lineTo(x+3,y-7);c.lineTo(x+9,y-10);c.stroke();
+      rect(c,x+2,y-8,2,2,C.rose);rect(c,x-3,y-25,7,7,C.ink);rect(c,x-2,y-24,5,5,C.gold);return true;
+    }
     if(kind==='cart'&&s.mapId==='lanternReach'&&p.lamps[0]===2&&x===120)return true;
     if(kind==='lantern'){
       const on=quay?p.parcels.length>0:s.mapId==='tollCourt'?true:p.lamps[x<400?0:1]>0;lamp(c,x,y,on,t);return true;
@@ -128,6 +136,7 @@
   G.openingDrawables=c=>{
     const list=oldDrawables(c);if(G.state.mapId==='orchardRoad'&&G.state.opening.complete)list.push({y:37*16+8,fn:()=>G.drawDeliveryProp(c,'departure',26*16+8,37*16+8,G.state.time)});
     if(!here())return list;const s=G.state,p=d();
+    if(s.mapId==='sunriseQuay'&&p.complete)list.push({y:20*16+8,fn:()=>G.drawDeliveryProp(c,'trailhead',35*16+8,20*16+8,s.time)});
     // Parcel's cart advances only after safety is established, without a timer.
     if(s.mapId==='lanternReach'&&p.lamps[0]===2){
       // The original cart prop is suppressed by the shared prop hook below.

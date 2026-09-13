@@ -70,6 +70,9 @@
       if(!d.salvage)return option('drain',G.state.formId==='rat'?'Explore the storm drain':'A small drain · Rat can fit',18,30,25);
     }
     if(map==='sunriseQuay'&&d.started&&d.keeper){
+      if(d.complete&&G.expeditionUnlocked()){
+        const trail=option('manyfold','Choose a Manyfold trail',35,20);if(trail)return trail;
+      }
       for(const [id,[x,y]]of Object.entries(locations))if(!d.parcels.includes(id)){
         const at=option(id,{bread:'Deliver the flour',letter:'Deliver Mara’s letter',present:'Deliver the birthday present'}[id],x,y);if(at)return at;
       }
@@ -100,6 +103,7 @@
       d.started=true;G.world.load(d.complete?'sunriseQuay':'lanternReach');
       say('departure',[['PARCEL','Flour for the baker. A letter for Mara. A birthday present, only slightly chewed.'],['NOBODY','Who has been keeping the road lights on?'],['PARCEL','Nobody. I was hoping you might take that personally.']]);
     }else if(at.id==='rideBack')G.world.load('orchardRoad',{x:26,y:37});
+    else if(at.id==='manyfold'){if(G.ui.openExpedition)G.ui.openExpedition(G.ensureExpeditionProgress().runs===0?3:undefined);}
     else if(at.id.startsWith('lamp')){
       const i=Number(at.id.slice(-1));d.lamps[i]=1;spawnWave(i);G.sfx.play('bossPhase');
       say('lamp'+i,[['PARCEL',i?'They followed the light across. Clear the bank; I will keep the flame.':'The light woke something in the reeds. I have the cart. You have room to move.']]);
@@ -128,7 +132,7 @@
       if(id==='quayBaker'&&d.parcels.includes('bread'))return 'The first loaf is yours. Do not argue with someone holding a bread paddle.';
       if(id==='quayMara'&&d.parcels.includes('letter'))return 'Two cups. One for today, one for when she gets here.';
       if(id==='quayPip'&&d.parcels.includes('present'))return 'I named him Nobody. He is a very important dragon.';
-      if(id==='parcel')return d.complete?'I have work again. A wonderfully ordinary thing to say.':'We made it. Brindle is by the oven, Mara by the east house, Pip down by the water.';
+      if(id==='parcel')return d.complete?'The map stand beside the east lantern leads into the Manyfold. New paths, borrowed powers, and something to bring home. I might let you carry the post next time.':'We made it. Brindle is by the oven, Mara by the east house, Pip down by the water.';
     }
     return oldTalk(id,chapter,index);
   };

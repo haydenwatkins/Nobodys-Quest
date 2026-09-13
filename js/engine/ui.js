@@ -1185,7 +1185,8 @@ G.ui = (() => {
     atlasSelectedId = G.state && G.state.mapId;
     openMenu(true);
   }
-  function openExpedition() {
+  function openExpedition(length) {
+    if([3,5,7,9].includes(length))expeditionLengthChoice=String(length);
     activeTab = "expedition";
     openMenu(true);
   }
@@ -2414,6 +2415,7 @@ G.ui = (() => {
         <div class="quest-row"><span>Farthest chamber</span><span class="prog">${progress.bestRoom}</span></div>
         <div class="quest-row"><span>Longest crossing</span><span class="prog">${progress.longestWin || "—"}</span></div>
         <div class="choice-setting"><span>Path length</span><div class="choice-strip">
+          <button data-expedition-length="3" data-nav-zone="expedition-length" class="${expeditionLengthChoice === "3" ? "active" : ""}">Short · 3</button>
           <button data-expedition-length="5" data-nav-zone="expedition-length" class="${expeditionLengthChoice === "5" ? "active" : ""}">Trail · 5</button>
           ${longUnlocked ? `<button data-expedition-length="7" data-nav-zone="expedition-length" class="${expeditionLengthChoice === "7" ? "active" : ""}">Deep · 7</button>` : ""}
           ${G.unlockedForms().length >= 10 ? `<button data-expedition-length="9" data-nav-zone="expedition-length" class="${expeditionLengthChoice === "9" ? "active" : ""}">Worldfold · 9</button>` : ""}
