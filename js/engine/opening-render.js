@@ -61,7 +61,8 @@
       ellipse(c,Math.round(ax),Math.round(ay),2,2,C.rose);rect(c,ax,ay-1,1,1,'#e4ab87');
     }
   }
-  function prop(c,kind,x,y,time){
+  function prop(c,kind,x,y,time,skipDelivery=false){
+    if(!skipDelivery&&G.drawDeliveryProp&&G.drawDeliveryProp(c,kind,x,y,time))return;
     if(kind==='apple'){tree(c,x,y,x+y,true);return;}
     if(kind==='cart'){
       ellipse(c,x,y+3,23,6,'rgba(26,36,35,.3)');
@@ -129,6 +130,7 @@
       else {poly(c,[[x+2,y-25],[x+15,y-23],[x+13,y-9],[x+7,y-13],[x+1,y-11]],C.rose);rect(c,x+7,y-21,2,7,C.paper);}return;
     }
   }
+  G.drawOpeningProp=prop;
   G.drawOpeningGround=(c,cam,time)=>{
     if(!here())return;
     if(G.state.mapId==='orchardRoad'){
@@ -136,7 +138,7 @@
       else {const x=30*16,y=24*16;for(let i=0;i<4;i++){poly(c,[[x-24,y+13],[x+i*9,y-17],[x+13+i*9,y+14]],C.woodDark);}ellipse(c,27*16+16,24*16+6,7,8,C.ink);}
       // Dam apron, millrace foam, and a sunlit scattering of fallen apples.
       for(let i=0;i<15;i++){const x=35*16+rand(i,14)*110,y=27*16+rand(i,71)*55;if(G.world.cellAt(x,y).tile==='water')rect(c,x,y,4,1,'#a0c1ac');}
-    }else{
+    }else if(G.state.mapId==='heartwood'){
       c.save();c.strokeStyle='#839575';c.globalAlpha=.22;c.lineWidth=1;
       for(const radius of [43,65,88]){c.beginPath();c.ellipse(16*16+8,13*16,radius,radius*.64,0,0,Math.PI*2);c.stroke();}c.restore();
     }
@@ -177,6 +179,7 @@
   G.drawOpeningHazards=c=>{
     if(!here())return;
     for(const h of G.state.openingHazards||[]){
+      if(G.drawDeliveryHazard&&G.drawDeliveryHazard(c,h))continue;
       const active=h.t>=h.warn;
       c.save();c.strokeStyle=active?'#f5dba0':'#eec780';c.fillStyle=active?'rgba(111, 60, 40, .8)':'rgba(224,174,101,.16)';c.lineWidth=active?3:1;
       if(h.kind==='roots'){
@@ -230,15 +233,15 @@
     if(boss){
       panel(c,100,6,146,23);text(c,boss.def.name,107,9,'#e9d39f',9);
       c.fillStyle='#40574a';c.fillRect(107,21,131,3);c.fillStyle='#bdc77d';c.fillRect(107,21,131*Math.max(0,boss.hp/boss.def.hp),3);
-      if(boss.ward&&boss.ward.hp>0)text(c,'BARK WARD · BLUNT',107,29,'#f0cf89',8);
+      if(boss.ward&&boss.ward.hp>0)text(c,boss.id==='ancientTreant'?'BARK WARD · BLUNT':'WARD · '+boss.ward.types.join(' / ').toUpperCase(),107,29,'#f0cf89',8);
     }else if(!G.ui.dialogueOpen){
       const goal=G.openingGoal();
-      text(c,'THE FIRST PROMISE',102,8,'#f4e5bc',7);
+      text(c,goal?goal.progress.label:s.mapDef.deliveryLandscape?'SUNRISE, TOGETHER':'THE FIRST PROMISE',102,8,'#f4e5bc',7);
       if(goal){
         c.font="9px 'VT323', monospace";
         const w=Math.min(202,c.measureText(goal.short).width+10);panel(c,100,18,w,14);
         text(c,goal.short,105,20,'#f3e4bd',9);
-      }else text(c,'The road is open',102,20,'#d2dda8',9);
+      }else text(c,s.mapDef.deliveryLandscape?'A place to return to':'The road is open',102,20,'#d2dda8',9);
     }
     // Keep the lower corners free for the touch joystick and ability buttons.
     if(!G.input.isTouch&&!G.ui.dialogueOpen&&!s.bossCutscene){
@@ -259,7 +262,7 @@
     c.save();c.textBaseline='top';
     const speaker=d.speaker.toUpperCase(),form=speaker.includes('RAT')?'rat':speaker.includes('KNIGHT')?'knight':speaker==='NOBODY'?'nobody':null;
     const npc=Object.values(G.NPCS).find(n=>speaker.includes(n.name.toUpperCase()));
-    const sprite=form?G.forms[form].sprite:npc?npc.sprite:G.enemies.ancientTreant.sprite;
+    const sprite=form?G.forms[form].sprite:npc?npc.sprite:speaker.includes('TOLLKEEPER')?G.enemies.tollkeeper.sprite:G.enemies.ancientTreant.sprite;
     c.font="11px 'VT323', monospace";
     const lines=wrap(c,d.text,235),visible=wrap(c,d.text.slice(0,Math.floor(d.shown)),235);
     const h=Math.max(55,30+lines.length*11),y=174-h;

@@ -7,6 +7,26 @@ and maps are data files designed to be extended by a kid** (see
 
 Plain JavaScript + Canvas. **No build tools, no npm, no installs.**
 
+## The road to Sunrise
+
+New adventures begin with **The First Promise** on Orchard Road: help Parcel,
+discover Rat and Knight, and reopen the Heartwood. After returning to Parcel,
+walk a few steps east to the departure post to begin **The Long Way Home**.
+Existing completed Orchard Road saves can take this trip too.
+
+Restore two lanterns across the rainy causeway, face the Tollkeeper on the old
+bridge, and deliver three parcels around Sunrise's new quay in any order.
+The baker lights her oven, Mara puts out a second cup, and Pip finally gets a
+birthday dragon. The quay connects directly to the original town and its
+building system. A small storm drain hides a Rat discovery along the way.
+
+Lanterns, partially cleared encounters, parcels, and rewards persist between
+visits. Failed guardian attempts reset the fight while preserving the road.
+Interactions use the existing keyboard, controller, and touch controls.
+
+Verify with `node --test tests/*.test.js 3d/tests/*.test.mjs`.
+The separate 3D prototype remains available at `3d/`.
+
 The current campaign includes 24 mixable forms, the late-game Shattercoast and
 Worldwake regions, personality-driven three-phase guardian trials, and two
 different run systems: a configurable boss gauntlet and branching Manyfold

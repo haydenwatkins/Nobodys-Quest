@@ -150,6 +150,7 @@
     playSeconds: 0,
     story: G.makeStory(),
     opening: G.makeOpening ? G.makeOpening() : null,
+    delivery: G.makeDelivery ? G.makeDelivery() : null,
     guidance: G.makeGuidance(),
     shake: 0,
     hitStop: 0,
@@ -168,6 +169,7 @@
     s.playSeconds = Math.max(0, Number(save.playSeconds) || 0);
     s.story = G.normalizeStory(save.story);
     s.opening = G.normalizeOpening ? G.normalizeOpening(save.opening) : null;
+    s.delivery = G.normalizeDelivery ? G.normalizeDelivery(save.delivery) : null;
     s.guidance = G.normalizeGuidance(save.guidance);
     s.stars = save.stars || 0;
     s.items = save.items || [];

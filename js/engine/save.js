@@ -118,6 +118,7 @@ G.saveGame = function () {
       playSeconds: Math.max(0, Number(s.playSeconds) || 0),
       story: s.story,
       opening: s.opening,
+      delivery: s.delivery,
       guidance: s.guidance,
       formId: s.formId,
       costumeId: s.costumeId,
