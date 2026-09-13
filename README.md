@@ -19,10 +19,18 @@ bridge, and deliver three parcels around Sunrise's new quay in any order.
 The baker lights her oven, Mara puts out a second cup, and Pip finally gets a
 birthday dragon. The quay connects directly to the original town and its
 building system. A small storm drain hides a Rat discovery along the way.
+Once the deliveries are finished, Parcel's cart offers free return trips
+between Orchard Road and Sunrise Quay. Adventure slots name the current
+authored chapter so returning players can recognize where they left off.
 
 Lanterns, partially cleared encounters, parcels, and rewards persist between
 visits. Failed guardian attempts reset the fight while preserving the road.
 Interactions use the existing keyboard, controller, and touch controls.
+
+Nobody, Rat, Knight, and Ranger have authored art facing all four directions.
+Ranger draws the bow before releasing an arrow; moving keeps the chosen aim,
+and shifting away before release cancels the shot. Arrow, Lucky Arrow, and
+Triple Shot have directional shafts, heads, and fletching in flight.
 
 Verify with `node --test tests/*.test.js 3d/tests/*.test.mjs`.
 The separate 3D prototype remains available at `3d/`.

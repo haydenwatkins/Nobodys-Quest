@@ -19,8 +19,11 @@ assert.ok(save.includes("G.drawSprite") && save.includes("data-title-form"),
 assert.match(css, /prefers-reduced-motion:\s*reduce/, "title animation should honor reduced-motion preferences");
 assert.match(css, /orientation:\s*portrait/, "the storybook needs a dedicated portrait composition");
 assert.match(css, /orientation:\s*landscape[^}]*max-height:\s*430px/, "short landscape devices need a compact composition");
-assert.ok(index.includes("style.css?v=20260823a") && index.includes("save.js?v=20260822c"),
-  "published clients must receive the new title screen instead of cached files");
+for (const [file,minimum] of [["style.css","20260823a"],["save.js","20260822c"]]) {
+  const version=index.match(new RegExp(file.replace('.', '\\.')+'\\?v=(\\d{8}[a-z])'));
+  assert.ok(version&&version[1]>=minimum,
+    `${file} must retain a title-screen-or-newer cache version`);
+}
 assert.match(css, /grid-template-rows:\s*repeat\(4,auto\)/,
   "portrait cards should grow four independent text rows without overlapping the next chapter");
 assert.match(css, /min-height:\s*154px/,

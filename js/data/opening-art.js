@@ -112,10 +112,10 @@
   G.enemies.orchardGuard.sprite=G.forms.knight.sprite;
 
   G.beginFormPerformance=(p,ability)=>{
-    const active={nobody:'slap',rat:'bite',knight:'slash'};
+    const active={nobody:'slap',rat:'bite',knight:'slash',ranger:'arrow'};
     if(active[G.state.formId]!==ability)return false;
-    const windup=ability==='slash'?.055:ability==='bite'?.025:.035;
-    p.performance={ability,form:G.state.formId,t:0,windup,duration:ability==='slash'?.29:.22,fired:false,dir:{...p.dir}};
+    const windup=ability==='arrow'?.09:ability==='slash'?.055:ability==='bite'?.025:.035;
+    p.performance={ability,form:G.state.formId,t:0,windup,duration:ability==='arrow'?.3:ability==='slash'?.29:.22,fired:false,dir:{...p.dir}};
     return true;
   };
   G.updateFormPerformance=dt=>{

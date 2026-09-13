@@ -60,7 +60,7 @@
   G.deliveryCandidate=()=>{
     if(!G.state||!safe())return null;const d=state(),map=G.state.mapId;
     const option=(id,label,x,y,r)=>near(x,y,r)?{id,label,x:x*16+8,y:y*16+8}:null;
-    if(map==='orchardRoad'&&G.state.opening.complete)return option('depart',d.started?'Return to the Lantern Reach':'Travel with Parcel',26,37);
+    if(map==='orchardRoad'&&G.state.opening.complete)return option('depart',d.complete?'Ride to Sunrise Quay':d.started?'Return to the Lantern Reach':'Travel with Parcel',26,37);
     if(!here())return null;
     if(map==='lanternReach'){
       for(const i of [0,1])if(d.started&&d.lamps[i]===0&&(i===0||d.lamps[0]===2)){
@@ -74,6 +74,7 @@
         const at=option(id,{bread:'Deliver the flour',letter:'Deliver Mara’s letter',present:'Deliver the birthday present'}[id],x,y);if(at)return at;
       }
       if(d.parcels.length===3&&!d.complete)return option('finish','Tell Parcel the delivery is done',8,20);
+      if(d.complete)return option('rideBack','Ride back to Orchard Road',8,20);
     }
     return null;
   };
@@ -96,9 +97,10 @@
     const at=G.deliveryCandidate();if(!at)return oldInteract();
     const d=state(),s=G.state;
     if(at.id==='depart'){
-      d.started=true;G.world.load('lanternReach');
+      d.started=true;G.world.load(d.complete?'sunriseQuay':'lanternReach');
       say('departure',[['PARCEL','Flour for the baker. A letter for Mara. A birthday present, only slightly chewed.'],['NOBODY','Who has been keeping the road lights on?'],['PARCEL','Nobody. I was hoping you might take that personally.']]);
-    }else if(at.id.startsWith('lamp')){
+    }else if(at.id==='rideBack')G.world.load('orchardRoad',{x:26,y:37});
+    else if(at.id.startsWith('lamp')){
       const i=Number(at.id.slice(-1));d.lamps[i]=1;spawnWave(i);G.sfx.play('bossPhase');
       say('lamp'+i,[['PARCEL',i?'They followed the light across. Clear the bank; I will keep the flame.':'The light woke something in the reeds. I have the cart. You have room to move.']]);
     }else if(at.id==='drain'){

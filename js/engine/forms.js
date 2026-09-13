@@ -332,7 +332,7 @@ G.checkUnlocks = function () {
 /* ---------- switching forms ---------- */
 G.setForm = function (id) {
   if (!G.formUnlocked(id) || id === G.state.formId) return;
-  if (G.state.player.performance && !G.state.player.performance.fired) return;
+  if (G.state.player.performance && !G.state.player.performance.fired && G.state.player.performance.ability !== 'arrow') return;
   G.state.player.performance = null;
   G.state.formId = id;
   const p = G.state.player;

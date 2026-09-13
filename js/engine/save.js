@@ -202,10 +202,14 @@ G.saveSlotSummaries = function () {
     const save = G.loadSaveData(slot);
     if (!save) return { slot, empty: true, active: slot === G.activeSaveSlot };
     const chapter = derivedChapter(save);
+    const fieldChapter = save.delivery && save.delivery.started && !save.delivery.complete
+      ? 'The Long Way Home'
+      : save.opening && !save.opening.complete && ['orchardRoad','heartwood'].includes(save.mapId)
+        ? 'The First Promise' : null;
     const complete = (save.items || []).includes("god-spark");
     return {
       slot, empty: false, active: slot === G.activeSaveSlot,
-      chapter, chapterName: chapterNames[chapter] || chapterNames[0], complete,
+      chapter, chapterName: fieldChapter || chapterNames[chapter] || chapterNames[0], complete,
       stars: save.stars || 0,
       forms: 1 + (Array.isArray(save.claimedForms) ? save.claimedForms.length : 0),
       formId: save.formId || "nobody",

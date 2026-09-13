@@ -1492,6 +1492,15 @@ G.drawProjectiles = function (ctx) {
       ctx.fillRect(Math.round(point.x - trailSize / 2), Math.round(point.y - 4 - trailSize / 2), trailSize, trailSize);
     }
     ctx.restore();
+    if(pr.fromPlayer&&['arrow','luckyArrow','tripleShot'].includes(pr.ability)){
+      ctx.save();ctx.translate(Math.round(pr.x),Math.round(pr.y-4));ctx.rotate(Math.atan2(pr.vy,pr.vx));
+      ctx.fillStyle='#483f3d';ctx.fillRect(-8,-1,14,3);
+      ctx.fillStyle='#d9b88a';ctx.fillRect(-7,0,12,1);
+      ctx.fillStyle=pr.ability==='luckyArrow'?'#ffdf8e':'#d4ddd1';
+      ctx.beginPath();ctx.moveTo(4,-3);ctx.lineTo(9,0);ctx.lineTo(4,3);ctx.closePath();ctx.fill();
+      ctx.fillStyle=pr.ability==='tripleShot'?'#89b2a1':'#b87968';
+      ctx.fillRect(-7,-2,3,1);ctx.fillRect(-8,2,3,1);ctx.restore();continue;
+    }
     if (pr.shape !== "card" && pr.shape !== "pie") {
       ctx.save();
       ctx.globalAlpha = 0.2;

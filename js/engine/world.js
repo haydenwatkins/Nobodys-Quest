@@ -297,6 +297,7 @@ G.world = (() => {
     p.x = at.x * G.TILE + G.TILE / 2;
     p.y = at.y * G.TILE + G.TILE / 2;
     p.dashing = null;
+    p.performance = null;
     p.lastSafe = { x: p.x, y: p.y };
     s.entryPoint = { x: p.x, y: p.y };
     // Do not let a held stick/key carry straight back through an arrival
