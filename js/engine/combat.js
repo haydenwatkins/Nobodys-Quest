@@ -80,6 +80,8 @@ G.combat = (() => {
     if (enemy.def.miniboss && enemy.bossIntroT > 0) return false;
     const type = abilityDamageType(opts.ability, opts.type, "blunt");
     if (opts.type !== type) opts = { ...opts, type };
+    if(G.expeditionHitOptions && !(enemy.ward?.hp>0 && !opts.breaksAnyWard && !enemy.ward.types.includes(type)))
+      opts=G.expeditionHitOptions(enemy,opts);
 
     // WARD CHECK
     if (enemy.ward && enemy.ward.hp > 0) {
@@ -152,7 +154,9 @@ G.combat = (() => {
   }
 
   function killEnemy(enemy, opts) {
+    const defeatedMap=G.state.mapId,run=G.state.expeditionRun;
     enemy.dead = true;
+    if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
     G.sfx.play("defeat");
     G.state.shake = Math.max(G.state.shake, enemy.def.heavy ? 0.3 : 0.14);
     G.spawnFx({ kind: "puff", x: enemy.x, y: enemy.y - 6, color: "#f4f4f4", dur: 0.35 });
@@ -169,6 +173,9 @@ G.combat = (() => {
       y: enemy.y,
       legendTrial: enemy.legendTrial || null,
     });
+    // A final run kill can synchronously return us to the campaign. Never
+    // drop arena pickups, echoes, or passive effects into that new location.
+    if(G.state.mapId!==defeatedMap || (run && (G.state.expeditionRun!==run || run.phase!=="battle")))return;
     if (G.passives) G.passives.onKill(enemy, opts);
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);
     // Quest and trophy listeners run synchronously above, so this exact
@@ -546,6 +553,7 @@ G.combat = (() => {
   function dash(user, o) {
     if (G.passives) o = G.passives.prepare("dash", user, o);
     const type = abilityDamageType(o.ability, o.type, "blunt");
+    if(G.expeditionDashEcho)G.expeditionDashEcho(user,{...o,type});
     user.dashing = {
       left: o.dist || 60,
       speed: o.speed || 260,

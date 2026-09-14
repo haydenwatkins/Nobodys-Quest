@@ -17,6 +17,9 @@ const EXPEDITION_BOONS = {
   deepWell: { icon: "💧", name: "Deep Well", text: "+2 maximum mana until you return" },
   quickBoots: { icon: "👟", name: "Quick Boots", text: "+10% movement speed until you return" },
   wardCake: { icon: "🛡", name: "Ward Cake", text: "Block the first hit in every chamber ahead" },
+  crossweave: { icon: "✦", name: "Crossweave", text: "Alternate different arts: the first hit with a different art deals +1 damage. Mix a second art to keep the rhythm.", unique: true },
+  afterstep: { icon: "◌", name: "Afterstep", text: "Each dash leaves an echo where it began. After a short delay it bursts for 2 damage. Lure foes in, then dash away.", unique: true },
+  briarRelay: { icon: "❧", name: "Briar Relay", text: "Defeated poisoned foes spread poison to three nearby enemies. Borrow Rat's Bite to start a chain.", unique: true },
 };
 
 // The menu renders the same catalogue used by the run logic. Exposing this
@@ -24,7 +27,7 @@ const EXPEDITION_BOONS = {
 G.EXPEDITION_BOONS = EXPEDITION_BOONS;
 
 G.makeExpeditionProgress = function () {
-  return { runs: 0, victories: 0, bestRoom: 0, longestWin: 0, boonsSeen: [] };
+  return { runs: 0, victories: 0, bestRoom: 0, longestWin: 0, boonsSeen: [], lastRun: null };
 };
 
 G.normalizeExpeditionProgress = function (saved) {
@@ -32,6 +35,13 @@ G.normalizeExpeditionProgress = function (saved) {
   for (const key of ["runs", "victories", "bestRoom", "longestWin"])
     progress[key] = Math.max(0, Number(progress[key]) || 0);
   progress.boonsSeen = Array.isArray(progress.boonsSeen) ? progress.boonsSeen.filter((id) => EXPEDITION_BOONS[id]) : [];
+  if(progress.lastRun)progress.lastRun={
+    outcome:["victory","defeat","return"].includes(progress.lastRun.outcome)?progress.lastRun.outcome:"return",
+    rooms:Math.max(0,Math.min(9,Number(progress.lastRun.rooms)||0)),
+    length:Math.max(3,Math.min(9,Number(progress.lastRun.length)||3)),
+    spirit:Math.max(0,Number(progress.lastRun.spirit)||0),
+    boons:Array.isArray(progress.lastRun.boons)?progress.lastRun.boons.filter(id=>EXPEDITION_BOONS[id]):[],
+  };
   return progress;
 };
 
@@ -44,7 +54,8 @@ G.normalizeExpeditionRun = function (saved) {
   run.wins = Math.max(0, Number(run.wins) || 0);
   run.seed = Math.max(1, Math.floor(Number(run.seed) || 1));
   run.bonusSpirit = Math.max(0, Math.floor(Number(run.bonusSpirit) || 0));
-  run.boons = run.boons && typeof run.boons === "object" ? run.boons : {};
+  run.boons = Object.fromEntries(Object.entries(run.boons || {}).filter(([id,count])=>EXPEDITION_BOONS[id]&&Number(count)>0)
+    .map(([id,count])=>[id,Math.min(EXPEDITION_BOONS[id].unique?1:9,Math.floor(Number(count)))]));
   run.routeChoices = Array.isArray(run.routeChoices) ? run.routeChoices : [];
   run.draftOptions = Array.isArray(run.draftOptions) ? run.draftOptions : [];
   run.encounterIds = Array.isArray(run.encounterIds) ? run.encounterIds.filter((id) => G.enemies[id]) : [];
@@ -121,7 +132,7 @@ function routeChoices(run) {
 
 function draftOptions(run, bonusChoice) {
   const options = [];
-  const boonIds = Object.keys(EXPEDITION_BOONS);
+  const boonIds = expeditionBoonPool(run);
   const boonId = chooseFrom(boonIds, runIndex(run, run.room + run.wins + 101));
   options.push(Object.assign({ kind: "boon", id: boonId }, EXPEDITION_BOONS[boonId]));
 
@@ -155,6 +166,68 @@ function draftOptions(run, bonusChoice) {
   return options;
 }
 
+function expeditionBoonPool(run) {
+  const arts=G.availableAbilities();
+  return Object.keys(EXPEDITION_BOONS).filter(id=>{
+    if(EXPEDITION_BOONS[id].unique && run.boons[id])return false;
+    if(id==="afterstep")return arts.some(art=>G.abilities[art].style==="dash");
+    if(id==="briarRelay")return arts.includes("bite");
+    return true;
+  });
+}
+
+function startingGifts(run) {
+  const pool=expeditionBoonPool(run);
+  const ids=["crossweave",pool.includes("afterstep")?"afterstep":"quickBoots",pool.includes("briarRelay")?"briarRelay":"heartThread"];
+  return ids.map(id=>({kind:"boon",id,...EXPEDITION_BOONS[id]}));
+}
+
+G.expeditionHitOptions = function(enemy, options) {
+  const run=G.state.expeditionRun;
+  if(!run || run.phase!=="battle" || !run.boons.crossweave || options.expeditionEcho || !G.abilities[options.ability])return options;
+  const previous=run.lastArt;run.lastArt=options.ability;
+  if(!previous || previous===options.ability)return options;
+  G.spawnFx({kind:"ring",x:enemy.x,y:enemy.y-4,radius:18,color:"#d9a7ff",dur:.25});
+  return {...options,damage:options.damage+1};
+};
+
+G.expeditionDashEcho = function(user, options) {
+  const run=G.state.expeditionRun;
+  if(!run || run.phase!=="battle" || !run.boons.afterstep)return;
+  const echoes=G.state.expeditionEchoes||(G.state.expeditionEchoes=[]);
+  echoes.push({x:user.x,y:user.y,t:.45,type:options.type||"blunt",ability:options.ability});
+  G.spawnFx({kind:"ring",x:user.x,y:user.y-4,radius:32,color:"#d9a7ff",dur:.45});
+};
+
+G.updateExpeditionEffects = function(dt) {
+  const run=G.state.expeditionRun;
+  if(!run || run.phase!=="battle") {G.state.expeditionEchoes=[];return;}
+  const echoes=G.state.expeditionEchoes||[];
+  G.state.expeditionEchoes=[];
+  for(const echo of echoes) {
+    echo.t-=dt;
+    if(echo.t>0){G.state.expeditionEchoes.push(echo);continue;}
+    G.spawnFx({kind:"ring",x:echo.x,y:echo.y-4,radius:32,color:"#fff3c2",dur:.25});
+    for(const enemy of G.state.enemies.slice()) {
+      if(G.state.expeditionRun!==run || run.phase!=="battle")break;
+      if(!enemy.dead && Math.hypot(enemy.x-echo.x,enemy.y-echo.y)<=32)
+        G.combat.damageEnemy(enemy,{damage:2,type:echo.type,ability:echo.ability,fromX:echo.x,fromY:echo.y,knockback:35,expeditionEcho:true,noMana:true});
+    }
+    if(G.state.expeditionRun!==run || run.phase!=="battle")break;
+  }
+};
+
+G.expeditionPoisonRelay = function(enemy) {
+  const run=G.state.expeditionRun;
+  if(!run || run.phase!=="battle" || !run.boons.briarRelay || !enemy.status?.poison)return;
+  const nearby=G.state.enemies.filter(e=>!e.dead && !e.def.practice && Math.hypot(e.x-enemy.x,e.y-enemy.y)<=72)
+    .sort((a,b)=>Math.hypot(a.x-enemy.x,a.y-enemy.y)-Math.hypot(b.x-enemy.x,b.y-enemy.y)).slice(0,3);
+  for(const target of nearby) {
+    G.combat.applyStatus(target,"poison",{dur:3,dps:.7,ability:"bite"});
+    G.spawnFx({kind:"bolt",x:enemy.x,y:enemy.y-4,x2:target.x,y2:target.y-4,color:"#a7f070",dur:.25});
+  }
+};
+
 function expeditionEnemy(id, x, y, routeId, champion) {
   const enemy = G.makeEnemy(id, x, y);
   const base = enemy.def;
@@ -171,6 +244,8 @@ function expeditionEnemy(id, x, y, routeId, champion) {
   enemy.hp = enemy.def.hp;
   enemy.expeditionElite = elite;
   enemy.expeditionChampion = !!champion;
+  const usableTypes=new Set(G.availableAbilities().map(id=>G.abilities[id].type));
+  if(enemy.ward && !enemy.ward.types.some(type=>usableTypes.has(type)))enemy.ward=null;
   if (routeId === "wardedChampion") enemy.ward = { hp: 1, maxHp: 1, types: ["sharp", "blunt", "light", "dark"] };
   return enemy;
 }
@@ -180,6 +255,17 @@ function spawnEncounter(run) {
   const champion = routeId === "wardedChampion" || routeId === "frenziedChampion";
   const count = champion ? 1 : routeId === "ambush" ? 5 : routeId === "elite" ? 2 : 3;
   const pool = expeditionPool();
+  // Room geometry is deterministic across resume. Cover creates a choice
+  // between breaking a shooter's sight line and keeping a clear dash lane.
+  const layouts=[
+    {name:"Split Pillars",rocks:[[12,5],[12,6],[12,10],[12,11],[20,7],[20,9]]},
+    {name:"The Needle",rocks:[[12,7],[12,8],[12,9],[19,4],[19,12]]},
+    {name:"Open Crossing",rocks:[[9,3],[9,13],[23,3],[23,13]]},
+  ];
+  const layout=layouts[runIndex(run,run.room+919)%layouts.length];
+  run.roomName=layout.name;
+  for(let y=1;y<G.state.mapH-1;y++)for(let x=1;x<G.state.mapW-1;x++)G.state.grid[y][x]={tile:"floor"};
+  for(const [x,y]of layout.rocks)G.state.grid[y][x]={tile:"rock",on:"floor"};
   if (!run.encounterIds.length) {
     for (let i = 0; i < count; i++)
       run.encounterIds.push(chooseFrom(pool, runIndex(run, run.room * 17 + i * 7 + run.wins + 503)));
@@ -191,13 +277,15 @@ function spawnEncounter(run) {
   });
   G.state.projectiles = [];
   G.state.pickups = [];
+  G.state.expeditionEchoes = [];
+  run.lastArt = null;
   G.state.player.x = 6 * G.TILE + G.TILE / 2;
   G.state.player.y = 8 * G.TILE + G.TILE / 2;
   G.state.entryPoint = { x: G.state.player.x, y: G.state.player.y };
   G.state.player.invuln = Math.max(G.state.player.invuln, 0.8);
   if (run.boons.wardCake) G.state.player.pantryGuard = Math.max(G.state.player.pantryGuard, 1);
   G.ui.banner(champion ? "★ FINAL MANYFOLD ROOM" : `◇ EXPEDITION ROOM ${run.room + 1}/${run.length}`,
-    champion ? G.state.enemies[0].def.name : `${G.state.enemies.length} foes · ${run.currentRoute.replace(/([A-Z])/g, " $1")}`);
+    champion ? G.state.enemies[0].def.name : `${layout.name} · ${G.state.enemies.length} foes`);
 }
 
 G.startManyfoldExpedition = function (length) {
@@ -206,16 +294,17 @@ G.startManyfoldExpedition = function (length) {
   const p = G.state.player;
   const runLength = Math.max(3, Math.min(9, Number(length) || 5));
   const run = {
-    length: runLength, room: 0, wins: 0, phase: "route", boons: {}, bonusSpirit: 0,
+    length: runLength, room: 0, wins: 0, phase: "reward", openingDraft: true, boons: {}, bonusSpirit: 0,
     seed: Math.max(1, Math.floor((Date.now() + progress.runs * 7919) % 2147483647)),
     routeChoices: [], draftOptions: [], encounterIds: [], currentRoute: null,
     backup: {
       mapId: G.state.mapId, px: p.x, py: p.y, formId: G.state.formId,
       damageTaken: p.damageTaken, mana: p.mana,
+      pantryGuard:p.pantryGuard||0,
       loadouts: JSON.parse(JSON.stringify(G.state.loadouts || {})),
     },
   };
-  run.routeChoices = routeChoices(run);
+  run.draftOptions = startingGifts(run);
   G.state.expeditionRun = run;
   progress.runs += 1;
   G.world.load("manyfoldExpedition", { x: 6, y: 8 });
@@ -280,6 +369,7 @@ G.chooseExpeditionDraft = function (index) {
     G.state.player.mana = Math.min(G.playerMaxMana(), G.state.player.mana + 3);
   }
   run.phase = "route";
+  run.openingDraft = false;
   run.currentRoute = null;
   run.encounterIds = [];
   run.draftOptions = [];
@@ -301,6 +391,7 @@ function restoreCampaign(run, refill) {
   G.state.player.damageTaken = refill ? 0 : Math.min(G.playerMaxHearts() - 1, Math.max(0, Number(backup.damageTaken) || 0));
   G.state.player.mana = refill ? G.playerMaxMana() : Math.min(G.playerMaxMana(), Math.max(0, Number(backup.mana) || 0));
   G.state.player.cooldowns = {};
+  G.state.player.pantryGuard = backup.pantryGuard || 0;
 }
 
 function completeExpedition(run) {
@@ -311,6 +402,7 @@ function completeExpedition(run) {
   const record = length > progress.longestWin;
   progress.longestWin = Math.max(progress.longestWin, length);
   const spirit = 8 + length * 2 + (run.bonusSpirit || 0);
+  progress.lastRun={outcome:"victory",rooms:run.room,length,spirit,boons:Object.keys(run.boons)};
   if (record) G.state.stars += 1;
   restoreCampaign(run, true);
   if (G.addTownReward) G.addTownReward(spirit, length >= 7 ? 2 : 1, "Manyfold victory", true);
@@ -327,6 +419,7 @@ G.failManyfoldExpedition = function (message, abandoned) {
   const progress = G.ensureExpeditionProgress();
   progress.bestRoom = Math.max(progress.bestRoom, run.room);
   const consolation = abandoned ? 0 : Math.min(6, run.wins);
+  progress.lastRun={outcome:abandoned?"return":"defeat",rooms:run.room,length:run.length,spirit:consolation,boons:Object.keys(run.boons)};
   restoreCampaign(run, false);
   if (consolation && G.addTownReward) G.addTownReward(consolation, 0, "Expedition lessons", true);
   G.sfx.play(abandoned ? "door" : "stagger");

@@ -71,6 +71,16 @@ vm.runInContext(fs.readFileSync(path.join(root, "js/engine/input.js"), "utf8"), 
 const G = context.G;
 const zone = elements["joy-zone"];
 
+// Switching apps while holding a movement key must not strand the player
+// against the next portal; keyup may never arrive after focus is lost.
+windowTarget.dispatch("keydown",{key:"ArrowRight"});G.input.update();
+assert.ok(G.input.vec.x>0);
+windowTarget.dispatch("blur");G.input.update();
+assert.equal(G.input.vec.x,0);
+windowTarget.dispatch("keydown",{key:"ArrowUp"});G.input.update();
+documentTarget.hidden=true;documentTarget.dispatch("visibilitychange");G.input.update();
+assert.equal(G.input.vec.y,0);documentTarget.hidden=false;
+
 function startMoving(pointerId = 7) {
   zone.dispatch("pointerdown", { pointerId, clientX: 100, clientY: 100 });
   zone.dispatch("pointermove", { pointerId, clientX: 58, clientY: 100 });

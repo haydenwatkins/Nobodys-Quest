@@ -5,12 +5,13 @@
   const road='orchardRoad',glade='heartwood';
   const near=(x,y,r=26)=>Math.hypot(G.state.player.x-(x*16+8),G.state.player.y-(y*16+8))<=r;
   const here=()=>G.state&&(G.state.mapId===road||G.state.mapId===glade);
-  G.makeOpening=()=>({version:1,notice:false,cart:false,sluice:false,bell:false,complete:false,seen:[],defeated:[]});
+  G.makeOpening=()=>({version:1,started:false,notice:false,cart:false,sluice:false,bell:false,complete:false,seen:[],defeated:[]});
   G.normalizeOpening=(raw)=>{
     const a=G.makeOpening();
     for(const k of ['notice','cart','sluice','bell','complete'])a[k]=!!(raw&&raw[k]);
     a.seen=Array.isArray(raw&&raw.seen)?raw.seen.filter(x=>typeof x==='string').slice(0,30):[];
     a.defeated=Array.isArray(raw&&raw.defeated)?raw.defeated.filter(x=>typeof x==='string').slice(0,40):[];
+    a.started=!!(raw&&(raw.started||a.notice||a.cart||a.complete||a.seen.includes('arrival')));
     return a;
   };
   const progress=()=>G.state.opening||(G.state.opening=G.makeOpening());
@@ -22,6 +23,7 @@
   }
   G.beginOpening=()=>{
     const s=G.state;if(!here()||progress().complete)return false;
+    progress().started=true;
     const st=G.ensureStory();st.prologueSeen=true;
     if(!st.seenChapters.includes(0))st.seenChapters.push(0);
     say('arrival',[
@@ -30,7 +32,7 @@
     ]);
     return true;
   };
-  G.openingActive=()=>!!(here()&&!progress().complete);
+  G.openingActive=()=>!!(G.state&&(here()||progress().started)&&!progress().complete);
   G.openingGoal=()=>{
     if(!G.openingActive())return null;
     const o=progress(),won=G.state.items.includes('trophy-heartwood-crown');

@@ -311,7 +311,7 @@ function titleTransformationStage(save) {
 
 function titleSlotCard(summary) {
   if (summary.empty) return `<button class="save-slot-card empty ${summary.active ? "active" : ""}" data-save-slot="${summary.slot}">
-    <span class="save-slot-number">CHAPTER ${summary.slot}</span>
+    <span class="save-slot-number">ADVENTURE ${summary.slot}</span>
     <span class="slot-chapter-art unwritten" aria-hidden="true"><i class="title-quill">✦</i></span>
     <strong>Begin a new story</strong>
     <small>The next page belongs to Nobody.</small>
@@ -319,7 +319,7 @@ function titleSlotCard(summary) {
   const form = G.forms && G.forms[summary.formId];
   const map = G.maps && G.maps[summary.mapId];
   return `<button class="save-slot-card ${summary.active ? "active" : ""}" data-save-slot="${summary.slot}">
-    <span class="save-slot-number">CHAPTER ${summary.slot}${summary.complete ? " · COMPLETE" : ""}</span>
+    <span class="save-slot-number">ADVENTURE ${summary.slot}${summary.complete ? " · COMPLETE" : ""}</span>
     <span class="slot-chapter-art ${titleSceneClass(summary.mapId)}" aria-hidden="true">
       <i class="slot-sun"></i><i class="slot-hill far"></i><i class="slot-hill near"></i>
       <canvas width="64" height="68" data-title-form="${titleEscape(summary.formId)}"></canvas>

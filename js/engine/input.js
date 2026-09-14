@@ -105,6 +105,13 @@ G.input = (() => {
     keyVec.x = (dirsHeld.right ? 1 : 0) - (dirsHeld.left ? 1 : 0);
     keyVec.y = (dirsHeld.down ? 1 : 0) - (dirsHeld.up ? 1 : 0);
   }
+  function resetKeyboard() {
+    for (const dir of Object.keys(dirsHeld)) dirsHeld[dir] = false;
+    for (const action of new Set(Object.values(keyMap))) if (!(action in dirsHeld)) release(action);
+    updateKeyVec();
+  }
+  window.addEventListener("blur", resetKeyboard);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) resetKeyboard(); });
 
   /* ---------- Android TV wrapper: native controller bridge ----------
      The Kotlin shell in android-tv/ intercepts Xbox controller input

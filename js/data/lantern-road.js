@@ -38,10 +38,10 @@
   q.put(0,19,'R');q.put(43,19,'T');q.put(19,22,'F');
   registerMap({id:'sunriseQuay',name:'Sunrise Town · The Quay',biome:'overworld',openingLandscape:true,deliveryLandscape:true,
     playerStart:{x:4,y:19},tiles:q.tiles(),
-    legend:{R:{tile:'path',portal:{map:'tollCourt',x:30,y:17},portalStyle:'gap'},T:{tile:'path',portal:{map:'town',x:27,y:8},portalStyle:'gap'},F:{tile:'grass',rest:true}},
+    legend:{R:{tile:'path',portal:{map:'tollCourt',x:30,y:17},portalStyle:'gap'},T:{tile:'path',portal:{map:'town',x:2,y:8},portalStyle:'gap'},F:{tile:'grass',rest:true}},
     openingProps:[['bakery',12,10],['letterHouse',30,11],['birthdayHouse',28,24],['cart',7,20],['well',21,16],['camp',19,22],['lantern',10,16],['lantern',33,16],['lantern',22,27],['bunting',21,12],['bunting',21,24],['willow',5,13],['willow',37,24],['apple',7,25],['apple',34,7],['apple',8,7],['apple',16,7],['flowerbed',15,9],['flowerbed',33,10],['flowerbed',25,25],['flowerbed',18,17],['bench',22,18],['fence',9,9],['fence',9,10],['fence',34,12],['fence',32,25],['fence',25,9],['reed',6,28],['reed',37,27],['boat',8,29],['boat',35,28]],
   });
-  const town=G.maps.town,row=town.tiles[8].split('');row[29]='Q';town.tiles[8]=row.join('');
+  const town=G.maps.town,row=town.tiles[8].split('');row[0]='Q';town.tiles[8]=row.join('');
   town.legend.Q={tile:'path',portal:{map:'sunriseQuay',x:40,y:19},portalStyle:'gap'};
   G.NPC_PLACEMENTS.lanternReach=[['parcel',8,29]];G.NPC_PLACEMENTS.tollCourt=[];
   G.NPC_PLACEMENTS.sunriseQuay=[['parcel',8,20],['quayBaker',12,12],['quayMara',30,13],['quayPip',28,26],['pebble',22,20]];

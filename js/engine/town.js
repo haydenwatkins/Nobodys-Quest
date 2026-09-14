@@ -61,8 +61,27 @@ G.ensureTown = function () {
 
 G.townUnlocked = function () {
   if (!G.state) return false;
+  if (G.state.opening && G.state.opening.started && !(G.state.delivery && G.state.delivery.complete)) return false;
   const town = G.ensureTown();
   return !!(town.founded || (G.state.claimedForms || []).length >= 1 || G.state.stars >= 2);
+};
+
+G.townTravelReason = function () {
+  if (!G.townUnlocked()) return "Finish the delivery to make Sunrise your home.";
+  if (G.state.expeditionRun || G.state.gauntletRun) return "Finish or leave your crossing first.";
+  if (G.state.knockout || G.state.bossCutscene || G.state.zoneTransition) return "Finish this moment before traveling.";
+  if (G.state.mapDef.bossTrial && !G.state.mapDef.bossTrial.worldBoss) return "Leave the guardian trial on foot first.";
+  if (G.state.enemies.some(e => !e.dead && !e.def.practice && Math.hypot(e.x-G.state.player.x,e.y-G.state.player.y)<120))
+    return "Reach a quiet part of the road before returning home.";
+  return null;
+};
+
+G.visitTown = function () {
+  if (G.townTravelReason()) return false;
+  G.world.load(G.state.delivery && G.state.delivery.complete ? "sunriseQuay" : "town",
+    G.state.delivery && G.state.delivery.complete ? {x:8,y:22} : {x:15,y:14});
+  G.saveGame();
+  return true;
 };
 
 G.checkTownIntroduction = function (quiet) {

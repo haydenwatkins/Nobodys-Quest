@@ -106,7 +106,7 @@
     G.world.load(mapId, spawn, { seamless: true });
     G.state.zoneTransition = {
       snapshot, incoming: null, direction, t: 0,
-      leadIn: 0.08, scrollDuration: 0.96, settle: 0.08, duration: 1.12,
+      leadIn: 0.03, scrollDuration: 0.36, settle: 0.05, duration: 0.44,
     };
     return true;
   };
@@ -374,7 +374,7 @@
 
     // Story boxes are a real pause, not a toast with a longer timer. Nothing
     // in the world moves until the player finishes the current conversation.
-    if (G.ui.dialogueOpen) {
+    if (G.ui.dialogueOpen && !s.zoneTransition) {
       s.time += dt;
       G.updateFx(dt * 0.2);
       G.ui.update(dt);
@@ -432,7 +432,9 @@
     s.time += dt;
 
     G.updatePlayer(dt);
-    if (G.ui.dialogueOpen) { G.input.clearTaps(); return; }
+    if (G.ui.dialogueOpen || s.zoneTransition) { G.input.clearTaps(); return; }
+    if(G.updateExpeditionEffects)G.updateExpeditionEffects(dt);
+    if(G.ui.menuOpen) {G.input.clearTaps();return;}
     if (G.updateOpening) G.updateOpening(dt);
     if (G.ui.dialogueOpen) { G.input.clearTaps(); return; }
     G.updateNpcs(dt);

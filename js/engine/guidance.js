@@ -67,6 +67,8 @@
       const cell = def.legend && def.legend[def.tiles[y][x]];
       if (cell && cell.portal) cells.push({ x, y, cell });
     }
+    for(const link of G.journeyTravelLinks ? G.journeyTravelLinks(mapId) : [])
+      cells.push({x:link.x,y:link.y,cell:{portal:{map:link.map}},link});
     return cells;
   }
 
@@ -121,6 +123,8 @@
     const nextMap = nextMapToward(s.mapId, goal.mapId);
     if (!nextMap) return null;
     const candidates = gridTargets((cell) => cell.portal && cell.portal.map === nextMap);
+    for(const link of G.journeyTravelLinks ? G.journeyTravelLinks(s.mapId) : [])
+      if(link.map===nextMap)candidates.push({x:link.x*G.TILE+8,y:link.y*G.TILE+8,tileX:link.x,tileY:link.y,link});
     const target = nearest(candidates, s.player.x, s.player.y);
     if (!target) return null;
     const destination = G.maps[nextMap] && G.maps[nextMap].name || goal.destination || nextMap;
@@ -131,7 +135,7 @@
       color: formEcho ? G.GUIDANCE_COLORS.form : travel ? G.GUIDANCE_COLORS.travel : G.GUIDANCE_COLORS.story,
       icon: formEcho && goal.formId && G.forms[goal.formId] ? G.forms[goal.formId].icon : travel ? "↗" : "◇",
       destination,
-      text: formEcho
+      text: target.link ? `Meet Parcel at the cart to travel to ${destination}.` : formEcho
         ? `Follow the purple trail toward ${G.forms[goal.formId] ? G.forms[goal.formId].name : "the form"} echo in ${G.maps[goal.mapId] ? G.maps[goal.mapId].name : goal.mapId}.`
         : `Follow the ${travel ? "blue" : "gold"} trail toward ${destination}.`,
     });
@@ -274,8 +278,7 @@
     if (x === target.tileX && y === target.tileY) return true;
     if (x < 0 || y < 0 || x >= s.mapW || y >= s.mapH) return false;
     const cell = s.grid[y] && s.grid[y][x];
-    return !!cell && !["tree", "water", "wall", "rock"].includes(cell.tile) &&
-      (!cell.portal || !G.world.solid(x * G.TILE + G.TILE / 2, y * G.TILE + G.TILE / 2));
+    return !!cell && !G.world.solid(x * G.TILE + G.TILE / 2, y * G.TILE + G.TILE / 2);
   }
 
   function pathTo(target) {

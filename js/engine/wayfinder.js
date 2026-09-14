@@ -175,6 +175,7 @@ G.wayfinderPostActivated = function (id) {
 // Find a clear tile beside the safe arrival point. This keeps posts close to
 // every entrance even if Ben reshapes a map without manually moving metadata.
 G.wayfinderPostForMap = function (mapId, grid) {
+  if (G.journeyStop && G.journeyStop(mapId)) return null;
   const region = G.wayfinderRegionInfo(mapId);
   if (!region || !grid || !grid.length) return null;
   const map = G.maps[mapId] || {};

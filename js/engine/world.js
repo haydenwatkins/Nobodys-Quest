@@ -203,6 +203,7 @@ G.world = (() => {
 
   /* ---------- loading a map ---------- */
   function load(mapId, spawn, options) {
+    const previousMap = G.state && G.state.mapId;
     const def = G.maps[mapId];
     if (!def) { console.error("No map called " + mapId); return; }
     if (G.state && G.state.gauntletRun && mapId !== "gauntletArena" && G.cancelGauntlet) G.cancelGauntlet();
@@ -286,6 +287,13 @@ G.world = (() => {
     s.safeLights = [];
     s.bossHazards = [];
     s.bossCutscene = null;
+    s.zoneTransition = null;
+    s.openingHazards = [];
+    s.expeditionEchoes = [];
+    s.lastSign = null;
+    s.lastRest = null;
+    s.lastTownPlot = null;
+    s.cameraKickX = s.cameraKickY = s.shake = 0;
     s.lastBlockedPortal = null;
     // A quick world-only fade makes doors feel intentional without delaying
     // control or covering the HTML HUD. Reduced-motion players skip it.
@@ -309,6 +317,18 @@ G.world = (() => {
     // a map-name toast does not collide with regional banter on small screens.
     if (def.name && !def.worldwake) G.ui.toast("🗺 " + def.name);
     G.events.emit("mapEnter", { map: mapId });
+    // Map-entry listeners restore story gates. Validate the entire feet box
+    // afterwards, including saves made before a road was rebuilt.
+    const safe = safeArrival(p.x, p.y);
+    p.x = safe.x; p.y = safe.y;
+    p.lastSafe = { x: p.x, y: p.y };
+    s.entryPoint = { x: p.x, y: p.y };
+    s.arrivalPoint = { x: p.x, y: p.y };
+    const returnPortals=[];
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(grid[y][x].portal?.map===previousMap)
+      returnPortals.push({x:x*G.TILE+8,y:y*G.TILE+8});
+    s.arrivalPortal=returnPortals.sort((a,b)=>G.util.dist(p.x,p.y,a.x,a.y)-G.util.dist(p.x,p.y,b.x,b.y))[0]||null;
+    s.arrivalPortalDistance=s.arrivalPortal?G.util.dist(p.x,p.y,s.arrivalPortal.x,s.arrivalPortal.y):0;
   }
 
   /* ---------- collision ---------- */
@@ -379,9 +399,28 @@ G.world = (() => {
   }
 
   function isSafeSpawn(px, py) {
+    if (!Number.isFinite(px) || !Number.isFinite(py)) return false;
     const cell = cellAt(px, py);
     if (!cell || cell.portal || SOLID[cell.tile]) return false;
-    return !solid(px, py);
+    const p = G.state.player || {};
+    const hw = (p.boxW || 10) / 2, bh = p.boxH || 8;
+    return ![[0,0],[-hw,0],[hw,0],[-hw,-bh],[hw,-bh]].some(([x,y]) => solid(px+x,py+y));
+  }
+
+  function safeArrival(px, py) {
+    if (isSafeSpawn(px, py)) return { x: px, y: py };
+    const s = G.state;
+    const sx = G.util.clamp(Math.floor(Number.isFinite(px) ? px/G.TILE : 1), 0, s.mapW-1);
+    const sy = G.util.clamp(Math.floor(Number.isFinite(py) ? py/G.TILE : 1), 0, s.mapH-1);
+    // Nearest walkable tile; never settle inside a doorway or a story gate.
+    for (let radius=0; radius<Math.max(s.mapW,s.mapH); radius++)
+      for(let y=Math.max(0,sy-radius);y<=Math.min(s.mapH-1,sy+radius);y++)
+        for(let x=Math.max(0,sx-radius);x<=Math.min(s.mapW-1,sx+radius);x++) {
+          if(Math.max(Math.abs(x-sx),Math.abs(y-sy))!==radius)continue;
+          const cx=x*G.TILE+G.TILE/2,cy=y*G.TILE+G.TILE/2;
+          if(isSafeSpawn(cx,cy))return {x:cx,y:cy};
+        }
+    return {x:px,y:py};
   }
 
   // Move an entity (with a small feet-box) through the world, one
@@ -422,7 +461,11 @@ G.world = (() => {
     s.portalGrace = Math.max(0, (s.portalGrace || 0) - dt);
     const move = G.input.vec;
     const travelDirection = Math.abs(move.x) + Math.abs(move.y) > 0.08 ? move : p.dir;
-    if (s.portalNeedsRelease && !p.dashing && Math.abs(move.x) < 0.08 && Math.abs(move.y) < 0.08)
+    const leftArrival = s.arrivalPoint && !cell.portal &&
+      G.util.dist(p.x,p.y,s.arrivalPoint.x,s.arrivalPoint.y) > G.TILE * 1.5 &&
+      (!s.arrivalPortal || G.util.dist(p.x,p.y,s.arrivalPortal.x,s.arrivalPortal.y)>s.arrivalPortalDistance+G.TILE);
+    if (s.portalNeedsRelease && !p.dashing &&
+        ((Math.abs(move.x) < 0.08 && Math.abs(move.y) < 0.08) || leftArrival))
       s.portalNeedsRelease = false;
 
     // Signs
@@ -1591,5 +1634,5 @@ G.world = (() => {
     if (G.drawWorldGuidance) G.drawWorldGuidance(ctx, cam, time);
   }
 
-  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, portalBlockReason };
+  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, safeArrival, portalBlockReason };
 })();
