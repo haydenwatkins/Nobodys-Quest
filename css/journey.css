@@ -1,13 +1,13 @@
 /* The pause journal: readable at arm's length and on a television. */
 #menu { --paper:#f6e9cd; --ink:#213739; --gold:#e7bd78; background:#12262bf5; border:1px solid #628080; border-radius:12px; box-shadow:0 18px 70px #0008; padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left)); }
-#menu .menu-title h1 { font-family:Georgia,serif; text-transform:none; font-size:clamp(17px,2.5vw,26px); line-height:1.2; letter-spacing:0; color:var(--paper); }
+#menu .menu-title h1 { font-family:"VT323",monospace; text-transform:none; font-size:clamp(17px,2.5vw,26px); line-height:1.2; letter-spacing:0; color:var(--paper); }
 #menu .menu-console-header { position:static; top:auto; margin:0; width:100%; max-width:1120px; justify-self:center; box-sizing:border-box; background:#173238; padding:14px 18px 0; border-bottom:1px solid #456064; }
 #menu .menu-title { margin-bottom:12px; }
 #menu .menu-tabs { display:flex; gap:6px; }
-#menu .menu-tabs button { flex:1; min-height:48px; font:600 16px/1.2 system-ui,sans-serif; background:transparent; color:#c4d7d3; border:0; border-bottom:3px solid transparent; border-radius:5px 5px 0 0; }
+#menu .menu-tabs button { flex:1; min-height:48px; font:600 16px/1.2 "VT323",monospace; background:transparent; color:#c4d7d3; border:0; border-bottom:3px solid transparent; border-radius:5px 5px 0 0; }
 #menu .menu-tabs button.active { color:var(--paper); background:#ffffff0a; border-bottom-color:var(--gold); }
 #menu .menu-route-tabs { gap:8px; padding:9px 0; }
-#menu .menu-route-tabs button { min-height:40px; font:500 14px/1.2 system-ui,sans-serif; border-radius:20px; padding:8px 14px; background:transparent; color:#c4d7d3; border:1px solid #59716f; }
+#menu .menu-route-tabs button { min-height:40px; font:500 14px/1.2 "VT323",monospace; border-radius:20px; padding:8px 14px; background:transparent; color:#c4d7d3; border:1px solid #59716f; }
 #menu .menu-route-tabs button.active { background:#335450; border-color:#bbcebc; color:white; }
 #menu .menu-body { box-sizing:border-box; padding:20px; overscroll-behavior:contain; }
 #menu .menu-body.field-body { max-width:1120px; display:block; }
@@ -17,39 +17,39 @@
 #menu button:disabled { opacity:.5; }
 .journey-home { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; margin:0; }
 .journey-home .journey-hero { grid-column:1/-1; padding:26px; background:var(--paper); color:var(--ink); border-radius:8px; border-left:5px solid var(--gold); }
-.journey-hero .eyebrow { color:#526d68; font:700 11px/1.4 system-ui,sans-serif; letter-spacing:.15em; }
-.journey-hero h2 { margin:10px 0; font:700 clamp(23px,3vw,34px)/1.15 Georgia,serif; color:var(--ink); }
-.journey-hero p { font:17px/1.5 system-ui,sans-serif; max-width:65ch; margin:0 0 16px; }
+.journey-hero .eyebrow { color:#526d68; font:700 11px/1.4 "VT323",monospace; letter-spacing:.15em; }
+.journey-hero h2 { margin:10px 0; font:700 clamp(23px,3vw,34px)/1.15 "VT323",monospace; color:var(--ink); }
+.journey-hero p { font:17px/1.5 "VT323",monospace; max-width:65ch; margin:0 0 16px; }
 .journey-hero .story-progress { height:5px; background:#bdc5b7; margin:16px 0; }
 .journey-hero .story-progress span { background:#55775f; }
 .journey-hero-actions { display:flex; gap:10px; flex-wrap:wrap; }
-#menu .journey-hero-actions button { min-height:44px; background:#294f49; border:1px solid #294f49; color:#fff7e4; padding:10px 16px; font:600 15px system-ui,sans-serif; border-radius:5px; }
+#menu .journey-hero-actions button { min-height:44px; background:#294f49; border:1px solid #294f49; color:#fff7e4; padding:10px 16px; font:600 15px "VT323",monospace; border-radius:5px; }
 #menu .journey-hero-actions button+button { background:transparent; color:#294f49; }
 .journey-home .field-card { margin:0; padding:20px; border:1px solid #47615c; background:#1d383c; border-radius:8px; min-width:0; }
 .journey-home .field-card-heading { align-items:flex-start; gap:12px; }
-.journey-home .field-card h3 { font:600 20px/1.3 Georgia,serif; margin:5px 0 12px; color:#f6e9cd; }
-.journey-home .field-card p { font:15px/1.55 system-ui,sans-serif; color:#c6d8cd; }
-.journey-home .field-card small { font:600 11px/1.5 system-ui,sans-serif; letter-spacing:.06em; color:#bacfbf; }
-.journey-home .field-card button { min-height:44px; font:600 14px/1.3 system-ui,sans-serif; background:#294f49; color:#fff7e4; border:1px solid #7a9a8a; border-radius:5px; padding:10px 12px; }
+.journey-home .field-card h3 { font:600 20px/1.3 "VT323",monospace; margin:5px 0 12px; color:#f6e9cd; }
+.journey-home .field-card p { font:15px/1.55 "VT323",monospace; color:#c6d8cd; }
+.journey-home .field-card small { font:600 11px/1.5 "VT323",monospace; letter-spacing:.06em; color:#bacfbf; }
+.journey-home .field-card button { min-height:44px; font:600 14px/1.3 "VT323",monospace; background:#294f49; color:#fff7e4; border:1px solid #7a9a8a; border-radius:5px; padding:10px 12px; }
 .journey-home .field-mastery, .journey-home .field-build { grid-column:auto; }
 .journey-home .field-place { grid-column:1/-1; display:flex; justify-content:space-between; align-items:center; gap:16px; }
 .journey-home .field-arts { grid-template-columns:1fr; }
 .journey-home .field-art { background:#153034; }
 .journey-home .next-reward { color:#ffe1a1!important; }
 .journey-crossing { grid-column:1/-1; display:flex; flex-direction:column; align-items:flex-start; gap:7px; padding:20px; background:#27334c; border:1px solid #7887a0; border-radius:8px; text-align:left; }
-.journey-crossing strong { font:22px Georgia,serif; color:#f5e6ca; }
-.journey-crossing span,.journey-crossing small { font:14px/1.4 system-ui,sans-serif; color:#d5dced; }
+.journey-crossing strong { font:22px "VT323",monospace; color:#f5e6ca; }
+.journey-crossing span,.journey-crossing small { font:14px/1.4 "VT323",monospace; color:#d5dced; }
 .journey-road { background:#1d383c; padding:18px; border-radius:8px; margin:0 0 16px; }
 .journey-stops { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; margin:12px 0; }
 #menu .journey-stops button { display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:center; padding:12px 6px; min-height:104px; background:#142c31; border:1px solid #56736e; border-radius:5px; }
 #menu .journey-stops button.here { background:#345d51; }
 #menu .journey-stops button.selected { border:2px solid #ffe1a1; }
-.journey-stops span { font-size:24px; }.journey-stops strong{font:600 14px/1.25 system-ui,sans-serif;color:#f4e8cd}.journey-stops small{font:10px system-ui,sans-serif;color:#c3d8ce}
-.journey-road p { font:13px/1.6 system-ui,sans-serif;color:#c3d8ce;margin-bottom:0; }
+.journey-stops span { font-size:24px; }.journey-stops strong{font:600 14px/1.25 "VT323",monospace;color:#f4e8cd}.journey-stops small{font:10px "VT323",monospace;color:#c3d8ce}
+.journey-road p { font:13px/1.6 "VT323",monospace;color:#c3d8ce;margin-bottom:0; }
 #menu .expedition-choice { min-height:130px; padding:20px; border-radius:8px; }
 .expedition-memory { border-left:3px solid #e7bd78; padding:12px 16px; background:#263f42; margin:14px 0; }
 .expedition-boon-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.expedition-boon-list p { margin:0;padding:12px;background:#183238;border:1px solid #496362;border-radius:5px;font:14px/1.5 system-ui,sans-serif; }
+.expedition-boon-list p { margin:0;padding:12px;background:#183238;border:1px solid #496362;border-radius:5px;font:14px/1.5 "VT323",monospace; }
 @media(max-width:700px){
   #menu .menu-console-header{padding:10px 10px 0}#menu .menu-body{padding:12px}#menu .menu-footer{padding:8px 10px}
   #menu .menu-tabs button{font-size:14px;min-height:46px;padding:8px 4px}#menu .menu-tabs button span{display:none}
@@ -79,12 +79,12 @@
   #menu .menu-route-tabs button { min-width:0; min-height:44px; padding:6px; font-size:13px; }
   #menu .menu-body { grid-column:2; grid-row:1 / -1; width:100%; max-width:none; height:100%; padding:8px; }
   #menu .menu-footer { grid-column:1; grid-row:2; flex-direction:column; width:100%; padding:4px 0 0; gap:4px; border:0; }
-  #menu .menu-footer button { flex:0 0 auto; width:100%; min-width:0; min-height:44px; padding:6px; font:600 13px/1.2 system-ui,sans-serif; }
+  #menu .menu-footer button { flex:0 0 auto; width:100%; min-width:0; min-height:44px; padding:6px; font:600 13px/1.2 "VT323",monospace; }
   #menu .controller-hints { display:none; }
   #menu .form-lab-header { flex-direction:column; align-items:stretch; padding:6px; gap:4px; }
   #menu .form-lab-header h2 { display:none; }
   #menu .form-lab-tabs { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); }
-  #menu .form-lab-tabs button { min-height:44px; font:600 12px system-ui,sans-serif; padding:4px; }
+  #menu .form-lab-tabs button { min-height:44px; font:600 12px "VT323",monospace; padding:4px; }
   #menu .console-roster-workbench { grid-template-columns:minmax(0,1fr) minmax(200px,.8fr); gap:8px; }
   #menu .console-roster-workbench>.form-stage { position:static; order:-1; }
   #menu .console-roster-workbench>.form-stage .form-stage-art, #menu .console-roster-workbench>.form-stage .hero-preview { min-height:64px; height:64px; }
@@ -105,5 +105,78 @@
   #menu .form-stage-copy > h2 { order:-2; }
   #menu .form-stage-copy > .lab-actions { order:-1; margin:4px 0 8px; display:grid; grid-template-columns:1fr 1fr; }
   #menu .form-stage-copy > .lab-actions button:first-child { grid-column:1/-1; }
-  #menu .form-stage-copy > .lab-actions button { min-height:44px; font:600 13px system-ui,sans-serif; }
+  #menu .form-stage-copy > .lab-actions button { min-height:44px; font:600 13px "VT323",monospace; }
 }
+/* Parcel's travelling journal: ink, timber and the colours of the orchard. */
+#menu {
+  --paper:#f5dfa6; --ink:#392c24; --gold:#efbd64;
+  background:linear-gradient(#171c2ad9,#171c2aed),url('../assets/title-world-landscape-v2.webp') center/cover;
+  border:4px solid #392c30; border-radius:0;
+  box-shadow:inset 0 0 0 2px #97714b;
+  color:#f5dfa6;
+}
+#menu .menu-console-header, #menu .menu-footer { background:transparent; border:0; }
+#menu .menu-title h1 { font:12px/1.6 "Press Start 2P",monospace; color:#ffdc91; text-shadow:2px 2px #382735; }
+#menu button { border-radius:0; }
+#menu .menu-tabs button, #menu .menu-route-tabs button, #menu .menu-footer button {
+  background:repeating-linear-gradient(0deg,#573c30 0 9px,#624333 9px 11px,#573c30 11px 22px);
+  border:2px solid #ae8150; border-bottom:4px solid #30232b;
+  box-shadow:inset 2px 2px #d3a66766,inset -2px -2px #2c233977;
+  color:#ffe6aa; font-family:"VT323",monospace; font-size:22px; font-weight:400;
+  text-shadow:1px 2px #30232b;
+}
+#menu .menu-tabs button.active, #menu .menu-route-tabs button.active {
+  background:#e7b960; color:#322333; border-color:#ffe5a1 #976443 #694631;
+  text-shadow:none; box-shadow:inset 0 0 0 2px #f6d58a;
+}
+#menu .menu-tabs button.active::before { content:'◆ '; color:#874239; }
+#menu .menu-body { scrollbar-color:#bd9255 #302735; }
+#menu .journey-home .journey-hero {
+  position:relative; background:#f1dfa9;
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,#97714b12 27px 28px);
+  border:3px solid #a87845; border-radius:0; color:#392c24;
+  box-shadow:inset 0 0 0 3px #ffeccb,4px 4px #15162299;
+}
+#menu .journey-hero .eyebrow { font:9px/1.8 "Press Start 2P",monospace; letter-spacing:0; color:#855337; }
+#menu .journey-hero h2 { font:32px/1.05 "VT323",monospace; color:#392c24; text-shadow:none; }
+#menu .journey-hero p { font:22px/1.15 "VT323",monospace; }
+#menu .journey-hero .story-progress { height:10px; border:2px solid #876345; background:#d2b780; }
+#menu .journey-hero .story-progress span { background:repeating-linear-gradient(90deg,#739852 0 12px,#a0bd6c 12px 14px); }
+#menu .journey-hero-actions button, #menu .journey-hero-actions button+button,
+#menu .journey-home .field-card button { font:20px/1.1 "VT323",monospace; background:#644431; border:2px solid #b48b53; border-bottom:4px solid #342632; color:#ffe8b5; border-radius:0; }
+#menu .journey-home .field-card, #menu .journey-road {
+  border:3px double #ad8956; border-radius:0; background:#302d35;
+  box-shadow:3px 3px #11142099;
+}
+#menu .journey-home .field-card h3 { font:26px/1.1 "VT323",monospace; color:#ffdb91; }
+#menu .journey-home .field-card p, #menu .journey-road p { font:20px/1.2 "VT323",monospace; color:#e4d3ae; }
+#menu .journey-home .field-card small { font:16px/1.2 "VT323",monospace; color:#c5b28a; letter-spacing:0; }
+#menu .field-art, #menu .field-lesson { border-radius:0; background:#222533; }
+#menu .journey-crossing { border:3px double #b296d0; border-radius:0; background:repeating-linear-gradient(135deg,#2e2942 0 16px,#322c49 16px 18px); box-shadow:3px 3px #141520; }
+#menu .journey-crossing strong { font:30px/1.1 "VT323",monospace; color:#eacaf9; }
+#menu .journey-crossing span, #menu .journey-crossing small { font:20px/1.2 "VT323",monospace; }
+#menu .journey-stops button { background:#393442; border:3px double #a18b6c; border-radius:0; }
+#menu .journey-stops button.here { background:#4d603b; }
+#menu .journey-stops strong { font:20px/1.1 "VT323",monospace; }
+#menu .journey-stops small { font:16px/1.1 "VT323",monospace; }
+#menu .form-lab-header, #menu .form-stage, #menu .console-roster-panel,
+#menu .form-tile, #menu .settings-panel, #menu .settings-grid button,
+#menu .town-hero, #menu .town-project, #menu .expedition-choice,
+#menu .expedition-memory, #menu .atlas-header, #menu .journey-dashboard {
+  border-radius:0; border-color:#9e805a; box-shadow:inset 0 0 0 1px #ead3a322,3px 3px #14152266;
+}
+#menu .form-lab-tabs button, #menu .lab-actions button { border-radius:0; }
+#menu .form-lab-tabs button.active { background:#e7b960; border-color:#ffe5a1; color:#342735; }
+#menu button:focus-visible, #menu button.controller-focus { outline:3px solid #fff2ba; outline-offset:2px; }
+@media (orientation:landscape) and (max-height:500px) {
+  #menu .menu-tabs button, #menu .menu-route-tabs button, #menu .menu-footer button { font:20px/1 "VT323",monospace; }
+  #menu .form-lab-tabs button, #menu .form-stage-copy > .lab-actions button { font:19px/1 "VT323",monospace; }
+  #menu .journey-hero h2 { font-size:30px; }
+  #menu .journey-hero p { font-size:21px; }
+}
+#menu .menu-tabs button.active { position:relative; }
+#menu .menu-tabs button.active::before { position:absolute; left:4px; top:4px; font:10px monospace; }
+#menu .menu-tabs button { white-space:nowrap; }
+#menu .console-roster-workbench .form-roster-tile { border-radius:0; }
+#menu .settings-grid button { background:#302d35; border:2px solid #957953; }
+#menu .expedition-choice { background:#302940; }
