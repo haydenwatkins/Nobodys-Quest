@@ -108,6 +108,7 @@ G.combat = (() => {
         G.state.hitStop = Math.max(G.state.hitStop, 0.05);
         G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: wardHitColor, dur: 0.45 });
         burst(enemy.x, enemy.y - 6, wardHitColor, 8);
+        openBossWard(enemy);
         G.events.emit("wardBreak", { damageType: type, ability: opts.ability, enemy: enemy.id });
       }
       return true;
@@ -315,6 +316,28 @@ G.combat = (() => {
     return moved;
   }
 
+  function interruptBossAttack(enemy) {
+    enemy.bossTelegraphT = 0;
+    enemy.bossChargeT = 0;
+    enemy.bossContactActive = false;
+    enemy.bossPendingAction = null;
+    enemy.bossAfterCharge = null;
+    if (G.cancelBossHazards) G.cancelBossHazards(enemy);
+  }
+
+  function openBossWard(enemy) {
+    if (!enemy.def.miniboss || !enemy.bossEngaged || enemy.dead) return;
+    interruptBossAttack(enemy);
+    // A ward only breaks once. Preserve earned stagger rather than replacing it.
+    enemy.bossStaggerT = Math.max(enemy.bossStaggerT || 0, G.BOSS_WARD_BREAK_SECONDS);
+    enemy.bossStaggerResistT = Math.max(enemy.bossStaggerResistT || 0, G.BOSS_WARD_BREAK_SECONDS);
+    // Mark instead of splicing: a player projectile can break the ward while
+    // updateProjectiles is iterating this same array.
+    for (const shot of G.state.projectiles) if (!shot.fromPlayer && shot.owner === enemy) shot.dispelled = true;
+    G.damageNumber(enemy.x, enemy.y - enemy.h() - 3, "WARD OPEN!", "#fff3c2");
+    if (G.tutorial) G.tutorial.hint("ward-opening", "Ward broken! The boss pauses and its attacks disperse. Close in or change forms now.", 3.2);
+  }
+
   function addBossStagger(enemy, amount) {
     if (!enemy.def.miniboss || !enemy.bossEngaged || enemy.dead) return;
     if (enemy.bossStaggerT > 0 || enemy.bossStaggerResistT > 0) return;
@@ -330,12 +353,8 @@ G.combat = (() => {
     enemy.bossStaggerT = G.BOSS_STAGGER_SECONDS;
     enemy.bossStaggerResistT = G.BOSS_STAGGER_RESIST_SECONDS;
     enemy.bossStaggerDecayT = 0;
-    enemy.bossTelegraphT = 0;
-    enemy.bossChargeT = 0;
-    enemy.bossPendingAction = null;
-    enemy.bossAfterCharge = null;
+    interruptBossAttack(enemy);
     enemy.bossRecoverT = Math.max(enemy.bossRecoverT || 0, 0.2);
-    if (G.cancelBossHazards) G.cancelBossHazards(enemy);
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.075);
     G.state.shake = Math.max(G.state.shake || 0, 0.24);
     G.sfx.play("stagger");
@@ -628,6 +647,7 @@ G.combat = (() => {
       // A knockout may clear the projectile list while this loop is already
       // walking it. Never let a stale index stop the entire game loop.
       if (!pr) continue;
+      if (pr.dispelled) { s.projectiles.splice(i, 1); continue; }
       pr.armT = Math.max(0, (pr.armT || 0) - dt);
       if (pr.boomerang && pr.returning && pr.owner) {
         const homeAngle = G.util.angleTo(pr.x, pr.y, pr.owner.x, pr.owner.y - 6);
