@@ -23,7 +23,30 @@
   ];
   const unlocked=()=>!!(G.state && G.state.delivery?.complete);
   const claimed=()=>{const town=G.ensureTown();if(!Array.isArray(town.requests))town.requests=[];return town.requests;};
-  G.sunriseRequests=()=>unlocked()?requests.map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,done:claimed().includes(r.id),ready:r.ready()})):[];
+  G.sunriseRequests=()=>unlocked()?requests.map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,done:claimed().includes(r.id),ready:r.ready(),followed:G.ensureTown().followedRequest===r.id})):[];
+  G.followSunriseRequest=id=>{
+    if(id!==null && (!unlocked() || !requests.some(r=>r.id===id) || claimed().includes(id)))return false;
+    G.ensureTown().followedRequest=id;
+    G.formEchoGuide=null;G.legendEchoGuide=null;
+    G.saveGame();return true;
+  };
+  G.followedSunriseRequest=()=>G.sunriseRequests().find(r=>r.followed&&!r.done)||null;
+  G.sunriseRequestTarget=()=>{
+    const selected=G.followedSunriseRequest();
+    if(!selected||G.state.expeditionRun)return null;
+    const r=requests.find(r=>r.id===selected.id);
+    let mapId="sunriseQuay",x=r.x,y=r.y,text=`Visit ${r.name} on the quay. You have good news.`;
+    if(!selected.ready){
+      if(r.id==="recipes"){mapId="lanternReach";x=18;y=30;text="Follow the bank to the drain, then become Rat to recover Brindle’s recipe book.";}
+      if(r.id==="dragon"){x=35;y=20;text="Choose a Manyfold crossing at the trail stand. Finish it and bring Pip a story.";}
+      if(r.id==="welcome")return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",spatial:false,destination:r.title,text:"Open Home → Sunrise and build the Welcome Lodge in Civic Works (12 spirit). Then visit Mara on the quay."};
+    }
+    if(G.state.mapId!==mapId){
+      const route=G.guidanceRouteTarget({mapId});
+      return route?{...route,kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",text:`${route.text} ${r.name} is counting on you.`}:null;
+    }
+    return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,tileX:x,tileY:y,x:x*G.TILE+8,y:y*G.TILE+8,text};
+  };
   function candidate(){
     const s=G.state;
     if(!unlocked() || s.mapId!=="sunriseQuay" || s.expeditionRun || G.ui.dialogueOpen || s.knockout || s.bossCutscene)return null;
@@ -38,7 +61,7 @@
     if(at?.kind!=="sunriseRequest")return oldInteract();
     const r=requests.find(r=>r.id===at.id), done=claimed().includes(r.id), ready=r.ready();
     if(!done&&ready){
-      claimed().push(r.id);G.ensureTown().spirit+=r.reward;G.saveGame();
+      claimed().push(r.id);if(G.ensureTown().followedRequest===r.id)G.ensureTown().followedRequest=null;G.ensureTown().spirit+=r.reward;G.saveGame();
       G.ui.banner(r.title.toUpperCase(),`${r.name}’s thanks · ${r.reward} town spirit`);
     }
     G.ui.dialogue(r.name.toUpperCase(),done?r.after:ready?r.thanks:r.ask,{accent:"#e7bd78"});

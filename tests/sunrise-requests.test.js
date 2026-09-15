@@ -30,3 +30,26 @@ test('failed expeditions do not qualify and unsafe interactions cannot claim',()
  assert.equal(G.normalizeTown({requests:['recipes','recipes','fake']}).requests.join(','),'recipes');
 });
 
+
+test('following a promise persists, routes across maps, and switches to its neighbour when ready',()=>{
+ const r=setup(),{G}=r;const campaign=G.storyGoal().short;
+ assert.equal(G.followSunriseRequest('invalid'),false);assert.equal(G.followSunriseRequest('recipes'),true);
+ G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));
+ assert.equal(G.followedSunriseRequest().id,'recipes');assert.equal(G.storyGoal().short,campaign);
+ let target=G.guidanceTarget();assert.equal(target.kind,'home');assert.ok(target.tileX!==undefined);
+ r.load('lanternReach');r.drain();target=G.guidanceTarget();assert.equal(target.tileX,18);assert.equal(target.tileY,30);assert.match(target.text,/Rat/);
+ G.state.delivery.salvage=true;assert.match(G.guidanceTarget().text,/Brindle/);
+ r.load('sunriseQuay');r.drain();assert.equal(G.guidanceTarget().tileX,12);
+ visit(G,12,12);G.tryOpeningInteraction();assert.equal(G.followedSunriseRequest(),null);
+ assert.equal(G.followSunriseRequest('recipes'),false);
+});
+test('Pip tracks victory rather than entry and Mara gives a building instruction instead of a false trail',()=>{
+ const {G}=setup();G.followSunriseRequest('dragon');assert.equal(G.guidanceTarget().tileX,35);
+ G.state.expeditionRun={};assert.equal(G.sunriseRequestTarget(),null);G.state.expeditionRun=null;
+ G.ensureExpeditionProgress().victories=1;assert.equal(G.guidanceTarget().tileX,28);
+ G.followSunriseRequest('welcome');assert.equal(G.guidanceTarget().spatial,false);assert.match(G.guidanceTarget().text,/12 spirit/);
+ G.state.town.projects.welcomeLodge=true;assert.equal(G.guidanceTarget().tileX,30);
+ G.followSunriseRequest(null);assert.equal(G.followedSunriseRequest(),null);
+ assert.equal(G.normalizeTown({followedRequest:'fake'}).followedRequest,null);
+ assert.equal(G.normalizeTown({followedRequest:'recipes',requests:['recipes']}).followedRequest,null);
+});

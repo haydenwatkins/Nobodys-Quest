@@ -141,6 +141,8 @@
     });
   }
 
+  G.guidanceRouteTarget = routeTarget;
+
   function formEchoTarget(echo) {
     if (!echo) return null;
     const form = G.forms[echo.formId];
@@ -236,6 +238,7 @@
     if (guidedEcho) return formEchoTarget(guidedEcho);
     const guidedLegend = G.guidedLegendEcho && G.guidedLegendEcho();
     if (guidedLegend) return legendEchoTarget(guidedLegend);
+    if (G.sunriseRequestTarget) { const request = G.sunriseRequestTarget(); if (request) return request; }
     if (G.openingTarget) { const opening = G.openingTarget(); if (opening) return opening; }
     if (!G.storyGoal) return null;
     const goal = G.storyGoal();

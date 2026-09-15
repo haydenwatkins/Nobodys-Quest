@@ -20,6 +20,7 @@ G.makeTown = function () {
     deeds: 0,
     projects: {},
     requests: [],
+    followedRequest: null,
     sponsoredResidents: 0,
     beautifications: 0,
   };
@@ -47,6 +48,7 @@ G.normalizeTown = function (saved) {
   if (!Array.isArray(town.houses)) town.houses = [];
   if (!town.projects || typeof town.projects !== "object" || Array.isArray(town.projects)) town.projects = {};
   town.requests = Array.isArray(town.requests) ? [...new Set(town.requests.filter(id => ["recipes", "dragon", "welcome"].includes(id)))] : [];
+  if (!["recipes", "dragon", "welcome"].includes(town.followedRequest) || town.requests.includes(town.followedRequest)) town.followedRequest = null;
   town.introduced = !!(town.introduced || town.founded);
   town.deeds = Math.max(0, Number(town.deeds) || 0);
   town.sponsoredResidents = Math.max(0, Number(town.sponsoredResidents) || 0);

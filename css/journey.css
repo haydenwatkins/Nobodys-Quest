@@ -188,3 +188,14 @@
 .sunrise-promise span, .sunrise-promise small { color: #6c4b30; }
 .sunrise-promise p { margin: 6px 0; }
 .sunrise-promise.kept strong::before { content: "✓ "; color: #52662f; }
+
+#menu .journey-road button, #menu .sunrise-promise button {
+  min-height:44px; max-width:100%; padding:8px 12px; margin:6px 8px 0 0;
+  font:20px/1.1 "VT323",monospace; color:#ffe8b5; background:#644431;
+  border:2px solid #b48b53; border-bottom:4px solid #342632; white-space:normal;
+}
+#menu .sunrise-promises { background:#f1dfa9; color:#392c24; border:3px solid #a87845; border-radius:0; }
+#menu .sunrise-promises h2, #menu .sunrise-promises p { color:#392c24; }
+#menu .sunrise-promises .eyebrow { color:#855337; }
+#menu .sunrise-promise button[aria-pressed="true"] { background:#4d603b; }
+#menu .journey-road h3 { font:26px/1.1 "VT323",monospace; color:#ffdb91; margin:6px 0; }

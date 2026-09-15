@@ -1249,12 +1249,14 @@ G.ui = (() => {
     const progress=goal.progress||{value:0,total:1,label:"YOUR JOURNEY"};
     const reward=G.fieldMasteryReward ? G.fieldMasteryReward() : null;
     const routes=G.localJourneyRoutes ? G.localJourneyRoutes() : [];
+    const followedRequest=G.followedSunriseRequest?.();
     const deliveryHandoff = G.state.delivery?.complete && !goal.complete && !G.state.expeditionRun;
     return `<section class="field-dashboard journey-home">
       ${deliveryHandoff ? `<article class="journey-road"><strong>☀ The Long Way Home · Complete</strong><p>Your parcels reached Sunrise. Keep building your town, try a Manyfold crossing, or follow the next adventure below. Parcel’s cart connects the quay to Orchard Road and Greenfield.</p><button data-menu-route="town">Small promises · visit your neighbours</button></article>` : ""}
+      ${followedRequest?`<article class="journey-road"><span class="eyebrow">A PROMISE TO ${escapeHtml(followedRequest.name.toUpperCase())}</span><h3>${escapeHtml(followedRequest.title)}</h3><p>${escapeHtml(followedRequest.ready?`Return to ${followedRequest.name} on the quay.`:followedRequest.task)}</p><button data-follow-request="${followedRequest.id}">Show the way</button><button data-stop-request>Set aside</button></article>`:""}
       <article class="journey-hero"><span class="eyebrow">${escapeHtml(progress.label)}</span><h2>${escapeHtml(goal.short)}</h2>
         <p>${escapeHtml(goal.objective)}</p><div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
-        <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the trail</button><button data-menu-route="story">Story so far</button></div></article>
+        <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the main story</button><button data-menu-route="story">Story so far</button></div></article>
       <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
         <button data-menu-route="quests">Lessons</button></div>${lessonHtml}${reward?`<p class="next-reward">${escapeHtml(reward.reward)}</p>`:""}</article>
       <article class="field-card field-build"><div class="field-card-heading"><div><small>YOUR COMBINATION</small><h3>${escapeHtml(form.passive?.name||form.name)}</h3></div><button data-menu-route="forms">Change form</button></div>
@@ -1357,7 +1359,11 @@ G.ui = (() => {
         openArtMixer(slot);
       }));
     const followTrail=menuEl.querySelector('[data-act="follow-trail"]');
-    if(followTrail)followTrail.addEventListener("click",()=>{closeMenu();G.requestGuidance(false);});
+    if(followTrail)followTrail.addEventListener("click",()=>{G.followSunriseRequest?.(null);closeMenu();G.requestGuidance(false);});
+    menuEl.querySelectorAll("[data-follow-request]").forEach(button=>button.addEventListener("click",()=>{
+      if(G.followSunriseRequest(button.dataset.followRequest)){closeMenu();G.requestGuidance(false);}
+    }));
+    menuEl.querySelectorAll("[data-stop-request]").forEach(button=>button.addEventListener("click",()=>{G.followSunriseRequest(null);buildMenu();}));
     const localMap=menuEl.querySelector('[data-act="local-map"]');
     if(localMap)localMap.addEventListener("click",()=>{atlasView="local";changeMenuRoute("map");});
     const storyMap = menuEl.querySelector('[data-act="story-map"]');
@@ -2371,7 +2377,7 @@ G.ui = (() => {
     const requests = G.sunriseRequests?.() || [];
     if (!requests.length) return "";
     return `<section class="form-card sunrise-promises"><span class="eyebrow">NAMES, NOT ERRANDS</span><h2>Small promises</h2><p>The parcels arrived. Life keeps going. Visit your neighbours on the quay.</p>
-      ${requests.map(r => `<article class="sunrise-promise ${r.done ? "kept" : ""}"><div><strong>${escapeHtml(r.title)}</strong><span>${escapeHtml(r.name)} · ${r.done ? "Promise kept" : r.ready ? "Good news — go tell them" : "Something to do"}</span></div><p>${r.done ? "Your kindness has left its mark on the quay." : escapeHtml(r.task)}</p><small>${r.done ? "Received" : "Thanks"}: ${r.reward} town spirit</small></article>`).join("")}</section>`;
+      ${requests.map(r => `<article class="sunrise-promise ${r.done ? "kept" : ""}"><div><strong>${escapeHtml(r.title)}</strong><span>${escapeHtml(r.name)} · ${r.done ? "Promise kept" : r.ready ? "Good news — go tell them" : "Something to do"}</span></div><p>${r.done ? "Your kindness has left its mark on the quay." : escapeHtml(r.task)}</p><small>${r.done ? "Received" : "Thanks"}: ${r.reward} town spirit</small>${r.done?"":`<button data-follow-request="${r.id}" aria-pressed="${r.followed}">${r.followed?"Show the way":r.ready?`Visit ${escapeHtml(r.name)}`:"Follow this promise"}</button>`}</article>`).join("")}</section>`;
   }
 
   function buildTownTab() {
