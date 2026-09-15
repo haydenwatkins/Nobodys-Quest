@@ -1251,7 +1251,7 @@ G.ui = (() => {
     const routes=G.localJourneyRoutes ? G.localJourneyRoutes() : [];
     const deliveryHandoff = G.state.delivery?.complete && !goal.complete && !G.state.expeditionRun;
     return `<section class="field-dashboard journey-home">
-      ${deliveryHandoff ? `<article class="journey-road"><strong>☀ The Long Way Home · Complete</strong><p>Your parcels reached Sunrise. Keep building your town, try a Manyfold crossing, or follow the next adventure below. Parcel’s cart connects the quay to Orchard Road and Greenfield.</p></article>` : ""}
+      ${deliveryHandoff ? `<article class="journey-road"><strong>☀ The Long Way Home · Complete</strong><p>Your parcels reached Sunrise. Keep building your town, try a Manyfold crossing, or follow the next adventure below. Parcel’s cart connects the quay to Orchard Road and Greenfield.</p><button data-menu-route="town">Small promises · visit your neighbours</button></article>` : ""}
       <article class="journey-hero"><span class="eyebrow">${escapeHtml(progress.label)}</span><h2>${escapeHtml(goal.short)}</h2>
         <p>${escapeHtml(goal.objective)}</p><div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
         <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the trail</button><button data-menu-route="story">Story so far</button></div></article>
@@ -2367,6 +2367,13 @@ G.ui = (() => {
     ${buildJourneyNotes()}`;
   }
 
+  function buildSunriseRequests() {
+    const requests = G.sunriseRequests?.() || [];
+    if (!requests.length) return "";
+    return `<section class="form-card sunrise-promises"><span class="eyebrow">NAMES, NOT ERRANDS</span><h2>Small promises</h2><p>The parcels arrived. Life keeps going. Visit your neighbours on the quay.</p>
+      ${requests.map(r => `<article class="sunrise-promise ${r.done ? "kept" : ""}"><div><strong>${escapeHtml(r.title)}</strong><span>${escapeHtml(r.name)} · ${r.done ? "Promise kept" : r.ready ? "Good news — go tell them" : "Something to do"}</span></div><p>${r.done ? "Your kindness has left its mark on the quay." : escapeHtml(r.task)}</p><small>${r.done ? "Received" : "Thanks"}: ${r.reward} town spirit</small></article>`).join("")}</section>`;
+  }
+
   function buildTownTab() {
     const town = G.ensureTown();
     const townName = escapeHtml(town.name);
@@ -2375,7 +2382,7 @@ G.ui = (() => {
         <h2>☀️ Found Your Town</h2>
         <div class="tagline">Claim your first new form to begin a home that grows with every kind of adventure.</div>
         <button data-act="found-town">Found town</button>
-      </div>`;
+      </div>${buildSunriseRequests()}`;
     }
 
     const capacity = G.townCapacity();
@@ -2405,6 +2412,7 @@ G.ui = (() => {
       <div class="town-main-actions"><button data-act="visit-town" ${G.townTravelReason()?"disabled":""}>Return to Sunrise</button><button data-act="rename-town">Rename</button></div>
       ${G.townTravelReason()?`<p>${escapeHtml(G.townTravelReason())}</p>`:""}
     </section>
+    ${buildSunriseRequests()}
     <section class="form-card town-works">
       <span class="eyebrow">LANDMARK PROJECTS</span><h2>🏗️ Civic Works</h2>
       <div class="tagline">Each project changes Sunrise Town, helps it flourish, and takes its place among the streets.</div>
