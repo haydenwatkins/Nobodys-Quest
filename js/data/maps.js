@@ -557,7 +557,7 @@ registerMap({
     "4": { tile: "grass", enemy: "wisp" },
     "8": { tile: "grass", enemy: "shade" },
     "Q": { tile: "grass", enemy: "mireQueen" },
-    "m": { tile: "grass", message: "The Mire Queen's purple veil fears DARK magic. Return with a Wizard's spell if it holds." },
+    "m": { tile: "grass", message: "DARK magic breaks the Mire Queen's veil. Leave the marked bubbles before they burst, then close in while she catches her breath." },
     "x": { tile: "path", portal: { map: "overworld", x: 1, y: 30 }, portalStyle: "gap", seamless: true },
     "H": { tile: "grass", chest: { heal: true, name: "a soggy-but-magical cookie" } },
   },

@@ -670,6 +670,10 @@ G.updateBossHazards = function (dt) {
       continue;
     }
 
+    if (h.kind === "mirePool") {
+      if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
+      continue;
+    }
     let danger = false;
     if (h.kind === "grid") danger = gridCellDanger(h, p.x, p.y);
     if (h.kind === "ring") danger = G.util.dist(p.x, p.y, h.x, h.y) > h.radius;
@@ -708,14 +712,23 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
-    ctx.clip();
+    if (h.kind !== "mirePool") {
+      ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
+      ctx.clip();
+    }
     ctx.fillStyle = h.color;
     ctx.strokeStyle = active ? "#f4f4f4" : h.color;
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if (h.kind === "grid") {
+    if (h.kind === "mirePool") {
+      // The full disk is always shown; the inner ring counts down to eruption.
+      ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=active?0.95:0.8;
+      ctx.setLineDash(active?[]:[3,3]);ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.arc(h.x,h.y,active?h.radius*0.55:h.radius*Math.min(1,local/h.warning),0,Math.PI*2);ctx.stroke();
+      if(active){ctx.fillStyle="#d8efaa";ctx.fillRect(h.x-2,h.y-7,4,9);ctx.fillRect(h.x-5,h.y-3,10,3);}
+    } else if (h.kind === "grid") {
       const cell = h.cell || 40;
       for (let y = b.top; y < b.bottom; y += cell) {
         for (let x = b.left; x < b.right; x += cell) {
@@ -857,6 +870,19 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if (action === "mireBubbles") {
+    const count = Math.min(3, Math.max(1, e.bossPhase));
+    const a = Math.atan2(p.y-e.y,p.x-e.x)+Math.PI/2;
+    // Snapshot the target once. Markers never chase the player during warning.
+    for(let i=0;i<count;i++){
+      const offset = i===0?0:i===1?-44:44;
+      const x=p.x+Math.cos(a)*offset,y=p.y+Math.sin(a)*offset;
+      if(i && G.world.solid(x,y))continue;
+      spawnBossHazard(e,"mirePool",{x,y,radius:16,warning:0.9+i*0.22,active:0.35,color:"#b29bdf"});
+    }
+    e.bossRecoverT=0.9+(count-1)*0.22+0.35+0.8;
+    return;
+  }
   if (["charge", "burrow", "vampireDash"].includes(action)) {
     e.bossChargeT = e.def.boss.chargeDur;
     e.bossAfterCharge = action === "burrow" ? "quake" : action === "vampireDash" ? "bloodBurst" : null;
