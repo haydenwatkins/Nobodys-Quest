@@ -70,6 +70,7 @@ registerAbility({
 registerAbility({
   id: "bite",
   name: "Bite",
+  description: "A quick bite that poisons. Scurry away, then spread the infection with Fester.",
   icon: "🦷",
   type: "sharp",
   style: "melee",
@@ -81,7 +82,7 @@ registerAbility({
       ability: "bite",
       range: 14, arcDeg: 90,
       damage: 1, type: "sharp",
-      knockback: 60,
+      knockback: 25,
       lunge: 3, hitStop: 0.024, shake: 0.09, weight: 2,
       // the germs are the point:
       status: { name: "poison", dur: 3, dps: 1 },
@@ -110,6 +111,7 @@ registerAbility({
 registerAbility({
   id: "fester",
   name: "Fester",
+  description: "Poison nearby foes and spread from up to three poisoned hosts within reach. Each foe is hit once.",
   icon: "🤢",
   type: "sharp",
   style: "area",
@@ -117,15 +119,12 @@ registerAbility({
   mana: 4,
   cooldown: 1.1,
   use(user) {
-    // a gross burst of germs all around you
-    G.combat.meleeArc(user, {
-      ability: "fester",
-      range: 28, arcDeg: 360,
-      damage: 1, type: "sharp",
-      knockback: 40,
-      status: { name: "poison", dur: 4, dps: 1 },
-      color: "#a7f070",
-    });
+    // Snapshot infected hosts before spreading: one cast never chains forever.
+    const origins=G.state.enemies.filter(e=>!e.dead&&e.status?.poison?.dur>0&&Math.hypot(e.x-user.x,e.y-user.y)<=64)
+      .sort((a,b)=>Math.hypot(a.x-user.x,a.y-user.y)-Math.hypot(b.x-user.x,b.y-user.y)).slice(0,3)
+      .map(e=>({x:e.x,y:e.y,range:20}));
+    G.combat.areaBurst(user, {ability:"fester",range:28,origins,damage:1,type:"sharp",knockback:25,
+      status:{name:"poison",dur:4,dps:1},color:"#a7f070",combo:"contagion"});
   },
 });
 
@@ -283,6 +282,7 @@ registerAbility({
 registerAbility({
   id: "shadowBolt",
   name: "Shadow Bolt",
+  description: "A fast dark bolt. Consumes poison on an unwarded target for +2 damage.",
   icon: "🌑",
   type: "dark",
   style: "projectile",
@@ -292,9 +292,9 @@ registerAbility({
   use(user) {
     G.combat.shoot(user, {
       ability: "shadowBolt",
-      speed: 170, range: 150,
-      damage: 2, type: "dark",
-      color: "#8153c1",
+      speed: 210, range: 150,
+      damage: 2, type: "dark", consumePoison: 2,
+      color: "#8153c1", recoil: 2.5, trail: 6, hitStop: 0.045, shake: 0.14,
     });
   },
 });
@@ -302,19 +302,21 @@ registerAbility({
 registerAbility({
   id: "dark matter",
   name: "Dark Matter",
+  description: "A slow, wide orb that pierces a line of enemies and briefly stuns each one.",
   icon: "🌑",
   type: "dark",
   style: "area",
+  traits: ["status"],
   mana: 5,
   cooldown: 1.15,
   autoAim: true, aimRange: 185,
   use(user) {
     G.combat.shoot(user, {
       ability: "dark matter",
-      speed: 125, range: 185,
-      damage: 3, type: "dark",
+      speed: 105, range: 185,
+      damage: 2, type: "dark",
       pierce: true,
-      size: 5, color: "#333c57",
+      size: 7, color: "#8153c1", trail: 6, status: {name:"stun",dur:0.35},
     });
   },
 });

@@ -774,7 +774,7 @@ G.ui = (() => {
     if (!ab) return id;
     const style = G.passives ? G.passives.styleLabel(ab.style) : ab.style;
     const synergy = form && G.passives && G.passives.formMatches(form, ab) ? "★ " : "";
-    return `${synergy}${ab.icon} ${ab.name} · ${style} · ${G.DAMAGE_TYPES[ab.type].name}${ab.mana ? " · " + ab.mana + " mana" : ""}`;
+    return `${ab.description ? ab.description + " · " : ""}${synergy}${ab.icon} ${ab.name} · ${style} · ${G.DAMAGE_TYPES[ab.type].name}${ab.mana ? " · " + ab.mana + " mana" : ""}`;
   }
 
   function escapeHtml(text) {
@@ -1015,6 +1015,7 @@ G.ui = (() => {
         return `<button data-quick-art="${id}" class="art-mixer-card ${id === currentId ? "equipped" : ""} ${synergy ? "boosted" : ""}">
           <span class="art-mixer-icon">${ability.icon}</span><span class="art-mixer-copy"><strong>${escapeHtml(ability.name)}</strong>
           <small>${escapeHtml(G.DAMAGE_TYPES[ability.type].name)} · ${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}${ability.mana ? ` · ${ability.mana} mana` : ""} · ${ability.cooldown}s</small>
+          ${ability.description?`<small>${escapeHtml(ability.description)}</small>`:""}
           <em>${origin ? `${origin.icon} ${escapeHtml(origin.name)}` : "Found art"}${synergy ? ` · ★ ${escapeHtml(form.passive.name)}` : ""}${quest ? " · ◇ Lesson" : ""}</em></span>
           ${id === currentId ? `<b>IN ${["A", "B", "C"][artMixerSlot]}</b>` : ""}</button>`;
       }).join("")}</div>

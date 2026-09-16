@@ -114,6 +114,13 @@ G.combat = (() => {
       return true;
     }
 
+    // Cash in an existing affliction only after the ward check has passed.
+    if(opts.consumePoison && enemy.status?.poison?.dur>0){
+      opts={...opts,damage:opts.damage+opts.consumePoison,consumedPoison:true};
+      delete enemy.status.poison;
+      G.damageNumber(enemy.x,enemy.y-enemy.h()-8,"HEX!","#d9a7ff");
+      G.spawnFx({kind:"ring",x:enemy.x,y:enemy.y-5,color:"#d9a7ff",radius:18,dur:0.3});
+    }
     // Normal damage
     enemy.hp -= opts.damage;
     enemy.flash = 0.12;
@@ -166,7 +173,7 @@ G.combat = (() => {
       enemy: enemy.id,
       ability: opts.ability,
       damageType: opts.type,
-      poisoned: !!(enemy.status && enemy.status.poison),
+      poisoned: !!opts.consumedPoison || !!(enemy.status && enemy.status.poison),
       rival: !!enemy.rival,
       expeditionChampion: !!enemy.expeditionChampion,
       miniboss: !!enemy.def.miniboss,
@@ -453,6 +460,7 @@ G.combat = (() => {
       pierce: !!o.pierce,
       hitSet: new Set(),
       status: o.status,
+      consumePoison: o.consumePoison || 0,
       explodeRadius: o.explodeRadius || 0,
       explodeDamage: o.explodeDamage,
       passivePull: o.passivePull || 0,
@@ -543,9 +551,10 @@ G.combat = (() => {
     const range = o.range || 34;
     const color = o.color || G.DAMAGE_TYPES[type].color;
     let hits = 0;
+    const origins=[{x:user.x,y:user.y,range},...(o.origins||[])];
     G.sfx.attack("melee", type, o.damage || 1);
     for (const e of G.state.enemies) {
-      if (e.dead || G.util.dist(user.x, user.y, e.x, e.y) > range + e.def.size / 2) continue;
+      if (e.dead || !origins.some(at=>G.util.dist(at.x,at.y,e.x,e.y)<=at.range+e.def.size/2)) continue;
       if (damageEnemy(e, {
         damage: o.damage || 1, type, ability: o.ability,
         knockback: o.pull ? 0 : o.knockback,
@@ -562,7 +571,7 @@ G.combat = (() => {
         }
       }
     }
-    G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color, radius: range, dur: o.dur || 0.34 });
+    for(const at of origins)G.spawnFx({kind:"ring",x:at.x,y:at.y-6,color,radius:at.range,dur:o.dur||0.34});
     if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
     return hits;
   }
@@ -709,7 +718,7 @@ G.combat = (() => {
             if (pr.hitSet) pr.hitSet.add(e);
             const hit = damageEnemy(e, {
                 damage: pr.damage, type: pr.type, ability: pr.ability,
-                status: pr.status, breaksAnyWard: pr.breaksAnyWard,
+                status: pr.status, breaksAnyWard: pr.breaksAnyWard, consumePoison: pr.consumePoison,
                 fromX: pr.startX, fromY: pr.startY,
                 combo: pr.ricochetsMax && pr.ricochets < pr.ricochetsMax ? "ricochet" : undefined,
                 hitStop: pr.hitStop, shake: pr.shake,
@@ -778,7 +787,7 @@ G.combat = (() => {
       if (pr.hitSet) pr.hitSet.add(e);
       if (damageEnemy(e, {
         damage, type: pr.type, ability: pr.ability,
-        status: pr.status, breaksAnyWard: pr.breaksAnyWard,
+        status: pr.status, breaksAnyWard: pr.breaksAnyWard, consumePoison: pr.consumePoison,
         fromX: pr.x, fromY: pr.y,
         knockback: 120,
       })) {

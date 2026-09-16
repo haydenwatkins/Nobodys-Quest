@@ -1,12 +1,4 @@
-/* ============================================================
-   RAT — small, fast, and full of germs.
-
-   BEN: this is the best file to COPY when making a new form!
-   It shows everything: stats, abilities, quests, unlock rule,
-   and a sprite. Copy it into a new file (like js/forms/wizard.js),
-   change the id and everything else, then add ONE line to
-   index.html next to the other forms. That's it!
-   ============================================================ */
+/* WIZARD — lay a curse, hold the crowd, then collect the debt. */
 
 "use strict";
 
@@ -29,7 +21,7 @@ registerForm({
     { id: "dark matter", level: 2 },
   ],
 
-  // How do you earn the Rat? Get Nobody to level 2.
+  // Study Rat’s poison lessons before learning to cash them in.
   unlock: { type: "challenge", hint: "Gather experience and study a quick form", requirements: [
     { type: "stars", stars: 5 },
     { type: "formLevel", form: "rat", level: 2 },

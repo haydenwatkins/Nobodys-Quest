@@ -355,7 +355,7 @@ for (const ability of Object.values(G.abilities)) {
 
 // Existing straight piercing projectiles must keep passing through distinct
 // enemies after the shared projectile accounting change.
-for (const [abilityId, damage] of [["luckyArrow", 2], ["dark matter", 3], ["voidStar", 4]]) {
+for (const [abilityId, damage] of [["luckyArrow", 2], ["dark matter", 2], ["voidStar", 4]]) {
   const targets = [enemy(40, 0), enemy(85, 0)];
   freshState();
   G.state.enemies = targets;
