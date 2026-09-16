@@ -1263,6 +1263,7 @@ G.ui = (() => {
     const progress=goal.progress||{value:0,total:1,label:"YOUR JOURNEY"};
     const reward=G.fieldMasteryReward ? G.fieldMasteryReward() : null;
     const routes=G.localJourneyRoutes ? G.localJourneyRoutes() : [];
+    const marsh=G.state.mapId==="sunkenMarsh"?G.marshSurvey?.():null;
     const followedRequest=G.followedSunriseRequest?.();
     const deliveryHandoff = G.state.delivery?.complete && !goal.complete && !G.state.expeditionRun;
     return `<section class="field-dashboard journey-home">
@@ -1271,6 +1272,7 @@ G.ui = (() => {
       <article class="journey-hero"><span class="eyebrow">${escapeHtml(progress.label)}</span><h2>${escapeHtml(goal.short)}</h2>
         <p>${escapeHtml(goal.objective)}</p><div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
         <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the main story</button><button data-menu-route="story">Story so far</button></div></article>
+      ${marsh?`<article class="journey-road"><span class="eyebrow">THE OLD FERRY MARSH</span><h3>${marsh.queen?"The court is quiet":"A choice of approaches"}</h3><p>${marsh.sluices}/2 sluices open · ${marsh.salvage?"Wreck keepsake recovered":"Northwest wreck unexplored"}</p><p>${marsh.queen?"The side banks still hold their stories. Return to Sunrise with the pearl when you’re ready.":"Challenge the Queen on the west bank, or clear the north and south sluices to weaken her ward first. A small form can investigate the wreck."}</p></article>`:""}
       ${buildBossPreparation()}
       <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
         <button data-menu-route="quests">Lessons</button></div>${lessonHtml}${reward?`<p class="next-reward">${escapeHtml(reward.reward)}</p>`:""}</article>

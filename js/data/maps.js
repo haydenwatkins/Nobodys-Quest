@@ -530,13 +530,13 @@ function makeSunkenMarshTiles() {
   for (let x = 0; x < w - 1; x++) for (let y = 8; y <= 10; y++) put(x, y, "p");
   for (let y = 1; y < h - 1; y++) for (let x = 14; x <= 16; x++) put(x, y, "p");
 
-  [[3,3,"1"],[12,3,"4"],[18,3,"2"],[27,5,"4"],[5,7,"2"],[11,7,"1"],
-   [19,7,"8"],[26,7,"1"],[4,12,"1"],[12,12,"4"],[18,12,"2"],[27,12,"8"],
-   [11,16,"2"],[19,16,"1"]].forEach(([x, y, ch]) => put(x, y, ch));
-  put(w - 1, 9, "x");
-  put(8, 9, "m");
-  put(12, 15, "H");
-  put(23, 9, "Q");
+  // The court occupies the far bank. Arrival has space to read the routes.
+  for(let y=6;y<=12;y++)for(let x=2;x<=12;x++)put(x,y,".");
+  for(let x=2;x<=28;x++)put(x,9,"p");
+  [[24,3,"4"],[20,5,"1"],[17,3,"2"],[24,15,"8"],
+   [20,13,"1"],[17,16,"2"],[11,3,"4"],[10,15,"1"]].forEach(([x,y,ch])=>put(x,y,ch));
+  put(w-1,9,"x");put(26,9,"m");put(12,15,"H");put(6,9,"Q");
+  put(15,3,"n");put(15,15,"s");put(3,3,"r");
   return rows.map((row) => row.join(""));
 }
 
@@ -557,7 +557,8 @@ registerMap({
     "4": { tile: "grass", enemy: "wisp" },
     "8": { tile: "grass", enemy: "shade" },
     "Q": { tile: "grass", enemy: "mireQueen" },
-    "m": { tile: "grass", message: "DARK magic breaks the Mire Queen's veil. Leave the marked bubbles before they burst, then close in while she catches her breath." },
+    "m": { tile: "path", message: "FERRY NOTICE: The Queen holds court on the west bank. North and south sluices feed her veil; open them to weaken it. A tiny salvage hatch survives in the northwest wreck. DARK magic breaks her remaining ward." },
+    "n": { tile: "path" }, "s": { tile: "path" }, "r": { tile: "grass" },
     "x": { tile: "path", portal: { map: "overworld", x: 1, y: 30 }, portalStyle: "gap", seamless: true },
     "H": { tile: "grass", chest: { heal: true, name: "a soggy-but-magical cookie" } },
   },
