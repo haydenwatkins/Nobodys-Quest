@@ -24,7 +24,7 @@
     const guards=fire.guards.map(([id,x,y])=>G.makeEnemy(id,x*16+8,y*16+8));
     for(const e of guards){G.state.enemies.push(e);}
     active={fire,guards};
-    G.ui.banner("THE OLD WATCH STIRS","Defeat both guards to relight the fire · recovery + 3 town spirit");
+    G.ui.toast(`${fire.name}: defeat both guards.`,3);
     G.input.clearTaps();return true;
   };
   const oldUpdate=G.updateOpening;

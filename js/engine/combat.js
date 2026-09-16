@@ -121,6 +121,13 @@ G.combat = (() => {
       G.damageNumber(enemy.x,enemy.y-enemy.h()-8,"HEX!","#d9a7ff");
       G.spawnFx({kind:"ring",x:enemy.x,y:enemy.y-5,color:"#d9a7ff",radius:18,dur:0.3});
     }
+    // A light mark rewards one sharp follow-up; wards never spend the mark.
+    if(opts.type==="sharp"&&enemy.status?.marked?.dur>0){
+      opts={...opts,damage:opts.damage+1,combo:opts.combo||"marked"};
+      delete enemy.status.marked;
+      G.damageNumber(enemy.x,enemy.y-enemy.h()-8,"TRUE!","#fff3c2");
+      G.spawnFx({kind:"ring",x:enemy.x,y:enemy.y-5,color:"#ffcd75",radius:15,dur:0.24});
+    }
     // Normal damage
     enemy.hp -= opts.damage;
     enemy.flash = 0.12;
@@ -285,6 +292,8 @@ G.combat = (() => {
       stun.dur -= dt;
       if (stun.dur <= 0) delete enemy.status.stun;
     }
+    const marked=enemy.status.marked;
+    if(marked){marked.dur-=dt;if(marked.dur<=0)delete enemy.status.marked;}
   }
 
   /* ============================================================

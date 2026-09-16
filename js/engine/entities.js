@@ -1422,6 +1422,12 @@ G.drawEnemy = function (ctx, e) {
     ctx.fillStyle = "#a7f070";
     ctx.fillRect(Math.round(e.x - 1), Math.round(e.y - e.def.size - 3), 2, 2);
   }
+  // The four gold corners identify a light mark without hiding the sprite.
+  if(e.status?.marked?.dur>0){
+    const x=Math.round(e.x),y=Math.round(e.y-e.def.size-7);
+    ctx.fillStyle="#ffcd75";
+    for(const side of [-1,1]){ctx.fillRect(x+side*5-1,y-2,2,5);ctx.fillRect(x+side*3-1,y-4,3,2);}
+  }
   // stun stars
   if (e.status && e.status.stun) {
     ctx.fillStyle = "#ffcd75";

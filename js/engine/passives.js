@@ -400,6 +400,10 @@ G.passives = (() => {
         p.knightGuardT = 0;
         p.knightPerfectT = 0;
         p.knightRiposteT = perfect ? 3 : 2.25;
+        if(perfect){
+          p.cooldowns.slash=0;
+          p.mana=Math.min(G.playerMaxMana(),p.mana+1);
+        }
         p.spriteAction = { frame: 2, t: 0.2 };
         result.damage = 0;
         result.knockback = false;

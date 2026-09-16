@@ -133,6 +133,7 @@ registerAbility({
 registerAbility({
   id: "slash",
   name: "Oathblade",
+  description: "A broad cut. In Knight form, parry first for a golden riposte that breaks any ward.",
   icon: "⚔️",
   type: "sharp",
   style: "melee",
@@ -166,6 +167,7 @@ registerAbility({
 registerAbility({
   id: "shieldBash",
   name: "Shield Advance",
+  description: "Advance and stun foes ahead. Knight raises a frontal guard; a perfect parry restores 1 mana and readies an immediate riposte.",
   icon: "🛡️",
   type: "blunt",
   style: "melee",
@@ -194,6 +196,7 @@ registerAbility({
 registerAbility({
   id: "spinSlash",
   name: "Hold the Line",
+  description: "Push back and briefly stun surrounding foes. Knight also raises a longer frontal guard.",
   icon: "🏰",
   type: "blunt",
   style: "area",
@@ -221,6 +224,7 @@ registerAbility({
 registerAbility({
   id: "arrow",
   name: "Arrow",
+  description: "A quick, free sharp shot. Follow a Lucky Arrow mark for +1 damage.",
   icon: "🏹",
   type: "sharp",
   style: "projectile",
@@ -240,9 +244,11 @@ registerAbility({
 registerAbility({
   id: "luckyArrow",
   name: "Lucky Arrow",
+  description: "Pierces a line with light and marks unwarded foes for 4 seconds. Their next sharp hit gains +1 damage and spends the mark.",
   icon: "🌟",
-  type: "light",                               // the only Light move so far!
+  type: "light",
   style: "projectile",
+  traits: ["status"],
   mana: 2,
   cooldown: 0.6,
   autoAim: true, aimRange: 160,
@@ -252,7 +258,7 @@ registerAbility({
       speed: 210, range: 160,
       damage: 2, type: "light",
       pierce: true,                            // flies through enemies
-      color: "#ffcd75",
+      color: "#ffcd75", status: {name:"marked",dur:4}, trail: 6, recoil: 2,
     });
   },
 });
@@ -260,6 +266,7 @@ registerAbility({
 registerAbility({
   id: "tripleShot",
   name: "Triple Shot",
+  description: "Three sharp arrows cover a fan. Sweep across marked foes to collect each follow-up bonus.",
   icon: "🎯",
   type: "sharp",
   style: "projectile",

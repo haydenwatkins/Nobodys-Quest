@@ -1,6 +1,5 @@
 /* ============================================================
-   RANGER — hits things from WAY over there.
-   The only form (so far!) with Light damage.
+   RANGER — light the target, then follow the golden mark.
    ============================================================ */
 
 "use strict";

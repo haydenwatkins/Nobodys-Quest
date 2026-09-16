@@ -6,7 +6,7 @@ registerForm({
   tagline: "Meets danger shield-first, then answers with the one cut it earned.",
   speed: 60, hearts: 7, slots: 2,
   passive: { id: "oathguard", name: "Oathguard",
-    description: "Starting a melee art raises a brief frontal guard. Turn aside one blow to ready an Oathblade riposte." },
+    description: "Starting a melee art raises a brief frontal guard. Turn aside one blow to ready an Oathblade riposte. Perfect timing restores 1 mana and readies Oathblade immediately." },
   basic: "slash",
   abilities: [{ id: "shieldBash", level: 1 }, { id: "spinSlash", level: 2 }],
   unlock: { type: "challenge", hint: "Recover a knight's lost crest", requirements: [
