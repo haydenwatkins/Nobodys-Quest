@@ -22,7 +22,7 @@ test('all three promises count past accomplishments and reward once across save 
 });
 test('failed expeditions do not qualify and unsafe interactions cannot claim',()=>{
  const {G}=setup();G.ensureExpeditionProgress().runs=5;assert.equal(G.sunriseRequests().find(r=>r.id==='dragon').ready,false);
- G.state.items.push('brindles-recipes');assert.equal(G.sunriseRequests()[0].ready,true);visit(G,12,12);
+ G.state.items.push('brindles-recipes');assert.equal(G.sunriseRequests().find(r=>r.id==="recipes").ready,true);visit(G,12,12);
  for(const flag of ['knockout','bossCutscene','expeditionRun']){G.state[flag]=true;assert.notEqual(G.deliveryCandidate()?.kind,'sunriseRequest');G.state[flag]=null;}
  G.ui.dialogueOpen=true;assert.equal(G.deliveryCandidate(),null);G.ui.dialogueOpen=false;
  G.state.enemies=[{def:{},x:G.state.player.x,y:G.state.player.y}];assert.equal(G.deliveryCandidate(),null);
@@ -52,4 +52,24 @@ test('Pip tracks victory rather than entry and Mara gives a building instruction
  G.followSunriseRequest(null);assert.equal(G.followedSunriseRequest(),null);
  assert.equal(G.normalizeTown({followedRequest:'fake'}).followedRequest,null);
  assert.equal(G.normalizeTown({followedRequest:'recipes',requests:['recipes']}).followedRequest,null);
+});
+
+test('the harbour beacon connects a real Queen victory to a permanent, once-only home reward',()=>{
+ const r=setup(),{G}=r;G.followSunriseRequest('beacon');assert.equal(G.followedSunriseRequest().ready,false);
+ assert.equal(G.guidanceTarget().kind,'home');r.load('sunkenMarsh');r.drain();
+ const queen=G.state.enemies.find(e=>e.id==='mireQueen');assert.equal(G.guidanceTarget().tileX,Math.floor(queen.x/G.TILE));
+ queen.bossEngaged=true;queen.bossIntroT=0;G.state.bossCutscene=null;
+ G.combat.damageEnemy(queen,{damage:5,type:'dark'});G.combat.damageEnemy(queen,{damage:100,type:'dark'});
+ assert.ok(G.state.items.includes('trophy-mire-pearl'));assert.equal(G.followedSunriseRequest().ready,true);
+ r.load('sunriseQuay');r.drain();visit(G,22,20);assert.equal(G.deliveryCandidate().id,'beacon');
+ const before=G.state.town.spirit;G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+8);assert.equal(G.followedSunriseRequest(),null);
+ G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+8);
+ assert.ok(G.state.items.includes('trophy-mire-pearl'),'the campaign trophy stays in inventory');
+ assert.match(G.npcDialogue('pebble',0,0),/turnips/);
+ const c=new Proxy({},{get:()=>()=>{}});for(const d of G.openingDrawables(c))d.fn();
+});
+test('earlier pearl victories qualify for the beacon without repeating the fight',()=>{
+ const {G}=setup();G.state.items.push('trophy-mire-pearl');assert.equal(G.sunriseRequests().find(r=>r.id==='beacon').ready,true);
+ G.followSunriseRequest('beacon');assert.equal(G.guidanceTarget().tileX,22);
+ const saved=G.normalizeTown({followedRequest:'beacon',requests:[]});assert.equal(saved.followedRequest,'beacon');
 });

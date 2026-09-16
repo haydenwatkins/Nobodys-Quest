@@ -7,6 +7,8 @@
 
 "use strict";
 
+G.SUNRISE_REQUEST_IDS = ["recipes", "dragon", "welcome", "beacon"];
+
 G.makeTown = function () {
   return {
     founded: false,
@@ -47,8 +49,8 @@ G.normalizeTown = function (saved) {
   if (saved && saved.sermons !== undefined) town.festivals = saved.sermons;
   if (!Array.isArray(town.houses)) town.houses = [];
   if (!town.projects || typeof town.projects !== "object" || Array.isArray(town.projects)) town.projects = {};
-  town.requests = Array.isArray(town.requests) ? [...new Set(town.requests.filter(id => ["recipes", "dragon", "welcome"].includes(id)))] : [];
-  if (!["recipes", "dragon", "welcome"].includes(town.followedRequest) || town.requests.includes(town.followedRequest)) town.followedRequest = null;
+  town.requests = Array.isArray(town.requests) ? [...new Set(town.requests.filter(id => G.SUNRISE_REQUEST_IDS.includes(id)))] : [];
+  if (!G.SUNRISE_REQUEST_IDS.includes(town.followedRequest) || town.requests.includes(town.followedRequest)) town.followedRequest = null;
   town.introduced = !!(town.introduced || town.founded);
   town.deeds = Math.max(0, Number(town.deeds) || 0);
   town.sponsoredResidents = Math.max(0, Number(town.sponsoredResidents) || 0);
