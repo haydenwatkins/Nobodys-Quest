@@ -80,3 +80,28 @@ G.localJourneyRoutes = () => {
   for(const link of G.journeyTravelLinks(s.mapId))routes.push({...link,name:link.label,direction:direction(link.x,link.y),reason:null});
   return routes;
 };
+
+// Prepare from the actual enemy and earned-art registries, including old saves.
+G.bossPreparation = () => {
+  const s=G.state;
+  if(!s || s.expeditionRun)return null;
+  const promise=G.followedSunriseRequest?.();
+  const goal=promise?.id==="beacon"&&!promise.ready?{guide:"boss",mapId:"sunkenMarsh"}:G.storyGoal();
+  if(goal?.guide!=="boss" || goal.complete)return null;
+  const map=G.maps[goal.mapId];
+  const def=Object.values(map?.legend||{}).map(cell=>G.enemies[cell.enemy]).find(e=>e?.miniboss&&e.ward&&!(s.items||[]).includes(e.trophy));
+  if(!def)return null;
+  const live=s.mapId===goal.mapId?s.enemies.find(e=>e.id===def.id&&!e.dead):null;
+  if(live?.ward?.hp<=0)return null;
+  const types=live?.ward?.types||def.ward.types,form=G.playerForm(),loadout=G.getLoadout(form.id);
+  const matches=id=>types.includes(G.abilities[id]?.type);
+  const equipped=loadout.slice(0,form.slots+1).find(matches);
+  const arts=G.availableAbilities().filter(matches).sort((a,b)=>(G.abilities[a].mana||0)-(G.abilities[b].mana||0));
+  const source=G.formOrder.map(id=>G.forms[id]).find(f=>matches(f.basic));
+  return {enemy:def.name,types,ready:!!equipped||!!form.breaksAnyWard,equipped,arts,source:source?.id};
+};
+G.equipBossPreparation = (id,slot) => {
+  const prep=G.bossPreparation(),form=G.playerForm();
+  if(!prep || !prep.arts.includes(id) || !Number.isInteger(slot) || slot<1 || slot>form.slots)return false;
+  G.getLoadout(form.id)[slot]=id;G.saveGame();return true;
+};

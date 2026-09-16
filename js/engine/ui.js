@@ -1229,6 +1229,20 @@ G.ui = (() => {
     }
   }
 
+  function buildBossPreparation() {
+    const prep=G.bossPreparation?.();if(!prep)return "";
+    const types=prep.types.map(id=>G.DAMAGE_TYPES[id].name).join(" or ");
+    const art=G.abilities[prep.arts[0]],loadout=G.getLoadout(G.state.formId),form=G.playerForm();
+    const source=G.forms[prep.source];
+    const actions=!prep.ready&&art?Array.from({length:form.slots},(_,i)=>{
+      const slot=i+1,old=G.abilities[loadout[slot]];
+      return `<button data-prep-art="${art.id}" data-prep-slot="${slot}">Put ${escapeHtml(art.name)} in ${["A","B","C"][slot]}${old?` · replaces ${escapeHtml(old.name)}`:""}</button>`;
+    }).join(""):"";
+    return `<article class="journey-road"><span class="eyebrow">BEFORE YOU SET OUT</span><h3>${escapeHtml(prep.enemy)} · ${escapeHtml(types)} ward</h3>
+      <p>${prep.ready?`${prep.equipped?escapeHtml(G.abilities[prep.equipped].name):escapeHtml(form.name)} can break this ward. Break it to interrupt the boss and create an opening.`:art?`You’ve learned ${escapeHtml(art.name)}. Borrow it in your current form before you go.`:source?`Learn ${escapeHtml(source.name)}’s ${escapeHtml(G.abilities[source.basic].name)}. ${escapeHtml(G.unlockHint(source.id))}`:`Learn an art with ${escapeHtml(types)} damage in Build.`}</p>
+      ${actions}${!prep.ready&&!art?`<button data-menu-route="forms">Explore forms</button>`:""}</article>`;
+  }
+
   function buildFieldTab() {
     const form = G.playerForm();
     const loadout = G.getLoadout(form.id);
@@ -1257,6 +1271,7 @@ G.ui = (() => {
       <article class="journey-hero"><span class="eyebrow">${escapeHtml(progress.label)}</span><h2>${escapeHtml(goal.short)}</h2>
         <p>${escapeHtml(goal.objective)}</p><div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
         <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the main story</button><button data-menu-route="story">Story so far</button></div></article>
+      ${buildBossPreparation()}
       <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
         <button data-menu-route="quests">Lessons</button></div>${lessonHtml}${reward?`<p class="next-reward">${escapeHtml(reward.reward)}</p>`:""}</article>
       <article class="field-card field-build"><div class="field-card-heading"><div><small>YOUR COMBINATION</small><h3>${escapeHtml(form.passive?.name||form.name)}</h3></div><button data-menu-route="forms">Change form</button></div>
@@ -1358,6 +1373,9 @@ G.ui = (() => {
         closeMenu();
         openArtMixer(slot);
       }));
+    menuEl.querySelectorAll("[data-prep-art]").forEach(button=>button.addEventListener("click",()=>{
+      if(G.equipBossPreparation(button.dataset.prepArt,Number(button.dataset.prepSlot))){btnCache="";buildMenu();}
+    }));
     const followTrail=menuEl.querySelector('[data-act="follow-trail"]');
     if(followTrail)followTrail.addEventListener("click",()=>{G.followSunriseRequest?.(null);closeMenu();G.requestGuidance(false);});
     menuEl.querySelectorAll("[data-follow-request]").forEach(button=>button.addEventListener("click",()=>{
