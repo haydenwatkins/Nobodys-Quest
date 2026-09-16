@@ -265,7 +265,15 @@ G.combat = (() => {
     if (enemy.dead) return;
     enemy.status = enemy.status || {};
     const isNew = !enemy.status[name];
-    enemy.status[name] = { dur: opts.dur || 3, dps: opts.dps || 0.7, tick: 0 };
+    const previous=enemy.status[name];
+    enemy.status[name] = { dur: opts.dur || 3, dps: opts.dps || 1, tick: 0 };
+    if(name==="poison"&&previous?.dur>0){
+      // Refresh the infection without postponing its next tick or replacing a
+      // stronger/longer poison with a weaker bite. Poison never stacks damage.
+      enemy.status[name].tick=previous.tick||0;
+      enemy.status[name].dur=Math.max(previous.dur,enemy.status[name].dur);
+      enemy.status[name].dps=Math.max(previous.dps||1,enemy.status[name].dps);
+    }
     if (isNew) {
       if (name === "poison") G.sfx.play("poison");
       G.events.emit("status", { status: name, enemy: enemy.id, ability: opts.ability });
@@ -276,12 +284,13 @@ G.combat = (() => {
     if (!enemy.status) return;
     const poison = enemy.status.poison;
     if (poison) {
+      poison.tick += Math.min(dt,Math.max(0,poison.dur));
       poison.dur -= dt;
-      poison.tick += dt;
-      if (poison.tick >= 1) {
+      while (poison.tick >= 1 && !enemy.dead) {
         poison.tick -= 1;
-        enemy.hp -= 1;
-        G.damageNumber(enemy.x, enemy.y - enemy.h(), 1, "#38b764");
+        const damage=poison.dps||1;
+        enemy.hp -= damage;
+        G.damageNumber(enemy.x, enemy.y - enemy.h(), damage, "#38b764");
         G.spawnFx({ kind: "bubble", x: enemy.x + (Math.random() * 8 - 4), y: enemy.y - 8, color: "#a7f070", vy: -14, dur: 0.5 });
         if (enemy.hp <= 0) killEnemy(enemy, { ability: "poison", type: "dark" });
       }
