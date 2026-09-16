@@ -672,6 +672,7 @@ G.world = (() => {
   }
 
   const TRIAL_TILE_PALETTES = {
+    ember: {floor: ["#66504b", "#725a50", "#58444a"], wall: "#352e3b", seam: "#342c35", accent: "#ef7d57"},
     riftblade: {
       floor: ["#494f76", "#525b83", "#45486d"], wall: "#292746", seam: "#17182b", accent: "#73eff7",
     },

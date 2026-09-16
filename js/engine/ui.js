@@ -1264,6 +1264,7 @@ G.ui = (() => {
     const progress=goal.progress||{value:0,total:1,label:"YOUR JOURNEY"};
     const reward=G.fieldMasteryReward ? G.fieldMasteryReward() : null;
     const routes=G.localJourneyRoutes ? G.localJourneyRoutes() : [];
+    const ridge=G.state.mapId==="emberRidge"?G.ridgeSurvey?.():null;
     const marsh=G.state.mapId==="sunkenMarsh"?G.marshSurvey?.():null;
     const followedRequest=G.followedSunriseRequest?.();
     const deliveryHandoff = G.state.delivery?.complete && !goal.complete && !G.state.expeditionRun;
@@ -1274,6 +1275,7 @@ G.ui = (() => {
         <p>${escapeHtml(goal.objective)}</p><div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
         <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the main story</button><button data-menu-route="story">Story so far</button></div></article>
       ${marsh?`<article class="journey-road"><span class="eyebrow">THE OLD FERRY MARSH</span><h3>${marsh.queen?"The court is quiet":"A choice of approaches"}</h3><p>${marsh.sluices}/2 sluices open · ${marsh.salvage?"Wreck keepsake recovered":"Northwest wreck unexplored"}</p><p>${marsh.queen?"The side banks still hold their stories. Return to Sunrise with the pearl when you’re ready.":"Challenge the Queen on the west bank, or clear the north and south sluices to weaken her ward first. A small form can investigate the wreck."}</p></article>`:""}
+      ${ridge?`<article class="journey-road"><span class="eyebrow">THE LAST WATCH</span><h3>${ridge.active?escapeHtml(ridge.active.name):ridge.knight?"Dawn on the ridge":"A light for the road"}</h3><p>${ridge.lit}/2 watchfires lit${ridge.active?` · ${ridge.active.remaining} guards remain`:""}</p><p>${ridge.active?"Finish the watchfire fight to restore your hearts and mana and earn 3 town spirit.":"The Knight waits in the eastern court. Optional watchfires to the north and south offer guarded fights and a one-time recovery. Dark magic cracks his ward."}</p></article>`:""}
       ${buildBossPreparation()}
       <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
         <button data-menu-route="quests">Lessons</button></div>${lessonHtml}${reward?`<p class="next-reward">${escapeHtml(reward.reward)}</p>`:""}</article>
