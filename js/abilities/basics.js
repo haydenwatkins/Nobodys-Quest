@@ -355,6 +355,7 @@ registerAbility({
 registerAbility({
   id: "tongueLash",
   name: "Tongue Lash",
+  description: "A long, narrow lash. Frog pulls foes closer, gathering them for a hop or croak.",
   icon: "👅",
   type: "blunt",
   style: "melee",
@@ -373,6 +374,7 @@ registerAbility({
 registerAbility({
   id: "hopCrash",
   name: "Hop Crash",
+  description: "Crash through foes, then land with a small stunning splash. Enemies can take one travel hit and one landing hit.",
   icon: "🐸",
   type: "blunt",
   style: "dash",
@@ -382,6 +384,7 @@ registerAbility({
     G.combat.dash(user, {
       ability: "hopCrash", dist: 52, speed: 260,
       damage: 1, type: "blunt", color: "#a7f070",
+      endBurst: {area:true,range:25,damage:1,type:"blunt",knockback:25,status:{name:"stun",dur:0.45},color:"#73eff7"},
     });
   },
 });
@@ -389,6 +392,7 @@ registerAbility({
 registerAbility({
   id: "croakBurst",
   name: "Croak Burst",
+  description: "An aimed fan of sound hits each foe once. Hop into position, then catch the stunned group ahead.",
   icon: "📣",
   type: "blunt",
   style: "projectile",
@@ -414,6 +418,7 @@ registerAbility({
 registerAbility({
   id: "bottleBonk",
   name: "Bottle Bonk",
+  description: "A quick bottle strike that pushes danger away while you prepare a flask.",
   icon: "🍾",
   type: "blunt",
   style: "melee",
@@ -432,6 +437,7 @@ registerAbility({
 registerAbility({
   id: "volatileFlask",
   name: "Volatile Flask",
+  description: "An explosive blunt flask. Each unwarded poisoned foe in the blast loses its poison and takes +1 damage.",
   icon: "💥",
   type: "blunt",
   style: "area",
@@ -442,6 +448,7 @@ registerAbility({
     G.combat.shoot(user, {
       ability: "volatileFlask", speed: 135, range: 115,
       damage: 2, explodeDamage: 2, explodeRadius: 27,
+      consumePoison: 1,
       type: "blunt", size: 5, color: "#ef7d57",
     });
   },
@@ -450,6 +457,7 @@ registerAbility({
 registerAbility({
   id: "miasmaFlask",
   name: "Miasma Flask",
+  description: "Poisons a cluster for 4 seconds. Let the infection work, or detonate it with Volatile Flask for immediate damage.",
   icon: "🧪",
   type: "dark",
   style: "area",

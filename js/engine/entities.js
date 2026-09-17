@@ -1286,7 +1286,9 @@ G.drawPlayer = function (ctx) {
   const poseScale = p.attackPose ? p.attackPose.t / p.attackPose.dur : 0;
   const drawX = p.x + (p.attackPose ? p.attackPose.x * poseScale : 0);
   const gaitLift = p.moving && !p.dashing && Math.floor(p.anim) % 2 ? 1 : 0;
-  const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift;
+  const hopLift=!G.reducedMotion&&p.dashing?.ability==="hopCrash"
+    ? Math.sin(Math.PI*G.util.clamp(1-p.dashing.left/p.dashing.distance,0,1))*10 : 0;
+  const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift - hopLift;
   const dressedSprite = G.playerAppearanceSprite ? G.playerAppearanceSprite(form) :
     (G.costumedSprite ? G.costumedSprite(form.sprite) : form.sprite);
   const frame = p.spriteAction ? p.spriteAction.frame : G.spriteFrame ?

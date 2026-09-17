@@ -118,7 +118,7 @@ G.combat = (() => {
     if(opts.consumePoison && enemy.status?.poison?.dur>0){
       opts={...opts,damage:opts.damage+opts.consumePoison,consumedPoison:true};
       delete enemy.status.poison;
-      G.damageNumber(enemy.x,enemy.y-enemy.h()-8,"HEX!","#d9a7ff");
+      G.damageNumber(enemy.x,enemy.y-enemy.h()-8,opts.ability==="volatileFlask"?"REACT!":"HEX!","#d9a7ff");
       G.spawnFx({kind:"ring",x:enemy.x,y:enemy.y-5,color:"#d9a7ff",radius:18,dur:0.3});
     }
     // A light mark rewards one sharp follow-up; wards never spend the mark.
@@ -602,6 +602,7 @@ G.combat = (() => {
     if(G.expeditionDashEcho)G.expeditionDashEcho(user,{...o,type});
     user.dashing = {
       left: o.dist || 60,
+      distance: o.dist || 60,
       speed: o.speed || 260,
       dirX: user.dir.x, dirY: user.dir.y,
       damage: o.damage || 0,
@@ -624,7 +625,8 @@ G.combat = (() => {
   function finishDash(user, dashData) {
     const burstData = dashData && dashData.endBurst;
     let hits = 0;
-    if (burstData) hits = meleeArc(user, {
+    const strike=burstData?.area?areaBurst:meleeArc;
+    if (burstData) hits = strike(user, {
       ability: burstData.ability || dashData.ability,
       range: burstData.range || 28,
       arcDeg: 360,
@@ -638,7 +640,7 @@ G.combat = (() => {
       shake: burstData.shake || 0.14,
       combo: "dash-finish",
     });
-    if (burstData) G.spawnFx({
+    if (burstData && !burstData.area) G.spawnFx({
         kind: "ring", x: user.x, y: user.y - 5,
         color: burstData.color || dashData.color,
         radius: burstData.range || 28, dur: 0.28,
