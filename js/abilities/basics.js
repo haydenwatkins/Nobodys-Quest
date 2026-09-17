@@ -760,6 +760,7 @@ registerAbility({
 registerAbility({
   id: "bloodBite",
   name: "Blood Bite",
+  description: "Every five enemies bitten restore one heart. Extra bite progress carries into the next heal; Vampire turns overhealing into temporary armor.",
   icon: "🦇",
   type: "sharp",
   style: "melee",
@@ -773,10 +774,11 @@ registerAbility({
       hitStop: 0.026,
     });
     if (!hits) return;
-    user.bloodPips = Math.min(5, (user.bloodPips || 0) + hits);
+    user.bloodPips = (user.bloodPips || 0) + hits;
     if (user.bloodPips >= 5) {
-      user.bloodPips = 0;
-      G.healPlayer(1, "bloodBite");
+      const hearts=Math.floor(user.bloodPips/5);
+      user.bloodPips %= 5;
+      G.healPlayer(hearts, "bloodBite");
       G.sfx.play("pickup");
       G.spawnFx({ kind: "ring", x: user.x, y: user.y - 7, color: "#b13e53", radius: 18, dur: 0.4 });
       G.damageNumber(user.x, user.y - 18, "DRAIN!", "#ef7d57");
@@ -787,6 +789,7 @@ registerAbility({
 registerAbility({
   id: "crimsonWaltz",
   name: "Crimson Waltz",
+  description: "A quick dark dash through enemies. Waltz into the edge of a crowd, then gather it under Blood Moon.",
   icon: "🌹",
   type: "dark",
   style: "dash",
@@ -804,18 +807,18 @@ registerAbility({
 registerAbility({
   id: "bloodMoon",
   name: "Blood Moon",
+  description: "Draw nearby foes inward with dark damage. Catch at least three to restore one heart, then follow with close-range bites.",
   icon: "🌕",
   type: "dark",
   style: "area",
   mana: 5,
   cooldown: 1.35,
   use(user) {
-    const hits = G.combat.meleeArc(user, {
-      ability: "bloodMoon", range: 40, arcDeg: 360,
-      damage: 2, type: "dark", knockback: 145,
+    const hits = G.combat.areaBurst(user, {
+      ability: "bloodMoon", range: 40,
+      damage: 2, type: "dark", pull: 16,
       color: "#b13e53", weight: 6, hitStop: 0.04, shake: 0.18,
     });
-    G.spawnFx({ kind: "ring", x: user.x, y: user.y - 7, color: "#8153c1", radius: 40, dur: 0.42 });
     if (hits >= 3) {
       G.healPlayer(1, "bloodMoon");
       G.damageNumber(user.x, user.y - 18, "FEAST!", "#ef7d57");
@@ -828,6 +831,7 @@ registerAbility({
 registerAbility({
   id: "wildCard",
   name: "Wild Card",
+  description: "Every third throw is a golden joker with two extra ricochets. Keep it ready for a crowd; cards seek targets with a clear path.",
   icon: "🃏",
   type: "sharp",
   style: "projectile",
@@ -850,6 +854,7 @@ registerAbility({
 registerAbility({
   id: "punchlinePie",
   name: "Punchline Pie",
+  description: "A blunt pie bursts across a cluster. Use its impact to break blunt wards before dealing your cards.",
   icon: "🥧",
   type: "blunt",
   style: "area",
@@ -869,6 +874,7 @@ registerAbility({
 registerAbility({
   id: "encore",
   name: "Encore!",
+  description: "A light card bounces through up to five distinct foes along clear paths. Jester adds one more bounce.",
   icon: "🎪",
   type: "light",
   style: "projectile",

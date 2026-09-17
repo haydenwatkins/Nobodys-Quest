@@ -21,6 +21,11 @@
 
 G.combat = (() => {
   let staggerHelpShown = false;
+  function clearArc(x,y,ex,ey){
+    const steps=Math.max(1,Math.ceil(Math.hypot(ex-x,ey-y)/6));
+    for(let i=1;i<steps;i++)if(G.world.solid(x+(ex-x)*i/steps,y+(ey-y)*i/steps))return false;
+    return true;
+  }
 
   /* ---------- dealing damage to an enemy ---------- */
   function breaksAnyWard(user) {
@@ -535,11 +540,6 @@ G.combat = (() => {
     const facing = Math.atan2(user.dir.y, user.dir.x);
     attackPose(user, facing + Math.PI, 1, 0.08);
     G.sfx.attack("chain", type, o.damage || 1);
-    const clearArc=(x,y,ex,ey)=>{
-      const steps=Math.max(1,Math.ceil(Math.hypot(ex-x,ey-y)/6));
-      for(let i=1;i<steps;i++)if(G.world.solid(x+(ex-x)*i/steps,y+(ey-y)*i/steps))return false;
-      return true;
-    };
     const available = G.state.enemies.filter((e) => {
       if (e.dead) return false;
       const d = G.util.dist(user.x, user.y, e.x, e.y);
@@ -767,7 +767,7 @@ G.combat = (() => {
                 for (const candidate of s.enemies) {
                   if (candidate.dead || (pr.hitSet && pr.hitSet.has(candidate))) continue;
                   const distance = G.util.dist(pr.x, pr.y, candidate.x, candidate.y - 4);
-                  if (distance <= pr.bounceRange + candidate.def.size / 2 && distance < nextDist) {
+                  if (distance <= pr.bounceRange + candidate.def.size / 2 && distance < nextDist && clearArc(pr.x,pr.y,candidate.x,candidate.y-4)) {
                     next = candidate;
                     nextDist = distance;
                   }

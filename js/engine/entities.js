@@ -1297,6 +1297,14 @@ G.drawPlayer = function (ctx) {
     ctx.restore();
   }
   G.drawShadow(ctx, p.x, p.y, 10);
+  // Small counters make stored bite progress and the next joker readable.
+  if(form.id==="vampire"||form.id==="jester"){
+    const count=form.id==="vampire"?5:3,filled=form.id==="vampire"?(p.bloodPips||0):(p.cardBeat||0)%3;
+    ctx.save();for(let i=0;i<count;i++){
+      ctx.fillStyle=i<filled?(form.id==="vampire"?"#ef7d57":"#ffcd75"):"#493d55";
+      ctx.fillRect(Math.round(p.x-count*2+i*4),Math.round(p.y+4),3,2);
+    }ctx.restore();
+  }
   const animationMode = p.attackPose ? "attack" : p.moving || p.dashing ? "walk" : "idle";
   const poseScale = p.attackPose ? p.attackPose.t / p.attackPose.dur : 0;
   const drawX = p.x + (p.attackPose ? p.attackPose.x * poseScale : 0);
