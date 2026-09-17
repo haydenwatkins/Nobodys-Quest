@@ -541,6 +541,7 @@ registerAbility({
 registerAbility({
   id: "tailSweep",
   name: "Tail Sweep",
+  description: "A wide tail strike that clears space for your slower, costlier fire attacks.",
   icon: "🐉",
   type: "blunt",
   style: "melee",
@@ -559,9 +560,11 @@ registerAbility({
 registerAbility({
   id: "fireBreath",
   name: "Fire Breath",
+  description: "A short cone hits each foe once for 1 light damage, then burns unwarded targets for 1 damage per second for 2 seconds.",
   icon: "🔥",
   type: "light",
   style: "area",
+  traits: ["status"],
   mana: 4,
   cooldown: 1.0,
   autoAim: true, aimRange: 78,
@@ -570,7 +573,8 @@ registerAbility({
     for (const spreadDeg of [-28, -14, 0, 14, 28]) {
       G.combat.shoot(user, {
         ability: "fireBreath", speed: 155, range: 78,
-        damage: 2, type: "light", spreadDeg, hitGroup,
+        damage: 1, type: "light", spreadDeg, hitGroup,
+        status: {name:"burn",dur:2,dps:1},
         size: 4, color: "#ef7d57",
       });
     }
@@ -580,9 +584,11 @@ registerAbility({
 registerAbility({
   id: "meteor",
   name: "Meteor",
+  description: "A heavy light blast briefly stuns its targets. Close the gap and follow with Fire Breath while they recover.",
   icon: "☄️",
   type: "light",
   style: "area",
+  traits: ["status"],
   mana: 6,
   cooldown: 1.45,
   autoAim: true, aimRange: 145,
@@ -590,6 +596,7 @@ registerAbility({
     G.combat.shoot(user, {
       ability: "meteor", speed: 105, range: 145,
       damage: 3, explodeDamage: 3, explodeRadius: 35,
+      status: {name:"stun",dur:0.5},
       type: "light", size: 7, color: "#ffcd75",
     });
   },
@@ -678,6 +685,7 @@ registerAbility({
 registerAbility({
   id: "drillTap",
   name: "Drill Tap",
+  description: "Keep a three-hit rhythm: the third tap erupts in a wider stunning arc. A pause resets the sequence.",
   icon: "⛏️",
   type: "blunt",
   style: "melee",
@@ -706,6 +714,7 @@ registerAbility({
 registerAbility({
   id: "burrowBlitz",
   name: "Burrow Blitz",
+  description: "Burrow safely forward, then erupt with dark damage and a brief stun. Solid terrain stops the tunnel early.",
   icon: "🕳️",
   type: "dark",
   style: "dash",
@@ -716,7 +725,7 @@ registerAbility({
       ability: "burrowBlitz", dist: 70, speed: 340,
       damage: 0, type: "dark", color: "#5d275d",
       endBurst: {
-        ability: "burrowBlitz", range: 27, damage: 2,
+        ability: "burrowBlitz", area:true, range: 27, damage: 2,
         type: "dark", knockback: 165, color: "#8153c1",
         status: { name: "stun", dur: 0.3 }, weight: 5,
       },
@@ -727,15 +736,18 @@ registerAbility({
 registerAbility({
   id: "faultLine",
   name: "Fault Line",
+  description: "A piercing ground fracture briefly stuns each foe it crosses, then bursts at its end. Mole adds a delayed aftershock.",
   icon: "〰️",
   type: "blunt",
   style: "area",
+  traits: ["status"],
   mana: 5,
   cooldown: 1.25,
   autoAim: true, aimRange: 130,
   use(user) {
     G.combat.shoot(user, {
       ability: "faultLine", speed: 125, range: 130,
+      status: {name:"stun",dur:0.25},
       damage: 2, explodeDamage: 2, explodeRadius: 27,
       type: "blunt", size: 6, color: "#d8b06a", pierce: true,
       shape: "fault", trail: 5, recoil: 3,

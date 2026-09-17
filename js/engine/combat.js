@@ -266,8 +266,8 @@ G.combat = (() => {
     enemy.status = enemy.status || {};
     const isNew = !enemy.status[name];
     const previous=enemy.status[name];
-    enemy.status[name] = { dur: opts.dur || 3, dps: opts.dps || 1, tick: 0 };
-    if(name==="poison"&&previous?.dur>0){
+    enemy.status[name] = { dur: opts.dur || 3, dps: opts.dps || 1, tick: 0, ability:opts.ability };
+    if((name==="poison"||name==="burn")&&previous?.dur>0){
       // Refresh the infection without postponing its next tick or replacing a
       // stronger/longer poison with a weaker bite. Poison never stacks damage.
       enemy.status[name].tick=previous.tick||0;
@@ -297,6 +297,17 @@ G.combat = (() => {
       if (poison.dur <= 0) delete enemy.status.poison;
     }
     const stun = enemy.status.stun;
+    const burn=enemy.status.burn;
+    if(burn){
+      burn.tick+=Math.min(dt,Math.max(0,burn.dur));burn.dur-=dt;
+      while(burn.tick>=1&&!enemy.dead){
+        burn.tick--;const damage=burn.dps||1;enemy.hp-=damage;
+        G.damageNumber(enemy.x,enemy.y-enemy.h(),damage,"#ef7d57");
+        G.spawnFx({kind:"spark",x:enemy.x,y:enemy.y-8,vy:-18,color:"#ffcd75",dur:0.3});
+        if(enemy.hp<=0)killEnemy(enemy,{ability:burn.ability||"fireBreath",type:abilityDamageType(burn.ability,"light","light")});
+      }
+      if(burn.dur<=0)delete enemy.status.burn;
+    }
     if (stun) {
       stun.dur -= dt;
       if (stun.dur <= 0) delete enemy.status.stun;

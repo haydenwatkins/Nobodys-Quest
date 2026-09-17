@@ -1254,6 +1254,13 @@ G.drawPlayer = function (ctx) {
   const p = G.state.player;
   const form = G.playerForm();
   if (p.invuln > 0 && Math.floor(p.invuln * 12) % 2 === 0 && !p.dashing) return; // hurt blink
+  if(p.dashing?.ability==="burrowBlitz"){
+    G.drawShadow(ctx,p.x,p.y,11);ctx.save();
+    const shift=G.reducedMotion?0:Math.round(Math.sin(G.state.time*32)*2);
+    ctx.fillStyle="#6b4a2b";ctx.fillRect(Math.round(p.x-8),Math.round(p.y-5),16,5);
+    ctx.fillStyle="#c09858";ctx.fillRect(Math.round(p.x-6+shift),Math.round(p.y-8),5,3);ctx.fillRect(Math.round(p.x+3-shift),Math.round(p.y-6),4,3);
+    ctx.restore();return;
+  }
   G.drawPlayerAura(ctx, p, form);
   if (form.id === "knight" && (p.knightGuardT > 0 || p.knightRiposteT > 0)) {
     const facing = Math.atan2(p.dir.y, p.dir.x);
@@ -1437,6 +1444,10 @@ G.drawEnemy = function (ctx, e) {
     const x=Math.round(e.x),y=Math.round(e.y-e.def.size-7);
     ctx.fillStyle="#ffcd75";
     for(const side of [-1,1]){ctx.fillRect(x+side*5-1,y-2,2,5);ctx.fillRect(x+side*3-1,y-4,3,2);}
+  }
+  if(e.status?.burn?.dur>0){
+    ctx.fillStyle="#ef7d57";ctx.fillRect(Math.round(e.x-4),Math.round(e.y-e.def.size-3),3,4);
+    ctx.fillStyle="#ffcd75";ctx.fillRect(Math.round(e.x-3),Math.round(e.y-e.def.size-5),2,3);
   }
   // stun stars
   if (e.status && e.status.stun) {
