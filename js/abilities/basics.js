@@ -1038,6 +1038,7 @@ registerAbility({
 
 registerAbility({
   id: "thornLash", name: "Thorn Lash", icon: "🌿", type: "dark", style: "melee", traits: ["status"],
+  description: "Sweep a poisonous vine through nearby enemies. Fallen victims can spread their poison through Seedbed.",
   mana: 0, cooldown: 0.47,
   use(user) {
     G.combat.meleeArc(user, {
@@ -1050,6 +1051,7 @@ registerAbility({
 
 registerAbility({
   id: "seedBurst", name: "Seed Burst", icon: "🌰", type: "dark", style: "area", traits: ["status"],
+  description: "Throw a seed that bursts and poisons nearby enemies on impact or at the end of its flight.",
   mana: 4, cooldown: 1.05, autoAim: true, aimRange: 145,
   use(user) {
     G.combat.shoot(user, {
@@ -1063,11 +1065,12 @@ registerAbility({
 
 registerAbility({
   id: "wildGrowth", name: "Wild Growth", icon: "🌳", type: "dark", style: "area", traits: ["status"],
+  description: "Hold nearby enemies in a burst of roots without scattering them. Follow up while the crowd is trapped.",
   mana: 5, cooldown: 1.4,
   use(user) {
     G.combat.areaBurst(user, {
       ability: "wildGrowth", range: 48, damage: 2, type: "dark",
-      knockback: 115, color: "#38b764", hitStop: 0.042, shake: 0.18,
+      knockback: 0, color: "#38b764", hitStop: 0.042, shake: 0.18,
       status: { name: "stun", dur: 0.7 }, combo: "overgrowth",
     });
   },
@@ -1140,6 +1143,7 @@ registerAbility({
 
 registerAbility({
   id: "silkNeedle", name: "Silk Needle", icon: "🪡", type: "sharp", style: "projectile",
+  description: "Fire a swift needle. Alternate targets to pull pairs together with Lifeline.",
   mana: 0, cooldown: 0.42, autoAim: true, aimRange: 170,
   use(user) {
     G.combat.shoot(user, { ability: "silkNeedle", speed: 240, range: 170, damage: 1, type: "sharp",
@@ -1148,7 +1152,8 @@ registerAbility({
 });
 
 registerAbility({
-  id: "stitchline", name: "Stitchline", icon: "🧵", type: "sharp", style: "chain",
+  id: "stitchline", name: "Stitchline", icon: "🧵", type: "sharp", style: "chain", traits: ["status"],
+  description: "Stitch up to five enemies together, briefly stunning each without pushing them apart.",
   mana: 4, cooldown: 1.0, autoAim: true, aimRange: 90,
   use(user) {
     G.combat.chain(user, { ability: "stitchline", range: 90, jumpRange: 58, maxTargets: 5,
@@ -1158,6 +1163,7 @@ registerAbility({
 
 registerAbility({
   id: "cocoonField", name: "Cocoon Field", icon: "🕸️", type: "dark", style: "area", traits: ["status"],
+  description: "Gather nearby enemies into a cocoon and hold them for a follow-up attack.",
   mana: 5, cooldown: 1.4,
   use(user) {
     G.combat.areaBurst(user, { ability: "cocoonField", range: 50, damage: 1, type: "dark", pull: 15,

@@ -556,7 +556,7 @@ G.combat = (() => {
       used.add(current);
       if (damageEnemy(current, {
         damage: o.damage || 1, type, ability: o.ability,
-        knockback: o.knockback || 35, status: o.status,
+        knockback: o.knockback ?? 35, status: o.status,
         breaksAnyWard: breaksAnyWard(user), fromX, fromY,
         hitStop: o.hitStop === undefined ? 0.02 : o.hitStop,
         shake: o.shake,
@@ -847,5 +847,5 @@ G.combat = (() => {
     return hits;
   }
 
-  return { damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, forceEnemies, updateProjectiles };
+  return { clearArc, damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, forceEnemies, updateProjectiles };
 })();

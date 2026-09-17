@@ -301,11 +301,21 @@
 
     druid: () => authored(42, 40, palette({ a: "#26362f", b: "#3f6245", c: "#65984e", d: "#91c75a", e: "#6f4d33", f: "#b9844d", g: "#edf4d0", h: "#eaa65d", i: "#8de4b3" }), (g, f) => {
       const { cx } = humanoid(g, f, { body: "b", trim: "d", legs: "e", skin: "f", eye: "i" });
-      g.ellipse(cx, 11, 7, 7, K); g.ellipse(cx, 11, 6, 6, "a");
+      // A carved heartwood mask stays readable beneath the branching crown.
+      g.ellipse(cx, 11, 7, 7, K); g.ellipse(cx, 11, 6, 6, "e");
+      g.poly([[cx-4,7],[cx,6],[cx+4,8],[cx+3,15],[cx,18],[cx-4,14]], "f");
+      g.rect(cx-4,10,3,2,"a"); g.rect(cx+2,10,3,2,"a");
+      g.put(cx-3,10,"i"); g.put(cx+3,10,"i"); g.line(cx,11,cx-1,15,"e",1);
+      g.poly([[cx-5,15],[cx+5,15],[cx+3,20],[cx,23],[cx-3,19]],"b");
+      g.line(cx-2,16,cx,20,"d",1);
       g.line(cx - 4, 6, cx - 11, 0, "e", 2); g.line(cx - 8, 3, cx - 13, 5, "e", 2); g.line(cx + 4, 6, cx + 11, 0, "e", 2); g.line(cx + 8, 3, cx + 13, 5, "e", 2);
       g.ellipse(cx - 12, 5, 3, 2, "h"); g.ellipse(cx + 12, 4, 3, 2, "d");
       g.line(cx - 6, 21, cx - 12, 29, "c", 3); g.line(cx + 6, 21, cx + 12, 29, "c", 3);
-      if (f === 2) { g.line(cx + 8, 21, 39, 8, "e", 2); g.ellipse(39, 7, 3, 4, "i"); }
+      // The seed staff is a permanent silhouette, lifted for the casting pose.
+      const sx=f===2?38:35, sy=f===2?8:15;
+      g.line(cx+9,25,sx,sy+4,"f",2); g.line(sx,sy,sx-2,36,K,3); g.line(sx,sy,sx-2,35,"e",2);
+      g.ellipse(sx,sy,4,5,K); g.ellipse(sx,sy,3,4,"h"); g.ellipse(sx-1,sy-1,1,2,"g");
+      g.poly([[sx-2,sy+3],[sx-6,sy],[sx-5,sy-3],[sx-2,sy-1]],"d");
     }),
 
     griffin: () => authored(56, 38, palette({ a: "#342d39", b: "#6a4c48", c: "#a86e4b", d: "#d69a58", e: "#f0c76d", f: "#f4e7ca", g: "#ffffff", h: "#738fa0", i: "#72d4dc" }), (g, f) => {
@@ -346,11 +356,17 @@
 
     weaver: () => authored(46, 38, palette({ a: "#241e3f", b: "#403064", c: "#68438a", d: "#a1529b", e: "#da72b1", f: "#ead6e9", g: "#ffffff", h: "#5bd6d0", i: "#d9a5f2" }), (g, f) => {
       const cx = 23, flex = f === 1 ? 2 : f === 3 ? -2 : 0;
-      g.ellipse(cx, 21, 10, 9, K); g.ellipse(cx, 21, 9, 8, "b");
+      g.ellipse(cx, 22, 10, 10, K); g.ellipse(cx, 22, 9, 9, "b");
+      // Silk chevrons and a pearl spinneret distinguish the abdomen from the head.
+      g.ellipse(cx-3,20,5,6,"c");
+      for(const y of [19,23,27]){g.line(cx-5,y-2,cx,y,"i",1);g.line(cx,y,cx+5,y-2,"f",1);}
+      g.ellipse(cx,30,3,2,"f"); g.put(cx,29,"g");
       g.ellipse(cx, 10, 7, 7, K); g.ellipse(cx, 10, 6, 6, "c");
+      g.line(cx-5,6,cx,4,"i",1); g.line(cx,4,cx+5,6,"f",1);
       g.rect(cx - 4, 9, 2, 2, "h"); g.rect(cx + 3, 9, 2, 2, "h"); g.put(cx - 2, 13, "g"); g.put(cx + 2, 13, "g");
       for (let side of [-1, 1]) for (let n = 0; n < 4; n++) {
         const y = 17 + n * 4, kneeX = cx + side * (12 + n * 2), footX = cx + side * (20 + flex * (n % 2 ? 1 : -1));
+        g.line(cx + side * 7, y, kneeX, y - 5 + n, K, 4); g.line(kneeX, y - 5 + n, footX, 29 + n, K, 4);
         g.line(cx + side * 7, y, kneeX, y - 5 + n, "d", 2); g.line(kneeX, y - 5 + n, footX, 29 + n, n === 0 ? "i" : "e", 2);
       }
       if (f === 2) { g.line(cx, 14, cx, 0, "f", 1); g.ellipse(cx, 2, 4, 3, "i"); }

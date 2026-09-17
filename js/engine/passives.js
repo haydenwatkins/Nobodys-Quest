@@ -294,13 +294,16 @@ G.passives = (() => {
     if (!statusName) return;
     let next = null, best = Infinity;
     for (const candidate of G.state.enemies) {
-      if (candidate.dead || (candidate.status && candidate.status[statusName])) continue;
+      if (candidate.dead || candidate.ward?.hp > 0 || (candidate.status && candidate.status[statusName])) continue;
+      if (!G.combat.clearArc(enemy.x, enemy.y, candidate.x, candidate.y)) continue;
       const d = G.util.dist(enemy.x, enemy.y, candidate.x, candidate.y);
       if (d <= 62 + candidate.def.size / 2 && d < best) { next = candidate; best = d; }
     }
     if (!next) return;
     const old = enemy.status[statusName];
-    G.combat.applyStatus(next, statusName, { dur: Math.max(0.8, old.dur * 0.7), dps: old.dps });
+    // A spread damage-over-time effect must live long enough to tick once.
+    const minimum = statusName === "poison" || statusName === "burn" ? 1 : 0.8;
+    G.combat.applyStatus(next, statusName, { dur: Math.max(minimum, old.dur * 0.7), dps: old.dps, ability: old.ability });
     G.spawnFx({ kind: "bolt", x: enemy.x, y: enemy.y - 5, x2: next.x, y2: next.y - 5, color: "#a7f070", dur: 0.3 });
     G.damageNumber(next.x, next.y - next.h(), "SPREAD!", "#a7f070");
   }
