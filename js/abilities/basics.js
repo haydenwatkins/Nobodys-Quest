@@ -947,6 +947,7 @@ registerAbility({
 
 registerAbility({
   id: "quickdraw", name: "Quickdraw", icon: "⚔️", type: "sharp", style: "melee",
+  description: "Keep cutting to finish a three-strike rhythm with a wide sweep. Pausing resets the rhythm.",
   mana: 0, cooldown: 0.4,
   use(user) {
     const last = typeof user.drawAt === "number" ? user.drawAt : -10;
@@ -955,7 +956,7 @@ registerAbility({
     const final = user.drawBeat === 3;
     G.combat.meleeArc(user, {
       ability: "quickdraw", range: final ? 32 : 22, arcDeg: final ? 255 : 82,
-      damage: 1, type: "sharp", knockback: final ? 165 : 68,
+      damage: 1, type: "sharp", knockback: final ? 165 : 25,
       color: final ? "#ffcd75" : "#f4f4f4", lunge: final ? 4 : 3,
       weight: final ? 5 : 2, hitStop: final ? 0.045 : 0.022,
       combo: final ? "draw-finish" : "draw",
@@ -965,6 +966,7 @@ registerAbility({
 
 registerAbility({
   id: "flashStep", name: "Flash Step", icon: "💨", type: "sharp", style: "dash",
+  description: "Cut through enemies in a swift, invulnerable dash.",
   mana: 3, cooldown: 0.75,
   use(user) {
     G.combat.dash(user, {
@@ -976,12 +978,13 @@ registerAbility({
 
 registerAbility({
   id: "crescentDraw", name: "Crescent Draw", icon: "🌙", type: "sharp", style: "area",
+  description: "Sweep all around you, scattering nearby enemies with a heavy crescent.",
   mana: 5, cooldown: 1.25,
   use(user) {
-    G.combat.meleeArc(user, {
-      ability: "crescentDraw", range: 40, arcDeg: 300,
+    G.combat.areaBurst(user, {
+      ability: "crescentDraw", range: 40,
       damage: 2, type: "sharp", knockback: 185,
-      color: "#73eff7", lunge: 4, weight: 7, hitStop: 0.048, shake: 0.2,
+      color: "#73eff7", hitStop: 0.048, shake: 0.2,
     });
   },
 });
@@ -990,6 +993,7 @@ registerAbility({
 
 registerAbility({
   id: "starNeedle", name: "Star Needle", icon: "✨", type: "light", style: "projectile",
+  description: "Every fourth needle pierces a longer line of enemies. The stars beneath you count toward alignment.",
   mana: 0, cooldown: 0.46, autoAim: true, aimRange: 165,
   use(user) {
     user.starBeat = (user.starBeat || 0) % 4 + 1;
@@ -1005,6 +1009,7 @@ registerAbility({
 
 registerAbility({
   id: "constellation", name: "Constellation", icon: "🌟", type: "light", style: "chain",
+  description: "Link up to six enemies with starlight. Gather scattered foes first to connect more targets.",
   mana: 4, cooldown: 1.0, autoAim: true, aimRange: 120,
   use(user) {
     // Draw a readable constellation through actual targets instead of firing
@@ -1018,12 +1023,13 @@ registerAbility({
 });
 
 registerAbility({
-  id: "gravityWell", name: "Gravity Well", icon: "🌀", type: "dark", style: "area",
+  id: "gravityWell", name: "Gravity Well", icon: "🌀", type: "dark", style: "area", traits: ["status"],
+  description: "Drag nearby enemies inward and hold them briefly for a follow-up attack.",
   mana: 5, cooldown: 1.35,
   use(user) {
     G.combat.areaBurst(user, {
       ability: "gravityWell", range: 52, damage: 2, type: "dark",
-      pull: 18, color: "#8153c1", hitStop: 0.04, shake: 0.17, combo: "gravity",
+      pull: 24, status: { name: "stun", dur: 0.65 }, color: "#8153c1", hitStop: 0.04, shake: 0.17, combo: "gravity",
     });
   },
 });

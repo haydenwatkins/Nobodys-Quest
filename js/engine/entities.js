@@ -1297,12 +1297,16 @@ G.drawPlayer = function (ctx) {
     ctx.restore();
   }
   G.drawShadow(ctx, p.x, p.y, 10);
-  // Small counters make stored bite progress and the next joker readable.
-  if(form.id==="vampire"||form.id==="jester"){
-    const count=form.id==="vampire"?5:3,filled=form.id==="vampire"?(p.bloodPips||0):(p.cardBeat||0)%3;
-    ctx.save();for(let i=0;i<count;i++){
-      ctx.fillStyle=i<filled?(form.id==="vampire"?"#ef7d57":"#ffcd75"):"#493d55";
-      ctx.fillRect(Math.round(p.x-count*2+i*4),Math.round(p.y+4),3,2);
+  // Form rhythms stay close to the character, where combat is happening.
+  const rhythm = form.id === "vampire" ? {count:5, filled:p.bloodPips||0, color:"#ef7d57"}
+    : form.id === "jester" ? {count:3, filled:(p.cardBeat||0)%3, color:"#ffcd75"}
+    : form.id === "astronomer" ? {count:4, filled:(p.starBeat||0)%4, color:"#73eff7"}
+    : form.id === "samurai" ? {count:3, filled:typeof p.drawAt === "number" && G.state.time-p.drawAt<0.76 ? p.drawBeat||0 : 0, color:"#ffcd75"}
+    : null;
+  if(rhythm){
+    ctx.save();for(let i=0;i<rhythm.count;i++){
+      ctx.fillStyle=i<rhythm.filled?rhythm.color:"#493d55";
+      ctx.fillRect(Math.round(p.x-rhythm.count*2+i*4),Math.round(p.y+4),3,2);
     }ctx.restore();
   }
   const animationMode = p.attackPose ? "attack" : p.moving || p.dashing ? "walk" : "idle";
