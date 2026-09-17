@@ -62,8 +62,8 @@ assert.equal(G.wayfinderLandmarkIds().length, 16, "all fifteen guardian trials a
   };
   for (const char of ["H", "m", "s"])
     assert.ok(found.has(locate(char)), `Starfall '${char}' must be reachable by ordinary movement`);
-  assert.equal(map.legend.H.chest.item, "starfall-thread");
-  assert.equal(map.legend.H.chest.heal, true, "the difficult vault should also restore the player");
+  assert.equal(map.legend.H.chest.item, undefined, "the Thread is earned at the observatory instrument, not the pantry");
+  assert.equal(map.legend.H.chest.heal, true, "the southwest pantry should restore the player");
   assert.ok(map.tiles.every((row) => row.length === 30), "Starfall rows should keep a consistent width");
 }
 
