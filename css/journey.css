@@ -199,3 +199,43 @@
 #menu .sunrise-promises .eyebrow { color:#855337; }
 #menu .sunrise-promise button[aria-pressed="true"] { background:#4d603b; }
 #menu .journey-road h3 { font:26px/1.1 "VT323",monospace; color:#ffdb91; margin:6px 0; }
+/* The field mixer belongs to the same travelling journal. Keep its controls
+   in view while the collection of handwritten art cards scrolls beneath. */
+#art-mixer { overflow:hidden; padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); background:#171c2af2; }
+#art-mixer .art-mixer-panel { height:100%; min-height:0; max-height:100%; display:grid; grid-template-rows:auto auto auto minmax(0,1fr) auto; padding:10px; border:4px solid #392c30; border-radius:0; background:#302d35; box-shadow:inset 0 0 0 2px #97714b; color:#f5dfa6; }
+#art-mixer .art-mixer-panel>header { align-items:center; gap:8px; grid-template-columns:1fr 44px; }
+#art-mixer .art-mixer-panel h1 { font:12px/1.5 "Press Start 2P",monospace; color:#ffdc91; margin:3px 0; }
+#art-mixer .eyebrow { color:#d6b580; font:8px/1.4 "Press Start 2P",monospace; }
+#art-mixer .art-mixer-panel header p { color:#e0cba1; margin:3px 0; }
+#art-mixer .art-mixer-panel header p strong { color:#ffdc91; }
+#art-mixer button { border-radius:0; }
+#art-mixer .art-mixer-slots button,#art-mixer [data-mix-close],#art-mixer footer button { background:repeating-linear-gradient(0deg,#573c30 0 9px,#624333 9px 11px,#573c30 11px 22px); border:2px solid #ae8150; border-bottom:4px solid #30232b; color:#ffe6aa; box-shadow:inset 2px 2px #d3a66766; }
+#art-mixer [data-mix-close] { width:44px; height:44px; }
+#art-mixer .art-mixer-slots { margin:6px 0; gap:8px; }
+#art-mixer .art-mixer-slots button { min-height:44px; padding:5px 8px; }
+#art-mixer .art-mixer-slots button>span { border-radius:0; background:#392c30; }
+#art-mixer .art-mixer-slots button.active { background:#e7b960; color:#322333; border-color:#ffe5a1 #976443 #694631; }
+#art-mixer .art-mixer-heading { margin:5px 2px; }
+#art-mixer .art-mixer-heading h2 { font:20px/1.1 "VT323",monospace; color:#ffe6aa; margin:0; }
+#art-mixer .art-mixer-heading>span,#art-mixer .art-mixer-controls { color:#d6b580; }
+#art-mixer .art-mixer-grid { overflow-y:auto; overscroll-behavior:contain; min-height:0; grid-template-columns:repeat(2,minmax(0,1fr)); align-content:start; gap:8px; padding:3px 5px 5px 0; scrollbar-color:#bd9255 #302735; }
+#art-mixer .art-mixer-card { min-height:110px; padding:9px; grid-template-columns:30px minmax(0,1fr); gap:8px; background:#f1dfa9; color:#392c24; border:3px solid #a87845; border-radius:0; box-shadow:inset 0 0 0 1px #ffeccb; }
+#art-mixer .art-mixer-card.boosted { background:#e5dfad; border-color:#778853; }
+#art-mixer .art-mixer-card.equipped { border-color:#805633; box-shadow:inset 0 0 0 2px #c2974f; }
+#art-mixer .art-mixer-icon { font-size:25px; }
+#art-mixer .art-mixer-copy strong { white-space:normal; font:8px/1.5 "Press Start 2P",monospace; }
+#art-mixer .art-mixer-copy small { color:#392c24; font:19px/1.05 "VT323",monospace; margin-top:4px; }
+#art-mixer .art-mixer-copy em { white-space:normal; color:#76502e; font:17px/1.05 "VT323",monospace; }
+#art-mixer .art-mixer-card>b { color:#4f6439; font:7px/1.4 "Press Start 2P",monospace; }
+#art-mixer .art-mixer-card.controller-focus,#art-mixer button:focus-visible { outline:3px solid #ffdc91; outline-offset:-3px; transform:none; }
+#art-mixer footer { margin-top:6px; }
+#art-mixer footer button { min-height:44px; font:19px/1 "VT323",monospace; }
+@media (min-width:1100px) { #art-mixer .art-mixer-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:540px) { #art-mixer .art-mixer-grid { grid-template-columns:1fr; } }
+#art-mixer .art-mixer-grid { grid-auto-rows:max-content; align-items:start; }
+#art-mixer .art-mixer-card { height:max-content; }
+@media (orientation:landscape) and (max-height:500px) {
+  #art-mixer header .eyebrow,#art-mixer .art-mixer-heading h2 { display:none; }
+  #art-mixer .art-mixer-heading { align-items:center; margin:3px 2px; }
+  #art-mixer .art-mixer-copy small { font-size:18px; }
+}
