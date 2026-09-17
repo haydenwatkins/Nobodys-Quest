@@ -327,6 +327,8 @@
       g.poly([[29, 21], [21, 3 + wing], [15, 1 + wing], [16, 12 + wing], [10, 6 + wing], [12, 18 + wing], [5, 14 + wing], [13, 27]], K);
       g.poly([[28, 20], [21, 6 + wing], [17, 4 + wing], [19, 15 + wing], [13, 10 + wing], [15, 21 + wing], [9, 18 + wing], [15, 25]], "f");
       g.line(20, 6 + wing, 18, 22, "h", 2); g.line(14, 11 + wing, 19, 23, "e", 2); g.line(9, 17 + wing, 16, 25, "d", 2);
+      // Light feather shafts separate the folded wing into readable layers.
+      g.line(19,8+wing,23,21,"g",1);g.line(14,14+wing,20,23,"f",1);g.line(10,19+wing,17,25,"f",1);
       // Golden lion body and haunches.
       g.ellipse(30, 24, 14, 7, K); g.ellipse(29, 24, 13, 6, "c"); g.ellipse(22, 24, 7, 7, "b");
       // Far hind paw and far eagle foreleg.
@@ -335,7 +337,7 @@
       g.poly([[36, 22], [39, 12], [45, 7], [51, 11], [48, 20], [42, 25]], K);
       g.poly([[37, 21], [40, 13], [45, 9], [49, 11], [47, 18], [42, 23]], "f");
       g.poly([[48, 11], [55, 13], [51, 17], [47, 16]], K); g.poly([[49, 12], [54, 13], [51, 15], [48, 15]], "e");
-      g.poly([[40, 11], [37, 6], [43, 9]], "h"); g.put(46, 11, "a"); g.put(47, 11, "g");
+      g.poly([[40, 11], [37, 6], [43, 9]], "h"); g.line(41,10,43,7,"g",1); g.line(39,12,40,9,"e",1); g.put(46, 11, "a"); g.put(47, 11, "g");
       // Lion hind leg ends in a paw; eagle foreleg ends in three long talons.
       g.line(25, 28, 24 - stride, 35, "c", 4); g.rect(21 - stride, 34, 8, 3, K);
       g.line(40, 26, 42 + stride, 34, "e", 3);
@@ -349,8 +351,16 @@
       g.poly([[cx - 9 + lean, 5], [cx + 8 + lean, 3], [cx + 12, 15], [cx + 9, 36], [cx - 10, 38], [cx - 13, 17]], K);
       g.poly([[cx - 7 + lean, 7], [cx + 6 + lean, 5], [cx + 9, 16], [cx + 7, 34], [cx - 8, 36], [cx - 10, 17]], "b");
       g.poly([[cx - 8, 7], [cx - 1, 5], [cx - 3, 18], [cx - 10, 17]], "c"); g.rect(cx + 1, 9, 7, 5, "d");
+      // Split stone brows frame the eyes; a recessed keystone anchors the chest.
+      g.line(cx-7,12,cx-2,12,K,2);g.line(cx+2,11,cx+7,11,K,2);
+      g.poly([[cx,20],[cx+5,24],[cx,31],[cx-5,25]],K);
+      g.poly([[cx,22],[cx+3,25],[cx,29],[cx-3,25]],"i");g.put(cx-1,24,"g");
       g.rect(cx - 5, 14, 3, 3, "h"); g.rect(cx + 4, 13, 3, 3, "h"); g.line(cx, 17, cx, 28, "i", 2); g.line(cx - 5, 23, cx + 5, 23, "i", 2);
       const reach = f === 2 ? 19 : 13; g.line(cx - 9, 18, cx - reach, 29, "c", 5); g.line(cx + 9, 18, cx + reach, 29, "c", 5);
+      // Large knuckles and visible stone joints make the heavy punches distinct.
+      for(const side of [-1,1]){const x=cx+side*reach;g.rect(x-3,25,7,7,K);g.rect(x-2,26,5,4,"d");g.line(x-1,27,x-1,29,"b",1);g.line(x+1,27,x+1,29,"b",1);}
+      g.line(cx-8,20,cx-4,18,"a",1);g.line(cx+4,32,cx+7,29,"a",1);
+      g.ellipse(cx-7,8,4,2,"f");g.put(cx-9,10,"g");
       g.rect(cx - 9, 36, 8, 4, K); g.rect(cx + 2, 35, 9, 5, K); g.ellipse(cx - 7, 9, 3, 3, "f");
     }),
 

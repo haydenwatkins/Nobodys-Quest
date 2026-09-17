@@ -1083,6 +1083,7 @@ registerAbility({
 
 registerAbility({
   id: "wingbeat", name: "Wingbeat", icon: "🪶", type: "blunt", style: "melee",
+  description: "Sweep enemies away with a broad wing strike. Attack while moving to ride a Slipstream.",
   mana: 0, cooldown: 0.4,
   use(user) {
     G.combat.meleeArc(user, { ability: "wingbeat", range: 25, arcDeg: 190, damage: 1,
@@ -1092,6 +1093,7 @@ registerAbility({
 
 registerAbility({
   id: "featherGale", name: "Feather Gale", icon: "🌬️", type: "sharp", style: "projectile",
+  description: "Fan out three sharp feathers to catch a spread of enemies. Each enemy takes one hit per volley.",
   mana: 3, cooldown: 0.8, autoAim: true, aimRange: 175,
   use(user) {
     const hitGroup = {};
@@ -1104,27 +1106,30 @@ registerAbility({
 
 registerAbility({
   id: "skyDive", name: "Sky Dive", icon: "🪽", type: "blunt", style: "dash",
+  description: "Soar through enemies, then land with a heavy burst all around you.",
   mana: 4, cooldown: 1.2,
   use(user) {
     G.combat.dash(user, { ability: "skyDive", dist: 82, speed: 390, damage: 1, type: "blunt", color: "#73eff7",
-      endBurst: { ability: "skyDive", range: 31, damage: 2, type: "blunt", knockback: 170, color: "#f4f4f4" } });
+      endBurst: { area: true, ability: "skyDive", range: 31, damage: 2, type: "blunt", knockback: 170, color: "#f4f4f4" } });
   },
 });
 
 registerAbility({
   id: "stoneKnuckle", name: "Stone Knuckle", icon: "🪨", type: "blunt", style: "melee",
+  description: "Every third punch lands a heavy, wider blow. The stones beneath you count toward the next heavy strike.",
   mana: 0, cooldown: 0.48,
   use(user) {
     user.stoneBeat = (user.stoneBeat || 0) % 3 + 1;
     const heavy = user.stoneBeat === 3;
     G.combat.meleeArc(user, { ability: "stoneKnuckle", range: heavy ? 29 : 22, arcDeg: heavy ? 210 : 125,
-      damage: heavy ? 2 : 1, type: "blunt", knockback: heavy ? 190 : 95, color: heavy ? "#ffcd75" : "#8a7f68",
+      damage: heavy ? 2 : 1, type: "blunt", knockback: heavy ? 190 : 35, color: heavy ? "#ffcd75" : "#8a7f68",
       lunge: 3, weight: heavy ? 7 : 4, hitStop: heavy ? 0.05 : 0.03, combo: heavy ? "keystone" : "knuckle" });
   },
 });
 
 registerAbility({
   id: "rampartPulse", name: "Rampart Pulse", icon: "🧱", type: "light", style: "area",
+  description: "Push nearby enemies away. As Golem, this also raises a temporary screen against enemy shots.",
   mana: 3, cooldown: 1.0,
   use(user) {
     G.combat.areaBurst(user, { ability: "rampartPulse", range: 34, damage: 1, type: "light",
@@ -1133,11 +1138,12 @@ registerAbility({
 });
 
 registerAbility({
-  id: "rollingMonolith", name: "Rolling Monolith", icon: "🗿", type: "blunt", style: "projectile",
+  id: "rollingMonolith", name: "Rolling Monolith", icon: "🗿", type: "blunt", style: "projectile", traits: ["status"],
+  description: "Roll a heavy stone through a line of enemies, briefly stunning each one.",
   mana: 5, cooldown: 1.25, autoAim: true, aimRange: 185,
   use(user) {
     G.combat.shoot(user, { ability: "rollingMonolith", speed: 125, range: 185, damage: 2, type: "blunt",
-      size: 8, pierce: true, color: "#8a7f68", trail: 4, recoil: 4, hitStop: 0.04 });
+      size: 8, pierce: true, status: { name: "stun", dur: 0.3 }, color: "#8a7f68", trail: 4, recoil: 4, hitStop: 0.04 });
   },
 });
 

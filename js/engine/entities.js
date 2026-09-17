@@ -1300,6 +1300,7 @@ G.drawPlayer = function (ctx) {
   // Form rhythms stay close to the character, where combat is happening.
   const rhythm = form.id === "vampire" ? {count:5, filled:p.bloodPips||0, color:"#ef7d57"}
     : form.id === "jester" ? {count:3, filled:(p.cardBeat||0)%3, color:"#ffcd75"}
+    : form.id === "golem" ? {count:3, filled:(p.stoneBeat||0)%3, color:"#ffcd75"}
     : form.id === "astronomer" ? {count:4, filled:(p.starBeat||0)%4, color:"#73eff7"}
     : form.id === "samurai" ? {count:3, filled:typeof p.drawAt === "number" && G.state.time-p.drawAt<0.76 ? p.drawBeat||0 : 0, color:"#ffcd75"}
     : null;
@@ -1313,8 +1314,9 @@ G.drawPlayer = function (ctx) {
   const poseScale = p.attackPose ? p.attackPose.t / p.attackPose.dur : 0;
   const drawX = p.x + (p.attackPose ? p.attackPose.x * poseScale : 0);
   const gaitLift = p.moving && !p.dashing && Math.floor(p.anim) % 2 ? 1 : 0;
-  const hopLift=!G.reducedMotion&&p.dashing?.ability==="hopCrash"
-    ? Math.sin(Math.PI*G.util.clamp(1-p.dashing.left/p.dashing.distance,0,1))*10 : 0;
+  const airborneDash = p.dashing && ["hopCrash", "skyDive"].includes(p.dashing.ability);
+  const hopLift = !G.reducedMotion && airborneDash
+    ? Math.sin(Math.PI*G.util.clamp(1-p.dashing.left/p.dashing.distance,0,1))*(p.dashing.ability==="skyDive"?16:10) : 0;
   const drawY = p.y + (p.attackPose ? p.attackPose.y * poseScale : 0) - gaitLift - hopLift;
   const dressedSprite = G.playerAppearanceSprite ? G.playerAppearanceSprite(form) :
     (G.costumedSprite ? G.costumedSprite(form.sprite) : form.sprite);
