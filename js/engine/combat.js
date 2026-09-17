@@ -524,11 +524,16 @@ G.combat = (() => {
     const facing = Math.atan2(user.dir.y, user.dir.x);
     attackPose(user, facing + Math.PI, 1, 0.08);
     G.sfx.attack("chain", type, o.damage || 1);
+    const clearArc=(x,y,ex,ey)=>{
+      const steps=Math.max(1,Math.ceil(Math.hypot(ex-x,ey-y)/6));
+      for(let i=1;i<steps;i++)if(G.world.solid(x+(ex-x)*i/steps,y+(ey-y)*i/steps))return false;
+      return true;
+    };
     const available = G.state.enemies.filter((e) => {
       if (e.dead) return false;
       const d = G.util.dist(user.x, user.y, e.x, e.y);
       const a = G.util.angleTo(user.x, user.y, e.x, e.y);
-      return d <= range + e.def.size / 2 && (d <= 10 || Math.abs(G.util.angleDiff(facing, a)) <= Math.PI * 0.55);
+      return d <= range + e.def.size / 2 && (d <= 10 || Math.abs(G.util.angleDiff(facing, a)) <= Math.PI * 0.55) && clearArc(user.x,user.y,e.x,e.y);
     });
     available.sort((a, b) => G.util.dist(user.x, user.y, a.x, a.y) - G.util.dist(user.x, user.y, b.x, b.y));
 
@@ -548,10 +553,11 @@ G.combat = (() => {
       G.spawnFx({ kind: "bolt", x: fromX, y: fromY, x2: current.x, y2: current.y - 5, color, dur: 0.22 });
       fromX = current.x; fromY = current.y - 5;
       let next = null, nextDist = Infinity;
+      const reach=jumpRange*(current.status?.stun?.dur>0?(o.stunnedJumpScale||1):1);
       for (const e of G.state.enemies) {
         if (e.dead || used.has(e)) continue;
         const d = G.util.dist(current.x, current.y, e.x, e.y);
-        if (d <= jumpRange + e.def.size / 2 && d < nextDist) { next = e; nextDist = d; }
+        if (d <= reach + e.def.size / 2 && d < nextDist && clearArc(current.x,current.y,e.x,e.y)) { next = e; nextDist = d; }
       }
       current = next;
     }

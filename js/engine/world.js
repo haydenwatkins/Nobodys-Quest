@@ -301,6 +301,7 @@ G.world = (() => {
     G.fx.length = 0;
 
     const p = s.player;
+    p.shellCounterT = 0;
     const at = spawn || def.playerStart || { x: 1, y: 1 };
     p.x = at.x * G.TILE + G.TILE / 2;
     p.y = at.y * G.TILE + G.TILE / 2;

@@ -349,6 +349,7 @@ G.passives = (() => {
     p.knightGuardT = Math.max(0, (p.knightGuardT || 0) - dt);
     p.knightPerfectT = Math.max(0, (p.knightPerfectT || 0) - dt);
     p.knightRiposteT = Math.max(0, (p.knightRiposteT || 0) - dt);
+    p.shellCounterT = Math.max(0, (p.shellCounterT || 0) - dt);
     if (p.passiveBarrierT <= 0) p.passiveBarrier = 0;
 
     const echoes = G.state.passiveEchoes || [];
@@ -480,6 +481,7 @@ G.passives = (() => {
     user.knightGuardT = 0;
     user.knightPerfectT = 0;
     user.knightRiposteT = 0;
+    user.shellCounterT = 0;
     user.spriteAction = null;
   }
 

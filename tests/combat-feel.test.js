@@ -216,7 +216,7 @@ for (const ability of Object.values(G.abilities)) {
 {
   freshState();
   G.abilities.shellCounter.use(G.state.player);
-  assert.equal(G.state.player.meleeGuard, 0.72, "Shell Counter should provide a generous deliberate guard window");
+  assert.equal(G.state.player.shellCounterT, 0.72, "Shell Counter should provide a timed reactive guard window");
 }
 
 {

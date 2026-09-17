@@ -480,6 +480,7 @@ registerAbility({
 registerAbility({
   id: "stormSpark",
   name: "Storm Spark",
+  description: "A quick light shot. Use it to crack wards before committing to a crowd.",
   icon: "⚡",
   type: "light",
   style: "projectile",
@@ -498,6 +499,7 @@ registerAbility({
 registerAbility({
   id: "chainLightning",
   name: "Chain Lightning",
+  description: "Arcs through up to four foes. Stunned targets conduct the next jump 50% farther; solid terrain blocks the arc.",
   icon: "🌩️",
   type: "light",
   style: "chain",
@@ -508,6 +510,7 @@ registerAbility({
     G.combat.chain(user, {
       ability: "chainLightning", range: 78, jumpRange: 48,
       maxTargets: 4, damage: 1, type: "light",
+      stunnedJumpScale: 1.5,
       color: "#73eff7",
     });
   },
@@ -516,6 +519,7 @@ registerAbility({
 registerAbility({
   id: "thunderclap",
   name: "Thunderclap",
+  description: "Stun nearby foes without scattering them far. Chain Lightning can use them to reach the next group.",
   icon: "👏",
   type: "blunt",
   style: "area",
@@ -523,9 +527,9 @@ registerAbility({
   mana: 5,
   cooldown: 1.3,
   use(user) {
-    G.combat.meleeArc(user, {
-      ability: "thunderclap", range: 31, arcDeg: 360,
-      damage: 2, type: "blunt", knockback: 190,
+    G.combat.areaBurst(user, {
+      ability: "thunderclap", range: 31,
+      damage: 2, type: "blunt", knockback: 35,
       status: { name: "stun", dur: 0.75 },
       color: "#73eff7",
     });
@@ -876,6 +880,7 @@ registerAbility({
 
 registerAbility({
   id: "shellJab", name: "Shell Jab", icon: "🐢", type: "blunt", style: "melee",
+  description: "Every third jab sweeps wide. Land it to earn a brief brace against incoming damage.",
   mana: 0, cooldown: 0.42,
   use(user) {
     user.shellBeat = (user.shellBeat || 0) % 3 + 1;
@@ -895,6 +900,7 @@ registerAbility({
 
 registerAbility({
   id: "shellRoll", name: "Shell Roll", icon: "🛞", type: "blunt", style: "dash",
+  description: "Roll through danger and strike again on landing. Use the momentum to reach a crowd or escape one.",
   mana: 3, cooldown: 0.9,
   use(user) {
     G.combat.dash(user, {
@@ -907,9 +913,10 @@ registerAbility({
 
 registerAbility({
   id: "shellCounter", name: "Shell Counter", icon: "🛡️", type: "blunt", style: "area",
+  description: "Burst outward and brace for 0.72 seconds. Block one incoming hit to answer with a second, wider burst.",
   mana: 4, cooldown: 1.35,
   use(user) {
-    user.meleeGuard = Math.max(user.meleeGuard || 0, 0.72);
+    user.shellCounterT = 0.72;
     G.combat.areaBurst(user, {
       ability: "shellCounter", range: 31, damage: 2, type: "blunt",
       knockback: 190, color: "#a7f070", hitStop: 0.038, shake: 0.16, combo: "counter",

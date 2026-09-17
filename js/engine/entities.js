@@ -26,6 +26,7 @@ G.makePlayer = function () {
     knightGuardT: 0,
     knightPerfectT: 0,
     knightRiposteT: 0,
+    shellCounterT: 0,
     swapCd: 0,
     dashing: null,
     passiveBarrier: 0,
@@ -90,7 +91,14 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     enemy: sourceEnemy.enemy.id,
     rival: !!sourceEnemy.enemy.rival,
   } : {};
-  if (p.invuln > 0 || (p.meleeGuard > 0 && !(p.knightGuardT > 0)) || p.dashing) return false;
+  if (p.invuln > 0 || p.dashing) return false;
+  if(p.shellCounterT>0&&dmg>0){
+    p.shellCounterT=0;p.invuln=Math.max(p.invuln,0.2);
+    G.combat.areaBurst(p,{ability:"shellCounter",range:39,damage:2,type:"blunt",knockback:210,color:"#fff3c2",combo:"counter",shake:0.2});
+    G.damageNumber(p.x,p.y-20,"ANSWER!","#a7f070");
+    return false;
+  }
+  if(p.meleeGuard>0&&!(p.knightGuardT>0))return false;
   if (p.pantryGuard > 0) {
     p.pantryGuard--;
     p.invuln = Math.max(p.invuln, 0.3);
@@ -1271,10 +1279,10 @@ G.drawPlayer = function (ctx) {
     }
     ctx.restore();
   }
-  if (p.meleeGuard > 0) {
+  if (p.meleeGuard > 0 || p.shellCounterT > 0) {
     ctx.save();
-    ctx.globalAlpha = Math.min(0.8, p.meleeGuard / G.MELEE_GUARD_SECONDS);
-    ctx.strokeStyle = "#fff3c2";
+    ctx.globalAlpha = p.shellCounterT>0?0.85:Math.min(0.8, p.meleeGuard / G.MELEE_GUARD_SECONDS);
+    ctx.strokeStyle = p.shellCounterT>0?"#a7f070":"#fff3c2";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(p.x, p.y - 7, 9, 0, Math.PI * 2);
