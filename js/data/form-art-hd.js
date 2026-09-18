@@ -235,7 +235,10 @@
     riftblade: () => authored(38, 38, palette({ a: "#1e2142", b: "#38356f", c: "#6851ad", d: "#cf4ecf", e: "#54e1e6", f: "#e9b574", g: "#ffffff", h: "#202a54", i: "#ff8ae8" }), (g, f) => {
       const { cx } = humanoid(g, f, { body: "b", trim: "d", legs: "a", skin: "f", eye: "e", mood: "mask" });
       g.rect(cx - 10, 6, 20, 3, K); g.rect(cx - 8, 5, 16, 2, "h"); g.poly([[cx - 5, 5], [cx, 0], [cx + 5, 5]], "c");
-      g.line(cx - 7, 20, cx - 11, 31, "i", 2);
+      // A split scarf and crossed chest clasp echo the returning star.
+      g.poly([[cx-5,18],[cx-10,20],[cx-15,28],[cx-10,26],[cx-12,33],[cx-6,27]],K);
+      g.line(cx-7,20,cx-12,27,"i",2);g.line(cx-8,24,cx-9,30,"d",2);
+      g.line(cx-3,20,cx+2,25,"e",1);g.line(cx+2,20,cx-3,25,"i",1);
       const endX = f === 2 ? 35 : 30, endY = f === 2 ? 9 : 26; g.line(cx + 5, 22, endX, endY, K, 3); g.line(cx + 7, 20, endX, endY, "e", 1); g.put(endX, endY, "g");
       g.line(cx - 4, 31, cx - 8, 35, "d", 2); g.line(cx + 3, 31, cx + 8, 35, "e", 2);
     }),
@@ -415,6 +418,11 @@
       g.poly([[cx - 10 + shift, 2], [cx + 7 + shift, 5], [cx + 14, 18], [cx + 12, 40], [cx - 14, 42], [cx - 17, 18]], K);
       g.poly([[cx - 8 + shift, 4], [cx + 5 + shift, 7], [cx + 11, 19], [cx + 9, 38], [cx - 12, 40], [cx - 14, 19]], "b");
       g.poly([[cx - 12, 8], [cx - 2, 3], [cx - 5, 22], [cx - 14, 19]], "c"); g.poly([[cx + 3, 8], [cx + 10, 14], [cx + 8, 27], [cx, 20]], "d");
+      // Broken strata frame a deep worldheart fissure.
+      g.line(cx-12,10,cx-6,7,"a",2);g.line(cx-6,7,cx-2,10,"e",1);
+      g.line(cx+5,6,cx+3,12,"a",2);g.line(cx+7,28,cx+2,33,"a",2);
+      g.poly([[cx,19],[cx+5,24],[cx+2,33],[cx-3,35],[cx-5,25]],K);
+      g.poly([[cx,21],[cx+3,25],[cx,32],[cx-3,25]],"i");g.line(cx,23,cx-1,29,"g",1);
       g.rect(cx - 6, 13, 4, 4, "h"); g.rect(cx + 4, 14, 4, 4, "h"); g.line(cx, 19, cx - 1, 31, "i", 3);
       const reach = f === 2 ? 23 : 17; g.line(cx - 13, 19, cx - reach, 36, "c", 7); g.line(cx + 11, 19, cx + reach, 35, "d", 7);
       g.rect(cx - 14, 39, 12, 5, K); g.rect(cx + 2, 38, 13, 6, K); g.ellipse(cx - 10, 8, 4, 3, "f"); g.ellipse(cx + 9, 26, 3, 3, "i");

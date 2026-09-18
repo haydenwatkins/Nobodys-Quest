@@ -279,14 +279,17 @@ G.updatePlayer = function (dt) {
     if (d.damage > 0) {
       for (const e of G.state.enemies) {
         if (e.dead || d.hitSet.has(e)) continue;
-        if (G.util.dist(p.x, p.y, e.x, e.y) < 6 + e.def.size / 2) {
+        // Test the distance to the travelled segment, not just this frame's endpoint.
+        const dx=p.x-beforeX,dy=p.y-beforeY,lengthSq=dx*dx+dy*dy;
+        const along=lengthSq?G.util.clamp(((e.x-beforeX)*dx+(e.y-beforeY)*dy)/lengthSq,0,1):0;
+        if (G.util.dist(beforeX+dx*along,beforeY+dy*along,e.x,e.y) < 6 + e.def.size / 2) {
           d.hitSet.add(e);
-          G.combat.damageEnemy(e, {
+          if (G.combat.damageEnemy(e, {
             damage: d.damage, type: d.type, ability: d.ability,
             breaksAnyWard: d.breaksAnyWard,
             fromX: beforeX, fromY: beforeY,
             hitStop: d.hitStop, shake: d.shake,
-          });
+          })) (d.hitTargets ||= new Set()).add(e);
         }
       }
     }
@@ -1300,6 +1303,7 @@ G.drawPlayer = function (ctx) {
   // Form rhythms stay close to the character, where combat is happening.
   const rhythm = form.id === "vampire" ? {count:5, filled:p.bloodPips||0, color:"#ef7d57"}
     : form.id === "jester" ? {count:3, filled:(p.cardBeat||0)%3, color:"#ffcd75"}
+    : form.id === "riftblade" ? {count:3, filled:typeof p.riftCutAt === "number" && G.state.time-p.riftCutAt<0.72 ? p.riftCutCombo||0 : 0, color:"#73eff7"}
     : form.id === "bellkeeper" ? {count:3, filled:(p.bellBeat||0)%3, color:"#fff3c2"}
     : form.id === "golem" ? {count:3, filled:(p.stoneBeat||0)%3, color:"#ffcd75"}
     : form.id === "astronomer" ? {count:4, filled:(p.starBeat||0)%4, color:"#73eff7"}

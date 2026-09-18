@@ -606,6 +606,7 @@ registerAbility({
 
 registerAbility({
   id: "riftCut",
+  description: "Keep a three-cut rhythm to finish with a wide sweep. Pausing resets the sequence.",
   name: "Rift Cut",
   icon: "🗡️",
   type: "sharp",
@@ -624,7 +625,7 @@ registerAbility({
       ability: "riftCut",
       range: finisher ? 27 : 21,
       arcDeg: finisher ? 230 : 125,
-      damage: 1, type: "sharp", knockback: finisher ? 145 : 85,
+      damage: 1, type: "sharp", knockback: finisher ? 145 : 30,
       color: finisher ? "#73eff7" : "#b58ee6",
       lunge: finisher ? 3.5 : 2.5,
       hitStop: finisher ? 0.038 : 0.024,
@@ -640,6 +641,7 @@ registerAbility({
 
 registerAbility({
   id: "riftRush",
+  description: "Dash through enemies with Dark damage. As Riftblade, land with a crowd-shoving afterimage.",
   name: "Rift Rush",
   icon: "💫",
   type: "dark",
@@ -659,6 +661,7 @@ registerAbility({
 
 registerAbility({
   id: "returningStar",
+  description: "Throw a piercing star that hits once going out and once coming home. Move to bend its return path.",
   name: "Returning Star",
   icon: "✦",
   type: "light",
@@ -1241,6 +1244,7 @@ registerAbility({
 
 registerAbility({
   id: "pillarFist", name: "Pillar Fist", icon: "✊", type: "blunt", style: "melee",
+  description: "Commit to a heavy punch. As Colossus, attacks resist knockback while still taking damage.",
   mana: 0, cooldown: 0.55,
   use(user) {
     G.combat.meleeArc(user, { ability: "pillarFist", range: 28, arcDeg: 170, damage: 2, type: "blunt",
@@ -1250,15 +1254,17 @@ registerAbility({
 
 registerAbility({
   id: "earthShoulder", name: "Earth Shoulder", icon: "💥", type: "blunt", style: "dash",
+  description: "Shoulder through enemies, then scatter the crowd with a landing burst. Each distinct target counts toward mastery.",
   mana: 4, cooldown: 1.0,
   use(user) {
     G.combat.dash(user, { ability: "earthShoulder", dist: 63, speed: 300, damage: 2, type: "blunt", color: "#ef7d57",
-      endBurst: { ability: "earthShoulder", range: 29, damage: 1, type: "blunt", knockback: 220, color: "#d8b06a" } });
+      endBurst: { area: true, ability: "earthShoulder", range: 29, damage: 1, type: "blunt", knockback: 220, color: "#d8b06a" } });
   },
 });
 
 registerAbility({
   id: "worldBreak", name: "World Break", icon: "🌋", type: "blunt", style: "area",
+  description: "Crack the ground in a wide, heavy burst that hurls enemies away.",
   mana: 6, cooldown: 1.45,
   use(user) {
     const hits = G.combat.areaBurst(user, { ability: "worldBreak", range: 48, damage: 3, type: "blunt",

@@ -434,6 +434,7 @@ G.combat = (() => {
         hitStop: o.hitStop, shake: o.shake, combo: o.combo,
       })) {
         hits++;
+        if (o.hitTargets) o.hitTargets.add(e);
         if (o.passivePull) {
           const d = G.util.dist(e.x, e.y, user.x, user.y);
           const a = G.util.angleTo(e.x, e.y, user.x, user.y);
@@ -464,7 +465,7 @@ G.combat = (() => {
         G.spawnFx({ kind: "puff", x: user.x, y: user.y - 3, color: "#f4f4f4", dur: 0.12 });
       }
     }
-    if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
+    if (hits >= 2 && !o.suppressMultiHit) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
     return hits;
   }
 
@@ -598,6 +599,7 @@ G.combat = (() => {
         hitStop: o.hitStop, shake: o.shake, combo: o.combo,
       })) {
         hits++;
+        if (o.hitTargets) o.hitTargets.add(e);
         if (o.pull) {
           const d = G.util.dist(e.x, e.y, user.x, user.y);
           const a = G.util.angleTo(e.x, e.y, user.x, user.y);
@@ -607,7 +609,7 @@ G.combat = (() => {
       }
     }
     for(const at of origins)G.spawnFx({kind:"ring",x:at.x,y:at.y-6,color,radius:at.range,dur:o.dur||0.34});
-    if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
+    if (hits >= 2 && !o.suppressMultiHit) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
     return hits;
   }
 
@@ -627,6 +629,7 @@ G.combat = (() => {
       ability: o.ability,
       breaksAnyWard: breaksAnyWard(user),
       hitSet: new Set(),
+      hitTargets: new Set(),
       color: o.color || "#f4f4f4",
       hitStop: o.hitStop === undefined ? 0.03 : o.hitStop,
       shake: o.shake,
@@ -641,10 +644,12 @@ G.combat = (() => {
 
   function finishDash(user, dashData) {
     const burstData = dashData && dashData.endBurst;
+    const hitTargets = dashData.hitTargets || new Set();
     let hits = 0;
     const strike=burstData?.area?areaBurst:meleeArc;
     if (burstData) hits = strike(user, {
       ability: burstData.ability || dashData.ability,
+      hitTargets, suppressMultiHit: true,
       range: burstData.range || 28,
       arcDeg: 360,
       damage: burstData.damage || 1,
@@ -662,6 +667,7 @@ G.combat = (() => {
         color: burstData.color || dashData.color,
         radius: burstData.range || 28, dur: 0.28,
       });
+    if (hitTargets.size >= 2) G.events.emit("multiHit", { ability: dashData.ability, hits: hitTargets.size, combo: "dash-finish" });
     if (G.passives) G.passives.onDashFinish(user, dashData);
     return hits;
   }
