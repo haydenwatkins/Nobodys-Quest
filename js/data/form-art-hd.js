@@ -432,8 +432,13 @@
       const cx = 26, bob = f === 1 ? 1 : f === 3 ? -1 : 0;
       g.ellipse(cx, 17 + bob, 18, 14, "d"); g.ellipse(cx, 17 + bob, 16, 12, "a");
       g.ellipse(cx, 18 + bob, 11, 11, K); g.ellipse(cx, 18 + bob, 9, 9, "g");
+      // A small crown and split ceremonial mantle distinguish the final form.
+      g.poly([[cx-7,10+bob],[cx-8,5+bob],[cx-3,8+bob],[cx,3+bob],[cx+3,8+bob],[cx+8,5+bob],[cx+7,10+bob]],K);
+      g.poly([[cx-6,9+bob],[cx-6,7+bob],[cx-2,9+bob],[cx,5+bob],[cx+2,9+bob],[cx+6,7+bob],[cx+6,9+bob]],"f");
       g.rect(cx - 5, 16 + bob, 3, 4, "a"); g.rect(cx + 3, 16 + bob, 3, 4, "a"); g.put(cx, 23 + bob, "h");
       g.poly([[cx - 8, 27 + bob], [cx + 8, 27 + bob], [cx + 13, 42], [cx, 46], [cx - 13, 42]], K); g.poly([[cx - 6, 28 + bob], [cx + 6, 28 + bob], [cx + 10, 41], [cx, 44], [cx - 10, 41]], "g");
+      g.line(cx-5,29+bob,cx-8,40,"d",2);g.line(cx+5,29+bob,cx+8,40,"e",2);
+      g.poly([[cx,29+bob],[cx+3,33+bob],[cx,37+bob],[cx-3,33+bob]],"f");g.put(cx,32+bob,"h");
       for (let n = 0; n < 8; n++) { const a = n * Math.PI / 4 + f * 0.18; const x = cx + Math.cos(a) * 22, y = 18 + bob + Math.sin(a) * 16; g.ellipse(x, y, 2, 2, n % 3 === 0 ? "f" : n % 2 ? "h" : "i"); }
       const reach = f === 2 ? 21 : 13; g.line(cx - 7, 31, cx - reach, 25, "e", 2); g.line(cx + 7, 31, cx + reach, 25, "h", 2);
     }),

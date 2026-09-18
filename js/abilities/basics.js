@@ -30,6 +30,7 @@
 
 registerAbility({
   id: "slap",
+  description: "A quick close-range slap that pushes an enemy away.",
   name: "Slap",
   icon: "👋",
   type: "blunt",
@@ -49,6 +50,7 @@ registerAbility({
 
 registerAbility({
   id: "cartwheel",
+  description: "Tumble through enemies with brief protection during the dash.",
   name: "Cartwheel",
   icon: "🤸",
   type: "blunt",
@@ -92,6 +94,7 @@ registerAbility({
 
 registerAbility({
   id: "squeakDash",
+  description: "Zoom through enemies to escape a crowd or reach a better position.",
   name: "Squeak Zoom",
   icon: "💨",
   type: "blunt",
@@ -330,6 +333,7 @@ registerAbility({
 
 registerAbility({
   id: "curse",
+  description: "Fire a dark bolt that poisons its target.",
   name: "Curse",
   icon: "🌑",
   type: "dark",
@@ -1277,6 +1281,7 @@ registerAbility({
 
 registerAbility({
   id: "divineSpark",
+  description: "Fire a powerful bolt of light. As God, your attacks can break any ward type.",
   name: "Divine Spark",
   icon: "☀️",
   type: "light",
@@ -1297,6 +1302,7 @@ registerAbility({
 
 registerAbility({
   id: "judgmentRing",
+  description: "Release a full-circle burst of light that drives nearby enemies away.",
   name: "Judgment Ring",
   icon: "⚖️",
   type: "light",
@@ -1304,9 +1310,9 @@ registerAbility({
   mana: 5,
   cooldown: 1.15,
   use(user) {
-    G.combat.meleeArc(user, {
+    G.combat.areaBurst(user, {
       ability: "judgmentRing",
-      range: 34, arcDeg: 360,
+      range: 34,
       damage: 3, type: "light",
       knockback: 180,
       color: "#f4f4f4",
@@ -1316,6 +1322,7 @@ registerAbility({
 
 registerAbility({
   id: "voidStar",
+  description: "Pierce enemies with a dark star, then burst at the end of its flight. Targets already pierced take no extra burst damage.",
   name: "Void Star",
   icon: "✴️",
   type: "dark",
@@ -1328,7 +1335,8 @@ registerAbility({
       ability: "voidStar",
       speed: 155, range: 190,
       damage: 4, type: "dark",
-      pierce: true,
+      pierce: true, explodeRadius: 26, explodeDamage: 2, explodeAtEndOnly: true,
+      size: 6, trail: 6,
       color: "#8153c1",
     });
   },

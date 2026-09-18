@@ -497,6 +497,7 @@ G.combat = (() => {
       status: o.status,
       consumePoison: o.consumePoison || 0,
       explodeRadius: o.explodeRadius || 0,
+      explodeAtEndOnly: !!o.explodeAtEndOnly,
       explodeDamage: o.explodeDamage,
       passivePull: o.passivePull || 0,
       hitGroup: o.hitGroup,
@@ -747,7 +748,7 @@ G.combat = (() => {
           if (pr.hitSet && pr.hitSet.has(e)) continue;
           if (pr.hitGroup && e.lastProjectileGroup === pr.hitGroup) continue;
           if (G.util.dist(pr.x, pr.y, e.x, e.y - 4) < pr.size + e.def.size / 2) {
-            if (pr.explodeRadius) {
+            if (pr.explodeRadius && !pr.explodeAtEndOnly) {
               // Piercing shockwaves erupt at every new target and keep going.
               // hitSet makes overlapping eruptions damage each foe only once.
               if (pr.pierce) {

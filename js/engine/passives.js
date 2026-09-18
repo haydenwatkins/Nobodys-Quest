@@ -477,7 +477,7 @@ G.passives = (() => {
     user.passiveHaste = 0;
     user.passiveBarrier = 0;
     user.passiveBarrierT = 0;
-    user.providenceKey = null;
+    // Providence belongs to the encounter phase, not the equipped form.
     user.slipstreamT = 0;
     user.resonanceStyle = null;
     user.lifelineTarget = null;

@@ -14,7 +14,7 @@ registerForm({
   hearts: 6,
   slots: 2,
   passive: { id: "providence", name: "Providence",
-    description: "Once each boss phase, a lethal hit leaves you at one heart and moves you to safety." },
+    description: "Once per boss phase or ordinary room, a lethal hit leaves you at one heart and attempts to move you out of danger. Switching forms does not recharge it." },
   breaksAnyWard: true,
   aura: {
     ring: "#b13e53",
