@@ -464,43 +464,30 @@ registerMap({
 });
 
 /* ================== MISTWOOD (30 x 19) ================== */
-
+function makeMistwoodTiles() {
+  const rows=Array.from({length:19},(_,y)=>Array.from({length:30},(_,x)=>x===0||y===0||x===29||y===18?"t":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  // A long root ridge divides the wood; north and south loops stay open.
+  for(let y=2;y<=16;y++)if(![5,6,15,16].includes(y))put(14,y,"t");
+  for(const [x,y]of [[3,3],[4,3],[9,3],[10,3],[5,8],[6,8],[9,9],[10,9],[3,11],[4,11],[10,12],[11,12],[5,16],[6,16],
+    [18,3],[19,3],[25,3],[26,3],[18,8],[19,8],[24,8],[25,8],[18,11],[19,11],[26,11],[27,11],[19,16],[20,16]])put(x,y,"t");
+  // Three distinct clearings lead away from the southern entrance.
+  for(const [x,y,c]of [[14,18,"x"],[15,17,"m"],[6,5,"."],[23,5,"."],[7,13,"."],[4,7,"H"],
+    [8,4,"1"],[4,5,"2"],[21,4,"3"],[25,6,"2"],[5,13,"1"],[9,14,"3"],[18,13,"1"],[23,15,"A"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
 registerMap({
-  id: "mistwood",
-  name: "Mistwood",
-  playerStart: { x: 15, y: 17 },
-
+  id: "mistwood", name: "Mistwood", playerStart: { x: 15, y: 17 },
   legend: {
     "1": { tile: "grass", enemy: "slime" },
     "2": { tile: "grass", enemy: "bat" },
     "3": { tile: "grass", enemy: "bones" },
     "A": { tile: "grass", enemy: "ancientTreant" },
-    "m": { tile: "grass", message: "Mistwood twists back on itself. Keep moving and the trees will open." },
+    "m": { tile: "grass", message: "Three old trail bells wait in the northwest, northeast, and southwest clearings. Wake their voices and the roots may remember the middle road. The Treant keeps the southeast clearing." },
     "x": { tile: "grass", portal: { map: "overworld", x: 20, y: 1 }, portalStyle: "gap", seamless: true },
     "H": { tile: "grass", chest: { heal: true, name: "a berry pie hidden under leaves" } },
   },
-
-  tiles: [
-    "tttttttttttttttttttttttttttttt",
-    "t.....t....1....t....2.......t",
-    "t...t.t.tt.tt.ttt.t.tttt.....t",
-    "t...t...t...t.t...t....t.....t",
-    "t1..t.tttt.1.t.t.ttt.t.3.....t",
-    "t...t......t.t.t...t.t.......t",
-    "t..ttt.tt..t...tt..t.tt......t",
-    "t.....2.t..ttt.....t..t......t",
-    "t.tt....t.....ttt.tt.t.......t",
-    "t.t....tttttt.t....1..t......t",
-    "t.t.t......H...t.ttttt.......t",
-    "t...t.ttt.tt.t.t.....2.......t",
-    "t3..t.t........ttttttt.......t",
-    "t...t.t......t....1..........t",
-    "t.ttt.t....m...tttt.t........t",
-    "t.....ttt.tttt....t.3........t",
-    "t.1.........t....2.....A.....t",
-    "t....2......t......1.........t",
-    "ttttttttttttttxtttttttttttttt",
-  ],
+  tiles: makeMistwoodTiles(),
 });
 
 /* ================== SUNKEN MARSH (30 x 19) ================== */
