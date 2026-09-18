@@ -75,6 +75,16 @@
     return `${name} broadens close strikes and guards you through the swing.`;
   }
 
+  function techniqueDescription(index, style) {
+    if(style === "projectile") return index % 2
+      ? "Fire a bolt that bursts on impact, catching nearby enemies without hitting the same target twice."
+      : "Fire a piercing bolt through a line of enemies.";
+    if(style === "dash") return "Rush through enemies, then land with a burst all around you. Distinct targets count once toward multi-hit feats.";
+    if(style === "area") return "Release a wide burst around you that pushes nearby enemies away.";
+    if(style === "chain") return "Link up to four enemies with a leaping attack. Each jump needs a clear path.";
+    return "Sweep a heavy strike through a broad arc in front of you.";
+  }
+
   function techniqueUse(id, index, style, type, color) {
     return function (user) {
       if (style === "projectile") {
@@ -82,11 +92,11 @@
           color, pierce: index % 2 === 0, explodeRadius: index % 2 ? 18 : 0, explodeDamage: 1 });
       } else if (style === "dash") {
         G.combat.dash(user, { ability: id, dist: 72, speed: 300, damage: 2, type, color,
-          endBurst: { range: 24, damage: 1, type, color } });
+          endBurst: { area: true, range: 24, damage: 1, type, color } });
       } else if (style === "area") {
         G.combat.areaBurst(user, { ability: id, range: 38, damage: 2, type, color, knockback: 105 });
       } else if (style === "chain") {
-        G.combat.chain(user, { ability: id, range: 90, jumps: 4, jumpRange: 50, damage: 1, type, color });
+        G.combat.chain(user, { ability: id, range: 90, maxTargets: 4, jumpRange: 50, damage: 1, type, color });
       } else {
         G.combat.meleeArc(user, { ability: id, range: 27, arcDeg: 180, damage: 2, type, color,
           knockback: 125, lunge: 5, hitStop: 0.055, shake: 0.18, weight: 5 });
@@ -115,6 +125,7 @@
     G.FORM_SURVIVAL[formId] = { role: names[4], text: survivalCopy[names[4]], hearts: form.hearts };
     registerAbility({
       id: techniqueId, name: names[1], icon: form.icon, type, style,
+      description: techniqueDescription(index, style),
       mana: 3 + (index % 2), cooldown: 0.75 + (index % 3) * 0.12,
       nativeForm: formId, legendTechnique: true,
       use: techniqueUse(techniqueId, index, style, type, color),
@@ -265,7 +276,9 @@
     const baseId = pools[(G.formOrder.indexOf(active.formId) + active.rank * 2 + index) % pools.length];
     const angle = index / Math.max(1, active.goal) * Math.PI * 2;
     const point = G.legendSitePoint(G.legendStage(active.formId));
-    const enemy = G.makeEnemy(baseId, point.x + Math.cos(angle) * (champion ? 62 : 46), point.y + Math.sin(angle) * (champion ? 42 : 34));
+    const desired = { x: point.x + Math.cos(angle) * (champion ? 62 : 46), y: point.y + Math.sin(angle) * (champion ? 42 : 34) };
+    const spawn = G.world?.safeArrival ? G.world.safeArrival(desired.x, desired.y) : desired;
+    const enemy = G.makeEnemy(baseId, spawn.x, spawn.y);
     const def = G.LEGEND_DEFS[active.formId];
     enemy.def = Object.assign({}, enemy.def, {
       name: champion ? `${def.armName} Keeper` : `${G.forms[active.formId].name} Trial Shade`,
@@ -292,7 +305,12 @@
       G.state.enemies.push(trialEnemy(active, 0, false), trialEnemy(active, 1, false));
     } else if (active.kind === "waypoints") {
       active.goal = 3;
-      active.runes = [[-42,-24],[44,-18],[0,42]];
+      const point = G.legendSitePoint(G.legendStage(active.formId));
+      active.runes = [[-42,-24],[44,-18],[0,42]].map(([dx,dy]) => {
+        const desired = {x:point.x+dx,y:point.y+dy};
+        const safe = G.world?.safeArrival ? G.world.safeArrival(desired.x,desired.y) : desired;
+        return [safe.x-point.x,safe.y-point.y];
+      });
     } else if (active.kind === "sequence") {
       active.goal = 4;
       active.sequence = ["native", "borrowed", "native", "borrowed"];
