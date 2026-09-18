@@ -289,7 +289,7 @@ function makeExpansionTrialArena(variant) {
   { id: "samuraiTrial", name: "The Folded Dojo", theme: "samurai", boss: "paperRonin", variant: 1,
     exit: { x: 36, y: 5 }, sign: "Three deliberate cuts beat one frantic swing. Watch the pause before the draw." },
   { id: "astronomerTrial", name: "The Crooked Observatory", theme: "astronomer", boss: "professorPerihelion", variant: 2,
-    exit: { x: 11, y: 24 }, sign: "Orbits are patterns, not walls. Cross a ring after it passes and close the distance." },
+    exit: { x: 11, y: 24 }, sign: "Light attacks break the Professor's ward. Stand between his two bright circles during the orbit, then close in after they fade." },
   { id: "druidTrial", name: "The Walking Garden", theme: "druid", boss: "grandmotherBriar", variant: 3,
     exit: { x: 36, y: 24 }, sign: "Seeds spread wide; briars leave narrow gaps. Keep moving and prune from the edges." },
 ].forEach((trial) => registerMap({

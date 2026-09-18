@@ -573,6 +573,7 @@ const BOSS_ARENA_ACTIONS = {
   rootBloom: "ROOT BLOOM",
   mireVolley: "REED VOLLEY",
   eclipseSweep: "ECLIPSE SWEEP",
+  orbitalBand: "SAFE ORBIT",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -694,6 +695,11 @@ G.updateBossHazards = function (dt) {
       if(!h.hit&&Math.hypot(p.x-h.x,p.y-h.y)<=h.radius&&Math.abs(delta)<=h.halfAngle&&G.damagePlayer(1,h.x,h.y))h.hit=true;
       continue;
     }
+    if(h.kind === "orbitalBand"){
+      const d=Math.hypot(p.x-h.x,p.y-h.y);
+      if(!h.hit&&(d<h.inner||d>h.outer)&&G.damagePlayer(1,h.x,h.y))h.hit=true;
+      continue;
+    }
     if (h.kind === "mirePool" || h.kind === "rootBloom") {
       if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
       continue;
@@ -745,7 +751,15 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if(h.kind === "eclipseSweep"){
+    if(h.kind === "orbitalBand"){
+      ctx.beginPath();ctx.rect(b.left,b.top,b.right-b.left,b.bottom-b.top);
+      ctx.moveTo(h.x+h.outer,h.y);ctx.arc(h.x,h.y,h.outer,0,Math.PI*2);
+      ctx.moveTo(h.x+h.inner,h.y);ctx.arc(h.x,h.y,h.inner,0,Math.PI*2);ctx.fill("evenodd");
+      ctx.globalAlpha=.95;ctx.strokeStyle="#73eff7";ctx.lineWidth=2;
+      for(const radius of [h.inner,h.outer]){ctx.beginPath();ctx.arc(h.x,h.y,radius,0,Math.PI*2);ctx.stroke();}
+      ctx.fillStyle="#263b4b";ctx.fillRect(h.x-25,h.y+(h.inner+h.outer)/2-5,50,11);
+      ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("SAFE ORBIT",h.x,h.y+(h.inner+h.outer)/2+3);
+    }else if(h.kind === "eclipseSweep"){
       ctx.globalAlpha=active?.32:.18;ctx.beginPath();ctx.moveTo(h.x,h.y);
       ctx.arc(h.x,h.y,h.radius,h.angle-h.halfAngle,h.angle+h.halfAngle);ctx.closePath();ctx.fill();
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#d9a7ff";ctx.setLineDash(active?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
@@ -959,6 +973,10 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "orbitalBand"){
+    spawnBossHazard(e,"orbitalBand",{x:e.x,y:e.y,inner:32+e.bossPhase*4,outer:108-e.bossPhase*8,warning:1.6,active:.65,color:"#73eff7"});
+    e.bossRecoverT=1.6+.65+.9;return;
+  }
   if(action === "eclipseSweep"){
     spawnBossHazard(e,"eclipseSweep",{x:e.x,y:e.y,angle:Math.atan2(p.y-e.y,p.x-e.x),radius:56+e.bossPhase*8,halfAngle:(45+e.bossPhase*10)*Math.PI/180,warning:.85,active:.24,color:"#b58ee6"});
     e.bossRecoverT=.85+.24+.9;return;
@@ -1014,6 +1032,7 @@ function resolveBossAction(e, p, action) {
   if (BOSS_ARENA_ACTIONS[action]) spawnArenaPattern(e, action);
   e.bossRecoverT = BOSS_ARENA_ACTIONS[action] ? 0.52 : 0.34;
   if(e.def.id === "mireQueen"&&action === "nova")e.bossRecoverT=155/82+.65;
+  if(e.def.id === "professorPerihelion"&&["stars","nova"].includes(action))e.bossRecoverT=155/(action==="stars"?104:82)+.75;
   if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
     if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
