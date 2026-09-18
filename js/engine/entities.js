@@ -811,6 +811,11 @@ G.drawBossHazards = function (ctx) {
       ctx.arc(h.x, h.y, h.radius, 0, Math.PI * 2);
       ctx.stroke();
     } else if (h.kind === "tether") {
+      if(h.owner.def.id === "silkMatriarch"){
+        ctx.globalAlpha=.85;ctx.strokeStyle="#fff3c2";ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(h.owner.x,h.owner.y,h.maxRange,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle="#302638";ctx.fillRect(h.owner.x-24,h.owner.y+h.maxRange-14,48,10);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("STAY CLOSE",h.owner.x,h.owner.y+h.maxRange-6);
+        ctx.strokeStyle=h.color;
+      }
       ctx.globalAlpha = active ? 0.9 : 0.45;
       ctx.setLineDash(active ? [4, 2] : [2, 3]);
       ctx.beginPath();
@@ -943,6 +948,10 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "oldMason" && ["faultGrid","collapseRing"].includes(action)){
     const field=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.t===0);
     if(field)e.bossRecoverT=(field.delay||0)+field.warning+field.active+0.9;
+  }
+  if(e.def.id === "silkMatriarch" && ["silkTether","webGrid"].includes(action)){
+    const field=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.t===0);
+    if(field)e.bossRecoverT=(field.delay||0)+field.warning+field.active+0.75;
   }
 }
 

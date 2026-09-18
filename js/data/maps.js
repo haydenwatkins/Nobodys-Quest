@@ -769,6 +769,20 @@ function makeHangingGardensTiles(){
   return rows.map(row=>row.join(""));
 }
 
+function makeRootdeepTiles(){
+  const rows=Array.from({length:29},(_,y)=>Array.from({length:46},(_,x)=>x===0||y===0||x===45||y===28?"t":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  // Root walls divide the hollow into chambers, with broad woven doorways.
+  for(let y=3;y<=25;y++)for(const x of [15,16,28,29])if(![6,7,8,13,14,15,22,23,24].includes(y))put(x,y,"t");
+  for(let x=3;x<=42;x++)for(const y of [13,14,15,23])put(x,y,"p");
+  for(let x=7;x<=38;x++)for(const y of [7,8])put(x,y,"p");
+  for(let y=7;y<=24;y++)for(const x of [7,8,22,23,34,35])put(x,y,"p");
+  for(const [x,y]of [[4,3],[5,3],[10,4],[11,4],[20,3],[21,3],[25,4],[26,4],[38,3],[39,3],[40,11],[41,11],[10,25],[11,25],[20,26],[21,26],[39,25],[40,25]])put(x,y,"t");
+  for(const [x,y,c]of [[0,14,"x"],[45,14,"y"],[35,8,"B"],[10,14,"m"],[37,23,"H"],[7,20,"C"],
+    [10,7,"b"],[20,9,"6"],[25,7,"2"],[39,14,"8"],[12,20,"6"],[23,20,"b"],[33,24,"8"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
+
 const WORLDWAKE_COMMON_ENEMIES = {
   "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
   "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
@@ -826,7 +840,7 @@ function caravanFenceLayout() {
   },
   {
     id: "rootdeepHollow", name: "Rootdeep Hollow", biome: "rootdeep", variant: 3,
-    message: "The silver threads are roads. Step gently; the Weaver remembers every traveler by name.",
+    message: "Silver roads join the root chambers. Tess waits in the northeast loom; the southern thread leads to her silk cache. Stay close when she draws a tether, then answer when her threads fall.",
     portals: {
       x: { map: "hangingGardens", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 2, y: 14 },
     },
@@ -899,7 +913,7 @@ function caravanFenceLayout() {
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
-    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
+    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 
