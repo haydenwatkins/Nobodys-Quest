@@ -737,6 +737,24 @@ function makeWorldwakeRegionTiles(variant, hasGuardian, portals) {
   return rows.map((row) => row.join(""));
 }
 
+// Windscar's shelves create two approaches, with the caravan road between them.
+function makeWindscarTiles(){
+  const w=46,h=29,rows=Array.from({length:h},(_,y)=>Array.from({length:w},(_,x)=>x===0||y===0||x===w-1||y===h-1?"r":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  for(let y=3;y<=11;y++)for(let x=12;x<=19;x++)if(!(x===12&&y<5)&&!(x===19&&y>9))put(x,y,"r");
+  for(let y=17;y<=25;y++)for(let x=25;x<=30;x++)if(!(x===25&&y>23))put(x,y,"r");
+  for(let y=3;y<=5;y++)for(let x=32;x<=40;x++)put(x,y,"r");
+  for(let x=1;x<45;x++)for(let y=13;y<=15;y++)put(x,y,"p");
+  // The upper traverse cuts through the first shelf and approaches the boss from the west.
+  for(let x=7;x<=38;x++)for(const y of [7,8])put(x,y,"p");
+  for(let y=7;y<=20;y++)for(const x of [7,8,33,34])put(x,y,"p");
+  for(let x=7;x<=38;x++)put(x,21,"p");
+  for(let y=15;y<=24;y++)put(38,y,"p");
+  for(const [x,y,c]of [[0,14,"x"],[45,14,"y"],[35,8,"B"],[10,14,"m"],[37,22,"H"],[7,20,"C"],
+    [10,6,"2"],[23,7,"7"],[24,10,"3"],[37,12,"2"],[17,19,"a"],[21,23,"7"],[34,23,"3"],[40,19,"2"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
+
 const WORLDWAKE_COMMON_ENEMIES = {
   "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
   "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
@@ -776,7 +794,7 @@ function caravanFenceLayout() {
   },
   {
     id: "windscarCanyon", name: "Windscar Canyon", biome: "windscar", variant: 1,
-    message: "Claw marks cross the canyon wall, each one wider than a wagon. Their owner is circling above.",
+    message: "The Sky Sovereign circles the northeast shelf. The upper traverse approaches its perch; the south road skirts the cliffs to a feather cache. The caravan fire waits southwest.",
     portals: {
       x: { map: "sunstepPrairie", x: 43, y: 14 }, y: { map: "hangingGardens", x: 2, y: 14 },
     },
@@ -867,7 +885,7 @@ function caravanFenceLayout() {
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
-    tiles: makeWorldwakeRegionTiles(region.variant, !!guardian, p),
+    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 

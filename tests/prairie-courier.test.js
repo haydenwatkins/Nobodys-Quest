@@ -21,3 +21,10 @@ test('menus pause the clock, timeout resets safely, and travel or knockout cance
 test('old or invalid save records normalize without changing valid courier times',()=>{
  const {G}=setup();for(const value of [undefined,NaN,Infinity,-1,0,46,'12'])assert.equal(G.normalizeTown({prairieBest:value}).prairieBest,null);assert.equal(G.normalizeTown({prairieBest:23.42}).prairieBest,23.42);
 });
+
+test('courier invitation waits for safety, appears once, and never starts the timer',()=>{
+ const r=setup(),{G}=r,notices=[];G.ui.toast=(text)=>notices.push(text);go(G,[11,14]);G.state.enemies=[G.makeEnemy('slime',184,232)];G.updateOpening(.02);assert.equal(G.ensureTown().prairieInvited,false);
+ G.state.enemies=[];G.ui.menuOpen=true;G.updateOpening(.02);assert.equal(G.ensureTown().prairieInvited,false);G.ui.menuOpen=false;G.updateOpening(.02);
+ assert.equal(G.ensureTown().prairieInvited,true);assert.equal(G.prairieSurvey().active,null);assert.equal(notices.filter(s=>s.includes('COURIER WANTED')).length,1);
+ G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));r.load('sunstepPrairie');r.drain();G.state.enemies=[];go(G,[11,14]);G.updateOpening(.02);assert.equal(notices.filter(s=>s.includes('COURIER WANTED')).length,1);
+});
