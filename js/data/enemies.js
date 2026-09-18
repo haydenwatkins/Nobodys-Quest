@@ -428,11 +428,11 @@ registerEnemy({
     style: "caster", intro: "HER COURT HAS RISEN",
     color: "#8153c1", specialEvery: 3.8,
     phases: 3, phaseThresholds: [0.67, 0.34], telegraph: 0.58,
-    chargeSpeed: 0, chargeDur: 0, patterns: ["seeds", "mireBubbles", "nova"],
+    chargeSpeed: 0, chargeDur: 0, patterns: ["mireVolley", "mireBubbles", "nova"],
     introLines: [
       "Welcome to court. The dress code is damp but distinguished.",
       "My veil is not decorative. Well, it is also decorative.",
-      "Dark magic tears my veil. Those bubbles mark where the marsh will rise. Do try to keep your feet.",
+      "Dark magic tears my veil. Step aside from my marked fan, and out of the bubbles. Do try to keep your feet.",
     ],
     phaseLine: "Two witnesses! Step out of the bubbles. I shall need a moment to collect their testimony.",
     phaseThreeLine: "Three witnesses! The entire marsh will take the stand. One at a time, please.",

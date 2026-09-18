@@ -571,6 +571,7 @@ function fireBossRadial(e, count, speed, shape, offset) {
 
 const BOSS_ARENA_ACTIONS = {
   rootBloom: "ROOT BLOOM",
+  mireVolley: "REED VOLLEY",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -661,6 +662,11 @@ G.updateBossHazards = function (dt) {
     }
     if (!hazardIsActive(h) || G.state.knockout) continue;
 
+    if(h.kind === "mireVolley"){
+      if(!h.fired){h.fired=true;fireBossFan(h.owner,{x:h.x,y:h.y},h.count,"seed",6,1);}
+      continue;
+    }
+
     if (h.kind === "gust") {
       if (!p.dashing && gustLaneDanger(h, p.x, p.y)) {
         const a = G.util.angleTo(p.x, p.y, h.owner.x, h.owner.y);
@@ -724,7 +730,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (h.kind !== "mirePool" && h.kind !== "rootBloom") {
+    if (h.kind !== "mirePool" && h.kind !== "rootBloom" && h.kind !== "mireVolley") {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
     }
@@ -733,7 +739,14 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if (h.kind === "rootBloom") {
+    if(h.kind === "mireVolley"){
+      const e=h.owner,a=Math.atan2(h.y-e.y,h.x-e.x),middle=(h.count-1)/2;
+      ctx.globalAlpha=active?.9:.65;ctx.strokeStyle=active?"#fff3c2":"#b8d99b";ctx.setLineDash(active?[]:[4,3]);
+      for(let i=0;i<h.count;i++){const angle=a+(i-middle)*14*Math.PI/180;
+        ctx.beginPath();ctx.moveTo(e.x,e.y-5);ctx.lineTo(e.x+Math.cos(angle)*100,e.y-5+Math.sin(angle)*100);ctx.stroke();
+      }ctx.setLineDash([]);
+      ctx.fillStyle="#302638";ctx.fillRect(e.x-26,e.y+15,52,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("STEP ASIDE",e.x,e.y+23);
+    } else if (h.kind === "rootBloom") {
       ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#a7f070";ctx.setLineDash(active?[]:[3,2]);ctx.stroke();ctx.setLineDash([]);
       if(active){
@@ -934,6 +947,11 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "mireVolley"){
+    spawnBossHazard(e,"mireVolley",{x:p.x,y:p.y,count:e.bossPhase>=3?7:e.bossPhase===2?5:3,warning:.85,active:.15,color:"#a7f070"});
+    e.bossRecoverT=.85+175/105+.65;
+    return;
+  }
   if(action === "rootBloom"){
     const a=Math.atan2(p.y-e.y,p.x-e.x)+Math.PI/2;
     for(let i=0;i<e.bossPhase;i++){
@@ -979,6 +997,7 @@ function resolveBossAction(e, p, action) {
   if (action === "briar") fireBossRadial(e, e.bossPhase >= 3 ? 18 : e.bossPhase === 2 ? 14 : 10, 76, "seed", e.bossPattern * 0.19);
   if (BOSS_ARENA_ACTIONS[action]) spawnArenaPattern(e, action);
   e.bossRecoverT = BOSS_ARENA_ACTIONS[action] ? 0.52 : 0.34;
+  if(e.def.id === "mireQueen"&&action === "nova")e.bossRecoverT=155/82+.65;
   if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
     if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
