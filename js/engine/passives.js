@@ -504,6 +504,12 @@ G.passives = (() => {
       ctx.strokeStyle = "#ffcd75";
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(light.x, light.y, light.radius, 0, Math.PI * 2); ctx.stroke();
+      // Four lantern marks keep the safe boundary legible against terrain.
+      ctx.fillStyle = "#fff3c2";
+      for(let n=0;n<4;n++){
+        const angle=n*Math.PI/2,x=light.x+Math.cos(angle)*light.radius,y=light.y+Math.sin(angle)*light.radius;
+        ctx.fillRect(Math.round(x-2),Math.round(y-2),4,4);
+      }
       ctx.globalAlpha *= 0.55;
       ctx.fillStyle = "#fff3c2";
       ctx.fillRect(Math.round(light.x - 2), Math.round(light.y - 5), 4, 8);

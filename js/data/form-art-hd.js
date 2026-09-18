@@ -386,6 +386,10 @@
       const cx = 21, sway = f === 1 ? -2 : f === 3 ? 2 : 0;
       g.poly([[cx - 5, 5], [cx + 5, 5], [cx + 13, 29], [cx + 16, 32], [cx - 16, 32], [cx - 13, 29]], K);
       g.poly([[cx - 4, 7], [cx + 4, 7], [cx + 11, 28], [cx + 13, 30], [cx - 13, 30], [cx - 11, 28]], "b");
+      // Brass ribs and an engraved lower rim give the walking bell its shape.
+      g.line(cx-3,8,cx-8,27,"c",2);g.line(cx+3,8,cx+8,27,"d",2);
+      g.rect(cx-11,27,22,3,"e");g.line(cx-9,27,cx+9,27,"f",1);
+      for(const x of [-7,0,7])g.put(cx+x,29,"a");
       g.rect(cx - 7, 11, 14, 3, "e"); g.rect(cx - 4, 15, 3, 3, "h"); g.rect(cx + 2, 15, 3, 3, "h");
       g.line(cx, 28, cx + sway, 37, "e", 2); g.ellipse(cx + sway, 37, 4, 3, "f");
       g.line(cx - 11, 22, cx - (f === 2 ? 19 : 15), 29, "c", 3); g.line(cx + 11, 22, cx + (f === 2 ? 19 : 15), 29, "c", 3);
@@ -397,7 +401,12 @@
       g.line(cx, 1, cx, 5 + bob, "e", 2); g.rect(cx - 6, 4 + bob, 12, 3, K);
       g.poly([[cx - 8, 7 + bob], [cx + 8, 7 + bob], [cx + 11, 22 + bob], [cx + 5, 28 + bob], [cx - 5, 28 + bob], [cx - 11, 22 + bob]], K);
       g.poly([[cx - 6, 8 + bob], [cx + 6, 8 + bob], [cx + 8, 21 + bob], [cx + 4, 26 + bob], [cx - 4, 26 + bob], [cx - 8, 21 + bob]], "d");
-      g.ellipse(cx, 17 + bob, 6, 8, "f"); g.rect(cx - 3, 15 + bob, 2, 3, "a"); g.rect(cx + 2, 15 + bob, 2, 3, "a");
+      // A flame-shaped glass light, with a cage and a hanging brass foot.
+      g.line(cx-6,10+bob,cx-5,23+bob,"e",1);g.line(cx+6,10+bob,cx+5,23+bob,"e",1);
+      g.ellipse(cx, 18 + bob, 6, 7, "f");
+      g.poly([[cx-4,15+bob],[cx-2,10+bob],[cx+1,7+bob],[cx+1,12+bob],[cx+4,15+bob]],"f");
+      g.ellipse(cx-2,19+bob,2,3,"g");
+      g.rect(cx-5,25+bob,10,2,"e");g.rect(cx-3,27+bob,6,2,"b"); g.rect(cx - 3, 15 + bob, 2, 3, "a"); g.rect(cx + 2, 15 + bob, 2, 3, "a");
       const flare = f === 2 ? 5 : 0; g.line(cx - 5, 27, cx - 9 - flare, 38, "i", 2); g.line(cx, 28, cx, 39, "h", 2); g.line(cx + 5, 27, cx + 9 + flare, 38, "e", 2);
     }),
 

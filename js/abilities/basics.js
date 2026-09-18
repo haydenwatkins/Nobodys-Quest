@@ -1179,6 +1179,7 @@ registerAbility({
 
 registerAbility({
   id: "handbell", name: "Handbell", icon: "🔔", type: "light", style: "area",
+  description: "Every third chime becomes a wider peal. Alternate with a different ability style to trigger Resonance.",
   mana: 0, cooldown: 0.5,
   use(user) {
     user.bellBeat = (user.bellBeat || 0) % 3 + 1;
@@ -1190,15 +1191,17 @@ registerAbility({
 
 registerAbility({
   id: "echoOrb", name: "Echo Orb", icon: "🫧", type: "light", style: "projectile",
+  description: "Send an orb bouncing through up to three enemies along clear paths.",
   mana: 3, cooldown: 0.85, autoAim: true, aimRange: 180,
   use(user) {
     G.combat.shoot(user, { ability: "echoOrb", speed: 170, range: 180, damage: 1, type: "light",
-      size: 6, ricochets: 1, bounceRange: 78, color: "#fff3c2", trail: 6, recoil: 2 });
+      size: 6, ricochets: 2, bounceRange: 78, color: "#fff3c2", trail: 6, recoil: 2 });
   },
 });
 
 registerAbility({
   id: "silenceRing", name: "Silence Ring", icon: "⭕", type: "dark", style: "area", traits: ["status"],
+  description: "Release a wide shockwave that pushes enemies away and briefly stuns them.",
   mana: 5, cooldown: 1.3,
   use(user) {
     G.combat.areaBurst(user, { ability: "silenceRing", range: 49, damage: 2, type: "dark",
@@ -1208,6 +1211,7 @@ registerAbility({
 
 registerAbility({
   id: "wickLash", name: "Wick Lash", icon: "🔥", type: "dark", style: "melee",
+  description: "Sweep a burning wick through nearby enemies with Dark damage.",
   mana: 0, cooldown: 0.42,
   use(user) {
     G.combat.meleeArc(user, { ability: "wickLash", range: 29, arcDeg: 175, damage: 1, type: "dark",
@@ -1217,6 +1221,7 @@ registerAbility({
 
 registerAbility({
   id: "ghostlight", name: "Ghostlight", icon: "🏮", type: "light", style: "area",
+  description: "Release a burst of light. As Lantern Wisp, leave a circle that swallows enemy shots.",
   mana: 4, cooldown: 1.05,
   use(user) {
     G.combat.areaBurst(user, { ability: "ghostlight", range: 39, damage: 2, type: "light",
@@ -1226,10 +1231,11 @@ registerAbility({
 
 registerAbility({
   id: "lanternDrift", name: "Lantern Drift", icon: "💫", type: "light", style: "dash",
+  description: "Dash through enemies and land in a burst of light. As Lantern Wisp, leave a protective circle at your landing.",
   mana: 4, cooldown: 1.15,
   use(user) {
     G.combat.dash(user, { ability: "lanternDrift", dist: 72, speed: 330, damage: 1, type: "light", color: "#ffcd75",
-      endBurst: { ability: "lanternDrift", range: 34, damage: 2, type: "light", knockback: 125, color: "#fff3c2" } });
+      endBurst: { area: true, ability: "lanternDrift", range: 34, damage: 2, type: "light", knockback: 125, color: "#fff3c2" } });
   },
 });
 

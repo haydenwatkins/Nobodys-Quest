@@ -1300,6 +1300,7 @@ G.drawPlayer = function (ctx) {
   // Form rhythms stay close to the character, where combat is happening.
   const rhythm = form.id === "vampire" ? {count:5, filled:p.bloodPips||0, color:"#ef7d57"}
     : form.id === "jester" ? {count:3, filled:(p.cardBeat||0)%3, color:"#ffcd75"}
+    : form.id === "bellkeeper" ? {count:3, filled:(p.bellBeat||0)%3, color:"#fff3c2"}
     : form.id === "golem" ? {count:3, filled:(p.stoneBeat||0)%3, color:"#ffcd75"}
     : form.id === "astronomer" ? {count:4, filled:(p.starBeat||0)%4, color:"#73eff7"}
     : form.id === "samurai" ? {count:3, filled:typeof p.drawAt === "number" && G.state.time-p.drawAt<0.76 ? p.drawBeat||0 : 0, color:"#ffcd75"}
