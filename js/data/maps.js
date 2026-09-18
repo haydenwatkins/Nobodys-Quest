@@ -830,6 +830,21 @@ function makeStormspineTiles(){
   return rows.map(row=>row.join(""));
 }
 
+function makeTitanGraveTiles(){
+  const rows=Array.from({length:29},(_,y)=>Array.from({length:46},(_,x)=>x===0||y===0||x===45||y===28?"r":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  // Broken ribs frame the pilgrim roads, leaving the northeast heart chamber open.
+  for(const [left,top,right,bottom]of [[8,3,11,11],[17,3,19,10],[13,18,16,26],[27,18,30,26],[37,18,40,21]])
+    for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++)put(x,y,"r");
+  for(let x=1;x<=42;x++)for(const y of [13,14,15])put(x,y,"p");
+  for(let y=1;y<=25;y++)for(const x of [22,23,24])put(x,y,"p");
+  for(let x=6;x<=39;x++)for(const y of [7,8,23,24])put(x,y,"p");
+  for(let y=7;y<=24;y++)for(const x of [6,7,34,35])put(x,y,"p");
+  for(const [x,y,c]of [[0,14,"x"],[23,0,"n"],[35,8,"B"],[23,12,"m"],[38,24,"H"],[7,20,"C"],
+    [6,5,"e"],[15,9,"3"],[25,5,"8"],[39,15,"5"],[11,22,"e"],[22,26,"8"],[34,21,"3"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
+
 const WORLDWAKE_COMMON_ENEMIES = {
   "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
   "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
@@ -924,7 +939,7 @@ function caravanFenceLayout() {
   },
   {
     id: "titanGrave", name: "Titan Grave", biome: "titan", variant: 7,
-    message: "The mountain ahead is breathing. Six paths meet at its heart, and it has been waiting for Nobody.",
+    message: "Broken ribs shelter the pilgrim roads. The northern spine returns to Glasswater; the southern memorial road holds the Titan's Smallest Memory. The Last Worldbearer waits northeast. Break his Blunt ward, read each field, and answer in the quiet afterward.",
     portals: {
       x: { map: "stormspinePeaks", x: 43, y: 14 },
       n: { map: "glasswaterDesert", x: 23, y: 27 },
@@ -960,7 +975,7 @@ function caravanFenceLayout() {
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
-    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : region.id === "frostbellTundra" ? makeFrostbellTiles() : region.id === "stormspinePeaks" ? makeStormspineTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
+    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : region.id === "frostbellTundra" ? makeFrostbellTiles() : region.id === "stormspinePeaks" ? makeStormspineTiles() : region.id === "titanGrave" ? makeTitanGraveTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 

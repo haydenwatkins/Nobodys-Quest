@@ -801,7 +801,7 @@ G.drawBossHazards = function (ctx) {
         ctx.stroke();
         ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
       }
-      if(h.owner.def.id === "skySovereign"){
+      if(["skySovereign","lastWorldbearer"].includes(h.owner.def.id)){
         const x=horizontal?b.left:b.left+h.safeLane*laneSize;
         const y=horizontal?b.top+h.safeLane*laneSize:b.top;
         const w=horizontal?b.right-b.left:laneSize,height=horizontal?laneSize:b.bottom-b.top;
@@ -866,7 +866,7 @@ function spawnArenaPattern(e, action) {
       warning: action === "windWall" ? 0.68 : 0.82, active: phase >= 3 ? 1.1 : 0.92,
       push: action === "windWall" ? 72 : 60, color: "#73eff7",
     });
-    if(e.def.id === "skySovereign"){
+    if(["skySovereign","lastWorldbearer"].includes(e.def.id)){
       // Prefer the authored lane, but never mark a cliff as the only refuge.
       const initial=gust.safeLane,b=arenaBounds(gust),p=G.state.player;
       for(let offset=0;offset<gust.lanes&&!gust.safePoint;offset++){
@@ -888,7 +888,8 @@ function spawnArenaPattern(e, action) {
     if (action === "worldGrid" && phase >= 3) {
       spawnBossHazard(e, "grid", {
         grid: "checker", parity: (turn + 1) & 1, cell: 32,
-        delay: 0.78, warning: 0.62, active: 0.48, color: "#ffcd75",
+        // Let the first checkerboard finish before warning about its inversion.
+        delay: 1.48, warning: 0.62, active: 0.48, color: "#ffcd75",
       });
     }
   }
@@ -978,6 +979,10 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "lanternKeeper" && ["safeCircle","stormGrid"].includes(action)){
     const fields=(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.t===0);
     if(fields.length)e.bossRecoverT=Math.max(...fields.map(h=>(h.delay||0)+h.warning+h.active))+0.8;
+  }
+  if(e.def.id === "lastWorldbearer" && BOSS_ARENA_ACTIONS[action]){
+    const fields=(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.t===0);
+    if(fields.length)e.bossRecoverT=Math.max(...fields.map(h=>(h.delay||0)+h.warning+h.active))+0.9;
   }
 }
 
