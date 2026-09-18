@@ -570,6 +570,7 @@ function fireBossRadial(e, count, speed, shape, offset) {
    arena so closing the gap remains the strongest counterplay. */
 
 const BOSS_ARENA_ACTIONS = {
+  rootBloom: "ROOT BLOOM",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -681,7 +682,7 @@ G.updateBossHazards = function (dt) {
       continue;
     }
 
-    if (h.kind === "mirePool") {
+    if (h.kind === "mirePool" || h.kind === "rootBloom") {
       if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
       continue;
     }
@@ -723,7 +724,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (h.kind !== "mirePool") {
+    if (h.kind !== "mirePool" && h.kind !== "rootBloom") {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
     }
@@ -732,7 +733,15 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if (h.kind === "mirePool") {
+    if (h.kind === "rootBloom") {
+      ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#a7f070";ctx.setLineDash(active?[]:[3,2]);ctx.stroke();ctx.setLineDash([]);
+      if(active){
+        ctx.strokeStyle="#b99c6b";ctx.lineWidth=3;
+        for(const dx of [-9,0,9]){ctx.beginPath();ctx.moveTo(h.x+dx,h.y+7);ctx.lineTo(h.x+dx-3,h.y-4);ctx.lineTo(h.x+dx+2,h.y-12);ctx.stroke();}
+        ctx.fillStyle="#a7f070";for(const dx of [-9,0,9])ctx.fillRect(h.x+dx,h.y-14,5,3);
+      }else{ctx.beginPath();ctx.arc(h.x,h.y,h.radius*Math.min(1,local/h.warning),0,Math.PI*2);ctx.stroke();}
+    } else if (h.kind === "mirePool") {
       // The full disk is always shown; the inner ring counts down to eruption.
       ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=active?0.95:0.8;
@@ -925,6 +934,16 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "rootBloom"){
+    const a=Math.atan2(p.y-e.y,p.x-e.x)+Math.PI/2;
+    for(let i=0;i<e.bossPhase;i++){
+      const offset=i===0?0:i===1?-42:42,x=p.x+Math.cos(a)*offset,y=p.y+Math.sin(a)*offset;
+      if(i&&!G.world.isSafeSpawn(x,y))continue;
+      spawnBossHazard(e,"rootBloom",{x,y,radius:18,warning:.95+i*.2,active:.38,color:"#a7f070"});
+    }
+    e.bossRecoverT=.95+(e.bossPhase-1)*.2+.38+.85;
+    return;
+  }
   if (action === "mireBubbles") {
     const count = Math.min(3, Math.max(1, e.bossPhase));
     const a = Math.atan2(p.y-e.y,p.x-e.x)+Math.PI/2;
@@ -1060,6 +1079,7 @@ function updateBossState(e, p, dist, dt) {
       if (e.bossAfterCharge) resolveBossAction(e, p, e.bossAfterCharge);
       e.bossAfterCharge = null;
       e.bossRecoverT = Math.max(e.bossRecoverT, boss.style === "charger" ? 0.55 : 0.38);
+      if(e.def.id === "ancientTreant"&&!boss.orchard)e.bossRecoverT=Math.max(e.bossRecoverT,.8);
     }
     return true;
   }

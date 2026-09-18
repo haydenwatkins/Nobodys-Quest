@@ -349,11 +349,11 @@ registerEnemy({
     style: "charger", intro: "THE FOREST REMEMBERS",
     color: "#a7f070", specialEvery: 3.6,
     telegraph: 0.65, chargeSpeed: 105, chargeDur: 0.45,
-    phases: 3, phaseThresholds: [0.67, 0.34], patterns: ["charge", "briar"],
+    phases: 3, phaseThresholds: [0.67, 0.34], patterns: ["charge", "rootBloom"],
     introLines: [
       "I was ancient when this path was only an ambitious puddle.",
       "The birds asked me to stop travelers. They were very persuasive.",
-      "Watch the roots, little wanderer. The forest always announces itself.",
+      "Step away from the root circles, little wanderer. I must catch my breath after they bloom.",
     ],
     phaseLine: "A strong breeze! Let us see how you fare in a storm of roots.",
     phaseThreeLine: "The oldest trees bend. They do not move out of the way.",
