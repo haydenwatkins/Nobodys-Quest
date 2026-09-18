@@ -574,6 +574,7 @@ const BOSS_ARENA_ACTIONS = {
   mireVolley: "REED VOLLEY",
   eclipseSweep: "ECLIPSE SWEEP",
   orbitalBand: "SAFE ORBIT",
+  gardenBeds: "BRIAR GARDEN",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -778,7 +779,7 @@ G.drawBossHazards = function (ctx) {
       if(active){
         ctx.strokeStyle="#b99c6b";ctx.lineWidth=3;
         for(const dx of [-9,0,9]){ctx.beginPath();ctx.moveTo(h.x+dx,h.y+7);ctx.lineTo(h.x+dx-3,h.y-4);ctx.lineTo(h.x+dx+2,h.y-12);ctx.stroke();}
-        ctx.fillStyle="#a7f070";for(const dx of [-9,0,9])ctx.fillRect(h.x+dx,h.y-14,5,3);
+        ctx.fillStyle=h.bloomColor||"#a7f070";for(const dx of [-9,0,9])ctx.fillRect(h.x+dx,h.y-14,5,3);
       }else{ctx.beginPath();ctx.arc(h.x,h.y,h.radius*Math.min(1,local/h.warning),0,Math.PI*2);ctx.stroke();}
     } else if (h.kind === "mirePool") {
       // The full disk is always shown; the inner ring counts down to eruption.
@@ -973,6 +974,15 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "gardenBeds"){
+    const count=e.bossPhase+3,angle=Math.atan2(p.y-e.y,p.x-e.x);
+    for(let i=0;i<count;i++){
+      const a=angle+i*Math.PI*2/count,x=e.x+Math.cos(a)*64,y=e.y+Math.sin(a)*64;
+      if(!G.world.isSafeSpawn(x,y))continue;
+      spawnBossHazard(e,"rootBloom",{x,y,radius:22,warning:1.1,active:.8,color:"#a7f070",bloomColor:"#e9a9ce"});
+    }
+    e.bossRecoverT=1.1+.8+.9;return;
+  }
   if(action === "orbitalBand"){
     spawnBossHazard(e,"orbitalBand",{x:e.x,y:e.y,inner:32+e.bossPhase*4,outer:108-e.bossPhase*8,warning:1.6,active:.65,color:"#73eff7"});
     e.bossRecoverT=1.6+.65+.9;return;
@@ -1033,6 +1043,7 @@ function resolveBossAction(e, p, action) {
   e.bossRecoverT = BOSS_ARENA_ACTIONS[action] ? 0.52 : 0.34;
   if(e.def.id === "mireQueen"&&action === "nova")e.bossRecoverT=155/82+.65;
   if(e.def.id === "professorPerihelion"&&["stars","nova"].includes(action))e.bossRecoverT=155/(action==="stars"?104:82)+.75;
+  if(e.def.id === "grandmotherBriar"&&action === "seeds")e.bossRecoverT=175/105+.7;
   if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
     if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
@@ -1135,6 +1146,7 @@ function updateBossState(e, p, dist, dt) {
       e.bossRecoverT = Math.max(e.bossRecoverT, boss.style === "charger" ? 0.55 : 0.38);
       if(e.def.id === "ancientTreant"&&!boss.orchard)e.bossRecoverT=Math.max(e.bossRecoverT,.8);
       if(e.def.id === "eclipseKnight")e.bossRecoverT=Math.max(e.bossRecoverT,.85);
+      if(e.def.id === "grandmotherBriar")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
     }
     return true;
   }
