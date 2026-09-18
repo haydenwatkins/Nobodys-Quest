@@ -1058,7 +1058,7 @@ registerEnemy({
     introLines: [
       "Tiny walker! Every gust in Windscar answers when I lift a feather.",
       "These cliffs are my wings, these roads my flight paths, and you are standing in both.",
-      "Follow my feathers through the gaps, then meet me where the wind ends.",
+      "Find the marked gap when my gust rises. When the wind falls, my wings need a moment. That is your opening.",
     ],
     phaseLine: "Good! The sky likes you. Unfortunately, I am the sky's landlord.",
     phaseThreeLine: "One last dive. If we miss, tell the canyon it owes me a nest.",

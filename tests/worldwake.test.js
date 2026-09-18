@@ -308,13 +308,15 @@ assert.equal(arenaBoss.hp, beforeMend + 2, "failed Phase I arena control should 
 assert.equal(arenaBoss.bossStagger, 2, "a failed pattern should also release a little melee pressure");
 assert.equal(G.state.enemies.filter((enemy) => !enemy.def.miniboss).length, ordinaryEnemies,
   "ordinary biome enemies must remain present during a Worldbearer fight");
-const hazardDrawCalls = { lines: 0, evenodd: 0 };
+const hazardDrawCalls = { lines: 0, evenodd: 0, labels: [] };
 const hazardCtx = {
+  fillText(text) { hazardDrawCalls.labels.push(text); },
   save() {}, restore() {}, beginPath() {}, rect() {}, clip() {}, fillRect() {}, strokeRect() {},
   moveTo() {}, lineTo() { hazardDrawCalls.lines++; }, stroke() {}, arc() {}, setLineDash() {},
   fill(rule) { if (rule === "evenodd") hazardDrawCalls.evenodd++; },
 };
 G.drawBossHazards(hazardCtx);
+assert.ok(hazardDrawCalls.labels.includes("SAFE"), "Aurelia should label usable refuge");
 assert.ok(hazardDrawCalls.lines >= 3, "gust warnings should draw directional arrows toward the boss");
 
 // Bongle's grid alternates full readable floor bands. It can hurt once after

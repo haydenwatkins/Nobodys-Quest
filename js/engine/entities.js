@@ -790,6 +790,14 @@ G.drawBossHazards = function (ctx) {
         ctx.stroke();
         ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
       }
+      if(h.owner.def.id === "skySovereign"){
+        const x=horizontal?b.left:b.left+h.safeLane*laneSize;
+        const y=horizontal?b.top+h.safeLane*laneSize:b.top;
+        const w=horizontal?b.right-b.left:laneSize,height=horizontal?laneSize:b.bottom-b.top;
+        ctx.globalAlpha=.9;ctx.strokeStyle="#fff3c2";ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        ctx.strokeRect(x+2,y+2,w-4,height-4);ctx.setLineDash([]);
+        if(h.safePoint){const p=h.safePoint;ctx.fillStyle="#263b3b";ctx.fillRect(p.x-12,p.y+6,24,10);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("SAFE",p.x,p.y+14);}
+      }
     } else if (h.kind === "ring") {
       // Shade precisely outside the safe circle. The even-odd cutout keeps the
       // picture identical to the collision test, including the four corners.
@@ -831,11 +839,23 @@ function spawnArenaPattern(e, action) {
   const turn = e.bossPattern;
   if (action === "gustLanes" || action === "windWall") {
     const axis = action === "windWall" ? (turn & 1 ? "y" : "x") : (turn & 1 ? "x" : "y");
-    spawnBossHazard(e, "gust", {
+    const gust = spawnBossHazard(e, "gust", {
       axis, lanes: phase >= 3 ? 6 : 5, safeLane: (turn * 2 + phase) % (phase >= 3 ? 6 : 5),
       warning: action === "windWall" ? 0.68 : 0.82, active: phase >= 3 ? 1.1 : 0.92,
       push: action === "windWall" ? 72 : 60, color: "#73eff7",
     });
+    if(e.def.id === "skySovereign"){
+      // Prefer the authored lane, but never mark a cliff as the only refuge.
+      const initial=gust.safeLane,b=arenaBounds(gust),p=G.state.player;
+      for(let offset=0;offset<gust.lanes&&!gust.safePoint;offset++){
+        gust.safeLane=(initial+offset)%gust.lanes;let best=Infinity;
+        for(let y=b.top+8;y<b.bottom-8;y+=8)for(let x=b.left+8;x<b.right-8;x+=8){
+          if(gustLaneDanger(gust,x,y)||!G.world.isSafeSpawn(x,y))continue;
+          const d=Math.hypot(x-p.x,y-p.y);
+          if(d<best){best=d;gust.safePoint={x,y};}
+        }
+      }
+    }
   }
   if (action === "faultGrid" || action === "webGrid" || action === "worldGrid") {
     const colors = { faultGrid: "#ffcd75", webGrid: "#d9a7ff", worldGrid: "#ef7d57" };
@@ -916,6 +936,10 @@ function resolveBossAction(e, p, action) {
   if (action === "briar") fireBossRadial(e, e.bossPhase >= 3 ? 18 : e.bossPhase === 2 ? 14 : 10, 76, "seed", e.bossPattern * 0.19);
   if (BOSS_ARENA_ACTIONS[action]) spawnArenaPattern(e, action);
   e.bossRecoverT = BOSS_ARENA_ACTIONS[action] ? 0.52 : 0.34;
+  if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
+    const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
+    if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
+  }
 }
 
 function updateBossState(e, p, dist, dt) {
