@@ -25,6 +25,7 @@ G.makeTown = function () {
     followedRequest: null,
     sponsoredResidents: 0,
     beautifications: 0,
+    prairieBest: null,
   };
 };
 
@@ -56,6 +57,7 @@ G.normalizeTown = function (saved) {
   town.sponsoredResidents = Math.max(0, Number(town.sponsoredResidents) || 0);
   town.beautifications = Math.max(0, Number(town.beautifications) || 0);
   town.festivalUntil = Number(town.festivalUntil) || 0;
+  town.prairieBest = Number.isFinite(town.prairieBest) && town.prairieBest > 0 && town.prairieBest <= 45 ? town.prairieBest : null;
   if (!town.name || town.name === "The Little Flock") town.name = "Sunrise Town";
   return town;
 };
