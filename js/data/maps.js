@@ -783,6 +783,24 @@ function makeRootdeepTiles(){
   return rows.map(row=>row.join(""));
 }
 
+function makeGlasswaterTiles(){
+  const rows=Array.from({length:29},(_,y)=>Array.from({length:46},(_,x)=>x===0||y===0||x===45||y===28?"r":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  for(let y=3;y<=10;y++)for(let x=12;x<=17;x++)if(y!==7&&y!==8)put(x,y,"r");
+  for(let y=4;y<=11;y++)for(let x=29;x<=32;x++)if(y!==7&&y!==8)put(x,y,"r");
+  // A low shelf interrupts the meridian; the eastern loop reaches the south gate first.
+  for(const y of [19,20])for(let x=16;x<=29;x++)put(x,y,"r");
+  for(let x=1;x<=40;x++)for(const y of [13,14,15])put(x,y,"p");
+  for(let x=7;x<=38;x++)for(const y of [7,8])put(x,y,"p");
+  for(let y=6;y<=18;y++)for(const x of [22,23,24])put(x,y,"p");
+  for(let y=8;y<=25;y++)for(const x of [35,36])put(x,y,"p");
+  for(let x=22;x<=36;x++)for(const y of [24,25])put(x,y,"p");
+  for(let y=21;y<=27;y++)for(const x of [22,23,24])put(x,y,"p");
+  for(const [x,y,c]of [[0,14,"x"],[23,28,"s"],[10,14,"m"],[37,9,"H"],[7,20,"C"],
+    [10,6,"0"],[20,9,"7"],[34,6,"c"],[39,11,"3"],[13,18,"c"],[31,22,"7"],[20,25,"0"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
+
 const WORLDWAKE_COMMON_ENEMIES = {
   "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
   "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
@@ -849,7 +867,7 @@ function caravanFenceLayout() {
   },
   {
     id: "glasswaterDesert", name: "Glasswater Desert", biome: "glasswater", variant: 4,
-    message: "At noon the sand reflects places that do not exist. At dusk it reflects the road to Titan Grave.",
+    message: "An old sundial stands north of the crossroads. The eastern shelf hides its missing prism. The long eastern loop reaches Titan Grave; the southern gate still demands the Lantern Mark.",
     portals: {
       x: { map: "rootdeepHollow", x: 43, y: 14 },
       s: { map: "titanGrave", x: 23, y: 1, mark: "light" },
@@ -913,7 +931,7 @@ function caravanFenceLayout() {
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
-    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
+    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 
