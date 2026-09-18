@@ -940,6 +940,10 @@ function resolveBossAction(e, p, action) {
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
     if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
   }
+  if(e.def.id === "oldMason" && ["faultGrid","collapseRing"].includes(action)){
+    const field=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.t===0);
+    if(field)e.bossRecoverT=(field.delay||0)+field.warning+field.active+0.9;
+  }
 }
 
 function updateBossState(e, p, dist, dt) {

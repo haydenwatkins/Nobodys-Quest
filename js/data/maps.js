@@ -755,6 +755,20 @@ function makeWindscarTiles(){
   return rows.map(row=>row.join(""));
 }
 
+function makeHangingGardensTiles(){
+  const rows=Array.from({length:29},(_,y)=>Array.from({length:46},(_,x)=>x===0||y===0||x===45||y===28?"r":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  // Two planted terraces drain into long channels; generous bridges join them.
+  for(const y of [10,11,18,19])for(let x=12;x<=40;x++)put(x,y,"w");
+  for(let x=1;x<45;x++)for(const y of [13,14,15])put(x,y,"p");
+  for(let y=5;y<=25;y++)for(const x of [7,8,22,23,24,33,34,35])put(x,y,"p");
+  for(let x=7;x<=39;x++)for(const y of [6,7,23,24])put(x,y,"p");
+  for(const [x,y]of [[12,4],[13,4],[17,4],[18,4],[28,4],[29,4],[39,4],[40,4],[13,25],[14,25],[18,25],[19,25],[28,26],[29,26]])put(x,y,"t");
+  for(const [x,y,c]of [[0,14,"x"],[45,14,"y"],[35,8,"B"],[10,14,"m"],[38,24,"H"],[7,20,"C"],
+    [12,7,"6"],[19,8,"4"],[28,7,"7"],[40,14,"4"],[15,21,"6"],[29,22,"7"],[37,21,"b"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
+
 const WORLDWAKE_COMMON_ENEMIES = {
   "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
   "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
@@ -803,7 +817,7 @@ function caravanFenceLayout() {
   },
   {
     id: "hangingGardens", name: "Hanging Gardens", biome: "gardens", variant: 2,
-    message: "These terraces are not ruins. The Old Mason is still building them, one patient footstep at a time.",
+    message: "The Old Mason tends the northeast terrace. Broad bridges cross the garden channels; the southern promenade leads to his singing keystone. His Blunt ward yields to heavy blows.",
     portals: {
       x: { map: "windscarCanyon", x: 43, y: 14 }, y: { map: "rootdeepHollow", x: 2, y: 14 },
     },
@@ -885,7 +899,7 @@ function caravanFenceLayout() {
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
-    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
+    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 
