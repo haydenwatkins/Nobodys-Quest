@@ -745,7 +745,13 @@ G.drawBossHazards = function (ctx) {
         for (let x = b.left; x < b.right; x += cell) {
           if (!gridCellDanger(h, x + 1, y + 1)) continue;
           ctx.fillRect(Math.round(x), Math.round(y), Math.ceil(cell), Math.ceil(cell));
+          if(h.owner.def.id === "bellTitan"){
+            ctx.globalAlpha=.75;ctx.strokeStyle=active?"#fff3c2":"#38546b";
+          }
           ctx.strokeRect(Math.round(x) + 1, Math.round(y) + 1, Math.ceil(cell) - 2, Math.ceil(cell) - 2);
+          if(h.owner.def.id === "bellTitan"){
+            ctx.globalAlpha=active?0.24+pulse*0.1:0.08+pulse*0.08;ctx.strokeStyle=active?"#f4f4f4":h.color;
+          }
           if (active) {
             // A tiny stepped bolt reads at the native 320x180 resolution and
             // distinguishes an electric/fault cell from ordinary decoration.
@@ -761,6 +767,11 @@ G.drawBossHazards = function (ctx) {
             ctx.globalAlpha = 0.24 + pulse * 0.1;
           }
         }
+      }
+      if(h.owner.def.id === "bellTitan"){
+        const label=h.note===2?"2 / ECHO":"1 / NOTE",x=h.owner.x,y=h.owner.y+25;
+        ctx.globalAlpha=.95;ctx.fillStyle="#263b4b";ctx.fillRect(x-23,y-8,46,11);
+        ctx.fillStyle=h.color;ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText(label,x,y);
       }
     } else if (h.kind === "gust") {
       const lanes = h.lanes || 5;
@@ -879,12 +890,13 @@ function spawnArenaPattern(e, action) {
     const firstAxis = turn & 1 ? "x" : "y";
     spawnBossHazard(e, "grid", {
       axis: firstAxis, parity: turn & 1, cell: phase >= 2 ? 32 : 40,
-      warning: 0.9, active: 0.5, color: action === "echoCross" ? "#fff3c2" : "#73eff7",
+      warning: 0.9, active: 0.5, note: 1, color: action === "echoCross" ? "#fff3c2" : "#73eff7",
     });
     if (phase >= 2 || action === "echoCross") {
       spawnBossHazard(e, "grid", {
         axis: firstAxis === "x" ? "y" : "x", parity: (turn + 1) & 1, cell: phase >= 2 ? 32 : 40,
-        delay: 0.72, warning: 0.66, active: 0.48, color: action === "echoCross" ? "#ffcd75" : "#fff3c2",
+        // Bongle's echo is a second beat, with a fresh warning after the first fades.
+        delay: e.def.id === "bellTitan" ? 1.4 : 0.72, warning: 0.66, active: 0.48, note: 2, color: action === "echoCross" ? "#ffcd75" : "#fff3c2",
       });
     }
   }
@@ -952,6 +964,10 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "silkMatriarch" && ["silkTether","webGrid"].includes(action)){
     const field=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.t===0);
     if(field)e.bossRecoverT=(field.delay||0)+field.warning+field.active+0.75;
+  }
+  if(e.def.id === "bellTitan" && ["stormGrid","echoCross"].includes(action)){
+    const fields=(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.t===0);
+    if(fields.length)e.bossRecoverT=Math.max(...fields.map(h=>(h.delay||0)+h.warning+h.active))+0.85;
   }
 }
 

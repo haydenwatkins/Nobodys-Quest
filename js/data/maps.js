@@ -801,6 +801,21 @@ function makeGlasswaterTiles(){
   return rows.map(row=>row.join(""));
 }
 
+function makeFrostbellTiles(){
+  const rows=Array.from({length:29},(_,y)=>Array.from({length:46},(_,x)=>x===0||y===0||x===45||y===28?"r":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  // Three frozen basins leave a broad eastern belfry and a southern arrival road.
+  for(const [left,top,right,bottom]of [[5,3,18,10],[12,18,19,25],[27,18,40,24]])
+    for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++)put(x,y,"w");
+  for(let x=3;x<45;x++)for(const y of [13,14,15])put(x,y,"p");
+  for(let y=6;y<28;y++)for(const x of [22,23,24])put(x,y,"p");
+  for(let x=7;x<=38;x++)for(const y of [7,8,21,22])put(x,y,"p");
+  for(let y=7;y<=24;y++)for(const x of [7,8,34,35,36])put(x,y,"p");
+  for(const [x,y,c]of [[23,28,"s"],[45,14,"y"],[35,8,"B"],[23,17,"m"],[38,22,"H"],[7,20,"C"],
+    [10,8,"d"],[21,5,"4"],[26,10,"8"],[40,15,"9"],[10,17,"4"],[18,22,"d"],[30,26,"8"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
+
 const WORLDWAKE_COMMON_ENEMIES = {
   "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
   "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
@@ -876,7 +891,7 @@ function caravanFenceLayout() {
   },
   {
     id: "frostbellTundra", name: "Frostbell Tundra", biome: "frostbell", variant: 5,
-    message: "Every frozen arch rings a different note. The Bell Titan is trying very hard to tune the wind.",
+    message: "Bell arches mark the causeways across the frozen lakes. Bongle waits at the northeast belfry; a chime rests across the southern lake. His Light ward yields to light attacks. Leave the lit strips, wait for the echo, then answer his song.",
     portals: {
       s: { map: "shattercoast", x: 23, y: 2 }, y: { map: "stormspinePeaks", x: 2, y: 14 },
     },
@@ -931,7 +946,7 @@ function caravanFenceLayout() {
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
-    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
+    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : region.id === "frostbellTundra" ? makeFrostbellTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 

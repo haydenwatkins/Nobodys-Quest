@@ -1136,7 +1136,7 @@ registerEnemy({
     introLines: [
       "BONG. Every frozen arch in Frostbell just said hello. Or avalanche.",
       "I practiced this song for a thousand winters and forgot the ending.",
-      "Change your rhythm when I change mine. Repetition makes the ice grumpy.",
+      "Step off the bright strips! Then listen for my echo. I need a breath after that.",
     ],
     phaseLine: "BONG BONG! That means phase two. I am almost certain.",
     phaseThreeLine: "The missing ending! It was louder. Of course it was louder.",
