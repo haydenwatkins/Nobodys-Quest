@@ -816,6 +816,20 @@ function makeFrostbellTiles(){
   return rows.map(row=>row.join(""));
 }
 
+function makeStormspineTiles(){
+  const rows=Array.from({length:29},(_,y)=>Array.from({length:46},(_,x)=>x===0||y===0||x===45||y===28?"r":"."));
+  const put=(x,y,c)=>rows[y][x]=c;
+  // Staggered ridges frame a wide caravan road and a southern lantern trail.
+  for(const [left,top,right,bottom]of [[11,3,17,11],[24,3,28,10],[13,18,18,25],[27,18,31,25]])
+    for(let y=top;y<=bottom;y++)for(let x=left;x<=right;x++)put(x,y,"r");
+  for(let x=1;x<45;x++)for(const y of [13,14,15])put(x,y,"p");
+  for(let x=7;x<=38;x++)for(const y of [7,8,22,23])put(x,y,"p");
+  for(let y=7;y<=24;y++)for(const x of [7,8,21,22,35,36])put(x,y,"p");
+  for(const [x,y,c]of [[0,14,"x"],[45,14,"y"],[35,8,"B"],[10,14,"m"],[38,23,"H"],[7,20,"C"],
+    [10,7,"d"],[20,5,"0"],[22,10,"2"],[40,15,"5"],[11,23,"d"],[24,24,"0"],[35,19,"5"]])put(x,y,c);
+  return rows.map(row=>row.join(""));
+}
+
 const WORLDWAKE_COMMON_ENEMIES = {
   "1": { tile: "grass", enemy: "slime" }, "2": { tile: "grass", enemy: "bat" },
   "3": { tile: "grass", enemy: "bones" }, "4": { tile: "grass", enemy: "wisp" },
@@ -900,7 +914,7 @@ function caravanFenceLayout() {
   },
   {
     id: "stormspinePeaks", name: "Stormspine Peaks", biome: "stormspine", variant: 6,
-    message: "The lanterns do not mark a safe road. They are the safe road. Stay near their warm light.",
+    message: "Lanterns trace the passes through the ridges. Mallow waits on the northeast summit; the southern trail reaches a Stormglass Lantern. Dark attacks break his ward. Stay inside his warm circle, then strike as it fades. The eastern gate requires Bongle's Echo Mark.",
     portals: {
       x: { map: "frostbellTundra", x: 43, y: 14 },
       y: { map: "titanGrave", x: 2, y: 14, mark: "echo" },
@@ -946,7 +960,7 @@ function caravanFenceLayout() {
       "m": { tile: "path", message: region.message },
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
-    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : region.id === "frostbellTundra" ? makeFrostbellTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
+    tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : region.id === "frostbellTundra" ? makeFrostbellTiles() : region.id === "stormspinePeaks" ? makeStormspineTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
   });
 });
 

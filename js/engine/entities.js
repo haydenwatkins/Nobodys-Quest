@@ -821,6 +821,12 @@ G.drawBossHazards = function (ctx) {
       ctx.beginPath();
       ctx.arc(h.x, h.y, h.radius, 0, Math.PI * 2);
       ctx.stroke();
+      if(h.owner.def.id === "lanternKeeper"){
+        ctx.globalAlpha=.95;ctx.strokeStyle="#fff3c2";ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(h.x,h.y,h.radius-2,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle="#302638";ctx.fillRect(h.x-31,h.y+h.radius-17,62,11);
+        ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("STAY IN LIGHT",h.x,h.y+h.radius-9);
+      }
     } else if (h.kind === "tether") {
       if(h.owner.def.id === "silkMatriarch"){
         ctx.globalAlpha=.85;ctx.strokeStyle="#fff3c2";ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(h.owner.x,h.owner.y,h.maxRange,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
@@ -968,6 +974,10 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "bellTitan" && ["stormGrid","echoCross"].includes(action)){
     const fields=(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.t===0);
     if(fields.length)e.bossRecoverT=Math.max(...fields.map(h=>(h.delay||0)+h.warning+h.active))+0.85;
+  }
+  if(e.def.id === "lanternKeeper" && ["safeCircle","stormGrid"].includes(action)){
+    const fields=(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.t===0);
+    if(fields.length)e.bossRecoverT=Math.max(...fields.map(h=>(h.delay||0)+h.warning+h.active))+0.8;
   }
 }
 
