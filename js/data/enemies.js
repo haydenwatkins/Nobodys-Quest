@@ -494,11 +494,11 @@ registerEnemy({
     style: "duelist", intro: "THE LAST LIGHT FADES",
     color: "#b58ee6", specialEvery: 3.0,
     telegraph: 0.48, chargeSpeed: 145, chargeDur: 0.3,
-    phases: 3, phaseThresholds: [0.67, 0.34], patterns: ["charge", "crescent"],
+    phases: 3, phaseThresholds: [0.67, 0.34], patterns: ["charge", "eclipseSweep"],
     introLines: [
       "I guarded the last light until it became awkward to leave.",
       "The armor is mostly shadow. The squeaking is entirely real.",
-      "Dark breaks dark here. Yes, the naming committee regrets it.",
+      "Dark breaks dark here. Step behind my marked crescent, if you can bear the squeaking.",
     ],
     phaseLine: "A spark remains. I shall make it considerably less convenient.",
     phaseThreeLine: "Eclipse complete. Fight by memory, not by brightness.",

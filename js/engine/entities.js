@@ -572,6 +572,7 @@ function fireBossRadial(e, count, speed, shape, offset) {
 const BOSS_ARENA_ACTIONS = {
   rootBloom: "ROOT BLOOM",
   mireVolley: "REED VOLLEY",
+  eclipseSweep: "ECLIPSE SWEEP",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -688,6 +689,11 @@ G.updateBossHazards = function (dt) {
       continue;
     }
 
+    if(h.kind === "eclipseSweep"){
+      const angle=Math.atan2(p.y-h.y,p.x-h.x)-h.angle,delta=Math.atan2(Math.sin(angle),Math.cos(angle));
+      if(!h.hit&&Math.hypot(p.x-h.x,p.y-h.y)<=h.radius&&Math.abs(delta)<=h.halfAngle&&G.damagePlayer(1,h.x,h.y))h.hit=true;
+      continue;
+    }
     if (h.kind === "mirePool" || h.kind === "rootBloom") {
       if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
       continue;
@@ -730,7 +736,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (h.kind !== "mirePool" && h.kind !== "rootBloom" && h.kind !== "mireVolley") {
+    if (!["mirePool","rootBloom","mireVolley","eclipseSweep"].includes(h.kind)) {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
     }
@@ -739,7 +745,13 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if(h.kind === "mireVolley"){
+    if(h.kind === "eclipseSweep"){
+      ctx.globalAlpha=active?.32:.18;ctx.beginPath();ctx.moveTo(h.x,h.y);
+      ctx.arc(h.x,h.y,h.radius,h.angle-h.halfAngle,h.angle+h.halfAngle);ctx.closePath();ctx.fill();
+      ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#d9a7ff";ctx.setLineDash(active?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
+      if(active){ctx.lineWidth=3;ctx.beginPath();ctx.arc(h.x,h.y,h.radius*.78,h.angle-h.halfAngle,h.angle+h.halfAngle);ctx.stroke();}
+      ctx.fillStyle="#302638";ctx.fillRect(h.x-24,h.y+18,48,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("GET BEHIND",h.x,h.y+26);
+    }else if(h.kind === "mireVolley"){
       const e=h.owner,a=Math.atan2(h.y-e.y,h.x-e.x),middle=(h.count-1)/2;
       ctx.globalAlpha=active?.9:.65;ctx.strokeStyle=active?"#fff3c2":"#b8d99b";ctx.setLineDash(active?[]:[4,3]);
       for(let i=0;i<h.count;i++){const angle=a+(i-middle)*14*Math.PI/180;
@@ -947,6 +959,10 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "eclipseSweep"){
+    spawnBossHazard(e,"eclipseSweep",{x:e.x,y:e.y,angle:Math.atan2(p.y-e.y,p.x-e.x),radius:56+e.bossPhase*8,halfAngle:(45+e.bossPhase*10)*Math.PI/180,warning:.85,active:.24,color:"#b58ee6"});
+    e.bossRecoverT=.85+.24+.9;return;
+  }
   if(action === "mireVolley"){
     spawnBossHazard(e,"mireVolley",{x:p.x,y:p.y,count:e.bossPhase>=3?7:e.bossPhase===2?5:3,warning:.85,active:.15,color:"#a7f070"});
     e.bossRecoverT=.85+175/105+.65;
@@ -1099,6 +1115,7 @@ function updateBossState(e, p, dist, dt) {
       e.bossAfterCharge = null;
       e.bossRecoverT = Math.max(e.bossRecoverT, boss.style === "charger" ? 0.55 : 0.38);
       if(e.def.id === "ancientTreant"&&!boss.orchard)e.bossRecoverT=Math.max(e.bossRecoverT,.8);
+      if(e.def.id === "eclipseKnight")e.bossRecoverT=Math.max(e.bossRecoverT,.85);
     }
     return true;
   }
