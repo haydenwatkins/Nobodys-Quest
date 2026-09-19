@@ -122,7 +122,62 @@ G.relevantMasteryQuests = function (limit) {
 };
 
 G.fieldMasteryQuest = function () {
+  const chosen = G.masteryLessons && G.masteryLessons(1, null, true)[0];
+  if (chosen && (!chosen.ability || chosen.slot >= 0)) return chosen;
   return G.relevantMasteryQuests(1)[0] || null;
+};
+
+// The lesson book only offers arts already earned. Borrowing advances the
+// source form's quest, so a favorite body can carry several other lessons.
+G.masteryLessons = function (limit, formId, chosenOnly) {
+  if (!G.state) return [];
+  const available = new Set(G.availableAbilities());
+  const body = G.forms[G.state.formId];
+  const loadout = G.getLoadout(body.id);
+  const entries = [];
+  for (const id of G.unlockedForms()) {
+    if (formId && id !== formId) continue;
+    for (const quest of G.forms[id].quests || []) {
+      if (G.questsDone.includes(quest.id)) continue;
+      if (chosenOnly && quest.id !== G.state.lessonQuestId) continue;
+      const match = quest.match || {};
+      const ability = match.ability;
+      if (ability && (!available.has(ability) || (match.form && match.form !== body.id))) continue;
+      // General lessons are offered only when their event has no hidden
+      // equipment condition. Status/ward lessons remain in the full journal.
+      if (!ability && (Object.keys(match).length || !["sign", "pickup", "kill"].includes(quest.event))) continue;
+      const slot = ability ? loadout.indexOf(ability) : -1;
+      if (ability && slot < 0 && !body.slots) continue;
+      const progress = G.questProgress(quest);
+      const form = G.forms[id], level = G.formLevel(id);
+      const nextArt = (form.abilities || []).find(a => a.level === level + 1 && G.abilities[a.id]);
+      const synergy = ability && G.passives ? G.passives.synergyText(body, G.abilities[ability]) : "";
+      const reward = nextArt ? `Unlock ${G.abilities[nextArt.id].name} · +1 star` : `${form.name} level ${level + 1} · +1 star`;
+      const score = (quest.id === G.state.lessonQuestId ? 1000 : 0) + (slot >= 0 ? 100 : 0) +
+        progress / Math.max(1, quest.count) * 60 + (synergy ? 20 : 0) + (id === body.id ? 10 : 0);
+      entries.push({ form, quest, ability, slot, progress, reward, synergy, score });
+    }
+  }
+  entries.sort((a, b) => b.score - a.score);
+  return entries.slice(0, limit === undefined ? 3 : limit);
+};
+
+G.prepareMasteryLesson = function (questId, slot) {
+  const lesson = G.masteryLessons(Infinity).find(entry => entry.quest.id === questId);
+  if (!lesson) return false;
+  const formId = G.state.formId, lo = G.getLoadout(formId);
+  if (lesson.ability && !lo.includes(lesson.ability)) {
+    if (!Number.isInteger(slot) || slot < 1 || slot > G.forms[formId].slots) return false;
+    // Keep the pre-experiment mix on the first unused card, once.
+    const recipes = G.mixRecipes(formId);
+    const empty = [0, 1, 2].find(i => !recipes[i]);
+    const slots = Array.from({length: G.forms[formId].slots + 1}, (_, i) => i);
+    if (empty !== undefined && !recipes.some(r => r && slots.every(i => (r[i] || null) === (lo[i] || null)))) G.saveMixRecipe(formId, empty);
+    lo[slot] = lesson.ability;
+  }
+  G.state.lessonQuestId = questId;
+  G.saveGame();
+  return true;
 };
 
 // One immediate lesson and the concrete move it is leading toward. Uses the

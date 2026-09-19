@@ -134,6 +134,8 @@
     unlockReadyNotified: [],
     formEchoes: [],
     loadouts: {},
+    mixRecipes: {},
+    lessonQuestId: null,
     npcTalk: {},
     pinnedQuestIds: [],
     town: G.makeTown(),
@@ -183,6 +185,8 @@
     s.unlockReadyNotified = Array.isArray(save.unlockReadyNotified) ? save.unlockReadyNotified : [];
     s.formEchoes = G.normalizeFormEchoes(save.formEchoes);
     s.loadouts = save.loadouts || {};
+    s.mixRecipes = G.normalizeMixRecipes(save.mixRecipes);
+    s.lessonQuestId = typeof save.lessonQuestId === "string" ? save.lessonQuestId : null;
     s.npcTalk = save.npcTalk && typeof save.npcTalk === "object" ? save.npcTalk : {};
     const wardrobe = G.normalizeCostumes(save.costumesUnlocked, save.costumeId);
     s.costumeId = wardrobe.selected;

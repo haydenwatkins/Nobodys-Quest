@@ -239,3 +239,19 @@
   #art-mixer .art-mixer-heading { align-items:center; margin:3px 2px; }
   #art-mixer .art-mixer-copy small { font-size:18px; }
 }
+
+/* A stitched lesson book and folded recipes, carried in the travelling kit. */
+#menu .lesson-book, #menu .mix-recipes { grid-column:1/-1; min-width:0; margin:12px 0; padding:14px; border:3px solid #95714b; border-left:8px double #b89864; background:#342c32; color:#f4dfab; }
+#menu .lesson-book h3 { color:#ffdc91; margin:5px 0; }
+#menu .lesson-leaves, #menu .recipe-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+#menu .lesson-leaves article, #menu .recipe-cards article { min-width:0; padding:12px; background:repeating-linear-gradient(#efdfa9 0 25px,#dfcb93 25px 26px); border:2px solid #ad8856; border-bottom:5px solid #927047; color:#392c24; }
+#menu .lesson-book h4, #menu .mix-recipes h4 { margin:5px 0; color:#392c24; font:21px/1.15 "VT323",monospace; }
+#menu .lesson-book p, #menu .mix-recipes p { margin:7px 0; font:19px/1.15 "VT323",monospace; color:inherit; }
+#menu .lesson-leaves small, #menu .recipe-cards small { color:#60442e; }
+#menu .lesson-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+#menu .lesson-actions button { min-height:44px; max-width:100%; white-space:normal; overflow-wrap:anywhere; border-radius:0; }
+#menu .lesson-actions button, #menu [data-lesson-auto] { padding:8px 12px; min-height:44px; font:19px/1.1 "VT323",monospace; color:#ffe6aa; background:repeating-linear-gradient(0deg,#573c30 0 9px,#624333 9px 11px,#573c30 11px 22px); border:2px solid #ae8150; border-bottom:4px solid #30232b; border-radius:0; box-shadow:inset 2px 2px #d3a66766; }
+#menu .lesson-actions button:disabled { opacity:.5; }
+#menu .lesson-actions button:focus-visible, #menu [data-lesson-auto]:focus-visible { outline:3px solid #ffdc91; outline-offset:2px; }
+#menu .lesson-synergy { border-left:3px solid #71804a; padding-left:7px; }
+@media (max-width:900px) { #menu .lesson-leaves, #menu .recipe-cards { grid-template-columns:1fr; } }

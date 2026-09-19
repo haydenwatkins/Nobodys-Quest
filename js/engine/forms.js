@@ -423,3 +423,39 @@ G.knownArtMatchesFilters = function (ability, damageFilter, styleFilter) {
   return (damage === "all" || ability.type === damage) &&
     (style === "all" || ability.style === style);
 };
+
+// Three folded recipe cards per form. Keep unavailable arts on the card so
+// an old save never silently replaces a player's recipe with a different one.
+G.normalizeMixRecipes = function (saved) {
+  const out = {};
+  if (!saved || typeof saved !== "object") return out;
+  for (const id of G.formOrder) {
+    if (!Array.isArray(saved[id])) continue;
+    out[id] = saved[id].slice(0, 3).map(recipe => Array.isArray(recipe)
+      ? [G.forms[id].basic, ...recipe.slice(1, G.forms[id].slots + 1).map(art => typeof art === "string" ? art : null)]
+      : null);
+  }
+  return out;
+};
+
+G.mixRecipes = function (formId) {
+  const recipes = G.state.mixRecipes || (G.state.mixRecipes = {});
+  return recipes[formId] || (recipes[formId] = [null, null, null]);
+};
+
+G.saveMixRecipe = function (formId, index) {
+  if (!G.formUnlocked(formId) || !Number.isInteger(index) || index < 0 || index > 2) return false;
+  G.mixRecipes(formId)[index] = G.getLoadout(formId).slice(0, G.forms[formId].slots + 1);
+  G.saveGame();
+  return true;
+};
+
+G.recallMixRecipe = function (formId, index) {
+  if (!G.formUnlocked(formId) || !Number.isInteger(index) || index < 0 || index > 2) return false;
+  const recipe = G.mixRecipes(formId)[index];
+  const earned = new Set(G.availableAbilities());
+  if (!recipe || recipe.slice(1).some(art => art && !earned.has(art))) return false;
+  G.state.loadouts[formId] = [G.forms[formId].basic, ...recipe.slice(1, G.forms[formId].slots + 1)];
+  G.saveGame();
+  return true;
+};

@@ -1244,6 +1244,33 @@ G.ui = (() => {
       ${actions}${!prep.ready&&!art?`<button data-menu-route="forms">Explore forms</button>`:""}</article>`;
   }
 
+  function buildLessonBook() {
+    const lessons = G.masteryLessons(3);
+    if (!lessons.length) return "";
+    const form = G.forms[G.state.formId];
+    return `<section class="lesson-book"><span class="eyebrow">THE BORROWED LESSON BOOK</span><h3>A little more somebody</h3>
+      ${G.state.lessonQuestId ? '<button data-lesson-auto>Let the field choose my lesson</button>' : ""}
+      <p>Wearing ${escapeHtml(form.name)}. Borrow an art: its original form earns mastery and you earn a star. An unused recipe card keeps your previous mix.</p>
+      <div class="lesson-leaves">${lessons.map(entry => `<article><small>${escapeHtml(entry.form.name)} · ${entry.progress}/${entry.quest.count}</small>
+        <h4>${escapeHtml(entry.quest.text)}</h4><p>${escapeHtml(entry.reward)}</p>
+        ${entry.synergy ? `<p class="lesson-synergy">◆ ${escapeHtml(entry.synergy)}</p>` : ""}
+        <div class="lesson-actions">${entry.ability && entry.slot < 0 ? [1, 2].filter(slot => slot <= form.slots).map(slot =>
+          `<button data-lesson="${entry.quest.id}" data-lesson-slot="${slot}">Borrow ${escapeHtml(G.abilities[entry.ability].name)} in ${["A", "B", "C"][slot]}</button>`).join("") :
+          `<button data-lesson="${entry.quest.id}" data-lesson-slot="1">${G.state.lessonQuestId === entry.quest.id ? "Following this lesson" : "Follow this lesson"}</button>`}</div></article>`).join("")}</div></section>`;
+  }
+
+  function buildMixRecipeCards(formId) {
+    const recipes = G.mixRecipes(formId), earned = new Set(G.availableAbilities());
+    return `<section class="mix-recipes"><span class="eyebrow">FOLDED RECIPE CARDS · ${escapeHtml(G.forms[formId].name)}</span>
+      <p>Keep three combinations for this form. Saving again replaces that card.</p><div class="recipe-cards">${[0, 1, 2].map(index => {
+        const recipe = recipes[index], ready = recipe && recipe.slice(1).every(art => !art || earned.has(art));
+        return `<article><h4>Recipe ${index + 1}</h4><p>${recipe ? recipe.slice(1).map((art, i) => `${["B", "C"][i]} · ${escapeHtml(G.abilities[art]?.name || (art ? "Unavailable art" : "Native art"))}`).join("<br>") : "An empty page for a good idea."}</p>
+          ${recipe && !ready ? "<small>Earn its missing arts before recalling.</small>" : ""}<div class="lesson-actions">
+          <button data-recipe-save="${index}" data-recipe-form="${formId}">${recipe ? "Replace" : "Save current"}</button>
+          <button data-recipe-recall="${index}" data-recipe-form="${formId}" ${ready ? "" : "disabled"}>Recall</button></div></article>`;
+      }).join("")}</div></section>`;
+  }
+
   function buildFieldTab() {
     const form = G.playerForm();
     const loadout = G.getLoadout(form.id);
@@ -1292,6 +1319,7 @@ G.ui = (() => {
       ${starfall?`<article class="journey-road"><span class="eyebrow">THE LOST OBSERVATORY</span><h3>${starfall.thread?"A road through the dark":starfall.aligned===3?"Return to the star instrument":"Three windows on the sky"}</h3><p>${starfall.aligned}/3 lenses restored · ${starfall.thread?"Fallen Star Thread recovered":starfall.remaining.map(escapeHtml).join(" · ")||"The central instrument is ready"}</p><p>Dawn lies northwest, Dusk northeast, and Midnight southeast. The instrument waits at the south end of the central hall; mooncake rests in the southwest gallery.</p></article>`:""}
       ${grove?`<article class="journey-road"><span class="eyebrow">SOMEWHERE TO RETURN</span><h3>${grove.planted?"The shelter grows again":grove.seed?"Bring the seed home":"A whisper in the clearing"}</h3><p>${grove.planted?"A young tree shelters the western path. Its roots have opened a crossing through the central curtain.":grove.seed?"Plant the Whispering Seed at the southwest stump to restore the shelter and open the central shortcut. The northern passage leads across the root curtain.":"Find the Whispering Seed in the southeast clearing. The old shelter stump waits in the southwest; moonberry pie rests along the western path."}</p></article>`:""}
       ${buildBossPreparation()}
+      ${goal.guide === "mastery" ? buildLessonBook() : ""}
       <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
         <button data-menu-route="quests">Lessons</button></div>${lessonHtml}${reward?`<p class="next-reward">${escapeHtml(reward.reward)}</p>`:""}</article>
       <article class="field-card field-build"><div class="field-card-heading"><div><small>YOUR COMBINATION</small><h3>${escapeHtml(form.passive?.name||form.name)}</h3></div><button data-menu-route="forms">Change form</button></div>
@@ -1461,6 +1489,23 @@ G.ui = (() => {
     });
     menuEl.querySelectorAll("[data-loadout-slot]").forEach((button) =>
       button.addEventListener("click", () => { labSlot = Number(button.dataset.loadoutSlot); buildMenu(); }));
+    menuEl.querySelectorAll("[data-lesson]").forEach(button => button.addEventListener("click", () => {
+      if (G.prepareMasteryLesson(button.dataset.lesson, Number(button.dataset.lessonSlot))) {
+        btnCache = "";
+        G.ui.toast("Lesson followed. Progress earns mastery for its original form.", 3);
+        buildMenu();
+      }
+    }));
+    const automaticLesson = menuEl.querySelector("[data-lesson-auto]");
+    if (automaticLesson) automaticLesson.addEventListener("click", () => {
+      G.state.lessonQuestId = null; G.saveGame(); buildMenu();
+    });
+    menuEl.querySelectorAll("[data-recipe-save], [data-recipe-recall]").forEach(button => button.addEventListener("click", () => {
+      const saving = button.dataset.recipeSave !== undefined;
+      const ok = saving ? G.saveMixRecipe(button.dataset.recipeForm, Number(button.dataset.recipeSave)) :
+        G.recallMixRecipe(button.dataset.recipeForm, Number(button.dataset.recipeRecall));
+      if (ok) { btnCache = ""; G.ui.toast(saving ? "Recipe tucked away." : "Recipe recalled."); buildMenu(); }
+    }));
     const restoreDefaultLoadout = menuEl.querySelector('[data-act="restore-default-loadout"]');
     if (restoreDefaultLoadout) restoreDefaultLoadout.addEventListener("click", () => {
       const restored = G.restoreDefaultLoadout(labFormId);
@@ -1923,6 +1968,7 @@ G.ui = (() => {
         }).join("")}</section>
       </div>
       <section class="ability-tray">
+        ${buildMixRecipeCards(form.id)}
         <div class="tray-heading"><div><span class="eyebrow">KNOWN ARTS</span><h2>Choose an art for ${["A", "B", "C"][labSlot]}</h2></div>
           <span class="ability-result-count">${filtered.length} of ${all.length} arts</span></div>
         <div class="ability-filter-panel" role="group" aria-label="Known Arts filters">
@@ -2104,7 +2150,7 @@ G.ui = (() => {
     const form = G.forms[masteryFormId];
     const activeLessons = new Set((G.relevantMasteryQuests ? G.relevantMasteryQuests(3) : []).map((entry) => entry.quest.id));
     const completed = form.quests.filter((quest) => G.questsDone.includes(quest.id)).length;
-    let html = `<section class="mastery-intro"><div><span class="eyebrow">MASTERY</span><h2>Learn by playing</h2>
+    let html = `${buildLessonBook()}<section class="mastery-intro"><div><span class="eyebrow">MASTERY</span><h2>Learn by playing</h2>
       <p>Your most relevant unfinished lesson appears automatically in the field. Changing form or mixing an art changes what the game follows.</p></div>
       <span>NO TRACKING REQUIRED</span></section><section class="mastery-console">
       <div class="mastery-picker" aria-label="Choose a form">${forms.map((id) => {

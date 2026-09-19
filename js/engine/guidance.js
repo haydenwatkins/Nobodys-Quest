@@ -201,9 +201,15 @@
 
   function masteryTarget(goal) {
     const s = G.state;
-    const lesson = firstOpenQuest(goal.formId);
+    const lesson = (goal.questId && G.questById(goal.questId)) ||
+      (G.masteryLessons && G.masteryLessons(1, goal.formId)[0]) || firstOpenQuest(goal.formId);
     if (!lesson) return null;
     const quest = lesson.quest;
+    if (quest.match && quest.match.ability && !G.getLoadout(s.formId).includes(quest.match.ability)) return {
+      kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦", spatial: false,
+      destination: lesson.form.name,
+      text: `Open Journey's lesson book to equip ${G.abilities[quest.match.ability]?.name || "the required art"}. ${quest.text}.`,
+    };
     let target = null;
     if (quest.event === "sign") {
       target = nearest(gridTargets((cell) => !!cell.message), s.player.x, s.player.y);

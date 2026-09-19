@@ -195,10 +195,12 @@ G.storyGoal = function () {
   }
 
   if (chapter === 2) {
+    const lesson = G.masteryLessons && G.masteryLessons(1)[0];
     if (stars < 24) return Object.assign(base, {
       guide: "mastery",
+      questId: lesson && lesson.quest.id,
       title: "Prepare for the waking horizon", short: `Earn ${24 - stars} more ⭐ to wake Sunstep Road`,
-      objective: "Challenge specialist masters, complete form mastery, and reach 24 stars.",
+      objective: lesson ? `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. Complete lessons in your travels to reach 24 stars.` : "Challenge specialist masters, complete form mastery, and reach 24 stars.",
       reason: "Rumors describe an eastern road older than Greenfield. It will answer only a hero with many proven shapes.",
       progress: storyProgress(stars, 24, "STARS"),
     });
@@ -237,12 +239,13 @@ G.storyGoal = function () {
   const beforeGod = G.formOrder.slice(0, Math.max(0, G.formOrder.indexOf("god")));
   const unmastered = beforeGod.filter((id) => G.formLevel(id) < 5);
   if (unmastered.length) {
-    const form = G.forms[unmastered[0]];
+    const lesson = G.masteryLessons && G.masteryLessons(Infinity).find(entry => unmastered.includes(entry.form.id));
+    const form = lesson ? lesson.form : G.forms[unmastered[0]];
     return Object.assign(base, {
-      guide: "mastery", formId: unmastered[0],
+      guide: "mastery", formId: form.id, questId: lesson && lesson.quest.id,
       title: "Bring every lesson to its ending", short: `Master ${unmastered.length} remaining form${unmastered.length === 1 ? "" : "s"}`,
-      objective: `Raise every form to level 5. Begin with ${form ? form.name : unmastered[0]}.`,
-      reason: "The Final Firmament tests the complete journey. No borrowed lesson can be left unfinished.",
+      objective: lesson ? `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. Borrow its art to learn while wearing your favorite form.` : `Raise every form to level 5. Begin with ${form.name}.`,
+      reason: "Every unfinished lesson is a piece of the final answer. Borrowed arts earn mastery for the form they came from.",
       progress: storyProgress(beforeGod.length - unmastered.length, beforeGod.length, "MASTERED FORMS"),
     });
   }

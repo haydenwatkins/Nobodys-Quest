@@ -139,6 +139,8 @@ G.saveGame = function () {
       unlockReadyNotified: s.unlockReadyNotified,
       formEchoes: s.formEchoes,
       loadouts: s.loadouts,
+      mixRecipes: s.mixRecipes,
+      lessonQuestId: s.lessonQuestId,
       npcTalk: s.npcTalk,
       town: s.town,
       heroBoard: s.heroBoard,
