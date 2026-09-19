@@ -6,7 +6,7 @@ function setup(phase=1,action='gustLanes'){
 test('every Sovereign gust phase marks walkable refuge and leaves a full recovery window',()=>{
  for(const phase of [1,2,3])for(const action of ['gustLanes','windWall']){const {G,e,h}=setup(phase,action);assert.ok(h.safePoint);assert.ok(G.world.isSafeSpawn(h.safePoint.x,h.safePoint.y));assert.ok(e.bossRecoverT>=h.warning+h.active+.79);
   const p=G.state.player;Object.assign(p,h.safePoint);const damage=p.damageTaken,x=e.x,y=e.y;
-  let elapsed=0;while(elapsed<h.warning+h.active+.3){G.updateEnemies(.02);G.updateBossHazards(.02);elapsed+=.02;}
+  let elapsed=0;while(elapsed<h.warning+h.active+.3){G.updateEnemies(.02);elapsed+=.02;}
   assert.equal(p.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.4);assert.equal(e.bossChargeT,0);
  }
 });

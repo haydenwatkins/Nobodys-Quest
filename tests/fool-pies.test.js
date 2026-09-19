@@ -15,5 +15,5 @@ test('a pie hits once and interrupting the act removes all future splats',()=>{
  G.cancelBossHazards(e);G.updateBossHazards(.3);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.player.damageTaken,after);
 });
 test('Fool remains open after the final pie lands',()=>{
- const {G,e}=setup(3),x=e.x,y=e.y;G.state.player.invuln=100;for(let t=0;t<2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
+ const {G,e}=setup(3),x=e.x,y=e.y;G.state.player.invuln=100;for(let t=0;t<2;t+=.02){G.updateEnemies(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
 });

@@ -8,7 +8,7 @@ test('Briar plants only on usable ground and leaves open gaps and a safe center'
   for(const h of beds){assert.ok(G.world.isSafeSpawn(h.x,h.y));assert.ok(Math.hypot(h.x-e.x,h.y-e.y)-h.radius>=41);}
   for(let i=0;i<beds.length;i++)for(let j=i+1;j<beds.length;j++)assert.ok(Math.hypot(beds[i].x-beds[j].x,beds[i].y-beds[j].y)>beds[i].radius+beds[j].radius+15);
   G.state.player.x=e.x-20;const damage=G.state.player.damageTaken,x=e.x,y=e.y;
-  for(let t=0;t<2.1;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
+  for(let t=0;t<2.1;t+=.02){G.updateEnemies(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
  }
 });
 test('flowerbeds warn before blooming, hit once, and can be interrupted',()=>{

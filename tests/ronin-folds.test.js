@@ -7,7 +7,7 @@ test('Ronin marks fixed sequential cuts with time between strokes in every phase
  for(const phase of [1,2,3]){const {G,e}=setup(phase),cuts=[...G.state.bossHazards];assert.equal(cuts.length,phase);
   for(let i=1;i<cuts.length;i++)assert.ok(cuts[i].warning>=cuts[i-1].warning+cuts[i-1].active+.1);
   const x=cuts[0].x,y=cuts[0].y,damage=G.state.player.damageTaken;G.state.player.y+=40;assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));const end=cuts.at(-1).warning+cuts.at(-1).active;
-  for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(cuts[0].x,x);assert.equal(cuts[0].y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
+  for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(cuts[0].x,x);assert.equal(cuts[0].y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
  }
 });
 test('fold collision matches its narrow rectangle, warns, and hits once',()=>{

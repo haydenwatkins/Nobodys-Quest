@@ -15,7 +15,7 @@ test('Bongle separates his notes and commits until the last echo ends in every p
   const first=fields[0],second=fields[1],end=Math.max(...fields.map(h=>h.delay+h.warning+h.active));
   if(second){assert.ok(second.delay>=first.warning+first.active);assert.notEqual(first.axis,second.axis);assert.equal(second.note,2);}
   assert.ok(e.bossRecoverT>=end+.84);const x=e.x,y=e.y;G.state.player.invuln=100;
-  for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}
+  for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);}
   assert.equal(G.state.bossHazards.length,0);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.projectiles.length,0);
  }
 });

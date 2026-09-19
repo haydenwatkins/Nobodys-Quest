@@ -14,7 +14,7 @@ test('Worldbearer fields never overlap the next attack and inverted grids leave 
   if(action==='worldGrid'&&phase===3){assert.equal(fields.length,2);assert.notEqual(fields[0].parity,fields[1].parity);assert.ok(fields[1].delay>=fields[0].warning+fields[0].active);}
   if(action==='gustLanes'){const h=fields[0];assert.ok(h.safePoint);assert.ok(G.world.isSafeSpawn(h.safePoint.x,h.safePoint.y));Object.assign(G.state.player,h.safePoint);G.state.player.invuln=0;}
   const damage=G.state.player.damageTaken;
-  for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}
+  for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);}
   assert.equal(G.state.player.damageTaken,damage);assert.equal(G.state.bossHazards.length,0);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.projectiles.length,0);
  }
 });

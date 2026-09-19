@@ -17,5 +17,5 @@ test('leaving the crescent radius or dashing avoids its hit; interruptions cance
 });
 test('Knight commits to the marked sweep and leaves a recovery opening',()=>{
  const {G,e,h}=setup(3),x=e.x,y=e.y;G.state.player.invuln=100;assert.ok(e.bossRecoverT>=h.warning+h.active+.89);
- for(let t=0;t<1.3;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
+ for(let t=0;t<1.3;t+=.02){G.updateEnemies(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
 });

@@ -13,8 +13,8 @@ test('Mallow holds position through every field and leaves time to counterattack
   const fields=[...G.state.bossHazards],end=Math.max(...fields.map(h=>h.delay+h.warning+h.active));assert.ok(e.bossRecoverT>=end+.79);const x=e.x,y=e.y;
   if(action==='safeCircle'){
    assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));G.state.player.invuln=0;
-   const damage=G.state.player.damageTaken;for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}assert.equal(G.state.player.damageTaken,damage);
-  }else for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}
+   const damage=G.state.player.damageTaken;for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);}assert.equal(G.state.player.damageTaken,damage);
+  }else for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);}
   assert.equal(G.state.bossHazards.length,0);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.5);assert.equal(G.state.projectiles.length,0);
  }
 });

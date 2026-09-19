@@ -7,7 +7,7 @@ test('every orbit has walkable refuge, stays fixed, and leaves a counterattack o
  for(const phase of [1,2,3]){const {G,e,h}=setup(phase);let safe;
   for(let y=24;y<G.state.mapH*16-24;y+=8)for(let x=24;x<G.state.mapW*16-24;x+=8){const d=Math.hypot(x-h.x,y-h.y);if(d>h.inner+8&&d<h.outer-8&&G.world.isSafeSpawn(x,y))safe={x,y};}
   assert.ok(safe);Object.assign(G.state.player,safe);const damage=G.state.player.damageTaken,x=e.x,y=e.y;
-  for(let t=0;t<h.warning+h.active+.2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}
+  for(let t=0;t<h.warning+h.active+.2;t+=.02){G.updateEnemies(.02);}
   assert.equal(G.state.player.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
  }
 });

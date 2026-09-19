@@ -964,15 +964,29 @@ function spawnArenaPattern(e, action) {
       gust.safeLane=G.util.clamp(Math.floor(at/span*gust.lanes),0,gust.lanes-1);
     }
     if(["skySovereign","lastWorldbearer","admiralTortoise","godAvatar"].includes(e.def.id)){
-      // Prefer the authored lane, but never mark a cliff as the only refuge.
+      // Trace real ground rather than choosing a nearby point across a cliff.
       const initial=gust.safeLane,b=arenaBounds(gust),p=G.state.player;
-      for(let offset=0;offset<gust.lanes&&!gust.safePoint;offset++){
-        gust.safeLane=(initial+offset)%gust.lanes;let best=Infinity;
-        for(let y=b.top+8;y<b.bottom-8;y+=8)for(let x=b.left+8;x<b.right-8;x+=8){
-          if(gustLaneDanger(gust,x,y)||!G.world.isSafeSpawn(x,y))continue;
-          const d=Math.hypot(x-p.x,y-p.y);
-          if(d<best){best=d;gust.safePoint={x,y};}
+      const nodes=[{x:p.x,y:p.y,parent:-1}],seen=new Set(['0,0']);let found=-1,fallback=-1,fallbackLane=initial;
+      for(let i=0;i<nodes.length;i++){
+        const n=nodes[i];
+        if(n.x>=b.left+4&&n.x<b.right-4&&n.y>=b.top+4&&n.y<b.bottom-4&&G.world.isSafeSpawn(n.x,n.y)){
+          const horizontal=gust.axis==="x",at=horizontal?n.y-b.top:n.x-b.left,span=horizontal?b.bottom-b.top:b.right-b.left;
+          const lane=Math.floor(at/span*gust.lanes);
+          if(fallback<0){fallback=i;fallbackLane=lane;}
+          if(lane===initial){found=i;break;}
         }
+        for(const [dx,dy]of [[8,0],[-8,0],[0,8],[0,-8]]){
+          const x=n.x+dx,y=n.y+dy,key=Math.round((x-p.x)/8)+','+Math.round((y-p.y)/8);
+          if(seen.has(key))continue;seen.add(key);
+          if(!G.world.isSafeSpawn(x,y))continue;nodes.push({x,y,parent:i});
+        }
+      }
+      if(found<0){found=fallback;gust.safeLane=fallbackLane;}
+      if(found>=0){
+        gust.safePoint={x:nodes[found].x,y:nodes[found].y};gust.safeRoute=[];
+        for(let i=found;i>=0;i=nodes[i].parent)gust.safeRoute.push({x:nodes[i].x,y:nodes[i].y});gust.safeRoute.reverse();
+        // Forty pixels per second leaves even slow forms time to follow the route.
+        gust.warning=Math.max(gust.warning,(gust.safeRoute.length-1)*8/40+.35);
       }
     }
   }
@@ -1125,7 +1139,9 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "royalFool"&&["cards","nova"].includes(action))e.bossRecoverT=(action==="cards"?175/105:155/82)+.65;
   if(e.def.id === "admiralTortoise"&&action === "shells")e.bossRecoverT=155/68+.7;
   if(e.def.id === "paperRonin"&&action === "crescent")e.bossRecoverT=175/105+.7;
-  if(e.def.id === "admiralTortoise"&&action === "tideWall")e.bossRecoverT=1.1+1+.85;
+  if(e.def.id === "admiralTortoise"&&action === "tideWall"){
+    const field=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.t===0);if(field)e.bossRecoverT=field.warning+field.active+.85;
+  }
   if(e.def.id === "godAvatar"){
     if(["cards","nova"].includes(action))e.bossRecoverT=(action==="cards"?175/105:155/82)+.75;
     if(BOSS_ARENA_ACTIONS[action]){

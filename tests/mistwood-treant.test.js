@@ -10,7 +10,7 @@ test('Treant roots warn at fixed positions, then damage only inside their bloom'
 });
 test('every Treant phase leaves a full counterattack window after the last root',()=>{
  for(const phase of [1,2,3]){const {G,e}=setup(phase),fields=[...G.state.bossHazards];assert.ok(fields.length>=1&&fields.length<=phase);const end=Math.max(...fields.map(h=>h.warning+h.active));assert.ok(e.bossRecoverT>=end+.84);
-  const x=e.x,y=e.y;G.state.player.invuln=100;for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
+  const x=e.x,y=e.y;G.state.player.invuln=100;for(let t=0;t<end+.2;t+=.02){G.updateEnemies(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
  }
 });
 test('interrupting roots removes the warning and future damage',()=>{

@@ -5,7 +5,7 @@ function setup(phase=1,action='tideWall'){
 }
 test('Admiral tide marks walkable refuge and keeps it safe in every phase',()=>{
  for(const phase of [1,2,3]){const {G,e}=setup(phase),h=G.state.bossHazards[0];assert.equal(h.lanes,phase+2);assert.ok(h.safePoint);assert.ok(G.world.isSafeSpawn(h.safePoint.x,h.safePoint.y));Object.assign(G.state.player,h.safePoint);
-  const damage=G.state.player.damageTaken,x=e.x,y=e.y;for(let t=0;t<2.3;t+=.02){G.updateEnemies(.02);G.updateBossHazards(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
+  const damage=G.state.player.damageTaken,x=e.x,y=e.y;for(let t=0;t<2.3;t+=.02){G.updateEnemies(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
  }
 });
 test('tide warns before damage and stagger cancels it',()=>{

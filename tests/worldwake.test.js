@@ -301,7 +301,7 @@ arenaBoss.bossStagger = 3;
 const beforeMend = arenaBoss.hp;
 G.updateBossHazards(0.4);
 assert.equal(G.state.player.x, beforeGust.x, "gust lane must not move during its warning");
-G.updateBossHazards(0.5);
+G.updateBossHazards(G.state.bossHazards[0].warning - 0.4 + 0.08);
 assert.ok(G.state.player.x > beforeGust.x, "an unsafe gust lane should push a distant player inward");
 assert.equal(G.state.player.damageTaken, beforeGust.damage + 1, "ignoring a gust lane should cost one heart");
 assert.equal(arenaBoss.hp, beforeMend + 2, "failed Phase I arena control should mend two boss health");
