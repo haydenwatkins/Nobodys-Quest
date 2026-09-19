@@ -39,7 +39,7 @@ for (const id of ["skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lan
   assert.ok(G.enemies[id].boss.introLines.length >= 3, `${id} should introduce its personality before combat`);
   assert.ok(G.enemies[id].hp >= 86 && G.enemies[id].damage <= 2, `${id} should last longer without a damage spike`);
 }
-assert.deepEqual(Array.from(G.enemies.godAvatar.boss.patterns.slice(3, 7)), ["shells", "crescent", "stars", "briar"]);
+assert.deepEqual(Array.from(G.enemies.godAvatar.boss.patterns.slice(3, 7)), ["tideWall", "eclipseSweep", "orbitalBand", "gardenBeds"]);
 assert.ok(G.maps.shattercoast.tiles.every((row) => row.length === 48));
 for (const id of ["turtleTrial", "samuraiTrial", "astronomerTrial", "druidTrial", "gauntletArena"])
   assert.ok(G.maps[id] && G.maps[id].tiles.every((row) => row.length === 28), `${id} should be a valid arena`);

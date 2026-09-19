@@ -891,7 +891,7 @@ G.drawBossHazards = function (ctx) {
         ctx.stroke();
         ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
       }
-      if(["skySovereign","lastWorldbearer","admiralTortoise"].includes(h.owner.def.id)){
+      if(["skySovereign","lastWorldbearer","admiralTortoise","godAvatar"].includes(h.owner.def.id)){
         const x=horizontal?b.left:b.left+h.safeLane*laneSize;
         const y=horizontal?b.top+h.safeLane*laneSize:b.top;
         const w=horizontal?b.right-b.left:laneSize,height=horizontal?laneSize:b.bottom-b.top;
@@ -963,7 +963,7 @@ function spawnArenaPattern(e, action) {
       const at=horizontal?p.y-b.top:p.x-b.left,span=horizontal?b.bottom-b.top:b.right-b.left;
       gust.safeLane=G.util.clamp(Math.floor(at/span*gust.lanes),0,gust.lanes-1);
     }
-    if(["skySovereign","lastWorldbearer","admiralTortoise"].includes(e.def.id)){
+    if(["skySovereign","lastWorldbearer","admiralTortoise","godAvatar"].includes(e.def.id)){
       // Prefer the authored lane, but never mark a cliff as the only refuge.
       const initial=gust.safeLane,b=arenaBounds(gust),p=G.state.player;
       for(let offset=0;offset<gust.lanes&&!gust.safePoint;offset++){
@@ -1126,6 +1126,13 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "admiralTortoise"&&action === "shells")e.bossRecoverT=155/68+.7;
   if(e.def.id === "paperRonin"&&action === "crescent")e.bossRecoverT=175/105+.7;
   if(e.def.id === "admiralTortoise"&&action === "tideWall")e.bossRecoverT=1.1+1+.85;
+  if(e.def.id === "godAvatar"){
+    if(["cards","nova"].includes(action))e.bossRecoverT=(action==="cards"?175/105:155/82)+.75;
+    if(BOSS_ARENA_ACTIONS[action]){
+      const fields=(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.t===0);
+      if(fields.length)e.bossRecoverT=Math.max(...fields.map(h=>(h.delay||0)+h.warning+h.active))+.9;
+    }
+  }
   if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
     if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
@@ -1232,6 +1239,7 @@ function updateBossState(e, p, dist, dt) {
       if(e.def.id === "admiralTortoise")e.bossRecoverT=Math.max(e.bossRecoverT,.9);
       if(e.def.id === "paperRonin")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
       if(e.def.id === "riftbladeAdept")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
+      if(e.def.id === "godAvatar")e.bossRecoverT=Math.max(e.bossRecoverT,.85);
     }
     return true;
   }
