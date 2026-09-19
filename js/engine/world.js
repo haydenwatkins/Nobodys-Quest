@@ -249,6 +249,8 @@ G.world = (() => {
           const key = `${mapId}:${x},${y}`;
           const food = G.isFoodChest(cell.chest);
           const pantry = food && G.ensurePantries()[key];
+          // Item identity survives a region redesign even when the chest moves.
+          if(!food&&cell.chest.item&&G.state.items.includes(cell.chest.item)&&!G.state.opened.includes(key))G.state.opened.push(key);
           chests.push({
             x, y, key, chest: cell.chest, food,
             opened: food ? !!pantry && !G.pantryReady(key) : G.state.opened.includes(key),
@@ -573,7 +575,9 @@ G.world = (() => {
           G.saveGame();
           continue;
         }
-        s.opened.push(ch.key);
+        if(!s.opened.includes(ch.key))s.opened.push(ch.key);
+        // A reward obtained elsewhere while this map was loaded is still unique.
+        if(ch.chest.item&&s.items.includes(ch.chest.item)){G.saveGame();continue;}
         G.sfx.play("unlock");
         G.spawnFx({ kind: "ring", x: cx, y: cy - 8, color: "#ffcd75", dur: 0.5 });
         const chestMessages = [];
