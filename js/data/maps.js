@@ -285,7 +285,7 @@ function makeExpansionTrialArena(variant) {
 
 [
   { id: "turtleTrial", name: "The Breakwater Bastion", theme: "turtle", boss: "admiralTortoise", variant: 0,
-    exit: { x: 11, y: 5 }, sign: "The Admiral's shell volleys leave lanes. Brace, reposition, then answer the charge." },
+    exit: { x: 11, y: 5 }, sign: "Blunt attacks break the Admiral's ward. Use the marked channel through his tide, sidestep the charge, and counterattack during his pause." },
   { id: "samuraiTrial", name: "The Folded Dojo", theme: "samurai", boss: "paperRonin", variant: 1,
     exit: { x: 36, y: 5 }, sign: "Three deliberate cuts beat one frantic swing. Watch the pause before the draw." },
   { id: "astronomerTrial", name: "The Crooked Observatory", theme: "astronomer", boss: "professorPerihelion", variant: 2,

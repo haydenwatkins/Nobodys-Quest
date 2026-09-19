@@ -578,6 +578,7 @@ const BOSS_ARENA_ACTIONS = {
   royalStomp: "ROYAL STOMP",
   crimsonWaltz: "CRIMSON WALTZ",
   pieRain: "PIE IN THE SKY",
+  tideWall: "BREAKWATER TIDE",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -871,7 +872,7 @@ G.drawBossHazards = function (ctx) {
         ctx.stroke();
         ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
       }
-      if(["skySovereign","lastWorldbearer"].includes(h.owner.def.id)){
+      if(["skySovereign","lastWorldbearer","admiralTortoise"].includes(h.owner.def.id)){
         const x=horizontal?b.left:b.left+h.safeLane*laneSize;
         const y=horizontal?b.top+h.safeLane*laneSize:b.top;
         const w=horizontal?b.right-b.left:laneSize,height=horizontal?laneSize:b.bottom-b.top;
@@ -929,14 +930,21 @@ G.drawBossHazards = function (ctx) {
 function spawnArenaPattern(e, action) {
   const phase = e.bossPhase;
   const turn = e.bossPattern;
-  if (action === "gustLanes" || action === "windWall") {
+  if (action === "gustLanes" || action === "windWall" || action === "tideWall") {
     const axis = action === "windWall" ? (turn & 1 ? "y" : "x") : (turn & 1 ? "x" : "y");
     const gust = spawnBossHazard(e, "gust", {
       axis, lanes: phase >= 3 ? 6 : 5, safeLane: (turn * 2 + phase) % (phase >= 3 ? 6 : 5),
       warning: action === "windWall" ? 0.68 : 0.82, active: phase >= 3 ? 1.1 : 0.92,
       push: action === "windWall" ? 72 : 60, color: "#73eff7",
     });
-    if(["skySovereign","lastWorldbearer"].includes(e.def.id)){
+    if(action === "tideWall"){
+      gust.lanes=phase+2;gust.warning=1.1;gust.active=1;gust.push=45;
+      // Keep the refuge near the player; a whole-arena crossing would be unfair to slow forms.
+      const b=arenaBounds(gust),p=G.state.player,horizontal=gust.axis==="x";
+      const at=horizontal?p.y-b.top:p.x-b.left,span=horizontal?b.bottom-b.top:b.right-b.left;
+      gust.safeLane=G.util.clamp(Math.floor(at/span*gust.lanes),0,gust.lanes-1);
+    }
+    if(["skySovereign","lastWorldbearer","admiralTortoise"].includes(e.def.id)){
       // Prefer the authored lane, but never mark a cliff as the only refuge.
       const initial=gust.safeLane,b=arenaBounds(gust),p=G.state.player;
       for(let offset=0;offset<gust.lanes&&!gust.safePoint;offset++){
@@ -1087,6 +1095,8 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "professorPerihelion"&&["stars","nova"].includes(action))e.bossRecoverT=155/(action==="stars"?104:82)+.75;
   if(e.def.id === "grandmotherBriar"&&action === "seeds")e.bossRecoverT=175/105+.7;
   if(e.def.id === "royalFool"&&["cards","nova"].includes(action))e.bossRecoverT=(action==="cards"?175/105:155/82)+.65;
+  if(e.def.id === "admiralTortoise"&&action === "shells")e.bossRecoverT=155/68+.7;
+  if(e.def.id === "admiralTortoise"&&action === "tideWall")e.bossRecoverT=1.1+1+.85;
   if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
     if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
@@ -1190,6 +1200,7 @@ function updateBossState(e, p, dist, dt) {
       if(e.def.id === "ancientTreant"&&!boss.orchard)e.bossRecoverT=Math.max(e.bossRecoverT,.8);
       if(e.def.id === "eclipseKnight")e.bossRecoverT=Math.max(e.bossRecoverT,.85);
       if(e.def.id === "grandmotherBriar")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
+      if(e.def.id === "admiralTortoise")e.bossRecoverT=Math.max(e.bossRecoverT,.9);
     }
     return true;
   }
