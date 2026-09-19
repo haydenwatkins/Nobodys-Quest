@@ -577,6 +577,7 @@ const BOSS_ARENA_ACTIONS = {
   gardenBeds: "BRIAR GARDEN",
   royalStomp: "ROYAL STOMP",
   crimsonWaltz: "CRIMSON WALTZ",
+  pieRain: "PIE IN THE SKY",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -707,7 +708,7 @@ G.updateBossHazards = function (dt) {
       if(!h.hit&&(d<h.inner||d>h.outer)&&G.damagePlayer(1,h.x,h.y))h.hit=true;
       continue;
     }
-    if (["mirePool","rootBloom","royalStomp"].includes(h.kind)) {
+    if (["mirePool","rootBloom","royalStomp","pieRain"].includes(h.kind)) {
       if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
       continue;
     }
@@ -749,7 +750,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (!["mirePool","rootBloom","mireVolley","eclipseSweep","royalStomp","crimsonWaltz"].includes(h.kind)) {
+    if (!["mirePool","rootBloom","mireVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain"].includes(h.kind)) {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
     }
@@ -758,7 +759,11 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if(h.kind === "crimsonWaltz"){
+    if(h.kind === "pieRain"){
+      ctx.globalAlpha=.25;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.95;ctx.strokeStyle="#fff3c2";ctx.setLineDash(active?[]:[3,3]);ctx.stroke();ctx.setLineDash([]);
+      if(active){ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-12,h.y-3,24,6);ctx.fillRect(h.x-5,h.y-8,10,16);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-6,h.y-4,12,8);}
+      else{const py=h.y-30*(1-Math.min(1,local/h.warning));ctx.fillStyle="#bb8c55";ctx.fillRect(h.x-8,py-3,16,6);ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-7,py-6,14,4);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-3,py-8,6,3);}
+    }else if(h.kind === "crimsonWaltz"){
       const e=h.owner;ctx.globalAlpha=.7;ctx.strokeStyle="#e9a9ce";ctx.setLineDash([3,3]);
       for(const a of h.shots){ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*14,e.y-6+Math.sin(a)*14);ctx.lineTo(e.x+Math.cos(a)*95,e.y-6+Math.sin(a)*95);ctx.stroke();}
       ctx.setLineDash([]);ctx.strokeStyle="#fff3c2";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(e.x+Math.cos(h.angle-.55)*90,e.y-6+Math.sin(h.angle-.55)*90);ctx.lineTo(e.x,e.y-6);ctx.lineTo(e.x+Math.cos(h.angle+.55)*90,e.y-6+Math.sin(h.angle+.55)*90);ctx.stroke();
@@ -990,6 +995,15 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "pieRain"){
+    const angle=Math.atan2(p.y-e.y,p.x-e.x)+Math.PI/2;
+    for(let i=0;i<e.bossPhase;i++){
+      const offset=i===0?0:i===1?-44:44,x=p.x+Math.cos(angle)*offset,y=p.y+Math.sin(angle)*offset;
+      if(i&&!G.world.isSafeSpawn(x,y))continue;
+      spawnBossHazard(e,"pieRain",{x,y,radius:17,warning:1+i*.25,active:.3,color:"#ffcd75"});
+    }
+    e.bossRecoverT=1+(e.bossPhase-1)*.25+.3+.9;return;
+  }
   if(action === "crimsonWaltz"){
     const angle=Math.atan2(p.y-(e.y-6),p.x-e.x),count=8+(e.bossPhase-1)*4,shots=[];
     for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)shots.push(a);}
@@ -1072,6 +1086,7 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "mireQueen"&&action === "nova")e.bossRecoverT=155/82+.65;
   if(e.def.id === "professorPerihelion"&&["stars","nova"].includes(action))e.bossRecoverT=155/(action==="stars"?104:82)+.75;
   if(e.def.id === "grandmotherBriar"&&action === "seeds")e.bossRecoverT=175/105+.7;
+  if(e.def.id === "royalFool"&&["cards","nova"].includes(action))e.bossRecoverT=(action==="cards"?175/105:155/82)+.65;
   if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
     if(gust)e.bossRecoverT=gust.warning+gust.active+0.8;
