@@ -598,7 +598,7 @@ registerEnemy({
     antiKiteRange: 104, chaseScale: 1.34,
     introLines: [
       "The blade always returns. My library books do not.",
-      "Move with the throw, or become part of the lesson.",
+      "Step off the marked throws. Wait for the blades to return, then make your point.",
       "Three beats, one opening. Tap an ability when you are ready.",
     ],
     phaseLine: "Better. Now follow three blades and one terrible metaphor.",

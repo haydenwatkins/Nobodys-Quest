@@ -674,6 +674,10 @@ G.updateBossHazards = function (dt) {
       if(!h.fired){h.fired=true;fireBossFan(h.owner,{x:h.x,y:h.y},h.count,"seed",6,1);}
       continue;
     }
+    if(h.kind === "riftVolley"){
+      if(!h.fired){h.fired=true;fireRiftbladeVolley(h.owner,{x:h.x,y:h.y});}
+      continue;
+    }
     if(h.kind === "crimsonWaltz"){
       if(!h.fired){h.fired=true;for(const angle of h.shots)enemyShot(G.state,h.owner,angle,{damage:1,speed:92,range:155,size:4});}
       continue;
@@ -757,7 +761,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (!["mirePool","rootBloom","mireVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut"].includes(h.kind)) {
+    if (!["mirePool","rootBloom","mireVolley","riftVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut"].includes(h.kind)) {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
     }
@@ -766,7 +770,11 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if(h.kind === "foldCut"){
+    if(h.kind === "riftVolley"){
+      const e=h.owner,angle=Math.atan2(h.y-e.y,h.x-e.x);ctx.globalAlpha=.85;ctx.strokeStyle="#73eff7";ctx.setLineDash([4,3]);
+      for(const spread of h.spreads){const a=angle+spread*Math.PI/180,x=e.x+Math.cos(a)*82,y=e.y-6+Math.sin(a)*82;ctx.beginPath();ctx.moveTo(e.x,e.y-6);ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.stroke();}
+      ctx.setLineDash([]);ctx.fillStyle="#263b4b";ctx.fillRect(e.x-28,e.y+16,56,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("THEY RETURN",e.x,e.y+24);
+    }else if(h.kind === "foldCut"){
       ctx.translate(h.x,h.y);ctx.rotate(h.angle);ctx.globalAlpha=active?.65:.17;ctx.fillRect(-h.length/2,-h.width/2,h.length,h.width);
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#f4f4f4";ctx.setLineDash(active?[]:[4,3]);ctx.strokeRect(-h.length/2,-h.width/2,h.length,h.width);ctx.setLineDash([]);
       if(active){ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-h.length/2,0);ctx.lineTo(h.length/2,0);ctx.stroke();}
@@ -1014,6 +1022,10 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "blades"&&e.def.id === "riftbladeAdept"){
+    spawnBossHazard(e,"riftVolley",{x:p.x,y:p.y,spreads:e.bossPhase>=3?[-28,-14,0,14,28]:e.bossPhase===2?[-22,0,22]:[-13,13],warning:.8,active:.15,color:"#73eff7"});
+    e.bossRecoverT=.8+2*82/120+.85;return;
+  }
   if(action === "foldCuts"){
     const angle=Math.atan2(p.y-e.y,p.x-e.x),turns=[0,Math.PI/3,-Math.PI/3];
     for(let i=0;i<e.bossPhase;i++)spawnBossHazard(e,"foldCut",{x:p.x,y:p.y,angle:angle+turns[i],length:140,width:14,note:i+1,warning:.95+i*.3,active:.18,color:"#f4f4f4"});
@@ -1219,6 +1231,7 @@ function updateBossState(e, p, dist, dt) {
       if(e.def.id === "grandmotherBriar")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
       if(e.def.id === "admiralTortoise")e.bossRecoverT=Math.max(e.bossRecoverT,.9);
       if(e.def.id === "paperRonin")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
+      if(e.def.id === "riftbladeAdept")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
     }
     return true;
   }

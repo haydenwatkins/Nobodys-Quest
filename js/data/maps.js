@@ -130,7 +130,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 18 } },
     "B": { tile: "floor", enemy: "riftbladeAdept" },
-    "m": { tile: "floor", message: "The Adept bends every returning blade by moving. Watch the path out — then dodge the path home." },
+    "m": { tile: "floor", message: "Sharp attacks break the Adept's ward. Step off the marked throws and wait for the blades to return, then close in during the pause." },
     "H": { tile: "floor", chest: { heal: true, name: "a perfectly folded star-cookie" } },
     "R": { tile: "rock", on: "floor" },
   },

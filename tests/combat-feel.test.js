@@ -761,6 +761,8 @@ G.enemies.testCaster = {
   assert.equal(adept.bossPendingAction, "blades");
   adept.bossTelegraphT = 0.001;
   G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles.length, 0, "Adept marks the throw before firing");
+  G.updateBossHazards(0.81);
   assert.equal(G.state.projectiles.length, 2);
   assert.ok(G.state.projectiles.every((shot) => shot.boomerang && shot.damage === 1));
 }
