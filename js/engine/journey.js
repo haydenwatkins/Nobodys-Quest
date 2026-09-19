@@ -59,8 +59,8 @@ G.journeyGateReason = (mapId,destination) => {
   const s=G.state,o=s.opening||{},d=s.delivery||{};
   if(mapId==="orchardRoad" && destination==="heartwood" && !o.bell) return "Ring the watch bell to open the root arch.";
   if(mapId==="lanternReach" && destination==="tollCourt" && d.lamps?.[1]!==2) return "Restore both lanterns to open the causeway.";
-  if(mapId==="tollCourt" && destination==="sunriseQuay" && !d.keeper && s.player.x<28*G.TILE) return "Defeat the Tollkeeper to cross the bridge.";
-  if(mapId==="tollCourt" && destination==="lanternReach" && !d.keeper && s.player.x>28*G.TILE) return "The Tollkeeper bars this side. Return through the quay.";
+  if(mapId==="tollCourt" && destination==="sunriseQuay" && !d.keeper && (s.mapId!==mapId || s.player.x<28*G.TILE)) return "Defeat the Tollkeeper to cross the bridge.";
+  if(mapId==="tollCourt" && destination==="lanternReach" && !d.keeper && s.mapId===mapId && s.player.x>28*G.TILE) return "The Tollkeeper bars this side. Return through the quay.";
   return null;
 };
 

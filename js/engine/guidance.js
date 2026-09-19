@@ -72,26 +72,29 @@
     return cells;
   }
 
-  function nextMapToward(start, destination) {
+  G.guidanceRoute = function (start, destination) {
     if (!start || !destination || start === destination) return null;
-    const queue = [start];
-    const parent = new Map([[start, null]]);
-    for (let head = 0; head < queue.length && head < 120; head++) {
-      const mapId = queue[head];
+    // Prefer any open road over a shorter sealed one. If no open road exists,
+    // retain the least-blocked route so the guide can explain its first gate.
+    const queue = [{ mapId: start, locks: 0, steps: [] }];
+    const visited = new Set();
+    while (queue.length) {
+      queue.sort((a, b) => a.locks - b.locks || a.steps.length - b.steps.length);
+      const current = queue.shift(), mapId = current.mapId;
+      if (visited.has(mapId)) continue;
+      visited.add(mapId);
+      if (mapId === destination) return current;
       for (const portal of mapPortalCells(mapId)) {
         const next = portal.cell.portal.map;
-        if (!next || parent.has(next)) continue;
-        parent.set(next, mapId);
-        if (next === destination) {
-          let step = destination;
-          while (parent.get(step) && parent.get(step) !== start) step = parent.get(step);
-          return step;
-        }
-        queue.push(next);
+        if (!next || visited.has(next) || !G.maps[next]) continue;
+        const reason = (G.world.portalBlockReason && G.world.portalBlockReason(portal.cell)?.text) ||
+          (G.journeyGateReason && G.journeyGateReason(mapId, next)) || null;
+        queue.push({ mapId: next, locks: current.locks + Number(!!reason),
+          steps: [...current.steps, { ...portal, from: mapId, to: next, reason }] });
       }
     }
     return null;
-  }
+  };
 
   function nearest(list, x, y) {
     let best = null;
@@ -120,16 +123,19 @@
 
   function routeTarget(goal) {
     const s = G.state;
-    const nextMap = nextMapToward(s.mapId, goal.mapId);
-    if (!nextMap) return null;
-    const candidates = gridTargets((cell) => cell.portal && cell.portal.map === nextMap);
-    for(const link of G.journeyTravelLinks ? G.journeyTravelLinks(s.mapId) : [])
-      if(link.map===nextMap)candidates.push({x:link.x*G.TILE+8,y:link.y*G.TILE+8,tileX:link.x,tileY:link.y,link});
-    const target = nearest(candidates, s.player.x, s.player.y);
-    if (!target) return null;
+    const route = G.guidanceRoute(s.mapId, goal.mapId);
+    if (!route || !route.steps.length) return null;
+    const leg = route.steps[0], nextMap = leg.to;
+    const target = { x:leg.x*G.TILE+8, y:leg.y*G.TILE+8, tileX:leg.x, tileY:leg.y, cell:leg.cell, link:leg.link };
     const destination = G.maps[nextMap] && G.maps[nextMap].name || goal.destination || nextMap;
     const travel = goal.guide === "travel";
     const formEcho = goal.guide === "echo";
+    const gate = route.steps.find(step => step.reason);
+    if (gate) return Object.assign(target, {
+      kind: "form", color: G.GUIDANCE_COLORS.form, icon: "!", destination,
+      blocked: true, gateMap: gate.from,
+      text: `${gate === leg ? "This road is sealed." : `Ahead, the road from ${G.maps[gate.from].name} is sealed.`} ${gate.reason}`,
+    });
     return Object.assign(target, {
       kind: formEcho ? "form" : travel ? "travel" : "story",
       color: formEcho ? G.GUIDANCE_COLORS.form : travel ? G.GUIDANCE_COLORS.travel : G.GUIDANCE_COLORS.story,
