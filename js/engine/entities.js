@@ -579,6 +579,7 @@ const BOSS_ARENA_ACTIONS = {
   crimsonWaltz: "CRIMSON WALTZ",
   pieRain: "PIE IN THE SKY",
   tideWall: "BREAKWATER TIDE",
+  foldCuts: "PAPER FOLDS",
   gustLanes: "GUST LANES",
   windWall: "CROSSWIND",
   faultGrid: "FAULT GRID",
@@ -704,6 +705,11 @@ G.updateBossHazards = function (dt) {
       if(!h.hit&&Math.hypot(p.x-h.x,p.y-h.y)<=h.radius&&Math.abs(delta)<=h.halfAngle&&G.damagePlayer(1,h.x,h.y))h.hit=true;
       continue;
     }
+    if(h.kind === "foldCut"){
+      const dx=p.x-h.x,dy=p.y-h.y,along=dx*Math.cos(h.angle)+dy*Math.sin(h.angle),across=-dx*Math.sin(h.angle)+dy*Math.cos(h.angle);
+      if(!h.hit&&Math.abs(along)<=h.length/2&&Math.abs(across)<=h.width/2&&G.damagePlayer(1,h.x,h.y))h.hit=true;
+      continue;
+    }
     if(h.kind === "orbitalBand"){
       const d=Math.hypot(p.x-h.x,p.y-h.y);
       if(!h.hit&&(d<h.inner||d>h.outer)&&G.damagePlayer(1,h.x,h.y))h.hit=true;
@@ -751,7 +757,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (!["mirePool","rootBloom","mireVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain"].includes(h.kind)) {
+    if (!["mirePool","rootBloom","mireVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut"].includes(h.kind)) {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
     }
@@ -760,7 +766,12 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if(h.kind === "pieRain"){
+    if(h.kind === "foldCut"){
+      ctx.translate(h.x,h.y);ctx.rotate(h.angle);ctx.globalAlpha=active?.65:.17;ctx.fillRect(-h.length/2,-h.width/2,h.length,h.width);
+      ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#f4f4f4";ctx.setLineDash(active?[]:[4,3]);ctx.strokeRect(-h.length/2,-h.width/2,h.length,h.width);ctx.setLineDash([]);
+      if(active){ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-h.length/2,0);ctx.lineTo(h.length/2,0);ctx.stroke();}
+      ctx.rotate(-h.angle);const nx=Math.cos(h.angle)*(h.length/2-10),ny=Math.sin(h.angle)*(h.length/2-10);ctx.fillStyle="#302638";ctx.fillRect(nx-5,ny-5,10,10);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText(String(h.note),nx,ny+3);
+    }else if(h.kind === "pieRain"){
       ctx.globalAlpha=.25;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.95;ctx.strokeStyle="#fff3c2";ctx.setLineDash(active?[]:[3,3]);ctx.stroke();ctx.setLineDash([]);
       if(active){ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-12,h.y-3,24,6);ctx.fillRect(h.x-5,h.y-8,10,16);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-6,h.y-4,12,8);}
       else{const py=h.y-30*(1-Math.min(1,local/h.warning));ctx.fillStyle="#bb8c55";ctx.fillRect(h.x-8,py-3,16,6);ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-7,py-6,14,4);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-3,py-8,6,3);}
@@ -1003,6 +1014,11 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossAction(e, p, action) {
+  if(action === "foldCuts"){
+    const angle=Math.atan2(p.y-e.y,p.x-e.x),turns=[0,Math.PI/3,-Math.PI/3];
+    for(let i=0;i<e.bossPhase;i++)spawnBossHazard(e,"foldCut",{x:p.x,y:p.y,angle:angle+turns[i],length:140,width:14,note:i+1,warning:.95+i*.3,active:.18,color:"#f4f4f4"});
+    e.bossRecoverT=.95+(e.bossPhase-1)*.3+.18+.9;return;
+  }
   if(action === "pieRain"){
     const angle=Math.atan2(p.y-e.y,p.x-e.x)+Math.PI/2;
     for(let i=0;i<e.bossPhase;i++){
@@ -1096,6 +1112,7 @@ function resolveBossAction(e, p, action) {
   if(e.def.id === "grandmotherBriar"&&action === "seeds")e.bossRecoverT=175/105+.7;
   if(e.def.id === "royalFool"&&["cards","nova"].includes(action))e.bossRecoverT=(action==="cards"?175/105:155/82)+.65;
   if(e.def.id === "admiralTortoise"&&action === "shells")e.bossRecoverT=155/68+.7;
+  if(e.def.id === "paperRonin"&&action === "crescent")e.bossRecoverT=175/105+.7;
   if(e.def.id === "admiralTortoise"&&action === "tideWall")e.bossRecoverT=1.1+1+.85;
   if(e.def.id === "skySovereign" && ["gustLanes","windWall"].includes(action)){
     const gust=(G.state.bossHazards||[]).find(h=>h.owner===e&&h.kind==="gust"&&h.t===0);
@@ -1201,6 +1218,7 @@ function updateBossState(e, p, dist, dt) {
       if(e.def.id === "eclipseKnight")e.bossRecoverT=Math.max(e.bossRecoverT,.85);
       if(e.def.id === "grandmotherBriar")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
       if(e.def.id === "admiralTortoise")e.bossRecoverT=Math.max(e.bossRecoverT,.9);
+      if(e.def.id === "paperRonin")e.bossRecoverT=Math.max(e.bossRecoverT,.8);
     }
     return true;
   }
