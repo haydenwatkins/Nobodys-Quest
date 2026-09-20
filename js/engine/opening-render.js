@@ -201,13 +201,13 @@
     }
   };
   G.drawOpeningPrompt=c=>{
-    if(!here()||G.ui.dialogueOpen)return;
+    if(G.ui.dialogueOpen||G.ui.menuOpen||G.state.bossCutscene)return false;
     const at=G.openingInteractionCandidate();if(!at)return;
     const prefix=G.input.isTouch?'A · ':G.input.hasGamepad?'A · ':'J / E · ';
     const label=prefix+at.label;
     c.save();c.font="9px 'VT323', monospace";const w=c.measureText(label).width+16;
     rect(c,(320-w)/2,136,w,16,'rgba(32,45,50,.94)');rect(c,(320-w)/2,136,2,16,C.gold);
-    c.fillStyle=C.paper;c.textBaseline='top';c.fillText(label,(320-w)/2+8,140);c.restore();
+    c.fillStyle=C.paper;c.textBaseline='top';c.fillText(label,(320-w)/2+8,140);c.restore();return true;
   };
 })();
 

@@ -1,12 +1,19 @@
 # Continuing upgrade plan
 
-Updated September 19, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
+Updated September 20, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
 
 ## Direction
 Keep the game's pixel-art personality, form mixing, exploration, and depth. Make each session rewarding through clear goals, discoveries, mastery, and build choices. Prefer meaningful improvements over adding more systems. Preserve existing saves and earned progress.
 
 ## Current larger pass: campaign progression and build depth
-Continuation is paused at the user's request after completing the travel-guidance batch. Resume further upgrades only when requested.
+The user resumed the upgrade loop with delegated execution and an 85% total weekly usage stopping threshold (15% remaining). Check live usage before new batches and after shipping. Temporary five-hour exhaustion leaves the heartbeat active; reaching the weekly threshold pauses it.
+
+### Shipped Windscar payoff and regional interaction prompts (September 20)
+Winning Aurelia's Sky Mark restores a permanent two-way wind lift between the caravan road (11,20) and northern high road (33,8). Feather pennants change from sleeping stone to cyan wind; the victory dialogue and Journey journal explain both landings. Every form can ride, and old trophy saves unlock it through the existing mark migration. Rides preserve health, mana, cooldowns and progression. Nearby enemies, hostile projectiles, active hazards and conflicting player states prevent unsafe travel; an unsafe destination gets an explanation. Boss fields conservatively block rides until they expire because some push outside their visible bounds.
+
+Browser inspection also found that regional interaction hints were hidden outside the opening landscape. The shared prompt now appears throughout the campaign with keyboard/touch/controller labels and takes priority over the route banner. Lift lettering sits above the pennants and the platform no longer covers a player standing on it.
+
+Validation: all 253 tests pass. Actual desktop-browser fixture checks exercised the sleeping explanation, both ride directions, reload persistence, normal post-victory enemy placement, and the prompt at 844x390 and 390x844. Canvas before/after renders were inspected too. The portrait game retains its landscape letterbox. These are desktop browser checks, not physical mobile/TV validation. The local helpers `../lift-qa.html` and `../render-windscar-lift.cjs` remain outside the repository.
 
 The travel-guidance batch now prefers open routes over shorter sealed passages, reevaluates shortcuts when marks are earned, and explains the first unmet gate when no open route exists. Remote route planning also checks the delivery causeway and Tollkeeper requirements. All 247 tests passed, including every Worldwake portal crossing with actual movement/collision, safe arrivals, and neutral-input bounce prevention. Full campaign pacing and physical-device validation remain unfinished.
 

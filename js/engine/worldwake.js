@@ -201,7 +201,9 @@ G.events.on("pickup", (data) => {
   const campaign = G.ensureWorldwake();
   if (!campaign.marks.includes(mark.id)) {
     campaign.marks.push(mark.id);
-    const awakening = "The region changes, and a new World Path answers you.";
+    const awakening = mark.id === "sky"
+      ? "Aurelia lowers her wings. The wind is a road again. Feather pennants beside Windscar's caravan camp and on the northern high road now carry you between them. Walk up and interact when both landings are clear."
+      : "The region changes, and a new World Path answers you.";
     if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening, { accent: mark.color || "#ffcd75" });
     else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening);
   }
