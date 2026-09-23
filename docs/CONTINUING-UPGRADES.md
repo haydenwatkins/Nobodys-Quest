@@ -1,12 +1,15 @@
 # Continuing upgrade plan
 
-Updated September 20, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
+Updated September 22, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
 
 ## Direction
 Keep the game's pixel-art personality, form mixing, exploration, and depth. Make each session rewarding through clear goals, discoveries, mastery, and build choices. Prefer meaningful improvements over adding more systems. Preserve existing saves and earned progress.
 
 ## Current larger pass: campaign progression and build depth
-The user resumed the upgrade loop with delegated execution and an 85% total weekly usage stopping threshold (15% remaining). Check live usage before new batches and after shipping. Temporary five-hour exhaustion leaves the heartbeat active; reaching the weekly threshold pauses it.
+The user resumed upgrades on September 22 with 96% of the weekly window used. Use that allowance first; the user explicitly approved redeeming the one available full reset credit afterward. After reset, the stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
+
+### Hanging Gardens Stone Mark payoff (September 22)
+After purifying the Old Mason, stone crossings rise through two western garden channels, shortening the route between the upper terrace, middle road, and southern promenade. The change uses the existing Stone Mark, activates on pickup, and restores on reload for old trophy saves. The victory dialogue and Journey journal explain the new roads. The raised stones have a carved, mossy pixel treatment. Focused checks cover both channels, old saves, return visits, normal routes and edge exits; before and after canvas renders were inspected. Full suite and push status are recorded in the September 22 task output.
 
 ### Shipped Windscar payoff and regional interaction prompts (September 20)
 Winning Aurelia's Sky Mark restores a permanent two-way wind lift between the caravan road (11,20) and northern high road (33,8). Feather pennants change from sleeping stone to cyan wind; the victory dialogue and Journey journal explain both landings. Every form can ride, and old trophy saves unlock it through the existing mark migration. Rides preserve health, mana, cooldowns and progression. Nearby enemies, hostile projectiles, active hazards and conflicting player states prevent unsafe travel; an unsafe destination gets an explanation. Boss fields conservatively block rides until they expire because some push outside their visible bounds.
