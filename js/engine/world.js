@@ -102,6 +102,8 @@ G.world = (() => {
   const SOLID = { tree: true, water: true, wall: true, rock: true };
 
   function portalMasteryMet(cell) {
+    if (cell.masteryPortfolio)
+      return (G.state.items || []).includes("god-spark") || (G.finalExamMastery && G.finalExamMastery().ready);
     if (!cell.mastery) return true;
     const end = cell.mastery.before ? G.formOrder.indexOf(cell.mastery.before) : G.formOrder.length;
     return G.formOrder.slice(0, end < 0 ? G.formOrder.length : end).every((id) => {
@@ -172,6 +174,16 @@ G.world = (() => {
         `Raise ${readableList(shown)} to level ${cell.mastery.level}. ` +
         `Practice those forms in the world; the Form Lab keeps the details.`
       );
+    }
+    if (cell.masteryPortfolio && !(G.state.items || []).includes("god-spark")) {
+      const exam = G.finalExamMastery();
+      if (exam.missingBreadth.length) {
+        const shown = exam.missingBreadth.slice(0, 4).map((id) => `${G.forms[id].name} (level ${G.formLevel(id)})`);
+        if (exam.missingBreadth.length > shown.length) shown.push(`${exam.missingBreadth.length - shown.length} more forms`);
+        requirements.push(`Learn every form to level 3 (${exam.broad}/${exam.total} ready). Begin with ${readableList(shown)}.`);
+      }
+      if (exam.specialists < exam.specialistGoal)
+        requirements.push(`Master ${exam.specialistGoal} forms of your choice to level 5 (${exam.specialists}/${exam.specialistGoal} mastered). Borrowed arts earn lessons for their original forms.`);
     }
 
     if (cell.mark && !(G.hasWorldMark && G.hasWorldMark(cell.mark))) {

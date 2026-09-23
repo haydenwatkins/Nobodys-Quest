@@ -617,8 +617,8 @@ for (const portal of ["R", "L", "U", "F", "Y"]) {
   assert.equal(G.maps.overworld.legend[portal].portalStyle, "trial");
   assert.ok(G.maps.overworld.legend[portal].portalTheme, `${portal} needs a recognizable landmark theme`);
 }
-assert.equal(G.maps.overworld.legend.Y.mastery.before, "god");
-assert.equal(G.maps.overworld.legend.Y.mastery.level, 5, "the final trial must require full prior mastery");
+assert.equal(G.maps.overworld.legend.Y.masteryPortfolio, true, "the final trial must require broad and chosen mastery");
+assert.equal(G.maps.overworld.legend.Y.allWorldMarks, true, "the final trial follows the six Worldbearers");
 {
   const map = G.maps.overworld;
   const solidChars = new Set(["t", "w", "r", "#"]);

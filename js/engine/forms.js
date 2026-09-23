@@ -150,7 +150,7 @@ G.validateCrossRefs = function () {
       if (ability && !ability.nativeForm) ability.nativeForm = id;
     }
     if (f.unlock) {
-      const allowed = ["level", "formLevel", "item", "stars", "claimedForms", "allFormsLevel", "previousFormsLevel", "any"];
+      const allowed = ["level", "formLevel", "item", "stars", "claimedForms", "allFormsLevel", "previousFormsLevel", "finalExamMastery", "any"];
       const checkRule = (u) => {
         if (!u || !allowed.includes(u.type)) {
           err(`Its unlock challenge has an unknown requirement type "${u && u.type}".`);
@@ -198,6 +198,7 @@ function requirementMet(u, targetId) {
   if (u.type === "stars") return G.state.stars >= u.stars;
   if (u.type === "claimedForms") return (G.state.claimedForms || []).length >= u.count;
   if (u.type === "any") return (u.options || []).some((option) => requirementMet(option, targetId));
+  if (u.type === "finalExamMastery") return G.finalExamMastery().ready;
   if (u.type === "allFormsLevel") {
     return G.formOrder.every((otherId) => {
       if (otherId === targetId) return true;
@@ -301,6 +302,10 @@ G.unlockHint = function (id) {
     if (u.type === "claimedForms") return `${done}${(G.state.claimedForms || []).length}/${u.count} forms awakened`;
     if (u.type === "allFormsLevel") return `${done}Every other form at level ${u.level}`;
     if (u.type === "previousFormsLevel") return `${done}Every previous form at level ${u.level}`;
+    if (u.type === "finalExamMastery") {
+      const exam = G.finalExamMastery();
+      return `${done}Every form level 3 (${exam.broad}/${exam.total}) and ${exam.specialistGoal} forms level 5 (${exam.specialists}/${exam.specialistGoal})`;
+    }
     if (u.type === "any") return `${done}One of: ${(u.options || []).map((option) => describe(option).replace(/^✓ /, "")).join(" or ")}`;
     return "Unknown challenge";
   };

@@ -32,7 +32,7 @@ test('sealed destinations explain marks, stars, and mastery instead of promising
   G.state.stars=24;
   assert.ok(!G.guidanceRouteTarget({mapId:'sunstepPrairie',guide:'travel'}).blocked);
   target=G.guidanceRouteTarget({mapId:'godTrial',guide:'boss'});
-  assert.equal(target.blocked,true);assert.match(target.text,/level 5/);
+  assert.equal(target.blocked,true);assert.match(target.text,/level 3/);assert.match(target.text,/level 5/);
 });
 
 test('the Final Firmament follows all six Worldbearers while completed old saves retain access', () => {

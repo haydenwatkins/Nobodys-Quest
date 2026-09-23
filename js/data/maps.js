@@ -109,7 +109,7 @@ registerMap({
     "L": { tile: "grass", portal: { map: "moleTrial", x: 3, y: 8 }, stars: 20, portalStyle: "trial", portalTheme: "mole" },
     "U": { tile: "grass", portal: { map: "vampireTrial", x: 3, y: 8 }, stars: 22, portalStyle: "trial", portalTheme: "vampire" },
     "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "trial", portalTheme: "jester" },
-    "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, mastery: { before: "god", level: 5 }, allWorldMarks: true, portalStyle: "trial", portalTheme: "god" },
+    "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, masteryPortfolio: true, allWorldMarks: true, portalStyle: "trial", portalTheme: "god" },
     "Z": { tile: "grass", portal: { map: "shattercoast", x: 45, y: 14 }, stars: 28, portalStyle: "gap" },
     "P": { tile: "path", portal: { map: "sunstepPrairie", x: 2, y: 14 }, stars: 24, portalStyle: "gap", seamless: true },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
@@ -223,7 +223,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 110, y: 1 } },
     "B": { tile: "floor", enemy: "godAvatar" },
-    "m": { tile: "floor", message: "FINAL EXAM: bring every form. Pencils will not be provided because swords are funnier." },
+    "m": { tile: "floor", message: "FINAL EXAM: know every form and master six of your favorites. Pencils will not be provided because swords are funnier." },
     "H": { tile: "floor", chest: { heal: true, name: "the last cookie (allegedly)" } },
     "R": { tile: "rock", on: "floor" },
   },

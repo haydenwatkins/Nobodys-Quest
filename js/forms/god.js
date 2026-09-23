@@ -1,5 +1,5 @@
 /* ============================================================
-   GOD - the final form, earned by mastering every other form.
+   GOD - the final form, earned by learning every path and mastering six.
    ============================================================ */
 
 "use strict";
@@ -8,7 +8,7 @@ registerForm({
   id: "god",
   name: "God",
   icon: "☀️",
-  tagline: "A blazing final form for players who mastered every path before it.",
+  tagline: "A blazing final form for players who learned every path and mastered their favorites.",
 
   speed: 100,
   hearts: 6,
@@ -28,8 +28,8 @@ registerForm({
     { id: "voidStar", level: 2 },
   ],
 
-  unlock: { type: "challenge", maintain: true, hint: "Master the complete roster, then pass its final exam", requirements: [
-    { type: "previousFormsLevel", level: 5 },
+  unlock: { type: "challenge", maintain: true, hint: "Learn every form, master six favorites, then pass the final exam", requirements: [
+    { type: "finalExamMastery" },
     { type: "item", item: "god-spark", hint: "Defeat the God of Every Form" },
   ] },
 

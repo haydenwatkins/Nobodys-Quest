@@ -127,6 +127,21 @@ G.fieldMasteryQuest = function () {
   return G.relevantMasteryQuests(1)[0] || null;
 };
 
+// The finale asks for breadth and a chosen set of deep specializations. The
+// same snapshot drives the gate, story guidance, and God's unlock condition.
+G.finalExamMastery = function () {
+  const godIndex = G.formOrder.indexOf("god");
+  const forms = G.formOrder.slice(0, godIndex < 0 ? G.formOrder.length : godIndex)
+    .filter((id) => G.forms[id] && !G.forms[id].invalid);
+  const levels = forms.map((id) => ({ id, level: G.formLevel(id) }));
+  const missingBreadth = levels.filter((entry) => entry.level < 3).map((entry) => entry.id);
+  const specialists = levels.filter((entry) => entry.level >= 5).length;
+  const specialistGoal = Math.min(6, forms.length);
+  return { total: forms.length, broad: forms.length - missingBreadth.length,
+    missingBreadth, specialists, specialistGoal,
+    ready: !missingBreadth.length && specialists >= specialistGoal };
+};
+
 // The lesson book only offers arts already earned. Borrowing advances the
 // source form's quest, so a favorite body can carry several other lessons.
 G.masteryLessons = function (limit, formId, chosenOnly) {
