@@ -43,6 +43,7 @@ G.WORLDWAKE_FAVORS = [
   { id: "firstFootsteps", name: "First Footsteps", text: "Discover 3 Worldwake regions", kind: "regions", count: 3, stars: 2 },
   { id: "campfireStories", name: "Campfire Stories", text: "Read 6 signs in the new world", kind: "signs", count: 6, stars: 2 },
   { id: "manyWays", name: "Many Ways Forward", text: "Use all 5 ability styles", kind: "styles", count: 5, stars: 2 },
+  { id: "roadLessons", name: "Road Lessons", text: "Land hits with 3 different carried World Marks in their home regions", kind: "markPractices", count: 3, stars: 2 },
   { id: "gentleGiants", name: "Gentle Giants", text: "Purify 3 Worldbearers", kind: "marks", count: 3, stars: 3 },
   { id: "wholeHorizon", name: "The Whole Horizon", text: "Discover all 8 Worldwake regions", kind: "regions", count: 8, stars: 4, item: "worldwake-cloak" },
   { id: "worldAtPeace", name: "A World at Peace", text: "Purify all 6 Worldbearers", kind: "marks", count: 6, stars: 5, item: "worldwake-crown" },
@@ -52,6 +53,7 @@ G.makeWorldwake = function () {
   return {
     discovered: [],
     marks: [],
+    markPractices: [],
     readSigns: [],
     stylesUsed: [],
     favorsDone: [],
@@ -82,6 +84,8 @@ G.normalizeWorldwake = function (saved, legacySave) {
     const mark = G.WORLDWAKE_MARKS[item];
     if (mark && !campaign.marks.includes(mark.id)) campaign.marks.push(mark.id);
   }
+  campaign.markPractices = Array.from(new Set((Array.isArray(campaign.markPractices) ? campaign.markPractices : []).filter((id) =>
+    markIds.has(id) && campaign.marks.includes(id))));
   const attuned = saved && saved.attunedMark;
   campaign.attunedMark = markIds.has(attuned) && campaign.marks.includes(attuned) ? attuned : null;
   if (legacySave && regionIds.has(legacySave.mapId) && !campaign.discovered.includes(legacySave.mapId))
@@ -104,6 +108,7 @@ G.worldwakeFavorProgress = function (favor) {
   if (favor.kind === "marks") return campaign.marks.length;
   if (favor.kind === "signs") return campaign.readSigns.length;
   if (favor.kind === "styles") return campaign.stylesUsed.length;
+  if (favor.kind === "markPractices") return campaign.markPractices.length;
   return 0;
 };
 
@@ -224,6 +229,22 @@ G.events.on("abilityUse", (data) => {
   const campaign = G.ensureWorldwake();
   if (!campaign.stylesUsed.includes(ability.style)) campaign.stylesUsed.push(ability.style);
   G.checkWorldwakeFavors(false);
+});
+
+// A field note needs a real contact, an earned and carried discipline, and
+// the landscape that taught it. Practice targets and empty casts do not count.
+G.events.on("hit", (data) => {
+  if (!G.state || G.state.expeditionRun || !data || !data.enemy) return;
+  const mark = G.activeWorldMarkDiscipline();
+  const source = mark && Object.values(G.WORLDWAKE_MARKS).find((entry) => entry.id === mark.id);
+  if (!source || G.state.mapId !== source.region || G.ensureWorldwake().markPractices.includes(mark.id)) return;
+  const ability = G.abilities[data.ability];
+  if (!ability || !mark.style.toLowerCase().split(" + ").includes(ability.style)) return;
+  if (!G.state.enemies.some((enemy) => enemy.id === data.enemy && !enemy.def.practice)) return;
+  const campaign = G.ensureWorldwake();
+  campaign.markPractices.push(mark.id);
+  G.ui.toast(`Caravan field note: ${mark.name} in ${G.maps[source.region].name} (${Math.min(campaign.markPractices.length, 3)}/3)`, 3);
+  if (!G.checkWorldwakeFavors(false)) G.saveGame();
 });
 
 G.events.on("pickup", (data) => {

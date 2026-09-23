@@ -1783,11 +1783,12 @@ G.ui = (() => {
   function buildWorldMarkLab() {
     const active = G.activeWorldMarkDiscipline();
     const owned = G.ensureWorldwake().marks;
+    const practiced = G.ensureWorldwake().markPractices;
     const regions = Object.values(G.WORLDWAKE_MARKS);
     return `<section class="mark-bench">
       <div class="mark-bench-intro"><span class="eyebrow">SIX PROMISES · ONE CARRIED LESSON</span>
         <h2>The Worldbearers' Marks</h2>
-        <p>Each awakened guardian lends one way of fighting. Carry a Mark to shape every form's arts; choose a different one whenever your build changes.</p>
+        <p>Each awakened guardian lends one way of fighting. Carry a Mark to shape every form's arts; choose a different one whenever your build changes. Land its kind of hit in its home region to write a caravan field note.</p>
         <strong>${active ? `${active.icon} ${escapeHtml(active.name)} carried · ${escapeHtml(active.effect)}` : `${owned.length}/6 awakened · No Mark carried`}</strong></div>
       <div class="mark-bench-grid">${G.WORLD_MARK_DISCIPLINES.map((mark) => {
         const earned = owned.includes(mark.id), selected = active && active.id === mark.id;
@@ -1797,6 +1798,7 @@ G.ui = (() => {
           <div class="mark-stone-head"><span class="mark-glyph" aria-hidden="true">${mark.icon}</span><div><small>${escapeHtml(regionName)} · ${escapeHtml(mark.style)}</small><h3>${escapeHtml(mark.name)}</h3></div></div>
           <p class="mark-effect">${earned ? escapeHtml(mark.effect) : `Awaken the ${escapeHtml(regionName)} guardian to learn this discipline.`}</p>
           <p class="mark-note">${earned ? escapeHtml(mark.note) : "A promise still asleep."}</p>
+          ${earned ? `<p class="mark-practice">${practiced.includes(mark.id) ? "✦ Field note written" : `Field note · land a ${escapeHtml(mark.style.toLowerCase().replace(" + ", " or "))} hit in ${escapeHtml(regionName)} while carrying this Mark`}</p>` : ""}
           <button data-world-mark="${mark.id}" ${earned && !selected ? "" : "disabled"} aria-pressed="${!!selected}">${selected ? "✦ Carried" : earned ? "Carry this Mark" : "Sleeping"}</button>
         </article>`;
       }).join("")}</div>
