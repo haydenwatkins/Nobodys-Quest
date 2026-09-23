@@ -1291,6 +1291,7 @@ G.ui = (() => {
     const progress=goal.progress||{value:0,total:1,label:"YOUR JOURNEY"};
     const reward=G.fieldMasteryReward ? G.fieldMasteryReward() : null;
     const routes=G.localJourneyRoutes ? G.localJourneyRoutes() : [];
+    const carriedMark = G.activeWorldMarkDiscipline && G.activeWorldMarkDiscipline();
     const glasswater=G.state.mapId==="glasswaterDesert"?G.glasswaterSurvey?.():null;
     const prairie=G.state.mapId==="sunstepPrairie"?G.prairieSurvey?.():null;
     const mistwood=G.state.mapId==="mistwood"?G.mistwoodSurvey?.():null;
@@ -1324,7 +1325,7 @@ G.ui = (() => {
       <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
         <button data-menu-route="quests">Lessons</button></div>${lessonHtml}${reward?`<p class="next-reward">${escapeHtml(reward.reward)}</p>`:""}</article>
       <article class="field-card field-build"><div class="field-card-heading"><div><small>YOUR COMBINATION</small><h3>${escapeHtml(form.passive?.name||form.name)}</h3></div><button data-menu-route="forms">Change form</button></div>
-        <p>${escapeHtml(form.passive?.text||form.passive?.description||"Mix a borrowed art with your form's basic move.")}</p><div class="field-arts">${artButtons}</div></article>
+        <p>${escapeHtml(form.passive?.text||form.passive?.description||"Mix a borrowed art with your form's basic move.")}</p>${carriedMark ? `<p class="field-carried-mark">${carriedMark.icon} ${escapeHtml(carriedMark.name)} · ${escapeHtml(carriedMark.effect)}</p>` : ""}<div class="field-arts">${artButtons}</div></article>
       <article class="field-card field-place"><div><small>ROADS FROM HERE</small><h3>${escapeHtml(mapName)}</h3><p>${routes.map(route=>`${route.direction} · ${route.reason?"🔒 ":""}${escapeHtml(route.name)}`).join("<br>")}</p></div><button data-act="local-map">Local map</button></article>
       ${G.expeditionUnlocked()?`<button class="journey-crossing" data-menu-route="expedition"><span>◇ A different adventure</span><strong>Explore the Manyfold</strong><small>Borrow a power. Try a combination. Bring something home.</small></button>`:""}
     </section>`;
@@ -1481,6 +1482,10 @@ G.ui = (() => {
         G.setLegendFacet(labFormId, button.dataset.legendFacet);
         G.sfx.play("menu");
         buildMenu();
+      }));
+    menuEl.querySelectorAll("[data-world-mark]").forEach((button) =>
+      button.addEventListener("click", () => {
+        if (G.attuneWorldMark(button.dataset.worldMark || null)) buildMenu();
       }));
     const legendGuide = menuEl.querySelector("[data-legend-guide]");
     if (legendGuide) legendGuide.addEventListener("click", () => {
@@ -1762,16 +1767,41 @@ G.ui = (() => {
 
   function buildFormLab() {
     const legendReady = G.legendReadyForms && G.legendReadyForms().length > 0;
-    const labels = { roster: "Forms", loadout: "Arts", legends: `Legends${legendReady ? " ✦" : ""}`, skins: "Looks" };
+    const labels = { roster: "Forms", loadout: "Arts", marks: "Marks", legends: `Legends${legendReady ? " ✦" : ""}`, skins: "Looks" };
     let html = `<div class="form-lab-header">
       <div><h2>⚗ Form Lab</h2><p>Choose a shape, mix its arts, and make it your own.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
         `<button data-formlab-view="${id}" data-nav-zone="form-pages" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}<button data-menu-route="quests" data-nav-zone="form-pages">Mastery</button></div>
     </div>`;
     if (formLabView === "loadout") return html + buildLoadoutLab();
+    if (formLabView === "marks") return html + buildWorldMarkLab();
     if (formLabView === "legends") return html + buildLegendsLab();
     if (formLabView === "skins") return html + buildSkinsLab();
     return html + buildRosterLab();
+  }
+
+  function buildWorldMarkLab() {
+    const active = G.activeWorldMarkDiscipline();
+    const owned = G.ensureWorldwake().marks;
+    const regions = Object.values(G.WORLDWAKE_MARKS);
+    return `<section class="mark-bench">
+      <div class="mark-bench-intro"><span class="eyebrow">SIX PROMISES · ONE CARRIED LESSON</span>
+        <h2>The Worldbearers' Marks</h2>
+        <p>Each awakened guardian lends one way of fighting. Carry a Mark to shape every form's arts; choose a different one whenever your build changes.</p>
+        <strong>${active ? `${active.icon} ${escapeHtml(active.name)} carried · ${escapeHtml(active.effect)}` : `${owned.length}/6 awakened · No Mark carried`}</strong></div>
+      <div class="mark-bench-grid">${G.WORLD_MARK_DISCIPLINES.map((mark) => {
+        const earned = owned.includes(mark.id), selected = active && active.id === mark.id;
+        const source = regions.find((entry) => entry.id === mark.id);
+        const regionName = G.maps[source.region]?.name || source.region;
+        return `<article class="mark-stone ${selected ? "carried" : earned ? "awake" : "sleeping"}" style="--mark-ink:${mark.color}">
+          <div class="mark-stone-head"><span class="mark-glyph" aria-hidden="true">${mark.icon}</span><div><small>${escapeHtml(regionName)} · ${escapeHtml(mark.style)}</small><h3>${escapeHtml(mark.name)}</h3></div></div>
+          <p class="mark-effect">${earned ? escapeHtml(mark.effect) : `Awaken the ${escapeHtml(regionName)} guardian to learn this discipline.`}</p>
+          <p class="mark-note">${earned ? escapeHtml(mark.note) : "A promise still asleep."}</p>
+          <button data-world-mark="${mark.id}" ${earned && !selected ? "" : "disabled"} aria-pressed="${!!selected}">${selected ? "✦ Carried" : earned ? "Carry this Mark" : "Sleeping"}</button>
+        </article>`;
+      }).join("")}</div>
+      ${active ? `<button class="mark-set-aside" data-world-mark="">Set the Mark aside</button>` : ""}
+    </section>`;
   }
 
   function buildLegendsLab() {

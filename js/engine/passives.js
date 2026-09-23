@@ -191,6 +191,25 @@ G.passives = (() => {
       o.weight = Math.max(6, o.weight || 0);
     }
 
+    const mark = G.activeWorldMarkDiscipline && G.activeWorldMarkDiscipline();
+    if (mark) {
+      if (mark.id === "sky" && kind === "dash" && style === "dash") o.dist = (o.dist || 60) * 1.18;
+      if (mark.id === "stone" && kind === "melee" && style === "melee")
+        o.arcDeg = Math.min(360, (o.arcDeg || 100) + 20);
+      if (mark.id === "thread" && kind === "projectile" && style === "projectile") {
+        o.ricochets = (o.ricochets || 0) + 1;
+        o.bounceRange = Math.max(68, o.bounceRange || 0);
+      }
+      if (mark.id === "echo" && kind === "chain" && style === "chain")
+        o.jumpRange = (o.jumpRange || 48) * 1.25;
+      if (mark.id === "light" && style === "area") {
+        if (kind === "area") o.range = (o.range || 34) * 1.18;
+        if (kind === "projectile" && o.explodeRadius) o.explodeRadius *= 1.18;
+      }
+      if (mark.id === "heart" && (style === "melee" || style === "area") && (kind === "melee" || kind === "area"))
+        o.knockback = (o.knockback === undefined ? 90 : o.knockback) * 1.22;
+    }
+
     return o;
   }
 

@@ -83,7 +83,7 @@
   #menu .controller-hints { display:none; }
   #menu .form-lab-header { flex-direction:column; align-items:stretch; padding:6px; gap:4px; }
   #menu .form-lab-header h2 { display:none; }
-  #menu .form-lab-tabs { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); }
+  #menu .form-lab-tabs { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); }
   #menu .form-lab-tabs button { min-height:44px; font:600 12px "VT323",monospace; padding:4px; }
   #menu .console-roster-workbench { grid-template-columns:minmax(0,1fr) minmax(200px,.8fr); gap:8px; }
   #menu .console-roster-workbench>.form-stage { position:static; order:-1; }
@@ -167,6 +167,29 @@
 }
 #menu .form-lab-tabs button, #menu .lab-actions button { border-radius:0; }
 #menu .form-lab-tabs button.active { background:#e7b960; border-color:#ffe5a1; color:#342735; }
+#menu .mark-bench { display:grid; gap:12px; }
+#menu .mark-bench-intro { padding:18px 20px; border:3px double #d9ba7d; background:repeating-linear-gradient(90deg,#243b3b 0 18px,#273f3e 18px 36px); box-shadow:inset 0 0 0 4px #172e30; }
+#menu .mark-bench-intro .eyebrow { color:#d9ba7d; font:700 12px "VT323",monospace; letter-spacing:.12em; }
+#menu .mark-bench-intro h2 { margin:4px 0; color:#f6e9cd; font:32px/1.05 "VT323",monospace; }
+#menu .mark-bench-intro p { max-width:65ch; margin:5px 0 10px; color:#d1dfd5; font:17px/1.3 "VT323",monospace; }
+#menu .mark-bench-intro strong { color:#ffe4a4; font:18px "VT323",monospace; }
+#menu .mark-bench-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+#menu .mark-stone { min-width:0; display:flex; flex-direction:column; padding:15px; border:2px solid #86785a; background:#253437; box-shadow:inset 0 0 0 3px #192b2d,3px 3px #0d2020; }
+#menu .mark-stone.sleeping { opacity:.65; border-color:#526464; }
+#menu .mark-stone.carried { border-color:var(--mark-ink); background:#30403d; box-shadow:inset 0 0 0 3px #172a2d,0 0 0 2px #e1c17f; }
+#menu .mark-stone-head { display:flex; align-items:center; gap:11px; min-height:54px; }
+#menu .mark-glyph { display:grid; place-items:center; flex:none; width:44px; height:44px; border:2px solid var(--mark-ink); background:#172729; font-size:23px; }
+#menu .mark-stone-head small { color:#b8cac0; font:13px/1.1 "VT323",monospace; }
+#menu .mark-stone h3 { margin:3px 0; color:var(--mark-ink); font:25px/1 "VT323",monospace; }
+#menu .mark-stone p { margin:8px 0; color:#d6e0d3; font:16px/1.25 "VT323",monospace; }
+#menu .mark-stone .mark-effect { color:#fff0c5; min-height:40px; }
+#menu .mark-stone .mark-note { flex:1; }
+#menu .mark-stone button,#menu .mark-set-aside { min-height:44px; border:2px solid #c9a86a; border-radius:0; background:#314d48; color:#ffedc7; font:19px "VT323",monospace; }
+#menu .mark-stone.carried button { border-color:var(--mark-ink); background:#203e3d; }
+#menu .mark-set-aside { justify-self:start; padding:8px 18px; }
+#menu .field-carried-mark { margin:8px 0 12px; padding:5px 9px; border-left:3px solid #e7bd78; color:#ffe4a4; background:#2e4140; }
+@media(max-width:760px) { #menu .mark-bench-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:500px) { #menu .mark-bench-grid { grid-template-columns:1fr; } }
 #menu button:focus-visible, #menu button.controller-focus { outline:3px solid #fff2ba; outline-offset:2px; }
 @media (orientation:landscape) and (max-height:500px) {
   #menu .menu-tabs button, #menu .menu-route-tabs button, #menu .menu-footer button { font:20px/1 "VT323",monospace; }

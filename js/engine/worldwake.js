@@ -28,6 +28,17 @@ G.WORLDWAKE_MARKS = {
   "trophy-last-worldbearer": { id: "heart", name: "Worldheart Mark", icon: "🗿", region: "titanGrave" },
 };
 
+// A World Mark can also teach one combat discipline. Only one answer can be
+// carried at a time; this is a build choice, not a permanent stat increase.
+G.WORLD_MARK_DISCIPLINES = [
+  { id: "sky", name: "Open Sky", style: "Dash", icon: "🪶", color: "#73eff7", effect: "Dashes travel 18% farther.", note: "Cross gaps, escape a field, or turn a dash art into an approach." },
+  { id: "stone", name: "Patient Stone", style: "Melee", icon: "🪨", color: "#d8b06a", effect: "Melee sweeps gain 20° of arc.", note: "Hold a crowd in front of you and make each close strike count." },
+  { id: "thread", name: "Silver Thread", style: "Projectile", icon: "🕸️", color: "#d9a7ff", effect: "Projectiles ricochet to one extra target.", note: "Angle a shot through clustered enemies and narrow roads." },
+  { id: "echo", name: "Clear Echo", style: "Chain", icon: "🔔", color: "#b9ddf4", effect: "Chain arts jump 25% farther.", note: "Carry a note from one enemy to the next." },
+  { id: "light", name: "Lantern Circle", style: "Area", icon: "🏮", color: "#ffcd75", effect: "Bursts and blast zones cover 18% more ground.", note: "Make room around you when a formation closes in." },
+  { id: "heart", name: "Worldheart", style: "Melee + Area", icon: "🗿", color: "#f29c8d", effect: "Close and area arts push 22% harder.", note: "Move a dangerous foe before it can control the road." },
+];
+
 G.WORLDWAKE_FAVORS = [
   { id: "firstFootsteps", name: "First Footsteps", text: "Discover 3 Worldwake regions", kind: "regions", count: 3, stars: 2 },
   { id: "campfireStories", name: "Campfire Stories", text: "Read 6 signs in the new world", kind: "signs", count: 6, stars: 2 },
@@ -46,6 +57,7 @@ G.makeWorldwake = function () {
     favorsDone: [],
     caravanLevel: 0,
     heardBanter: [],
+    attunedMark: null,
   };
 };
 
@@ -70,6 +82,8 @@ G.normalizeWorldwake = function (saved, legacySave) {
     const mark = G.WORLDWAKE_MARKS[item];
     if (mark && !campaign.marks.includes(mark.id)) campaign.marks.push(mark.id);
   }
+  const attuned = saved && saved.attunedMark;
+  campaign.attunedMark = markIds.has(attuned) && campaign.marks.includes(attuned) ? attuned : null;
   if (legacySave && regionIds.has(legacySave.mapId) && !campaign.discovered.includes(legacySave.mapId))
     campaign.discovered.push(legacySave.mapId);
   return campaign;
@@ -120,6 +134,24 @@ G.checkWorldwakeFavors = function (quiet) {
 
 G.hasWorldMark = function (id) {
   return !!(G.state && G.ensureWorldwake().marks.includes(id));
+};
+
+G.activeWorldMarkDiscipline = function () {
+  const campaign = G.state && G.ensureWorldwake();
+  return campaign && campaign.marks.includes(campaign.attunedMark)
+    ? G.WORLD_MARK_DISCIPLINES.find((mark) => mark.id === campaign.attunedMark) || null : null;
+};
+
+G.attuneWorldMark = function (id) {
+  if (!G.state) return false;
+  const campaign = G.ensureWorldwake();
+  if (id !== null && (!campaign.marks.includes(id) || !G.WORLD_MARK_DISCIPLINES.some((mark) => mark.id === id))) return false;
+  if (campaign.attunedMark === id) return false;
+  campaign.attunedMark = id;
+  G.sfx.play("pickup");
+  G.ui.toast(id ? `${G.WORLD_MARK_DISCIPLINES.find((mark) => mark.id === id).name} carried into battle.` : "World Mark discipline set aside.", 3);
+  G.saveGame();
+  return true;
 };
 
 G.worldwakePurified = function (mapId) {
@@ -214,8 +246,9 @@ G.events.on("pickup", (data) => {
         : mark.id === "heart"
           ? "The Last Worldbearer gives the road back to everyone. A heartlit arch opens at Titan Grave's southern edge and answers another beside the Final Firmament in Greenfield. Walk through to return to the first horizon."
         : "The region changes, and a new World Path answers you.";
-    if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening, { accent: mark.color || "#ffcd75" });
-    else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening);
+    const news = `${awakening} Its fighting lesson is ready in Form Lab / Marks.`;
+    if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, news, { accent: mark.color || "#ffcd75" });
+    else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, news);
   }
   G.checkWorldwakeFavors(false);
 });
