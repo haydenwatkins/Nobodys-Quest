@@ -11,6 +11,9 @@ The user used the available reset on September 22. The stopping target is 50% of
 ### Final Firmament campaign gate (September 22)
 The God trial now asks for all six World Marks as well as the existing level-five form mastery. The sealed entrance reports mark progress and points toward the next Worldbearer. Saves that already earned God's Spark can still revisit the original finale. Route guidance reads the same gate as collision and entry, so it will not direct players through a sealed trial.
 
+### Frostbell Echo Mark payoff (September 22)
+Purifying Bongle awakens resonant ice across both southern lakes, making direct north-south links from shore to lower causeway. The Echo Mark rebuilds both on return and from old trophy saves. Victory dialogue and the Journey journal explain the new crossings; bright bellwork distinguishes them from ordinary ice. Focused route and persistence checks, visual inspection, full suite, and shipping status follow in the task output.
+
 ### Hanging Gardens Stone Mark payoff (September 22)
 After purifying the Old Mason, stone crossings rise through two western garden channels, shortening the route between the upper terrace, middle road, and southern promenade. The change uses the existing Stone Mark, activates on pickup, and restores on reload for old trophy saves. The victory dialogue and Journey journal explain the new roads. The raised stones have a carved, mossy pixel treatment. Focused checks cover both channels, old saves, return visits, normal routes and edge exits; before and after canvas renders were inspected. Full suite and push status are recorded in the September 22 task output.
 

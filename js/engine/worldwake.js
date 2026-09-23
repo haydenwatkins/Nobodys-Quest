@@ -207,6 +207,8 @@ G.events.on("pickup", (data) => {
         ? "The Old Mason lays his tools down. Stone steps rise through both western garden channels, joining the caravan side to the upper terraces and southern promenade. His roads will hold whenever you return."
         : mark.id === "thread"
           ? "Tess gathers her broken web and begins again. Woven passages now join Rootdeep's lower chambers across both root walls. Follow the pale crossing threads toward the eastern road; they will be here when you return."
+        : mark.id === "echo"
+          ? "Bongle rings one clear note across Frostbell. Resonant ice now bridges both southern lakes from shore to causeway. Follow the golden chimes through the water; the crossings will answer whenever you return."
         : "The region changes, and a new World Path answers you.";
     if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening, { accent: mark.color || "#ffcd75" });
     else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening);
