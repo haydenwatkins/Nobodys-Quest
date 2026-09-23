@@ -117,6 +117,75 @@ function storyProgress(value, total, label) {
   return { value: Math.min(total, Math.max(0, value)), total, label };
 }
 
+// The final portfolio can include forms whose guardian or parent lesson is
+// still missing. Resolve the next attainable step rather than pointing at a
+// quest belonging to a form the player cannot wear yet.
+const trophyChallenges = new Map();
+function trophyChallenge(itemId) {
+  if (!trophyChallenges.has(itemId)) {
+    let found = null;
+    for (const [mapId, map] of Object.entries(G.maps || {})) {
+      const cell = Object.values(map.legend || {}).find(entry => entry.enemy && G.enemies[entry.enemy]?.trophy === itemId);
+      if (cell) { found = { mapId, destination: map.name, enemy: G.enemies[cell.enemy].name,
+        prize: G.enemies[cell.enemy].trophyName || "its trophy" }; break; }
+    }
+    trophyChallenges.set(itemId, found);
+  }
+  return trophyChallenges.get(itemId);
+}
+
+function finaleFormLead(formId, progress, seen = new Set()) {
+  if (seen.has(formId) || !G.forms[formId]) return null;
+  seen.add(formId);
+  const form = G.forms[formId];
+  if (G.formReady(formId)) {
+    const echo = G.formEchoFor && G.formEchoFor(formId);
+    return { guide: "echo", formId, mapId: echo?.mapId || G.state.mapId,
+      destination: echo ? G.maps[echo.mapId].name : G.maps[G.state.mapId].name,
+      title: `Meet the ${form.name} Form Echo`, short: echo ? `Approach ${form.name}'s echo` : `Reveal ${form.name}'s echo in battle`,
+      objective: echo ? `Approach ${form.name}'s Form Echo in ${G.maps[echo.mapId].name}.` : `Win a battle to reveal ${form.name}'s Form Echo, then approach it.`,
+      reason: `${form.name}'s path is complete. Its answer is ready to join Nobody's final portfolio.`, progress };
+  }
+  const steps = G.formUnlockSteps ? G.formUnlockSteps(formId).filter(step => !step.met) : [];
+  const trophy = steps.find(step => step.kind === "trophy" && trophyChallenge(step.itemId));
+  if (trophy) {
+    const fight = trophyChallenge(trophy.itemId);
+    return { guide: "boss", mapId: fight.mapId, destination: fight.destination,
+      title: `Recover ${form.name}'s missing lesson`, short: `Face ${fight.enemy} in ${fight.destination}`,
+      objective: `Defeat ${fight.enemy} in ${fight.destination} to claim ${fight.prize} for ${form.name}.`,
+      reason: `${form.name}'s guardian still holds one answer needed for the final portfolio. Other mastery requirements remain visible in Form Lab.`, progress };
+  }
+  for (const step of steps) {
+    const options = step.options ? step.options.filter(option => !option.met).map(option => ({ id: option.formId, target: option.target })) :
+      step.formIds ? step.formIds.filter(id => G.formLevel(id) < step.target).map(id => ({ id, target: step.target })) : [];
+    for (const option of options) {
+      if (!G.formUnlocked(option.id)) continue;
+      const lesson = G.masteryLessons && G.masteryLessons(Infinity, option.id)[0];
+      if (!lesson) continue;
+      const source = G.forms[option.id];
+      return { guide: "mastery", formId: option.id, questId: lesson.quest.id,
+        title: `Learn the path to ${form.name}`, short: `Raise ${source.name} to level ${option.target} for ${form.name}`,
+        objective: `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. ${source.name} needs level ${option.target} to awaken ${form.name}.`,
+        reason: `${form.name}'s path begins with a lesson from ${source.name}. Borrowed arts count for their original forms.`, progress };
+    }
+    for (const option of options) if (!G.formUnlocked(option.id)) {
+      const earlier = finaleFormLead(option.id, progress, seen);
+      if (earlier) return earlier;
+    }
+    if (step.kind === "stars") {
+      const lesson = G.masteryLessons && G.masteryLessons(1)[0];
+      if (lesson) return { guide: "mastery", formId: lesson.form.id, questId: lesson.quest.id,
+        title: `Learn the path to ${form.name}`, short: `Earn more stars for ${form.name}`,
+        objective: `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. ${form.name}'s path needs more stars.`,
+        reason: "A completed lesson opens another path into the final portfolio.", progress };
+    }
+  }
+  return { guide: "mastery", formId,
+    title: `Find the path to ${form.name}`, short: `Awaken ${form.name}`,
+    objective: `Awaken ${form.name}. ${G.unlockHint(formId)} Review its remaining steps in Form Lab.`,
+    reason: "The final portfolio needs every shape, including forms not yet awakened.", progress };
+}
+
 G.storyComplete = function () {
   return hasItem("god-spark");
 };
@@ -267,6 +336,14 @@ G.storyGoal = function () {
     const focus = exam.missingBreadth.length ? exam.missingBreadth :
       G.formOrder.filter((id) => id !== "god" && G.forms[id] && !G.forms[id].invalid && G.formLevel(id) < 5);
     const lesson = G.masteryLessons && G.masteryLessons(Infinity).find(entry => focus.includes(entry.form.id));
+    const progress = storyProgress(exam.broad + Math.min(exam.specialists, exam.specialistGoal), exam.total + exam.specialistGoal, "FINAL PREPARATION");
+    const locked = focus.find(id => !G.formUnlocked(id));
+    if (!lesson && locked) {
+      const lead = finaleFormLead(locked, progress);
+      return Object.assign(base, lead, {
+        objective: `${lead.objective} Bring every form to level 3 and six favorites to level 5.`,
+      });
+    }
     const form = lesson ? lesson.form : G.forms[focus[0]];
     const step = lesson ? `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}.` :
       G.formUnlocked && !G.formUnlocked(form.id) ? `Awaken ${form.name}. ${G.unlockHint(form.id)}` : `Practice ${form.name}'s remaining lessons.`;
@@ -275,7 +352,7 @@ G.storyGoal = function () {
       title: "Learn every path, master your favorites", short: `${exam.broad}/${exam.total} forms at level 3 · ${exam.specialists}/${exam.specialistGoal} mastered`,
       objective: `${step} Bring every form to level 3 and six chosen forms to level 5. Borrowed arts count for their original forms.`,
       reason: "The final answer needs experience with every shape and a handful of lessons carried all the way through.",
-      progress: storyProgress(exam.broad + Math.min(exam.specialists, exam.specialistGoal), exam.total + exam.specialistGoal, "FINAL PREPARATION"),
+      progress,
     });
   }
   return Object.assign(base, {

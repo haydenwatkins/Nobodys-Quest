@@ -1301,7 +1301,7 @@ G.ui = (() => {
     const ridge=G.state.mapId==="emberRidge"?G.ridgeSurvey?.():null;
     const marsh=G.state.mapId==="sunkenMarsh"?G.marshSurvey?.():null;
     const followedRequest=G.followedSunriseRequest?.();
-    const deliveryHandoff = G.state.delivery?.complete && !goal.complete && !G.state.expeditionRun;
+    const deliveryHandoff = G.state.delivery?.complete && goal.chapter <= 1 && !goal.complete && !G.state.expeditionRun;
     return `<section class="field-dashboard journey-home">
       ${deliveryHandoff ? `<article class="journey-road"><strong>☀ The Long Way Home · Complete</strong><p>Your parcels reached Sunrise. Keep building your town, try a Manyfold crossing, or follow the next adventure below. Parcel’s cart connects the quay to Orchard Road and Greenfield.</p><button data-menu-route="town">Small promises · visit your neighbours</button></article>` : ""}
       ${followedRequest?`<article class="journey-road"><span class="eyebrow">A PROMISE TO ${escapeHtml(followedRequest.name.toUpperCase())}</span><h3>${escapeHtml(followedRequest.title)}</h3><p>${escapeHtml(followedRequest.ready?`Return to ${followedRequest.name} on the quay.`:followedRequest.task)}</p><button data-follow-request="${followedRequest.id}">Show the way</button><button data-stop-request>Set aside</button></article>`:""}

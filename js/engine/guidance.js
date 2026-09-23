@@ -218,6 +218,10 @@
 
   function masteryTarget(goal) {
     const s = G.state;
+    if (goal.formId && !G.formUnlocked(goal.formId) && !goal.questId) return {
+      kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦", spatial: false,
+      destination: G.forms[goal.formId]?.name || "a new form", text: goal.objective,
+    };
     const lesson = (goal.questId && G.questById(goal.questId)) ||
       (G.masteryLessons && G.masteryLessons(1, goal.formId)[0]) || firstOpenQuest(goal.formId);
     if (!lesson) return null;
