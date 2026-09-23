@@ -235,7 +235,7 @@
     };
     const loadout = G.getLoadout(s.formId);
     const damageType = ["kill", "wardBreak"].includes(quest.event) ? match.damageType : null;
-    const groupSize = quest.event === "multiHit" && match.hits?.gte > 1 ? match.hits.gte : 0;
+    const groupSize = quest.event === "multiHit" ? Math.max(2, match.hits?.gte || 2) : 0;
     const missingArt = (match.ability || quest.lessonArt) && !loadout.includes(match.ability || quest.lessonArt);
     const missingType = damageType && !loadout.some(id => G.abilities[id]?.type === damageType);
     if (missingArt || missingType) {

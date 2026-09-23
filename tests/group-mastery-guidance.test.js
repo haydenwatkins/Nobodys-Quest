@@ -31,3 +31,31 @@ test('group mastery asks for enough live targets before drawing a field trail', 
   assert.equal(target.spatial, false, 'dead foes must not count toward a group lesson');
   assert.match(target.text, /Only 2\/3/);
 });
+
+test('combo-only multi-hit lessons need two foes, and Mole requires the three it promises', () => {
+  const r = runtime(), { G } = r;
+  G.state.opening.complete = true;
+  G.state.delivery.complete = true;
+  G.state.claimedForms = ['turtle', 'mole'];
+  G.questsDone = [G.forms.turtle.quests[0].id, G.forms.mole.quests[0].id];
+  G.state.formId = 'turtle';
+  r.load('overworld'); r.drain();
+  const turtle = G.forms.turtle.quests[1];
+  G.storyGoal = () => ({ guide: 'mastery', formId: 'turtle', questId: turtle.id });
+  const x = G.state.player.x, y = G.state.player.y;
+  G.state.enemies = [G.makeEnemy('slime', x + 40, y)];
+  assert.match(G.guidanceTarget().text, /Only 1\/2 baddies remain/);
+  G.state.enemies.push(G.makeEnemy('slime', x + 50, y));
+  assert.match(G.guidanceTarget().text, /Draw 2 baddies together/);
+
+  G.state.formId = 'mole';
+  const mole = G.forms.mole.quests[1];
+  G.storyGoal = () => ({ guide: 'mastery', formId: 'mole', questId: mole.id });
+  assert.match(G.guidanceTarget().text, /Only 2\/3 baddies remain/);
+  G.events.emit('multiHit', { ability: 'drillTap', combo: 'eruption', hits: 2 });
+  assert.equal(G.questProgress(mole), 0, 'two hits cannot satisfy the stated three-target lesson');
+  G.state.enemies.push(G.makeEnemy('slime', x + 60, y));
+  assert.match(G.guidanceTarget().text, /Draw 3 baddies together/);
+  G.events.emit('multiHit', { ability: 'drillTap', combo: 'eruption', hits: 3 });
+  assert.equal(G.questProgress(mole), 1);
+});
