@@ -234,6 +234,23 @@ G.storyGoal = function () {
   if (chapter === 3 || chapter === 4) {
     const range = chapter === 3 ? worldbearers.slice(0, 3) : worldbearers.slice(3);
     const next = range.find((guardian) => !marks.includes(guardian.mark)) || worldbearers.find((guardian) => !marks.includes(guardian.mark));
+    // Only the western return road adds a late star gate; avoid searching the
+    // whole map graph for a goal the HUD may request every frame.
+    const route = chapter === 4 && stars < 28 && next && G.state.mapId && G.guidanceRoute &&
+      G.guidanceRoute(G.state.mapId, next.mapId);
+    const firstGate = route && route.steps.find((step) => step.reason);
+    if (firstGate && firstGate.cell.stars > stars && !firstGate.cell.mark && !firstGate.cell.mastery && !firstGate.cell.masteryPortfolio) {
+      const road = G.maps[firstGate.to]?.name || firstGate.to;
+      const lesson = G.masteryLessons && G.masteryLessons(1)[0];
+      return Object.assign(base, {
+        guide: "mastery", questId: lesson && lesson.quest.id,
+        title: `Open the road to ${road}`, short: `Earn ${firstGate.cell.stars - stars} more ⭐ for ${road}`,
+        objective: lesson ? `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. Then cross ${road} toward ${next.destination}.`
+          : `Complete form lessons to open ${road}, then continue toward ${next.destination}.`,
+        reason: `The path to ${next.destination} runs through ${road}. The Worldbearer beyond it can wait while Nobody learns one more answer.`,
+        progress: storyProgress(stars, firstGate.cell.stars, "STARS"),
+      });
+    }
     return Object.assign(base, {
       guide: "boss",
       mapId: next ? next.mapId : "titanGrave", destination: next ? next.destination : "Titan Grave",

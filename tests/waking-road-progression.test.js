@@ -89,3 +89,35 @@ test('a 24-star traveler crosses into Worldwake, meets the first guardian, and e
   assert.ok(G.hasWorldMark('sky'));
   assert.equal(G.storyGoal().mapId, 'hangingGardens');
 });
+
+test('after the third Mark, a missing Shattercoast star takes priority over the impossible Titan shortcut', () => {
+  const r = runtime(), {G} = r;
+  r.load('rootdeepHollow'); r.drain();
+  G.state.opening.complete = true;
+  G.state.delivery.complete = true;
+  G.state.stars = 27;
+  G.state.worldwake.marks = ['sky', 'stone', 'thread'];
+  G.state.worldwake.discovered = ['sunstepPrairie', 'windscarCanyon', 'hangingGardens', 'rootdeepHollow'];
+
+  const route = G.guidanceRoute('rootdeepHollow', 'frostbellTundra');
+  assert.equal(route.locks, 1);
+  assert.equal(route.steps.find(step => step.reason).to, 'shattercoast');
+  assert.ok(!route.steps.some(step => step.to === 'titanGrave'));
+  assert.match(G.guidanceRouteTarget({ mapId: 'frostbellTundra', guide: 'boss' }).text, /1 more star/);
+
+  let goal = G.storyGoal();
+  assert.equal(G.storyChapter(), 4);
+  assert.equal(goal.guide, 'mastery');
+  assert.match(goal.short, /1 more.*Shattercoast/);
+  assert.ok(goal.questId, 'the star gate should lead to an earned, unfinished lesson');
+
+  const quest = G.questById(goal.questId).quest;
+  assert.equal(quest.event, 'hit');
+  for (let hit = 0; hit < quest.count; hit++) G.events.emit('hit', { ability: quest.match.ability });
+  assert.equal(G.state.stars, 28);
+  assert.ok(G.questsDone.includes(quest.id));
+  goal = G.storyGoal();
+  assert.equal(goal.guide, 'boss');
+  assert.equal(goal.mapId, 'frostbellTundra');
+  assert.equal(G.guidanceRoute('rootdeepHollow', goal.mapId).locks, 0);
+});

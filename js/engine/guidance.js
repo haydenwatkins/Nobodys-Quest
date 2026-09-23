@@ -75,11 +75,22 @@
   G.guidanceRoute = function (start, destination) {
     if (!start || !destination || start === destination) return null;
     // Prefer any open road over a shorter sealed one. If no open road exists,
-    // retain the least-blocked route so the guide can explain its first gate.
-    const queue = [{ mapId: start, locks: 0, steps: [] }];
+    // favor a star lesson over a missing World Mark. A mark may be held by a
+    // guardian beyond the destination, while stars can be earned on this side.
+    const gateBurden = (cell, reason) => {
+      if (!reason) return 0;
+      const missingMark = cell.mark && !(G.hasWorldMark && G.hasWorldMark(cell.mark));
+      const missingPortfolioMarks = cell.allWorldMarks && !(G.state.items || []).includes("god-spark") &&
+        Object.values(G.WORLDWAKE_MARKS || {}).some(mark => !(G.hasWorldMark && G.hasWorldMark(mark.id)));
+      if (missingMark || missingPortfolioMarks) return 4;
+      if (cell.mastery || cell.masteryPortfolio) return 3;
+      if (cell.stars && G.state.stars < cell.stars) return 1;
+      return 2;
+    };
+    const queue = [{ mapId: start, locks: 0, burden: 0, steps: [] }];
     const visited = new Set();
     while (queue.length) {
-      queue.sort((a, b) => a.locks - b.locks || a.steps.length - b.steps.length);
+      queue.sort((a, b) => a.locks - b.locks || a.burden - b.burden || a.steps.length - b.steps.length);
       const current = queue.shift(), mapId = current.mapId;
       if (visited.has(mapId)) continue;
       visited.add(mapId);
@@ -89,7 +100,7 @@
         if (!next || visited.has(next) || !G.maps[next]) continue;
         const reason = (G.world.portalBlockReason && G.world.portalBlockReason(portal.cell)?.text) ||
           (G.journeyGateReason && G.journeyGateReason(mapId, next)) || null;
-        queue.push({ mapId: next, locks: current.locks + Number(!!reason),
+        queue.push({ mapId: next, locks: current.locks + Number(!!reason), burden: current.burden + gateBurden(portal.cell, reason),
           steps: [...current.steps, { ...portal, from: mapId, to: next, reason }] });
       }
     }
