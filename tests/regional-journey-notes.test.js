@@ -34,10 +34,30 @@ test('Glasswater notes recognize the earned Lantern Mark at the southern gate', 
   G.ui.openMenu();
   const menu = r.nodes.get('menu');
   assert.ok(menu.innerHTML.includes('Lantern Mark is still required'));
+  assert.ok(!menu.innerHTML.includes('even before the shortcut opens'));
   G.ensureWorldwake().marks.push('light');
   G.ui.openMenu();
   assert.ok(menu.innerHTML.includes('Your Lantern Mark opens Titan Grave'));
   assert.ok(!menu.innerHTML.includes('Lantern Mark is still required'));
+});
+
+test('Rootdeep detour notes follow the Prism, sundial and Lantern Mark on return visits', () => {
+  const r = runtime(), { G } = r;
+  G.state.opening.complete = true;
+  r.load('rootdeepHollow'); r.drain(); r.run('js/engine/ui.js');
+  G.ui.openMenu();
+  const menu = r.nodes.get('menu');
+  assert.ok(menu.innerHTML.includes('find the Prism and awaken its sundial'));
+  G.state.items.push('glasswater-prism');
+  G.ui.openMenu();
+  assert.ok(menu.innerHTML.includes('bring its Prism to the sundial'));
+  G.state.items.push('glasswater-meridian');
+  G.ui.openMenu();
+  assert.ok(menu.innerHTML.includes("Glasswater's awakened sundial"));
+  assert.ok(!menu.innerHTML.includes('find the Prism'));
+  G.ensureWorldwake().marks.push('light');
+  G.ui.openMenu();
+  assert.ok(menu.innerHTML.includes('Your Lantern Mark opens its southern Titan gate'));
 });
 
 test('Mistwood and Ember Ridge retire defeated guardian directions but keep side activities', () => {
