@@ -335,7 +335,12 @@ G.storyGoal = function () {
   if (!exam.ready) {
     const focus = exam.missingBreadth.length ? exam.missingBreadth :
       G.formOrder.filter((id) => id !== "god" && G.forms[id] && !G.forms[id].invalid && G.formLevel(id) < 5);
-    const lesson = G.masteryLessons && G.masteryLessons(Infinity).find(entry => focus.includes(entry.form.id));
+    const lessons = G.masteryLessons ? G.masteryLessons(Infinity).filter(entry => focus.includes(entry.form.id)) : [];
+    // During specialization, complete a nearly mastered form before sending
+    // the traveler into another level-three path. An explicit followed lesson
+    // remains the player's choice even when another form is closer to five.
+    const lesson = lessons.find(entry => entry.quest.id === G.state.lessonQuestId) ||
+      (!exam.missingBreadth.length && lessons.find(entry => G.formLevel(entry.form.id) === 4)) || lessons[0];
     const progress = storyProgress(exam.broad + Math.min(exam.specialists, exam.specialistGoal), exam.total + exam.specialistGoal, "FINAL PREPARATION");
     const locked = focus.find(id => !G.formUnlocked(id));
     if (!lesson && locked) {
