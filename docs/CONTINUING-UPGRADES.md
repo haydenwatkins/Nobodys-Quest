@@ -14,6 +14,9 @@ The God trial asks for all six World Marks, level 3 across the 23 earlier forms,
 ### Frostbell Echo Mark payoff (September 22)
 Purifying Bongle awakens resonant ice across both southern lakes, making direct north-south links from shore to lower causeway. The Echo Mark rebuilds both on return and from old trophy saves. Victory dialogue and the Journey journal explain the new crossings; bright bellwork distinguishes them from ordinary ice. Focused route and persistence checks, visual inspection, full suite, and shipping status follow in the task output.
 
+### Stormspine Lantern Mark payoff (September 22)
+Mallow's victory lights the brass trail lamps and opens two golden cuts through the southern ridges. Both link the high road to the lower Stormglass trail and restore on return or from old trophy saves. The victory dialogue and Journey journal explain the new roads. The Echo Mark gate toward Titan Grave remains intact. Route/persistence checks, before-and-after visual inspection, full suite, and shipping status follow in the task output.
+
 ### Hanging Gardens Stone Mark payoff (September 22)
 After purifying the Old Mason, stone crossings rise through two western garden channels, shortening the route between the upper terrace, middle road, and southern promenade. The change uses the existing Stone Mark, activates on pickup, and restores on reload for old trophy saves. The victory dialogue and Journey journal explain the new roads. The raised stones have a carved, mossy pixel treatment. Focused checks cover both channels, old saves, return visits, normal routes and edge exits; before and after canvas renders were inspected. Full suite and push status are recorded in the September 22 task output.
 

@@ -209,6 +209,8 @@ G.events.on("pickup", (data) => {
           ? "Tess gathers her broken web and begins again. Woven passages now join Rootdeep's lower chambers across both root walls. Follow the pale crossing threads toward the eastern road; they will be here when you return."
         : mark.id === "echo"
           ? "Bongle rings one clear note across Frostbell. Resonant ice now bridges both southern lakes from shore to causeway. Follow the golden chimes through the water; the crossings will answer whenever you return."
+        : mark.id === "light"
+          ? "Mallow gathers the storm into one lantern. Every brass lamp along Stormspine's passes wakes, and two lit cuts open through the southern ridges. Follow their gold marks between the high road and lower trail whenever you return."
         : "The region changes, and a new World Path answers you.";
     if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening, { accent: mark.color || "#ffcd75" });
     else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening);
