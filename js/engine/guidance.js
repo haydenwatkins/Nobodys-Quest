@@ -227,6 +227,12 @@
     if (!lesson) return null;
     const quest = lesson.quest;
     const match = quest.match || {};
+    const requiredForm = quest.lessonForm || (quest.event === "parry" ? match.form : null);
+    if (requiredForm && s.formId !== requiredForm) return {
+      kind: "form", color: G.GUIDANCE_COLORS.form, icon: G.forms[requiredForm]?.icon || "✦", spatial: false,
+      destination: G.forms[requiredForm]?.name || lesson.form.name,
+      text: `Open Build's lesson book to become ${G.forms[requiredForm]?.name || "the required form"} and follow ${quest.text.toLowerCase()}.`,
+    };
     const loadout = G.getLoadout(s.formId);
     const damageType = ["kill", "wardBreak"].includes(quest.event) ? match.damageType : null;
     const missingArt = match.ability && !loadout.includes(match.ability);

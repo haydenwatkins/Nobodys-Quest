@@ -1250,11 +1250,13 @@ G.ui = (() => {
     const form = G.forms[G.state.formId];
     return `<section class="lesson-book"><span class="eyebrow">THE BORROWED LESSON BOOK</span><h3>A little more somebody</h3>
       ${G.state.lessonQuestId ? '<button data-lesson-auto>Let the field choose my lesson</button>' : ""}
-      <p>Wearing ${escapeHtml(form.name)}. Borrow an art: its original form earns mastery and you earn a star. An unused recipe card keeps your previous mix.</p>
+      <p>Wearing ${escapeHtml(form.name)}. Borrow an art or become the form a lesson needs. Its original form earns mastery and you earn a star. An unused recipe card keeps your previous mix.</p>
       <div class="lesson-leaves">${lessons.map(entry => `<article><small>${escapeHtml(entry.form.name)} · ${entry.progress}/${entry.quest.count}</small>
         <h4>${escapeHtml(entry.quest.text)}</h4><p>${escapeHtml(entry.reward)}</p>
         ${entry.synergy ? `<p class="lesson-synergy">◆ ${escapeHtml(entry.synergy)}</p>` : ""}
-        <div class="lesson-actions">${entry.ability && entry.slot < 0 ? [1, 2].filter(slot => slot <= form.slots).map(slot =>
+        <div class="lesson-actions">${entry.requiredForm && entry.requiredForm !== form.id ?
+          `<button data-lesson="${entry.quest.id}" data-lesson-slot="1">Become ${escapeHtml(G.forms[entry.requiredForm].name)} &amp; follow</button>` :
+          entry.ability && entry.slot < 0 ? [1, 2].filter(slot => slot <= form.slots).map(slot =>
           `<button data-lesson="${entry.quest.id}" data-lesson-slot="${slot}">Borrow ${escapeHtml(G.abilities[entry.ability].name)} in ${["A", "B", "C"][slot]}</button>`).join("") :
           `<button data-lesson="${entry.quest.id}" data-lesson-slot="1">${G.state.lessonQuestId === entry.quest.id ? "Following this lesson" : "Follow this lesson"}</button>`}</div></article>`).join("")}</div></section>`;
   }
@@ -1287,7 +1289,7 @@ G.ui = (() => {
     const lessonHtml = lesson ? `<div class="field-lesson"><span>${lesson.form.icon}</span><div><strong>${escapeHtml(lesson.quest.text)}</strong>
       <small>${escapeHtml(lesson.form.name)} mastery · ${lesson.progress}/${lesson.quest.count}${lesson.slot > 0 ? ` · Slot ${["A", "B", "C"][lesson.slot]}` : ""}</small>
       <i><b style="width:${Math.round(100 * lesson.progress / Math.max(1, lesson.quest.count))}%"></b></i></div></div>`
-      : `<div class="field-lesson complete"><span>✓</span><div><strong>Every known lesson is complete</strong><small>Your forms remember everything you taught them.</small></div></div>`;
+      : `<div class="field-lesson complete"><span>✦</span><div><strong>No lesson for this mix</strong><small>Change form or visit Build / Mastery to choose another lesson.</small></div></div>`;
     const progress=goal.progress||{value:0,total:1,label:"YOUR JOURNEY"};
     const reward=G.fieldMasteryReward ? G.fieldMasteryReward() : null;
     const routes=G.localJourneyRoutes ? G.localJourneyRoutes() : [];

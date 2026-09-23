@@ -106,7 +106,12 @@ G.relevantMasteryQuests = function (limit) {
       const quest = form.quests[questIndex];
       if (G.questsDone.includes(quest.id)) continue;
       const match = quest.match || {};
+      const requiredForm = quest.lessonForm || (quest.event === "parry" ? match.form : null);
+      if (requiredForm && requiredForm !== formId) continue;
       const slot = match.ability && equipped.has(match.ability) ? equipped.get(match.ability) : -1;
+      if (match.ability && slot < 0) continue;
+      if (["kill", "wardBreak"].includes(quest.event) && match.damageType &&
+          !loadout.some(id => G.abilities[id]?.type === match.damageType)) continue;
       const progress = G.questProgress(quest);
       let score = id === formId ? 60 : 0;
       if (slot >= 0) score += 90 + (slot === 0 ? 2 : 4 - slot);
@@ -123,7 +128,8 @@ G.relevantMasteryQuests = function (limit) {
 
 G.fieldMasteryQuest = function () {
   const chosen = G.masteryLessons && G.masteryLessons(1, null, true)[0];
-  if (chosen && (!chosen.ability || chosen.slot >= 0)) return chosen;
+  if (chosen && (!chosen.requiredForm || chosen.requiredForm === G.state.formId) &&
+      (!chosen.ability || chosen.slot >= 0)) return chosen;
   return G.relevantMasteryQuests(1)[0] || null;
 };
 
@@ -156,26 +162,31 @@ G.masteryLessons = function (limit, formId, chosenOnly) {
       if (G.questsDone.includes(quest.id)) continue;
       if (chosenOnly && quest.id !== G.state.lessonQuestId) continue;
       const match = quest.match || {};
+      const requiredForm = quest.lessonForm || (quest.event === "parry" ? match.form : null);
+      const lessonBody = requiredForm ? G.forms[requiredForm] : body;
+      if (!lessonBody || (requiredForm && !G.formUnlocked(requiredForm))) continue;
+      const lessonLoadout = requiredForm ? G.getLoadout(requiredForm) : loadout;
       // Damage-type kills and ward breaks accept any art of that type.
       // Offer one the player already carries first, then another earned art
       // they can borrow into the current build.
       const damageType = ["kill", "wardBreak"].includes(quest.event) && Object.keys(match).length === 1 ? match.damageType : null;
-      const ability = match.ability || (damageType ? (loadout.find(id => G.abilities[id]?.type === damageType) ||
+      const ability = match.ability || (quest.event === "parry" && requiredForm ? lessonBody.basic : null) ||
+        (damageType ? (lessonLoadout.find(id => G.abilities[id]?.type === damageType) ||
         [...available].find(id => G.abilities[id]?.type === damageType)) : null);
-      if (ability && (!available.has(ability) || (match.form && match.form !== body.id))) continue;
+      if (ability && (!available.has(ability) || (match.form && match.form !== lessonBody.id))) continue;
       // General lessons are offered only when their event has no hidden
       // equipment condition. Other status/ward lessons remain in the journal.
       if (!ability && (Object.keys(match).length || !["sign", "pickup", "kill"].includes(quest.event))) continue;
-      const slot = ability ? loadout.indexOf(ability) : -1;
-      if (ability && slot < 0 && !body.slots) continue;
+      const slot = ability ? lessonLoadout.indexOf(ability) : -1;
+      if (ability && slot < 0 && !lessonBody.slots) continue;
       const progress = G.questProgress(quest);
       const form = G.forms[id], level = G.formLevel(id);
       const nextArt = (form.abilities || []).find(a => a.level === level + 1 && G.abilities[a.id]);
-      const synergy = ability && G.passives ? G.passives.synergyText(body, G.abilities[ability]) : "";
+      const synergy = ability && G.passives ? G.passives.synergyText(lessonBody, G.abilities[ability]) : "";
       const reward = nextArt ? `Unlock ${G.abilities[nextArt.id].name} · +1 star` : `${form.name} level ${level + 1} · +1 star`;
       const score = (quest.id === G.state.lessonQuestId ? 1000 : 0) + (slot >= 0 ? 100 : 0) +
         progress / Math.max(1, quest.count) * 60 + (synergy ? 20 : 0) + (id === body.id ? 10 : 0);
-      entries.push({ form, quest, ability, slot, progress, reward, synergy, score });
+      entries.push({ form, quest, ability, slot, requiredForm, progress, reward, synergy, score });
     }
   }
   entries.sort((a, b) => b.score - a.score);
@@ -185,6 +196,11 @@ G.masteryLessons = function (limit, formId, chosenOnly) {
 G.prepareMasteryLesson = function (questId, slot) {
   const lesson = G.masteryLessons(Infinity).find(entry => entry.quest.id === questId);
   if (!lesson) return false;
+  if (lesson.ability && lesson.slot < 0 && (!Number.isInteger(slot) || slot < 1 || slot > G.forms[lesson.requiredForm || G.state.formId].slots)) return false;
+  if (lesson.requiredForm && G.state.formId !== lesson.requiredForm) {
+    G.setForm(lesson.requiredForm);
+    if (G.state.formId !== lesson.requiredForm) return false;
+  }
   const formId = G.state.formId, lo = G.getLoadout(formId);
   if (lesson.ability && !lo.includes(lesson.ability)) {
     if (!Number.isInteger(slot) || slot < 1 || slot > G.forms[formId].slots) return false;

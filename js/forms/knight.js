@@ -14,7 +14,7 @@ registerForm({
   ] },
   quests: [
     { text: "Turn aside 8 attacks with Oathguard", event: "parry", match: { form: "knight" }, count: 8 },
-    { text: "Land 6 golden Oathblade ripostes", event: "hit", match: { ability: "slash", combo: "riposte" }, count: 6 },
+    { text: "Land 6 golden Oathblade ripostes", event: "hit", match: { ability: "slash", combo: "riposte" }, lessonForm: "knight", count: 6 },
     { text: "Stun 10 baddies with Shield Advance", event: "status", match: { ability: "shieldBash", status: "stun" }, count: 10 },
     { text: "Drive back 3 baddies with one Hold the Line, 3 times", event: "multiHit", match: { ability: "spinSlash", combo: "hold-line", hits: { gte: 3 } }, count: 3 },
   ],
