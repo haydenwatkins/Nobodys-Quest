@@ -1,6 +1,24 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
 function setup(){const r=runtime();r.load('glasswaterDesert');r.drain();return r;}
 function dial(G){Object.assign(G.state.player,{x:376,y:104});}
+test('Rootdeep marks Glasswater as an optional reachable road while the Titan gate stays sealed',()=>{
+ const r=runtime(),{G}=r;r.load('rootdeepHollow');r.drain();G.state.enemies=[];
+ const sign=G.state.grid[14][43];
+ assert.match(sign.message,/Glasswater Desert/i);
+ assert.match(sign.message,/detour/i);
+ assert.equal(G.world.solid(43*16+8,14*16+8),false);
+ let spoken='';G.ui.dialogue=(_title,message)=>{spoken=message;};
+ Object.assign(G.state.player,{x:43*16+8,y:14*16+8});G.world.checkTriggers(.5);r.drain();
+ assert.match(spoken,/Lantern Mark/);
+ G.input.vec={x:0,y:0};G.world.checkTriggers(.5);r.drain();
+ G.input.vec={x:1,y:0};
+ for(let i=0;i<50&&G.state.mapId==='rootdeepHollow';i++){
+  G.world.moveBox(G.state.player,1.5,0);G.world.checkTriggers(.02);r.drain();
+ }
+ assert.equal(G.state.mapId,'glasswaterDesert');
+ assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));
+ assert.match(G.world.portalBlockReason(G.state.grid[28][23]).text,/Lantern Mark/);
+});
 test('Glasswater loop connects the prism, sundial, camp, exits and legend sites before alignment',()=>{
  const {G}=setup(),s=G.state,q=[[2,14]],seen=new Set(['2,14']);
  for(let i=0;i<q.length;i++){const [x,y]=q[i];for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx<0||ny<0||nx>=s.mapW||ny>=s.mapH||seen.has(k)||G.world.solid(nx*16+8,ny*16+8))continue;seen.add(k);q.push([nx,ny]);}}

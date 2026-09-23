@@ -8,6 +8,9 @@ Keep the game's pixel-art personality, form mixing, exploration, and depth. Make
 ## Current larger pass: campaign progression and build depth
 The user used the available reset on September 22. The stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
 
+### Glasswater's optional invitation (September 23)
+The six-Mark route crossing never enters Glasswater Desert, so its Prism and sundial could go unseen. A sign on Rootdeep's eastern exit now names that route as an optional detour, describes the Prism, and distinguishes it from the main road through Shattercoast and Frostbell. Rootdeep's Journey notes also name the detour and the Lantern Mark requirement at its southern Titan gate. The existing main quest remains on its open route. A physical portal crossing test confirms that the sign is on passable ground, the detour can be entered, and the Titan gate stays sealed without the Mark. Desktop Chrome at 844×390 showed the Journey note readable with vertical scrolling and the sign on the eastern field road; this is not physical device testing.
+
 ### Six-Mark road crossing audit (September 23)
 An integrated campaign simulation starts at the 24-star Sunstep Road, physically crosses every portal selected by route guidance, defeats each Worldbearer through its matching ward, and follows the resulting Mark to the next region. The normal discovery and three-guardian favors provide enough stars to open the 28-star Shattercoast return without grinding extra lessons. All six Marks lead to the final mastery portfolio, and the western route actually visits Shattercoast rather than a sealed Titan shortcut. This verifies connected roads, safe arrivals, gates, and story handoffs under simulated combat; it does not measure ordinary fight duration or replace a manual end-to-end playthrough.
 

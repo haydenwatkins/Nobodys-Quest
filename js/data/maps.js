@@ -795,7 +795,7 @@ function makeRootdeepTiles(){
   for(let x=7;x<=38;x++)for(const y of [7,8])put(x,y,"p");
   for(let y=7;y<=24;y++)for(const x of [7,8,22,23,34,35])put(x,y,"p");
   for(const [x,y]of [[4,3],[5,3],[10,4],[11,4],[20,3],[21,3],[25,4],[26,4],[38,3],[39,3],[40,11],[41,11],[10,25],[11,25],[20,26],[21,26],[39,25],[40,25]])put(x,y,"t");
-  for(const [x,y,c]of [[0,14,"x"],[45,14,"y"],[35,8,"B"],[10,14,"m"],[37,23,"H"],[7,20,"C"],
+  for(const [x,y,c]of [[0,14,"x"],[45,14,"y"],[43,14,"q"],[35,8,"B"],[10,14,"m"],[37,23,"H"],[7,20,"C"],
     [10,7,"b"],[20,9,"6"],[25,7,"2"],[39,14,"8"],[12,20,"6"],[23,20,"b"],[33,24,"8"]])put(x,y,c);
   return rows.map(row=>row.join(""));
 }
@@ -991,6 +991,7 @@ function caravanFenceLayout() {
       // caches, and ordinary enemies. There is deliberately no trial door.
       "B": guardian ? { tile: "path", enemy: guardian.id } : { tile: "path" },
       "m": { tile: "path", message: region.message },
+      ...(region.id === "rootdeepHollow" ? { "q": { tile: "path", message: "EAST · GLASSWATER DESERT. The missing prism can wake an old sundial. This road is a detour; Shattercoast leads to Frostbell's Worldbearer. Glasswater's southern gate opens only with the Lantern Mark." } } : {}),
       "H": { tile: "path", chest: Object.assign({ heal: true }, region.cache) },
     })),
     tiles: region.id === "windscarCanyon" ? makeWindscarTiles() : region.id === "hangingGardens" ? makeHangingGardensTiles() : region.id === "rootdeepHollow" ? makeRootdeepTiles() : region.id === "glasswaterDesert" ? makeGlasswaterTiles() : region.id === "frostbellTundra" ? makeFrostbellTiles() : region.id === "stormspinePeaks" ? makeStormspineTiles() : region.id === "titanGrave" ? makeTitanGraveTiles() : makeWorldwakeRegionTiles(region.variant, !!guardian, p),
