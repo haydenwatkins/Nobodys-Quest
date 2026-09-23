@@ -70,6 +70,20 @@ assert.equal(stormChoice.options.length, 2);
 assert.match(stormChoice.detail, /Wizard Lv/);
 assert.match(stormChoice.detail, /Ranger Lv/);
 
+const finalStep = G.formUnlockSteps("god")[0];
+assert.equal(finalStep.kind, "portfolio", "the Form Lab must describe the live finale rule");
+assert.equal(finalStep.met, false);
+assert.match(finalStep.detail, /1\/23 forms at level 3 · 0\/6 at level 5/);
+assert.equal(G.FORM_PATH_EDGES.filter((edge) => edge.to === "@wholeRoster").length, 23);
+assert.ok(G.FORM_PATH_EDGES.filter((edge) => edge.to === "@wholeRoster").every((edge) => edge.level === 3));
+G.questsDone = G.formOrder.filter((id) => id !== "god").flatMap((id) => G.forms[id].quests.slice(0, 2).map((quest) => quest.id));
+for (const id of G.formOrder.filter((id) => id !== "god").slice(0, 6))
+  G.questsDone.push(...G.forms[id].quests.slice(2).map((quest) => quest.id));
+assert.equal(G.formUnlockSteps("god")[0].met, true, "any six mastered forms complete the portfolio");
+assert.equal(G.formPathEdgeMet({ from: "@wholeRoster", to: "god", kind: "gate" }), true);
+assert.deepEqual(JSON.parse(JSON.stringify(G.formPathProgress("god"))), { done: 1, total: 2, complete: false },
+  "the boss trophy remains a separate final requirement");
+
 const ui = fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8");
 const css = fs.readFileSync(path.join(root, "css/style.css"), "utf8");
 const combat = fs.readFileSync(path.join(root, "js/engine/combat.js"), "utf8");

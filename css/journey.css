@@ -188,6 +188,14 @@
 #menu .mark-stone.carried button { border-color:var(--mark-ink); background:#203e3d; }
 #menu .mark-set-aside { justify-self:start; padding:8px 18px; }
 #menu .field-carried-mark { margin:8px 0 12px; padding:5px 9px; border-left:3px solid #e7bd78; color:#ffe4a4; background:#2e4140; }
+#menu .form-route-card { border-radius:0; border-color:#b29568; background:#252e36; box-shadow:inset 0 0 0 2px #202635; }
+#menu .form-route-title { font:17px "VT323",monospace; }
+#menu .form-route-card > p { font:18px/1.2 "VT323",monospace; }
+#menu .form-route-step { border-radius:0; border-color:#807f75; background:#293841; }
+#menu .form-route-step strong { overflow:visible; white-space:normal; text-overflow:clip; font:17px/1.1 "VT323",monospace; }
+#menu .form-route-step small { font:16px/1.1 "VT323",monospace; }
+#menu .form-route-next strong { font:18px/1.1 "VT323",monospace; }
+#menu .form-route-next small { font:16px/1.1 "VT323",monospace; }
 @media(max-width:760px) { #menu .mark-bench-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:500px) { #menu .mark-bench-grid { grid-template-columns:1fr; } }
 #menu button:focus-visible, #menu button.controller-focus { outline:3px solid #fff2ba; outline-offset:2px; }

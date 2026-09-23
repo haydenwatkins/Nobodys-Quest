@@ -18,7 +18,7 @@
     { id: "masters-beyond", number: "VI", title: "Masters Beyond", note: "Specialists awaken from deeper victories.", forms: ["riftblade", "jester", "samurai", "astronomer"] },
     { id: "waking-road", number: "VII", title: "The Waking Road", note: "One guardian leads to the next.", forms: ["griffin", "golem", "weaver"] },
     { id: "last-bells", number: "VIII", title: "The Last Bells", note: "Carry the guardian chain to its end.", forms: ["bellkeeper", "lanternWisp", "colossus"] },
-    { id: "whole-roster", number: "IX", title: "The Whole Roster", note: "Master every shape to approach the final form.", forms: ["god"] },
+    { id: "whole-roster", number: "IX", title: "The Final Answer", note: "Learn every shape to level 3; master six favorites to level 5.", forms: ["god"] },
   ];
 
   G.FORM_PATH_TIERS = [
@@ -42,7 +42,7 @@
 
   G.FORM_PATH_GATES = {
     "@earlyMastery": { target: "dragon", label: "ALL EARLIER FORMS", short: "EARLY MASTERY" },
-    "@wholeRoster": { target: "god", label: "THE COMPLETE ROSTER", short: "FINAL MASTERY" },
+    "@wholeRoster": { target: "god", label: "THE FINAL PORTFOLIO", short: "FINAL MASTERY" },
   };
 
   // "choice" means either parent can satisfy the mastery gate. "all"
@@ -80,12 +80,9 @@
     { from: "weaver", to: "bellkeeper" },
     { from: "bellkeeper", to: "lanternWisp" },
     { from: "lanternWisp", to: "colossus" },
-    { from: "jester", to: "@wholeRoster", kind: "all", level: 5 },
-    { from: "turtle", to: "@wholeRoster", kind: "all", level: 5 },
-    { from: "samurai", to: "@wholeRoster", kind: "all", level: 5 },
-    { from: "astronomer", to: "@wholeRoster", kind: "all", level: 5 },
-    { from: "druid", to: "@wholeRoster", kind: "all", level: 5 },
-    { from: "colossus", to: "@wholeRoster", kind: "all", level: 5 },
+    // Every earlier shape contributes breadth. The six level-five specialists
+    // are chosen by the player, so no fixed form line should imply otherwise.
+    ...G.formOrder.filter((id) => id !== "god").map((id) => ({ from: id, to: "@wholeRoster", kind: "all", level: 3 })),
     { from: "@wholeRoster", to: "god", kind: "gate" },
   ];
 
@@ -158,6 +155,14 @@
         formIds: ids, target: rule.level,
       };
     }
+    if (rule.type === "finalExamMastery") {
+      const exam = G.finalExamMastery();
+      return {
+        kind: "portfolio", icon: "✦", label: "Breadth and chosen mastery",
+        detail: `${exam.broad}/${exam.total} forms at level 3 · ${exam.specialists}/${exam.specialistGoal} at level 5`,
+        met: exam.ready, formIds: exam.missingBreadth,
+      };
+    }
     return { kind: "unknown", icon: "?", label: "Unknown path", detail: "Requirement unavailable", met: false };
   }
 
@@ -176,7 +181,7 @@
   G.formPathEdgeMet = function (edge) {
     if (edge.kind === "gate") {
       const gate = G.FORM_PATH_GATES[edge.from];
-      const step = gate && G.formUnlockSteps(gate.target).find((entry) => entry.kind === "all");
+      const step = gate && G.formUnlockSteps(gate.target).find((entry) => entry.kind === "all" || entry.kind === "portfolio");
       return !!(step && step.met);
     }
     if (edge.kind === "all") return G.formLevel(edge.from) >= edge.level;

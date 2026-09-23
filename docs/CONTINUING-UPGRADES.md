@@ -11,6 +11,8 @@ The user used the available reset on September 22. The stopping target is 50% of
 ### Final Firmament campaign gate and mastery portfolio (September 22)
 The God trial asks for all six World Marks, level 3 across the 23 earlier forms, and level 5 on six forms the player chooses. This changes the original all-forms level-5 requirement from 92 lessons to a 58-lesson minimum while preserving a broad roster education and meaningful specialization. Remaining lessons and legends stay available after the finale. The sealed entrance reports mark and mastery progress; Journey guidance and the God form unlock use the same mastery rule. Saves that already earned God's Spark can still revisit the original finale. Route guidance reads the same gate as collision and entry, so it will not direct players through a sealed trial. Full progression pacing remains to be playtested.
 
+The Form Lab awakening path now uses that same portfolio. It reports breadth and any six level-five specialists instead of an unknown requirement or six fixed named specialists; the boss trophy remains a separate step. The final chapter and path graph no longer instruct players to level every form to five.
+
 ### Frostbell Echo Mark payoff (September 22)
 Purifying Bongle awakens resonant ice across both southern lakes, making direct north-south links from shore to lower causeway. The Echo Mark rebuilds both on return and from old trophy saves. Victory dialogue and the Journey journal explain the new crossings; bright bellwork distinguishes them from ordinary ice. Focused route and persistence checks, visual inspection, full suite, and shipping status follow in the task output.
 
