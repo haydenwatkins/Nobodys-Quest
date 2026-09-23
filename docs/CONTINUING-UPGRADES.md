@@ -8,6 +8,9 @@ Keep the game's pixel-art personality, form mixing, exploration, and depth. Make
 ## Current larger pass: campaign progression and build depth
 The user used the available reset on September 22. The stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
 
+### Six-Mark road crossing audit (September 23)
+An integrated campaign simulation starts at the 24-star Sunstep Road, physically crosses every portal selected by route guidance, defeats each Worldbearer through its matching ward, and follows the resulting Mark to the next region. The normal discovery and three-guardian favors provide enough stars to open the 28-star Shattercoast return without grinding extra lessons. All six Marks lead to the final mastery portfolio, and the western route actually visits Shattercoast rather than a sealed Titan shortcut. This verifies connected roads, safe arrivals, gates, and story handoffs under simulated combat; it does not measure ordinary fight duration or replace a manual end-to-end playthrough.
+
 ### Waking-road progression audit (September 23)
 At ten stars, the story could advance to the 24-star Sunstep Road objective while earlier guardians remained undefeated. The Journey now points to the next accessible unfinished guardian during that stretch, using its actual route and ward-preparation guidance; once those guardians are resolved, it returns to a concrete earned mastery lesson. The guardians remain optional for the 24-star road. A progression simulation covers the two outstanding guardian leads, lesson fallback, open-road priority, actual crossings from Greenfield through Sunstep to Windscar, and the first World Mark's handoff to Hanging Gardens. Continue the pacing audit beyond this first guardian with ordinary combat timing and real play.
 
