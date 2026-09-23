@@ -111,7 +111,9 @@ G.world = (() => {
   }
 
   function portalMarkMet(cell) {
-    return !cell.mark || (G.hasWorldMark && G.hasWorldMark(cell.mark));
+    if (cell.mark && !(G.hasWorldMark && G.hasWorldMark(cell.mark))) return false;
+    if (!cell.allWorldMarks || (G.state.items || []).includes("god-spark")) return true;
+    return Object.values(G.WORLDWAKE_MARKS || {}).every((mark) => G.hasWorldMark && G.hasWorldMark(mark.id));
   }
 
   function portalOpen(cell) {
@@ -172,12 +174,22 @@ G.world = (() => {
       );
     }
 
-    if (!portalMarkMet(cell)) {
+    if (cell.mark && !(G.hasWorldMark && G.hasWorldMark(cell.mark))) {
       const mark = portalMarkDetails(cell.mark);
       const markName = mark ? mark.name : `${cell.mark} mark`;
       const region = mark && G.maps[mark.region];
       const where = region && region.name ? ` in ${region.name}` : "";
       requirements.push(`Purify the Worldbearer${where} to awaken the ${markName}.`);
+    }
+    if (cell.allWorldMarks && !(G.state.items || []).includes("god-spark")) {
+      const marks = Object.values(G.WORLDWAKE_MARKS || {});
+      const missingMarks = marks.filter((mark) => !(G.hasWorldMark && G.hasWorldMark(mark.id)));
+      if (missingMarks.length) {
+        const next = missingMarks[0];
+        const region = G.maps[next.region];
+        requirements.push(`Restore all ${marks.length} World Marks (${marks.length - missingMarks.length}/${marks.length} awakened). ` +
+          `Next, purify the Worldbearer in ${region ? region.name : next.region} to awaken the ${next.name}.`);
+      }
     }
 
     return {

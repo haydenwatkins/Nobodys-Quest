@@ -6,7 +6,10 @@ Updated September 22, 2026. This tracks the classic Nobody's Quest transformatio
 Keep the game's pixel-art personality, form mixing, exploration, and depth. Make each session rewarding through clear goals, discoveries, mastery, and build choices. Prefer meaningful improvements over adding more systems. Preserve existing saves and earned progress.
 
 ## Current larger pass: campaign progression and build depth
-The user resumed upgrades on September 22 with 96% of the weekly window used. Use that allowance first; the user explicitly approved redeeming the one available full reset credit afterward. After reset, the stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
+The user used the available reset on September 22. The stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
+
+### Final Firmament campaign gate (September 22)
+The God trial now asks for all six World Marks as well as the existing level-five form mastery. The sealed entrance reports mark progress and points toward the next Worldbearer. Saves that already earned God's Spark can still revisit the original finale. Route guidance reads the same gate as collision and entry, so it will not direct players through a sealed trial.
 
 ### Hanging Gardens Stone Mark payoff (September 22)
 After purifying the Old Mason, stone crossings rise through two western garden channels, shortening the route between the upper terrace, middle road, and southern promenade. The change uses the existing Stone Mark, activates on pickup, and restores on reload for old trophy saves. The victory dialogue and Journey journal explain the new roads. The raised stones have a carved, mossy pixel treatment. Focused checks cover both channels, old saves, return visits, normal routes and edge exits; before and after canvas renders were inspected. Full suite and push status are recorded in the September 22 task output.

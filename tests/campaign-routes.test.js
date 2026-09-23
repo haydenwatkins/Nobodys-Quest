@@ -35,6 +35,42 @@ test('sealed destinations explain marks, stars, and mastery instead of promising
   assert.equal(target.blocked,true);assert.match(target.text,/level 5/);
 });
 
+test('the Final Firmament follows all six Worldbearers while completed old saves retain access', () => {
+  const r=runtime(), {G}=r;
+  G.formLevel=()=>5;
+  G.state.stars=100;
+  r.load('overworld');r.drain();
+  const gate=G.maps.overworld.legend.Y;
+  let reason=G.world.portalBlockReason(gate);
+  assert.match(reason.text,/Restore all 6 World Marks \(0\/6 awakened\)/);
+  assert.match(reason.text,/Windscar Canyon.*Sky Mark/);
+  assert.equal(G.guidanceRouteTarget({mapId:'godTrial',guide:'boss'}).blocked,true);
+  G.state.worldwake.marks=['sky','stone','thread','echo','light'];
+  reason=G.world.portalBlockReason(gate);
+  assert.match(reason.text,/5\/6 awakened/);
+  assert.match(reason.text,/Titan Grave.*Worldheart Mark/);
+  assert.equal(G.world.solid(110*16+8,8),true);
+  G.state.worldwake.marks.push('heart');
+  assert.equal(G.world.portalBlockReason(gate),null);
+  assert.ok(!G.guidanceRouteTarget({mapId:'godTrial',guide:'boss'}).blocked);
+  assert.ok(!G.world.solid(110*16+8,8));
+  Object.assign(G.state.player,{x:110*16+8,y:16+8});
+  G.state.portalNeedsRelease=false;
+  G.state.portalGrace=0;
+  G.input.vec={x:0,y:-1};
+  for(let step=0;step<40&&G.state.mapId==='overworld';step++) {
+    G.world.moveBox(G.state.player,0,-1.5);
+    G.world.checkTriggers(.02);
+  }
+  assert.equal(G.state.mapId,'godTrial','the restored entrance should really travel to the finale');
+
+  r.load('overworld');r.drain();
+  G.state.worldwake.marks=[];
+  G.state.items.push('god-spark');
+  assert.equal(G.world.portalBlockReason(gate),null,'a save with the original ending can revisit God');
+  assert.ok(!G.world.solid(110*16+8,8));
+});
+
 test('the unopened delivery causeway is checked even while planning from another map', () => {
   const r=runtime(), {G}=r;r.load('orchardRoad');r.drain();
   G.state.opening.complete=true;
