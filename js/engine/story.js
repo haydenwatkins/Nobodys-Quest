@@ -134,6 +134,19 @@ function trophyChallenge(itemId) {
   return trophyChallenges.get(itemId);
 }
 
+const cacheChallenges = new Map();
+function cacheChallenge(itemId) {
+  if (!cacheChallenges.has(itemId)) {
+    let found = null;
+    for (const [mapId, map] of Object.entries(G.maps || {})) {
+      const cell = Object.values(map.legend || {}).find(entry => entry.chest?.item === itemId);
+      if (cell) { found = { mapId, destination: map.name, prize: cell.chest.name || itemId }; break; }
+    }
+    cacheChallenges.set(itemId, found);
+  }
+  return cacheChallenges.get(itemId);
+}
+
 function finaleFormLead(formId, progress, seen = new Set()) {
   if (seen.has(formId) || !G.forms[formId]) return null;
   seen.add(formId);
@@ -154,6 +167,14 @@ function finaleFormLead(formId, progress, seen = new Set()) {
       title: `Recover ${form.name}'s missing lesson`, short: `Face ${fight.enemy} in ${fight.destination}`,
       objective: `Defeat ${fight.enemy} in ${fight.destination} to claim ${fight.prize} for ${form.name}.`,
       reason: `${form.name}'s guardian still holds one answer needed for the final portfolio. Other mastery requirements remain visible in Form Lab.`, progress };
+  }
+  const cache = steps.find(step => step.kind === "trophy" && cacheChallenge(step.itemId));
+  if (cache) {
+    const lead = cacheChallenge(cache.itemId);
+    return { guide: "item", itemId: cache.itemId, mapId: lead.mapId, destination: lead.destination,
+      title: `Recover ${form.name}'s missing lesson`, short: `Find ${lead.prize} in ${lead.destination}`,
+      objective: `Search ${lead.destination} for ${lead.prize} to awaken ${form.name}.`,
+      reason: `${form.name}'s path still needs a keepsake hidden on an older road.`, progress };
   }
   for (const step of steps) {
     const options = step.options ? step.options.filter(option => !option.met).map(option => ({ id: option.formId, target: option.target })) :

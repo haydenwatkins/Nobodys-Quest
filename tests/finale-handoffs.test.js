@@ -70,3 +70,42 @@ test('a locked form with no known trial never sends field guidance to its unavai
   assert.ok(!target.text.includes('Shell Jab'));
   G.masteryLessons = oldLessons;
 });
+
+test('a missing Knight follows the Crest chest through the old dungeon to its Form Echo', () => {
+  const r = runtime(), { G } = r;
+  G.state.opening.complete = true;
+  G.state.delivery.complete = true;
+  G.state.stars = 60;
+  G.state.worldwake.marks = ['sky', 'stone', 'thread', 'echo', 'light', 'heart'];
+  G.state.claimedForms = G.formOrder.filter(id => !['nobody', 'god', 'knight'].includes(id));
+  G.questsDone = G.formOrder.filter(id => !['god', 'knight'].includes(id))
+    .flatMap(id => G.forms[id].quests.slice(0, 2).map(quest => quest.id));
+  r.load('overworld'); r.drain();
+  let goal = G.storyGoal();
+  assert.equal(goal.guide, 'item');
+  assert.equal(goal.mapId, 'dungeon');
+  assert.equal(goal.itemId, 'knights-crest');
+  assert.match(goal.objective, /Knight's Crest/);
+  assert.equal(G.guidanceRoute('overworld', 'dungeon').locks, 0);
+  assert.equal(G.guidanceTarget().cell.portal.map, 'dungeon');
+
+  r.load('dungeon'); r.drain();
+  const target = G.guidanceTarget();
+  assert.equal(target.chest.chest.item, 'knights-crest');
+  assert.equal(G.state.grid[target.tileY][target.tileX].chest.item, 'knights-crest');
+  const start = [Math.floor(G.state.player.x / G.TILE), Math.floor(G.state.player.y / G.TILE)];
+  const seen = new Set([start.join(',')]), queue = [start];
+  for (let i = 0; i < queue.length; i++) for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    const x = queue[i][0] + dx, y = queue[i][1] + dy, key = `${x},${y}`;
+    if (x < 0 || y < 0 || x >= G.state.mapW || y >= G.state.mapH || seen.has(key) ||
+        G.world.solid(x * G.TILE + 8, y * G.TILE + 8)) continue;
+    seen.add(key); queue.push([x, y]);
+  }
+  assert.ok(seen.has(`${target.tileX},${target.tileY}`), 'the dungeon entrance reaches the Crest chest');
+  Object.assign(G.state.player, { x: target.x, y: target.y });
+  G.world.checkTriggers(.5); r.drain();
+  assert.ok(G.state.items.includes('knights-crest'));
+  goal = G.storyGoal();
+  assert.equal(goal.guide, 'echo');
+  assert.equal(goal.formId, 'knight');
+});

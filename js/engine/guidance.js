@@ -322,6 +322,19 @@
 
     if (goal.mapId && goal.mapId !== s.mapId) return routeTarget(goal);
 
+    if (goal.guide === "item") {
+      const chests = (s.chests || []).filter(chest => !chest.opened && chest.chest?.item === goal.itemId)
+        .map(chest => ({ x: chest.x * G.TILE + G.TILE / 2, y: chest.y * G.TILE + G.TILE / 2,
+          tileX: chest.x, tileY: chest.y, chest }));
+      const chest = nearest(chests, s.player.x, s.player.y);
+      if (chest) return Object.assign(chest, {
+        kind: "story", color: G.GUIDANCE_COLORS.story, icon: "◇", destination: goal.destination,
+        text: `${goal.short} — follow the gold trail to its chest.`,
+      });
+      return { kind: "story", color: G.GUIDANCE_COLORS.story, icon: "◇", spatial: false,
+        destination: goal.destination, text: goal.objective };
+    }
+
     if (goal.guide === "boss" || goal.mapId === s.mapId) {
       const bosses = (s.enemies || []).filter((enemy) => !enemy.dead && enemy.def.miniboss);
       const boss = nearest(bosses, s.player.x, s.player.y);
