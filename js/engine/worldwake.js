@@ -211,6 +211,8 @@ G.events.on("pickup", (data) => {
           ? "Bongle rings one clear note across Frostbell. Resonant ice now bridges both southern lakes from shore to causeway. Follow the golden chimes through the water; the crossings will answer whenever you return."
         : mark.id === "light"
           ? "Mallow gathers the storm into one lantern. Every brass lamp along Stormspine's passes wakes, and two lit cuts open through the southern ridges. Follow their gold marks between the high road and lower trail whenever you return."
+        : mark.id === "heart"
+          ? "The Last Worldbearer gives the road back to everyone. A heartlit arch opens at Titan Grave's southern edge and answers another beside the Final Firmament in Greenfield. Walk through to return to the first horizon."
         : "The region changes, and a new World Path answers you.";
     if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening, { accent: mark.color || "#ffcd75" });
     else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening);

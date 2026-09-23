@@ -17,6 +17,9 @@ Purifying Bongle awakens resonant ice across both southern lakes, making direct 
 ### Stormspine Lantern Mark payoff (September 22)
 Mallow's victory lights the brass trail lamps and opens two golden cuts through the southern ridges. Both link the high road to the lower Stormglass trail and restore on return or from old trophy saves. The victory dialogue and Journey journal explain the new roads. The Echo Mark gate toward Titan Grave remains intact. Route/persistence checks, before-and-after visual inspection, full suite, and shipping status follow in the task output.
 
+### Titan Grave Worldheart payoff (September 22)
+The final Worldbearer's Heart Mark opens a two-way road between Titan Grave's southern edge and Greenfield beside the Final Firmament. A weathered heart arch marks both ends, brightening when the mark is earned. The route is reflected in victory dialogue, Journey guidance, and route planning. Old trophy saves restore it; the two existing Titan exits and the separate God entrance remain intact. Actual portal movement, safe arrivals, bounce protection, visual inspection, full suite, and shipping status follow in the task output.
+
 ### Hanging Gardens Stone Mark payoff (September 22)
 After purifying the Old Mason, stone crossings rise through two western garden channels, shortening the route between the upper terrace, middle road, and southern promenade. The change uses the existing Stone Mark, activates on pickup, and restores on reload for old trophy saves. The victory dialogue and Journey journal explain the new roads. The raised stones have a carved, mossy pixel treatment. Focused checks cover both channels, old saves, return visits, normal routes and edge exits; before and after canvas renders were inspected. Full suite and push status are recorded in the September 22 task output.
 

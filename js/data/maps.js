@@ -60,6 +60,7 @@ function makeGreenfieldTiles() {
   put(50, H - 1, "U"); put(50, H - 2, ".");
   put(W - 1, 60, "F"); put(W - 2, 60, ".");
   put(110, 0, "Y"); put(110, 1, ".");
+  put(114, 0, "Q"); put(114, 1, ".");
   put(0, 65, "Z"); put(1, 65, ".");
   put(W - 1, 70, "P"); put(W - 2, 70, "p");
 
@@ -110,6 +111,7 @@ registerMap({
     "U": { tile: "grass", portal: { map: "vampireTrial", x: 3, y: 8 }, stars: 22, portalStyle: "trial", portalTheme: "vampire" },
     "F": { tile: "grass", portal: { map: "jesterTrial", x: 3, y: 8 }, stars: 24, portalStyle: "trial", portalTheme: "jester" },
     "Y": { tile: "grass", portal: { map: "godTrial", x: 3, y: 8 }, stars: 0, masteryPortfolio: true, allWorldMarks: true, portalStyle: "trial", portalTheme: "god" },
+    "Q": { tile: "grass", portal: { map: "titanGrave", x: 23, y: 27 }, mark: "heart", portalStyle: "gap", seamless: true },
     "Z": { tile: "grass", portal: { map: "shattercoast", x: 45, y: 14 }, stars: 28, portalStyle: "gap" },
     "P": { tile: "path", portal: { map: "sunstepPrairie", x: 2, y: 14 }, stars: 24, portalStyle: "gap", seamless: true },
     "C": { tile: "grass", chest: { heal: true, name: "a giant cookie" } },
@@ -840,7 +842,7 @@ function makeTitanGraveTiles(){
   for(let y=1;y<=25;y++)for(const x of [22,23,24])put(x,y,"p");
   for(let x=6;x<=39;x++)for(const y of [7,8,23,24])put(x,y,"p");
   for(let y=7;y<=24;y++)for(const x of [6,7,34,35])put(x,y,"p");
-  for(const [x,y,c]of [[0,14,"x"],[23,0,"n"],[35,8,"B"],[23,12,"m"],[38,24,"H"],[7,20,"C"],
+  for(const [x,y,c]of [[0,14,"x"],[23,0,"n"],[23,28,"q"],[35,8,"B"],[23,12,"m"],[38,24,"H"],[7,20,"C"],
     [6,5,"e"],[15,9,"3"],[25,5,"8"],[39,15,"5"],[11,22,"e"],[22,26,"8"],[34,21,"3"]])put(x,y,c);
   return rows.map(row=>row.join(""));
 }
@@ -943,6 +945,7 @@ function caravanFenceLayout() {
     portals: {
       x: { map: "stormspinePeaks", x: 43, y: 14 },
       n: { map: "glasswaterDesert", x: 23, y: 27 },
+      q: { map: "overworld", x: 114, y: 1, mark: "heart" },
     },
     guardian: { id: "lastWorldbearer", retreat: { x: 8, y: 20 } },
     cache: { item: "titan-memory", name: "the Titan's Smallest Memory" },
@@ -951,7 +954,7 @@ function caravanFenceLayout() {
   const p = region.portals;
   const guardian = region.guardian;
   const portalLegend = {};
-  for (const key of ["x", "y", "n", "s"]) {
+  for (const key of ["x", "y", "n", "s", "q"]) {
     if (!p[key]) continue;
     portalLegend[key] = { tile: "path", portal: p[key], portalStyle: "gap", seamless: true, mark: p[key].mark };
   }
