@@ -243,15 +243,26 @@ function makeShattercoastTiles() {
   // tide pools and stone shelves make movement visually measurable.
   for (let x = 1; x < w - 1; x++) for (let y = 13; y <= 15; y++) put(x, y, "p");
   for (let y = 1; y < h - 1; y++) for (let x = 22; x <= 24; x++) put(x, y, "p");
+  // Four weathered approaches radiate from the coliseum. Salt shelves and
+  // tidal fingers break up the old empty lawn without sealing any trial.
+  for (const [left, top, bottom] of [[10, 5, 13], [35, 5, 13], [10, 15, 24], [35, 15, 24]])
+    for (let y = top; y <= bottom; y++) for (let x = left; x <= left + 2; x++) put(x, y, "p");
   for (let y = 3; y <= 9; y++) for (let x = 4; x <= 9; x++) put(x, y, "w");
   for (let y = 20; y <= 26; y++) for (let x = 38; x <= 43; x++) put(x, y, "w");
-  [[14,4],[17,8],[31,5],[37,10],[9,20],[16,25],[31,22],[35,26]].forEach(([x,y]) => put(x,y,"r"));
-  [[8,12,"9"],[14,17,"8"],[19,7,"6"],[29,8,"0"],[35,17,"4"],[40,12,"9"],[25,22,"0"],[7,25,"6"]]
+  for (const [left, right, y] of [[14,19,4],[16,20,5],[27,32,4],[28,33,6],
+    [14,19,24],[15,20,26],[27,32,23],[29,34,25]])
+    for (let x = left; x <= right; x++) put(x, y, "r");
+  for (const [left, right, y] of [[2,7,10],[3,8,11],[39,44,18],[38,43,19]])
+    for (let x = left; x <= right; x++) put(x, y, "w");
+  [[17,8],[37,10],[9,20],[31,22],[35,26]].forEach(([x,y]) => put(x,y,"r"));
+  [[8,12,"9"],[14,17,"8"],[19,7,"6"],[32,8,"0"],[35,17,"4"],[40,12,"9"],[25,22,"0"],[7,25,"6"]]
     .forEach(([x,y,ch]) => put(x,y,ch));
   put(w - 1, 14, "x");
   put(23, 0, "F");
   put(11, 5, "T"); put(36, 5, "K"); put(11, 24, "A"); put(36, 24, "D");
   put(23, 14, "G"); put(19, 14, "m"); put(27, 14, "H");
+  put(11, 9, "a"); put(36, 9, "b"); put(11, 20, "c"); put(36, 20, "d");
+  put(25, 10, "p"); put(26, 10, "p");
   return rows.map((row) => row.join(""));
 }
 
@@ -274,6 +285,10 @@ registerMap({
     "D": { tile: "path", portal: { map: "druidTrial", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "druid" },
     "G": { tile: "path", portal: { map: "gauntletArena", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "god" },
     "m": { tile: "path", message: "Four guardians teach four new forms. The central coliseum remixes every guardian you have already defeated." },
+    "a": { tile: "path", message: "BREAKWATER BASTION · Admiral Tortoise guards a shell that yields to blunt force. Follow the marked channel through his tide." },
+    "b": { tile: "path", message: "FOLDED DOJO · The Paper Ronin's ward yields to sharp force. Count the marked cuts before answering." },
+    "c": { tile: "path", message: "CROOKED OBSERVATORY · Light breaks Professor Perihelion's ward. The quiet band between his bright orbits is safe." },
+    "d": { tile: "path", message: "WALKING GARDEN · Dark breaks Grandmother Briar's ward. Her flowerbeds leave a path and a clear center." },
     "H": { tile: "path", chest: { heal: true, name: "a salt-spark cookie" } },
   },
   tiles: makeShattercoastTiles(),
