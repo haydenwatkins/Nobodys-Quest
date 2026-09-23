@@ -156,15 +156,15 @@ G.masteryLessons = function (limit, formId, chosenOnly) {
       if (G.questsDone.includes(quest.id)) continue;
       if (chosenOnly && quest.id !== G.state.lessonQuestId) continue;
       const match = quest.match || {};
-      // A damage-type kill lesson accepts any finishing art of that type.
+      // Damage-type kills and ward breaks accept any art of that type.
       // Offer one the player already carries first, then another earned art
       // they can borrow into the current build.
-      const damageType = quest.event === "kill" && Object.keys(match).length === 1 ? match.damageType : null;
+      const damageType = ["kill", "wardBreak"].includes(quest.event) && Object.keys(match).length === 1 ? match.damageType : null;
       const ability = match.ability || (damageType ? (loadout.find(id => G.abilities[id]?.type === damageType) ||
         [...available].find(id => G.abilities[id]?.type === damageType)) : null);
       if (ability && (!available.has(ability) || (match.form && match.form !== body.id))) continue;
       // General lessons are offered only when their event has no hidden
-      // equipment condition. Status/ward lessons remain in the full journal.
+      // equipment condition. Other status/ward lessons remain in the journal.
       if (!ability && (Object.keys(match).length || !["sign", "pickup", "kill"].includes(quest.event))) continue;
       const slot = ability ? loadout.indexOf(ability) : -1;
       if (ability && slot < 0 && !body.slots) continue;

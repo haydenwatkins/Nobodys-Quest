@@ -226,11 +226,22 @@
       (G.masteryLessons && G.masteryLessons(1, goal.formId)[0]) || firstOpenQuest(goal.formId);
     if (!lesson) return null;
     const quest = lesson.quest;
-    if (quest.match && quest.match.ability && !G.getLoadout(s.formId).includes(quest.match.ability)) return {
-      kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦", spatial: false,
-      destination: lesson.form.name,
-      text: `Open Journey's lesson book to equip ${G.abilities[quest.match.ability]?.name || "the required art"}. ${quest.text}.`,
-    };
+    const match = quest.match || {};
+    const loadout = G.getLoadout(s.formId);
+    const damageType = ["kill", "wardBreak"].includes(quest.event) ? match.damageType : null;
+    const missingArt = match.ability && !loadout.includes(match.ability);
+    const missingType = damageType && !loadout.some(id => G.abilities[id]?.type === damageType);
+    if (missingArt || missingType) {
+      const suggested = G.masteryLessons && G.masteryLessons(Infinity, lesson.form.id)
+        .find(entry => entry.quest.id === quest.id)?.ability;
+      const art = G.abilities[match.ability || suggested];
+      const typeName = G.DAMAGE_TYPES[damageType]?.name || damageType;
+      return {
+        kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦", spatial: false,
+        destination: lesson.form.name,
+        text: `Open Journey's lesson book to equip ${art?.name || `a ${typeName} art`}. ${quest.text}.`,
+      };
+    }
     let target = null;
     if (quest.event === "sign") {
       target = nearest(gridTargets((cell) => !!cell.message), s.player.x, s.player.y);
@@ -240,14 +251,31 @@
         tileX: chest.x, tileY: chest.y,
       }));
       target = nearest(chests, s.player.x, s.player.y);
+    } else if (quest.event === "wardBreak") {
+      const wards = (s.enemies || []).filter(enemy => !enemy.dead && !enemy.def.miniboss &&
+        enemy.ward?.hp > 0 && (!match.damageType || enemy.ward.types.includes(match.damageType)));
+      target = nearest(wards, s.player.x, s.player.y);
+      if (!target && match.damageType && s.mapId !== "shattercoast") {
+        const road = routeTarget({ guide: "echo", mapId: "shattercoast", formId: lesson.form.id });
+        if (road?.blocked) return road;
+        if (road && !road.blocked) return Object.assign(road, {
+          destination: "Shattercoast ward practice",
+          text: `${lesson.form.icon} Follow the coast road to ${match.damageType === "blunt" ? "Tide Crabs" : "Star Motes"}; their ${G.DAMAGE_TYPES[match.damageType].name} wards count for ${lesson.form.name}.`,
+        });
+      }
     } else {
       const enemies = (s.enemies || []).filter((enemy) => !enemy.dead && !enemy.def.miniboss);
       target = nearest(enemies, s.player.x, s.player.y);
     }
-    const text = `${lesson.form.icon} ${quest.text} — try it here in the world.`;
+    const text = quest.event === "wardBreak" && match.damageType
+      ? `${lesson.form.icon} Break this ${G.DAMAGE_TYPES[match.damageType].name} ward for ${lesson.form.name} mastery.`
+      : `${lesson.form.icon} ${quest.text} — try it here in the world.`;
     if (!target) return {
       kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦",
-      destination: lesson.form.name, text, spatial: false,
+      destination: lesson.form.name,
+      text: quest.event === "wardBreak" && match.damageType && s.mapId === "shattercoast"
+        ? `The coast's warded creatures are gone for now. Leave Shattercoast and return to practice ${lesson.form.name}'s lesson.` : text,
+      spatial: false,
     };
     return Object.assign({}, target, {
       kind: quest.event === "sign" ? "story" : "form",
