@@ -14,6 +14,8 @@ Late multi-target mastery lessons now count live local foes before drawing a fie
 
 The follow-up covers combo lessons that omit an explicit hit count: Turtle's brace now guides toward the two foes needed for any multi-hit event. Mole's third Drill Tap now requires the three stunned foes its text promises rather than granting credit for two. Prior progress on existing saves remains intact. Focused tests check both guidance and Mole's actual quest credit; the earlier 844×390 Chrome check showed the shorter field cue and group label readable beside the mastery tracker. Physical-device testing remains outstanding.
 
+A narrower 667×375 landscape check found the requested-help toast covering the nonspatial group label. Manual help now shows the full text first and reveals the label when that toast expires; automatic guidance is unaffected. Desktop Chrome screenshots verified both states, and a focused timing test guards the handoff. This is still not a physical phone test.
+
 ### Finale path to the Knight's Crest (September 23)
 
 The final portfolio could identify Knight as the last missing form yet offer only “Awaken Knight” because its Crest is hidden in a chest rather than held by a boss. Finale guidance now recognizes item-bearing map caches as well as guardian trophies. It leads to the Old Dungeon, points to the actual unopened Crest chest there, and changes to Knight's Form Echo once the Crest is collected. The same cache lookup can support later item-gated forms without naming a hard-coded location. Focused tests cover the open route, walkable path to the chest, pickup, and Echo handoff. Desktop Chrome at 844×390 checked the new finale card; ordinary play pacing and physical-device validation remain outstanding.

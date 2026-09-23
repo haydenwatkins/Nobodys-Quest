@@ -30,6 +30,18 @@ test('group mastery asks for enough live targets before drawing a field trail', 
   target = G.guidanceTarget();
   assert.equal(target.spatial, false, 'dead foes must not count toward a group lesson');
   assert.match(target.text, /Only 2\/3/);
+
+  G.requestGuidance(false);
+  let labelDraws = 0;
+  const ctx = {
+    font: '', fillStyle: '', measureText: () => ({ width: 120 }),
+    fillRect() { labelDraws++; }, fillText() { labelDraws++; },
+  };
+  G.drawGuidanceHud(ctx, { x: 0, y: 0 });
+  assert.equal(labelDraws, 0, 'the nonspatial label waits while its help toast is visible');
+  G.state.time += 4.6;
+  G.drawGuidanceHud(ctx, { x: 0, y: 0 });
+  assert.ok(labelDraws > 0, 'the label returns after the toast clears');
 });
 
 test('combo-only multi-hit lessons need two foes, and Mole requires the three it promises', () => {

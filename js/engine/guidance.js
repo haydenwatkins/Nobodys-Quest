@@ -44,6 +44,7 @@
   const runtime = {
     activeUntil: 0,
     cardUntil: 0,
+    toastUntil: 0,
     target: null,
     targetKey: "",
     path: [],
@@ -448,6 +449,7 @@
     runtime.activeUntil = now() + (automatic ? 8 : 13);
     runtime.cardUntil = now() + (automatic ? 4 : 7);
     if (!automatic) {
+      runtime.toastUntil = target.spatial === false ? now() + 4.5 : 0;
       runtime.manualCount += 1;
       const guidance = G.ensureGuidance();
       guidance.helpRequests += 1;
@@ -602,7 +604,7 @@
     if (!target) return;
     const active = runtime.activeUntil > now();
     if (target.spatial === false) {
-      if (!active) return;
+      if (!active || runtime.toastUntil > now()) return;
       ctx.font = "5px 'Press Start 2P', monospace";
       const label = `✦ ${String(target.destination).toUpperCase()}`;
       const width = ctx.measureText(label).width + 10;
