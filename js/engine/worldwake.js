@@ -205,6 +205,8 @@ G.events.on("pickup", (data) => {
       ? "Aurelia lowers her wings. The wind is a road again. Feather pennants beside Windscar's caravan camp and on the northern high road now carry you between them. Walk up and interact when both landings are clear."
       : mark.id === "stone"
         ? "The Old Mason lays his tools down. Stone steps rise through both western garden channels, joining the caravan side to the upper terraces and southern promenade. His roads will hold whenever you return."
+        : mark.id === "thread"
+          ? "Tess gathers her broken web and begins again. Woven passages now join Rootdeep's lower chambers across both root walls. Follow the pale crossing threads toward the eastern road; they will be here when you return."
         : "The region changes, and a new World Path answers you.";
     if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening, { accent: mark.color || "#ffcd75" });
     else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, awakening);
