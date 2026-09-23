@@ -235,6 +235,7 @@
     };
     const loadout = G.getLoadout(s.formId);
     const damageType = ["kill", "wardBreak"].includes(quest.event) ? match.damageType : null;
+    const groupSize = quest.event === "multiHit" && match.hits?.gte > 1 ? match.hits.gte : 0;
     const missingArt = (match.ability || quest.lessonArt) && !loadout.includes(match.ability || quest.lessonArt);
     const missingType = damageType && !loadout.some(id => G.abilities[id]?.type === damageType);
     if (missingArt || missingType) {
@@ -275,10 +276,16 @@
       }
     } else {
       const enemies = (s.enemies || []).filter((enemy) => !enemy.dead && !enemy.def.miniboss);
+      if (groupSize && enemies.length < groupSize) return {
+        kind: "form", color: G.GUIDANCE_COLORS.form, icon: lesson.form.icon, spatial: false,
+        destination: `${lesson.form.name} group practice`,
+        text: `Only ${enemies.length}/${groupSize} baddies remain in ${s.mapDef.name}. Return later or find a busier road for ${G.abilities[match.ability]?.name || "that art"}.`,
+      };
       target = nearest(enemies, s.player.x, s.player.y);
     }
     const text = quest.event === "wardBreak" && match.damageType
       ? `${lesson.form.icon} Break this ${G.DAMAGE_TYPES[match.damageType].name} ward for ${lesson.form.name} mastery.`
+      : groupSize ? `${lesson.form.icon} Draw ${groupSize} baddies together, then use ${G.abilities[match.ability]?.name || "this art"} for ${lesson.form.name} mastery.`
       : `${lesson.form.icon} ${quest.text} — try it here in the world.`;
     if (!target) return {
       kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦",

@@ -8,7 +8,12 @@ Keep the game's pixel-art personality, form mixing, exploration, and depth. Make
 ## Current larger pass: campaign progression and build depth
 The user used the available reset on September 22. The stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
 
+### Multi-target mastery guidance (September 23)
+
+Late multi-target mastery lessons now count live local foes before drawing a field trail. When too few remain, the cue says how many are needed and suggests returning or finding a busier road; with enough present, it asks the player to gather the required group before casting. This prevents a three-foe lesson from pointing to a lone survivor. Focused tests cover sufficient, insufficient, and defeated targets. The combat and quest-credit rules are unchanged.
+
 ### Finale path to the Knight's Crest (September 23)
+
 The final portfolio could identify Knight as the last missing form yet offer only “Awaken Knight” because its Crest is hidden in a chest rather than held by a boss. Finale guidance now recognizes item-bearing map caches as well as guardian trophies. It leads to the Old Dungeon, points to the actual unopened Crest chest there, and changes to Knight's Form Echo once the Crest is collected. The same cache lookup can support later item-gated forms without naming a hard-coded location. Focused tests cover the open route, walkable path to the chest, pickup, and Echo handoff. Desktop Chrome at 844×390 checked the new finale card; ordinary play pacing and physical-device validation remain outstanding.
 
 ### Region journals after victory (September 23)
