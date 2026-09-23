@@ -41,7 +41,7 @@ for (const [formId, enemyId] of [['golem', 'tideCrab'], ['bellkeeper', 'starMote
     G.combat.damageEnemy(guide, { ability: lesson.ability, type: quest.match.damageType, damage: 3, knockback: 0 });
     assert.equal(G.questProgress(quest), 1);
     G.state.enemies = [];
-    assert.match(G.guidanceTarget().text, /Leave Shattercoast and return/);
+    assert.match(G.guidanceTarget().text, /Leave and return/);
     r.load('overworld'); r.drain(); r.load('shattercoast'); r.drain();
     assert.ok(G.state.enemies.some(enemy => enemy.id === enemyId && enemy.ward?.hp > 0), 'zone return restores a matching ward');
     for (let i = 1; i < quest.count; i++) G.events.emit('wardBreak', { ability: lesson.ability, damageType: quest.match.damageType });
@@ -57,4 +57,26 @@ test('an unearned matching art never creates a false ward lesson', () => {
   assert.match(G.guidanceTarget().text, /equip .*\./);
   G.availableAbilities = () => ['slap'];
   assert.equal(G.masteryLessons(Infinity, 'bellkeeper').length, 0);
+});
+
+test('Wizard learns to break accessible Dark wards before the Worldwake road', () => {
+  const r = runtime(), { G } = r;
+  G.state.opening.complete = true;
+  G.state.stars = 5;
+  G.state.claimedForms = ['rat', 'wizard'];
+  G.questsDone = [G.forms.wizard.quests[0].id];
+  r.load('overworld'); r.drain();
+  const quest = G.forms.wizard.quests[1];
+  const lesson = G.masteryLessons(Infinity, 'wizard').find(entry => entry.quest.id === quest.id);
+  assert.equal(lesson?.ability, 'curse');
+  assert.equal(G.prepareMasteryLesson(quest.id, 1), true);
+  G.storyGoal = () => ({ guide: 'mastery', formId: 'wizard', questId: quest.id });
+  let guide = G.guidanceTarget();
+  assert.equal(guide.cell.portal.map, 'sunkenMarsh');
+  assert.match(guide.text, /Shades/);
+  r.load('sunkenMarsh'); r.drain();
+  guide = G.guidanceTarget();
+  assert.equal(guide.id, 'shade');
+  G.combat.damageEnemy(guide, { ability: 'curse', type: 'dark', damage: 2, knockback: 0 });
+  assert.equal(G.questProgress(quest), 1);
 });

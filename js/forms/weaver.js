@@ -16,7 +16,7 @@ registerForm({
   quests: [
     { text: "Pin 24 baddies with Silk Needle", event: "hit", match: { ability: "silkNeedle" }, count: 24 },
     { text: "Stitch 4 baddies in one line, three times", event: "multiHit", match: { ability: "stitchline", hits: { gte: 4 } }, count: 3 },
-    { text: "Cocoon 16 baddies", event: "status", match: { status: "stun" }, count: 16 },
+    { text: "Cocoon 16 baddies", event: "status", match: { status: "stun" }, lessonArt: "cocoonField", count: 16 },
     { text: "Defeat 10 baddies with Dark damage", event: "kill", match: { damageType: "dark" }, count: 10 },
   ],
   sprite: {

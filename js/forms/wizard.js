@@ -29,7 +29,7 @@ registerForm({
 
   quests: [
     { text: "Defeat 10 baddies as a magic user", event: "kill", count: 10 },
-    { text: "Break 2 wards", event: "wardBreak", count: 2 },
+    { text: "Break 2 wards", event: "wardBreak", lessonArt: "curse", lessonPractice: { mapId: "sunkenMarsh", enemy: "Shades" }, count: 2 },
     { text: "Hit 8 baddies with Shadow Bolt", event: "hit", match: { ability: "shadowBolt" }, count: 8 },
     { text: "Hit 8 baddies with Dark Matter", event: "hit", match: { ability: "dark matter" }, count: 8 },
   ],

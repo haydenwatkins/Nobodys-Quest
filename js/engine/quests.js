@@ -108,8 +108,9 @@ G.relevantMasteryQuests = function (limit) {
       const match = quest.match || {};
       const requiredForm = quest.lessonForm || (quest.event === "parry" ? match.form : null);
       if (requiredForm && requiredForm !== formId) continue;
-      const slot = match.ability && equipped.has(match.ability) ? equipped.get(match.ability) : -1;
-      if (match.ability && slot < 0) continue;
+      const teachingArt = match.ability || quest.lessonArt;
+      const slot = teachingArt && equipped.has(teachingArt) ? equipped.get(teachingArt) : -1;
+      if (teachingArt && slot < 0) continue;
       if (["kill", "wardBreak"].includes(quest.event) && match.damageType &&
           !loadout.some(id => G.abilities[id]?.type === match.damageType)) continue;
       const progress = G.questProgress(quest);
@@ -170,7 +171,7 @@ G.masteryLessons = function (limit, formId, chosenOnly) {
       // Offer one the player already carries first, then another earned art
       // they can borrow into the current build.
       const damageType = ["kill", "wardBreak"].includes(quest.event) && Object.keys(match).length === 1 ? match.damageType : null;
-      const ability = match.ability || (quest.event === "parry" && requiredForm ? lessonBody.basic : null) ||
+      const ability = match.ability || quest.lessonArt || (quest.event === "parry" && requiredForm ? lessonBody.basic : null) ||
         (damageType ? (lessonLoadout.find(id => G.abilities[id]?.type === damageType) ||
         [...available].find(id => G.abilities[id]?.type === damageType)) : null);
       if (ability && (!available.has(ability) || (match.form && match.form !== lessonBody.id))) continue;

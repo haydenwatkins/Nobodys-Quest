@@ -34,8 +34,8 @@ registerForm({
   ] },
 
   quests: [
-    { text: "Poison 8 baddies", event: "status", match: { status: "poison" }, count: 8 },
-    { text: "Defeat 5 baddies while they're poisoned", event: "kill", match: { poisoned: true }, count: 5 },
+    { text: "Poison 8 baddies", event: "status", match: { status: "poison" }, lessonArt: "bite", count: 8 },
+    { text: "Defeat 5 baddies while they're poisoned", event: "kill", match: { poisoned: true }, lessonArt: "bite", count: 5 },
     { text: "Bite 10 baddies", event: "hit", match: { ability: "bite" }, count: 10 },
     { text: "Spread Fester to 6 baddies", event: "hit", match: { ability: "fester" }, count: 6 },
   ],
