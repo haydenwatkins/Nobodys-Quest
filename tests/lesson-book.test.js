@@ -78,6 +78,7 @@ test('campaign star gate and final exam name an earned lesson instead of sending
   G.openingGoal = () => null;
   G.storyChapter = () => 2;
   G.state.stars = 15;
+  G.state.items.push('trophy-heartwood-crown', 'trophy-mire-pearl', 'trophy-eclipse-sigil');
   let goal = G.storyGoal();
   assert.ok(goal.questId);
   assert.ok(goal.objective.includes(G.questById(goal.questId).quest.text));

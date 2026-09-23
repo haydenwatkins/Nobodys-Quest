@@ -1,12 +1,15 @@
 # Continuing upgrade plan
 
-Updated September 22, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
+Updated September 23, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
 
 ## Direction
 Keep the game's pixel-art personality, form mixing, exploration, and depth. Make each session rewarding through clear goals, discoveries, mastery, and build choices. Prefer meaningful improvements over adding more systems. Preserve existing saves and earned progress.
 
 ## Current larger pass: campaign progression and build depth
 The user used the available reset on September 22. The stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
+
+### Waking-road progression audit (September 23)
+At ten stars, the story could advance to the 24-star Sunstep Road objective while earlier guardians remained undefeated. The Journey now points to the next accessible unfinished guardian during that stretch, using its actual route and ward-preparation guidance; once those guardians are resolved, it returns to a concrete earned mastery lesson. The guardians remain optional for the 24-star road. A progression simulation covers the two outstanding guardian leads, lesson fallback, open-road priority, actual crossings from Greenfield through Sunstep to Windscar, and the first World Mark's handoff to Hanging Gardens. Continue the pacing audit beyond this first guardian with ordinary combat timing and real play.
 
 ### Final Firmament campaign gate and mastery portfolio (September 22)
 The God trial asks for all six World Marks, level 3 across the 23 earlier forms, and level 5 on six forms the player chooses. This changes the original all-forms level-5 requirement from 92 lessons to a 58-lesson minimum while preserving a broad roster education and meaningful specialization. Remaining lessons and legends stay available after the finale. The sealed entrance reports mark and mastery progress; Journey guidance and the God form unlock use the same mastery rule. Saves that already earned God's Spark can still revisit the original finale. Route guidance reads the same gate as collision and entry, so it will not direct players through a sealed trial. Full progression pacing remains to be playtested.

@@ -167,12 +167,12 @@ G.storyGoal = function () {
     });
   }
 
+  const masters = [
+    { trophy: "trophy-heartwood-crown", name: "Ancient Treant", mapId: "mistwood", destination: "Mistwood", stars: 1 },
+    { trophy: "trophy-mire-pearl", name: "Mire Queen", mapId: "sunkenMarsh", destination: "Sunken Marsh", stars: 4 },
+    { trophy: "trophy-eclipse-sigil", name: "Eclipse Knight", mapId: "emberRidge", destination: "Ember Ridge", stars: 7 },
+  ];
   if (chapter === 1) {
-    const masters = [
-      { trophy: "trophy-heartwood-crown", name: "Ancient Treant", mapId: "mistwood", destination: "Mistwood", stars: 1 },
-      { trophy: "trophy-mire-pearl", name: "Mire Queen", mapId: "sunkenMarsh", destination: "Sunken Marsh", stars: 4 },
-      { trophy: "trophy-eclipse-sigil", name: "Eclipse Knight", mapId: "emberRidge", destination: "Ember Ridge", stars: 7 },
-    ];
     const defeated = masters.filter((master) => items.has(master.trophy)).length;
     const next = masters.find((master) => !items.has(master.trophy) && stars >= master.stars) ||
       masters.find((master) => !items.has(master.trophy));
@@ -196,6 +196,15 @@ G.storyGoal = function () {
 
   if (chapter === 2) {
     const lesson = G.masteryLessons && G.masteryLessons(1)[0];
+    const unfinishedMaster = masters.find((master) => !items.has(master.trophy) && stars >= master.stars);
+    if (stars < 24 && unfinishedMaster) return Object.assign(base, {
+      guide: "boss", mapId: unfinishedMaster.mapId, destination: unfinishedMaster.destination,
+      title: `Answer the ${unfinishedMaster.name}'s challenge`,
+      short: `Face ${unfinishedMaster.name} in ${unfinishedMaster.destination}`,
+      objective: `The ${unfinishedMaster.name} still holds an old road in ${unfinishedMaster.destination}. Face this guardian while gathering ${24 - stars} more stars for Sunstep Road.`,
+      reason: "The waking horizon asks for lessons from the roads already traveled. An unfinished guardian is a stronger answer than another empty tally.",
+      progress: storyProgress(stars, 24, "STARS TO SUNSTEP"),
+    });
     if (stars < 24) return Object.assign(base, {
       guide: "mastery",
       questId: lesson && lesson.quest.id,
