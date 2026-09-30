@@ -20,6 +20,9 @@ G.KEEPSAKES = [
   { id: 'spindle', name: "Tess's Spindle", item: 'trophy-silk-matriarch', icon: '◇', color: '#d9a7ff',
     region: 'Rootdeep Hollow', guardian: 'Silk Matriarch', gain: 'Chain arts can connect one extra foe.',
     price: 'Projectile arts take 25% longer to recover.', note: 'Gather a crowd for the extra thread. Damage per foe and jump reach stay the same; walls and wards keep their rules.' },
+  { id: 'clapper', name: "Bongle's Clapper", item: 'trophy-bell-titan', icon: '♪', color: '#ffcd75',
+    region: 'Frostbell Tundra', guardian: 'Bell Titan', gain: 'A chain connecting at least 3 foes returns 1 extra mana.',
+    price: 'Paid area arts cost 1 more mana.', note: 'Gather three voices for a returning note. One extra mana per cast, even in a larger crowd; full wells and practice props give none.' },
 ];
 
 G.normalizeKeepsake = function (id, items) {
@@ -30,7 +33,8 @@ G.activeKeepsake = function () {
 };
 G.abilityManaCost = function (ability) {
   const id = G.activeKeepsake()?.id;
-  const surcharge = ability.mana > 0 && id === 'mire' || ability.style === 'dash' && id === 'plumbline';
+  const surcharge = ability.mana > 0 && id === 'mire' || ability.style === 'dash' && id === 'plumbline'
+    || ability.mana > 0 && ability.style === 'area' && id === 'clapper';
   return ability.mana + (surcharge ? 1 : 0);
 };
 G.meleeGuardDuration = function () { return G.MELEE_GUARD_SECONDS * (G.activeKeepsake()?.id === 'plumbline' ? 1.5 : 1); };

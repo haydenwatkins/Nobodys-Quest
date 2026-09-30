@@ -555,7 +555,7 @@ G.combat = (() => {
     const used = new Set();
     let current = available[0];
     let fromX = user.x, fromY = user.y - 6;
-    let hits = 0;
+    let hits = 0, realHits = 0;
     while (current && used.size < maxTargets) {
       used.add(current);
       if (damageEnemy(current, {
@@ -564,7 +564,7 @@ G.combat = (() => {
         breaksAnyWard: breaksAnyWard(user), fromX, fromY,
         hitStop: o.hitStop === undefined ? 0.02 : o.hitStop,
         shake: o.shake,
-      })) hits++;
+      })) { hits++; if (!current.def.practice) realHits++; }
       G.spawnFx({ kind: "bolt", x: fromX, y: fromY, x2: current.x, y2: current.y - 5, color, dur: 0.22 });
       fromX = current.x; fromY = current.y - 5;
       let next = null, nextDist = Infinity;
@@ -575,6 +575,11 @@ G.combat = (() => {
         if (d <= reach + e.def.size / 2 && d < nextDist && clearArc(current.x,current.y,e.x,e.y)) { next = e; nextDist = d; }
       }
       current = next;
+    }
+    if (user === G.state.player && G.activeKeepsake?.()?.id === 'clapper' && realHits >= 3 && user.mana < user.manaMax) {
+      user.mana = Math.min(user.manaMax, user.mana + 1);
+      G.damageNumber(user.x, user.y - 18, '+1 MANA', '#ffcd75');
+      G.spawnFx({ kind: 'ring', x: user.x, y: user.y - 6, color: '#ffcd75', radius: 13, dur: .35 });
     }
     if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits });
     if (!used.size) G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color, radius: 8, dur: 0.2 });
