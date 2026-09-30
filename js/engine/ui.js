@@ -1262,14 +1262,18 @@ G.ui = (() => {
   }
 
   function buildMixRecipeCards(formId) {
-    const recipes = G.mixRecipes(formId), earned = new Set(G.availableAbilities());
+    const recipes = G.mixRecipes(formId);
     return `<section class="mix-recipes"><span class="eyebrow">FOLDED RECIPE CARDS · ${escapeHtml(G.forms[formId].name)}</span>
-      <p>Keep three combinations for this form. Saving again replaces that card.</p><div class="recipe-cards">${[0, 1, 2].map(index => {
-        const recipe = recipes[index], ready = recipe && recipe.slice(1).every(art => !art || earned.has(art));
-        return `<article><h4>Recipe ${index + 1}</h4><p>${recipe ? recipe.slice(1).map((art, i) => `${["B", "C"][i]} · ${escapeHtml(G.abilities[art]?.name || (art ? "Unavailable art" : "Native art"))}`).join("<br>") : "An empty page for a good idea."}</p>
-          ${recipe && !ready ? "<small>Earn its missing arts before recalling.</small>" : ""}<div class="lesson-actions">
+      <p>Save this form's arts, carried Mark, and followed lesson together. A complete card becomes this form when recalled. Saving again replaces that card.</p><div class="recipe-cards">${[0, 1, 2].map(index => {
+        const recipe = recipes[index], details = recipe && G.mixRecipeDetails(formId, index), ready = details?.ready;
+        const markText = details?.complete ? details.mark ? `${details.mark.icon} ${details.mark.name}` : recipe.mark ? "Unavailable World Mark" : "No World Mark carried" : "Arts only · keeps your carried Mark";
+        const lesson = details?.lesson;
+        const lessonText = lesson && !G.questsDone.includes(lesson.quest.id) ? `${lesson.form.name} · ${lesson.quest.text}` : "Let the field choose a lesson";
+        return `<article><h4>Recipe ${index + 1}</h4><p>${details ? details.arts.slice(1).map((art, i) => `${["B", "C"][i]} · ${escapeHtml(G.abilities[art]?.name || (art ? "Unavailable art" : "Native art"))}`).join("<br>") : "An empty page for a good idea."}</p>
+          ${details ? `<p class="recipe-mark">${escapeHtml(markText)}</p>${details.complete ? `<small>${escapeHtml(lessonText)}</small>` : ""}` : ""}
+          ${recipe && !ready ? `<small>${escapeHtml(details.reason)}</small>` : ""}<div class="lesson-actions">
           <button data-recipe-save="${index}" data-recipe-form="${formId}">${recipe ? "Replace" : "Save current"}</button>
-          <button data-recipe-recall="${index}" data-recipe-form="${formId}" ${ready ? "" : "disabled"}>Recall</button></div></article>`;
+          <button data-recipe-recall="${index}" data-recipe-form="${formId}" ${ready ? "" : "disabled"}>${details?.complete && formId !== G.state.formId ? "Become & recall" : "Recall"}</button></div></article>`;
       }).join("")}</div></section>`;
   }
 

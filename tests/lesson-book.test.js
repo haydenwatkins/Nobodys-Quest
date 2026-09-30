@@ -17,7 +17,7 @@ test('borrowed lesson earns the source form mastery and keeps the original mix',
   assert.ok(G.prepareMasteryLesson(quest.id, 2));
   assert.equal(G.getLoadout('knight')[0], G.forms.knight.basic);
   assert.equal(G.getLoadout('knight')[2], 'bite');
-  assert.deepEqual([...G.mixRecipes('knight')[0]], old);
+  assert.deepEqual([...G.mixRecipeDetails('knight', 0).arts], old);
   assert.equal(G.fieldMasteryQuest().quest.id, quest.id);
   G.restoreDefaultLoadout('knight');
   assert.notEqual(G.fieldMasteryQuest()?.quest.id, quest.id, 'a removed art must not keep an impossible field lesson active');

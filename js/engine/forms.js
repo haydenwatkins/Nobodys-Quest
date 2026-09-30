@@ -436,9 +436,16 @@ G.normalizeMixRecipes = function (saved) {
   if (!saved || typeof saved !== "object") return out;
   for (const id of G.formOrder) {
     if (!Array.isArray(saved[id])) continue;
-    out[id] = saved[id].slice(0, 3).map(recipe => Array.isArray(recipe)
-      ? [G.forms[id].basic, ...recipe.slice(1, G.forms[id].slots + 1).map(art => typeof art === "string" ? art : null)]
-      : null);
+    out[id] = saved[id].slice(0, 3).map(recipe => {
+      const arts = Array.isArray(recipe) ? recipe : recipe && recipe.version === 2 && recipe.arts;
+      if (!Array.isArray(arts)) return null;
+      const clean = [G.forms[id].basic, ...arts.slice(1, G.forms[id].slots + 1).map(art => typeof art === "string" ? art : null)];
+      // Earlier cards carry arts only. Do not infer a Mark or lesson from the
+      // current save and silently change the meaning of those old cards.
+      return Array.isArray(recipe) ? clean : { version: 2, arts: clean,
+        mark: typeof recipe.mark === "string" ? recipe.mark : null,
+        lesson: typeof recipe.lesson === "string" ? recipe.lesson : null };
+    });
   }
   return out;
 };
@@ -448,19 +455,57 @@ G.mixRecipes = function (formId) {
   return recipes[formId] || (recipes[formId] = [null, null, null]);
 };
 
+function recipeLessonFor(formId, arts, questId) {
+  const lesson = G.questById && G.questById(questId);
+  if (!lesson || !G.formUnlocked(lesson.form.id) || G.questsDone.includes(lesson.quest.id)) return null;
+  const quest = lesson.quest, match = quest.match || {};
+  const teachingArt = match.ability || quest.lessonArt;
+  const requiredForm = quest.lessonForm || match.form;
+  const damageType = ["kill", "wardBreak"].includes(quest.event) && match.damageType;
+  return (!teachingArt || arts.includes(teachingArt)) && (!requiredForm || requiredForm === formId) &&
+    (!damageType || arts.some(id => G.abilities[id]?.type === damageType)) ? lesson : null;
+}
+
 G.saveMixRecipe = function (formId, index) {
   if (!G.formUnlocked(formId) || !Number.isInteger(index) || index < 0 || index > 2) return false;
-  G.mixRecipes(formId)[index] = G.getLoadout(formId).slice(0, G.forms[formId].slots + 1);
+  const arts = G.getLoadout(formId).slice(0, G.forms[formId].slots + 1);
+  const lesson = recipeLessonFor(formId, arts, G.state.lessonQuestId);
+  G.mixRecipes(formId)[index] = { version: 2, arts,
+    mark: G.activeWorldMarkDiscipline?.()?.id || null,
+    lesson: lesson ? lesson.quest.id : null };
   G.saveGame();
   return true;
+};
+
+G.mixRecipeDetails = function (formId, index) {
+  const recipe = G.mixRecipes(formId)[index];
+  if (!recipe) return null;
+  const complete = !Array.isArray(recipe), arts = complete ? recipe.arts : recipe;
+  const earned = new Set(G.availableAbilities());
+  const mark = complete && recipe.mark ? G.WORLD_MARK_DISCIPLINES?.find(mark => mark.id === recipe.mark) : null;
+  const lesson = complete && recipe.lesson ? recipeLessonFor(formId, arts, recipe.lesson) : null;
+  const missingArt = arts.slice(1).some(art => art && !earned.has(art));
+  const missingMark = complete && recipe.mark && (!mark || !G.hasWorldMark(recipe.mark));
+  return { arts, complete, mark, lesson,
+    ready: G.formUnlocked(formId) && !missingArt && !missingMark,
+    reason: missingArt ? "Earn its missing arts before recalling." : missingMark ? "Awaken its World Mark before recalling." : "" };
 };
 
 G.recallMixRecipe = function (formId, index) {
   if (!G.formUnlocked(formId) || !Number.isInteger(index) || index < 0 || index > 2) return false;
   const recipe = G.mixRecipes(formId)[index];
-  const earned = new Set(G.availableAbilities());
-  if (!recipe || recipe.slice(1).some(art => art && !earned.has(art))) return false;
-  G.state.loadouts[formId] = [G.forms[formId].basic, ...recipe.slice(1, G.forms[formId].slots + 1)];
+  const details = G.mixRecipeDetails(formId, index);
+  if (!details?.ready) return false;
+  if (details.complete && G.state.formId !== formId) {
+    G.setForm(formId);
+    if (G.state.formId !== formId) return false;
+  }
+  G.state.loadouts[formId] = [G.forms[formId].basic, ...details.arts.slice(1, G.forms[formId].slots + 1)];
+  if (details.complete) {
+    G.ensureWorldwake().attunedMark = recipe.mark;
+    const lesson = details.lesson;
+    G.state.lessonQuestId = lesson ? lesson.quest.id : null;
+  }
   G.saveGame();
   return true;
 };

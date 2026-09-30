@@ -1,12 +1,15 @@
 # Continuing upgrade plan
 
-Updated September 23, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
+Updated September 29, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
 
 ## Direction
 Keep the game's pixel-art personality, form mixing, exploration, and depth. Make each session rewarding through clear goals, discoveries, mastery, and build choices. Prefer meaningful improvements over adding more systems. Preserve existing saves and earned progress.
 
 ## Current larger pass: campaign progression and build depth
-The user used the available reset on September 22. The stopping target is 50% of the refreshed weekly window used. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
+The user resumed the upgrade loop on September 29 at 16% weekly usage. The stopping target remains 50% total weekly usage, including other tasks. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
+
+### Folded cards for complete builds (September 29)
+New recipe cards save the form's arts, its carried World Mark, and a followed lesson that the saved build can actually practice. Recall becomes that form and restores those choices together. The three parchment cards name the Mark and lesson, and explain missing unlocks before recall. Completed or no-longer-applicable lessons return to automatic field mastery. Earlier arts-only cards keep their behavior and do not change the worn form, Mark, or lesson; replacing one opts into the fuller snapshot. Experiment backups distinguish the same arts with different Marks. Save serialization, borrowed quest credit, unavailable arts/Marks, blocked form changes, old cards, and completed lessons are covered by focused checks. Desktop Chrome landscape inspection verifies card readability and the actual recall handoff; physical-device validation remains outstanding.
 
 ### Multi-target mastery guidance (September 23)
 
