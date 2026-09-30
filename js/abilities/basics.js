@@ -1184,6 +1184,11 @@ registerAbility({
   },
 });
 
+function bellCastPose(user, animation) {
+  if (user !== G.state.player || G.state.formId !== "bellkeeper") return;
+  user.attackPose = { x: 0, y: 0, t: 0.24, dur: 0.24, animation };
+}
+
 registerAbility({
   id: "handbell", name: "Handbell", icon: "🔔", type: "light", style: "area",
   description: "Every third chime becomes a wider peal. Alternate with a different ability style to trigger Resonance.",
@@ -1193,6 +1198,7 @@ registerAbility({
     const peal = user.bellBeat === 3;
     G.combat.areaBurst(user, { ability: "handbell", range: peal ? 34 : 25, damage: 1, type: "light",
       knockback: peal ? 175 : 90, color: peal ? "#fff3c2" : "#ffcd75", combo: peal ? "peal" : "chime" });
+    bellCastPose(user, peal ? "peal" : "attack");
   },
 });
 
@@ -1213,6 +1219,7 @@ registerAbility({
   use(user) {
     G.combat.areaBurst(user, { ability: "silenceRing", range: 49, damage: 2, type: "dark",
       knockback: 195, color: "#8153c1", status: { name: "stun", dur: 0.65 }, combo: "silence" });
+    bellCastPose(user, "silence");
   },
 });
 

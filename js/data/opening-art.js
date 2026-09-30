@@ -134,8 +134,9 @@
     const set=dirs[facing];
     if(a){const beat=a.t<a.windup?0:a.t<a.windup+.075?1:2;return set.attack[beat];}
     if(p.attackPose){
-      const beat=Math.min(set.attack.length-1,Math.floor((1-p.attackPose.t/p.attackPose.dur)*set.attack.length));
-      return set.attack[Math.max(0,beat)];
+      const poses=set[p.attackPose.animation]||set.attack;
+      const beat=Math.min(poses.length-1,Math.floor((1-p.attackPose.t/p.attackPose.dur)*poses.length));
+      return poses[Math.max(0,beat)];
     }
     if(G.state.formId==='knight'&&p.knightGuardT>0)return set.guard[0];
     if(p.moving||p.dashing)return set.walk[Math.floor(p.anim*1.55)%set.walk.length];

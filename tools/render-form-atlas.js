@@ -23,6 +23,7 @@ for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alch
   run(`js/forms/${name}.js`);
 run("js/data/form-art-hd.js");
 run("js/data/vampire-art.js");
+run("js/data/bellkeeper-art.js");
 
 const useBase = process.argv.includes("--base");
 const useSkins = process.argv.includes("--skins");
