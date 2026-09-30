@@ -806,6 +806,7 @@ G.ui = (() => {
   let labFormId = null;
   let labSlot = 1;
   let labAbilityId = null;
+  let labNativeArt = false;
   let labDamageFilter = "all";
   let labStyleFilter = "all";
   let labBoostedOnly = false;
@@ -1502,6 +1503,7 @@ G.ui = (() => {
     menuEl.querySelectorAll("[data-form-select]").forEach((button) =>
       button.addEventListener("click", () => {
         labFormId = button.dataset.formSelect;
+        labNativeArt = false;
         if (formLabView === "roster" && formRosterView === "path") formRosterView = "roster";
         labSkinId = G.selectedFormSkin(labFormId)?.id || "classic";
         labAbilityId = null;
@@ -1545,7 +1547,10 @@ G.ui = (() => {
       G.guideToLegendEcho(formId);
     });
     menuEl.querySelectorAll("[data-loadout-slot]").forEach((button) =>
-      button.addEventListener("click", () => { labSlot = Number(button.dataset.loadoutSlot); buildMenu(); }));
+      button.addEventListener("click", () => { labSlot = Number(button.dataset.loadoutSlot); labNativeArt = false; labAbilityId = G.getLoadout(labFormId)[labSlot]; buildMenu(); }));
+    menuEl.querySelectorAll("[data-native-art]").forEach(button=>button.addEventListener("click",()=>{
+      labNativeArt=true;buildMenu();menuEl.querySelector('.ability-inspector')?.scrollIntoView?.({block:'nearest'});
+    }));
     menuEl.querySelectorAll("[data-lesson]").forEach(button => button.addEventListener("click", () => {
       if (G.prepareMasteryLesson(button.dataset.lesson, Number(button.dataset.lessonSlot))) {
         btnCache = "";
@@ -1566,6 +1571,7 @@ G.ui = (() => {
     const restoreDefaultLoadout = menuEl.querySelector('[data-act="restore-default-loadout"]');
     if (restoreDefaultLoadout) restoreDefaultLoadout.addEventListener("click", () => {
       const restored = G.restoreDefaultLoadout(labFormId);
+      labNativeArt = false;
       labAbilityId = restored[labSlot] || restored[1] || null;
       btnCache = "";
       G.sfx.play("pickup");
@@ -1573,15 +1579,16 @@ G.ui = (() => {
       buildMenu();
     });
     menuEl.querySelectorAll("[data-ability-damage]").forEach((button) =>
-      button.addEventListener("click", () => { labDamageFilter = button.dataset.abilityDamage; buildMenu(); }));
+      button.addEventListener("click", () => { labDamageFilter = button.dataset.abilityDamage; labNativeArt=false; buildMenu(); }));
     menuEl.querySelectorAll("[data-ability-style]").forEach((button) =>
-      button.addEventListener("click", () => { labStyleFilter = button.dataset.abilityStyle; buildMenu(); }));
+      button.addEventListener("click", () => { labStyleFilter = button.dataset.abilityStyle; labNativeArt=false; buildMenu(); }));
     const boostedArts = menuEl.querySelector("[data-ability-boosted]");
-    if (boostedArts) boostedArts.addEventListener("click", () => { labBoostedOnly = !labBoostedOnly; buildMenu(); });
+    if (boostedArts) boostedArts.addEventListener("click", () => { labBoostedOnly = !labBoostedOnly; labNativeArt=false; buildMenu(); });
     menuEl.querySelectorAll("[data-ability-select]").forEach((button) =>
-      button.addEventListener("click", () => { labAbilityId = button.dataset.abilitySelect; buildMenu(); }));
+      button.addEventListener("click", () => { labAbilityId = button.dataset.abilitySelect; labNativeArt=false; buildMenu(); }));
     const equipAbility = menuEl.querySelector('[data-act="equip-ability"]');
     if (equipAbility) equipAbility.addEventListener("click", () => {
+      if(labNativeArt || labSlot<1 || labSlot>G.forms[labFormId].slots || !G.availableAbilities().includes(labAbilityId))return;
       const lo = G.getLoadout(labFormId);
       lo[labSlot] = labAbilityId;
       btnCache = "";
@@ -2074,7 +2081,7 @@ G.ui = (() => {
     const filtered = all.filter((id) => G.knownArtMatchesFilters(G.abilities[id], labDamageFilter, labStyleFilter) &&
       (!labBoostedOnly || !!(G.passives && G.passives.formMatches(form, G.abilities[id]))));
     if (!labAbilityId || !filtered.includes(labAbilityId)) labAbilityId = lo[labSlot] && filtered.includes(lo[labSlot]) ? lo[labSlot] : filtered[0];
-    const selected = G.abilities[labAbilityId];
+    const selected = G.abilities[labNativeArt ? form.basic : labAbilityId];
     const source = selected && G.forms[selected.nativeForm];
     const synergy = selected && G.passives ? G.passives.synergyText(form, selected) : "";
     const skin = G.selectedFormSkin(form.id);
@@ -2093,9 +2100,9 @@ G.ui = (() => {
         <section class="loadout-slots" aria-label="Ability slots">${slots.map((slot) => {
           const ability = G.abilities[lo[slot]];
           const match = ability && G.passives && G.passives.formMatches(form, ability);
-          return `<button class="ability-slot ${slot === labSlot ? "selected" : ""} ${slot === 0 ? "fixed" : ""}" ${slot === 0 ? "disabled" : `data-loadout-slot="${slot}"`}>
+          return `<button class="ability-slot ${slot===(labNativeArt?0:labSlot)?"selected":""} ${slot === 0 ? "fixed" : ""}" ${slot === 0 ? 'data-native-art data-nav-id="native-art"' : `data-loadout-slot="${slot}"`}>
             <span class="slot-letter">${["A", "B", "C"][slot]}</span><span class="slot-icon">${ability?.icon || "＋"}</span>
-            <span class="slot-copy"><strong>${escapeHtml(ability?.name || "Empty")}</strong><small>${slot === 0 ? "NATIVE ART · ALWAYS READY" : match ? "★ NATURE AWAKENED" : "MIXED ART"}</small></span>
+            <span class="slot-copy"><strong>${escapeHtml(ability?.name || "Empty")}</strong><small>${slot === 0 ? "NATIVE ART · INSPECT" : match ? "★ NATURE AWAKENED" : "MIXED ART"}</small></span>
           </button>`;
         }).join("")}</section>
       </div>
@@ -2124,8 +2131,9 @@ G.ui = (() => {
           <div class="ability-inspector-icon">${selected.icon}</div><div><span class="eyebrow">${source ? `${source.icon} ${escapeHtml(source.name)} ART` : "FOUND ART"}</span>
           <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${manaCost(selected)} mana` : " · no mana"} · ${recoverySeconds(selected)}s recovery</p>
           ${keepsakeArtNote(selected)?`<p>${escapeHtml(keepsakeArtNote(selected))}</p>`:""}
+          ${selected.description?`<p class="ability-description">${escapeHtml(selected.description)}</p>`:""}
           <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(activePassive.name)} will not modify it.`}</div></div>
-          <button data-act="equip-ability" ${lo[labSlot] === selected.id ? "disabled" : ""}>${lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
+          <button data-act="equip-ability" ${labNativeArt||lo[labSlot] === selected.id ? "disabled" : ""}>${labNativeArt?"Native A · stays with this form":lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
         </div>` : `<div class="empty-tray"><strong>No arts found</strong><span>Try another damage or attack combination.</span></div>`}
       </section>`;
   }

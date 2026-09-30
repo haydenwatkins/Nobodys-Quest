@@ -212,6 +212,7 @@
 #menu .console-roster-workbench .form-roster-tile { border-radius:0; }
 #menu .settings-grid button { background:#302d35; border:2px solid #957953; }
 #menu .expedition-choice { background:#302940; }
+#menu .ability-inspector .ability-description { margin-top:6px; font:20px/1.2 "VT323",monospace; color:#ecdfc4; }
 #menu .expedition-art-draft { cursor:default; display:flex; flex-direction:column; align-items:stretch; gap:6px; padding:12px; }
 #menu .expedition-art-draft:hover { transform:none; border-color:#9e805a; }
 #menu .expedition-draft-head { display:flex; align-items:center; gap:8px; }
