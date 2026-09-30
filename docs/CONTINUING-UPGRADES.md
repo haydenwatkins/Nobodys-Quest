@@ -5,7 +5,11 @@ Updated September 30, 2026. This tracks the classic Nobody's Quest transformatio
 ## Direction
 Keep the game's pixel-art personality, form mixing, exploration, and depth. Make each session rewarding through clear goals, discoveries, mastery, and build choices. Prefer meaningful improvements over adding more systems. Preserve existing saves and earned progress.
 
-## Current larger pass: campaign progression and build depth
+## Current priority: cute, detailed form and boss art
+
+The user's September 30 direction takes priority over the campaign/build communication queue: make a fresh art pass on every form and every boss. Ben wants cute; Hayden wants fairly high fidelity, cool designs and no odd-looking shapes. Recent upgrades are not exempt. See [the complete coverage ledger and acceptance direction](CHARACTER-ART-PASS.md). Nobody, Rat, and Ancient Treant (both normal and Orchard variants) are now shipped with softer silhouettes and detailed faces/materials. All 388 tests pass; four-direction pose sheets and a real Chrome Heartwood scene at 667x375 were inspected. Phone landscape had no horizontal overflow; physical hardware and boss balance remain untested. Next: the other early forms and their regional guardians, then the whole roster in region order. The automation prompt now records this priority.
+
+## Campaign progression and build depth queue
 The user resumed the upgrade loop on September 29 at 16% weekly usage. The stopping target remains 50% total weekly usage, including other tasks. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
 
 September 30 continuation: the five-hour window reset while weekly usage was 31%. The ten September 29 batches remain shipped and should not be redone. Windscar, Hanging Gardens, and Rootdeep now have validated regional keepsakes; all six later Worldbearer keepsakes are complete through Titan Grave. Next inspect broader campaign/build communication; do not add more equipment slots or repeat these rewards. Inspect existing World Mark disciplines, actual combat behavior, guardian trophies, and the player journey before choosing each tradeoff. Keep one carried keepsake, preserve old saves and complete-build cards, and check fair boss escape times for any mobility price. The campaign and physical-device playthroughs remain unfinished. Check live usage before each new batch and stop at 50% total weekly consumed; temporary five-hour exhaustion leaves the heartbeat active and a clean checkpoint.
