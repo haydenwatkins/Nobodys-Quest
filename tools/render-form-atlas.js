@@ -22,6 +22,7 @@ run("js/abilities/basics.js");
 for (const name of ["nobody", "rat", "knight", "ranger", "wizard", "frog", "alchemist", "stormcaller", "dragon", "riftblade", "mole", "vampire", "jester", "turtle", "samurai", "astronomer", "druid", "griffin", "golem", "weaver", "bellkeeper", "lantern-wisp", "colossus", "god"])
   run(`js/forms/${name}.js`);
 run("js/data/form-art-hd.js");
+run("js/data/vampire-art.js");
 
 const useBase = process.argv.includes("--base");
 const useSkins = process.argv.includes("--skins");
@@ -54,8 +55,8 @@ if (output && output.endsWith(".ppm")) {
     const sprite = useBase ? appearance : appearance.hd;
     fill(x + 6, y + 6, cellW - 12, cellH - 12, "#1b2234");
     fill(x + 6, y + 6, cellW - 12, 4, Object.values(sprite.palette)[3] || "#f4d47c");
-    [0, 2].forEach((frameIndex, pose) => {
-      const rows = sprite.frames[frameIndex], frameW = Math.max(...rows.map((line) => line.length));
+    ["idle", "attack"].forEach((mode, pose) => {
+      const rows = sprite.frames[sprite.animations[mode][0]], frameW = Math.max(...rows.map((line) => line.length));
       const originX = Math.round(x + (pose ? 245 : 90) - frameW * scale / 2), originY = y + 24;
       for (let py = 0; py < rows.length; py++) for (let px = 0; px < rows[py].length; px++) {
         const key = rows[py][px];
@@ -90,8 +91,8 @@ G.formOrder.forEach((id, index) => {
   xml.push(`<text x="${x + 18}" y="${y + 28}" fill="#f4d47c" font-family="monospace" font-size="18" font-weight="bold">${form.name}</text>`);
   const artY = y + 42;
   const idleW = Math.max(...sprite.frames[0].map((line) => line.length)) * scale;
-  drawFrame(sprite, 0, x + 90 - idleW / 2, artY);
-  drawFrame(sprite, 2, x + 245 - idleW / 2, artY);
+  drawFrame(sprite, sprite.animations.idle[0], x + 90 - idleW / 2, artY);
+  drawFrame(sprite, sprite.animations.attack[0], x + 245 - idleW / 2, artY);
   xml.push(`<text x="${x + 90}" y="${y + 146}" text-anchor="middle" fill="#8996ad" font-family="monospace" font-size="12">IDLE</text>`);
   xml.push(`<text x="${x + 245}" y="${y + 146}" text-anchor="middle" fill="#8996ad" font-family="monospace" font-size="12">ACTION</text>`);
 });
