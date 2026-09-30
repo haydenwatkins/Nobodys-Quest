@@ -282,6 +282,27 @@
       }
     } else {
       const enemies = (s.enemies || []).filter((enemy) => !enemy.dead && !enemy.def.miniboss);
+      if (match.ability === 'wildCard' && match.combo === 'ricochet') {
+        const foes = enemies.filter(enemy => !enemy.def.practice && !(enemy.ward?.hp > 0));
+        const base = { kind: 'form', color: G.GUIDANCE_COLORS.form, icon: lesson.form.icon,
+          destination: 'Jester ricochet practice', spatial: false };
+        if (foes.length < 2) return { ...base,
+          text: 'A ricochet needs two baddies. Find a busier road or break their wards first; a single card hit cannot count.' };
+        const native = G.playerForm().passive?.id === 'trickTrajectory';
+        const reach = 72 * (native ? 1.15 : 1);
+        const pairs = foes.filter(foe => foes.some(other => other !== foe &&
+          G.util.dist(foe.x, foe.y - 4, other.x, other.y - 4) <= reach &&
+          G.combat.clearArc(foe.x, foe.y - 4, other.x, other.y - 4)));
+        if (!pairs.length) return { ...base,
+          text: 'Draw two unwarded baddies close together with a clear path between them. Wild Card cannot ricochet across a wall or an empty road.' };
+        const target = nearest(pairs, s.player.x, s.player.y);
+        const throws = 3 - ((s.player.cardBeat || 0) % 3);
+        return { ...base, spatial: true, x: target.x, y: target.y, entity: target,
+          tileX: Math.floor(target.x / G.TILE), tileY: Math.floor(target.y / G.TILE),
+          text: native
+            ? "Jester's passive gives every Wild Card a bounce. Aim at one baddie in this pair; the follow-up earns ricochet mastery. Every third throw adds two more bounces."
+            : `Borrowed Wild Card only bounces on its third throw. ${throws === 1 ? 'Your next throw is a golden joker' : `A golden joker is ${throws} throws away`}; aim it at this pair for ricochet mastery.` };
+      }
       if (match.dist?.gte) {
         const art = G.abilities[match.ability || quest.lessonArt];
         const candidates = enemies.filter(enemy => !enemy.def.practice &&
