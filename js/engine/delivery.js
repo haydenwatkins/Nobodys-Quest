@@ -167,6 +167,24 @@
   };
   const oldHit=G.openingHazardHits,oldBoss=G.updateOrchardBoss;
   G.openingHazardHits=(h,x,y)=>h.kind==='flood'?Math.hypot(x-h.x,y-h.y)>h.radius:oldHit(h,x,y);
+  function floodRefuge(h, p) {
+    const nodes=[{x:p.x,y:p.y,parent:-1}],seen=new Set(['0,0']);
+    for(let i=0;i<nodes.length;i++) {
+      const n=nodes[i];
+      if(Math.hypot(n.x-h.x,n.y-h.y)<=h.radius-8&&G.world.isSafeSpawn(n.x,n.y)) {
+        h.safePoint={x:n.x,y:n.y};h.safeRoute=[];
+        for(let at=i;at>=0;at=nodes[at].parent)h.safeRoute.push({x:nodes[at].x,y:nodes[at].y});
+        h.safeRoute.reverse();
+        h.warn=Math.max(h.warn,(h.safeRoute.length-1)*8/G.bossWalkingSpeed()+.35);
+        return;
+      }
+      for(const [dx,dy] of [[8,0],[-8,0],[0,8],[0,-8]]) {
+        const x=n.x+dx,y=n.y+dy,key=Math.round((x-p.x)/8)+','+Math.round((y-p.y)/8);
+        if(seen.has(key))continue;seen.add(key);
+        if(G.world.isSafeSpawn(x,y))nodes.push({x,y,parent:i});
+      }
+    }
+  }
   G.updateOrchardBoss=(e,p,dt)=>{
     if(e.id!=='tollkeeper')return oldBoss(e,p,dt);
     e.openingTimer=Math.max(0,(e.openingTimer||0)-dt);if(e.openingTimer)return true;
@@ -174,8 +192,10 @@
     const warn=1.15+(assist?.35:0),hazards=G.state.openingHazards||(G.state.openingHazards=[]);
     e.openingBeat=(e.openingBeat||0)+1;
     if(e.openingBeat%2){
-      // A nearby refuge encourages closing the distance; every form can reach it.
-      hazards.push({kind:'flood',owner:e,x:e.x,y:e.y+12,radius:phase===3?57:70,t:0,warn:1.65+(assist?.4:0),active:.65,hit:false});e.openingTimer=3.6;
+      const flood={kind:'flood',owner:e,x:e.x,y:e.y+12,radius:phase===3?57:70,t:0,warn:1.65,active:.65,hit:false};
+      floodRefuge(flood,p);
+      if(assist)flood.warn+=.4;
+      hazards.push(flood);e.openingTimer=flood.warn+flood.active+1.3;
     }else{
       const a=Math.atan2(p.y-e.y,p.x-e.x),count=phase===1?1:3;
       for(let i=0;i<count;i++){const angle=a+(i-(count-1)/2)*.65;hazards.push({kind:'tollSweep',owner:e,x:e.x,y:e.y,dx:Math.cos(angle),dy:Math.sin(angle),length:155,width:8,t:0,warn,active:.25,hit:false});}

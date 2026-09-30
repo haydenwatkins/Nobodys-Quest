@@ -572,6 +572,11 @@ function fireBossRadial(e, count, speed, shape, offset) {
    warning, every pattern has stable geometry, and melee stagger clears the
    arena so closing the gap remains the strongest counterplay. */
 
+// Refuge warnings allow a form change and do not depend on temporary haste.
+G.bossWalkingSpeed = function () {
+  return Math.max(1, Math.min(40, G.playerForm().speed) * (G.keepsakeSpeedScale ? G.keepsakeSpeedScale() : 1));
+};
+
 const BOSS_ARENA_ACTIONS = {
   rootBloom: "ROOT BLOOM",
   mireVolley: "REED VOLLEY",
@@ -988,8 +993,7 @@ function spawnArenaPattern(e, action) {
       if(found>=0){
         gust.safePoint={x:nodes[found].x,y:nodes[found].y};gust.safeRoute=[];
         for(let i=found;i>=0;i=nodes[i].parent)gust.safeRoute.push({x:nodes[i].x,y:nodes[i].y});gust.safeRoute.reverse();
-        // Forty pixels per second leaves even slow forms time to follow the route.
-        gust.warning=Math.max(gust.warning,(gust.safeRoute.length-1)*8/40+.35);
+        gust.warning=Math.max(gust.warning,(gust.safeRoute.length-1)*8/G.bossWalkingSpeed()+.35);
       }
     }
   }
