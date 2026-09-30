@@ -13,6 +13,7 @@
 "use strict";
 
 G.ui = (() => {
+  const manaCost = ab => G.abilityManaCost ? G.abilityManaCost(ab) : ab.mana;
   const toasts = [];           // {text, t, dur}
   let bannerData = null;       // {title, sub, t}
   const dialogueQueue = [];    // deliberate, player-advanced story text
@@ -322,11 +323,11 @@ G.ui = (() => {
         c.fillText("-", x + 17, y + 5);
         continue;
       }
-      const ready = (p.cooldowns[lo[i]] || 0) <= 0 && ab.mana <= p.mana;
+      const ready = (p.cooldowns[lo[i]] || 0) <= 0 && manaCost(ab) <= p.mana;
       c.fillStyle = ready ? "#f4f4f4" : "#566c86";
       c.fillText(ab.icon || "*", x + 16, y + 5);
       if (!ready) {
-        const cd = Math.max(p.cooldowns[lo[i]] || 0, ab.mana > p.mana ? 1 : 0);
+        const cd = Math.max(p.cooldowns[lo[i]] || 0, manaCost(ab) > p.mana ? 1 : 0);
         c.fillStyle = "rgba(26,28,44,0.75)";
         c.fillRect(x + 1, y + 1, 27, Math.min(13, Math.ceil(cd / Math.max(0.1, ab.cooldown || 1) * 13)));
       }
@@ -735,7 +736,7 @@ G.ui = (() => {
       }
       const ab = G.abilities[lo[i]];
       if (!ab) return "·";
-      const ready = (p.cooldowns[lo[i]] || 0) <= 0 && ab.mana <= p.mana;
+      const ready = (p.cooldowns[lo[i]] || 0) <= 0 && manaCost(ab) <= p.mana;
       sig += lo[i] + ready;
       return ab.icon;
     });
@@ -746,7 +747,7 @@ G.ui = (() => {
       const el = document.getElementById(ids[i]);
       el.textContent = txt;
       const ab = G.abilities[lo[i]];
-      el.style.opacity = ab && (ab.mana > p.mana) ? 0.4 : 1;
+      el.style.opacity = ab && (manaCost(ab) > p.mana) ? 0.4 : 1;
     });
     const ultimate = document.getElementById("btn-ultimate");
     if (ultimate) {
@@ -774,7 +775,7 @@ G.ui = (() => {
     if (!ab) return id;
     const style = G.passives ? G.passives.styleLabel(ab.style) : ab.style;
     const synergy = form && G.passives && G.passives.formMatches(form, ab) ? "★ " : "";
-    return `${ab.description ? ab.description + " · " : ""}${synergy}${ab.icon} ${ab.name} · ${style} · ${G.DAMAGE_TYPES[ab.type].name}${ab.mana ? " · " + ab.mana + " mana" : ""}`;
+    return `${ab.description ? ab.description + " · " : ""}${synergy}${ab.icon} ${ab.name} · ${style} · ${G.DAMAGE_TYPES[ab.type].name}${ab.mana ? " · " + manaCost(ab) + " mana" : ""}`;
   }
 
   function escapeHtml(text) {
@@ -1014,7 +1015,7 @@ G.ui = (() => {
           .some((entry) => entry.quest.match && entry.quest.match.ability === id);
         return `<button data-quick-art="${id}" class="art-mixer-card ${id === currentId ? "equipped" : ""} ${synergy ? "boosted" : ""}">
           <span class="art-mixer-icon">${ability.icon}</span><span class="art-mixer-copy"><strong>${escapeHtml(ability.name)}</strong>
-          <small>${escapeHtml(G.DAMAGE_TYPES[ability.type].name)} · ${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}${ability.mana ? ` · ${ability.mana} mana` : ""} · ${ability.cooldown}s</small>
+          <small>${escapeHtml(G.DAMAGE_TYPES[ability.type].name)} · ${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}${ability.mana ? ` · ${manaCost(ability)} mana` : ""} · ${ability.cooldown}s</small>
           ${ability.description?`<small>${escapeHtml(ability.description)}</small>`:""}
           <em>${origin ? `${origin.icon} ${escapeHtml(origin.name)}` : "Found art"}${synergy ? ` · ★ ${escapeHtml(form.passive.name)}` : ""}${quest ? " · ◇ Lesson" : ""}</em></span>
           ${id === currentId ? `<b>IN ${["A", "B", "C"][artMixerSlot]}</b>` : ""}</button>`;
@@ -1264,13 +1265,14 @@ G.ui = (() => {
   function buildMixRecipeCards(formId) {
     const recipes = G.mixRecipes(formId);
     return `<section class="mix-recipes"><span class="eyebrow">FOLDED RECIPE CARDS · ${escapeHtml(G.forms[formId].name)}</span>
-      <p>Save this form's arts, carried Mark, and followed lesson together. A complete card becomes this form when recalled. Saving again replaces that card.</p><div class="recipe-cards">${[0, 1, 2].map(index => {
+      <p>Save this form's arts, carried Mark, keepsake, and followed lesson together. A complete card becomes this form when recalled. Saving again replaces that card.</p><div class="recipe-cards">${[0, 1, 2].map(index => {
         const recipe = recipes[index], details = recipe && G.mixRecipeDetails(formId, index), ready = details?.ready;
         const markText = details?.complete ? details.mark ? `${details.mark.icon} ${details.mark.name}` : recipe.mark ? "Unavailable World Mark" : "No World Mark carried" : "Arts only · keeps your carried Mark";
         const lesson = details?.lesson;
+        const keepsakeText = details?.keepsakeSaved ? details.keepsake ? details.keepsake.name : recipe.keepsake ? "Unavailable keepsake" : "No keepsake carried" : "Earlier card · keeps your carried keepsake";
         const lessonText = lesson && !G.questsDone.includes(lesson.quest.id) ? `${lesson.form.name} · ${lesson.quest.text}` : "Let the field choose a lesson";
         return `<article><h4>Recipe ${index + 1}</h4><p>${details ? details.arts.slice(1).map((art, i) => `${["B", "C"][i]} · ${escapeHtml(G.abilities[art]?.name || (art ? "Unavailable art" : "Native art"))}`).join("<br>") : "An empty page for a good idea."}</p>
-          ${details ? `<p class="recipe-mark">${escapeHtml(markText)}</p>${details.complete ? `<small>${escapeHtml(lessonText)}</small>` : ""}` : ""}
+          ${details ? `<p class="recipe-mark">${escapeHtml(markText)}</p><small>${escapeHtml(keepsakeText)}${details.complete ? `<br>${escapeHtml(lessonText)}` : ""}</small>` : ""}
           ${recipe && !ready ? `<small>${escapeHtml(details.reason)}</small>` : ""}<div class="lesson-actions">
           <button data-recipe-save="${index}" data-recipe-form="${formId}">${recipe ? "Replace" : "Save current"}</button>
           <button data-recipe-recall="${index}" data-recipe-form="${formId}" ${ready ? "" : "disabled"}>${details?.complete && formId !== G.state.formId ? "Become & recall" : "Recall"}</button></div></article>`;
@@ -1298,6 +1300,7 @@ G.ui = (() => {
     const reward=G.fieldMasteryReward ? G.fieldMasteryReward() : null;
     const routes=G.localJourneyRoutes ? G.localJourneyRoutes() : [];
     const carriedMark = G.activeWorldMarkDiscipline && G.activeWorldMarkDiscipline();
+    const carriedKeepsake = G.activeKeepsake && G.activeKeepsake();
     const glasswaterProgress=G.glasswaterSurvey?.();
     const glasswater=G.state.mapId==="glasswaterDesert"?glasswaterProgress:null;
     const prairie=G.state.mapId==="sunstepPrairie"?G.prairieSurvey?.():null;
@@ -1334,7 +1337,7 @@ G.ui = (() => {
       <article class="field-card field-mastery"><div class="field-card-heading"><div><small>ACTIVE MASTERY</small><h3>${form.icon} ${escapeHtml(form.name)} · Level ${G.formLevel(form.id)}</h3></div>
         <button data-menu-route="quests">Lessons</button></div>${lessonHtml}${reward?`<p class="next-reward">${escapeHtml(reward.reward)}</p>`:""}</article>
       <article class="field-card field-build"><div class="field-card-heading"><div><small>YOUR COMBINATION</small><h3>${escapeHtml(form.passive?.name||form.name)}</h3></div><button data-menu-route="forms">Change form</button></div>
-        <p>${escapeHtml(form.passive?.text||form.passive?.description||"Mix a borrowed art with your form's basic move.")}</p>${carriedMark ? `<p class="field-carried-mark">${carriedMark.icon} ${escapeHtml(carriedMark.name)} · ${escapeHtml(carriedMark.effect)}</p>` : ""}<div class="field-arts">${artButtons}</div></article>
+        <p>${escapeHtml(form.passive?.text||form.passive?.description||"Mix a borrowed art with your form's basic move.")}</p>${carriedMark ? `<p class="field-carried-mark">${carriedMark.icon} ${escapeHtml(carriedMark.name)} · ${escapeHtml(carriedMark.effect)}</p>` : ""}${carriedKeepsake ? `<p class="field-carried-mark">${carriedKeepsake.icon} ${escapeHtml(carriedKeepsake.name)} · ${escapeHtml(carriedKeepsake.gain)} ${escapeHtml(carriedKeepsake.price)}</p>` : ""}<div class="field-arts">${artButtons}</div></article>
       <article class="field-card field-place"><div><small>ROADS FROM HERE</small><h3>${escapeHtml(mapName)}</h3><p>${routes.map(route=>`${route.direction} · ${route.reason?"🔒 ":""}${escapeHtml(route.name)}`).join("<br>")}</p></div><button data-act="local-map">Local map</button></article>
       ${G.expeditionUnlocked()?`<button class="journey-crossing" data-menu-route="expedition"><span>◇ A different adventure</span><strong>Explore the Manyfold</strong><small>Borrow a power. Try a combination. Bring something home.</small></button>`:""}
     </section>`;
@@ -1496,6 +1499,11 @@ G.ui = (() => {
       button.addEventListener("click", () => {
         if (G.attuneWorldMark(button.dataset.worldMark || null)) buildMenu();
       }));
+    menuEl.querySelectorAll("[data-keepsake]").forEach(button => button.addEventListener("click", () => {
+      if (G.carryKeepsake(button.dataset.keepsake || null)) {
+        btnCache = ""; G.sfx.play("menu"); buildMenu();
+      }
+    }));
     const legendGuide = menuEl.querySelector("[data-legend-guide]");
     if (legendGuide) legendGuide.addEventListener("click", () => {
       const formId = legendGuide.dataset.legendGuide;
@@ -1776,17 +1784,38 @@ G.ui = (() => {
 
   function buildFormLab() {
     const legendReady = G.legendReadyForms && G.legendReadyForms().length > 0;
-    const labels = { roster: "Forms", loadout: "Arts", marks: "Marks", legends: `Legends${legendReady ? " ✦" : ""}`, skins: "Looks" };
+    const labels = { roster: "Forms", loadout: "Arts", keepsakes: "Keepsakes", marks: "Marks", legends: `Legends${legendReady ? " ✦" : ""}`, skins: "Looks" };
     let html = `<div class="form-lab-header">
       <div><h2>⚗ Form Lab</h2><p>Choose a shape, mix its arts, and make it your own.</p></div>
       <div class="form-lab-tabs">${Object.entries(labels).map(([id, label]) =>
         `<button data-formlab-view="${id}" data-nav-zone="form-pages" class="${formLabView === id ? "active" : ""}">${label}</button>`).join("")}<button data-menu-route="quests" data-nav-zone="form-pages">Mastery</button></div>
     </div>`;
     if (formLabView === "loadout") return html + buildLoadoutLab();
+    if (formLabView === "keepsakes") return html + buildKeepsakeLab();
     if (formLabView === "marks") return html + buildWorldMarkLab();
     if (formLabView === "legends") return html + buildLegendsLab();
     if (formLabView === "skins") return html + buildSkinsLab();
     return html + buildRosterLab();
+  }
+
+  function buildKeepsakeLab() {
+    const active = G.activeKeepsake();
+    const art = {
+      heartwood: '<path fill="#384d37" d="M2 5h3v3h6V5h3v8H2z"/><path fill="#a6d66e" d="M1 3h2v3h2V2h2v6h2V2h2v4h2V3h2v7H1z"/><path fill="#d8b06a" d="M3 10h10v2H3z"/><path fill="#527845" d="M3 13h3v2H3zm7 0h3v2h-3z"/>',
+      mire: '<path fill="#29366f" d="M5 1h6v2h2v2h2v6h-2v2h-2v2H5v-2H3v-2H1V5h2V3h2z"/><path fill="#41a6f6" d="M5 3h6v2h2v6h-2v2H5v-2H3V5h2z"/><path fill="#73eff7" d="M5 3h6v6H5z"/><path fill="#f4f4f4" d="M5 4h3v2H5z"/>',
+      eclipse: '<path fill="#d8b06a" d="M5 1h6v2h2v2h2v6h-2v2h-2v2H5v-2H3v-2H1V5h2V3h2z"/><path fill="#ffcd75" d="M5 3h6v2h2v6h-2v2H5v-2H3V5h2z"/><path fill="#8153c1" d="M8 3h3v2h2v6h-2v2H8z"/><path fill="#1a1c2c" d="M8 5h3v6H8z"/>',
+    };
+    return `<section class="mark-bench"><div class="mark-bench-intro"><span class="eyebrow">THE OLD GUARDIANS' KEEPSAKES</span>
+      <h2>Every gift has its weight</h2><p>Carry one keepsake with any form. Its gift and price travel together; a World Mark can be carried alongside it. Changing keepsakes never refills mana.</p>
+      <strong>${active ? `${escapeHtml(active.name)} carried` : "No keepsake carried · travel light"}</strong></div>
+      <div class="mark-bench-grid">${G.KEEPSAKES.map(k => {
+        const earned = G.state.items.includes(k.item), selected = active?.id === k.id;
+        return `<article class="mark-stone ${selected ? "carried" : earned ? "awake" : "sleeping"}" style="--mark-ink:${k.color}">
+          <div class="mark-stone-head"><span class="mark-glyph" aria-hidden="true"><svg width="48" height="48" viewBox="0 0 16 16" shape-rendering="crispEdges">${art[k.id]}</svg></span><div><small>${escapeHtml(k.region)}</small><h3>${escapeHtml(k.name)}</h3></div></div>
+          <p class="mark-effect">GIFT · ${escapeHtml(k.gain)}</p><p class="mark-practice">PRICE · ${escapeHtml(k.price)}</p>
+          <p class="mark-note">${escapeHtml(earned ? k.note : `Face the ${k.guardian} in ${k.region} to recover this keepsake.`)}</p>
+          <button data-keepsake="${k.id}" ${earned && !selected ? "" : "disabled"} aria-pressed="${!!selected}">${selected ? "✦ Carried" : earned ? "Carry this keepsake" : "Still with its guardian"}</button></article>`;
+      }).join("")}</div>${active ? '<button class="mark-set-aside" data-keepsake="">Set the keepsake aside · travel light</button>' : ""}</section>`;
   }
 
   function buildWorldMarkLab() {
@@ -1851,7 +1880,7 @@ G.ui = (() => {
       ${rank >= 1 ? `<section class="facet-picker"><div><span class="eyebrow">ACTIVE NATURE</span><h2>Choose what stirs within ${escapeHtml(form.name)}</h2></div>
         <button data-legend-facet="original" class="${chosen === "original" ? "active" : ""}"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></button>
         <button data-legend-facet="legend" class="${chosen === "legend" ? "active" : ""}"><strong>✦ ${escapeHtml(def.facet.name)}</strong><span>${escapeHtml(def.facet.description)}</span></button></section>` : ""}
-      ${rank >= 2 ? `<section class="legend-reward"><span>${technique.icon}</span><div><small>SECRET ART AWAKENED</small><h2>${escapeHtml(technique.name)}</h2><p>${escapeHtml(G.passives.styleLabel(technique.style))} · ${technique.mana} mana · ${technique.cooldown}s recovery</p></div><button data-formlab-view="loadout">Carry this art</button></section>` : ""}
+      ${rank >= 2 ? `<section class="legend-reward"><span>${technique.icon}</span><div><small>SECRET ART AWAKENED</small><h2>${escapeHtml(technique.name)}</h2><p>${escapeHtml(G.passives.styleLabel(technique.style))} · ${manaCost(technique)} mana · ${technique.cooldown}s recovery</p></div><button data-formlab-view="loadout">Carry this art</button></section>` : ""}
       ${rank >= 3 ? `<section class="legend-reward ultimate"><span>✦</span><div><small>LEGEND ARM AWAKENED</small><h2>${escapeHtml(def.armName)}</h2><p>${escapeHtml(def.ultimateName)} · Fill the Legend meter in battle. ${ultimateControl} when it shines.</p></div></section>` : ""}`;
   }
 
@@ -2032,7 +2061,7 @@ G.ui = (() => {
         }).join("")}</div>
         ${selected ? `<div class="ability-inspector">
           <div class="ability-inspector-icon">${selected.icon}</div><div><span class="eyebrow">${source ? `${source.icon} ${escapeHtml(source.name)} ART` : "FOUND ART"}</span>
-          <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${selected.mana} mana` : " · no mana"} · ${selected.cooldown}s recovery</p>
+          <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${manaCost(selected)} mana` : " · no mana"} · ${selected.cooldown}s recovery</p>
           <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(activePassive.name)} will not modify it.`}</div></div>
           <button data-act="equip-ability" ${lo[labSlot] === selected.id ? "disabled" : ""}>${lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
         </div>` : `<div class="empty-tray"><strong>No arts found</strong><span>Try another damage or attack combination.</span></div>`}

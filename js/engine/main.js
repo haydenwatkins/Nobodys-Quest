@@ -136,6 +136,7 @@
     loadouts: {},
     mixRecipes: {},
     lessonQuestId: null,
+    keepsakeId: null,
     npcTalk: {},
     pinnedQuestIds: [],
     town: G.makeTown(),
@@ -175,6 +176,7 @@
     s.guidance = G.normalizeGuidance(save.guidance);
     s.stars = save.stars || 0;
     s.items = save.items || [];
+    s.keepsakeId = G.normalizeKeepsake(save.keepsakeId, s.items);
     s.opened = save.opened || [];
     s.pantries = save.pantries && typeof save.pantries === "object" ? save.pantries : {};
     s.known = save.known || [];

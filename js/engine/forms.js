@@ -437,14 +437,17 @@ G.normalizeMixRecipes = function (saved) {
   for (const id of G.formOrder) {
     if (!Array.isArray(saved[id])) continue;
     out[id] = saved[id].slice(0, 3).map(recipe => {
-      const arts = Array.isArray(recipe) ? recipe : recipe && recipe.version === 2 && recipe.arts;
+      const arts = Array.isArray(recipe) ? recipe : recipe && [2, 3].includes(recipe.version) && recipe.arts;
       if (!Array.isArray(arts)) return null;
       const clean = [G.forms[id].basic, ...arts.slice(1, G.forms[id].slots + 1).map(art => typeof art === "string" ? art : null)];
       // Earlier cards carry arts only. Do not infer a Mark or lesson from the
       // current save and silently change the meaning of those old cards.
-      return Array.isArray(recipe) ? clean : { version: 2, arts: clean,
+      if (Array.isArray(recipe)) return clean;
+      const card = { version: recipe.version, arts: clean,
         mark: typeof recipe.mark === "string" ? recipe.mark : null,
         lesson: typeof recipe.lesson === "string" ? recipe.lesson : null };
+      if (recipe.version === 3) card.keepsake = typeof recipe.keepsake === "string" ? recipe.keepsake : null;
+      return card;
     });
   }
   return out;
@@ -470,8 +473,9 @@ G.saveMixRecipe = function (formId, index) {
   if (!G.formUnlocked(formId) || !Number.isInteger(index) || index < 0 || index > 2) return false;
   const arts = G.getLoadout(formId).slice(0, G.forms[formId].slots + 1);
   const lesson = recipeLessonFor(formId, arts, G.state.lessonQuestId);
-  G.mixRecipes(formId)[index] = { version: 2, arts,
+  G.mixRecipes(formId)[index] = { version: 3, arts,
     mark: G.activeWorldMarkDiscipline?.()?.id || null,
+    keepsake: G.activeKeepsake?.()?.id || null,
     lesson: lesson ? lesson.quest.id : null };
   G.saveGame();
   return true;
@@ -486,9 +490,12 @@ G.mixRecipeDetails = function (formId, index) {
   const lesson = complete && recipe.lesson ? recipeLessonFor(formId, arts, recipe.lesson) : null;
   const missingArt = arts.slice(1).some(art => art && !earned.has(art));
   const missingMark = complete && recipe.mark && (!mark || !G.hasWorldMark(recipe.mark));
-  return { arts, complete, mark, lesson,
-    ready: G.formUnlocked(formId) && !missingArt && !missingMark,
-    reason: missingArt ? "Earn its missing arts before recalling." : missingMark ? "Awaken its World Mark before recalling." : "" };
+  const keepsakeSaved = complete && recipe.version === 3;
+  const keepsake = keepsakeSaved && G.KEEPSAKES?.find(k => k.id === recipe.keepsake) || null;
+  const missingKeepsake = keepsakeSaved && recipe.keepsake && (!keepsake || !G.state.items.includes(keepsake.item));
+  return { arts, complete, mark, lesson, keepsakeSaved, keepsake,
+    ready: G.formUnlocked(formId) && !missingArt && !missingMark && !missingKeepsake,
+    reason: missingArt ? "Earn its missing arts before recalling." : missingMark ? "Awaken its World Mark before recalling." : missingKeepsake ? "Recover its missing keepsake before recalling." : "" };
 };
 
 G.recallMixRecipe = function (formId, index) {
@@ -503,6 +510,7 @@ G.recallMixRecipe = function (formId, index) {
   G.state.loadouts[formId] = [G.forms[formId].basic, ...details.arts.slice(1, G.forms[formId].slots + 1)];
   if (details.complete) {
     G.ensureWorldwake().attunedMark = recipe.mark;
+    if (details.keepsakeSaved) G.carryKeepsake(recipe.keepsake || null);
     const lesson = details.lesson;
     G.state.lessonQuestId = lesson ? lesson.quest.id : null;
   }

@@ -50,6 +50,7 @@ G.playerMaxHearts = function () {
 G.playerHp = function () { return Math.max(0, G.playerMaxHearts() - G.state.player.damageTaken); };
 G.playerMaxMana = function () {
   return 12 + (G.state && (G.state.items || []).includes("manyfold-crown") ? 2 : 0) +
+    (G.keepsakeManaBonus ? G.keepsakeManaBonus() : 0) +
     (G.expeditionManaBonus ? G.expeditionManaBonus() : 0);
 };
 
@@ -258,9 +259,10 @@ G.updatePlayer = function (dt) {
   // any high-cost move depend on farming basic attacks.
   p.manaRegenDelay = Math.max(0, (p.manaRegenDelay || 0) - dt);
   if (p.mana < p.manaMax && p.manaRegenDelay <= 0) {
+    const regenSeconds = G.manaRegenSeconds ? G.manaRegenSeconds() : G.MANA_REGEN_SECONDS;
     p.manaRegenProgress = (p.manaRegenProgress || 0) + dt;
-    while (p.manaRegenProgress >= G.MANA_REGEN_SECONDS && p.mana < p.manaMax) {
-      p.manaRegenProgress -= G.MANA_REGEN_SECONDS;
+    while (p.manaRegenProgress >= regenSeconds && p.mana < p.manaMax) {
+      p.manaRegenProgress -= regenSeconds;
       p.mana = Math.min(p.manaMax, p.mana + 1);
     }
   } else if (p.mana >= p.manaMax) {
@@ -306,7 +308,7 @@ G.updatePlayer = function (dt) {
       p.dir = { x: v.x, y: v.y };
       const pantrySpeed = p.pantryHasteT > 0 ? 1.18 : 1;
       const expeditionSpeed = G.expeditionSpeedScale ? G.expeditionSpeedScale() : 1;
-      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1) * pantrySpeed * expeditionSpeed;
+      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1) * pantrySpeed * expeditionSpeed * (G.keepsakeSpeedScale ? G.keepsakeSpeedScale() : 1);
       G.world.moveBox(p, v.x * spd * dt, v.y * spd * dt);
       p.anim += dt * (spd / 14);
     }
@@ -349,15 +351,16 @@ G.updatePlayer = function (dt) {
         G.tutorial.hint("touch-aim", "🎯 Tap ranged attacks to auto-aim · drag to aim yourself", 3.5);
       }
     }
-    if (ab.mana > p.mana) {
+    const manaCost = G.abilityManaCost ? G.abilityManaCost(ab) : ab.mana;
+    if (manaCost > p.mana) {
       if (G.tutorial) G.tutorial.hint("low-mana", "💧 Mana returns over time, and successful hits refill it faster.", 3);
       G.sfx.play("wardDing");
       delete p.abilityBuffer[button];
       continue;
     }
     delete p.abilityBuffer[button];
-    p.mana -= ab.mana;
-    if (ab.mana > 0) {
+    p.mana -= manaCost;
+    if (manaCost > 0) {
       p.manaRegenDelay = G.MANA_CAST_DELAY;
       p.manaRegenProgress = 0;
     }

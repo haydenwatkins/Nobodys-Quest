@@ -235,7 +235,8 @@ G.combat = (() => {
     G.state.shake = Math.max(G.state.shake, 0.45);
     burst(enemy.x, enemy.y - enemy.h() / 2, "#ffcd75", 24);
     const defeatLine = enemy.def.boss && enemy.def.boss.defeatLine;
-    const rewardLine = `${enemy.def.trophyName} found · +1 ⭐`;
+    const keepsake = G.KEEPSAKES && G.KEEPSAKES.find(k => k.item === trophy);
+    const rewardLine = `${enemy.def.trophyName} found · +1 ⭐${keepsake ? " · New build choice: carry its gift and price in Build / Keepsakes." : ""}`;
     if (G.ui.dialogue) G.ui.dialogue(
       `🏆 ${enemy.def.name}`,
       `${defeatLine ? `“${defeatLine}” ` : ""}${rewardLine}`,

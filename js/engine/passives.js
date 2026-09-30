@@ -210,6 +210,11 @@ G.passives = (() => {
         o.knockback = (o.knockback === undefined ? 90 : o.knockback) * 1.22;
     }
 
+    const keepsake = G.activeKeepsake && G.activeKeepsake();
+    if (keepsake?.id === "heartwood" && kind === "melee" && style === "melee")
+      o.arcDeg = Math.min(360, (o.arcDeg || 100) + 25);
+    if (keepsake?.id === "mire" && o.status?.name === "poison")
+      o.status = { ...o.status, dur: (o.status.dur || 3) * 1.4 };
     return o;
   }
 

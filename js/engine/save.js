@@ -141,6 +141,7 @@ G.saveGame = function () {
       loadouts: s.loadouts,
       mixRecipes: s.mixRecipes,
       lessonQuestId: s.lessonQuestId,
+      keepsakeId: s.keepsakeId,
       npcTalk: s.npcTalk,
       town: s.town,
       heroBoard: s.heroBoard,

@@ -210,10 +210,12 @@ G.prepareMasteryLesson = function (questId, slot) {
     const empty = [0, 1, 2].find(i => !recipes[i]);
     const slots = Array.from({length: G.forms[formId].slots + 1}, (_, i) => i);
     const markId = G.activeWorldMarkDiscipline?.()?.id || null;
+    const keepsakeId = G.activeKeepsake?.()?.id || null;
     const kept = recipes.some((recipe, index) => {
       const details = recipe && G.mixRecipeDetails(formId, index);
       return details?.ready && slots.every(i => (details.arts[i] || null) === (lo[i] || null)) &&
-        (!details.complete || (details.mark?.id || null) === markId);
+        (!details.complete || (details.mark?.id || null) === markId) &&
+        (details.keepsakeSaved ? (details.keepsake?.id || null) === keepsakeId : !keepsakeId);
     });
     if (empty !== undefined && !kept) G.saveMixRecipe(formId, empty);
     lo[slot] = lesson.ability;
