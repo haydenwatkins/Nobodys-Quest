@@ -117,9 +117,8 @@ function storyProgress(value, total, label) {
   return { value: Math.min(total, Math.max(0, value)), total, label };
 }
 
-// The final portfolio can include forms whose guardian or parent lesson is
-// still missing. Resolve the next attainable step rather than pointing at a
-// quest belonging to a form the player cannot wear yet.
+// A new calling can still need a keepsake, guardian, or parent lesson.
+// Resolve an attainable step before recommending an unavailable art.
 const trophyChallenges = new Map();
 function trophyChallenge(itemId) {
   if (!trophyChallenges.has(itemId)) {
@@ -147,7 +146,7 @@ function cacheChallenge(itemId) {
   return cacheChallenges.get(itemId);
 }
 
-function finaleFormLead(formId, progress, seen = new Set()) {
+function formJourneyLead(formId, progress, seen = new Set(), horizon = false) {
   if (seen.has(formId) || !G.forms[formId]) return null;
   seen.add(formId);
   const form = G.forms[formId];
@@ -157,7 +156,7 @@ function finaleFormLead(formId, progress, seen = new Set()) {
       destination: echo ? G.maps[echo.mapId].name : G.maps[G.state.mapId].name,
       title: `Meet the ${form.name} Form Echo`, short: echo ? `Approach ${form.name}'s echo` : `Reveal ${form.name}'s echo in battle`,
       objective: echo ? `Approach ${form.name}'s Form Echo in ${G.maps[echo.mapId].name}.` : `Win a battle to reveal ${form.name}'s Form Echo, then approach it.`,
-      reason: `${form.name}'s path is complete. Its answer is ready to join Nobody's final portfolio.`, progress };
+      reason: horizon ? `${form.name}'s path is complete. A new shape brings new arts and lessons for the waking road.` : `${form.name}'s path is complete. Its answer is ready to join Nobody's final portfolio.`, progress };
   }
   const steps = G.formUnlockSteps ? G.formUnlockSteps(formId).filter(step => !step.met) : [];
   const trophy = steps.find(step => step.kind === "trophy" && trophyChallenge(step.itemId));
@@ -166,7 +165,7 @@ function finaleFormLead(formId, progress, seen = new Set()) {
     return { guide: "boss", mapId: fight.mapId, destination: fight.destination,
       title: `Recover ${form.name}'s missing lesson`, short: `Face ${fight.enemy} in ${fight.destination}`,
       objective: `Defeat ${fight.enemy} in ${fight.destination} to claim ${fight.prize} for ${form.name}.`,
-      reason: `${form.name}'s guardian still holds one answer needed for the final portfolio. Other mastery requirements remain visible in Form Lab.`, progress };
+      reason: horizon ? `${form.name}'s guardian holds a new answer for the journey. Its other requirements remain visible in Form Lab.` : `${form.name}'s guardian still holds one answer needed for the final portfolio. Other mastery requirements remain visible in Form Lab.`, progress };
   }
   const cache = steps.find(step => step.kind === "trophy" && cacheChallenge(step.itemId));
   if (cache) {
@@ -190,7 +189,7 @@ function finaleFormLead(formId, progress, seen = new Set()) {
         reason: `${form.name}'s path begins with a lesson from ${source.name}. Borrowed arts count for their original forms.`, progress };
     }
     for (const option of options) if (!G.formUnlocked(option.id)) {
-      const earlier = finaleFormLead(option.id, progress, seen);
+      const earlier = formJourneyLead(option.id, progress, seen, horizon);
       if (earlier) return earlier;
     }
     if (step.kind === "stars") {
@@ -198,13 +197,13 @@ function finaleFormLead(formId, progress, seen = new Set()) {
       if (lesson) return { guide: "mastery", formId: lesson.form.id, questId: lesson.quest.id,
         title: `Learn the path to ${form.name}`, short: `Earn more stars for ${form.name}`,
         objective: `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. ${form.name}'s path needs more stars.`,
-        reason: "A completed lesson opens another path into the final portfolio.", progress };
+        reason: horizon ? "A completed lesson opens another calling on the way to Sunstep Road." : "A completed lesson opens another path into the final portfolio.", progress };
     }
   }
   return { guide: "mastery", formId,
     title: `Find the path to ${form.name}`, short: `Awaken ${form.name}`,
     objective: `Awaken ${form.name}. ${G.unlockHint(formId)} Review its remaining steps in Form Lab.`,
-    reason: "The final portfolio needs every shape, including forms not yet awakened.", progress };
+    reason: horizon ? "Another calling can turn the lessons ahead into new ways to travel and fight." : "The final portfolio needs every shape, including forms not yet awakened.", progress };
 }
 
 G.storyComplete = function () {
@@ -295,6 +294,22 @@ G.storyGoal = function () {
       reason: "The waking horizon asks for lessons from the roads already traveled. An unfinished guardian is a stronger answer than another empty tally.",
       progress: storyProgress(stars, 24, "STARS TO SUNSTEP"),
     });
+    if (stars < 24 && !G.masteryLessons(1, null, true).length) {
+      // Introduce the early roster during the long mastery stretch, rather
+      // than reserving its missing paths for the final portfolio. This is a
+      // lead, never an additional gate. A player's followed lesson wins.
+      const dragon = G.formOrder.indexOf("dragon");
+      const callings = G.formOrder.slice(0, dragon < 0 ? 8 : dragon + 1)
+        .filter(id => G.forms[id] && !G.forms[id].invalid && !G.formUnlocked(id));
+      const next = callings.find(id => G.formReady(id)) || callings[0];
+      if (next) {
+        const progress = storyProgress(stars, 24, "STARS TO SUNSTEP");
+        const lead = formJourneyLead(next, progress, new Set(), true);
+        if (lead) return Object.assign(base, lead, {
+          objective: `${lead.objective} Sunstep Road opens at 24 stars (${stars}/24).`,
+        });
+      }
+    }
     if (stars < 24) return Object.assign(base, {
       guide: "mastery",
       questId: lesson && lesson.quest.id,
@@ -365,7 +380,7 @@ G.storyGoal = function () {
     const progress = storyProgress(exam.broad + Math.min(exam.specialists, exam.specialistGoal), exam.total + exam.specialistGoal, "FINAL PREPARATION");
     const locked = focus.find(id => !G.formUnlocked(id));
     if (!lesson && locked) {
-      const lead = finaleFormLead(locked, progress);
+      const lead = formJourneyLead(locked, progress);
       return Object.assign(base, lead, {
         objective: `${lead.objective} Bring every form to level 3 and six favorites to level 5.`,
       });
