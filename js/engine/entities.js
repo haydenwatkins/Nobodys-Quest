@@ -370,6 +370,7 @@ G.updatePlayer = function (dt) {
     p.cooldowns[abilityId] = recovery;
     (p.cooldownDurations || (p.cooldownDurations = {}))[abilityId] = recovery;
     if (!G.beginFormPerformance || !G.beginFormPerformance(p, abilityId)) ab.use(p);
+    if (G.onKeepsakeAbilityUse) G.onKeepsakeAbilityUse(p, ab);
     if (G.passives) G.passives.onAbilityUse(p, abilityId);
     G.events.emit("abilityUse", { ability: abilityId, form: G.state.formId });
   }

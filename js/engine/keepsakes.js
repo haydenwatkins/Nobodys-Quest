@@ -23,6 +23,9 @@ G.KEEPSAKES = [
   { id: 'clapper', name: "Bongle's Clapper", item: 'trophy-bell-titan', icon: '♪', color: '#ffcd75',
     region: 'Frostbell Tundra', guardian: 'Bell Titan', gain: 'A chain connecting at least 3 foes returns 1 extra mana.',
     price: 'Paid area arts cost 1 more mana.', note: 'Gather three voices for a returning note. One extra mana per cast, even in a larger crowd; full wells and practice props give none.' },
+  { id: 'ember', name: "Mallow's Ember", item: 'trophy-lantern-keeper', icon: '✧', color: '#ef7d57',
+    region: 'Stormspine Peaks', guardian: 'Lantern Keeper', gain: 'Paid area casts snuff one nearby hostile shot.',
+    price: 'Chain arts cost 1 more mana.', note: 'Catch the nearest active shot within 60 units and a clear path. Free arts, delayed shots, and floor hazards are untouched; Lantern Wisp keeps its lasting circles.' },
 ];
 
 G.normalizeKeepsake = function (id, items) {
@@ -34,7 +37,8 @@ G.activeKeepsake = function () {
 G.abilityManaCost = function (ability) {
   const id = G.activeKeepsake()?.id;
   const surcharge = ability.mana > 0 && id === 'mire' || ability.style === 'dash' && id === 'plumbline'
-    || ability.mana > 0 && ability.style === 'area' && id === 'clapper';
+    || ability.mana > 0 && ability.style === 'area' && id === 'clapper'
+    || ability.style === 'chain' && id === 'ember';
   return ability.mana + (surcharge ? 1 : 0);
 };
 G.meleeGuardDuration = function () { return G.MELEE_GUARD_SECONDS * (G.activeKeepsake()?.id === 'plumbline' ? 1.5 : 1); };
@@ -70,3 +74,23 @@ G.events.on("pickup", data => {
   const keepsake = G.KEEPSAKES.find(k => k.item === data.item);
   if (keepsake) G.ui.toast(`${keepsake.name} can shape your build. Visit Build / Keepsakes to choose its gift and price.`, 5);
 });
+
+G.onKeepsakeAbilityUse = function (user, ability) {
+  if (user !== G.state.player || G.activeKeepsake()?.id !== 'ember' || ability.style !== 'area' || ability.mana <= 0) return false;
+  let chosen = -1, nearest = 60;
+  for (let i = 0; i < G.state.projectiles.length; i++) {
+    const shot = G.state.projectiles[i];
+    if (shot.fromPlayer || shot.armT > 0) continue;
+    const distance = G.util.dist(user.x, user.y - 6, shot.x, shot.y);
+    if (distance <= nearest && G.combat.clearArc(user.x, user.y - 6, shot.x, shot.y)) {
+      chosen = i; nearest = distance;
+    }
+  }
+  if (chosen < 0) return false;
+  const shot = G.state.projectiles.splice(chosen, 1)[0];
+  G.spawnFx({ kind: 'bolt', x: user.x, y: user.y - 6, x2: shot.x, y2: shot.y, color: '#ffcd75', dur: .28 });
+  G.spawnFx({ kind: 'puff', x: shot.x, y: shot.y, color: '#ef7d57', dur: .3 });
+  G.damageNumber(shot.x, shot.y - 8, 'SNUFF!', '#fff3c2');
+  G.events.emit('projectileBlock', { kind: 'ember', ability: ability.id });
+  return true;
+};
