@@ -221,6 +221,7 @@ G.prepareMasteryLesson = function (questId, slot) {
     lo[slot] = lesson.ability;
   }
   G.state.lessonQuestId = questId;
+  if (G.state.worldwake) G.state.worldwake.practiceMark = null;
   G.saveGame();
   return true;
 };

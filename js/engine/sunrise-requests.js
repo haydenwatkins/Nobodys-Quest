@@ -34,6 +34,7 @@
     if(id!==null && (!unlocked() || !requests.some(r=>r.id===id) || claimed().includes(id)))return false;
     G.ensureTown().followedRequest=id;
     G.formEchoGuide=null;G.legendEchoGuide=null;
+    G.ensureWorldwake().practiceMark=null;
     G.saveGame();return true;
   };
   G.followedSunriseRequest=()=>G.sunriseRequests().find(r=>r.followed&&!r.done)||null;

@@ -340,6 +340,32 @@
     });
   }
 
+  function worldMarkPracticeTarget(mark) {
+    const s = G.state, source = Object.values(G.WORLDWAKE_MARKS).find(entry => entry.id === mark.id);
+    const region = G.maps[source.region].name;
+    if (s.mapId !== source.region) {
+      const route = routeTarget({ mapId: source.region, destination: region });
+      return route && Object.assign(route, { text: `${route.text} Carry ${mark.name} home to ${region} for a caravan field note.` });
+    }
+    const styles = mark.style.toLowerCase().split(" + ");
+    const carried = G.getLoadout(s.formId).map(id => G.abilities[id]).filter(art => art && styles.includes(art.style));
+    const base = { kind: "form", color: G.GUIDANCE_COLORS.form, icon: mark.icon, destination: `${mark.name} field note` };
+    if (!carried.length) {
+      const art = G.availableAbilities().map(id => G.abilities[id]).find(art => art && styles.includes(art.style));
+      return { ...base, spatial: false, text: art
+        ? `Open Build / Arts and borrow ${art.name}. Land its ${mark.style.toLowerCase().replace(" + ", " or ")} hit here while carrying ${mark.name}.`
+        : `You need an earned ${mark.style.toLowerCase().replace(" + ", " or ")} art for ${mark.name}'s field note. Review the awakening paths in Form Lab.` };
+    }
+    const enemy = nearest(s.enemies.filter(e => !e.dead && !e.def.practice && !e.def.miniboss && !(e.ward?.hp > 0)), s.player.x, s.player.y);
+    if (!enemy) return { ...base, spatial: false,
+      text: `The nearby roads have no unwarded practice foes. Break a ward, or leave and return to ${region}. A real ${mark.style.toLowerCase().replace(" + ", " or ")} hit writes ${mark.name}'s note.` };
+    return { ...base, x: enemy.x, y: enemy.y, entity: enemy,
+      tileX: Math.floor(enemy.x / G.TILE), tileY: Math.floor(enemy.y / G.TILE),
+      text: `Land ${carried[0].name} on a baddie here while carrying ${mark.name}. One real hit writes this road's field note; three different notes earn 2 stars.` };
+  }
+
+  G.worldMarkPracticeTarget = worldMarkPracticeTarget;
+
   G.guidanceTarget = function () {
     const s = G.state;
     if (!s || !s.player) return null;
@@ -348,6 +374,8 @@
     const guidedLegend = G.guidedLegendEcho && G.guidedLegendEcho();
     if (guidedLegend) return legendEchoTarget(guidedLegend);
     if (G.sunriseRequestTarget) { const request = G.sunriseRequestTarget(); if (request) return request; }
+    const practice = G.followedWorldMarkPractice && G.followedWorldMarkPractice();
+    if (practice) return worldMarkPracticeTarget(practice);
     if (G.openingTarget) { const opening = G.openingTarget(); if (opening) return opening; }
     if (!G.storyGoal) return null;
     const goal = G.storyGoal();

@@ -1313,10 +1313,13 @@ G.ui = (() => {
     const ridge=G.state.mapId==="emberRidge"?G.ridgeSurvey?.():null;
     const marsh=G.state.mapId==="sunkenMarsh"?G.marshSurvey?.():null;
     const followedRequest=G.followedSunriseRequest?.();
+    const markPractice=G.followedWorldMarkPractice?.();
+    const practiceTarget=markPractice&&G.worldMarkPracticeTarget(markPractice);
     const deliveryHandoff = G.state.delivery?.complete && goal.chapter <= 1 && !goal.complete && !G.state.expeditionRun;
     return `<section class="field-dashboard journey-home">
       ${deliveryHandoff ? `<article class="journey-road"><strong>☀ The Long Way Home · Complete</strong><p>Your parcels reached Sunrise. Keep building your town, try a Manyfold crossing, or follow the next adventure below. Parcel’s cart connects the quay to Orchard Road and Greenfield.</p><button data-menu-route="town">Small promises · visit your neighbours</button></article>` : ""}
       ${followedRequest?`<article class="journey-road"><span class="eyebrow">A PROMISE TO ${escapeHtml(followedRequest.name.toUpperCase())}</span><h3>${escapeHtml(followedRequest.title)}</h3><p>${escapeHtml(followedRequest.ready?`Return to ${followedRequest.name} on the quay.`:followedRequest.task)}</p><button data-follow-request="${followedRequest.id}">Show the way</button><button data-stop-request>Set aside</button></article>`:""}
+      ${markPractice?`<article class="journey-road"><span class="eyebrow">CARAVAN FIELD NOTES · ${Math.min(3,G.ensureWorldwake().markPractices.length)}/3</span><h3>${markPractice.icon} Trace ${escapeHtml(markPractice.name)} home</h3><p>${escapeHtml(practiceTarget?.text||"Follow this Mark's old road.")}</p><button data-act="mark-practice-trail">Trace this road</button><button data-mark-practice="">Set aside</button></article>`:""}
       <article class="journey-hero"><span class="eyebrow">${escapeHtml(progress.label)}</span><h2>${escapeHtml(goal.short)}</h2>
         <p>${escapeHtml(goal.objective)}</p><div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
         <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the main story</button><button data-menu-route="story">Story so far</button></div></article>
@@ -1441,6 +1444,8 @@ G.ui = (() => {
       if(G.equipBossPreparation(button.dataset.prepArt,Number(button.dataset.prepSlot))){btnCache="";buildMenu();}
     }));
     const followTrail=menuEl.querySelector('[data-act="follow-trail"]');
+    const markTrail=menuEl.querySelector('[data-act="mark-practice-trail"]');
+    if(markTrail)markTrail.addEventListener("click",()=>{closeMenu();G.requestGuidance(false);});
     if(followTrail)followTrail.addEventListener("click",()=>{G.followSunriseRequest?.(null);closeMenu();G.requestGuidance(false);});
     menuEl.querySelectorAll("[data-follow-request]").forEach(button=>button.addEventListener("click",()=>{
       if(G.followSunriseRequest(button.dataset.followRequest)){closeMenu();G.requestGuidance(false);}
@@ -1501,6 +1506,12 @@ G.ui = (() => {
       button.addEventListener("click", () => {
         if (G.attuneWorldMark(button.dataset.worldMark || null)) buildMenu();
       }));
+    menuEl.querySelectorAll("[data-mark-practice]").forEach(button => button.addEventListener("click", () => {
+      const id = button.dataset.markPractice || null;
+      if (!G.followWorldMarkPractice(id)) return;
+      if (id) { closeMenu(); G.requestGuidance(false); }
+      else buildMenu();
+    }));
     menuEl.querySelectorAll("[data-keepsake]").forEach(button => button.addEventListener("click", () => {
       if (G.carryKeepsake(button.dataset.keepsake || null)) {
         btnCache = ""; G.sfx.play("menu"); buildMenu();
@@ -1824,12 +1835,15 @@ G.ui = (() => {
     const active = G.activeWorldMarkDiscipline();
     const owned = G.ensureWorldwake().marks;
     const practiced = G.ensureWorldwake().markPractices;
+    const following = G.followedWorldMarkPractice();
+    const favorDone = G.ensureWorldwake().favorsDone.includes("roadLessons");
     const regions = Object.values(G.WORLDWAKE_MARKS);
     return `<section class="mark-bench">
       <div class="mark-bench-intro"><span class="eyebrow">SIX PROMISES · ONE CARRIED LESSON</span>
         <h2>The Worldbearers' Marks</h2>
         <p>Each awakened guardian lends one way of fighting. Carry a Mark to shape every form's arts; choose a different one whenever your build changes. Land its kind of hit in its home region to write a caravan field note.</p>
-        <strong>${active ? `${active.icon} ${escapeHtml(active.name)} carried · ${escapeHtml(active.effect)}` : `${owned.length}/6 awakened · No Mark carried`}</strong></div>
+        <strong>${active ? `${active.icon} ${escapeHtml(active.name)} carried · ${escapeHtml(active.effect)}` : `${owned.length}/6 awakened · No Mark carried`}</strong>
+        <p>Road Lessons · ${favorDone ? "Complete" : `${Math.min(3, practiced.length)}/3 field notes · 2 stars for three different roads`}</p></div>
       <div class="mark-bench-grid">${G.WORLD_MARK_DISCIPLINES.map((mark) => {
         const earned = owned.includes(mark.id), selected = active && active.id === mark.id;
         const source = regions.find((entry) => entry.id === mark.id);
@@ -1840,6 +1854,7 @@ G.ui = (() => {
           <p class="mark-note">${earned ? escapeHtml(mark.note) : "A promise still asleep."}</p>
           ${earned ? `<p class="mark-practice">${practiced.includes(mark.id) ? "✦ Field note written" : `Field note · land a ${escapeHtml(mark.style.toLowerCase().replace(" + ", " or "))} hit in ${escapeHtml(regionName)} while carrying this Mark`}</p>` : ""}
           <button data-world-mark="${mark.id}" ${earned && !selected ? "" : "disabled"} aria-pressed="${!!selected}">${selected ? "✦ Carried" : earned ? "Carry this Mark" : "Sleeping"}</button>
+          ${earned && !practiced.includes(mark.id) && !favorDone ? `<button data-mark-practice="${following?.id === mark.id ? "" : mark.id}">${following?.id === mark.id ? "Stop tracing this road" : "Carry and trace its road"}</button>` : ""}
         </article>`;
       }).join("")}</div>
       ${active ? `<button class="mark-set-aside" data-world-mark="">Set the Mark aside</button>` : ""}

@@ -60,6 +60,7 @@ G.makeWorldwake = function () {
     caravanLevel: 0,
     heardBanter: [],
     attunedMark: null,
+    practiceMark: null,
   };
 };
 
@@ -88,6 +89,8 @@ G.normalizeWorldwake = function (saved, legacySave) {
     markIds.has(id) && campaign.marks.includes(id))));
   const attuned = saved && saved.attunedMark;
   campaign.attunedMark = markIds.has(attuned) && campaign.marks.includes(attuned) ? attuned : null;
+  campaign.practiceMark = campaign.marks.includes(saved?.practiceMark) && saved.practiceMark === campaign.attunedMark &&
+    !campaign.markPractices.includes(saved.practiceMark) && !campaign.favorsDone.includes("roadLessons") ? saved.practiceMark : null;
   if (legacySave && regionIds.has(legacySave.mapId) && !campaign.discovered.includes(legacySave.mapId))
     campaign.discovered.push(legacySave.mapId);
   return campaign;
@@ -153,10 +156,35 @@ G.attuneWorldMark = function (id) {
   if (id !== null && (!campaign.marks.includes(id) || !G.WORLD_MARK_DISCIPLINES.some((mark) => mark.id === id))) return false;
   if (campaign.attunedMark === id) return false;
   campaign.attunedMark = id;
+  if (campaign.practiceMark !== id) campaign.practiceMark = null;
   G.sfx.play("pickup");
   G.ui.toast(id ? `${G.WORLD_MARK_DISCIPLINES.find((mark) => mark.id === id).name} carried into battle.` : "World Mark discipline set aside.", 3);
   G.saveGame();
   return true;
+};
+
+G.followWorldMarkPractice = function (id) {
+  if (!G.state || G.state.expeditionRun) return false;
+  const campaign = G.ensureWorldwake();
+  if (id !== null && (!campaign.marks.includes(id) || campaign.markPractices.includes(id) ||
+    campaign.favorsDone.includes("roadLessons") || !G.WORLD_MARK_DISCIPLINES.some(mark => mark.id === id))) return false;
+  if (id === campaign.practiceMark) return false;
+  if (id !== null) {
+    G.attuneWorldMark(id);
+    G.formEchoGuide = null; G.legendEchoGuide = null;
+    if (G.ensureTown) G.ensureTown().followedRequest = null;
+  }
+  campaign.practiceMark = id;
+  G.saveGame();
+  return true;
+};
+
+G.followedWorldMarkPractice = function () {
+  const campaign = G.state && G.ensureWorldwake();
+  if (!campaign || G.state.expeditionRun || campaign.favorsDone.includes("roadLessons") ||
+      campaign.markPractices.includes(campaign.practiceMark)) return null;
+  return campaign.practiceMark === campaign.attunedMark && campaign.marks.includes(campaign.practiceMark)
+    ? G.WORLD_MARK_DISCIPLINES.find(mark => mark.id === campaign.practiceMark) || null : null;
 };
 
 G.worldwakePurified = function (mapId) {
@@ -243,6 +271,7 @@ G.events.on("hit", (data) => {
   if (!G.state.enemies.some((enemy) => enemy.id === data.enemy && !enemy.def.practice)) return;
   const campaign = G.ensureWorldwake();
   campaign.markPractices.push(mark.id);
+  if (campaign.practiceMark === mark.id) campaign.practiceMark = null;
   G.ui.toast(`Caravan field note: ${mark.name} in ${G.maps[source.region].name} (${Math.min(campaign.markPractices.length, 3)}/3)`, 3);
   if (!G.checkWorldwakeFavors(false)) G.saveGame();
 });
