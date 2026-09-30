@@ -215,6 +215,8 @@ G.passives = (() => {
       o.arcDeg = Math.min(360, (o.arcDeg || 100) + 25);
     if (keepsake?.id === "mire" && o.status?.name === "poison")
       o.status = { ...o.status, dur: (o.status.dur || 3) * 1.4 };
+    if (keepsake?.id === 'spindle' && kind === 'chain' && style === 'chain')
+      o.maxTargets = (o.maxTargets || 4) + 1;
     return o;
   }
 

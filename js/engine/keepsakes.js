@@ -17,6 +17,9 @@ G.KEEPSAKES = [
   { id: "plumbline", name: "Mason's Plumbline", item: "trophy-old-mason", icon: "◆", color: "#d8b06a",
     region: "Hanging Gardens", guardian: "Old Mason", gain: "The brief guard after a melee hit lasts 50% longer.",
     price: "Dash arts cost 1 more mana.", note: "A sure hand in a crowded fight: a landed swing gives 0.18 seconds of guard. Misses and wrong wards give none; longer form-specific defenses keep their timing." },
+  { id: 'spindle', name: "Tess's Spindle", item: 'trophy-silk-matriarch', icon: '◇', color: '#d9a7ff',
+    region: 'Rootdeep Hollow', guardian: 'Silk Matriarch', gain: 'Chain arts can connect one extra foe.',
+    price: 'Projectile arts take 25% longer to recover.', note: 'Gather a crowd for the extra thread. Damage per foe and jump reach stay the same; walls and wards keep their rules.' },
 ];
 
 G.normalizeKeepsake = function (id, items) {
@@ -32,8 +35,10 @@ G.abilityManaCost = function (ability) {
 };
 G.meleeGuardDuration = function () { return G.MELEE_GUARD_SECONDS * (G.activeKeepsake()?.id === 'plumbline' ? 1.5 : 1); };
 G.abilityCooldown = function (ability) {
-  const plume = G.activeKeepsake()?.id === 'plume';
-  return ability.cooldown * (plume && ability.style === 'dash' ? .75 : plume && ability.style === 'area' ? 1.25 : 1);
+  const id = G.activeKeepsake()?.id;
+  const scale = id === 'plume' && ability.style === 'dash' ? .75
+    : id === 'plume' && ability.style === 'area' || id === 'spindle' && ability.style === 'projectile' ? 1.25 : 1;
+  return ability.cooldown * scale;
 };
 // The meter remembers the price at cast time. Changing equipment cannot
 // shorten a running cooldown or make its displayed progress jump backwards.
