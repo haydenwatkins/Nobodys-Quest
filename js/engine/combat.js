@@ -454,12 +454,13 @@ G.combat = (() => {
       dur: 0.15,
     });
     if (hits > 0 && user === G.state.player) {
-      user.meleeGuard = Math.max(user.meleeGuard || 0, G.MELEE_GUARD_SECONDS);
+      const guard = G.meleeGuardDuration ? G.meleeGuardDuration() : G.MELEE_GUARD_SECONDS;
+      user.meleeGuard = Math.max(user.meleeGuard || 0, guard);
       if (user.mana < user.manaMax) user.mana = Math.min(user.manaMax, user.mana + 1);
       G.spawnFx({
         kind: "ring", x: user.x, y: user.y - 6,
         color: o.color || G.DAMAGE_TYPES[type].color,
-        radius: 7, dur: G.MELEE_GUARD_SECONDS,
+        radius: 7, dur: guard,
       });
       if (o.passiveSlide) {
         G.world.moveBox(user, user.dir.x * o.passiveSlide, user.dir.y * o.passiveSlide);

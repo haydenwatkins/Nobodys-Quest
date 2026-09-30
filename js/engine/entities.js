@@ -1566,7 +1566,7 @@ G.drawPlayer = function (ctx) {
   }
   if (p.meleeGuard > 0 || p.shellCounterT > 0) {
     ctx.save();
-    ctx.globalAlpha = p.shellCounterT>0?0.85:Math.min(0.8, p.meleeGuard / G.MELEE_GUARD_SECONDS);
+    ctx.globalAlpha = p.shellCounterT>0?0.85:Math.min(0.8, p.meleeGuard / (G.meleeGuardDuration ? G.meleeGuardDuration() : G.MELEE_GUARD_SECONDS));
     ctx.strokeStyle = p.shellCounterT>0?"#a7f070":"#fff3c2";
     ctx.lineWidth = 1;
     ctx.beginPath();

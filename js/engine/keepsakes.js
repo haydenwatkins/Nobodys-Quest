@@ -14,6 +14,9 @@ G.KEEPSAKES = [
   { id: "plume", name: "Sovereign's Plume", item: "trophy-sky-sovereign", icon: "🪶", color: "#73eff7",
     region: "Windscar Canyon", guardian: "Sky Sovereign", gain: "Dash arts recover 25% sooner.",
     price: "Area arts take 25% longer to recover.", note: "Keep moving between your openings. Melee, projectile, and chain timing stays unchanged; the Sky Mark can lengthen your dash." },
+  { id: "plumbline", name: "Mason's Plumbline", item: "trophy-old-mason", icon: "◆", color: "#d8b06a",
+    region: "Hanging Gardens", guardian: "Old Mason", gain: "The brief guard after a melee hit lasts 50% longer.",
+    price: "Dash arts cost 1 more mana.", note: "A sure hand in a crowded fight: a landed swing gives 0.18 seconds of guard. Misses and wrong wards give none; longer form-specific defenses keep their timing." },
 ];
 
 G.normalizeKeepsake = function (id, items) {
@@ -23,8 +26,11 @@ G.activeKeepsake = function () {
   return G.state && G.KEEPSAKES.find(k => k.id === G.state.keepsakeId && G.state.items.includes(k.item)) || null;
 };
 G.abilityManaCost = function (ability) {
-  return ability.mana + (ability.mana > 0 && G.activeKeepsake()?.id === "mire" ? 1 : 0);
+  const id = G.activeKeepsake()?.id;
+  const surcharge = ability.mana > 0 && id === 'mire' || ability.style === 'dash' && id === 'plumbline';
+  return ability.mana + (surcharge ? 1 : 0);
 };
+G.meleeGuardDuration = function () { return G.MELEE_GUARD_SECONDS * (G.activeKeepsake()?.id === 'plumbline' ? 1.5 : 1); };
 G.abilityCooldown = function (ability) {
   const plume = G.activeKeepsake()?.id === 'plume';
   return ability.cooldown * (plume && ability.style === 'dash' ? .75 : plume && ability.style === 'area' ? 1.25 : 1);
