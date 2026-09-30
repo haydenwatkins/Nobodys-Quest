@@ -267,7 +267,9 @@ G.events.on("*", (type, data) => {
       if (!questMatches(q.match, data)) continue;
 
       // multiHit counts as done in one go if hits >= the match
-      G.questCounts[q.id] = (G.questCounts[q.id] || 0) + 1;
+      const credit = type === "selfHeal" ? (Number.isFinite(data.amount) ? Math.max(0, data.amount) : 0) : 1;
+      if (!credit) continue;
+      G.questCounts[q.id] = (G.questCounts[q.id] || 0) + credit;
       const prog = G.questCounts[q.id];
       G.state.masteryHudPulse = 1.4;
 

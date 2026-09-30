@@ -253,6 +253,11 @@
       };
     }
     let target = null;
+    if (quest.event === "selfHeal" && G.state.player.damageTaken <= 0) return {
+      kind: "form", color: G.GUIDANCE_COLORS.form, icon: lesson.form.icon, spatial: false,
+      destination: `${lesson.form.name} drain practice`,
+      text: `Your hearts are full. ${G.abilities[match.ability]?.name || "This art"} must restore missing hearts for this lesson; overflow armor does not count. Practice another lesson until healing is useful.`,
+    };
     if (quest.event === "sign") {
       target = nearest(gridTargets((cell) => !!cell.message), s.player.x, s.player.y);
     } else if (quest.event === "pickup") {
@@ -303,11 +308,21 @@
         destination: `${lesson.form.name} group practice`,
         text: `Only ${enemies.length}/${groupSize} baddies remain in ${s.mapDef.name}. Return later or find a busier road for ${G.abilities[match.ability]?.name || "that art"}.`,
       };
-      target = nearest(enemies, s.player.x, s.player.y);
+      if (quest.event === "selfHeal") {
+        const type = G.abilities[match.ability]?.type;
+        const drainable = enemies.filter(enemy => !enemy.def.practice &&
+          (!(enemy.ward?.hp > 0) || enemy.ward.types.includes(type) || G.playerForm().breaksAnyWard));
+        target = nearest(drainable, s.player.x, s.player.y);
+        if (!target) return { kind: "form", color: G.GUIDANCE_COLORS.form, icon: lesson.form.icon, spatial: false,
+          destination: `${lesson.form.name} drain practice`,
+          text: "Find a baddie Blood Bite can hurt, or break a ward first. Empty bites cannot build the five hits needed to restore a heart.", };
+      } else target = nearest(enemies, s.player.x, s.player.y);
     }
+    const drainHits = Math.max(0, 5 - (s.player.bloodPips || 0));
     const text = quest.event === "wardBreak" && match.damageType
       ? `${lesson.form.icon} Break this ${G.DAMAGE_TYPES[match.damageType].name} ward for ${lesson.form.name} mastery.`
       : groupSize ? `${lesson.form.icon} Draw ${groupSize} baddies together, then use ${G.abilities[match.ability]?.name || "this art"} for ${lesson.form.name} mastery.`
+      : quest.event === "selfHeal" ? `${lesson.form.icon} Blood Bite restores a missing heart every five hits. ${drainHits} more hit${drainHits === 1 ? "" : "s"} to the next drain; restored hearts count for this lesson.`
       : `${lesson.form.icon} ${quest.text} — try it here in the world.`;
     if (!target) return {
       kind: "form", color: G.GUIDANCE_COLORS.form, icon: "✦",
