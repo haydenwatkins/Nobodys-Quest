@@ -1245,12 +1245,14 @@ G.ui = (() => {
     const types=prep.types.map(id=>G.DAMAGE_TYPES[id].name).join(" or ");
     const art=G.abilities[prep.arts[0]],loadout=G.getLoadout(G.state.formId),form=G.playerForm();
     const source=G.forms[prep.source];
+    const kept=G.findCurrentMixRecipe(form.id),room=G.mixRecipes(form.id).some(card=>!card);
     const actions=!prep.ready&&art?Array.from({length:form.slots},(_,i)=>{
       const slot=i+1,old=G.abilities[loadout[slot]];
       return `<button data-prep-art="${art.id}" data-prep-slot="${slot}">Put ${escapeHtml(art.name)} in ${["A","B","C"][slot]}${old?` · replaces ${escapeHtml(old.name)}`:""}</button>`;
     }).join(""):"";
     return `<article class="journey-road"><span class="eyebrow">BEFORE YOU SET OUT</span><h3>${escapeHtml(prep.enemy)} · ${escapeHtml(types)} ward</h3>
       <p>${prep.ready?`${prep.equipped?escapeHtml(G.abilities[prep.equipped].name):escapeHtml(form.name)} can break this ward. Break it to interrupt the boss and create an opening.`:art?`You’ve learned ${escapeHtml(art.name)}. Borrow it in your current form before you go.`:source?`Learn ${escapeHtml(source.name)}’s ${escapeHtml(G.abilities[source.basic].name)}. ${escapeHtml(G.unlockHint(source.id))}`:`Learn an art with ${escapeHtml(types)} damage in Build.`}</p>
+      ${actions?`<p>${kept>=0?`Your current build is kept on Recipe ${kept+1}.`:room?"An unused recipe card keeps your previous build before borrowing.":"Your recipe cards are full. Save this build yourself before replacing an art."}</p>`:""}
       ${actions}${!prep.ready&&!art?`<button data-menu-route="forms">Explore forms</button>`:""}</article>`;
   }
 

@@ -481,6 +481,24 @@ G.saveMixRecipe = function (formId, index) {
   return true;
 };
 
+G.findCurrentMixRecipe = function (formId) {
+  const arts=G.getLoadout(formId),slots=G.forms[formId].slots+1;
+  const mark=G.activeWorldMarkDiscipline?.()?.id||null,keepsake=G.activeKeepsake?.()?.id||null;
+  const lesson=recipeLessonFor(formId,arts,G.state.lessonQuestId)?.quest.id||null;
+  return G.mixRecipes(formId).findIndex((recipe,index)=>{
+    const details=recipe&&G.mixRecipeDetails(formId,index);
+    return details?.ready&&details.complete&&details.keepsakeSaved&&
+      Array.from({length:slots},(_,i)=>i).every(i=>(details.arts[i]||null)===(arts[i]||null))&&
+      (details.mark?.id||null)===mark&&(details.keepsake?.id||null)===keepsake&&(details.lesson?.quest.id||null)===lesson;
+  });
+};
+
+G.keepCurrentMixRecipe = function (formId) {
+  const kept=G.findCurrentMixRecipe(formId);if(kept>=0)return kept;
+  const empty=G.mixRecipes(formId).findIndex(recipe=>!recipe);
+  return empty>=0&&G.saveMixRecipe(formId,empty)?empty:null;
+};
+
 G.mixRecipeDetails = function (formId, index) {
   const recipe = G.mixRecipes(formId)[index];
   if (!recipe) return null;

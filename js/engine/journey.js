@@ -103,5 +103,7 @@ G.bossPreparation = () => {
 G.equipBossPreparation = (id,slot) => {
   const prep=G.bossPreparation(),form=G.playerForm();
   if(!prep || !prep.arts.includes(id) || !Number.isInteger(slot) || slot<1 || slot>form.slots)return false;
-  G.getLoadout(form.id)[slot]=id;G.saveGame();return true;
+  const loadout=G.getLoadout(form.id);
+  if(loadout[slot]!==id){G.keepCurrentMixRecipe(form.id);loadout[slot]=id;}
+  G.saveGame();return true;
 };

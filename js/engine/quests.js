@@ -205,19 +205,7 @@ G.prepareMasteryLesson = function (questId, slot) {
   const formId = G.state.formId, lo = G.getLoadout(formId);
   if (lesson.ability && !lo.includes(lesson.ability)) {
     if (!Number.isInteger(slot) || slot < 1 || slot > G.forms[formId].slots) return false;
-    // Keep the pre-experiment mix on the first unused card, once.
-    const recipes = G.mixRecipes(formId);
-    const empty = [0, 1, 2].find(i => !recipes[i]);
-    const slots = Array.from({length: G.forms[formId].slots + 1}, (_, i) => i);
-    const markId = G.activeWorldMarkDiscipline?.()?.id || null;
-    const keepsakeId = G.activeKeepsake?.()?.id || null;
-    const kept = recipes.some((recipe, index) => {
-      const details = recipe && G.mixRecipeDetails(formId, index);
-      return details?.ready && slots.every(i => (details.arts[i] || null) === (lo[i] || null)) &&
-        (!details.complete || (details.mark?.id || null) === markId) &&
-        (details.keepsakeSaved ? (details.keepsake?.id || null) === keepsakeId : !keepsakeId);
-    });
-    if (empty !== undefined && !kept) G.saveMixRecipe(formId, empty);
+    G.keepCurrentMixRecipe(formId);
     lo[slot] = lesson.ability;
   }
   G.state.lessonQuestId = questId;
