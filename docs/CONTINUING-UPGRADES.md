@@ -9,6 +9,10 @@ Keep the game's pixel-art personality, form mixing, exploration, and depth. Make
 
 The user's September 30 direction takes priority over the campaign/build communication queue: make a fresh art pass on every form and every boss. Ben wants cute; Hayden wants fairly high fidelity, cool designs and no odd-looking shapes. Recent upgrades are not exempt. See [the complete coverage ledger and acceptance direction](CHARACTER-ART-PASS.md). Nobody, Rat, and Ancient Treant (both normal and Orchard variants) are now shipped with softer silhouettes and detailed faces/materials. All 388 tests pass; four-direction pose sheets and a real Chrome Heartwood scene at 667x375 were inspected. Phone landscape had no horizontal overflow; physical hardware and boss balance remain untested. Next: the other early forms and their regional guardians, then the whole roster in region order. The automation prompt now records this priority.
 
+### Cute marsh relatives (September 30)
+
+Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attached feet and visible tongue gestures. The Queen retains her regal silhouette with a gold/enamel crown and petal collar. Their existing source dimensions, two pixel settings, four-pose indexing, cast behavior and boss hazards remain unchanged. All 389 tests pass. Both enlarged four-pose sheets and Chrome's actual Sunken Marsh scene at 667x375 were inspected; no horizontal overflow appeared. Physical-device and ordinary combat-balance playthroughs remain outstanding. Continue the art ledger, including Knight, Ranger, Wizard and Eclipse Knight before later-region designs.
+
 ## Campaign progression and build depth queue
 The user resumed the upgrade loop on September 29 at 16% weekly usage. The stopping target remains 50% total weekly usage, including other tasks. Check live usage before new batches and after shipping. Temporary five-hour exhaustion should leave a clear checkpoint for later continuation.
 

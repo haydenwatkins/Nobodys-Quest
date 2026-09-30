@@ -16,6 +16,12 @@ Nobody now has a rounded coat/head, soft ivory shading, a mint scarf, small boot
 
 All 388 tests pass, including cast-time damage exactly once, real Orchard guardian variant/size, both resolutions, directions, and skin/dye preservation. Chrome at 667x375 showed Rat and the large Treant in Heartwood with no horizontal overflow. That scene was held by the opening dialogue; it is visual inspection, not a boss-balance playthrough. Full pose sheets were inspected too. Signature skins retain the existing five-source-pixel padding in each resolution; this pass did not change that renderer.
 
+## September 30 marsh batch
+
+Frog and Mire Queen now share jade material shading and clear highlighted eyes, with distinct springy and regal silhouettes. Cheeks, attached hind feet, visible tongue gestures, and the Queen's gold/enamel crown and petal collar preserve their identities. Existing 17x13 and 26x19 logical footprints, four pose indices, abilities, ward rules, warnings, and timing remain unchanged. All four enlarged poses were inspected. Chrome at 667x375 displayed the real Marsh scene and Queen sprite without horizontal overflow; this is desktop-browser visual evidence, not physical-device or boss-balance validation.
+
+All 389 tests pass after this batch, including both pixel settings, unchanged footprints, pose indices, dyes/skins, and existing Frog/Queen combat and campaign tests.
+
 ## Coverage ledger
 
 The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, plus the separate Orchard Treant. This is a baseline audit, not acceptance of every remaining frame. Each pending entry needs the detailed design/pose pass above. Continue early forms and their corresponding regional guardians before late regions; campaign/balance work resumes after this art priority.
@@ -27,7 +33,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Knight | Pending: softer armored proportions; clear helmet expression |
 | Ranger | Pending: friendly hooded face; articulated bow poses |
 | Wizard | Pending: face visibility, rounded robe, convincing hands/staff |
-| Frog | Pending: sculpted cheeks/body, eyes, clear legs and tongue |
+| Frog | Shipped September 30: sculpted cheeks/body, eyes, feet and tongue |
 | Alchemist | Pending: clear face/goggles, satchel and bottle-hand anatomy |
 | Stormcaller | Pending: softer mantle, face and natural casting arms |
 | Dragon | Pending: cute strong muzzle, coherent wings/feet/tail |
@@ -50,7 +56,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Boss | Fresh pass |
 |---|---|
 | Ancient Treant | Shipped September 30, registry and Orchard variants |
-| Mire Queen | Pending: regal cute frog, cheeks/feet/crown and tongue pose |
+| Mire Queen | Shipped September 30: regal jade frog, crown/petal collar, feet and tongue |
 | Eclipse Knight | Pending: rounded powerful armor, clear helmet/arms/shield |
 | Riftblade Adept | Pending: approachable masked duelist, coherent throwing pose |
 | Mole Monarch | Pending: cute royal mole, clear digging paws |
