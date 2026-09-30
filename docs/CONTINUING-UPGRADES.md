@@ -2,6 +2,8 @@
 
 Updated September 30, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
 
+Budget checkpoint: the fresh art batches shipped through `e628a94`; live total weekly usage reached 50% (five-hour 19%). The upgrade heartbeat is paused at the user's stopping target. No unfinished implementation remains. Resume only with a new user budget instruction, starting from the character-art ledger: Ranger and Wizard are next, with 20 forms and 16 bosses still pending detailed redesign/acceptance.
+
 ## Direction
 Keep the game's pixel-art personality, form mixing, exploration, and depth. Make each session rewarding through clear goals, discoveries, mastery, and build choices. Prefer meaningful improvements over adding more systems. Preserve existing saves and earned progress.
 
