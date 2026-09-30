@@ -14,6 +14,7 @@
 
 G.ui = (() => {
   const manaCost = ab => G.abilityManaCost ? G.abilityManaCost(ab) : ab.mana;
+  const recoverySeconds = ab => Math.round((G.abilityCooldown ? G.abilityCooldown(ab) : ab.cooldown) * 100) / 100;
   const toasts = [];           // {text, t, dur}
   let bannerData = null;       // {title, sub, t}
   const dialogueQueue = [];    // deliberate, player-advanced story text
@@ -329,7 +330,7 @@ G.ui = (() => {
       if (!ready) {
         const cd = Math.max(p.cooldowns[lo[i]] || 0, manaCost(ab) > p.mana ? 1 : 0);
         c.fillStyle = "rgba(26,28,44,0.75)";
-        c.fillRect(x + 1, y + 1, 27, Math.min(13, Math.ceil(cd / Math.max(0.1, ab.cooldown || 1) * 13)));
+        c.fillRect(x + 1, y + 1, 27, Math.min(13, Math.ceil(cd / Math.max(0.1, G.cooldownDuration ? G.cooldownDuration(ab) : ab.cooldown || 1) * 13)));
       }
     }
     const rank = G.legendRank ? G.legendRank(G.state.formId) : 0;
@@ -1017,7 +1018,7 @@ G.ui = (() => {
           .some((entry) => entry.quest.match && entry.quest.match.ability === id);
         return `<button data-quick-art="${id}" class="art-mixer-card ${id === currentId ? "equipped" : ""} ${synergy ? "boosted" : ""}">
           <span class="art-mixer-icon">${ability.icon}</span><span class="art-mixer-copy"><strong>${escapeHtml(ability.name)}</strong>
-          <small>${escapeHtml(G.DAMAGE_TYPES[ability.type].name)} · ${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}${ability.mana ? ` · ${manaCost(ability)} mana` : ""} · ${ability.cooldown}s</small>
+          <small>${escapeHtml(G.DAMAGE_TYPES[ability.type].name)} · ${escapeHtml(G.passives ? G.passives.styleLabel(ability.style) : ability.style)}${ability.mana ? ` · ${manaCost(ability)} mana` : ""} · ${recoverySeconds(ability)}s</small>
           ${ability.description?`<small>${escapeHtml(ability.description)}</small>`:""}
           <em>${origin ? `${origin.icon} ${escapeHtml(origin.name)}` : "Found art"}${synergy ? ` · ★ ${escapeHtml(form.passive.name)}` : ""}${quest ? " · ◇ Lesson" : ""}</em></span>
           ${id === currentId ? `<b>IN ${["A", "B", "C"][artMixerSlot]}</b>` : ""}</button>`;
@@ -1330,7 +1331,7 @@ G.ui = (() => {
       ${G.state.mapId==="titanGrave"?`<article class="journey-road"><span class="eyebrow">THE WORLDBEARER'S ROAD</span><h3>${G.hasWorldMark("heart")?"The last road leads home":"A heartbeat beneath the stone"}</h3><p>${G.hasWorldMark("heart")?"The heartlit arch at the southern edge returns to Greenfield beside the Final Firmament. Walk through when you are ready to prepare for the last exam; the road works both ways.":"The Last Worldbearer waits in the northeast heart chamber. Five memorials along the southern pilgrim road remember the guardians already freed."} The western caravan fire restores you; the northern spine returns to Glasswater.</p>${G.hasWorldMark("heart")?"":`<p>Blunt attacks break his ward. Leave the marked fields and walk to the refuge his gusts reveal, then answer during the quiet after each attack.</p>`}</article>`:""}
       ${G.state.mapId==="rootdeepHollow"?`<article class="journey-road"><span class="eyebrow">THE SILVER ROADS</span><h3>${G.hasWorldMark("thread")?"Tess stitches the hollow together":"Every chamber has a thread"}</h3><p>${G.hasWorldMark("thread")?"Woven passages cross both lower root walls. Follow the pale threads for a quicker return toward the eastern road and southern silk cache.":"Wide gaps join the root chambers. The northeast loom belongs to Tess; follow the southern road for Rootdeep Silk."} The southwest caravan fire remains a safe place to recover.</p><p>${glasswaterProgress?.aligned?"The eastern exit returns to Glasswater's awakened sundial.":glasswaterProgress?.prism?"The eastern exit leads to Glasswater; bring its Prism to the sundial north of the crossroads.":"The eastern exit offers an optional Glasswater detour: find the Prism and awaken its sundial shortcut."} ${G.hasWorldMark("light")?"Your Lantern Mark opens its southern Titan gate.":"Its southern Titan gate opens after the Lantern Mark."}</p>${G.hasWorldMark("thread")?"":`<p>Dark attacks break Tess's ward. Stay inside her tether circle, step into the gaps of her web grid, and counterattack after the threads settle.</p>`}</article>`:""}
       ${G.state.mapId==="hangingGardens"?`<article class="journey-road"><span class="eyebrow">THE MASON'S TERRACES</span><h3>${G.hasWorldMark("stone")?"The Mason's roads rise again":"Gardens held in patient hands"}</h3><p>${G.hasWorldMark("stone")?"Stone steps now cross both western channels near the caravan side. They make a direct return between the upper terrace, middle road, and southern promenade.":"Broad bridges cross the two channels. The northern terrace leads to the Old Mason; the southern promenade holds the Garden Keystone."} Rest at the southwest caravan fire.</p>${G.hasWorldMark("stone")?"":`<p>Blunt attacks break the Mason's ward. Stand in the gaps of his fault grid or inside his marked ring, then strike while he recovers.</p>`}</article>`:""}
-      ${G.state.mapId==="windscarCanyon"?`<article class="journey-road"><span class="eyebrow">THE TWO CANYON ROADS</span><h3>${G.hasWorldMark("sky")?"Aurelia gives the wind back":"Beneath the Sovereign's wings"}</h3><p>${G.hasWorldMark("sky")?"The feather pennants east of the caravan fire and on the northern high road now carry you between their landings. Walk up and interact to ride; clear danger from both ends first. Every form can travel on the wind.":"Take the northern traverse toward the Sky Sovereign's northeast perch, or explore the southern loop for the Windscar Feather. The silent feather pennants await Aurelia's Sky Mark."}</p><p>The southwest caravan fire restores hearts and mana. The middle road connects Sunstep Prairie to the Hanging Gardens.</p></article>`:""}
+      ${G.state.mapId==="windscarCanyon"?`<article class="journey-road"><span class="eyebrow">THE TWO CANYON ROADS</span><h3>${G.hasWorldMark("sky")?"Aurelia gives the wind back":"Beneath the Sovereign's wings"}</h3><p>${G.hasWorldMark("sky")?"The feather pennants east of the caravan fire and on the northern high road now carry you between their landings. Walk up and interact to ride; clear danger from both ends first. Every form can travel on the wind.":"Take the northern traverse toward the Sky Sovereign's northeast perch, or explore the southern loop for the Windscar Feather. The silent feather pennants await Aurelia's Sky Mark."}</p><p>The southwest caravan fire restores hearts and mana. The middle road connects Sunstep Prairie to the Hanging Gardens.</p>${G.hasWorldMark("sky")?`<p>Sovereign's Plume is ready: dash arts recover 25% sooner, while area arts take 25% longer. Carry it alongside a World Mark, or travel light.</p><button data-formlab-view="keepsakes">Weigh Aurelia's gift</button>`:""}</article>`:""}
       ${prairie?`<article class="journey-road"><span class="eyebrow">THE SUNSTEP COURIER CIRCUIT</span><h3>${prairie.active?`${prairie.active.step}/4 checkpoints · ${Math.ceil(prairie.active.time)} seconds left`:"A delivery before sundown"}</h3><p>${prairie.active?`Next: ${escapeHtml(prairie.active.next)}.`:"Start at the desk just east of the caravan camp. Visit the northwest, northeast, and south meadow pennants, then return within 45 seconds. Form changes and dash arts are welcome."}</p><p>${prairie.best?`Personal best: ${prairie.best.toFixed(2)}s. `:""}${prairie.done?"First delivery reward claimed; race again to improve your time.":"First successful delivery earns 6 town spirit."}</p></article>`:""}
       ${mistwood?`<article class="journey-road"><span class="eyebrow">THE THREE TRAIL BELLS</span><h3>${mistwood.open?"The middle road remembers":"A voice between the trees"}</h3><p>${mistwood.bells}/3 bells restored</p><p>${mistwood.open?`The central shortcut is open. ${G.state.items.includes("trophy-heartwood-crown")?"The southeast clearing is quiet":"The Treant keeps the southeast clearing"}; the northwest pantry still offers a bite for the road.`:"Explore the northwest, northeast, and southwest clearings. Ring each bell after clearing nearby danger to open the middle road and earn a one-time recovery and 6 town spirit."}</p>${G.state.items.includes("trophy-heartwood-crown")?"":`<p>Blunt attacks break the Treant's ward. Leave the marked root circles before they bloom, dodge his charge sideways, then strike while he catches his breath.</p>`}</article>`:""}
       ${marsh?`<article class="journey-road"><span class="eyebrow">THE OLD FERRY MARSH</span><h3>${marsh.queen?"The court is quiet":"A choice of approaches"}</h3><p>${marsh.sluices}/2 sluices open · ${marsh.salvage?"Wreck keepsake recovered":"Northwest wreck unexplored"}</p><p>${marsh.queen?"The side banks still hold their stories. Return to Sunrise with the pearl when you’re ready.":"Challenge the Queen on the west bank, or clear the north and south sluices to weaken her ward first. A small form can investigate the wreck."}</p></article>`:""}
@@ -1474,6 +1475,8 @@ G.ui = (() => {
     });
     menuEl.querySelectorAll("[data-formlab-view]").forEach((button) =>
       button.addEventListener("click", () => {
+        activeTab = "forms";
+        settingsOpen = false;
         formLabView = button.dataset.formlabView;
         if (formLabView === "roster") formRosterView = "roster";
         labFormId = G.formUnlocked(labFormId) ? labFormId : G.state.formId;
@@ -1817,8 +1820,9 @@ G.ui = (() => {
       heartwood: '<path fill="#384d37" d="M2 5h3v3h6V5h3v8H2z"/><path fill="#a6d66e" d="M1 3h2v3h2V2h2v6h2V2h2v4h2V3h2v7H1z"/><path fill="#d8b06a" d="M3 10h10v2H3z"/><path fill="#527845" d="M3 13h3v2H3zm7 0h3v2h-3z"/>',
       mire: '<path fill="#29366f" d="M5 1h6v2h2v2h2v6h-2v2h-2v2H5v-2H3v-2H1V5h2V3h2z"/><path fill="#41a6f6" d="M5 3h6v2h2v6h-2v2H5v-2H3V5h2z"/><path fill="#73eff7" d="M5 3h6v6H5z"/><path fill="#f4f4f4" d="M5 4h3v2H5z"/>',
       eclipse: '<path fill="#d8b06a" d="M5 1h6v2h2v2h2v6h-2v2h-2v2H5v-2H3v-2H1V5h2V3h2z"/><path fill="#ffcd75" d="M5 3h6v2h2v6h-2v2H5v-2H3V5h2z"/><path fill="#8153c1" d="M8 3h3v2h2v6h-2v2H8z"/><path fill="#1a1c2c" d="M8 5h3v6H8z"/>',
+      plume: '<path fill="#263d54" d="M10 1h4v5h-2v3h-2v3H7v2H3v-4h2V7h2V4h3z"/><path fill="#73eff7" d="M11 2h2v3h-2v3H9v3H6V8h2V5h3z"/><path fill="#b9ddf4" d="M11 2h2v2h-2zm-2 3h2v2H9z"/><path fill="#d8b06a" d="M3 13h3v2H3zm3-3h2v3H6zm2-3h1v3H8z"/>',
     };
-    return `<section class="mark-bench"><div class="mark-bench-intro"><span class="eyebrow">THE OLD GUARDIANS' KEEPSAKES</span>
+    return `<section class="mark-bench"><div class="mark-bench-intro"><span class="eyebrow">THE GUARDIANS' KEEPSAKES</span>
       <h2>Every gift has its weight</h2><p>Carry one keepsake with any form. Its gift and price travel together; a World Mark can be carried alongside it. Changing keepsakes never refills mana.</p>
       <strong>${active ? `${escapeHtml(active.name)} carried` : "No keepsake carried · travel light"}</strong></div>
       <div class="mark-bench-grid">${G.KEEPSAKES.map(k => {
@@ -1897,7 +1901,7 @@ G.ui = (() => {
       ${rank >= 1 ? `<section class="facet-picker"><div><span class="eyebrow">ACTIVE NATURE</span><h2>Choose what stirs within ${escapeHtml(form.name)}</h2></div>
         <button data-legend-facet="original" class="${chosen === "original" ? "active" : ""}"><strong>◆ ${escapeHtml(form.passive.name)}</strong><span>${escapeHtml(form.passive.description)}</span></button>
         <button data-legend-facet="legend" class="${chosen === "legend" ? "active" : ""}"><strong>✦ ${escapeHtml(def.facet.name)}</strong><span>${escapeHtml(def.facet.description)}</span></button></section>` : ""}
-      ${rank >= 2 ? `<section class="legend-reward"><span>${technique.icon}</span><div><small>SECRET ART AWAKENED</small><h2>${escapeHtml(technique.name)}</h2><p>${escapeHtml(G.passives.styleLabel(technique.style))} · ${manaCost(technique)} mana · ${technique.cooldown}s recovery</p></div><button data-formlab-view="loadout">Carry this art</button></section>` : ""}
+      ${rank >= 2 ? `<section class="legend-reward"><span>${technique.icon}</span><div><small>SECRET ART AWAKENED</small><h2>${escapeHtml(technique.name)}</h2><p>${escapeHtml(G.passives.styleLabel(technique.style))} · ${manaCost(technique)} mana · ${recoverySeconds(technique)}s recovery</p></div><button data-formlab-view="loadout">Carry this art</button></section>` : ""}
       ${rank >= 3 ? `<section class="legend-reward ultimate"><span>✦</span><div><small>LEGEND ARM AWAKENED</small><h2>${escapeHtml(def.armName)}</h2><p>${escapeHtml(def.ultimateName)} · Fill the Legend meter in battle. ${ultimateControl} when it shines.</p></div></section>` : ""}`;
   }
 
@@ -2078,7 +2082,7 @@ G.ui = (() => {
         }).join("")}</div>
         ${selected ? `<div class="ability-inspector">
           <div class="ability-inspector-icon">${selected.icon}</div><div><span class="eyebrow">${source ? `${source.icon} ${escapeHtml(source.name)} ART` : "FOUND ART"}</span>
-          <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${manaCost(selected)} mana` : " · no mana"} · ${selected.cooldown}s recovery</p>
+          <h2>${escapeHtml(selected.name)}</h2><p>${dmgChip(selected.type)} · ${escapeHtml(G.passives ? G.passives.styleLabel(selected.style) : selected.style)}${selected.mana ? ` · ${manaCost(selected)} mana` : " · no mana"} · ${recoverySeconds(selected)}s recovery</p>
           <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(activePassive.name)} will not modify it.`}</div></div>
           <button data-act="equip-ability" ${lo[labSlot] === selected.id ? "disabled" : ""}>${lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
         </div>` : `<div class="empty-tray"><strong>No arts found</strong><span>Try another damage or attack combination.</span></div>`}

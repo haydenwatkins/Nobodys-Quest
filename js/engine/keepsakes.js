@@ -11,6 +11,9 @@ G.KEEPSAKES = [
   { id: "eclipse", name: "Eclipse Sigil", item: "trophy-eclipse-sigil", icon: "◐", color: "#d9a7ff",
     region: "Ember Ridge", guardian: "Eclipse Knight", gain: "Carry 4 more mana.",
     price: "Each mana regeneration tick takes 25% longer.", note: "Save a deeper well for your opening. Successful hits still refill mana normally." },
+  { id: "plume", name: "Sovereign's Plume", item: "trophy-sky-sovereign", icon: "🪶", color: "#73eff7",
+    region: "Windscar Canyon", guardian: "Sky Sovereign", gain: "Dash arts recover 25% sooner.",
+    price: "Area arts take 25% longer to recover.", note: "Keep moving between your openings. Melee, projectile, and chain timing stays unchanged; the Sky Mark can lengthen your dash." },
 ];
 
 G.normalizeKeepsake = function (id, items) {
@@ -21,6 +24,15 @@ G.activeKeepsake = function () {
 };
 G.abilityManaCost = function (ability) {
   return ability.mana + (ability.mana > 0 && G.activeKeepsake()?.id === "mire" ? 1 : 0);
+};
+G.abilityCooldown = function (ability) {
+  const plume = G.activeKeepsake()?.id === 'plume';
+  return ability.cooldown * (plume && ability.style === 'dash' ? .75 : plume && ability.style === 'area' ? 1.25 : 1);
+};
+// The meter remembers the price at cast time. Changing equipment cannot
+// shorten a running cooldown or make its displayed progress jump backwards.
+G.cooldownDuration = function (ability) {
+  return G.state?.player.cooldownDurations?.[ability.id] || G.abilityCooldown(ability);
 };
 G.keepsakeManaBonus = function () { return G.activeKeepsake()?.id === "eclipse" ? 4 : 0; };
 G.manaRegenSeconds = function () { return G.MANA_REGEN_SECONDS * (G.activeKeepsake()?.id === "eclipse" ? 1.25 : 1); };

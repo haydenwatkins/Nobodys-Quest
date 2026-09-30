@@ -20,6 +20,7 @@ G.makePlayer = function () {
     manaRegenDelay: 0,
     manaRegenProgress: 0,
     cooldowns: {},             // abilityId -> seconds left
+    cooldownDurations: {},     // duration paid when that cooldown began
     abilityBuffer: {},         // button -> recent tap waiting on cooldown
     attackPose: null,
     spriteAction: null,
@@ -204,6 +205,7 @@ G.updateKnockout = function (dt) {
   p.manaRegenDelay = 0;
   p.manaRegenProgress = 0;
   p.cooldowns = {};
+  p.cooldownDurations = {};
   G.state.knockout = null;
   G.world.load(exit.map, { x: exit.x, y: exit.y });
   G.ui.toast(`⚔ ${ko.bossName} is back at full strength.`, 2.5);
@@ -364,7 +366,9 @@ G.updatePlayer = function (dt) {
       p.manaRegenDelay = G.MANA_CAST_DELAY;
       p.manaRegenProgress = 0;
     }
-    p.cooldowns[abilityId] = ab.cooldown;
+    const recovery = G.abilityCooldown ? G.abilityCooldown(ab) : ab.cooldown;
+    p.cooldowns[abilityId] = recovery;
+    (p.cooldownDurations || (p.cooldownDurations = {}))[abilityId] = recovery;
     if (!G.beginFormPerformance || !G.beginFormPerformance(p, abilityId)) ab.use(p);
     if (G.passives) G.passives.onAbilityUse(p, abilityId);
     G.events.emit("abilityUse", { ability: abilityId, form: G.state.formId });

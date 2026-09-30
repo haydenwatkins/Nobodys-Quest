@@ -265,7 +265,7 @@
         const ab=G.abilities[loadout[i]],x=7+i*62;
         panel(c,x,157,58,17);text(c,keys[i],x+5,161,'#edcf89',9);
         text(c,ab?ab.name:'—',x+15,162,'#f0e4c9',7);
-        if(ab){const cd=p.cooldowns[ab.id]||0;c.fillStyle='#9cae86';c.fillRect(x+3,173,52*(1-Math.min(1,cd/ab.cooldown)),1);}
+        if(ab){const cd=p.cooldowns[ab.id]||0,duration=G.cooldownDuration?G.cooldownDuration(ab):ab.cooldown;c.fillStyle='#9cae86';c.fillRect(x+3,173,52*(1-Math.min(1,cd/duration)),1);}
       }
       text(c,G.input.hasGamepad?'B  FORMS   R3  MIX':'Q  FORMS   F  MIX',205,163,'#f0dfb2',8);
     }

@@ -296,7 +296,8 @@ G.events.on("pickup", (data) => {
         : mark.id === "heart"
           ? "The Last Worldbearer gives the road back to everyone. A heartlit arch opens at Titan Grave's southern edge and answers another beside the Final Firmament in Greenfield. Walk through to return to the first horizon."
         : "The region changes, and a new World Path answers you.";
-    const news = `${awakening} Its fighting lesson is ready in Form Lab / Marks.`;
+    const keepsake = G.KEEPSAKES?.find(entry => entry.item === data.item);
+    const news = `${awakening} Its fighting lesson is ready in Form Lab / Marks.${keepsake ? ` ${keepsake.name} is ready in Build / Keepsakes: ${keepsake.gain} ${keepsake.price}` : ''}`;
     if (G.ui.dialogue) G.ui.dialogue(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, news, { accent: mark.color || "#ffcd75" });
     else G.ui.banner(`${mark.icon} ${mark.name.toUpperCase()} AWAKENED`, news);
   }

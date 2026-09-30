@@ -391,6 +391,7 @@ function restoreCampaign(run, refill) {
   G.state.player.damageTaken = refill ? 0 : Math.min(G.playerMaxHearts() - 1, Math.max(0, Number(backup.damageTaken) || 0));
   G.state.player.mana = refill ? G.playerMaxMana() : Math.min(G.playerMaxMana(), Math.max(0, Number(backup.mana) || 0));
   G.state.player.cooldowns = {};
+  G.state.player.cooldownDurations = {};
   G.state.player.pantryGuard = backup.pantryGuard || 0;
 }
 
