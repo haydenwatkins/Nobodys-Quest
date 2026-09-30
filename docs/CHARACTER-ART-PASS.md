@@ -22,6 +22,12 @@ Frog and Mire Queen now share jade material shading and clear highlighted eyes, 
 
 All 389 tests pass after this batch, including both pixel settings, unchanged footprints, pose indices, dyes/skins, and existing Frog/Queen combat and campaign tests.
 
+## September 30 armored pair
+
+Knight now has rounded steel plates, small boots, a soft cape and clear helmet eyes in all four directions. The same sprite carries through Orchard guards. Eclipse Knight has distinct violet armor, short curved moon horns and a crescent shield. Both swords keep a consistent apparent length through the strike. The 28x24 and 24x24 footprints, Slash windup/damage, guard behavior, boss wards and hazard timing remain unchanged.
+
+The full 389-test suite passed; after the final sword/horn geometry refinement, targeted opening-art tests passed again, including real Slash damage once and skin/dye/direction compatibility. Enlarged directional idle/strike sheets and the actual Ember Ridge introduction in Chrome at 667x375 were inspected with no horizontal overflow. Combat was paused by dialogue for the live visual check; ordinary fight pacing and physical hardware remain untested.
+
 ## Coverage ledger
 
 The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, plus the separate Orchard Treant. This is a baseline audit, not acceptance of every remaining frame. Each pending entry needs the detailed design/pose pass above. Continue early forms and their corresponding regional guardians before late regions; campaign/balance work resumes after this art priority.
@@ -30,7 +36,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 |---|---|
 | Nobody | Shipped September 30 |
 | Rat | Shipped September 30 |
-| Knight | Pending: softer armored proportions; clear helmet expression |
+| Knight | Shipped September 30: rounded steel plates, clear helmet eyes, all directions |
 | Ranger | Pending: friendly hooded face; articulated bow poses |
 | Wizard | Pending: face visibility, rounded robe, convincing hands/staff |
 | Frog | Shipped September 30: sculpted cheeks/body, eyes, feet and tongue |
@@ -57,7 +63,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 |---|---|
 | Ancient Treant | Shipped September 30, registry and Orchard variants |
 | Mire Queen | Shipped September 30: regal jade frog, crown/petal collar, feet and tongue |
-| Eclipse Knight | Pending: rounded powerful armor, clear helmet/arms/shield |
+| Eclipse Knight | Shipped September 30: violet armor, moon horns, crescent shield |
 | Riftblade Adept | Pending: approachable masked duelist, coherent throwing pose |
 | Mole Monarch | Pending: cute royal mole, clear digging paws |
 | Countess Carmine | Pending: charming countess, shaped cape and casting arms |
