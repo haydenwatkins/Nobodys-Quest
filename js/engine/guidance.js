@@ -340,9 +340,17 @@
       } else target = nearest(enemies, s.player.x, s.player.y);
     }
     const drainHits = Math.max(0, 5 - (s.player.bloodPips || 0));
+    const braceJabs = 3 - ((s.player.shellBeat || 0) % 3);
+    const comboNote = {
+      brace: braceJabs === 1 ? 'The next Shell Jab is a wide brace; land it on the pair.'
+        : `The wide brace is ${braceJabs} Shell Jabs away. Only that third jab counts for this lesson.`,
+      eruption: 'Chain three Drill Taps without pausing; only the third eruption counts. Gather the crowd before starting.',
+      finisher: 'Chain three Rift Cuts without pausing; only the wide third cut counts. Gather the crowd before starting.',
+      'draw-finish': 'Chain three Quickdraws without pausing; only the third draw counts. Gather the crowd before starting.',
+    }[match.combo];
     const text = quest.event === "wardBreak" && match.damageType
       ? `${lesson.form.icon} Break this ${G.DAMAGE_TYPES[match.damageType].name} ward for ${lesson.form.name} mastery.`
-      : groupSize ? `${lesson.form.icon} Draw ${groupSize} baddies together, then use ${G.abilities[match.ability]?.name || "this art"} for ${lesson.form.name} mastery.`
+      : groupSize ? `${lesson.form.icon} Draw ${groupSize} baddies together, then use ${G.abilities[match.ability]?.name || "this art"} for ${lesson.form.name} mastery.${comboNote ? ` ${comboNote}` : ''}`
       : quest.event === "selfHeal" ? `${lesson.form.icon} Blood Bite restores a missing heart every five hits. ${drainHits} more hit${drainHits === 1 ? "" : "s"} to the next drain; restored hearts count for this lesson.`
       : `${lesson.form.icon} ${quest.text} — try it here in the world.`;
     if (!target) return {
