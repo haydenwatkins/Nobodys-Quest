@@ -26,6 +26,9 @@ G.KEEPSAKES = [
   { id: 'ember', name: "Mallow's Ember", item: 'trophy-lantern-keeper', icon: '✧', color: '#ef7d57',
     region: 'Stormspine Peaks', guardian: 'Lantern Keeper', gain: 'Paid area casts snuff one nearby hostile shot.',
     price: 'Chain arts cost 1 more mana.', note: 'Catch the nearest active shot within 60 units and a clear path. Free arts, delayed shots, and floor hazards are untouched; Lantern Wisp keeps its lasting circles.' },
+  { id: 'lodestone', name: "Atlas's Lodestone", item: 'trophy-last-worldbearer', icon: '▣', color: '#ef7d57',
+    region: 'Titan Grave', guardian: 'Last Worldbearer', gain: 'Matching melee and area hits chip 1 extra ward point.',
+    price: 'Dash arts take 25% longer to recover.', note: "Bring the ward's own damage type. The weight never bypasses a wrong ward or adds health damage; Worldheart keeps its separate shove." },
 ];
 
 G.normalizeKeepsake = function (id, items) {
@@ -45,7 +48,7 @@ G.meleeGuardDuration = function () { return G.MELEE_GUARD_SECONDS * (G.activeKee
 G.abilityCooldown = function (ability) {
   const id = G.activeKeepsake()?.id;
   const scale = id === 'plume' && ability.style === 'dash' ? .75
-    : id === 'plume' && ability.style === 'area' || id === 'spindle' && ability.style === 'projectile' ? 1.25 : 1;
+    : id === 'plume' && ability.style === 'area' || id === 'spindle' && ability.style === 'projectile' || id === 'lodestone' && ability.style === 'dash' ? 1.25 : 1;
   return ability.cooldown * scale;
 };
 // The meter remembers the price at cast time. Changing equipment cannot

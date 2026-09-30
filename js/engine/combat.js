@@ -103,10 +103,14 @@ G.combat = (() => {
         return false;
       }
       // Right type — chip the ward
-      enemy.ward.hp -= opts.damage;
-      G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "GOD!" : opts.damage, wardHitColor);
+      const style = G.abilities[opts.ability]?.style;
+      const wardBonus = G.activeKeepsake?.()?.id === 'lodestone' && opts.damage > 0 && !overrulesWard
+        && (style === 'melee' || style === 'area') ? 1 : 0;
+      const wardDamage = opts.damage + wardBonus;
+      enemy.ward.hp -= wardDamage;
+      G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "GOD!" : wardDamage, wardHitColor);
       knockback(enemy, opts, 0.7);
-      impactFeedback(enemy, { ...opts, hitStop: Math.min(opts.hitStop || 0.025, 0.025), shake: 0.08 }, wardHitColor);
+      impactFeedback(enemy, { ...opts, damage: wardDamage, hitStop: Math.min(opts.hitStop || 0.025, 0.025), shake: 0.08 }, wardHitColor);
       if (enemy.ward.hp <= 0) {
         G.sfx.play("wardBreak");
         G.state.shake = Math.max(G.state.shake, 0.18);
