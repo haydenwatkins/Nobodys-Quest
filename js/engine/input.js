@@ -89,6 +89,13 @@ G.input = (() => {
   window.addEventListener("keydown", (e) => {
     const b = keyMap[e.key];
     if (!b) return;
+    if (G.ui && (G.ui.menuOpen || G.ui.artMixerOpen || G.ui.workshopOpen || G.ui.dialogueOpen)) {
+      const tag = e.target?.tagName?.toLowerCase();
+      const field = ["input", "select", "textarea"].includes(tag) || e.target?.isContentEditable;
+      // Native controls need their ordinary keyboard behavior, with no game
+      // tap queued behind it. Escape still leaves a field through the menu.
+      if (field && e.key !== "Escape" || tag === "button" && (e.key === "Enter" || e.key === " ")) return;
+    }
     e.preventDefault();
     if (b in dirsHeld) dirsHeld[b] = true;
     else press(b);

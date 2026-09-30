@@ -342,4 +342,22 @@ G.input.update();
 assert.equal(G.input.hasGamepad, false, "disconnecting should clear controller state");
 assertStopped("disconnecting a controller must stop movement");
 
+// A focused native menu control must receive its key without also queuing an
+// attack, interaction, movement, or pause after the overlay closes.
+for (const overlay of ["menuOpen", "artMixerOpen", "workshopOpen", "dialogueOpen"]) {
+  for (const key of ["menuOpen", "artMixerOpen", "workshopOpen", "dialogueOpen"]) G.ui[key]=key===overlay;
+  for (const [tag,key] of [["BUTTON","Enter"],["BUTTON"," "],["INPUT","ArrowRight"],["SELECT","ArrowDown"],["TEXTAREA","j"],["INPUT","p"]]) {
+    G.input.clearTaps();let prevented=false;
+    windowTarget.dispatch("keydown",{key,target:{tagName:tag},preventDefault(){prevented=true;}});
+    windowTarget.dispatch("keyup",{key,target:{tagName:tag}});G.input.update();
+    assert.equal(prevented,false,`${overlay} ${tag} receives ${key}`);
+    for(const action of ["a","interact","pause"])assert.equal(G.input.tapped(action),false);
+    assertStopped("field arrows do not steer the player");
+  }
+}
+G.input.clearTaps();windowTarget.dispatch("keydown",{key:"Escape",target:{tagName:"INPUT"}});
+assert.equal(G.input.tapped("pause"),true,"Escape still leaves a menu field");windowTarget.dispatch("keyup",{key:"Escape"});
+for (const key of ["menuOpen", "artMixerOpen", "workshopOpen", "dialogueOpen"]) G.ui[key]=false;
+windowTarget.dispatch("keydown",{key:"Enter"});assert.equal(G.input.tapped("interact"),true,"Enter still interacts in the field");windowTarget.dispatch("keyup",{key:"Enter"});
+
 console.log("input tests passed");
