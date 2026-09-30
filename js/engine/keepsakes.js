@@ -37,16 +37,14 @@ G.normalizeKeepsake = function (id, items) {
 G.activeKeepsake = function () {
   return G.state && G.KEEPSAKES.find(k => k.id === G.state.keepsakeId && G.state.items.includes(k.item)) || null;
 };
-G.abilityManaCost = function (ability) {
-  const id = G.activeKeepsake()?.id;
+G.abilityManaCost = function (ability, id = G.activeKeepsake()?.id) {
   const surcharge = ability.mana > 0 && id === 'mire' || ability.style === 'dash' && id === 'plumbline'
     || ability.mana > 0 && ability.style === 'area' && id === 'clapper'
     || ability.style === 'chain' && id === 'ember';
   return ability.mana + (surcharge ? 1 : 0);
 };
 G.meleeGuardDuration = function () { return G.MELEE_GUARD_SECONDS * (G.activeKeepsake()?.id === 'plumbline' ? 1.5 : 1); };
-G.abilityCooldown = function (ability) {
-  const id = G.activeKeepsake()?.id;
+G.abilityCooldown = function (ability, id = G.activeKeepsake()?.id) {
   const scale = id === 'plume' && ability.style === 'dash' ? .75
     : id === 'plume' && ability.style === 'area' || id === 'spindle' && ability.style === 'projectile' || id === 'lodestone' && ability.style === 'dash' ? 1.25 : 1;
   return ability.cooldown * scale;

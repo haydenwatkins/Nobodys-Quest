@@ -287,3 +287,30 @@
 #menu .lesson-actions button:focus-visible, #menu [data-lesson-auto]:focus-visible { outline:3px solid #ffdc91; outline-offset:2px; }
 #menu .lesson-synergy { border-left:3px solid #71804a; padding-left:7px; }
 @media (max-width:900px) { #menu .lesson-leaves, #menu .recipe-cards { grid-template-columns:1fr; } }
+
+/* A carved trophy rack: one inspected gift, with a cost preview before carry. */
+#menu .keepsake-carried { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#ffe4a4; font:18px "VT323",monospace; }
+#menu .keepsake-carried .mark-set-aside { padding:5px 14px; }
+#menu .keepsake-workbench { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); align-items:start; gap:12px; }
+#menu .keepsake-inspector.sleeping { opacity:1; }
+#menu .keepsake-inspector .mark-note { margin-bottom:0; }
+#menu .keepsake-arts-preview { margin-top:12px; border-top:1px dashed #7c8f83; padding-top:8px; }
+#menu .keepsake-arts-preview h4 { margin:0 0 5px; color:#c9b990; font:15px "VT323",monospace; }
+#menu .keepsake-arts-preview ul { margin:0; padding:0; list-style:none; }
+#menu .keepsake-arts-preview li { padding:5px 0; border-top:1px solid #405352; color:#d6e0d3; font:16px/1.15 "VT323",monospace; }
+#menu .keepsake-arts-preview strong,#menu .keepsake-arts-preview span { display:block; }
+#menu .keepsake-arts-preview strong { color:#fff0c5; font-weight:normal; }
+#menu .keepsake-rack { padding:10px; border:3px double #a98a5e; background:repeating-linear-gradient(90deg,#2b3533 0 19px,#303a36 19px 38px); box-shadow:inset 0 0 0 3px #1a2829; }
+#menu .keepsake-rack-heading .eyebrow { color:#d9ba7d; font:12px "VT323",monospace; }
+#menu .keepsake-rack-heading h3 { margin:3px 0; color:#f6e9cd; font:25px "VT323",monospace; }
+#menu .keepsake-rack-heading p,#menu .keepsake-bench-note { color:#c3d1c5; font:16px/1.2 "VT323",monospace; }
+#menu .keepsake-rack-heading p { margin:4px 0 10px; }
+#menu .keepsake-pouches { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+#menu .keepsake-pouch { min-width:0; min-height:86px; display:grid; justify-items:center; align-content:center; gap:4px; padding:8px 5px; border:2px solid #897756; border-radius:0; background:#273b3a; color:#e9dbaa; box-shadow:inset 0 0 0 2px #192b2d,2px 2px #111f21; }
+#menu .keepsake-pouch strong { font:17px/1.05 "VT323",monospace; }
+#menu .keepsake-pouch small { color:#b1c4b8; font:13px "VT323",monospace; }
+#menu .keepsake-pouch.sleeping { background:#263032; color:#9ba69d; }
+#menu .keepsake-pouch.sleeping svg { opacity:.5; }
+#menu .keepsake-pouch.inspecting { border-color:var(--mark-ink); box-shadow:inset 0 0 0 2px #192b2d,0 0 0 1px #e1c17f; }
+@media(max-width:760px) { #menu .keepsake-workbench { grid-template-columns:1fr; } #menu .keepsake-pouches { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:420px) { #menu .keepsake-pouches { grid-template-columns:repeat(2,minmax(0,1fr)); } }
