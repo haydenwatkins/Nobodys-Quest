@@ -277,6 +277,27 @@
       }
     } else {
       const enemies = (s.enemies || []).filter((enemy) => !enemy.dead && !enemy.def.miniboss);
+      if (match.dist?.gte) {
+        const art = G.abilities[match.ability || quest.lessonArt];
+        const candidates = enemies.filter(enemy => !enemy.def.practice &&
+          !(enemy.ward?.hp > 0) && (!G.combat?.clearArc || G.combat.clearArc(s.player.x, s.player.y - 6, enemy.x, enemy.y - 4)));
+        const inRange = candidates.filter(enemy => G.util.dist(s.player.x, s.player.y, enemy.x, enemy.y) >= match.dist.gte &&
+          G.util.dist(s.player.x, s.player.y, enemy.x, enemy.y) <= (art?.aimRange || 140));
+        const foe = nearest(inRange.length ? inRange : candidates, s.player.x, s.player.y);
+        if (!foe) return { kind: "form", color: G.GUIDANCE_COLORS.form, icon: lesson.form.icon, spatial: false,
+          destination: `${lesson.form.name} range practice`,
+          text: `Find an unwarded baddie with a clear shot for ${lesson.form.name}'s distant-hit lesson. Break its ward first, or try another road.` };
+        const distance = G.util.dist(s.player.x, s.player.y, foe.x, foe.y);
+        return { x: foe.x, y: foe.y, entity: foe, noTrail: true, practiceDistance: match.dist.gte,
+          tileX: Math.floor(foe.x / G.TILE), tileY: Math.floor(foe.y / G.TILE),
+          kind: "form", color: G.GUIDANCE_COLORS.form, icon: lesson.form.icon,
+          destination: `${lesson.form.name} range practice`,
+          text: distance < match.dist.gte
+            ? `Step outside the purple ring, then fire ${art?.name || "a ranged art"}. Stay back until the shot lands; close hits do not count.`
+            : distance > (art?.aimRange || 140)
+              ? `Move within ${art?.name || "your art"}'s reach while staying outside the purple ring. Keep that distance until the shot lands.`
+              : `Hold this distance and fire ${art?.name || "a ranged art"}. Stay outside the purple ring until the shot lands for ${lesson.form.name} mastery.` };
+      }
       if (groupSize && enemies.length < groupSize) return {
         kind: "form", color: G.GUIDANCE_COLORS.form, icon: lesson.form.icon, spatial: false,
         destination: `${lesson.form.name} group practice`,
@@ -423,20 +444,18 @@
       runtime.autoStage = 0;
       runtime.manualCount = 0;
       runtime.recalcAt = 0;
-    } else if (target && runtime.target && target.entity) {
-      runtime.target.x = target.x;
-      runtime.target.y = target.y;
     } else {
       runtime.target = target;
     }
     // Large regions can contain thousands of tiles. Rebuild a route only while
     // its breadcrumbs are visible (or when help was explicitly requested), so
     // an idle phone never spends frames solving an invisible path.
-    if (target && target.spatial !== false &&
+    if (target && target.spatial !== false && !target.noTrail &&
         (force || (runtime.activeUntil > now() && now() >= runtime.recalcAt))) {
       runtime.path = pathTo(target);
       runtime.recalcAt = now() + 0.8;
     }
+    if (target?.noTrail) runtime.path = [];
     return runtime.target;
   }
 
@@ -595,6 +614,16 @@
       ctx.stroke();
       ctx.fillStyle = target.color;
       ctx.fillRect(Math.round(target.x - 1), Math.round(target.y - 25 - pulse * 3), 3, 3);
+    }
+    if (active && target.practiceDistance) {
+      // Lesson geometry is measured from the feet, just like hit credit.
+      ctx.globalAlpha = 0.65; ctx.strokeStyle = target.color; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(target.x, target.y, target.practiceDistance, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 8; i++) {
+        const angle = i * Math.PI / 4, radius = target.practiceDistance;
+        ctx.fillRect(Math.round(target.x + Math.cos(angle) * radius) - 1,
+          Math.round(target.y + Math.sin(angle) * radius) - 1, 3, 3);
+      }
     }
     ctx.restore();
   };

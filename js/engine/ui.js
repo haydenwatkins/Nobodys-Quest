@@ -393,7 +393,9 @@ G.ui = (() => {
   }
 
   function drawQuestTracker(c) {
-    const lessons = G.relevantMasteryQuests ? G.relevantMasteryQuests(3) : [];
+    const field = G.fieldMasteryQuest && G.fieldMasteryQuest();
+    const automatic = G.relevantMasteryQuests ? G.relevantMasteryQuests(3) : [];
+    const lessons = field ? [field, ...automatic.filter(entry => entry.quest.id !== field.quest.id)].slice(0, 3) : automatic;
     if (!lessons.length) return;
     const active = lessons[0];
     const { form, quest, progress, slot } = active;
