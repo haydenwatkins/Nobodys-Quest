@@ -1690,7 +1690,8 @@ G.ui = (() => {
       }));
     menuEl.querySelectorAll("[data-expedition-draft]").forEach((button) =>
       button.addEventListener("click", () => {
-        if (G.chooseExpeditionDraft(Number(button.dataset.expeditionDraft))) buildMenu();
+        const slot = button.dataset.expeditionSlot;
+        if (G.chooseExpeditionDraft(Number(button.dataset.expeditionDraft), slot === undefined ? undefined : Number(slot))) buildMenu();
       }));
     const abandonExpedition = menuEl.querySelector('[data-act="abandon-expedition"]');
     if (abandonExpedition) abandonExpedition.addEventListener("click", () => {
@@ -2707,9 +2708,23 @@ G.ui = (() => {
       </button>`).join("")}</div>`;
     } else if (run.phase === "reward") {
       body += `<div class="form-card"><h2>${run.openingDraft?"What kind of crossing will this be?":"Choose one gift"}</h2><div class="tagline">${run.openingDraft?"Pick a power, then use Build to pair it with your arts.":"The Manyfold lends its power only until you return home."}</div></div>
-        <div class="expedition-choice-grid draft-grid">${run.draftOptions.map((option, index) => `<button class="expedition-choice" data-expedition-draft="${index}">
+        <div class="expedition-choice-grid draft-grid">${run.draftOptions.map((option, index) => {
+          if(option.kind === "ability"){
+            const art=G.abilities[option.id],form=G.playerForm(),loadout=G.getLoadout(form.id),earned=art&&G.availableAbilities().includes(art.id);
+            const terms=art?`${G.DAMAGE_TYPES[art.type].name} · ${art.style} · ${G.abilityManaCost(art)} mana · ${Math.round(G.abilityCooldown(art)*100)/100}s recovery`:"This art is unavailable.";
+            const slots=Array.from({length:form.slots},(_,i)=>{
+              const slot=i+1,old=G.abilities[loadout[slot]],label=["A","B","C"][slot];
+              return `<button data-expedition-draft="${index}" data-expedition-slot="${slot}" data-nav-id="draft-${index}-${slot}" ${earned?"":"disabled"}>Borrow in ${label}<small>${old?`Replaces ${escapeHtml(old.name)}`:"Empty mix slot"}</small></button>`;
+            }).join("");
+            return `<article class="expedition-choice expedition-art-draft"><div class="expedition-draft-head"><span class="choice-icon">${option.icon}</span><strong>${escapeHtml(option.name)}</strong></div>
+              <small>${escapeHtml(terms)}</small>
+              <em>${escapeHtml(form.name)} · A stays ${escapeHtml(G.abilities[loadout[0]].name)}</em>
+              ${earned?"":"<small>This art is no longer earned; choose another gift.</small>"}<div class="expedition-draft-slots">${slots}</div><small>${escapeHtml(art?.description||option.text)}</small></article>`;
+          }
+          return `<button class="expedition-choice" data-expedition-draft="${index}">
           <span class="choice-icon">${option.icon}</span><strong>${escapeHtml(option.name)}</strong><small>${escapeHtml(option.text)}</small><em>CLAIM</em>
-        </button>`).join("")}</div>`;
+        </button>`;
+        }).join("")}</div>`;
     } else {
       body += `<div class="form-card"><h2>${escapeHtml(run.roomName||"The chamber is waiting")}</h2><div class="tagline">Return to battle. A new gift will appear when the last foe falls.</div></div>`;
     }

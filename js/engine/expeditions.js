@@ -143,7 +143,7 @@ function draftOptions(run, bonusChoice) {
   if (abilityId) {
     const ability = G.abilities[abilityId];
     options.push({ kind: "ability", id: abilityId, icon: ability.icon, name: ability.name,
-      text: `Carry this ${ability.style} art in your last mix slot until you return` });
+      text: `Choose a mix slot for this ${ability.style} art until you return` });
   } else {
     options.push({ kind: "recovery", id: "recovery", icon: "🍪", name: "Trail Biscuit",
       text: "Recover two hearts and three mana" });
@@ -348,19 +348,21 @@ function rememberBoon(progress, id) {
   if (!progress.boonsSeen.includes(id)) progress.boonsSeen.push(id);
 }
 
-G.chooseExpeditionDraft = function (index) {
+G.chooseExpeditionDraft = function (index, chosenSlot) {
   const run = G.state.expeditionRun;
   const option = run && run.phase === "reward" ? run.draftOptions[index] : null;
   if (!option) return false;
+  const form = G.playerForm();
+  const artSlot = chosenSlot === undefined ? Math.max(1, Math.min(form.slots || 1, 2)) : chosenSlot;
+  if (option.kind === "ability" && (!Number.isInteger(artSlot) || artSlot < 1 || artSlot > form.slots ||
+    !G.availableAbilities().includes(option.id))) return false;
   if (option.kind === "boon") {
     run.boons[option.id] = (run.boons[option.id] || 0) + 1;
     rememberBoon(G.ensureExpeditionProgress(), option.id);
     if (option.id === "heartThread") G.state.player.damageTaken = Math.max(0, G.state.player.damageTaken - 1);
     if (option.id === "deepWell") G.state.player.mana = Math.min(G.playerMaxMana(), G.state.player.mana + 2);
   } else if (option.kind === "ability") {
-    const form = G.playerForm();
-    const slot = Math.max(1, Math.min(form.slots || 1, 2));
-    G.getLoadout(G.state.formId)[slot] = option.id;
+    G.getLoadout(G.state.formId)[artSlot] = option.id;
   } else if (option.kind === "form") {
     G.setForm(option.id);
     G.healPlayer(2, "expedition-form-surge");

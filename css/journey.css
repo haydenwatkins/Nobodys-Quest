@@ -212,6 +212,15 @@
 #menu .console-roster-workbench .form-roster-tile { border-radius:0; }
 #menu .settings-grid button { background:#302d35; border:2px solid #957953; }
 #menu .expedition-choice { background:#302940; }
+#menu .expedition-art-draft { cursor:default; display:flex; flex-direction:column; align-items:stretch; gap:6px; padding:12px; }
+#menu .expedition-art-draft:hover { transform:none; border-color:#9e805a; }
+#menu .expedition-draft-head { display:flex; align-items:center; gap:8px; }
+#menu .expedition-draft-head .choice-icon { font-size:24px; }
+#menu .expedition-draft-head strong { font:24px/1 "VT323",monospace; color:#f5e5c4; }
+#menu .expedition-draft-slots { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px; }
+#menu .expedition-draft-slots button { min-height:52px; padding:8px; border:2px solid #b79b6d; background:#38464a; color:#f6dfaa; font:20px/1.1 "VT323",monospace; }
+#menu .expedition-draft-slots small { display:block; margin-top:4px; color:#d4d4ca; font:16px/1.1 "VT323",monospace; }
+@media(max-width:760px){ #menu .draft-grid .expedition-art-draft { grid-column:1/-1; } }
 
 /* Neighbours' notes, kept in the same pocket journal as the journey. */
 .sunrise-promise { padding: 12px 0; border-top: 2px dashed #ad8b56; }
