@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Rounded custard landings (October 1)
+
+The remaining block-cross pie impact on Wayward Stage is now a flattened rounded custard splat with an attached berry and cream highlights, within the original 24x16 footprint. The flight still occupies 16x11; the actual damage circle, ordered three-phase landings, hit accounting, interruption and recovery are unchanged. Only Stage uses this small art hook; later Tansy arena passes should deliberately reuse both pastry states. Environment coverage stays 26/40.
+
+Six focused Stage scenery/pantry/travel/footprint and Fool pie-behaviour checks pass. The 491-check full run immediately before this art polish remains the latest broad regression run; it was not rerun for this small visual replacement. Native enlarged impact views and two Chrome 667x375 scenes were inspected in both pixel settings, with visible touch controls, no overflow and no console errors. These held actual landings do not establish physical hardware support or ordinary encounter balance. The temporary fixture is removed. Final Firmament remains the next substantive environment batch when five-hour headroom permits.
+
 ### Field panels yield to travellers and guardian warnings (October 1)
 
 The Stage art review exposed two real readability problems: campaign/mastery cards hid the traveller at northern cover, and the wayfinder's Patchling destination label covered a pie landing tell. The label was guidance, not the Form Echo sprite renderer. Story, mastery, tutorial and desktop minimap panels now yield whenever their screen rectangles overlap the actual form's sprite bounds, including camera offsets and padding; they return as the traveller moves clear. Boss encounter focus also suppresses wayfinder HUD guidance. Essential health/form/boss/ability information, guidance state, tutorial timing, quest progress and boss hazard clocks remain unchanged.

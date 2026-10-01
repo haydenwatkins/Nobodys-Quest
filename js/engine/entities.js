@@ -794,7 +794,7 @@ G.drawBossHazards = function (ctx) {
       ctx.rotate(-h.angle);const nx=Math.cos(h.angle)*(h.length/2-10),ny=Math.sin(h.angle)*(h.length/2-10);ctx.fillStyle="#302638";ctx.fillRect(nx-5,ny-5,10,10);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText(String(h.note),nx,ny+3);
     }else if(h.kind === "pieRain"){
       ctx.globalAlpha=.25;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.95;ctx.strokeStyle="#fff3c2";ctx.setLineDash(active?[]:[3,3]);ctx.stroke();ctx.setLineDash([]);
-      if(active){ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-12,h.y-3,24,6);ctx.fillRect(h.x-5,h.y-8,10,16);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-6,h.y-4,12,8);}
+      if(active){if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,h.y,true)){ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-12,h.y-3,24,6);ctx.fillRect(h.x-5,h.y-8,10,16);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-6,h.y-4,12,8);}}
       else{const py=h.y-30*(1-Math.min(1,local/h.warning));if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,py)){ctx.fillStyle="#bb8c55";ctx.fillRect(h.x-8,py-3,16,6);ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-7,py-6,14,4);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-3,py-8,6,3);}}
     }else if(h.kind === "crimsonWaltz"){
       const e=h.owner;ctx.globalAlpha=.7;ctx.strokeStyle="#e9a9ce";ctx.setLineDash([3,3]);
