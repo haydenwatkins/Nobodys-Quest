@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Silkstep and Tess's silver roads (October 1)
+
+At 70% weekly and 15% five-hour usage, Weaver/Tess's fresh pass began. Silkstep has a soft jumping-spider face, eight joined segmented legs, fitted woven wrap and a needle/thread carried in a forepaw. Tess has older ivory features, cranberry silk, copper wrap clasp and held needle/reel. Their 48 directional player poses/four guardian indices retain footprints, save IDs, Lifeline, chain/cocoon, Thread Mark/Spindle, restored passages and all guardian warning/recovery; the detached crown is absent.
+
+All 418 regression checks pass, plus four focused art/decoration/native checks after a final dark-pupil refinement. All poses/default/signature looks and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed the actual pair through a temporary save-disabled local fixture without overflow or console errors. The ordinary local builder inherits old trophies and removes defeated regional guardians: its earlier screenshots show form echoes, not both encounter participants. Windscar/Gardens were rechecked through the fixture too; actual Aurelia/Pillar and their player forms render without overflow. Story recap pauses these checks; ordinary encounter balance and physical-device validation remain outstanding. Coverage is 20/24 forms and 14/19 boss definitions. Continue Bellkeeper/Bongle, then remaining characters, environments and NPCs before playthrough work. For future regional guardian visual checks, clear only fixture memory, disable saving, reload the region and position the pair explicitly; verify the guardian is visibly present.
+
 ### Cobblekin and Pillar's garden masonry (October 1)
 
 At 69% weekly and 11% five-hour usage, Golem/Pillar's fresh pass began. Cobblekin has rounded joined river stones, a clear carved face, a mossy forelock and quartz chest keystone. Pillar has weathered pale stone, a gentle face, fitted canvas apron, a held trowel and grounded casting palms. Their 48 directional player poses/four guardian indices keep the source footprints, save IDs, third punch, Masonry cover, monolith, Stone Mark/Plumbline, garden routes and terrace warning/recovery unchanged.

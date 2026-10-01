@@ -2,8 +2,8 @@
 "use strict";
 
 registerForm({
-  id: "weaver", name: "Weaver", icon: "🕷️",
-  tagline: "A silk duelist who turns scattered crowds into one beautifully tangled problem.",
+  id: "weaver", name: "Silkstep", icon: "🕷️",
+  tagline: "A soft little stitcher who mends the silver roads one careful thread at a time.",
   speed: 94, hearts: 4, slots: 2,
   passive: { id: "lifeline", name: "Lifeline",
     description: "Successive hits on two different enemies bind and tug them together; bosses gain stagger instead of being dragged." },

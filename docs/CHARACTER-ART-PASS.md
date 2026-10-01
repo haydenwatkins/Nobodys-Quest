@@ -40,17 +40,23 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Silkstep and Tess (October 1)
+
+Weaver now appears as Silkstep, a soft spider stitcher with a warm jumping-spider face, eight joined legs, fitted woven work-wrap and a needle carried in a forepaw. Tess has an older ivory face, cranberry silk, copper wrap clasp and a held needle/reel. The fresh pose review corrected a clipped needle tip/foot edges and kept tools attached during walking. The player has 48 directional poses; the guardian keeps four indices. Their 23x19/30x23 footprints, stable IDs, Thread Mark/Spindle, Lifeline, chain/cocoon, restored passages and guardian warning/recovery remain unchanged. The detached crown is absent.
+
+All 418 regression checks pass, with four focused art/decoration/native checks passing after the final dark-pupil refinement. Default/signature sheets and all guardian indices were inspected in both pixel settings at gameplay scale and enlarged. Chrome at 667x375 displayed the actual player and guardian through a temporary local fixture, without horizontal overflow or console errors. The regular builder inherited all regional marks and removed defeated guardians, so its earlier region screenshots show form echoes, not both encounter participants. The fixture clears only its in-memory marks and disables saving. Story recap pauses combat; ordinary balance and physical-device checks remain outstanding. Coverage is now 20/24 forms and 14/19 boss definitions. Continue Bellkeeper with Bongle, then remaining characters, environments and NPCs.
+
 ### Cobblekin and Pillar (October 1)
 
 Golem now appears as Cobblekin, a friendly stone roadmender with rounded joined limbs, clear carved face, a mossy forelock and quartz keystone fitted into the chest. Older Pillar has weathered pale stone, a canvas mason's apron, a held trowel and broad grounded casting palms. The player has 48 directional poses; the guardian retains four indices. Their 22x21/28x26 footprints, stable IDs, native third-punch rhythm, Masonry cover, monolith, Stone Mark/Plumbline and three-phase terrace recovery remain unchanged.
 
-All 416 regression checks pass. Complete default/signature sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Real-input third-punch and paid Rampart/hostile-only cover, monolith, garden routes, terrace recovery and Plumbline checks pass. Chrome at 667x375 displayed the actual pair without horizontal overflow, with story recap pausing combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 19/24 forms and 13/19 boss definitions. Continue Weaver with Tess in Rootdeep, before remaining character, environment and NPC art.
+All 416 regression checks pass. Complete default/signature sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Real-input third-punch and paid Rampart/hostile-only cover, monolith, garden routes, terrace recovery and Plumbline checks pass. The initial Chrome region check inherited a completed mark and showed the form echo. A later 667x375 save-disabled local fixture rendered actual Cobblekin and Pillar without horizontal overflow. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage at shipping was 19/24 forms and 13/19 boss definitions. Continue Weaver with Tess in Rootdeep, before remaining character, environment and NPC art.
 
 ### Galecrest Courier and Aurelia (October 1)
 
 Griffin now appears as Galecrest Courier, a feathered cliffpost courier with rounded lion haunches, a soft expressive eagle face, layered honey wings, fitted teal neckcloth and leather dispatch pouch. Aurelia's older ivory ruff, broad blue feather fan and copper chest harness distinguish the guardian. The courier has 48 directional idle/walk/strike/guard frames; Aurelia retains four guardian indices. Their 28x19/30x22 footprints, save IDs, Sky Mark/Plume, combat timing, gust escape/recovery, ward and regional unlock remain unchanged. No detached crown or ornament returns.
 
-All 413 regression checks pass. Complete default/signature sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Real-input immediate Wingbeat/Slipstream shove, fan/dive, gust and Plume checks pass. Chrome at 667x375 displayed the actual pair without horizontal overflow. Story recap paused combat; ordinary encounter-balance and physical-device validation remain outstanding. Coverage is now 18/24 forms and 12/19 boss definitions. Continue Golem with its Hanging Gardens guardian next, before remaining character, environment and NPC art.
+All 413 regression checks pass. Complete default/signature sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Real-input immediate Wingbeat/Slipstream shove, fan/dive, gust and Plume checks pass. The initial Chrome region check inherited a completed mark and showed the form echo. A later 667x375 save-disabled local fixture rendered actual Galecrest Courier and Aurelia without horizontal overflow. Story recap pauses combat; ordinary encounter-balance and physical-device validation remain outstanding. Coverage at shipping was 18/24 forms and 12/19 boss definitions. Continue Golem with its Hanging Gardens guardian next, before remaining character, environment and NPC art.
 
 ### Hedgehare and Grandmother Briar (October 1)
 
@@ -137,7 +143,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Druid / Hedgehare | Shipped October 1: soft hare face, folded ear, sage apron and basket/pruning cane carried in every direction |
 | Griffin / Galecrest Courier | Shipped October 1: rounded lion/eagle anatomy, expressive beak, layered joined wings, dispatch pouch and 48 directional poses |
 | Golem / Cobblekin | Shipped October 1: friendly carved face, moss rooted in stone, separate rounded joints and 48 directional poses |
-| Weaver | Pending: friendly spider face, attached readable legs |
+| Weaver / Silkstep | Shipped October 1: warm spider face, eight joined legs, fitted woven wrap, held needle and 48 directional poses |
 | Bellkeeper | Pending: rounded bell silhouette and charming face, all casts |
 | Lantern Wisp | Pending: flame expression, clear cage and soft wisps |
 | Colossus | Pending: powerful friendly anatomy, distinct from Golem |
@@ -158,7 +164,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Grandmother Briar | Shipped October 1: warm grandmother face, silver braid, straw hat, fitted work apron and carried garden tools |
 | Aurelia, Sky Sovereign | Shipped October 1: older ivory ruff, broad blue feather fan, copper chest harness and clear talons; source/indices preserved |
 | Pillar, Old Mason | Shipped October 1: weathered pale stone, warm carved face, fitted canvas apron, held trowel and grounded casting palms |
-| Tess, Silk Matriarch | Pending: friendly silk guardian, attached readable limbs |
+| Tess, Silk Matriarch | Shipped October 1: older ivory spider face, cranberry silk, eight joined legs, fitted wrap, held needle/reel |
 | Bongle, Bell Titan | Pending: powerful round bell, expression and metal detail |
 | Mallow, Lantern Keeper | Pending: charming flame/cage guardian, readable casting pose |
 | Atlas, Last Worldbearer | Pending: strong gentle face and worldheart stone anatomy |
