@@ -20,10 +20,10 @@
  };
  const oldDraw=G.openingDrawables;
  G.openingDrawables=c=>{const list=oldDraw(c);if(G.state.mapId!==map)return list;
-  list.push({y:y+3,fn:()=>{c.save();c.fillStyle="#625568";c.fillRect(x-14,y-5,28,9);c.fillStyle="#d6c5aa";c.fillRect(x-12,y-8,24,6);c.fillStyle="#837892";c.fillRect(x-2,y-19,4,13);
+  list.push({y:y-4,fn:()=>{if(G.drawGlasswaterDial&&G.drawGlasswaterDial(c,x,y,has(reward)))return;c.save();c.fillStyle="#625568";c.fillRect(x-14,y-5,28,9);c.fillStyle="#d6c5aa";c.fillRect(x-12,y-8,24,6);c.fillStyle="#837892";c.fillRect(x-2,y-19,4,13);
    if(has(reward)){c.fillStyle="#73eff7";c.beginPath();c.moveTo(x,y-28);c.lineTo(x+6,y-19);c.lineTo(x,y-12);c.lineTo(x-6,y-19);c.closePath();c.fill();c.fillStyle="#fff3c2";c.fillRect(x-1,y-24,2,7);}
    else{c.strokeStyle="#ffcd75";c.strokeRect(x-5,y-24,10,10);}c.restore();}});
-  for(const ty of [10,14,18,22,26]){const py=ty*16+8;list.push({y:py,fn:()=>{c.save();c.fillStyle=has(reward)?"#73eff7":"#9e899b";c.fillRect(x-2,py-1,4,2);c.fillRect(x-1,py-3,2,6);c.restore();}});}
+  for(const ty of [10,14,18,22,26]){const py=ty*16+8;list.push({y:py-4,fn:()=>{if(G.drawGlasswaterMeridian&&G.drawGlasswaterMeridian(c,x,py,has(reward)))return;c.save();c.fillStyle=has(reward)?"#73eff7":"#9e899b";c.fillRect(x-2,py-1,4,2);c.fillRect(x-1,py-3,2,6);c.restore();}});}
   return list;
  };
 })();
