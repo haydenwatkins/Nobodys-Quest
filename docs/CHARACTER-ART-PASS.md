@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Tollkeeper (October 1)
+
+The Tollkeeper is now a riveted bronze river-otter with round ears, warm muzzle/whiskers, rolled rain hood, rounded fitted coat, receipts tucked into sewn pockets, joined tail, bound leather ledger and a lantern held on a short chain. Its 52x55 footprint, four guardian indices, hitbox, warning pose, flood/sweep/refuge clocks and delivery/save rewards remain stable. Shared-module quay NPCs remain for their separate later review.
+
+All 426 regression checks pass. Every pose and both pixel settings were inspected at gameplay size and enlarged; the real flood warning selects the raised lantern, and cancellation returns to rest. Delivery and walking-refuge checks pass. Chrome at 667x375 displayed the actual Tollkeeper with Patchling through a save-disabled local fixture without overflow or console errors. Story recap pauses combat; ordinary balance and physical-device checks remain outstanding. Fresh character coverage is now 24/24 forms and 19/19 boss definitions, including the normal/Orchard Treant variants. Environments across all regions and every NPC world sprite/portrait still need their fresh pass before returning to playthrough work; this is not a completed originality/publication review.
+
 ### Wayheart and Meridian (October 1)
 
 The final calling now appears as Wayheart, Patchling's completed living map: a warm folded-canvas face, stitched teal route coat, carried map and brass route quill. Meridian, the Perfect Map, has a pale folded face, meticulous indigo chart coat, map ledger and an attached compass staff. The impossible-ideal story role remains: demanding one perfect answer sealed the roads. Chapter recap, NPC lore, final guidance and ending use the original identity. No floating halo, crown or orbiting ornaments remain. Their 26x24/29x27 footprints, 48 directional player poses/four guardian indices, internal IDs, mastery gate, Providence, any-ward rule and every exam warning/recovery remain stable.
@@ -193,4 +199,4 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Mallow, Lantern Keeper | Shipped October 1: warm older flame face, broad weathered lantern and hinged casting shutters; source/indices preserved |
 | Atlas, Last Worldbearer | Shipped October 1: older russet mountain bear, pale brows/muzzle, joined broad paws and worldheart seam; source/indices preserved |
 | God of Every Form / Meridian, the Perfect Map | Shipped October 1: pale folded face, indigo chart coat, held map ledger/compass staff and coherent casting arms; source/indices preserved |
-| Tollkeeper | Pending: charming clockwork coat/face, clear staff and mechanisms |
+| Tollkeeper | Shipped October 1: warm bronze otter face, rolled rain hood, sewn receipt pockets, joined tail and held ledger/lantern; source/indices preserved |

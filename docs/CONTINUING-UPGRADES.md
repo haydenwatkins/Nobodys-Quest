@@ -9,13 +9,19 @@ Keep the game's pixel-art personality, form mixing, exploration, and depth. Make
 
 ## Current priority: cute, detailed form and boss art
 
-The user's September 30 direction takes priority over the campaign/build communication queue: make a fresh art pass on every form and every boss. Ben wants cute; Hayden wants fairly high fidelity, cool designs and no odd-looking shapes. Recent upgrades are not exempt. See [the complete coverage ledger and acceptance direction](CHARACTER-ART-PASS.md). Nobody, Rat, and Ancient Treant (both normal and Orchard variants) are now shipped with softer silhouettes and detailed faces/materials. All 388 tests pass; four-direction pose sheets and a real Chrome Heartwood scene at 667x375 were inspected. Phone landscape had no horizontal overflow; physical hardware and boss balance remain untested. Next: the other early forms and their regional guardians, then the whole roster in region order. The automation prompt now records this priority.
+The user's September 30 direction takes priority over the campaign/build communication queue: cute, fairly detailed original art, with cool designs and no odd-looking shapes. The fresh character pass now covers all 24 forms and 19 boss definitions, including both Treant variants; recent upgrades were not exempt. See [the complete coverage ledger and acceptance direction](CHARACTER-ART-PASS.md). All 426 regression checks pass, with pose/earned-appearance inspection in both pixel settings and controlled Chrome landscape scenes. Physical hardware and ordinary encounter balance remain untested. Next: inventory and upgrade environments across every region in order, then every NPC portrait/world sprite before campaign/playthrough upgrades. The character ledger does not imply those phases or a publication review are complete.
 
 ### Cute marsh relatives (September 30)
 
 Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attached feet and visible tongue gestures. The Queen retains her regal silhouette with a gold/enamel crown and petal collar. Their existing source dimensions, two pixel settings, four-pose indexing, cast behavior and boss hazards remain unchanged. All 389 tests pass. Both enlarged four-pose sheets and Chrome's actual Sunken Marsh scene at 667x375 were inspected; no horizontal overflow appeared. Physical-device and ordinary combat-balance playthroughs remain outstanding. Continue the art ledger, including Knight, Ranger, Wizard and Eclipse Knight before later-region designs.
 
 ## Campaign progression and build depth queue
+
+### Tollkeeper completes the character roster (October 1)
+
+At 75% weekly and 50% five-hour usage, the Tollkeeper's fresh pass began. The original collector is now a riveted bronze river-otter with a warm muzzle, rolled rain hood, rounded fitted coat, receipts tucked into sewn pockets, joined tail, bound leather ledger and a lantern held on a short chain. Its 52x55 footprint, four indices, hitbox, warning pose, all flood/sweep/refuge clocks, delivery gates and saved rewards remain unchanged. The three quay NPCs in the shared art module remain for their later fresh review.
+
+All 426 regression checks pass. Every guardian pose and both pixel settings were inspected at gameplay size and enlarged. The actual flood selects the raised-lantern frame, and cancellation returns to rest; walking refuge and delivery checks pass. Chrome at 667x375 displayed the actual Tollkeeper with Patchling through a save-disabled local fixture without overflow or console errors. Story recap pauses combat; ordinary balance and physical-device checks remain outstanding. Fresh character coverage is now 24/24 forms and 19/19 boss definitions. Begin the environment inventory/art pass, starting with Orchard Road/Heartwood, then delivery roads and all campaign regions in order; NPC sprites/portraits follow before playthrough work.
 
 ### Wayheart and Meridian's living maps (October 1)
 
