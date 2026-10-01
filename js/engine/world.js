@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawGardensTile && G.drawGardensTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawRootdeepTile && G.drawRootdeepTile(ctx, cell, x, y, time)) ||
+      (G.drawGardensTile && G.drawGardensTile(ctx, cell, x, y, time)) ||
       (G.drawWindscarTile && G.drawWindscarTile(ctx, cell, x, y, time)) ||
       (G.drawPrairieTile && G.drawPrairieTile(ctx, cell, x, y, time)) ||
       (G.drawGroveTile && G.drawGroveTile(ctx, cell, x, y, time)) ||
@@ -909,7 +910,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawGardensPortal || !G.drawGardensPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawRootdeepPortal || !G.drawRootdeepPortal(ctx, cell, x, y)) &&
+        (!G.drawGardensPortal || !G.drawGardensPortal(ctx, cell, x, y)) &&
         (!G.drawWindscarPortal || !G.drawWindscarPortal(ctx, cell, x, y)) &&
         (!G.drawPrairiePortal || !G.drawPrairiePortal(ctx, cell, x, y)) &&
         (!G.drawGrovePortal || !G.drawGrovePortal(ctx, cell, x, y)) &&
@@ -957,7 +959,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawGardensNotice || !G.drawGardensNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawRootdeepNotice || !G.drawRootdeepNotice(ctx, cell, x, y)) &&
+        (!G.drawGardensNotice || !G.drawGardensNotice(ctx, cell, x, y)) &&
         (!G.drawWindscarNotice || !G.drawWindscarNotice(ctx, cell, x, y)) &&
         (!G.drawPrairieNotice || !G.drawPrairieNotice(ctx, cell, x, y)) &&
         (!G.drawGroveNotice || !G.drawGroveNotice(ctx, cell, x, y)) &&
@@ -1240,6 +1243,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.rootdeepScenery && s.mapId === "rootdeepHollow") return;
     if (G.gardensScenery && s.mapId === "hangingGardens") return;
     if ((G.prairieScenery && s.mapId === "sunstepPrairie") || (G.windscarScenery && s.mapId === "windscarCanyon")) return;
     if ((G.homeScenery && s.mapId === "playerHouse") || (G.ridgeScenery && s.mapId === "emberRidge") || (G.starfallScenery && s.mapId === "starfallRuins")) return;
@@ -1277,6 +1281,7 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawRootdeepCache && G.drawRootdeepCache(ctx, ch)) return;
     if (G.drawGardensCache && G.drawGardensCache(ctx, ch)) return;
     if (G.drawWindscarCache && G.drawWindscarCache(ctx, ch)) return;
     if (G.drawPrairieCache && G.drawPrairieCache(ctx, ch)) return;
@@ -1547,6 +1552,7 @@ G.world = (() => {
   }
 
   function drawWorldwakeState(ctx, time) {
+    if (G.drawRootdeepCamp && G.drawRootdeepCamp(ctx, time)) return;
     if (G.drawGardensCamp && G.drawGardensCamp(ctx, time)) return;
     if (G.drawWindscarCamp && G.drawWindscarCamp(ctx, time)) return;
     if (G.drawPrairieCamp && G.drawPrairieCamp(ctx, time)) return;
@@ -1593,6 +1599,7 @@ G.world = (() => {
   // They organize a scene and suggest safety without adding collision to the
   // game's already busy mobile-sized paths.
   function drawFenceRun(ctx, fence) {
+    if (G.drawRootdeepFence && G.drawRootdeepFence(ctx, fence)) return;
     if (G.drawGardensFence && G.drawGardensFence(ctx, fence)) return;
     if (G.drawWindscarFence && G.drawWindscarFence(ctx, fence)) return;
     if (G.drawPrairieFence && G.drawPrairieFence(ctx, fence)) return;
@@ -1665,6 +1672,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawRootdeepPost && G.drawRootdeepPost(ctx, post, awake, near)) return;
     if (G.drawGardensPost && G.drawGardensPost(ctx, post, awake, near)) return;
     if (G.drawWindscarPost && G.drawWindscarPost(ctx, post, awake, near)) return;
     if (G.drawPrairiePost && G.drawPrairiePost(ctx, post, awake, near)) return;
