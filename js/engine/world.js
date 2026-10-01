@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawWayglassTile && G.drawWayglassTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawBurrowTile && G.drawBurrowTile(ctx, cell, x, y, time)) ||
+      (G.drawWayglassTile && G.drawWayglassTile(ctx, cell, x, y, time)) ||
       (G.drawTitanTile && G.drawTitanTile(ctx, cell, x, y, time)) ||
       (G.drawStormspineTile && G.drawStormspineTile(ctx, cell, x, y, time)) ||
       (G.drawFrostbellTile && G.drawFrostbellTile(ctx, cell, x, y, time)) ||
@@ -916,7 +917,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawWayglassPortal || !G.drawWayglassPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawBurrowPortal || !G.drawBurrowPortal(ctx, cell, x, y)) &&
+        (!G.drawWayglassPortal || !G.drawWayglassPortal(ctx, cell, x, y)) &&
         (!G.drawTitanPortal || !G.drawTitanPortal(ctx, cell, x, y)) &&
         (!G.drawStormspinePortal || !G.drawStormspinePortal(ctx, cell, x, y)) &&
         (!G.drawFrostbellPortal || !G.drawFrostbellPortal(ctx, cell, x, y)) &&
@@ -971,7 +973,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawWayglassNotice || !G.drawWayglassNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawBurrowNotice || !G.drawBurrowNotice(ctx, cell, x, y)) &&
+        (!G.drawWayglassNotice || !G.drawWayglassNotice(ctx, cell, x, y)) &&
         (!G.drawTitanNotice || !G.drawTitanNotice(ctx, cell, x, y)) &&
         (!G.drawStormspineNotice || !G.drawStormspineNotice(ctx, cell, x, y)) &&
         (!G.drawFrostbellNotice || !G.drawFrostbellNotice(ctx, cell, x, y)) &&
@@ -1146,6 +1149,7 @@ G.world = (() => {
   // arenas keep exactly the same tiles, rocks, spawns, and collision.
   function drawTrialFloor(ctx, time) {
     const s = G.state;
+    if (G.burrowScenery && s.mapId === "moleTrial") return;
     if (G.wayglassScenery && s.mapId === "riftbladeTrial") return;
     if ((G.homeScenery && s.mapId === "playerHouse") || (G.ridgeScenery && s.mapId === "emberRidge") || (G.starfallScenery && s.mapId === "starfallRuins")) return;
     const theme = s.mapDef && s.mapDef.visualTheme;
@@ -1264,6 +1268,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.burrowScenery && s.mapId === "moleTrial") return;
     if (G.wayglassScenery && s.mapId === "riftbladeTrial") return;
     if (G.titanScenery && s.mapId === "titanGrave") return;
     if (G.stormspineScenery && s.mapId === "stormspinePeaks") return;
@@ -1308,6 +1313,7 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawBurrowCache && G.drawBurrowCache(ctx, ch)) return;
     if (G.drawWayglassCache && G.drawWayglassCache(ctx, ch)) return;
     if (G.drawTitanCache && G.drawTitanCache(ctx, ch)) return;
     if (G.drawStormspineCache && G.drawStormspineCache(ctx, ch)) return;
