@@ -92,15 +92,6 @@ G.state.items.push("manyfold-crown");
 G.checkCostumeUnlocks(false);
 assert.ok(G.costumeUnlocked("manyfold"));
 
-G.state.costumeId = "starstrider";
-const calls = [];
-const ctx = {
-  fillStyle: "", save() { calls.push("save"); }, restore() { calls.push("restore"); },
-  fillRect(x, y, w, h) { calls.push([x, y, w, h]); },
-};
-G.drawCostumeAccessory(ctx, { dir: { x: 1 } }, { sprite: base }, 20, 30);
-assert.ok(calls.some(Array.isArray), "the scalable accessory layer should draw on any form sprite");
-
 const normalized = G.normalizeCostumes(["classic", "fake", "trailblazer", "trailblazer"], "fake");
 assert.deepEqual(Array.from(normalized.unlocked), ["classic", "trailblazer"]);
 assert.equal(normalized.selected, "classic");

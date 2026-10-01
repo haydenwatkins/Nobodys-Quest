@@ -656,28 +656,4 @@
     return true;
   };
 
-  G.drawLegendArm = function (ctx, p, form, x, y) {
-    const def = G.LEGEND_DEFS[form.id];
-    if (!def || G.legendRank(form.id) < 3) return;
-    const ready = G.legendCharge(form.id) >= 100, side = p.dir.x < 0 ? -1 : 1;
-    ctx.save();
-    ctx.translate(Math.round(x + side * 8), Math.round(y - 9));
-    if (ready) { ctx.shadowColor = def.color; ctx.shadowBlur = 7; }
-    ctx.strokeStyle = def.color; ctx.fillStyle = def.color; ctx.lineWidth = 2;
-    const shape = def.armShape % 6;
-    const tier = Math.floor(def.armShape / 6);
-    if (shape === 0) { ctx.fillRect(-1, -8, 2, 14); ctx.fillRect(-4, 3, 8, 2); }
-    else if (shape === 1) { ctx.beginPath(); ctx.arc(0, -3, 4, 0, Math.PI * 2); ctx.stroke(); ctx.fillRect(-1, 1, 2, 7); }
-    else if (shape === 2) { ctx.strokeRect(-5, -6, 10, 12); ctx.fillRect(-2, -2, 4, 4); }
-    else if (shape === 3) { ctx.beginPath(); ctx.moveTo(-5, 5); ctx.quadraticCurveTo(6, 0, -4, -8); ctx.stroke(); }
-    else if (shape === 4) { ctx.fillRect(-5, -5, 10, 3); ctx.fillRect(-2, -8, 4, 14); }
-    else { ctx.beginPath(); ctx.moveTo(-6, 4); ctx.lineTo(0, -8); ctx.lineTo(6, 4); ctx.stroke(); }
-    // Four authored ornament tiers make all 24 arms different even when two
-    // share a weapon family: gem, wings, crown, or orbiting sparks.
-    ctx.fillStyle = tier % 2 ? "#fff3c2" : def.color;
-    if (tier === 1) { ctx.fillRect(-5, -1, 2, 2); ctx.fillRect(4, -1, 2, 2); }
-    else if (tier === 2) { ctx.fillRect(-4, -9, 2, 3); ctx.fillRect(3, -9, 2, 3); ctx.fillRect(-1, -10, 2, 2); }
-    else if (tier === 3) { ctx.fillRect(-6, -7, 2, 2); ctx.fillRect(5, 3, 2, 2); ctx.fillRect(-5, 6, 2, 2); }
-    ctx.restore();
-  };
 })();

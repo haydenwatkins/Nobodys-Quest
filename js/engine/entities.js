@@ -1606,38 +1606,7 @@ G.drawPlayer = function (ctx) {
     (p.moving || p.dashing ? Math.floor(p.anim) % 2 : 0);
   if (!G.drawFormPerformance || !G.drawFormPerformance(ctx, dressedSprite, drawX, drawY))
     G.drawSprite(ctx, dressedSprite, frame, drawX, drawY, p.dir.x < 0);
-  if (G.drawLegendArm) G.drawLegendArm(ctx, p, form, drawX, drawY);
-  const hasSignatureEffect = G.drawFormSkinEffect && G.drawFormSkinEffect(ctx, p, form, drawX, drawY);
-  if (!hasSignatureEffect && G.drawCostumeAccessory) G.drawCostumeAccessory(ctx, p, form, drawX, drawY);
 
-  const items = G.state.items || [];
-  if (items.includes("orchard-ribbon")) {
-    const flutter = G.reducedMotion ? 0 : Math.round(Math.sin(G.state.time * 7) * 2);
-    ctx.fillStyle = "#b96872";
-    ctx.fillRect(Math.round(p.x - p.dir.x * 7), Math.round(p.y - 13), 3, 7);
-    ctx.fillRect(Math.round(p.x - p.dir.x * 10 + flutter), Math.round(p.y - 8), 5, 2);
-    ctx.fillStyle = "#efd5a0"; ctx.fillRect(Math.round(p.x - p.dir.x * 7), Math.round(p.y - 13), 3, 2);
-  }
-  if (items.includes("wayfarer-ribbon") && p.moving) {
-    const sway = Math.round(Math.sin(G.state.time * 9) * 2);
-    ctx.fillStyle = "#73eff7";
-    ctx.fillRect(Math.round(p.x - p.dir.x * 7 + sway), Math.round(p.y - 4 - p.dir.y * 5), 2, 2);
-  }
-  if (items.includes("heroic-halo")) {
-    ctx.strokeStyle = "#ffcd75";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(Math.round(p.x), Math.round(p.y - 19), 6, 2, 0, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-  if (items.includes("manyfold-crown")) {
-    const cy = Math.round(p.y - 21);
-    ctx.fillStyle = "#ffcd75";
-    ctx.fillRect(Math.round(p.x - 5), cy, 3, 3);
-    ctx.fillRect(Math.round(p.x - 1), cy - 2, 3, 5);
-    ctx.fillRect(Math.round(p.x + 3), cy, 3, 3);
-    ctx.fillRect(Math.round(p.x - 5), cy + 3, 11, 2);
-  }
 };
 
 G.drawAimGuide = function (ctx) {

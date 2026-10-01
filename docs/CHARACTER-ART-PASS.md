@@ -6,6 +6,8 @@ Expanded scope: the user wants original characters rather than copied Nobody Sav
 
 ## Direction and acceptance
 
+October 1 user correction: detached character decorations are removed across the roster, including reward ribbons/halos/crowns, global outfit accessories, signature particles and fixed-position legend ornaments. Preserve reward/save mechanics, but keep deliberate clothes and equipment within the authored character silhouette. This supersedes earlier notes deferring cosmetic accessory review.
+
 Use rounded, deliberate silhouettes, expressive eyes with restrained highlights, natural limb attachments, and short readable gestures. Detail should explain cloth, metal, fur, bark, and magic rather than create noisy decorative pixels. Avoid stiff rectangular torsos, hidden faces, spindly ambiguous limbs, and interchangeable stone lumps. Cute bosses can still look powerful through scale, posture, equipment, and clear attack intent. Do not apply one face or identical proportions to the whole roster.
 
 Inspect the actual shipped script order. `opening-art.js`, Ranger, Vampire, Bellkeeper, and delivery overrides supersede parts of the older atlases. Treant has both a normal registry sprite and a larger Orchard battle variant; inspect both. `tools/render-character-review.cjs` makes the current roster sheets with gameplay-size samples. `tools/render-cute-opening.cjs` shows the first batch's directional idle/action poses and larger Treant poses; `--previous` shows the prior opening designs.

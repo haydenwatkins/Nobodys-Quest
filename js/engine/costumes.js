@@ -3,7 +3,7 @@
 
    Legacy costumes remain as global dyes so old saves stay intact. Signature
    skins rebuild the actual text-art frames with a new silhouette, palette,
-   and effect. Neither system changes combat stats.
+   and attached details. Neither system changes combat stats.
    ============================================================ */
 
 "use strict";
@@ -23,14 +23,14 @@ G.COSTUMES = [
     hint: "Available from the beginning.", swatches: ["#f4f4f4", "#94b0c2", "#566c86"],
   },
   {
-    id: "trailblazer", icon: "🧣", name: "Trailblazer", tagline: "Road-worn gold with a sky-blue scarf.",
-    hint: "Discover 2 major regions.", accessory: "scarf", accent: "#73eff7",
+    id: "trailblazer", icon: "🧣", name: "Trailblazer", tagline: "Road-worn gold and sky-blue colors.",
+    hint: "Discover 2 major regions.", accent: "#73eff7",
     palette: COSTUME_NEUTRAL, swatches: ["#fff3c2", "#d8b06a", "#73eff7"],
     condition: () => G.wayfinderProgress && G.wayfinderProgress().found >= 2,
   },
   {
     id: "moonberry", icon: "🫐", name: "Moonberry", tagline: "A berry-bright look from the whispering woods.",
-    hint: "Find the Whispering Seed.", accessory: "berries", accent: "#f4a6ff",
+    hint: "Find the Whispering Seed.", accent: "#f4a6ff",
     palette: {
       "#f4f4f4": "#e8d7ff", "#94b0c2": "#a884d8", "#566c86": "#5d275d",
       "#38b764": "#8153c1", "#41a6f6": "#73eff7", "#ef7d57": "#b13e53", "#ffcd75": "#f4a6ff",
@@ -40,7 +40,7 @@ G.COSTUMES = [
   },
   {
     id: "mirecloak", icon: "🍃", name: "Mirecloak", tagline: "Moss, lily, and deep-water colors.",
-    hint: "Discover the Sunken Marsh.", accessory: "leaf", accent: "#a7f070",
+    hint: "Discover the Sunken Marsh.", accent: "#a7f070",
     palette: {
       "#f4f4f4": "#d8e6c3", "#94b0c2": "#7f9b65", "#566c86": "#3c6255",
       "#38b764": "#a7f070", "#41a6f6": "#257179", "#ef7d57": "#c6d66a", "#ffcd75": "#d8e6c3",
@@ -50,7 +50,7 @@ G.COSTUMES = [
   },
   {
     id: "emberguard", icon: "🔥", name: "Emberguard", tagline: "Coal-dark armor with a living ember trim.",
-    hint: "Discover Ember Ridge.", accessory: "ember", accent: "#ffcd75",
+    hint: "Discover Ember Ridge.", accent: "#ffcd75",
     palette: {
       "#f4f4f4": "#ffe0b0", "#94b0c2": "#c45d4f", "#566c86": "#6b2d2d",
       "#38b764": "#ef7d57", "#41a6f6": "#ff9d57", "#ef7d57": "#ffcd75", "#8153c1": "#b13e53",
@@ -59,8 +59,8 @@ G.COSTUMES = [
     condition: () => G.wayfinderDiscovered && G.wayfinderDiscovered("emberRidge"),
   },
   {
-    id: "starstrider", icon: "☄️", name: "Starstrider", tagline: "Midnight blue crossed by orbiting starlight.",
-    hint: "Find the Fallen Star Thread in Starfall Ruins.", accessory: "stars", accent: "#73eff7",
+    id: "starstrider", icon: "☄️", name: "Starstrider", tagline: "Midnight blue and bright starlight colors.",
+    hint: "Find the Fallen Star Thread in Starfall Ruins.", accent: "#73eff7",
     palette: {
       "#f4f4f4": "#f4f4f4", "#94b0c2": "#73eff7", "#566c86": "#3b5dc9",
       "#38b764": "#41a6f6", "#41a6f6": "#73eff7", "#ef7d57": "#8153c1", "#ffcd75": "#fff3c2",
@@ -74,8 +74,8 @@ G.COSTUMES = [
     )),
   },
   {
-    id: "tidewalker", icon: "🌊", name: "Tidewalker", tagline: "Sea-glass colors and a trail of bright foam.",
-    hint: "Discover Shattercoast.", accessory: "foam", accent: "#dff6f5",
+    id: "tidewalker", icon: "🌊", name: "Tidewalker", tagline: "Sea-glass colors and bright foam-white trim.",
+    hint: "Discover Shattercoast.", accent: "#dff6f5",
     palette: {
       "#f4f4f4": "#dff6f5", "#94b0c2": "#73eff7", "#566c86": "#257179",
       "#38b764": "#38b764", "#41a6f6": "#41a6f6", "#ef7d57": "#73eff7", "#ffcd75": "#a7f070",
@@ -85,7 +85,7 @@ G.COSTUMES = [
   },
   {
     id: "guardian", icon: "🏅", name: "Guardian Gold", tagline: "A champion's finish earned from the great guardians.",
-    hint: "Collect 3 different miniboss trophies.", accessory: "medal", accent: "#ffcd75",
+    hint: "Collect 3 different miniboss trophies.", accent: "#ffcd75",
     palette: {
       "#f4f4f4": "#fff3c2", "#94b0c2": "#ffcd75", "#566c86": "#6b4a2b",
       "#38b764": "#ef7d57", "#41a6f6": "#ffcd75", "#ef7d57": "#b13e53", "#8153c1": "#c45d4f",
@@ -95,7 +95,7 @@ G.COSTUMES = [
   },
   {
     id: "manyfold", icon: "👑", name: "Manyfold Royal", tagline: "A prismatic victory look for a complete gauntlet.",
-    hint: "Defeat every guardian in one gauntlet.", accessory: "prism", accent: "#ffcd75",
+    hint: "Defeat every guardian in one gauntlet.", accent: "#ffcd75",
     palette: {
       "#f4f4f4": "#fff3c2", "#94b0c2": "#73eff7", "#566c86": "#8153c1",
       "#38b764": "#a7f070", "#41a6f6": "#73eff7", "#ef7d57": "#ef7d57", "#ffcd75": "#ffcd75",
@@ -105,7 +105,7 @@ G.COSTUMES = [
   },
   {
     id: "worldwalker", icon: "🌍", name: "Worldwalker", tagline: "Sunlit cloth and horizon-blue trim from the roaming caravan.",
-    hint: "Complete The Whole Horizon caravan favor.", accessory: "scarf", accent: "#73eff7",
+    hint: "Complete The Whole Horizon caravan favor.", accent: "#73eff7",
     palette: {
       "#f4f4f4": "#fff3c2", "#94b0c2": "#d8b06a", "#566c86": "#6b4a2b",
       "#38b764": "#a7f070", "#41a6f6": "#73eff7", "#ef7d57": "#ffcd75", "#8153c1": "#3b5dc9",
@@ -114,8 +114,8 @@ G.COSTUMES = [
     condition: () => !!(G.state && (G.state.items || []).includes("worldwake-cloak")),
   },
   {
-    id: "worldheart", icon: "🗿", name: "Worldheart", tagline: "Ancient stone, warm embers, and six tiny orbiting lights.",
-    hint: "Complete A World at Peace caravan favor.", accessory: "stars", accent: "#ef7d57",
+    id: "worldheart", icon: "🗿", name: "Worldheart", tagline: "Ancient stone, warm embers, and sunlit gold.",
+    hint: "Complete A World at Peace caravan favor.", accent: "#ef7d57",
     palette: {
       "#f4f4f4": "#d8b06a", "#94b0c2": "#8a7f68", "#566c86": "#4b4541",
       "#38b764": "#ef7d57", "#41a6f6": "#ffcd75", "#ef7d57": "#b13e53", "#8153c1": "#6b4a2b",
@@ -240,63 +240,6 @@ G.costumedSprite = function (sprite) {
   });
   variants.set(costume.id, variant);
   return variant;
-};
-
-G.drawCostumeAccessory = function (ctx, p, form, drawX, drawY) {
-  if (!G.state || G.state.costumeId === "classic") return;
-  const costume = G.costumeById(G.state.costumeId);
-  if (!costume.accessory || !form || !form.sprite || !form.sprite.frames.length) return;
-  const metrics = G.spriteMetrics ? G.spriteMetrics(form.sprite) : null;
-  const rows = form.sprite.frames[0];
-  const height = metrics ? metrics.h : rows.length;
-  const width = metrics ? metrics.w : rows.reduce((best, row) => Math.max(best, row.length), 1);
-  const left = Math.round(drawX - width / 2);
-  const top = Math.round(drawY - height);
-  const mid = top + Math.max(3, Math.floor(height * 0.48));
-  const facing = p.dir.x < 0 ? -1 : 1;
-  const t = (G.state.time || 0);
-  ctx.save();
-  ctx.fillStyle = costume.accent || "#ffcd75";
-  if (costume.accessory === "scarf") {
-    const tail = left + (facing > 0 ? -3 : width + 1);
-    ctx.fillRect(tail, mid, 4, 2);
-    ctx.fillRect(tail - facing * 2, mid + 2 + Math.round(Math.sin(t * 8)), 3, 2);
-  } else if (costume.accessory === "berries") {
-    ctx.fillRect(Math.round(drawX - 4), top, 2, 2);
-    ctx.fillRect(Math.round(drawX + 2), top + 1, 2, 2);
-    ctx.fillStyle = "#a7f070";
-    ctx.fillRect(Math.round(drawX - 1), top - 1, 2, 2);
-  } else if (costume.accessory === "leaf") {
-    ctx.fillRect(Math.round(drawX - 1), top - 2, 3, 2);
-    ctx.fillRect(Math.round(drawX + 1), top - 3, 3, 2);
-  } else if (costume.accessory === "ember") {
-    ctx.fillRect(left - 2, Math.round(drawY - 3 - (t * 4) % 4), 2, 2);
-    ctx.fillStyle = "#ef7d57";
-    ctx.fillRect(left + width + 1, Math.round(drawY - 6 - (t * 5) % 5), 2, 2);
-  } else if (costume.accessory === "stars") {
-    const orbitX = Math.round(Math.cos(t * 3) * (width / 2 + 4));
-    const orbitY = Math.round(Math.sin(t * 3) * 4);
-    ctx.fillRect(Math.round(drawX + orbitX), mid + orbitY, 2, 2);
-    ctx.fillStyle = "#fff3c2";
-    ctx.fillRect(Math.round(drawX - orbitX), mid - orbitY, 1, 1);
-  } else if (costume.accessory === "foam") {
-    const step = Math.round((t * 12) % 5);
-    ctx.fillRect(left - 2 - step, Math.round(drawY - 2), 3, 2);
-    ctx.fillRect(left + width + 1 + step, Math.round(drawY - 1), 2, 1);
-  } else if (costume.accessory === "medal") {
-    ctx.fillStyle = "#b13e53";
-    ctx.fillRect(Math.round(drawX - 1), mid, 3, 3);
-    ctx.fillStyle = "#ffcd75";
-    ctx.fillRect(Math.round(drawX), mid + 1, 1, 1);
-  } else if (costume.accessory === "prism") {
-    const colors = ["#ffcd75", "#73eff7", "#a7f070", "#ef7d57"];
-    for (let i = 0; i < colors.length; i++) {
-      const angle = t * 2.4 + i * Math.PI / 2;
-      ctx.fillStyle = colors[i];
-      ctx.fillRect(Math.round(drawX + Math.cos(angle) * (width / 2 + 4)), Math.round(mid + Math.sin(angle) * 5), 2, 2);
-    }
-  }
-  ctx.restore();
 };
 
 /* ---------- Signature skins ----------
@@ -524,33 +467,4 @@ G.formPreviewSprite = function (formId, skinId) {
 G.playerAppearanceSprite = function (form) {
   const skin = form && G.selectedFormSkin(form.id);
   return skin ? G.signatureSprite(form.sprite, skin) : G.costumedSprite(form.sprite);
-};
-
-G.drawFormSkinEffect = function (ctx, p, form, drawX, drawY) {
-  const skin = form && G.selectedFormSkin(form.id);
-  if (!skin) return false;
-  const t = G.state.time || 0;
-  const phase = Math.floor(t * 5) % 3;
-  ctx.save();
-  ctx.fillStyle = skin.colors[3];
-  if (["orbit", "cosmos", "orrery"].includes(skin.effect)) {
-    ctx.fillRect(Math.round(drawX + Math.cos(t * 2.5) * 12), Math.round(drawY - 10 + Math.sin(t * 2.5) * 5), 2, 2);
-    ctx.fillStyle = skin.colors[2];
-    ctx.fillRect(Math.round(drawX - Math.cos(t * 2.5) * 10), Math.round(drawY - 10 - Math.sin(t * 2.5) * 4), 1, 1);
-  } else if (["leaf", "paper", "ribbon", "snow"].includes(skin.effect)) {
-    ctx.fillRect(Math.round(drawX - 9 + phase * 4), Math.round(drawY - 4 - ((t * 7) % 9)), 2, 2);
-  } else if (["ember", "sun", "lightning", "spark", "crystal"].includes(skin.effect)) {
-    ctx.fillRect(Math.round(drawX - 7), Math.round(drawY - 4 - ((t * 8) % 7)), 2, 2);
-    ctx.fillRect(Math.round(drawX + 6), Math.round(drawY - 7 - ((t * 6 + 3) % 6)), 1, 2);
-  } else if (["void", "afterimage", "moon"].includes(skin.effect)) {
-    ctx.globalAlpha = 0.55;
-    ctx.fillRect(Math.round(drawX - p.dir.x * (8 + phase)), Math.round(drawY - 9), 3, 5);
-  } else if (skin.effect === "bubble") {
-    ctx.globalAlpha = 0.7;
-    ctx.fillRect(Math.round(drawX + 8), Math.round(drawY - 8 - ((t * 6) % 8)), 2, 2);
-  } else if (skin.effect === "gear" || skin.effect === "chime") {
-    ctx.fillRect(Math.round(drawX + Math.cos(t * 4) * 9), Math.round(drawY - 9 + Math.sin(t * 4) * 3), 2, 2);
-  }
-  ctx.restore();
-  return true;
 };

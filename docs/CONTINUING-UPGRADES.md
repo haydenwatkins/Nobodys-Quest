@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Remove detached character decorations (October 1)
+
+The Orchard reward ribbon was drawn as a loose shape in front of every form. The entire detached cosmetic layer is now removed: reward ribbons/halos/crowns, global dye accessories, signature-skin particles and fixed-position legend-arm ornaments. Appearance choices retain their authored sprite artwork; earned items, unlocks, legend charge/ultimates and reward stats remain intact. Do not reintroduce this category during the art pass; equipment and clothing should belong to the character's authored silhouette.
+
+The real player renderer is checked across all 24 forms, classic/dyed/signature appearances, with every affected reward and fully charged legends. All 397 tests pass, including wardrobe, opening reward/save and legend behavior. Chrome at 667x375 rendered Patchling with endgame legend rewards and no detached ornaments or horizontal overflow. This is browser evidence, not physical-device testing. Resume Mole and its regional guardian next.
+
 ### Hearthdrake and the Wayglass Court (October 1)
 
 Dragon and Riftblade now have original Hearthdrake/Wayglass Duelist identities and 48 directional poses. Mira, Wayglass Keeper, has a visible face, woven hood, copper-bound braid and articulated knife gesture. The renamed court/sigil retains its IDs, routes, reward and three-phase returning-blade rhythm; all footprints, passives and native cast rules remain. All 395 tests passed; focused art/portrait/opening checks pass after fixing Errata incorrectly receiving a Rat portrait. Full default/signature pose sheets and Chrome at 667x375 court/introduction and field scenes were inspected without horizontal overflow. Dialogue-paused visual checks do not establish ordinary fight balance or physical-device performance. Next: Mole with its regional guardian, then Vampire with its guardian, in art-ledger order.
