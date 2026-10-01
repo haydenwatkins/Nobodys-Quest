@@ -1,4 +1,5 @@
-/* Meadow materials shared deliberately by Greenfield and the settlement. */
+/* Meadow materials shared deliberately by Greenfield and the settlement.
+   The legacy hash occupies [0,.5); expand only cosmetic samples, never global RNG. */
 "use strict";
 (()=>{
  const A=G.authoredPixelArt,S=G.meadowScenery={},pal={k:'#30463b',a:'#40593f',b:'#5d744b',c:'#82945f',d:'#abb77a',e:'#53443b',f:'#85644a',g:'#b49167',h:'#cfc79a',i:'#dfc69a',j:'#a87270'};
@@ -7,10 +8,10 @@
  S.notice=A.compactSprite(A.authored(32,38,pal,g=>{g.rect(14,15,5,22,'e');g.line(15,17,15,35,'g',1);g.rect(1,2,30,24,'e');g.rect(3,4,26,20,'f');g.rect(5,6,22,16,'h');for(const [y,w]of [[10,16],[14,12],[18,14]])g.line(8,y,8+w,y,'f',1);g.put(3,4,'g');g.put(28,23,'g');}));
  G.drawMeadowNotice=(c,cell,x,y)=>{if(!here()||!cell.message)return false;G.drawSprite(c,S.notice,0,x*16+8,y*16+16,false);return true;};
  const here=()=>G.state&&(G.state.mapId==='town'||G.state.mapId==='overworld');
- G.meadowGroundColor=(kind,x,y)=>{if(!here()||!['grass','path'].includes(kind))return null;const r=G.util.hash2(Math.floor((x+(Math.floor(y/4)%2)*2)/5)+71,Math.floor(y/4)+43);return (kind==='path'?['#b29c73','#b9a77f','#b5a079']:['#71835c','#7a8b64','#758660'])[r<.3?0:r>.76?1:2];};
- G.drawMeadowTile=(c,cell,x,y)=>{if(!here()||!['grass','path','tree'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x,y);c.fillStyle=G.meadowGroundColor(cell.tile==='path'?'path':'grass',x,y);c.fillRect(px,py,16,16);
+ G.meadowGroundColor=(kind,x,y)=>{if(!here()||!['grass','path'].includes(kind))return null;const r=G.util.hash2(Math.floor((x+(Math.floor(y/4)%2)*2)/5)+71,Math.floor(y/4)+43)*2;return (kind==='path'?['#b29c73','#b9a77f','#b5a079']:['#71835c','#7a8b64','#758660'])[r<.3?0:r>.76?1:2];};
+ G.drawMeadowTile=(c,cell,x,y)=>{if(!here()||!['grass','path','tree'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x,y)*2;c.fillStyle=G.meadowGroundColor(cell.tile==='path'?'path':'grass',x,y);c.fillRect(px,py,16,16);
   if(cell.tile==='tree')G.drawSprite(c,S.hedge,Math.floor(r*4),px+8,py+16,false);
-  else if(cell.tile==='grass'&&r>.6)G.drawSprite(c,S.herbs,r>.96?3:Math.floor(r*3),px+8,py+16,false);
+  else if(cell.tile==='grass'&&r>.82)G.drawSprite(c,S.herbs,r>.96?3:Math.floor(G.util.hash2(x+131,y+19)*6),px+8,py+16,false);
   else if(cell.tile==='path'&&r>.45){c.fillStyle='#998365';c.fillRect(px+3+Math.floor(r*6),py+6,3,1);c.fillStyle='#d1bc91';c.fillRect(px+4+Math.floor(r*6),py+5,G.hdPilot?1.5:2,G.hdPilot ? .5 : 1);if(r>.8){c.fillStyle='#a7926e';c.fillRect(px+11,py+11,1,1);}}
   return true;
  };

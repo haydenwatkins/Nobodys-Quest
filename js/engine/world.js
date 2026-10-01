@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = G.drawMeadowTile && G.drawMeadowTile(ctx, cell, x, y, time);
+    const meadow = (G.drawGreenfieldTile && G.drawGreenfieldTile(ctx, cell, x, y, time)) ||
+      (G.drawMeadowTile && G.drawMeadowTile(ctx, cell, x, y, time));
     if (!meadow) switch (cell.tile) {
       case "grass": {
         ctx.fillStyle = groundColor("grass", x, y);
@@ -900,7 +901,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawTownPortal || !G.drawTownPortal(ctx, cell, x, y))) {
+    if (cell.portal && (!G.drawTownPortal || !G.drawTownPortal(ctx, cell, x, y)) &&
+        (!G.drawGreenfieldPortal || !G.drawGreenfieldPortal(ctx, cell, x, y, !portalOpen(cell)))) {
       const locked = !portalOpen(cell);
       if (cell.portalStyle === "trial") {
         const glow = 0.45 + 0.25 * Math.sin(time * 4);
@@ -1069,7 +1071,8 @@ G.world = (() => {
     const T = G.TILE;
     const px = x * T, py = y * T;
     if (cell.tile === "water") {
-      const water = biomePalette() && biomePalette().water || ["#293a9b", "#41a6f6", "#73eff7"];
+      const water = (G.greenfieldWaterColors && G.greenfieldWaterColors()) ||
+        biomePalette() && biomePalette().water || ["#293a9b", "#41a6f6", "#73eff7"];
       ctx.fillStyle = water[2];
       if (neighborTile(x, y - 1) !== "water") ctx.fillRect(px, py, T, 1);
       if (neighborTile(x - 1, y) !== "water") ctx.fillRect(px, py, 1, T);
@@ -1248,6 +1251,7 @@ G.world = (() => {
     const px = ch.x * T, py = ch.y * T;
     if (ch.food) {
       if (G.drawHomePantry && G.drawHomePantry(ctx, ch, time)) return;
+      if (G.drawGreenfieldPantry && G.drawGreenfieldPantry(ctx, ch, time)) return;
       // Renewable food is a picnic hamper, not a one-time treasure chest.
       // The cloth and refill bar make its different rules visible at a glance.
       ctx.fillStyle = "rgba(26,28,44,0.35)";
@@ -1616,6 +1620,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawGreenfieldPost && G.drawGreenfieldPost(ctx, post, awake, near)) return;
     const pulse = 0.28 + Math.abs(Math.sin(time * 3.2)) * 0.28;
 
     ctx.save();
