@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawMistwoodTile && G.drawMistwoodTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawMarshTile && G.drawMarshTile(ctx, cell, x, y, time)) ||
+      (G.drawMistwoodTile && G.drawMistwoodTile(ctx, cell, x, y, time)) ||
       (G.drawGreenfieldTile && G.drawGreenfieldTile(ctx, cell, x, y, time)) ||
       (G.drawMeadowTile && G.drawMeadowTile(ctx, cell, x, y, time));
     if (!meadow) switch (cell.tile) {
@@ -902,7 +903,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawMistwoodPortal || !G.drawMistwoodPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawMarshPortal || !G.drawMarshPortal(ctx, cell, x, y)) &&
+        (!G.drawMistwoodPortal || !G.drawMistwoodPortal(ctx, cell, x, y)) &&
         (!G.drawTownPortal || !G.drawTownPortal(ctx, cell, x, y)) &&
         (!G.drawGreenfieldPortal || !G.drawGreenfieldPortal(ctx, cell, x, y, !portalOpen(cell)))) {
       const locked = !portalOpen(cell);
@@ -943,7 +945,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawMistwoodNotice || !G.drawMistwoodNotice(ctx, cell, x, y)) && (!G.drawMeadowNotice || !G.drawMeadowNotice(ctx, cell, x, y))) { // signpost
+    if (cell.message && (!G.drawMarshNotice || !G.drawMarshNotice(ctx, cell, x, y)) &&
+        (!G.drawMistwoodNotice || !G.drawMistwoodNotice(ctx, cell, x, y)) && (!G.drawMeadowNotice || !G.drawMeadowNotice(ctx, cell, x, y))) { // signpost
       ctx.fillStyle = "#6b4a2b";
       ctx.fillRect(px + 7, py + 7, 2, 7);
       ctx.fillStyle = "#d8b06a";
@@ -1073,7 +1076,8 @@ G.world = (() => {
     const T = G.TILE;
     const px = x * T, py = y * T;
     if (cell.tile === "water") {
-      const water = (G.greenfieldWaterColors && G.greenfieldWaterColors()) ||
+      const water = (G.marshWaterColors && G.marshWaterColors()) ||
+        (G.greenfieldWaterColors && G.greenfieldWaterColors()) ||
         biomePalette() && biomePalette().water || ["#293a9b", "#41a6f6", "#73eff7"];
       ctx.fillStyle = water[2];
       if (neighborTile(x, y - 1) !== "water") ctx.fillRect(px, py, T, 1);
@@ -1253,6 +1257,7 @@ G.world = (() => {
     const px = ch.x * T, py = ch.y * T;
     if (ch.food) {
       if (G.drawHomePantry && G.drawHomePantry(ctx, ch, time)) return;
+      if (G.drawMarshPantry && G.drawMarshPantry(ctx, ch, time)) return;
       if (G.drawMistwoodPantry && G.drawMistwoodPantry(ctx, ch, time)) return;
       if (G.drawGreenfieldPantry && G.drawGreenfieldPantry(ctx, ch, time)) return;
       // Renewable food is a picnic hamper, not a one-time treasure chest.
@@ -1556,6 +1561,7 @@ G.world = (() => {
   // They organize a scene and suggest safety without adding collision to the
   // game's already busy mobile-sized paths.
   function drawFenceRun(ctx, fence) {
+    if (G.drawMarshFence && G.drawMarshFence(ctx, fence)) return;
     if (G.drawTownFence && G.drawTownFence(ctx, fence)) return;
     const T = G.TILE;
     const length = Math.max(1, Math.floor(fence.length || 1));
@@ -1624,6 +1630,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawMarshPost && G.drawMarshPost(ctx, post, awake, near)) return;
     if (G.drawMistwoodPost && G.drawMistwoodPost(ctx, post, awake, near)) return;
     if (G.drawGreenfieldPost && G.drawGreenfieldPost(ctx, post, awake, near)) return;
     const pulse = 0.28 + Math.abs(Math.sin(time * 3.2)) * 0.28;
@@ -1656,6 +1663,17 @@ G.world = (() => {
     ctx.restore();
   }
 
+  function nearPortal(radius = 56) {
+    const s = G.state;
+    if (!s.grid || !s.player) return false;
+    const T = G.TILE, p = s.player, range = Math.ceil(radius / T);
+    const x = Math.floor(p.x / T), y = Math.floor(p.y / T);
+    for (let yy = Math.max(0, y - range); yy <= Math.min(s.mapH - 1, y + range); yy++)
+      for (let xx = Math.max(0, x - range); xx <= Math.min(s.mapW - 1, x + range); xx++)
+        if (s.grid[yy][xx].portal && Math.hypot(p.x - (xx * T + T / 2), p.y - (yy * T + T / 2)) < radius) return true;
+    return false;
+  }
+
   function draw(ctx, cam, time) {
     const s = G.state;
     const T = G.TILE;
@@ -1684,5 +1702,5 @@ G.world = (() => {
     if (G.drawWorldGuidance) G.drawWorldGuidance(ctx, cam, time);
   }
 
-  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, safeArrival, portalBlockReason };
+  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, safeArrival, portalBlockReason, nearPortal };
 })();

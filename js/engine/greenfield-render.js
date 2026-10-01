@@ -40,13 +40,6 @@
     if(Math.abs(p.x-spot.x)<20&&p.y>spot.bottom-32&&p.y<spot.bottom-12)c.globalAlpha=alpha*.55;
     G.drawSprite(c,G.greenfieldScenery[courts[cell.portalTheme]],locked?1:0,spot.x,spot.bottom,false);c.globalAlpha=alpha;return true;
   };
-  G.nearGreenfieldEntrance=()=>{
-    if(!here()||!G.state.grid)return false;const p=G.state.player,T=G.TILE;
-    const x=Math.floor(p.x/T),y=Math.floor(p.y/T);
-    for(let yy=Math.max(0,y-3);yy<=Math.min(G.state.mapH-1,y+3);yy++)
-      for(let xx=Math.max(0,x-3);xx<=Math.min(G.state.mapW-1,x+3);xx++)
-        if(G.state.grid[yy][xx].portal&&Math.hypot(p.x-(xx*T+8),p.y-(yy*T+8))<56)return true;
-    return false;
-  };
+  G.nearGreenfieldEntrance=()=>here()&&G.world.nearPortal(56);
 
 })();

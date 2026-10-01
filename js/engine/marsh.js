@@ -46,6 +46,7 @@
     const list=oldDraw(c);if(G.state.mapId!=="sunkenMarsh")return list;
     for(const r of stops){const x=r.x*16+8,y=r.y*16+8,done=has(r.id),wreck=r.id==="marsh-ferry-token";
       list.push({y:y+6,fn:()=>{
+        if(G.drawMarshMechanism&&G.drawMarshMechanism(c,r,done))return;
         c.save();c.fillStyle="#493d35";
         if(wreck){
           c.fillRect(x-18,y-4,36,9);c.fillRect(x-13,y+5,26,4);c.fillRect(x-8,y-9,16,5);

@@ -53,3 +53,5 @@ Environmental identity starts with the first homeward roads: authored layered pi
 5. Review final public title/branding, remaining story references, UI icons, sound/media asset provenance and release presentation before a publishing release. The repository and current working title remain Nobody's Quest for now; this document does not declare publication readiness.
 
 Maintain exhaustive coverage in `CHARACTER-ART-PASS.md` and add environmental/NPC ledgers when those phases begin. Art, environmental and NPC phases take priority over further playthrough upgrades under the user's latest instruction.
+
+Sunken Marsh continues the living-road world through abandoned ferry works: a patched hull and brass hatch, weathered timber, fitted copper handwheels and soft lily pools. It deliberately shares regional river willows and road-keeping materials, while preserving the Queen, sluice and keepsake identities and all saved internal IDs. Environment coverage is 10/40; Ember Ridge, later regions/courts/Worldbacks and every NPC portrait/world sprite remain pending.

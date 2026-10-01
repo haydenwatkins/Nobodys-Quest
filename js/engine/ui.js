@@ -638,7 +638,7 @@ G.ui = (() => {
       pantryX += w + 2;
     }
 
-    const entranceFocus = G.nearGreenfieldEntrance && G.nearGreenfieldEntrance();
+    const entranceFocus = G.world && G.world.nearPortal && G.world.nearPortal(56);
     const bossBarShown = drawBossBar(c);
     if (!bossBarShown && !entranceFocus) drawLocationChip(c);
 
