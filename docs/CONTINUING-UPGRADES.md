@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Hedgehare and Briar's Walking Garden (October 1)
+
+Druid now appears as original garden neighbour Hedgehare: soft fur, folded ear, clear face, a fitted sage apron and seedling basket/pruning cane carried in its paws. Briar has a warm grandmother face, silver braid, straw hat and practical work apron/tools. Their source footprints, 48 directional player poses/four guardian indices, save IDs, Elder Acorn, native poison/Seedbed, rooting and three-phase flowerbed warning/refuge/recovery remain unchanged.
+
+All 411 regression checks pass. Complete default/signature pose sheets and every guardian index were inspected, including both pixel settings at gameplay scale and enlarged. Real-input poison and existing garden/status-spread checks pass. Chrome at 667x375 displayed the actual pair without horizontal overflow; story recap paused combat, so physical-device and ordinary encounter-balance checks remain outstanding. The fresh-pass ledger now records 17/24 forms and 11/19 boss definitions. Continue Griffin with its regional guardian, then the remaining character roster before environments, NPCs and playthrough work.
+
 ### Skylens Mapper and the Starpath Observatory (October 1)
 
 Astronomer and Professor Perihelion now appear as original night-route scholars Skylens Mapper and Nell, Starpath Keeper. Warm faces, brass spectacles, soft hair, blue field coats and held telescopes replace the orbital head rings. Nell's ivory curls and stitched chart distinguish the guardian. The Starpath Observatory retains its ID, routes, Orrery Key and unlock conditions. Their source footprints, 48 directional player poses/four guardian indices, immediate fourth-shot alignment, gravity and orbital warning/refuge/recovery remain unchanged.

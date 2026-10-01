@@ -918,7 +918,7 @@ registerEnemy({
     phaseLine: "Lovely footwork. Terrible for the begonias, but lovely.",
     phaseThreeLine: "Very well, dear. The whole arena is a flowerpot now.",
     knockoutLine: "A little compost, a little rest, and you may try again.",
-    defeatLine: "Take the acorn. Plant something kinder than my hedge.",
+    defeatLine: "Take the acorn. Plant something kind beside the road, dear. Kinder than my hedge.",
     rematchLine: "Tea is not ready, but the briars certainly are.",
   },
   trophy: "elder-acorn", trophyName: "Elder Acorn", location: "The Walking Garden",

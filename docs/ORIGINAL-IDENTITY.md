@@ -14,6 +14,8 @@ The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satche
 
 ## Next original-identity work
 
+**Hedgehare** tends the hedges beside homeward roads, with soft fur, one folded ear, a fitted sage apron and a seedling basket/pruning cane carried in its paws. **Grandmother Briar** keeps her original name and Walking Garden, now with a warm visible grandmother face, silver braid, straw hat and practical apron/tools. Their calling retains `druid`, and all guardian, arena, Elder Acorn, poison/Seedbed, rooting and flowerbed IDs/rules remain unchanged.
+
 **Skylens Mapper** finds homeward routes in the night sky: warm skin, soft dark hair, brass spectacles, a blue field coat and a hand-held segmented telescope. **Nell, Starpath Keeper**, charts the paths to home lamps in the Starpath Observatory, with ivory curls, a calm older face and stitched star-chart details. Their identities retain `astronomer`, `professorPerihelion` and `astronomerTrial`; the Orrery Key, fourth-shot alignment, gravity and safe orbital band remain unchanged.
 
 **Foldstep Fox** is a nimble map courier in a short indigo wrap coat, mint belt and copper map case, with a warm fox face, joined tail and deliberate blade grip. **Sumi, Foldroad Keeper**, folds route maps that lead travellers home: silver fur, a pleated teal coat, coral/ivory collar and calm older face. The Foldroad Hall, Wayfold Crane and Moonfold look retain `samuraiTrial`, `paper-crane` and `moonRonin`; `samurai`/`paperRonin`, all cut/dash clocks and the marked fold sequence remain stable.

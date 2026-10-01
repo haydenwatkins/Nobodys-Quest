@@ -2,8 +2,8 @@
 "use strict";
 
 registerForm({
-  id: "druid", name: "Druid", icon: "🌳",
-  tagline: "Plants first, asks questions later, and considers every arena excellent soil.",
+  id: "druid", name: "Hedgehare", icon: "🌳",
+  tagline: "A gentle hedgeway gardener with a seedling basket and a lively pruning cane.",
   speed: 82, hearts: 4, slots: 2,
   passive: { id: "seedbed", name: "Seedbed",
     description: "Status effects leap to a nearby enemy when their victim falls." },

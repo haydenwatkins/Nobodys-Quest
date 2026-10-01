@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Hedgehare and Grandmother Briar (October 1)
+
+The former Druid now appears as Hedgehare, a soft-furred garden neighbour with one folded ear, clear muzzle/eyes, a fitted sage apron, a seedling basket and pruning cane carried in its paws. Briar has a warm older face, silver braid, straw hat with a sewn flower, work apron and carried basket/cane. Their 21x20/27x25 footprints, 48 directional player poses/four guardian indices, internal IDs, Elder Acorn, poison/Seedbed, rooting and flowerbed warning/refuge/recovery remain unchanged. Equipment belongs to their authored silhouettes; no detached decorative layer is added.
+
+All 411 regression checks pass. Complete default/signature sheets, all guardian indices, and both pixel settings at gameplay scale and enlarged were inspected. Real-input Thorn Lash hits immediately once, retains poison attribution and recovers without a second melee hit. Existing status spread, ward rejection, rooting and three-phase flowerbed escape checks pass. Chrome at 667x375 displayed both in the actual Walking Garden without horizontal overflow. Story recap paused combat; physical-device and ordinary encounter-balance validation remain outstanding. Continue Griffin with its regional guardian next, before remaining character, environment and NPC art.
+
 ### Skylens Mapper and Nell, Starpath Keeper (October 1)
 
 The former Astronomer and Professor Perihelion now appear as visible-faced night-route scholars. Skylens Mapper has soft dark hair, warm skin, brass spectacles, a blue field coat and a segmented telescope held in the hand. Older Nell has ivory curls, stitched star-chart details and a larger instrument. Their faces replace the oversized orbital head rings. The Starpath Observatory retains its arena ID; their 21x20/26x25 footprints, 48 directional player poses/four guardian indices, save IDs, Orrery Key, fourth-shot alignment and three-phase orbital-band safety remain unchanged.
@@ -116,7 +122,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Turtle / Harborback | Shipped October 1: rounded scuted shell, expressive terrapin face, attached flippers and fitted neck cloth in all directions |
 | Samurai / Foldstep Fox | Shipped October 1: warm fox face, indigo wrap coat, map case, joined tail and held blade in every direction |
 | Astronomer / Skylens Mapper | Shipped October 1: warm face, brass spectacles, blue field coat and held segmented telescope in every direction |
-| Druid | Pending: face distinct from branches, organic costume/gesture |
+| Druid / Hedgehare | Shipped October 1: soft hare face, folded ear, sage apron and basket/pruning cane carried in every direction |
 | Griffin | Pending: coherent eagle/lion anatomy, soft beak and proud wings |
 | Golem | Pending: rounded stone body with separate limbs and expression |
 | Weaver | Pending: friendly spider face, attached readable legs |
@@ -137,7 +143,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Admiral Tortoise / Marlo, Breakwater Keeper | Shipped October 1: rounded harbor turtle, dock cap, fitted bib and shell-following rope harness |
 | Paper Ronin / Sumi, Foldroad Keeper | Shipped October 1: silver fox face, pleated teal/coral coat, joined tail and articulated held blade |
 | Professor Perihelion / Nell, Starpath Keeper | Shipped October 1: visible older face, ivory curls, brass spectacles, stitched star chart and held telescope |
-| Grandmother Briar | Pending: kind powerful gardener, readable face/hands |
+| Grandmother Briar | Shipped October 1: warm grandmother face, silver braid, straw hat, fitted work apron and carried garden tools |
 | Aurelia, Sky Sovereign | Pending: cute regal griffin, coherent wings and talons |
 | Pillar, Old Mason | Pending: rounded stone mason, distinct arm/body shapes |
 | Tess, Silk Matriarch | Pending: friendly silk guardian, attached readable limbs |
