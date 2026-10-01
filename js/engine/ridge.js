@@ -45,6 +45,7 @@
     const list=oldDraw(c);if(G.state.mapId!=="emberRidge")return list;
     for(const f of fires){const x=f.x*16+8,y=f.y*16+8,lit=has(f.id),fighting=active?.fire.id===f.id;
       list.push({y:y+7,fn:()=>{
+        if(G.drawRidgeFire&&G.drawRidgeFire(c,f,lit,fighting))return;
         c.save();c.fillStyle="#292733";c.fillRect(x-14,y-5,28,12);
         c.fillStyle="#8a6858";c.fillRect(x-13,y+3,26,5);c.fillRect(x-16,y-4,5,8);c.fillRect(x+11,y-4,5,8);
         c.fillStyle="#43353d";c.fillRect(x-9,y-2,18,5);
@@ -58,7 +59,7 @@
     }
     // Broken standards frame the dueling court without blocking movement.
     for(const [tx,ty]of [[21,5],[27,5],[21,13],[27,13]])list.push({y:ty*16+8,fn:()=>{
-      const x=tx*16+8,y=ty*16+8;c.save();c.fillStyle="#ad8e69";c.fillRect(x-1,y-25,2,29);
+      const x=tx*16+8,y=ty*16+8;if(G.drawRidgeStandard&&G.drawRidgeStandard(c,tx,ty))return;c.save();c.fillStyle="#ad8e69";c.fillRect(x-1,y-25,2,29);
       c.fillStyle="#493e5a";c.fillRect(x+1,y-24,11,14);c.fillStyle="#ffcd75";c.fillRect(x+4,y-20,4,4);
       c.fillStyle="#292733";c.fillRect(x-5,y+2,10,3);c.restore();
     }});

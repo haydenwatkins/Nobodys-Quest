@@ -640,7 +640,8 @@ G.ui = (() => {
 
     const entranceFocus = G.world && G.world.nearPortal && G.world.nearPortal(56);
     const bossBarShown = drawBossBar(c);
-    if (!bossBarShown && !entranceFocus) drawLocationChip(c);
+    const encounterFocus = bossBarShown || (G.state.mapId === "emberRidge" && G.ridgeSurvey && G.ridgeSurvey().active);
+    if (!encounterFocus && !entranceFocus) drawLocationChip(c);
 
     /* stars (top right) */
     const starTxt = `⭐${G.state.stars}`;
@@ -652,7 +653,7 @@ G.ui = (() => {
 
     if (!G.state.bossCutscene) {
       // Let travellers see the actual gate; health, stars, warnings and arts stay.
-      if (!entranceFocus && !bossBarShown) {
+      if (!entranceFocus && !encounterFocus) {
         drawMinimap(c);
         drawStoryTracker(c);
         drawQuestTracker(c);
