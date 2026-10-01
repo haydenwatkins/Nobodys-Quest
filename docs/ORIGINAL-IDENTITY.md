@@ -14,6 +14,8 @@ The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satche
 
 ## Next original-identity work
 
+**Galecrest Courier** carries homeward letters between Windscar's cliffposts: rounded lion haunches, a soft eagle face, layered honey feathers, teal neckcloth and a leather dispatch pouch fitted to the flank. **Aurelia, Sky Sovereign**, is the older cliffpost keeper, with an ivory cheek/breast ruff, broad blue flight feathers and a fitted copper chest harness. Her dialogue now connects the wind roads to the waiting letters. They retain `griffin`/`skySovereign`, source footprints, Sky Mark/Plume, Wingbeat/Slipstream, volley/dive rules and all gust warning/recovery clocks. Wings and tail join the body in every pose; no detached crown or reward ornament returns.
+
 **Hedgehare** tends the hedges beside homeward roads, with soft fur, one folded ear, a fitted sage apron and a seedling basket/pruning cane carried in its paws. **Grandmother Briar** keeps her original name and Walking Garden, now with a warm visible grandmother face, silver braid, straw hat and practical apron/tools. Their calling retains `druid`, and all guardian, arena, Elder Acorn, poison/Seedbed, rooting and flowerbed IDs/rules remain unchanged.
 
 **Skylens Mapper** finds homeward routes in the night sky: warm skin, soft dark hair, brass spectacles, a blue field coat and a hand-held segmented telescope. **Nell, Starpath Keeper**, charts the paths to home lamps in the Starpath Observatory, with ivory curls, a calm older face and stitched star-chart details. Their identities retain `astronomer`, `professorPerihelion` and `astronomerTrial`; the Orrery Key, fourth-shot alignment, gravity and safe orbital band remain unchanged.

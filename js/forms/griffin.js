@@ -2,8 +2,8 @@
 "use strict";
 
 registerForm({
-  id: "griffin", name: "Griffin", icon: "🦅",
-  tagline: "A sky hunter who turns movement itself into a weapon and never lands quietly.",
+  id: "griffin", name: "Galecrest Courier", icon: "🦅",
+  tagline: "A feathered cliffpost courier who carries homeward letters on the canyon wind.",
   speed: 118, hearts: 5, slots: 2,
   passive: { id: "slipstream", name: "Slipstream",
     description: "Attack while moving to leave a tailwind that speeds you and shoves enemies without adding damage." },

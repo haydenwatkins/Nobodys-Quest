@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Galecrest Courier and Aurelia's cliffpost (October 1)
+
+The fresh five-hour window resumed at 68% weekly usage. Griffin now appears as Galecrest Courier, with rounded lion/eagle anatomy, a soft expressive beak, layered honey wings, fitted teal neckcloth and a leather dispatch pouch. Older Aurelia has an ivory ruff, broad blue feather fan and fitted copper chest harness. Her dialogue connects the restored canyon winds to homeward letters. Their source footprints, 48 directional player poses/four guardian indices, stable IDs, Wingbeat/Slipstream, volley/dive, Sky Mark/Plume, ward and all gust escape/recovery remain unchanged; no detached crown or ornament returns.
+
+All 413 regression checks pass. Complete default/signature sheets and every guardian index were inspected in both pixel settings at gameplay scale and enlarged. Chrome at 667x375 displayed the actual pair without horizontal overflow, with the story recap pausing combat. Physical-device and ordinary encounter-balance checks remain outstanding. The ledger now covers 18/24 forms and 12/19 boss definitions. Continue Golem with Pillar in the Hanging Gardens, then the remaining character roster, environments and NPCs before playthrough upgrades.
+
 ### Windscar art preflight and crown cleanup (October 1)
 
 The five-hour window was still 97% used, with weekly usage at 67%, so the full Griffin/Aurelia redesign is not started. Current pose sheets expose angular flat torsos, ambiguous wing/leg attachments, little facial expression and only four source indices. Aurelia also had a detached cyan crown baked into her default source art; that stamp is removed without changing any other pixels, dimensions, animation indices or gameplay. All seven focused boss-art, three-phase gust and Plume checks pass; all four poses and both pixel settings were inspected at gameplay size and enlarged. This small cleanup has no live-browser or physical-device check. The loop remains active and the banked reset untouched.

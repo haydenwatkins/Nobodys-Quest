@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Galecrest Courier and Aurelia (October 1)
+
+Griffin now appears as Galecrest Courier, a feathered cliffpost courier with rounded lion haunches, a soft expressive eagle face, layered honey wings, fitted teal neckcloth and leather dispatch pouch. Aurelia's older ivory ruff, broad blue feather fan and copper chest harness distinguish the guardian. The courier has 48 directional idle/walk/strike/guard frames; Aurelia retains four guardian indices. Their 28x19/30x22 footprints, save IDs, Sky Mark/Plume, combat timing, gust escape/recovery, ward and regional unlock remain unchanged. No detached crown or ornament returns.
+
+All 413 regression checks pass. Complete default/signature sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Real-input immediate Wingbeat/Slipstream shove, fan/dive, gust and Plume checks pass. Chrome at 667x375 displayed the actual pair without horizontal overflow. Story recap paused combat; ordinary encounter-balance and physical-device validation remain outstanding. Coverage is now 18/24 forms and 12/19 boss definitions. Continue Golem with its Hanging Gardens guardian next, before remaining character, environment and NPC art.
+
 ### Hedgehare and Grandmother Briar (October 1)
 
 The former Druid now appears as Hedgehare, a soft-furred garden neighbour with one folded ear, clear muzzle/eyes, a fitted sage apron, a seedling basket and pruning cane carried in its paws. Briar has a warm older face, silver braid, straw hat with a sewn flower, work apron and carried basket/cane. Their 21x20/27x25 footprints, 48 directional player poses/four guardian indices, internal IDs, Elder Acorn, poison/Seedbed, rooting and flowerbed warning/refuge/recovery remain unchanged. Equipment belongs to their authored silhouettes; no detached decorative layer is added.
@@ -123,7 +129,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Samurai / Foldstep Fox | Shipped October 1: warm fox face, indigo wrap coat, map case, joined tail and held blade in every direction |
 | Astronomer / Skylens Mapper | Shipped October 1: warm face, brass spectacles, blue field coat and held segmented telescope in every direction |
 | Druid / Hedgehare | Shipped October 1: soft hare face, folded ear, sage apron and basket/pruning cane carried in every direction |
-| Griffin | Pending: coherent eagle/lion anatomy, soft beak and proud wings |
+| Griffin / Galecrest Courier | Shipped October 1: rounded lion/eagle anatomy, expressive beak, layered joined wings, dispatch pouch and 48 directional poses |
 | Golem | Pending: rounded stone body with separate limbs and expression |
 | Weaver | Pending: friendly spider face, attached readable legs |
 | Bellkeeper | Pending: rounded bell silhouette and charming face, all casts |
@@ -144,7 +150,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Paper Ronin / Sumi, Foldroad Keeper | Shipped October 1: silver fox face, pleated teal/coral coat, joined tail and articulated held blade |
 | Professor Perihelion / Nell, Starpath Keeper | Shipped October 1: visible older face, ivory curls, brass spectacles, stitched star chart and held telescope |
 | Grandmother Briar | Shipped October 1: warm grandmother face, silver braid, straw hat, fitted work apron and carried garden tools |
-| Aurelia, Sky Sovereign | Pending: cute regal griffin, coherent wings and talons; detached default crown removed October 1, source/indices preserved |
+| Aurelia, Sky Sovereign | Shipped October 1: older ivory ruff, broad blue feather fan, copper chest harness and clear talons; source/indices preserved |
 | Pillar, Old Mason | Pending: rounded stone mason, distinct arm/body shapes |
 | Tess, Silk Matriarch | Pending: friendly silk guardian, attached readable limbs |
 | Bongle, Bell Titan | Pending: powerful round bell, expression and metal detail |
