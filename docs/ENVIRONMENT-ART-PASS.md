@@ -6,21 +6,21 @@ Completed first environments: **Orchard Road, Heartwood, Lantern Reach, the Toll
 
 The river chapter adds layered weeping willows, reeds, copper/glass lamps, linked gate chains, broad causeway slabs, wet shore edges, boats/wrecks, storm drain, satchel, notice boards, well, benches, flower boxes and stitched bunting. Shared cart/camp/fence/apple materials are integrated explicitly. The bakery, letter house and birthday home have authored timber, tiled roofs, arched windows and their own mounted details; deliveries warm their windows and reveal fresh bread, a letter and a wooden wheeled toy. Departure/trailhead stations remain legible. All lamp/gate/parcel states, moving cart checkpoints, flood/sweep warning geometry and gameplay stay unchanged.
 
-The home now has a timber floor, uninterrupted wall panelling, fitted windows, a quilted bed, map-writing desk, bookshelf, woven route rug, marked exit mat and a refillable cookie hamper. Town housing has a stitched-map home with its doorway aligned to the native entrance, four distinct cottage designs and clear empty plot stakes; town terrain, fences, project/festival furniture and Greenfield are still pending.
+The home now has a timber floor, uninterrupted wall panelling, fitted windows, a quilted bed, map-writing desk, bookshelf, woven route rug, marked exit mat and a refillable cookie hamper. Town housing has a stitched-map home with its doorway aligned to the native entrance, four distinct cottage designs and clear empty plot stakes; Town/Greenfield now also share muted meadow patches, quiet gravel, authored herbs, layered tile-sized hedges and detailed notice boards. Town fences/project/festival furniture and Greenfield landmarks remain pending; this is partial coverage of those two maps.
 
-Validation: all 432 regression checks pass, plus five focused home/pantry/town checks after final window-fit and side-wall refinements. Native building spends spirit once; rest, furniture collision, cookies/refill timer and house exit/return remain intact. Every authored foliage/prop/house frame was inspected in both pixel settings at gameplay size and enlarged; native before/after scenes and save-disabled Chrome landscape fixtures at 667x375 were reviewed without overflow or console errors. Fixtures hold simulation and suppress review-blocking dialogue; physical devices and ordinary playthrough balance remain untested. NPC sprites and portraits are a later phase.
+Validation: all 433 regression checks pass, plus four focused meadow/home/world checks after final notice-board integration. Native building spends spirit once; rest, furniture collision, cookies/refill timer and house exit/return remain intact. Every authored foliage/prop/house frame was inspected in both pixel settings at gameplay size and enlarged; native before/after scenes and save-disabled Chrome landscape fixtures at 667x375 were reviewed without overflow or console errors. Fixtures hold simulation and suppress review-blocking dialogue; physical devices and ordinary playthrough balance remain untested. NPC sprites and portraits are a later phase.
 
 ## Direction and omissions
 
 Ground should remain quieter than characters and hazard tells. Use clustered leaves, sculpted wood/stone, worn route materials and deliberate regional landmarks. Preserve interaction recognition, doors/returns, landmark positions and warning hierarchy. Review every terrain family, structure, vegetation, prop, interior, trial and Worldback; runtime terrain inventory below supplements rather than replaces inspection of renderer-specific landmarks and procedural details.
 
-Next: Greenfield terrain/landmarks and town terrain, fences, project/festival furniture, then early campaign regions, form courts, Worldbearer regions/Worldbacks, final arena and repeatable arenas. Complete all environmental regions before NPC sprites/portraits. Existing guardian fields and ground marks remain gameplay warnings rather than decorative art.
+Next: Greenfield landmarks and town fences/project/festival furniture, then early campaign regions, form courts, Worldbearer regions/Worldbacks, final arena and repeatable arenas. Complete all environmental regions before NPC sprites/portraits. Existing guardian fields and ground marks remain gameplay warnings rather than decorative art.
 
 ## Runtime map coverage
 
 | Map | Materials / theme | Terrain inventory | Explicit props | Fresh pass |
 |---|---|---|---|---|
-| Greenfield (overworld) | shared base | grass, tree, path | renderer landmarks / shared props | Pending |
+| Greenfield (overworld) | shared base | grass, tree, path | renderer landmarks / shared props | Partial: meadow terrain/hedges/notices; landmarks pending |
 | Wayglass Court (riftbladeTrial) | riftblade | floor, rock | renderer landmarks / shared props | Pending |
 | The Royal Burrow (moleTrial) | mole | floor, rock | renderer landmarks / shared props | Pending |
 | The Dusk Court (vampireTrial) | vampire | floor, rock | renderer landmarks / shared props | Pending |
@@ -34,7 +34,7 @@ Next: Greenfield terrain/landmarks and town terrain, fences, project/festival fu
 | The Manyfold Coliseum (gauntletArena) | god | floor, rock | renderer landmarks / shared props | Pending |
 | The Shifting Path (manyfoldExpedition) | riftblade | floor, rock | renderer landmarks / shared props | Pending |
 | The Old Dungeon (dungeon) | shared base | floor, rock | renderer landmarks / shared props | Pending |
-| Your Town (town) | shared base | grass, path | homes, plots, project/festival furniture | Partial: homes/plots; terrain and public props pending |
+| Your Town (town) | shared base | grass, path | homes, plots, project/festival furniture | Partial: homes/plots, terrain/hedges/notices; fences/public props pending |
 | Your House (playerHouse) | shared base | floor, rock | authored room, rest, pantry, exit | Complete: interior materials and furniture |
 | Mistwood (mistwood) | shared base | grass | renderer landmarks / shared props | Pending |
 | Sunken Marsh (sunkenMarsh) | shared base | grass, path | renderer landmarks / shared props | Pending |

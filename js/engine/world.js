@@ -685,6 +685,8 @@ G.world = (() => {
   }
 
   function groundColor(kind, x, y) {
+    const meadow = G.meadowGroundColor && G.meadowGroundColor(kind, x, y);
+    if (meadow) return meadow;
     // Staggered 4x4/5x4 regions read as broad natural patches instead of a
     // checkerboard. Their subtle contrast gives motion a reference point.
     const patchX = Math.floor((x + (Math.floor(y / 4) % 2) * 2) / 5);
@@ -765,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    switch (cell.tile) {
+    const meadow = G.drawMeadowTile && G.drawMeadowTile(ctx, cell, x, y, time);
+    if (!meadow) switch (cell.tile) {
       case "grass": {
         ctx.fillStyle = groundColor("grass", x, y);
         ctx.fillRect(px, py, T, T);
@@ -936,7 +939,7 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message) { // signpost
+    if (cell.message && (!G.drawMeadowNotice || !G.drawMeadowNotice(ctx, cell, x, y))) { // signpost
       ctx.fillStyle = "#6b4a2b";
       ctx.fillRect(px + 7, py + 7, 2, 7);
       ctx.fillStyle = "#d8b06a";
@@ -972,7 +975,7 @@ G.world = (() => {
         ctx.fillRect(px + 12, py + 4, 1, 9);
       }
     }
-    drawHdWorldDetail(ctx, cell, x, y, time);
+    if (!meadow) drawHdWorldDetail(ctx, cell, x, y, time);
   }
 
   function drawHdWorldDetail(ctx, cell, x, y, time) {
