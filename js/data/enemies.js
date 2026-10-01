@@ -819,7 +819,7 @@ registerEnemy({
 });
 
 registerEnemy({
-  id: "paperRonin", name: "The Paper Ronin",
+  id: "paperRonin", name: "Sumi, Foldroad Keeper",
   hp: 68, speed: 71, damage: 2, behavior: "chase", aggro: 190,
   size: 19, heavy: true, miniboss: true,
   ward: { types: ["sharp"], hp: 7 },
@@ -829,19 +829,19 @@ registerEnemy({
     telegraph: 0.43, chargeSpeed: 235, chargeDur: 0.3,
     antiKiteRange: 116, chaseScale: 1.34,
     patterns: ["charge", "crescent", "charge", "foldCuts"],
-    intro: "ONE DUEL REMAINS UNFINISHED",
+    intro: "EVERY ROAD BEGINS WITH A FOLD",
     introLines: [
-      "I folded one thousand cranes while waiting for a worthy rival.",
+      "I fold route maps for travellers. A good crease should lead somebody home.",
       "Crane nine hundred and twelve looked suspiciously like a sandwich.",
       "Leave the marked folds before I cut. Count the strokes, then answer in the silence.",
     ],
     phaseLine: "Your rhythm has edges. Let us see whether it has patience.",
     phaseThreeLine: "No more warm-up. Draw the moon before I do.",
     knockoutLine: "A duel may pause. It does not end until both agree.",
-    defeatLine: "The final crane is yours. It is definitely not a sandwich.",
+    defeatLine: "Take this Wayfold Crane. Even a lost path can open again. Unlike the sandwich.",
     rematchLine: "The paper remembers every crease. I remember every cut.",
   },
-  trophy: "paper-crane", trophyName: "Thousandth Paper Crane", location: "The Folded Dojo",
+  trophy: "paper-crane", trophyName: "Wayfold Crane", location: "The Foldroad Hall",
   sprite: {
     palette: { k: "#1a1c2c", w: "#f4f4f4", s: "#94b0c2", r: "#b13e53", d: "#2d1b2e", y: "#ffcd75", c: "#73eff7" },
     frames: [[

@@ -262,7 +262,7 @@ G.FORM_SKINS = [
   ["vampire", "daybreaker", "☀️", "Daybreaker", "Rose velvet, warm ivory and sunlight gold.", "sunhalo", ["#4a2031", "#9d3d4d", "#f1d3b3", "#ffd95a"], "sun"],
   ["jester", "puppetKing", "🎭", "Puppet King", "Plum cloth, petal pink and honey-gold trim.", "puppetcrown", ["#35205a", "#7d45a5", "#ef6f9a", "#ffd166"], "ribbon"],
   ["turtle", "volcanoShell", "🌋", "Volcano Shell", "Obsidian shell and warm magma-red accents.", "volcanoshell", ["#241d1d", "#5a3630", "#db553a", "#ffcf55"], "ember"],
-  ["samurai", "moonRonin", "🌙", "Moon Ronin", "Midnight cloth and pale moonlit blue.", "mooncrest", ["#151d3a", "#314b79", "#83a6d8", "#e9efff"], "moon"],
+  ["samurai", "moonRonin", "🌙", "Moonfold", "Midnight cloth and pale moonlit blue.", "mooncrest", ["#151d3a", "#314b79", "#83a6d8", "#e9efff"], "moon"],
   ["astronomer", "livingOrrery", "🪐", "Living Orrery", "Slate-blue cloth, warm brass and cool glass.", "orrery", ["#27304a", "#596b8b", "#d2b36c", "#73eff7"], "orbit"],
   ["druid", "autumnAncient", "🍂", "Autumn Ancient", "Autumn bark, russet leaves and harvest gold.", "antlers", ["#3b2d25", "#765137", "#c97941", "#f2c14e"], "leaf"],
   ["griffin", "stormRoc", "🪶", "Storm Roc", "Storm-blue feathers and warm electric gold.", "feathercrest", ["#293653", "#4b72a6", "#d9edf2", "#ffe45e"], "lightning"],

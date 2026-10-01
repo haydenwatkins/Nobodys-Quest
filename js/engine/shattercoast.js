@@ -5,7 +5,7 @@
   const x = 26 * G.TILE + 8, y = 10 * G.TILE + 8;
   const keepsakes = [
     { item: "tide-shell", name: "Tide Shell", color: "#a7f070" },
-    { item: "paper-crane", name: "Paper Crane", color: "#f4f4f4" },
+    { item: "paper-crane", name: "Wayfold Crane", color: "#f4f4f4" },
     { item: "orrery-key", name: "Orrery Key", color: "#73eff7" },
     { item: "elder-acorn", name: "Elder Acorn", color: "#d9a7ff" },
   ];

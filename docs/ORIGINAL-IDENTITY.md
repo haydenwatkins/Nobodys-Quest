@@ -14,6 +14,8 @@ The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satche
 
 ## Next original-identity work
 
+**Foldstep Fox** is a nimble map courier in a short indigo wrap coat, mint belt and copper map case, with a warm fox face, joined tail and deliberate blade grip. **Sumi, Foldroad Keeper**, folds route maps that lead travellers home: silver fur, a pleated teal coat, coral/ivory collar and calm older face. The Foldroad Hall, Wayfold Crane and Moonfold look retain `samuraiTrial`, `paper-crane` and `moonRonin`; `samurai`/`paperRonin`, all cut/dash clocks and the marked fold sequence remain stable.
+
 **Harborback** is a patient terrapin shorekeeper with copper-toned shell scutes, clear flippers and a fitted teal neck cloth. **Marlo, Breakwater Keeper**, keeps little boats' homeward route sound, wearing a rolled dock cap, work bib and rope harness against his shell. Their calling, guardian and arena retain `turtle`, `admiralTortoise` and `turtleTrial`; the Tide Shell, wards, jab/brace/counter rhythm and marked tide channel remain unchanged.
 
 **Pocket Trouper** carries a hand-held fan of cards in a fitted plum stage coat, teal neckcloth and rounded felt beret. **Tansy, Caravan Star**, takes a travelling show along the reopened roads: a teal coat, copper-tied braid, pastry and cards held in articulated hands. The Wayward Stage and Curtain Bell preserve `jesterTrial` and `jester-bell`; `jester`/`royalFool` and all card, ricochet, pie and warning mechanics stay stable.

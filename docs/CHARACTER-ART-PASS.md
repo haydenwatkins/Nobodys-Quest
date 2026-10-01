@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Foldstep Fox and Sumi, Foldroad Keeper (October 1)
+
+The former Samurai and Paper Ronin now appear as warm-faced fox routekeepers. Foldstep Fox wears a short indigo wrap coat, mint belt and map case; older Sumi has silver fur, a teal pleated coat and coral/ivory collar. Their tails join their bodies and their hands hold the blades through every pose. The Foldroad Hall, Wayfold Crane and Moonfold appearance preserve the existing arena, reward and skin IDs. Their 20x20/25x25 footprints, 48 directional player poses/four guardian indices, timed third draw, dash, wards and marked fold-cut escape/recovery remain unchanged.
+
+All 407 regression checks pass, with the focused Shattercoast checks passing after the final keepsake-label update. Full default/signature sheets, every guardian index, and both pixel settings at gameplay scale and enlarged were inspected. Real-input cuts damage once on the input frame, recover visually and preserve the three-beat rhythm and pause reset. Existing three-phase cut warnings, narrow collision, interruption and escape checks pass. Chrome at 667x375 rendered both in the actual hall without horizontal overflow; a brief inspection timeout under the test load cleared on the next screenshot. The story recap paused combat, so this is browser appearance evidence, not ordinary encounter-balance or physical-device validation. Continue Astronomer with its Shattercoast guardian next.
+
 ### Harborback and Marlo, Breakwater Keeper (October 1)
 
 Harborback now has a rounded sea-worn shell with joined copper scutes, an expressive terrapin face, four attached flippers and a fitted neck cloth. Marlo wears a rolled dock cap and work bib; a rope harness follows his larger shell. These are shorekeepers who help little boats and travellers get home, rather than naval caricatures. Their 21x16/29x21 footprints, 48 directional player poses/four guardian indices, internal IDs, Tide Shell reward and arena routes remain unchanged.
@@ -102,7 +108,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Vampire / Velvetwing | Shipped October 1: velvet ears, warm muzzle, fitted waistcoat and attached directional membrane wings |
 | Jester / Pocket Trouper | Shipped October 1: rounded stage coat, beret, warm face and 48 directional hand-held card poses |
 | Turtle / Harborback | Shipped October 1: rounded scuted shell, expressive terrapin face, attached flippers and fitted neck cloth in all directions |
-| Samurai | Pending: cute face under hat, coherent robe and sword grip |
+| Samurai / Foldstep Fox | Shipped October 1: warm fox face, indigo wrap coat, map case, joined tail and held blade in every direction |
 | Astronomer | Pending: readable face, rounded coat, deliberate instrument |
 | Druid | Pending: face distinct from branches, organic costume/gesture |
 | Griffin | Pending: coherent eagle/lion anatomy, soft beak and proud wings |
@@ -123,7 +129,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Countess Carmine / Vesper, Dusk Host | Shipped October 1: expressive bat face, ivory ruff, sewn duskflower brooch and attached casting wings |
 | Royal Fool / Tansy, Caravan Star | Shipped October 1: teal stage coat, copper-tied braid and attached pie/card gestures |
 | Admiral Tortoise / Marlo, Breakwater Keeper | Shipped October 1: rounded harbor turtle, dock cap, fitted bib and shell-following rope harness |
-| Paper Ronin | Pending: clear cute face, folded robe and sword grip |
+| Paper Ronin / Sumi, Foldroad Keeper | Shipped October 1: silver fox face, pleated teal/coral coat, joined tail and articulated held blade |
 | Professor Perihelion | Pending: scholarly face, clear instruments and coat |
 | Grandmother Briar | Pending: kind powerful gardener, readable face/hands |
 | Aurelia, Sky Sovereign | Pending: cute regal griffin, coherent wings and talons |

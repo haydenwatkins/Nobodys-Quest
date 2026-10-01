@@ -286,7 +286,7 @@ registerMap({
     "G": { tile: "path", portal: { map: "gauntletArena", x: 3, y: 8 }, portalStyle: "trial", portalTheme: "god" },
     "m": { tile: "path", message: "Four guardians teach four new forms. The central coliseum remixes every guardian you have already defeated." },
     "a": { tile: "path", message: "BREAKWATER BASTION · Marlo, Breakwater Keeper, guards a shell that yields to blunt force. Follow the marked channel through his tide." },
-    "b": { tile: "path", message: "FOLDED DOJO · The Paper Ronin's ward yields to sharp force. Count the marked cuts before answering." },
+    "b": { tile: "path", message: "FOLDROAD HALL · Sumi's ward yields to sharp force. Count the marked cuts before answering." },
     "c": { tile: "path", message: "CROOKED OBSERVATORY · Light breaks Professor Perihelion's ward. The quiet band between his bright orbits is safe." },
     "d": { tile: "path", message: "WALKING GARDEN · Dark breaks Grandmother Briar's ward. Her flowerbeds leave a path and a clear center." },
     "H": { tile: "path", chest: { heal: true, name: "a salt-spark cookie" } },
@@ -303,7 +303,7 @@ function makeExpansionTrialArena(variant) {
 [
   { id: "turtleTrial", name: "The Breakwater Bastion", theme: "turtle", boss: "admiralTortoise", variant: 0,
     exit: { x: 11, y: 5 }, sign: "Blunt attacks break Marlo's ward. Use the marked channel through his tide, sidestep the charge, and counterattack during his pause." },
-  { id: "samuraiTrial", name: "The Folded Dojo", theme: "samurai", boss: "paperRonin", variant: 1,
+  { id: "samuraiTrial", name: "The Foldroad Hall", theme: "samurai", boss: "paperRonin", variant: 1,
     exit: { x: 36, y: 5 }, sign: "Three deliberate cuts beat one frantic swing. Watch the pause before the draw." },
   { id: "astronomerTrial", name: "The Crooked Observatory", theme: "astronomer", boss: "professorPerihelion", variant: 2,
     exit: { x: 11, y: 24 }, sign: "Light attacks break the Professor's ward. Stand between his two bright circles during the orbit, then close in after they fade." },

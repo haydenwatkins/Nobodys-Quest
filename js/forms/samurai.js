@@ -2,15 +2,15 @@
 "use strict";
 
 registerForm({
-  id: "samurai", name: "Samurai", icon: "⚔️",
-  tagline: "Finds the quiet beat inside a crowded fight, then cuts the moon out of it.",
+  id: "samurai", name: "Foldstep Fox", icon: "⚔️",
+  tagline: "A nimble map courier who opens folded roads with three patient cuts.",
   speed: 104, hearts: 5, slots: 2,
   passive: { id: "flowingDraw", name: "Flowing Draw",
     description: "Moving melee hits slide you through the cut with extra reach." },
   basic: "quickdraw",
   abilities: [{ id: "flashStep", level: 1 }, { id: "crescentDraw", level: 2 }],
-  unlock: { type: "challenge", hint: "Finish the Paper Ronin's unfinished duel", requirements: [
-    { type: "item", item: "paper-crane", hint: "Win the Paper Crane" },
+  unlock: { type: "challenge", hint: "Earn Sumi's routekeeper lesson", requirements: [
+    { type: "item", item: "paper-crane", hint: "Win the Wayfold Crane" },
     { type: "formLevel", form: "riftblade", level: 4 },
   ] },
   quests: [

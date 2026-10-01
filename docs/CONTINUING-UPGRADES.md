@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Foldstep Fox and the Foldroad Hall (October 1)
+
+Samurai and Paper Ronin now appear as original fox routekeepers Foldstep Fox and Sumi, Foldroad Keeper. Warm faces, wrap coats, fitted belts, joined tails and articulated blade grips replace the rigid masked/hat figures. The Foldroad Hall, Wayfold Crane and Moonfold appearance preserve internal IDs, saves, reward routes and unlock requirements. Source footprints, 48 directional player poses/four guardian indices, timed third draw, movement passive, dash and three-phase fold-cut warning/escape/recovery remain unchanged.
+
+All 407 regression checks pass, with focused Shattercoast checks passing after the final keepsake-label update. Complete default/signature pose sheets and every guardian index were inspected, including both pixel settings at gameplay scale and enlarged. Chrome at 667x375 showed the actual pair without horizontal overflow after one transient inspection timeout under the regression load. Story recap paused the world; physical-device and ordinary encounter-balance validation remain outstanding. The fresh-pass ledger now records 15/24 forms and 9/19 boss definitions. Continue Astronomer with its Shattercoast guardian, then the character roster before environments, NPCs and playthrough work.
+
 ### Harborback and the Breakwater Keeper (October 1)
 
 Turtle and Admiral Tortoise now appear as original shorekeepers Harborback and Marlo, Breakwater Keeper. Rounded shell scutes, clear terrapin faces, attached flippers and fitted harbor workwear replace the angular side-on figures. Their source footprints, 48 directional player poses/four guardian indices, stable save IDs, native jab/brace/counter, tide warning/refuge, shell recovery, Tide Shell reward and routes remain unchanged.
