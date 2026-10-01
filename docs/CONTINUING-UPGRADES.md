@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Chimelet and Bongle's warm bells (October 1)
+
+At 71% weekly and 24% five-hour usage, Bellkeeper/Bongle's fresh pass began. Chimelet has rounded hammered bronze, warm eyes/cheeks, joined cast-metal loop/handles, engraved rim and attached swinging clapper; Bongle has older teal metal, a broad bronze lip and a warm face. The old frayed ribbon is absent. Their 72 directional ringing/peal/silence player frames/four guardian indices retain footprints, save IDs, third peal, Resonance, silence, Echo Mark/Clapper and delayed-echo warning/recovery.
+
+All 418 regression checks pass. Full default/signature poses and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed actual Chimelet and Bongle through a save-disabled local fixture without horizontal overflow. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 21/24 forms and 15/19 boss definitions. Continue Lantern Wisp/Mallow in Stormspine, then remaining characters, environments and NPCs before playthrough work.
+
 ### Silkstep and Tess's silver roads (October 1)
 
 At 70% weekly and 15% five-hour usage, Weaver/Tess's fresh pass began. Silkstep has a soft jumping-spider face, eight joined segmented legs, fitted woven wrap and a needle/thread carried in a forepaw. Tess has older ivory features, cranberry silk, copper wrap clasp and held needle/reel. Their 48 directional player poses/four guardian indices retain footprints, save IDs, Lifeline, chain/cocoon, Thread Mark/Spindle, restored passages and all guardian warning/recovery; the detached crown is absent.

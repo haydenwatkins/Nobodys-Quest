@@ -21,6 +21,11 @@ test('Bellkeeper keeps directional ringing poses through both resolutions, dyes,
       assert.notDeepEqual(active.frames[active.directional.south.idle[0]],active.frames[active.directional.east.idle[0]]);
     }
   }
+  for(const hd of [true,false]){
+    G.hdPilot=hd;const boss=G.enemies.bellTitan.sprite,m=G.spriteMetrics(boss),active=G.activeSpriteDefinition(boss);
+    assert.equal(m.w,27);assert.equal(m.h,26);assert.equal(active.frames.length,4);assert.notDeepEqual(active.frames[0],active.frames[2]);
+    for(const frame of active.frames)for(const row of frame)for(const pixel of row)assert.ok(pixel==='.'||active.palette[pixel]);
+  }
 });
 
 test('the third Handbell peal displays its own ringing sequence without delaying damage or adding guard',()=>{

@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Chimelet and Bongle (October 1)
+
+Bellkeeper now appears as Chimelet: rounded hammered bronze, warm eyes/cheeks, joined cast-metal loop/handles, engraved rim and attached swinging clapper. Bongle has older teal metal, a broad bronze lip and a warm face. The old frayed ribbon is absent. All 72 directional ringing/peal/silence player frames and four guardian indices retain 21x20/27x26 footprints, stable IDs, third peal, Resonance, silence, Echo Mark/Clapper and delayed-echo warning/recovery.
+
+All 418 regression checks pass. Complete default/signature sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Real-input peal/recovery, silence, Resonance, Clapper and three-phase echo/refuge/recovery checks pass. Chrome at 667x375 displayed actual Chimelet and Bongle through a save-disabled local fixture without horizontal overflow. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 21/24 forms and 15/19 boss definitions. Continue Lantern Wisp/Mallow in Stormspine, then remaining characters, environments and NPCs.
+
 ### Silkstep and Tess (October 1)
 
 Weaver now appears as Silkstep, a soft spider stitcher with a warm jumping-spider face, eight joined legs, fitted woven work-wrap and a needle carried in a forepaw. Tess has an older ivory face, cranberry silk, copper wrap clasp and a held needle/reel. The fresh pose review corrected a clipped needle tip/foot edges and kept tools attached during walking. The player has 48 directional poses; the guardian keeps four indices. Their 23x19/30x23 footprints, stable IDs, Thread Mark/Spindle, Lifeline, chain/cocoon, restored passages and guardian warning/recovery remain unchanged. The detached crown is absent.
@@ -144,7 +150,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Griffin / Galecrest Courier | Shipped October 1: rounded lion/eagle anatomy, expressive beak, layered joined wings, dispatch pouch and 48 directional poses |
 | Golem / Cobblekin | Shipped October 1: friendly carved face, moss rooted in stone, separate rounded joints and 48 directional poses |
 | Weaver / Silkstep | Shipped October 1: warm spider face, eight joined legs, fitted woven wrap, held needle and 48 directional poses |
-| Bellkeeper | Pending: rounded bell silhouette and charming face, all casts |
+| Bellkeeper / Chimelet | Shipped October 1: rounded bronze metalwork, warm face, joined loop/handles/clapper and all 72 directional cast poses |
 | Lantern Wisp | Pending: flame expression, clear cage and soft wisps |
 | Colossus | Pending: powerful friendly anatomy, distinct from Golem |
 | God | Pending: charming original keeper, clear mantle and attached arms; no floating halo |
@@ -165,7 +171,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Aurelia, Sky Sovereign | Shipped October 1: older ivory ruff, broad blue feather fan, copper chest harness and clear talons; source/indices preserved |
 | Pillar, Old Mason | Shipped October 1: weathered pale stone, warm carved face, fitted canvas apron, held trowel and grounded casting palms |
 | Tess, Silk Matriarch | Shipped October 1: older ivory spider face, cranberry silk, eight joined legs, fitted wrap, held needle/reel |
-| Bongle, Bell Titan | Pending: powerful round bell, expression and metal detail |
+| Bongle, Bell Titan | Shipped October 1: rounded teal metalwork, bronze lip, warm face and joined clapper; source/indices preserved |
 | Mallow, Lantern Keeper | Pending: charming flame/cage guardian, readable casting pose |
 | Atlas, Last Worldbearer | Pending: strong gentle face and worldheart stone anatomy |
 | God of Every Form | Pending: cute final guardian with regal, coherent gestures |

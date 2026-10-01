@@ -2,8 +2,8 @@
 "use strict";
 
 registerForm({
-  id: "bellkeeper", name: "Bellkeeper", icon: "🔔",
-  tagline: "A wandering musician who makes every different kind of move answer the last one.",
+  id: "bellkeeper", name: "Chimelet", icon: "🔔",
+  tagline: "A little waystation bell who rings lost travellers toward warm doors.",
   speed: 78, hearts: 6, slots: 2,
   passive: { id: "resonance", name: "Resonance",
     description: "Following one ability style with another releases a harmless shockwave that shoves nearby enemies." },

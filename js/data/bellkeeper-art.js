@@ -1,64 +1,57 @@
-/* A living belfry: hammered metal, a frayed red crown, and a swinging clapper.
-   Its third peal opens the whole bell; no pose delays the immediate chime. */
+/* Frostbell's living waystation bells: rounded hammered metal, warm faces,
+   joined handles and visible clappers. Ring/peal/silence clocks stay native. */
 "use strict";
 (() => {
-  const {grid,compactSprite}=G.authoredPixelArt;
-  const palette={k:'#171e29',a:'#293441',b:'#465564',c:'#758c97',d:'#b7c8c5',e:'#9d773e',f:'#d7ad5d',g:'#f4df9c',h:'#78dce0',i:'#8d485c',j:'#c87583',l:'#c0a2dd'};
-  function draw(dir,mode,step){
-    const g=grid(42,40),side=dir==='east'||dir==='west',back=dir==='north';
-    const walk=mode==='walk'?Math.sin(step/6*Math.PI*2):0;
-    const ringing=mode==='attack'||mode==='peal',peal=mode==='peal',mute=mode==='silence';
-    const open=ringing&&step===1,settle=ringing&&step===2,hush=mute&&step!==2;
-    const cx=21+Math.round(walk),bob=mode==='idle'?step:Math.round(Math.abs(walk));
-    const top=6+bob,half=side?9:13,flare=open?(peal?3:1):0,rim=30+bob;
-    // The clapper sits behind the mouth, with room to swing during the peal.
-    const swing=Math.round(walk*3)+(open?(side?7:peal?7:4):settle?-3:0);
-    g.line(cx,27+bob,cx+swing,35+bob,'k',3);g.line(cx,27+bob,cx+swing,35+bob,'e',1);
-    g.ellipse(cx+swing,36+bob,4,2,'k');g.ellipse(cx+swing,36+bob,3,1,'g');
-    // Riveted handles, tucked in for Silence and thrown wide on a peal.
-    for(const sign of [-1,1]){
-      const reach=hush?half+(step===1?-1:1):half+3+(open&&peal?2:0),handY=hush?(step===1?20:24)+bob:open?22+bob:28+bob;
-      g.line(cx+sign*(half-3),20+bob,cx+sign*reach,handY,'k',4);
-      g.line(cx+sign*(half-3),20+bob,cx+sign*reach,handY,'c',2);
-      g.rect(cx+sign*reach-1,handY-1,3,3,hush?'l':'d');
-    }
-    g.poly([[cx-5,top],[cx+5,top],[cx+half,27+bob],[cx+half+2+flare,rim],[cx-half-2-flare,rim],[cx-half,27+bob]],'k');
-    g.poly([[cx-4,top+2],[cx+4,top+2],[cx+half-2,27+bob],[cx+half+flare,rim-2],[cx-half-flare,rim-2],[cx-half+2,27+bob]],'b');
-    // Curved ribs and a worn casting seam distinguish front, side, and back.
-    g.line(cx-half+3,25+bob,cx-3,top+3,'a',2);
-    g.line(cx+3,top+3,cx+half-3,25+bob,'d',1);
-    g.line(cx+1,top+4,cx+2,25+bob,'c',2);
-    if(back){
-      g.line(cx-2,top+5,cx-2,25+bob,'a',1);
-      g.poly([[cx,16+bob],[cx+3,19+bob],[cx,22+bob],[cx-3,19+bob]],'e');g.put(cx,19+bob,'f');
-      g.rect(cx-1,8+bob,2,5,'i');
+  const A=G.authoredPixelArt;
+  const palette={k:'#373740',a:'#735445',b:'#a47a50',c:'#cf9e61',d:'#ebc17c',e:'#f6dc9e',f:'#fff0ca',g:'#536d75',h:'#78979a',i:'#a9bdb5',j:'#d0d6bb',l:'#bf8680',m:'#e1ada0',n:'#8c7a99',o:'#bba8c5',p:'#ecdeeb',q:'#48605f',r:'#779383',s:'#b1c2a2'};
+  function handle(g,x,y,hx,hy,elder){
+    g.line(x,y,hx,hy,'k',elder?6:4);g.line(x,y,hx,hy,elder?'h':'c',elder?4:2);
+    g.ellipse(hx,hy,elder?4:3,elder?4:3,'k');g.ellipse(hx,hy-1,elder?3:2,elder?3:2,elder?'i':'e');g.put(hx-1,hy-2,'f');
+  }
+  function bell(g,cx,bob,side,back,mode,step,walk,elder){
+    const peal=mode==='peal',ringing=mode==='attack'||peal,open=ringing&&step===1,hush=mode==='silence',closed=hush&&step===1;
+    const cy=(elder?26:20)+bob,rx=side?9:elder?17:12,ry=elder?18:12,rim=(elder?41:31)+bob;
+    const flare=open?(peal?3:1):0,swing=Math.round(walk*(elder?4:2))+(open?(side?4:peal?5:2):ringing&&step===2?-2:0);
+    // The clapper shaft is joined inside the bell and remains visible below its mouth.
+    g.line(cx,cy+6,cx+swing,rim+5,'k',elder?5:3);g.line(cx,cy+6,cx+swing,rim+5,'b',elder?3:1);
+    const clapperY=rim+(elder?6:5);
+    g.ellipse(cx+swing,clapperY,elder?5:3,elder?3:2,'k');g.ellipse(cx+swing,clapperY-1,elder?4:2,elder?2:1,'d');g.put(cx+swing-1,clapperY-2,'f');
+    const reach=rx+(closed?0:open&&peal?5:3),hy=closed?cy+2:open?cy+1:cy+7;
+    for(const sign of [-1,1])handle(g,cx+sign*(rx-3),cy+1,cx+sign*reach,hy+Math.round(walk*sign),elder);
+    // Curved shoulder and full lip, rather than a triangular cloak silhouette.
+    g.ellipse(cx,cy,rx,ry,'k');g.ellipse(cx,cy-1,rx-1,ry-1,elder?'g':'b');
+    g.ellipse(cx-2,cy-2,rx-3,ry-3,elder?'h':'c');g.ellipse(cx-4,cy-3,Math.max(2,rx-7),ry-5,elder?'i':'d');
+    g.poly([[cx-rx+2,cy+4],[cx+rx-2,cy+4],[cx+rx+flare,rim],[cx-rx-flare,rim]],elder?'g':'b');
+    g.line(cx-rx+4,cy+5,cx-rx+2,rim-3,elder?'i':'d',2);g.line(cx+rx-3,cy+4,cx+rx-1,rim-3,elder?'q':'a',2);
+    // A cast-metal hanging loop joins the crown of the bell. No ribbon/crown stamp.
+    const ly=cy-ry-3;
+    g.ellipse(cx,ly,elder?5:4,elder?4:3,'k');g.ellipse(cx,ly-1,elder?4:3,elder?3:2,'c');g.ellipse(cx,ly-1,elder?2:1,elder?2:1,'.');g.line(cx-2,ly+3,cx+2,ly+3,'d',2);
+    if(back){g.line(cx-1,cy-7,cx-1,cy+6,elder?'g':'a',1);g.line(cx+1,cy-7,cx+1,cy+6,elder?'j':'e',1);
+      g.ellipse(cx+4,cy+1,2,3,elder?'g':'c');g.put(cx+4,cy,'f');
     }else{
-      const eye=side?cx+3:cx-5,glow=hush?'l':open&&peal?'g':'h';
-      g.rect(eye-1,15+bob,4,4,'k');g.rect(eye,16+bob,2,2,glow);
-      if(!side){g.rect(cx+2,15+bob,4,4,'k');g.rect(cx+3,16+bob,2,2,glow);}
-      g.line(side?cx+3:cx-2,21+bob,side?cx+5:cx+2,21+bob,'a',1);
+      const eyeY=cy-2,eyes=side?[cx+3]:[cx-4,cx+4];
+      for(const ex of eyes){if(closed)g.line(ex-1,eyeY+1,ex+1,eyeY+1,'k',1);else{g.ellipse(ex,eyeY,2,3,'k');g.put(ex-1,eyeY-1,'f');}if(elder)g.line(ex-2,eyeY-4,ex+1,eyeY-4,'j',1);}
+      const mx=side?cx+4:cx;g.line(mx-2,cy+5,mx+2,cy+5,'a',1);g.put(mx,cy+6,elder?'i':'d');
+      g.ellipse(cx-(side?1:7),cy+2,2,1,'l');if(!side)g.ellipse(cx+7,cy+2,2,1,'l');
     }
-    // A brass shoulder band, stamped rim, and dark open mouth.
-    g.rect(cx-5,10+bob,side?11:10,2,'e');g.line(cx-4,10+bob,cx+4,10+bob,'f',1);
-    g.rect(cx-half-flare,rim-4,2*(half+flare)+1,3,hush?'i':'e');
-    g.line(cx-half-flare+1,rim-4,cx+half+flare-1,rim-4,hush?'l':open&&peal?'g':'f',1);
-    for(let x=cx-half+3;x<=cx+half-2;x+=5)g.put(x,rim-2,'a');
-    g.line(cx-half+1,rim,cx+half-1,rim,'a',1);
-    if(open)g.line(cx-half+3,rim+1,cx+half-3,rim+1,'g',1);
-    // The red hanging loop has a split fabric end rather than a solid cap.
-    g.rect(cx-2,1+bob,4,4,'k');g.rect(cx-1,2+bob,2,3,'i');g.put(cx,2+bob,'j');
-    g.line(cx+1,4+bob,cx+3+Math.round(walk),8+bob,'i',1);g.put(cx+4+Math.round(walk),8+bob,'j');
-    if(dir==='west')for(const row of g.cells)row.reverse();
-    return g.rows();
+    const lip=closed?'n':'b',shine=closed?'o':open&&peal?'f':'e';
+    g.ellipse(cx,rim,rx+2+flare,3,'k');g.ellipse(cx,rim-1,rx+1+flare,2,lip);g.line(cx-rx-flare+1,rim-2,cx+rx+flare-1,rim-2,shine,2);
+    for(let x=cx-rx+3;x<cx+rx-2;x+=5)g.put(x,rim,'d');
+    // Engraved song dashes follow the metal rim; they are part of its surface.
+    for(const dx of [-5,0,5]){g.put(cx+dx,cy+9,elder?'j':'e');g.put(cx+dx+1,cy+8,elder?'i':'d');}
+    if(open)g.line(cx-rx+3,rim+2,cx+rx-3,rim+2,peal?'f':'d',1);
+    if(hush&&step===2)g.line(cx-4,cy+7,cx+4,cy+7,'o',1);
   }
-  const frames=[],directional={};
-  for(const dir of ['south','east','north','west']){
-    directional[dir]={};
-    for(const [mode,count]of [['idle',2],['walk',6],['attack',3],['peal',3],['silence',3],['guard',1]]){
-      directional[dir][mode]=[];
-      for(let n=0;n<count;n++){directional[dir][mode].push(frames.length);frames.push(draw(dir,mode,n));}
-    }
+  function draw(dir,mode,step){
+    const g=A.grid(42,40),side=dir==='east'||dir==='west',back=dir==='north';
+    const walk=mode==='walk'?Math.sin(step*Math.PI/3):0;
+    const bob=mode==='idle'?step:mode==='attack'||mode==='peal'?[1,0,-1][step]:mode==='silence'?[0,1,-1][step]:Math.round(Math.abs(walk));
+    bell(g,21+Math.round(walk),bob,side,back,mode,step,walk,false);
+    if(dir==='west')for(const row of g.cells)row.reverse();return g.rows();
   }
-  const sprite=compactSprite({palette,frames,density:2,authored:true,directional,animations:directional.south});
-  sprite.directional=directional;G.forms.bellkeeper.sprite=sprite;
+  const frames=[],directional={};for(const dir of ['south','east','north','west']){const set=directional[dir]={};for(const [mode,count]of [['idle',2],['walk',6],['attack',3],['peal',3],['silence',3],['guard',1]]){set[mode]=[];for(let i=0;i<count;i++){set[mode].push(frames.length);frames.push(draw(dir,mode,i));}}}
+  const sprite=A.compactSprite({palette,frames,density:2,authored:true,directional,animations:directional.south});sprite.directional=directional;G.forms.bellkeeper.sprite=sprite;
+  G.enemies.bellTitan.sprite=A.compactSprite(A.authored(54,52,palette,(g,frame)=>{
+    const bob=frame===1?1:frame===3?-1:0;bell(g,27,bob,false,false,frame===2?'peal':'idle',frame===2?1:0,frame===1?1:frame===3?-1:0,true);
+  }));
 })();
