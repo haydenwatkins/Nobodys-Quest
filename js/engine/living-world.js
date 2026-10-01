@@ -249,7 +249,7 @@
     ctx.restore();
   };
 
-  function findDetailSpot(grid, w, h, seed) {
+  function findDetailSpot(grid, w, h, seed, allowFloor = false) {
     const total = Math.max(1, w * h);
     let index = Math.floor(G.util.hash2(seed + 101, seed * 5 + 17) * total);
     for (let checked = 0; checked < total; checked++) {
@@ -257,7 +257,7 @@
       const y = Math.floor(index / w);
       const cell = grid[y] && grid[y][x];
       if (x > 1 && y > 1 && x < w - 2 && y < h - 2 && cell && !cell.portal && !cell.message &&
-          (cell.tile === "grass" || cell.tile === "path")) return { x, y };
+          (cell.tile === "grass" || cell.tile === "path" || allowFloor && cell.tile === "floor")) return { x, y };
       index = (index + 29) % total;
     }
     return null;
@@ -267,7 +267,7 @@
     if (!regionRestored(mapId)) return [];
     const details = [];
     for (let i = 0; i < 28; i++) {
-      const tile = findDetailSpot(grid, w, h, i + mapId.length * 23);
+      const tile = findDetailSpot(grid, w, h, i + mapId.length * 23, mapId === "emberRidge");
       if (!tile) continue;
       details.push({
         x: tile.x * G.TILE + 3 + Math.floor(G.util.hash2(i + 7, 43) * 10),
@@ -331,6 +331,7 @@
     for (const detail of s.restorationDetails || []) {
       const x = Math.round(detail.x), y = Math.round(detail.y);
       if (x < cam.x - 8 || x > cam.x + G.W + 8 || y < cam.y - 8 || y > cam.y + G.H + 8) continue;
+      if (G.drawRestoredRoadDetail && G.drawRestoredRoadDetail(ctx, detail)) continue;
       if (detail.kind === "lantern") {
         ctx.fillStyle = "#6b4a2b"; ctx.fillRect(x, y - 5, 2, 7);
         ctx.globalAlpha = 0.35 + Math.sin(time * 3 + x) * 0.12;

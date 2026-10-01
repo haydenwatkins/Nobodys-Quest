@@ -87,7 +87,8 @@
     const list=oldDraw(c);if(G.state.mapId!==map)return list;
     const active=unlocked();
     endpoints.forEach((endpoint,index)=>{const {x,y}=point(endpoint);
-      list.push({y:y-1,fn:()=>{
+      list.push({y:y-4,fn:()=>{
+        if(G.drawWindscarLift&&G.drawWindscarLift(c,x,y,active,index))return;
         c.save();
         // A broad stone landing keeps the destination readable beneath Nobody's feet.
         c.fillStyle="#493c3d";c.fillRect(x-16,y-5,32,9);
