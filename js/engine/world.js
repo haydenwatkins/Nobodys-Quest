@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawGlasswaterTile && G.drawGlasswaterTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawCoastTile && G.drawCoastTile(ctx, cell, x, y, time)) ||
+      (G.drawGlasswaterTile && G.drawGlasswaterTile(ctx, cell, x, y, time)) ||
       (G.drawRootdeepTile && G.drawRootdeepTile(ctx, cell, x, y, time)) ||
       (G.drawGardensTile && G.drawGardensTile(ctx, cell, x, y, time)) ||
       (G.drawWindscarTile && G.drawWindscarTile(ctx, cell, x, y, time)) ||
@@ -911,7 +912,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawGlasswaterPortal || !G.drawGlasswaterPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawCoastPortal || !G.drawCoastPortal(ctx, cell, x, y)) &&
+        (!G.drawGlasswaterPortal || !G.drawGlasswaterPortal(ctx, cell, x, y)) &&
         (!G.drawRootdeepPortal || !G.drawRootdeepPortal(ctx, cell, x, y)) &&
         (!G.drawGardensPortal || !G.drawGardensPortal(ctx, cell, x, y)) &&
         (!G.drawWindscarPortal || !G.drawWindscarPortal(ctx, cell, x, y)) &&
@@ -961,7 +963,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawGlasswaterNotice || !G.drawGlasswaterNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawCoastNotice || !G.drawCoastNotice(ctx, cell, x, y)) &&
+        (!G.drawGlasswaterNotice || !G.drawGlasswaterNotice(ctx, cell, x, y)) &&
         (!G.drawRootdeepNotice || !G.drawRootdeepNotice(ctx, cell, x, y)) &&
         (!G.drawGardensNotice || !G.drawGardensNotice(ctx, cell, x, y)) &&
         (!G.drawWindscarNotice || !G.drawWindscarNotice(ctx, cell, x, y)) &&
@@ -1100,7 +1103,8 @@ G.world = (() => {
     const T = G.TILE;
     const px = x * T, py = y * T;
     if (cell.tile === "water") {
-      const water = (G.gardensWaterColors && G.gardensWaterColors()) ||
+      const water = (G.coastWaterColors && G.coastWaterColors()) ||
+        (G.gardensWaterColors && G.gardensWaterColors()) ||
         (G.groveWaterColors && G.groveWaterColors()) ||
         (G.marshWaterColors && G.marshWaterColors()) ||
         (G.greenfieldWaterColors && G.greenfieldWaterColors()) ||
@@ -1246,6 +1250,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.coastScenery && s.mapId === "shattercoast") return;
     if (G.glasswaterScenery && s.mapId === "glasswaterDesert") return;
     if (G.rootdeepScenery && s.mapId === "rootdeepHollow") return;
     if (G.gardensScenery && s.mapId === "hangingGardens") return;
@@ -1285,6 +1290,7 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawCoastPantry && G.drawCoastPantry(ctx, ch)) return;
     if (G.drawGlasswaterCache && G.drawGlasswaterCache(ctx, ch)) return;
     if (G.drawRootdeepCache && G.drawRootdeepCache(ctx, ch)) return;
     if (G.drawGardensCache && G.drawGardensCache(ctx, ch)) return;
@@ -1352,6 +1358,7 @@ G.world = (() => {
   // a tiny code-drawn facade so new trials only need a portalTheme in maps.js.
   function drawTrialLandmark(ctx, cell, x, y, time) {
     if (cell.portalStyle !== "trial") return;
+    if (G.drawCoastTrial && G.drawCoastTrial(ctx, cell, x, y, !portalOpen(cell))) return;
     if (G.drawGreenfieldTrial && G.drawGreenfieldTrial(ctx, cell, x, y, !portalOpen(cell))) return;
     const T = G.TILE;
     const inwardX = x === 0 ? 8 : x === G.state.mapW - 1 ? -8 : 0;
@@ -1605,6 +1612,7 @@ G.world = (() => {
   // They organize a scene and suggest safety without adding collision to the
   // game's already busy mobile-sized paths.
   function drawFenceRun(ctx, fence) {
+    if (G.drawCoastFence && G.drawCoastFence(ctx, fence)) return;
     if (G.drawGlasswaterFence && G.drawGlasswaterFence(ctx, fence)) return;
     if (G.drawRootdeepFence && G.drawRootdeepFence(ctx, fence)) return;
     if (G.drawGardensFence && G.drawGardensFence(ctx, fence)) return;
@@ -1679,6 +1687,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawCoastPost && G.drawCoastPost(ctx, post, awake, near)) return;
     if (G.drawGlasswaterPost && G.drawGlasswaterPost(ctx, post, awake, near)) return;
     if (G.drawRootdeepPost && G.drawRootdeepPost(ctx, post, awake, near)) return;
     if (G.drawGardensPost && G.drawGardensPost(ctx, post, awake, near)) return;

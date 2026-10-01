@@ -51,7 +51,8 @@
     const list = oldDraw(c);
     if (G.state.mapId !== map) return list;
     const lit = has(reward);
-    list.push({ y: y + 4, fn: () => {
+    list.push({ y: y - 4, fn: () => {
+      if (G.drawCoastCairn && G.drawCoastCairn(c,x,y,lit)) return;
       c.save();
       c.fillStyle = "#273c49"; c.fillRect(x - 11, y - 5, 23, 10);
       c.fillStyle = "#8eb4ba"; c.fillRect(x - 9, y - 8, 19, 5);
