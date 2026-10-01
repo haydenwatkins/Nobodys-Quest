@@ -22,8 +22,8 @@ test('final preparation follows a missing guardian, its parent lesson, then the 
   let goal = G.storyGoal();
   assert.equal(goal.guide, 'boss');
   assert.equal(goal.mapId, 'turtleTrial');
-  assert.match(goal.objective, /Admiral Tortoise/);
-  assert.equal(G.bossPreparation().enemy, 'Admiral Tortoise');
+  assert.ok(goal.objective.includes(G.enemies.admiralTortoise.name));
+  assert.equal(G.bossPreparation().enemy, G.enemies.admiralTortoise.name);
   assert.equal(G.guidanceRoute('overworld', goal.mapId).locks, 0);
   assert.equal(G.guidanceTarget().cell.portal.map, 'shattercoast');
 
@@ -43,7 +43,7 @@ test('final preparation follows a missing guardian, its parent lesson, then the 
   assert.match(G.guidanceTarget().text, /win a battle/i);
   const echo = G.leaveReadyFormEchoAt(G.state.player.x + 40, G.state.player.y, 'battle');
   assert.equal(echo.formId, 'turtle');
-  assert.match(G.guidanceTarget().destination, /Turtle/);
+  assert.ok(G.guidanceTarget().destination.includes(G.forms.turtle.name));
   assert.equal(G.claimForm('turtle'), true);
   goal = G.storyGoal();
   assert.equal(goal.guide, 'mastery');
@@ -66,7 +66,7 @@ test('a locked form with no known trial never sends field guidance to its unavai
   assert.equal(goal.questId, undefined);
   const target = G.guidanceTarget();
   assert.equal(target.spatial, false);
-  assert.match(target.text, /Awaken Turtle/);
+  assert.ok(target.text.includes('Awaken '+G.forms.turtle.name));
   assert.ok(!target.text.includes('Shell Jab'));
   G.masteryLessons = oldLessons;
 });

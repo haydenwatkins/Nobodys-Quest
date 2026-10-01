@@ -2,14 +2,14 @@
 "use strict";
 
 registerForm({
-  id: "turtle", name: "Turtle", icon: "🐢",
-  tagline: "Turns patience into momentum and incoming trouble into somebody else's problem.",
+  id: "turtle", name: "Harborback", icon: "🐢",
+  tagline: "A patient shorekeeper with sea-worn shell plates and a heart for stranded travellers.",
   speed: 62, hearts: 8, slots: 2,
   passive: { id: "shellback", name: "Shellback",
     description: "Your shell removes one damage and all knockback from attacks behind you." },
   basic: "shellJab",
   abilities: [{ id: "shellRoll", level: 1 }, { id: "shellCounter", level: 2 }],
-  unlock: { type: "challenge", hint: "Crack Admiral Tortoise's perfect defense", requirements: [
+  unlock: { type: "challenge", hint: "Crack Marlo's breakwater defense", requirements: [
     { type: "item", item: "tide-shell", hint: "Win the Tide Shell" },
     { type: "formLevel", form: "knight", level: 4 },
   ] },

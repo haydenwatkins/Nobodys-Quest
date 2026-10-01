@@ -14,6 +14,8 @@ The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satche
 
 ## Next original-identity work
 
+**Harborback** is a patient terrapin shorekeeper with copper-toned shell scutes, clear flippers and a fitted teal neck cloth. **Marlo, Breakwater Keeper**, keeps little boats' homeward route sound, wearing a rolled dock cap, work bib and rope harness against his shell. Their calling, guardian and arena retain `turtle`, `admiralTortoise` and `turtleTrial`; the Tide Shell, wards, jab/brace/counter rhythm and marked tide channel remain unchanged.
+
 **Pocket Trouper** carries a hand-held fan of cards in a fitted plum stage coat, teal neckcloth and rounded felt beret. **Tansy, Caravan Star**, takes a travelling show along the reopened roads: a teal coat, copper-tied braid, pastry and cards held in articulated hands. The Wayward Stage and Curtain Bell preserve `jesterTrial` and `jester-bell`; `jester`/`royalFool` and all card, ricochet, pie and warning mechanics stay stable.
 
 **Velvetwing** is a velvet-eared bat keeper of the dusk roads, with a plum waistcoat, copper clasp, warm muzzle and folded membrane wings joined to its thumbs and shoulders. **Vesper, Dusk Host**, welcomes night travellers in The Dusk Court: a rose coat, soft ivory ruff, sewn duskflower brooch and broader expressive wings. Their calling, guardian, court and seal retain `vampire`, `countessCarmine`, `vampireTrial` and `crimson-seal` internally; bite/healing, dash, ward and waltz timing remain unchanged. Generic signature ornament stamps are removed across the roster; all earned look IDs remain as alternate material palettes.

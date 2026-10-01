@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Harborback and Marlo, Breakwater Keeper (October 1)
+
+Harborback now has a rounded sea-worn shell with joined copper scutes, an expressive terrapin face, four attached flippers and a fitted neck cloth. Marlo wears a rolled dock cap and work bib; a rope harness follows his larger shell. These are shorekeepers who help little boats and travellers get home, rather than naval caricatures. Their 21x16/29x21 footprints, 48 directional player poses/four guardian indices, internal IDs, Tide Shell reward and arena routes remain unchanged.
+
+Default/signature full pose sheets, every guardian index, and both pixel settings at gameplay scale and enlarged were inspected. All 405 checks pass across the full run and a focused rerun of updated guardian/form naming assertions. Real-input jabs retain immediate damage, short ordinary guard and the third-hit brace; existing counter, travel expiry, tide refuge/warning and shell recovery checks pass. Chrome at 667x375 displayed the pair in the actual Breakwater Bastion without horizontal overflow. Story recap paused the scene, so this is browser visual evidence, not ordinary encounter-balance or physical-device validation. Continue Samurai with its regional guardian next.
+
 ### Pocket Trouper and Tansy, Caravan Star (October 1)
 
 The former Jester now has a rounded plum stage coat, teal neckcloth, fitted beret, clear warm face, small boots and a fan of cards gripped in an articulated hand. Tansy's teal coat, copper-tied braid and hand-held pie distinguish the guardian. Their 20x20/25x25 footprints, 48 directional player poses/four boss indices, save IDs, card/ricochet rhythm, pie warnings, escape times and recovery remain intact. The Wayward Stage and Curtain Bell retain the existing arena/reward IDs.
@@ -95,7 +101,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Mole / Tunneltuft | Shipped October 1: soft fur, warm muzzle, fitted headlamp and 48 directional digging poses |
 | Vampire / Velvetwing | Shipped October 1: velvet ears, warm muzzle, fitted waistcoat and attached directional membrane wings |
 | Jester / Pocket Trouper | Shipped October 1: rounded stage coat, beret, warm face and 48 directional hand-held card poses |
-| Turtle | Pending: sculpted shell/feet/head, defensive poses |
+| Turtle / Harborback | Shipped October 1: rounded scuted shell, expressive terrapin face, attached flippers and fitted neck cloth in all directions |
 | Samurai | Pending: cute face under hat, coherent robe and sword grip |
 | Astronomer | Pending: readable face, rounded coat, deliberate instrument |
 | Druid | Pending: face distinct from branches, organic costume/gesture |
@@ -116,7 +122,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Mole Monarch / Bram, Tunnelwarden | Shipped October 1: warm face, broad digging paws, work bib and fitted copper root crown |
 | Countess Carmine / Vesper, Dusk Host | Shipped October 1: expressive bat face, ivory ruff, sewn duskflower brooch and attached casting wings |
 | Royal Fool / Tansy, Caravan Star | Shipped October 1: teal stage coat, copper-tied braid and attached pie/card gestures |
-| Admiral Tortoise | Pending: proud naval turtle with sculpted shell and limbs |
+| Admiral Tortoise / Marlo, Breakwater Keeper | Shipped October 1: rounded harbor turtle, dock cap, fitted bib and shell-following rope harness |
 | Paper Ronin | Pending: clear cute face, folded robe and sword grip |
 | Professor Perihelion | Pending: scholarly face, clear instruments and coat |
 | Grandmother Briar | Pending: kind powerful gardener, readable face/hands |

@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Harborback and the Breakwater Keeper (October 1)
+
+Turtle and Admiral Tortoise now appear as original shorekeepers Harborback and Marlo, Breakwater Keeper. Rounded shell scutes, clear terrapin faces, attached flippers and fitted harbor workwear replace the angular side-on figures. Their source footprints, 48 directional player poses/four guardian indices, stable save IDs, native jab/brace/counter, tide warning/refuge, shell recovery, Tide Shell reward and routes remain unchanged.
+
+All 405 checks pass across the full run and the focused rerun of updated naming assertions. Complete default/signature pose sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Chrome at 667x375 rendered the actual pair without horizontal overflow. The story recap paused the world; physical-device and ordinary encounter-balance validation remain outstanding. The ledger now records 14/24 forms and 8/19 boss definitions through this fresh pass. Continue Samurai with its Shattercoast guardian, then the rest of the character roster before environments, NPCs and playthrough work.
+
 ### Pocket Trouper and the Wayward Stage (October 1)
 
 Jester and the Royal Fool now appear as travelling theatre players Pocket Trouper and Tansy, Caravan Star. Soft coats, fitted berets, warm faces, gripped cards and Tansy's pie/braid replace the rigid split-hat figures. Their source footprints, 48 directional player poses/four guardian indices, stable save IDs, third-throw joker, ricochets, pie warnings and escape/recovery rules remain intact. The Wayward Stage and Curtain Bell retain arena/reward IDs; field guidance uses the new calling name.

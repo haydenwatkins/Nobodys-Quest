@@ -779,7 +779,7 @@ registerEnemy({
 
 /* ---- SHATTERCOAST GUARDIANS — the expansion's four form teachers ---- */
 registerEnemy({
-  id: "admiralTortoise", name: "Admiral Tortoise",
+  id: "admiralTortoise", name: "Marlo, Breakwater Keeper",
   hp: 72, speed: 46, damage: 2, behavior: "chase", aggro: 185,
   size: 21, heavy: true, miniboss: true,
   ward: { types: ["blunt"], hp: 7 },
@@ -789,16 +789,16 @@ registerEnemy({
     telegraph: 0.58, chargeSpeed: 175, chargeDur: 0.42,
     antiKiteRange: 112, chaseScale: 1.18,
     patterns: ["shells", "charge", "tideWall"],
-    intro: "THE TIDE HAS FILED A FORMAL COMPLAINT",
+    intro: "A GOOD HARBOR HOLDS THROUGH EVERY TIDE",
     introLines: [
-      "I have defended this beach for two hundred years.",
-      "Admittedly, most of those years were against seagulls.",
-      "Blunt blows crack my shell. When the tide arrives, take the marked channel. Even admirals need a breather.",
+      "I keep this breakwater sound so little boats can find their way home.",
+      "Seagulls keep stealing the survey rope. They call it a community project.",
+      "Blunt blows crack my shell. When the tide arrives, take the marked channel. Even shorekeepers need a breather.",
     ],
-    phaseLine: "A respectable opening. Deploy the emergency shell formation!",
+    phaseLine: "A sound opening. Let's see how you handle the rolling shells!",
     phaseThreeLine: "Full speed ahead! Yes, this is full speed. Be polite.",
     knockoutLine: "Retreat is a maneuver, not an embarrassment. I checked.",
-    defeatLine: "Defense is yours. Please use it against the seagulls.",
+    defeatLine: "Carry this Tide Shell. A shorekeeper makes room for someone else to get home.",
     rematchLine: "Back on deck? Excellent. I have finished turning around.",
   },
   trophy: "tide-shell", trophyName: "Tide Shell", location: "The Breakwater Bastion",
