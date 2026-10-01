@@ -330,7 +330,7 @@ G.FORM_SKINS = [
   ["bellkeeper", "cathedralBell", "⛪", "Cathedral Bell", "A vaulted iron crown with stained-glass light.", "cathedral", ["#23283b", "#555f79", "#c3c8d4", "#ef5b8c"], "chime"],
   ["lanternWisp", "festivalSpirit", "🎐", "Festival Spirit", "A ribboned lantern dancing with warm festival fire.", "lanternribbons", ["#45254b", "#a33f5f", "#ff9b62", "#fff2a8"], "ribbon"],
   ["colossus", "crystalTitan", "💎", "Crystal Titan", "A mountain split open by enormous living crystals.", "crystaltitan", ["#293544", "#536879", "#9ad5d8", "#c08cff"], "crystal"],
-  ["god", "cosmicNobody", "🌌", "Cosmic Nobody", "The little blank someone, containing every horizon.", "cosmichalo", ["#16142e", "#41366f", "#8f7ee7", "#fff36b"], "cosmos"],
+  ["god", "cosmicNobody", "🌌", "Cosmic Patchling", "A little canvas traveller, carrying every horizon.", "cosmichalo", ["#16142e", "#41366f", "#8f7ee7", "#fff36b"], "cosmos"],
 ].map(([formId, id, icon, name, tagline, motif, colors, effect]) => ({
   formId, id, icon, name, tagline, motif, colors, effect, unlockLevel: 3,
 }));

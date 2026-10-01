@@ -34,7 +34,7 @@
       G.ui.dialogue("THE WRECK","A brass token glints inside. The hatch is barely wider than a rat. Someone has scratched: ONE LAST CROSSING.",{accent:"#d5be83"});
     }else{
       G.state.items.push(r.id);G.ensureTown().spirit+=salvage?6:2;weakenVeil();
-      G.ui.dialogue(salvage?"NOBODY":"THE OLD SLUICE",salvage?"A ferry token, worn smooth by a hundred journeys. Somebody kept it for the way home. I think I will too.":"The wheel gives. Water runs toward the abandoned ferry channels, and a thread of the Queen’s purple veil unravels.",{accent:"#d5be83"});
+      G.ui.dialogue(salvage?"PATCHLING":"THE OLD SLUICE",salvage?"A ferry token, worn smooth by a hundred journeys. Somebody kept it for the way home. I think I will too.":"The wheel gives. Water runs toward the abandoned ferry channels, and a thread of the Queen’s purple veil unravels.",{accent:"#d5be83"});
       G.ui.banner(salvage?"ONE LAST CROSSING":"THE MARSH BREATHES",salvage?"Old Ferry Token · 6 town spirit":`${sluices()}/2 sluices open · Queen’s ward weakened · 2 town spirit`);
       G.saveGame();
     }

@@ -1108,7 +1108,7 @@ registerEnemy({
     patterns: ["silkTether", "webGrid", "cards", "briar", "nova"],
     intro: "THE LOOM HAS EIGHT HANDS AND ONE OPINION",
     introLines: [
-      "Welcome, Nobody. Every silver road in Rootdeep carried me your footsteps.",
+      "Welcome, Patchling. Every silver road in Rootdeep carried me your footsteps.",
       "Do not worry. I only eat rude guests, and you wiped your feet.",
       "Watch where one thread ends and the next begins. That is your opening.",
     ],
@@ -1186,7 +1186,7 @@ registerEnemy({
     patterns: ["worldGrid", "collapseRing", "gustLanes", "charge", "quake", "stormGrid", "nova"],
     intro: "THE MOUNTAIN REMEMBERS YOUR NAME",
     introLines: [
-      "Nobody. Every road in Titan Grave is a promise I carried here for you.",
+      "Patchling. Every road in Titan Grave is a promise I carried here for you.",
       "I am tired, but do not mistake tired for fragile. Mountains dislike that.",
       "Bring every lesson you gathered. I will answer with the weight of the world.",
     ],

@@ -40,7 +40,7 @@ G.TOWN_PROJECTS = [
   { id: "lanternWalk", icon: "🏮", name: "Lantern Walk", cost: 42,
     text: "A glowing path through gardens planted together.", effect: "Permanent town lights and flowers" },
   { id: "hallOfForms", icon: "◇", name: "Hall of Forms", cost: 60,
-    text: "Every shape Nobody has worn gets a place of honour.", effect: "+10 resident capacity and a town monument" },
+    text: "Every shape Patchling has worn gets a place of honour.", effect: "+10 resident capacity and a town monument" },
 ];
 
 G.normalizeTown = function (saved) {

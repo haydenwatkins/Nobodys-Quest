@@ -1,6 +1,9 @@
 # Nobody's Quest
 
-A browser clone of *Nobody Saves the World* built as a family project:
+A family-built browser adventure about restoring living roads through
+form switching, mastery and borrowed talents. Originally inspired by
+*Nobody Saves the World*, it is developing its own cast and world; see
+[the original identity direction](docs/ORIGINAL-IDENTITY.md).
 the engine is finished infrastructure; the **forms, abilities, enemies,
 and maps are data files designed to be extended by a kid** (see
 [FOR-BEN.md](FOR-BEN.md)).
@@ -30,8 +33,9 @@ Lanterns, partially cleared encounters, parcels, and rewards persist between
 visits. Failed guardian attempts reset the fight while preserving the road.
 Interactions use the existing keyboard, controller, and touch controls.
 
-Nobody, Rat, Knight, and Ranger have authored art facing all four directions.
-Ranger draws the bow before releasing an arrow; moving keeps the chosen aim,
+Patchling is a living canvas traveller stitched from an old road map.
+Patchling, Rat, Knight, Bramble Scout and Starwick Sage have authored art
+facing all four directions. Bramble Scout draws the bow before releasing an arrow; moving keeps the chosen aim,
 and shifting away before release cancels the shot. Arrow, Lucky Arrow, and
 Triple Shot have directional shafts, heads, and fletching in flight.
 
@@ -152,4 +156,5 @@ Saves are per-device (localStorage), so Ben and Lily each have their own.
 ## Credits
 
 Game design pillars borrowed with admiration from Drinkbox Studios'
-*Nobody Saves the World*. This is a fan-made learning project.
+*Nobody Saves the World*. This began as a family learning project; the
+original cast, art, story and eventual public branding are under active review.

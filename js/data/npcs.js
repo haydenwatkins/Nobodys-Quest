@@ -63,7 +63,7 @@
       ],
       1: [
         "You change shape whenever one answer fails. At last, a heroic habit I understand.",
-        "Every form fits you because Nobody comes with very generous empty space.",
+        "Your coat remembers everyone who lent you a hand. Very useful tailoring.",
       ],
       3: [
         "The roads woke up grumpy. In fairness, people have been walking all over them.",
@@ -71,7 +71,7 @@
       ],
       5: [
         "A perfect hero would have arrived sooner. Good thing we got a persistent one.",
-        "The story says Nobody saved everyone. The grammar department is furious.",
+        "A little map brought everyone home. The cartographers are trying to give it a medal.",
       ],
     }),
 
@@ -79,8 +79,8 @@
       hair: "#70493e", skin: "#e7ad88", coat: "#8f4f71", accent: "#f3d56b",
     }, {
       0: [
-        "Welcome! Our hero request was addressed to Somebody. You are close enough for local government.",
-        "The town motto is 'Somebody Else Will Handle It.' The second line was never handled.",
+        "Welcome! A walking map is exactly what our missing roads need. Please sign the visitor book with a reasonably small footprint.",
+        "The town motto is 'All Roads Lead Home.' The roads have been ignoring it. Very disrespectful.",
         "Monsters are unfinished chores with teeth. This is why I never floss near paperwork.",
       ],
       1: [
@@ -101,7 +101,7 @@
       hair: "#b7b1c9", skin: "#c98c72", coat: "#4f577e", accent: "#8fd3c8",
     }, {
       0: [
-        "History says a chosen hero will rise. The footnote says history was guessing.",
+        "Your cloth was cut from the old road map. The places missing from it are still waiting to be found.",
         "The Unfinished began as duties, vows, and one extremely overdue library book.",
       ],
       1: [
@@ -118,7 +118,7 @@
       ],
       5: [
         "The God of Every Form was built from our demand for one answer to every problem.",
-        "You won by being many imperfect answers. I have corrected the prophecy in permanent pencil.",
+        "You joined the broken paths together. I have left room on the map for whatever grows next.",
       ],
     }, "robe"),
 
@@ -130,7 +130,7 @@
         "Road tip: enter at one edge, leave at the opposite edge. Revolutionary, I know.",
       ],
       1: [
-        "Your package says 'TO: NOBODY.' Finally, a customer who cannot deny it is theirs.",
+        "Your package says 'TO: THE WALKING MAP.' Please stay in one place until I finish the receipt.",
         "I tried changing into a courier form. Turns out this is already my final form. Distressing.",
       ],
       3: [
@@ -169,7 +169,7 @@
     }, {
       0: [
         "Names are just tiny costumes for ideas. Mine has pockets.",
-        "Nobody sounds lonely until you realize it leaves room for everybody.",
+        "A patch is a memory you can wear. Yours are turning into a very lively family album.",
       ],
       1: [
         "Do not ask which form is the real you. Real things are allowed to change clothes.",
@@ -252,7 +252,7 @@
       hair: "#f2e4a8", skin: "#694b67", coat: "#493e75", accent: "#d68bd4",
     }, {
       0: [
-        "I foresee a hero with no name, many faces, and pockets full of food. Probably you.",
+        "I foresee a little canvas traveller, many faces, and pockets full of food. Probably you.",
         "My visions are never wrong. Their relationship with reality is merely informal.",
       ],
       1: [
@@ -269,7 +269,7 @@
       ],
       5: [
         "The future survived. It is untidy, overgrown, and already requesting help.",
-        "Nobody saved the world. Everybody else can start cleaning up after lunch.",
+        "Patchling mended the roads. Everybody else can start cleaning up after lunch.",
       ],
     }, "robe"),
   };

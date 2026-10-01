@@ -10,7 +10,7 @@
 
 (function () {
   G.FORM_PATH_CHAPTERS = [
-    { id: "origin", number: "I", title: "The First Spark", note: "Every path begins as Nobody.", forms: ["nobody"] },
+    { id: "origin", number: "I", title: "The First Spark", note: "Every path begins with Patchling’s first stitch.", forms: ["nobody"] },
     { id: "first-shapes", number: "II", title: "First Shapes", note: "Two simple lessons open the world.", forms: ["rat", "knight"] },
     { id: "callings", number: "III", title: "Choose a Calling", note: "Magic, precision, or transformation.", forms: ["wizard", "ranger", "frog"] },
     { id: "crossed-lessons", number: "IV", title: "Crossed Lessons", note: "Combine what the early forms taught you.", forms: ["alchemist", "stormcaller", "dragon"] },

@@ -73,12 +73,12 @@
 
   G.storyChapterName = function (chapter) {
     return [
-      "Somebody Else's Problem",
+      "A Stitch in the Road",
       "Many Useful Shapes",
       "Masters of One Thing",
       "The Waking Roads",
       "Six Old Promises",
-      "Nobody, Together",
+      "Every Road Home",
     ][chapter == null ? G.storyChapter() : chapter];
   };
 

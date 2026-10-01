@@ -38,11 +38,17 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Patchling: an original protagonist
+
+The starting traveller now has a folded canvas hood with stitching, a copper map patch, repaired teal coat, small boots and mint scarf. All 48 directional poses retain the existing 28x24 footprint and Slap performance. The opening road, six chapter scenes, recap, ending, NPC references and save labels use the living-map premise; the legacy `nobody` ID, chapter IDs/numbers, quest IDs, cosmetic IDs and rewards remain unchanged. Pip's wooden dragon is Thimble.
+
+All 391 tests pass, including opening/delivery progression and legacy-save checks, chapter/ending scenes, save slots and real Slap timing. Full directional/default and signature-skin pose sheets were inspected. Chrome at 667x375 displayed the actual Orchard opening, Patchling's name and matching dialogue portrait without horizontal overflow. This is desktop-browser visual evidence, not a physical phone or ordinary combat-balance playthrough. Existing signature accessory designs remain for the later cosmetic review.
+
 The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, plus the separate Orchard Treant. This is a baseline audit, not acceptance of every remaining frame. Each pending entry needs the detailed design/pose pass above. Continue early forms and their corresponding regional guardians before late regions; campaign/balance work resumes after this art priority.
 
 | Form | Fresh pass |
 |---|---|
-| Nobody | Cute baseline shipped; original mended-traveller identity next |
+| Nobody / Patchling | Shipped September 30: original canvas traveller, seams/map patch, repaired coat and matching opening story |
 | Rat | Shipped September 30 |
 | Knight | Shipped September 30: rounded steel plates, clear helmet eyes, all directions |
 | Ranger / Bramble Scout | Shipped September 30: generous leaf hood, clear face, articulated bow |

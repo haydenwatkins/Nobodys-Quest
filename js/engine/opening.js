@@ -27,8 +27,8 @@
     const st=G.ensureStory();st.prologueSeen=true;
     if(!st.seenChapters.includes(0))st.seenChapters.push(0);
     say('arrival',[
-      ['PEBBLE','The notice says Somebody. You look like Nobody. This may be a very short interview.'],
-      ['NOBODY','There is someone shouting up the road. I can start there.'],
+      ['PEBBLE','Help wanted: hands for a broken road. Yours look small. We can start with the small bits.'],
+      ['PATCHLING','There is someone shouting up the road. I can start there.'],
     ]);
     return true;
   };
@@ -40,7 +40,7 @@
     if(won)data=['A road is a promise','Return to Parcel at the cart',[22,37],6,'The Heartwood is open. Tell Parcel the deliveries can reach Sunrise Town.'];
     else if(!o.notice)data=['Someone has to answer','Read the notice beside the road',[12,35],0,'Step up to the notice. The stranded cart is just beyond it.'];
     else if(!o.cart)data=['The first person who needed you','Clear the tangles around Parcel’s cart',[20,34],1,'The little root creatures have trapped the courier. Drive them away.'];
-    else if(!G.formUnlocked('rat'))data=['A smaller answer',G.formReady('rat')?'Meet the Rat echo':'Practice Slap at the straw post',[20,23],2,'Finish two Nobody lessons. Practice at the straw post if you need more Slap contacts, then meet the echo.'];
+    else if(!G.formUnlocked('rat'))data=['A smaller answer',G.formReady('rat')?'Meet the Rat echo':'Practice Slap at the straw post',[20,23],2,'Finish two Patchling lessons. Practice at the straw post if you need more Slap contacts, then meet the echo.'];
     else if(!o.sluice)data=['Under the roots','Become Rat and enter the old culvert',[27,24],3,'The road is crushed under roots. Rat can slip through the culvert and release the sluice.'];
     else if(!G.formUnlocked('knight'))data=['Someone kept watch','Recover the crest beside the mill',[38,25],4,'The mill keeper left a Knight’s Crest. Open the chest and meet the shape it leaves behind.'];
     else if(!o.bell)data=['Let them hear you coming','Ring the watch bell',[46,14],5,'The watchmen gather near the bell. Clear the approach and ring it for the stranded town.'];
@@ -86,7 +86,7 @@
       else {
         o.sluice=true;p.x=35*16+8;p.y=24*16+8;p.dashing=null;p.lastSafe={x:p.x,y:p.y};
         G.state.entryPoint={x:p.x,y:p.y};G.state.mapReveal=G.reducedMotion?0:.28;
-        say('sluice', [['PARCEL, FROM THE OTHER SIDE','The water is moving! And the bridge... you did it!'],['NOBODY','Nobody could move the roots. A rat could reach the latch.']]);
+        say('sluice', [['PARCEL, FROM THE OTHER SIDE','The water is moving! And the bridge... you did it!'],['PATCHLING','The roots needed hands. The latch needed paws. I had room for both.']]);
         G.healPlayer(2,'opening');G.sfx.play('unlock');G.saveGame();
       }
     } else if(at.id==='bell'){
@@ -94,12 +94,12 @@
       else {
         o.bell=true;G.healPlayer(G.playerMaxHearts(),'opening');p.mana=G.playerMaxMana();
         G.sfx.play('bossIntro');G.state.openingBellT=3;
-        say('bell',[['THE ANCIENT TREANT','That bell has been silent for years. Who dares promise this road will matter?'],['NOBODY','There is a cart behind me. That seems like a start.']]);G.saveGame();
+        say('bell',[['THE ANCIENT TREANT','That bell has been silent for years. Who dares promise this road will matter?'],['PATCHLING','There is a cart behind me. That seems like a start.']]);G.saveGame();
       }
     }else if(at.id==='home'){
       o.complete=true;
       if(!G.state.items.includes('orchard-ribbon')){G.state.items.push('orchard-ribbon');if(G.state.town)G.state.town.spirit=(G.state.town.spirit||0)+5;}
-      say('home',[['PARCEL','Bread, letters, a birthday present. None of it looked important until it stopped arriving.'],['PEBBLE','The notice still says Somebody. Shall we correct it?'],['NOBODY','Leave it. Someone else might answer too.']]);
+      say('home',[['PARCEL','Bread, letters, a birthday present. None of it looked important until it stopped arriving.'],['PEBBLE','Road open. Shall we take the help-wanted notice down?'],['PATCHLING','Leave it. There are more roads on my map. We could use more hands.']]);
       G.ui.banner('THE FIRST PROMISE KEPT','Orchard Ribbon · 5 town spirit · the wider world awaits');G.saveGame();
     }
     G.input.clearTaps();return true;
@@ -108,7 +108,7 @@
   G.npcDialogue=(id,chapter,index)=>{
     if(G.state&&G.state.mapId===road){
       if(id==='parcel')return progress().cart?'There is a drain under the roots. The mill keeper used to keep a spare crest beside the water.':'Those tangles will eat the birthday present next. Please help!';
-      if(id==='pending')return progress().bell?'A blunt blow breaks old bark. My Shield Advance will do; Nobody’s Slap works too. The empty ground between roots is your way through.':'A shield is a promise to stay when running would be easier. Try Shield Advance as the watchman winds up, then answer with Oathblade.';
+      if(id==='pending')return progress().bell?'A blunt blow breaks old bark. My Shield Advance will do; Patchling’s Slap works too. The empty ground between roots is your way through.':'A shield is a promise to stay when running would be easier. Try Shield Advance as the watchman winds up, then answer with Oathblade.';
       if(id==='pebble')return 'The world waited for a perfect hero. The courier would settle for someone who showed up.';
     }
     return oldNpcDialogue(id,chapter,index);
@@ -153,7 +153,7 @@
     const s=G.state,o=progress();s.openingBellT=Math.max(0,(s.openingBellT||0)-dt);
     if(s.mapId===road&&!o.cart&&!s.enemies.some(e=>!e.dead&&e.id==='orchardTangle')){
       o.cart=true;
-      say('cart',[['PARCEL','Thank you! The mill bridge is caught in those roots. Sunrise hasn’t had a delivery in days.'],['PEBBLE','You answered. That is already more than the prophecy managed.']]);
+      say('cart',[['PARCEL','Thank you! The mill bridge is caught in those roots. Sunrise hasn’t had a delivery in days.'],['PEBBLE','You answered. A road starts waking up when someone shows up.']]);
     }
     // A practice contact can finish a lesson after the last creature is gone.
     // Seed an earned echo beside the post, never underneath a wall or the player.

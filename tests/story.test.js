@@ -44,7 +44,7 @@ for (const act of G.STORY_CHAPTERS) {
 
 let goal = G.storyGoal();
 assert.equal(goal.chapter, 0);
-assert.match(goal.objective, /Nobody's mastery quests/);
+assert.match(goal.objective, /Patchling's mastery quests/);
 assert.equal(goal.progress.total, 2);
 G.formReady = (id) => id === "rat";
 goal = G.storyGoal();
@@ -70,9 +70,9 @@ chapter = 5;
 G.state.items.push("god-spark");
 goal = G.storyGoal();
 assert.equal(goal.complete, true);
-assert.match(goal.reason, /collection of lessons/);
+assert.match(goal.reason, /living map/);
 G.storyCheck();
-assert.ok(dialogue.some((line) => line.text.includes("choosing hero")), "the ending should correct the prophecy");
+assert.ok(dialogue.some((line) => line.text.includes("people carry each other home")), "the ending should pay off the living-road story");
 assert.ok(saves > 0, "story milestones should persist immediately");
 
 console.log("story tests passed");

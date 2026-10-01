@@ -25,7 +25,7 @@
     }else{
       G.state.items.push(reward);G.ensureTown().spirit+=6;restoreRoad();
       G.healPlayer(G.playerMaxHearts(),"grove");G.state.player.mana=G.playerMaxMana();
-      G.ui.dialogue("NOBODY","I tuck the seed beneath the roots. The ground stirs, and the old path opens. There. Somewhere to come back to.",{accent:"#a7f070"});
+      G.ui.dialogue("PATCHLING","I tuck the seed beneath the roots. The ground stirs, and the old path opens. There. Somewhere to come back to.",{accent:"#a7f070"});
       G.ui.banner("ROOM FOR ONE MORE","Shelter tree planted · central shortcut opened · 6 town spirit");G.saveGame();
     }
     G.input.clearTaps();return true;

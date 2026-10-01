@@ -29,7 +29,7 @@
       if(isInstrument){
         G.healPlayer(G.playerMaxHearts(),"starfall");G.state.player.mana=G.playerMaxMana();
         G.ensureTown().spirit+=8;G.events.emit("pickup",{item:r.id});G.checkUnlocks();
-        G.ui.dialogue("NOBODY","A thread of starlight winds around my hand. Not a prophecy. Just a road somebody left for whoever needed it.",{accent:instrument.color});
+        G.ui.dialogue("PATCHLING","A thread of starlight winds around my hand. Not a prophecy. Just a road somebody left for whoever needed it.",{accent:instrument.color});
         G.ui.banner("A ROAD THROUGH THE DARK","Fallen Star Thread · 8 town spirit · hearts and mana restored");
       }else{
         G.ui.dialogue(r.name.toUpperCase(),r.story,{accent:r.color});

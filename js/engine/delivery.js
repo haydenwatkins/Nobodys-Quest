@@ -101,7 +101,7 @@
     const d=state(),s=G.state;
     if(at.id==='depart'){
       d.started=true;G.world.load(d.complete?'sunriseQuay':'lanternReach');
-      say('departure',[['PARCEL','Flour for the baker. A letter for Mara. A birthday present, only slightly chewed.'],['NOBODY','Who has been keeping the road lights on?'],['PARCEL','Nobody. I was hoping you might take that personally.']]);
+      say('departure',[['PARCEL','Flour for the baker. A letter for Mara. A birthday present, only slightly chewed.'],['PATCHLING','Who has been keeping the road lights on?'],['PARCEL','No one lately. The lamps could use a keeper. Start with the one beside us.']]);
     }else if(at.id==='rideBack')G.world.load('orchardRoad',{x:26,y:37});
     else if(at.id==='manyfold'){if(G.ui.openExpedition)G.ui.openExpedition(G.ensureExpeditionProgress().runs===0?3:undefined);}
     else if(at.id.startsWith('lamp')){
@@ -109,18 +109,18 @@
       say('lamp'+i,[['PARCEL',i?'They followed the light across. Clear the bank; I will keep the flame.':'The light woke something in the reeds. I have the cart. You have room to move.']]);
     }else if(at.id==='drain'){
       if(s.formId!=='rat')G.ui.dialogue('PEBBLE','Something pale is caught under that bank. A rat could follow the drain.',{accent:'#e7bd78'});
-      else{move(20,33);d.salvage=true;s.town.spirit+=3;G.sfx.play('pickup');say('salvage',[['NOBODY','A recipe book. The pages smell of cinnamon.'],['PARCEL','Brindle lost that in the flood. Keep it dry. She will be pleased.']]);if(!s.items.includes('brindles-recipes'))s.items.push('brindles-recipes');}
+      else{move(20,33);d.salvage=true;s.town.spirit+=3;G.sfx.play('pickup');say('salvage',[['PATCHLING','A recipe book. The pages smell of cinnamon.'],['PARCEL','Brindle lost that in the flood. Keep it dry. She will be pleased.']]);if(!s.items.includes('brindles-recipes'))s.items.push('brindles-recipes');}
     }else if(at.id==='drainBack')move(18,30);
     else if(locations[at.id]){
       d.parcels.push(at.id);G.sfx.play('pickup');s.deliveryWarmT=3;
-      const lines={bread:[['BAKER BRINDLE',d.salvage?'My flour AND my recipes! I can stop calling the burnt ones a local tradition.':'Flour! I was down to making the smell of bread. Very popular. Not filling.'],['NOBODY','You kept the oven warm.'],['BAKER BRINDLE','Someone had to believe something would arrive.']],
-        letter:[['MARA','From my sister. She is coming home. She thought I had stopped writing.'],['NOBODY','The letters stopped. You didn’t.'],['MARA','I will put another cup out.']],
-        present:[['PIP','A wooden dragon! It has wheels!'],['NOBODY','The best dragons do.'],['PIP','Will you stay until I make it fly?']]};
+      const lines={bread:[['BAKER BRINDLE',d.salvage?'My flour AND my recipes! I can stop calling the burnt ones a local tradition.':'Flour! I was down to making the smell of bread. Very popular. Not filling.'],['PATCHLING','You kept the oven warm.'],['BAKER BRINDLE','Someone had to believe something would arrive.']],
+        letter:[['MARA','From my sister. She is coming home. She thought I had stopped writing.'],['PATCHLING','The letters stopped. You didn’t.'],['MARA','I will put another cup out.']],
+        present:[['PIP','A wooden dragon! It has wheels!'],['PATCHLING','The best dragons do.'],['PIP','Will you stay until I make it fly?']]};
       say(at.id,lines[at.id]);
     }else if(at.id==='finish'){
       d.complete=true;if(!s.items.includes('sunrise-seal')){s.items.push('sunrise-seal');s.town.spirit+=8;}
       G.healPlayer(G.playerMaxHearts(),'delivery');
-      say('home',[['PARCEL','Every name crossed off. That used to be an ordinary day.'],['PEBBLE','Nobody delivered everything. I am going to enjoy writing that down.'],['NOBODY','Tomorrow there will be more.'],['PARCEL','Good. The road knows the way now.']]);
+      say('home',[['PARCEL','Every name crossed off. That used to be an ordinary day.'],['PEBBLE','Patchling delivered everything. I am going to enjoy writing that down.'],['PATCHLING','Tomorrow there will be more.'],['PARCEL','Good. The road knows the way now.']]);
       G.ui.banner('THE LONG WAY HOME','Sunrise Seal · 8 town spirit · a place to return to');
     }
     G.saveGame();G.input.clearTaps();return true;
@@ -131,7 +131,7 @@
       const d=state();
       if(id==='quayBaker'&&d.parcels.includes('bread'))return 'The first loaf is yours. Do not argue with someone holding a bread paddle.';
       if(id==='quayMara'&&d.parcels.includes('letter'))return 'Two cups. One for today, one for when she gets here.';
-      if(id==='quayPip'&&d.parcels.includes('present'))return 'I named him Nobody. He is a very important dragon.';
+      if(id==='quayPip'&&d.parcels.includes('present'))return 'I named him Thimble. He is a very important dragon.';
       if(id==='parcel')return d.complete?'The map stand beside the east lantern leads into the Manyfold. New paths, borrowed powers, and something to bring home. I might let you carry the post next time.':'We made it. Brindle is by the oven, Mara by the east house, Pip down by the water.';
     }
     return oldTalk(id,chapter,index);
@@ -160,8 +160,8 @@
       const [x,y]=i?[40,15]:[14,25];s.entryPoint={x:x*16+8,y:y*16+8};G.sfx.play('unlock');
       say('lit'+i,[['PARCEL',i?'Two lights. The bridge is just ahead. I can see the town windows from here.':'One light. One stretch of road we can trust. I will bring the cart up.']]);
     }
-    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','I kept counting what they owed. I forgot what the bridge was for.'],['NOBODY','You could count who gets home.'],['THE TOLLKEEPER','Three parcels. Two travelers. Go on. I can start with that.']]);
-    if(s.mapId==='sunriseQuay'&&d.keeper&&!d.complete)say('quay',[['PARCEL','There. The oven chimney. Mara’s blue door. Pip waiting on the step.'],['NOBODY','They are still here.'],['PARCEL','Yes. Let us make that worth the wait.']]);
+    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','I kept counting what they owed. I forgot what the bridge was for.'],['PATCHLING','You could count who gets home.'],['THE TOLLKEEPER','Three parcels. Two travelers. Go on. I can start with that.']]);
+    if(s.mapId==='sunriseQuay'&&d.keeper&&!d.complete)say('quay',[['PARCEL','There. The oven chimney. Mara’s blue door. Pip waiting on the step.'],['PATCHLING','They are still here.'],['PARCEL','Yes. Let us make that worth the wait.']]);
     for(const h of s.openingHazards||[]){h.t+=dt;if(!h.hit&&h.t>=h.warn&&h.t<h.warn+h.active&&!h.owner.dead&&!s.knockout&&G.openingHazardHits(h,s.player.x,s.player.y))h.hit=!!G.damagePlayer(1,h.owner.x,h.owner.y);}
     s.openingHazards=(s.openingHazards||[]).filter(h=>!h.owner.dead&&h.t<h.warn+h.active);
   };

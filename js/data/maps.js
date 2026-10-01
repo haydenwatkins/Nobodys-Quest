@@ -98,7 +98,7 @@ registerMap({
     "2": { tile: "grass", enemy: "bat" },
     "3": { tile: "grass", enemy: "bones" },
     "4": { tile: "grass", enemy: "wisp" },
-    "s": { tile: "grass", message: "Gold motes follow the main story. If you lose the road, hold 🧭 and Nobody will look around." },
+    "s": { tile: "grass", message: "Gold motes follow the main story. If you lose the road, hold 🧭 and Patchling will look around." },
     "G": { tile: "grass", message: "Beware the wisp grove... wisps only fear the LIGHT." },
     "D": { tile: "tree", portal: { map: "dungeon", x: 15, y: 14 }, stars: 3 },
     "M": { tile: "grass", portal: { map: "mistwood", x: 15, y: 17 }, stars: 1, portalStyle: "gap" },

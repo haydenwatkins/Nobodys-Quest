@@ -152,7 +152,7 @@
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.12);
     G.ui.dialogue("✦ FORM ECHO", discoveryLine(echo, form), { accent: ECHO_COLOR });
     G.ui.dialogue(`${form.icon} ${form.name.toUpperCase()}`, `${form.tagline} ${G.formEchoDescription(form)}`, { accent: ECHO_COLOR });
-    G.ui.dialogue("◇ NOBODY", `I don't have to become ${form.name} forever. I only have to carry what it knows.`, {
+    G.ui.dialogue("◇ PATCHLING", `I don't have to become ${form.name} forever. I only have to carry what it knows.`, {
       accent: "#f4f4f4",
       onClose: () => completeEcho(echo),
     });

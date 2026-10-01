@@ -21,16 +21,23 @@
       limb(g,cx+dx,35-bob,foot,43-Math.max(0,Math.round(stride*phase)), 'b');
       g.ellipse(foot,44,4,2,'k');g.line(foot-2,43,foot+1,43,'c',1);
     }
-    g.ellipse(cx,32-bob,8,9,'k');g.ellipse(cx,31-bob,7,8,'d');
-    g.line(cx-4,29-bob,cx-4,36-bob,'e',2);g.line(cx+4,32-bob,cx+4,37-bob,'n',1);
+    g.ellipse(cx,32-bob,8,9,'k');g.ellipse(cx,31-bob,7,8,'o');
+    g.line(cx-4,29-bob,cx-4,36-bob,'f',2);g.line(cx+4,32-bob,cx+4,37-bob,'a',1);
+    g.rect(cx-5,33-bob,4,4,'n');g.put(cx-4,34-bob,'e');g.put(cx-2,36-bob,'g');
     const hand=beat===0?-2:beat===1?11:beat===2?5:0;
-    limb(g,cx-6,29-bob,cx-9,35-bob+Math.round(stride),'d');
-    limb(g,cx+6,29-bob,cx+8+hand,hit?26-bob:35-bob-Math.round(stride),'d');
+    limb(g,cx-6,29-bob,cx-9,35-bob+Math.round(stride),'o');
+    limb(g,cx+6,29-bob,cx+8+hand,hit?26-bob:35-bob-Math.round(stride),'o');
     g.ellipse(cx+8+hand,hit?26-bob:35-bob-Math.round(stride),3,3,'k');
-    g.ellipse(cx+8+hand,hit?25-bob:34-bob-Math.round(stride),2,2,'e');
-    g.ellipse(cx,y,10,11,'k');g.ellipse(cx,y-1,9,10,'d');g.ellipse(cx-2,y-3,7,7,'e');
+    g.ellipse(cx+8+hand,hit?25-bob:34-bob-Math.round(stride),2,2,'n');
+    // A folded canvas hood, copper map patch and stitches belong to this traveller.
+    g.ellipse(cx,y,10,11,'k');g.ellipse(cx,y-1,9,10,'n');g.ellipse(cx-2,y-3,7,7,'d');
+    g.poly([[cx-8,y-6],[cx-8,y-12],[cx-3,y-10],[cx-1,y-8]],'k');
+    g.poly([[cx-7,y-7],[cx-7,y-10],[cx-4,y-9],[cx-3,y-8]],'d');
+    g.line(cx+4,y-8,cx+7,y+6,'b',1);
+    for(const dy of [-6,-2,2,6])g.line(cx+4,y+dy,cx+6,y+dy,'e',1);
+    if(!back){g.rect(cx-7,y-7,4,3,'g');g.put(cx-6,y-6,'a');}
     if(!back){eyes(g,cx,y-1,side);g.line(cx+(side?1:-7),y+4,cx+(side?2:-6),y+4,'m',1);if(!side)g.line(cx+6,y+4,cx+7,y+4,'m',1);}
-    else {g.line(cx-5,y+5,cx+3,y+7,'n',1);g.put(cx+4,y+5,'e');}
+    else {g.line(cx-5,y-5,cx+2,y+5,'b',1);for(const dy of [-3,1,5])g.line(cx-4+(dy+3)/4,y+dy,cx-2+(dy+3)/4,y+dy,'e',1);}
     g.line(cx-6,y+10,cx+6,y+10,'o',3);g.line(cx-5,y+9,cx+5,y+9,'f',1);
     g.poly([[cx+3,y+10],[cx+7,y+12],[cx+6,y+18],[cx+3,y+16]],'f');g.put(cx+5,y+13,'p');
     if(!back)g.put(cx-1,35-bob,'g');

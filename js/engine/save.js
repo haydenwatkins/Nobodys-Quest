@@ -197,8 +197,8 @@ function playtimeLabel(seconds) {
 
 G.saveSlotSummaries = function () {
   const chapterNames = [
-    "Somebody Else's Problem", "Many Useful Shapes", "Masters of One Thing",
-    "The Waking Roads", "Six Old Promises", "Nobody, Together",
+    "A Stitch in the Road", "Many Useful Shapes", "Masters of One Thing",
+    "The Waking Roads", "Six Old Promises", "Every Road Home",
   ];
   return Array.from({ length: SAVE_SLOT_COUNT }, (_, index) => {
     const slot = index + 1;
@@ -305,7 +305,7 @@ function titleTransformationStage(save) {
   }).join("");
   const particles = Array.from({ length: 12 }, (_, index) =>
     `<i style="--bit:${index};--bit-x:${((index * 47) % 150) - 75}px;--bit-y:${-32 - ((index * 31) % 92)}px"></i>`).join("");
-  return `<div class="title-transform-stage" role="img" aria-label="Nobody changing into many forms">
+  return `<div class="title-transform-stage" role="img" aria-label="Patchling changing into many forms">
     <div class="title-form-echoes" aria-hidden="true">${echoes}</div>
     <span class="title-change-burst" aria-hidden="true">${particles}</span>
     <span class="title-nobody" aria-hidden="true"><i></i><canvas width="88" height="102" data-title-form="nobody"></canvas></span>
@@ -317,7 +317,7 @@ function titleSlotCard(summary) {
     <span class="save-slot-number">ADVENTURE ${summary.slot}</span>
     <span class="slot-chapter-art unwritten" aria-hidden="true"><i class="title-quill">✦</i></span>
     <strong>Begin a new story</strong>
-    <small>The next page belongs to Nobody.</small>
+    <small>The next stitch belongs to you.</small>
   </button>`;
   const form = G.forms && G.forms[summary.formId];
   const map = G.maps && G.maps[summary.mapId];
@@ -327,7 +327,7 @@ function titleSlotCard(summary) {
       <i class="slot-sun"></i><i class="slot-hill far"></i><i class="slot-hill near"></i>
       <canvas width="64" height="68" data-title-form="${titleEscape(summary.formId)}"></canvas>
     </span>
-    <strong>Continue as ${titleEscape(form ? form.name : "Nobody")}</strong>
+    <strong>Continue as ${titleEscape(form ? form.name : "Patchling")}</strong>
     <span>ACT ${summary.chapter + 1} · ${titleEscape(summary.chapterName)}</span>
     <small>${titleEscape(map ? map.name : "Greenfield")} · ⭐${summary.stars} · ✦${summary.forms} · ${titleEscape(summary.playtime)}</small>
   </button>`;
@@ -349,7 +349,7 @@ G.showSaveSlotScreen = function (force) {
   overlay.innerHTML = `<main class="save-screen-panel title-world-screen" role="dialog" aria-modal="true" aria-label="Nobody's Quest title screen. Choose an adventure.">
       ${force ? `<button class="title-return" data-title-return aria-label="Return to the current adventure">← Return</button>` : ""}
       <section class="title-world-hero">
-        <header class="title-lockup"><span>Nobody's</span><h1>Quest</h1><p>The prophecy chose the wrong name</p></header>
+        <header class="title-lockup"><span>Nobody's</span><h1>Quest</h1><p>Every road begins with a stitch</p></header>
         ${titleTransformationStage(activeSave)}
       </section>
       <section class="title-chapter-panel" aria-label="Adventure slots">

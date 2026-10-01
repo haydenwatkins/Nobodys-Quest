@@ -11,37 +11,37 @@
 G.STORY_CHAPTERS = [
   {
     id: "somebodysProblem", icon: "○", color: "#f4f4f4",
-    title: "Somebody Else's Problem",
-    thesis: "A prophecy chose the wrong name. The world may have found the right hero.",
-    summary: "Nobody inherits a rescue meant for Somebody and discovers that unfinished promises have begun growing teeth.",
+    title: "A Stitch in the Road",
+    thesis: "An old map becomes a traveller. A small kindness becomes a way home.",
+    summary: "Patchling follows a stranded courier's call and discovers that abandoned promises have begun growing teeth.",
     scene: [
-      ["THE STORY", "Long ago, the world wrote a prophecy for Somebody. Somebody never arrived."],
-      ["MAYOR MAYBE", "The hero request definitely says Somebody. You are close enough for local government."],
+      ["THE STORY", "They stitched a torn road map into a travelling coat. One morning, the coat set off to find its missing roads."],
+      ["MAYOR MAYBE", "A walking map! Excellent. Our roads have been missing from themselves for weeks."],
       ["ARCHIVIST ERRATA", "The Unfinished are abandoned duties, vows, and hopes. Left alone, they learned to bite."],
-      ["PEBBLE", "Good news: you are not the chosen one. That means you still get to choose."],
+      ["PEBBLE", "That courier needs a hand. We can worry about the rest of your map after breakfast."],
     ],
   },
   {
     id: "manyShapes", icon: "✦", color: "#73eff7",
     title: "Many Useful Shapes",
-    thesis: "Nobody is not an absence. Nobody is room.",
-    summary: "Every recovered form becomes another way to help—and another piece of a hero no prophecy could predict.",
+    thesis: "A patch keeps the memory of the hands that made it.",
+    summary: "Every recovered form adds a living patch to the traveller's map: another talent, another way to help.",
     scene: [
-      ["ARCHIVIST ERRATA", "A form is the shape left behind when someone devotes themself to one answer."],
-      ["PEBBLE", "You can carry several. Apparently being Nobody comes with excellent storage."],
+      ["ARCHIVIST ERRATA", "These roads remember their keepers. Your cloth can carry those memories as living shapes."],
+      ["PEBBLE", "A pocket for every talent. Please leave one for lunch."],
       ["MAYOR MAYBE", "One hero with many jobs! At last, a staffing plan with no meetings."],
-      ["THE STORY", "The blank figure on the prophecy begins filling with borrowed color."],
+      ["THE STORY", "New paths bloom across the cloth. Each patch remembers a kindness learned along the way."],
     ],
   },
   {
     id: "masters", icon: "⚔", color: "#ef7d57",
     title: "Masters of One Thing",
     thesis: "A perfect answer becomes a prison when the question changes.",
-    summary: "Nobody challenges masters who mistook excellence for ownership and learns the weakness inside every perfect form.",
+    summary: "Patchling challenges masters who mistook excellence for ownership and learns the weakness inside every perfect form.",
     scene: [
       ["ARCHIVIST ERRATA", "The old masters guarded their forms until mastery hardened into possession."],
       ["PEBBLE", "They became perfect. It sounds exhausting."],
-      ["THE STORY", "Each master knows one road completely. Nobody survives by changing roads."],
+      ["THE STORY", "Each master knows one road completely. Patchling survives by joining roads together."],
       ["ARCHIVIST ERRATA", "Do not defeat what they are. Show them what they can no longer become."],
     ],
   },
@@ -61,19 +61,19 @@ G.STORY_CHAPTERS = [
     id: "oldPromises", icon: "🗿", color: "#d9a7ff",
     title: "Six Old Promises",
     thesis: "The Worldbearers do not need to be conquered. They need a reason to carry the future again.",
-    summary: "Six World Marks reconnect the horizon as Nobody reminds each ancient carrier why roads exist.",
+    summary: "Six World Marks reconnect the horizon as Patchling reminds each ancient carrier why roads exist.",
     scene: [
       ["PEBBLE", "Three marks answered. I think the horizon is starting to remember us."],
       ["ARCHIVIST ERRATA", "The Worldbearers were promised that every road would matter. We broke that promise first."],
       ["THE STORY", "Stone, thread, and sky pull against centuries of stillness."],
-      ["PEBBLE", "Let us finish the road. Not because a prophecy says so. Because someone is waiting at the other end."],
+      ["PEBBLE", "Let us finish the road. Someone is waiting at the other end."],
     ],
   },
   {
     id: "together", icon: "☀", color: "#fff3c2",
-    title: "Nobody, Together",
+    title: "Every Road Home",
     thesis: "The world does not need one perfect answer. It needs every good answer willing to change.",
-    summary: "With the horizon restored, Nobody faces the impossible ideal that created the prophecy: the God of Every Form.",
+    summary: "With the horizon restored, Patchling faces the impossible ideal that sealed the roads: the God of Every Form.",
     scene: [
       ["THE LAST WORLDBEARER", "I carried every road here for you. I cannot carry the final step."],
       ["ARCHIVIST ERRATA", "The God of Every Form was built from our demand for one answer to every problem."],
@@ -156,7 +156,7 @@ function formJourneyLead(formId, progress, seen = new Set(), horizon = false) {
       destination: echo ? G.maps[echo.mapId].name : G.maps[G.state.mapId].name,
       title: `Meet the ${form.name} Form Echo`, short: echo ? `Approach ${form.name}'s echo` : `Reveal ${form.name}'s echo in battle`,
       objective: echo ? `Approach ${form.name}'s Form Echo in ${G.maps[echo.mapId].name}.` : `Win a battle to reveal ${form.name}'s Form Echo, then approach it.`,
-      reason: horizon ? `${form.name}'s path is complete. A new shape brings new arts and lessons for the waking road.` : `${form.name}'s path is complete. Its answer is ready to join Nobody's final portfolio.`, progress };
+      reason: horizon ? `${form.name}'s path is complete. A new shape brings new arts and lessons for the waking road.` : `${form.name}'s path is complete. Its answer is ready to join Patchling's final portfolio.`, progress };
   }
   const steps = G.formUnlockSteps ? G.formUnlockSteps(formId).filter(step => !step.met) : [];
   const trophy = steps.find(step => step.kind === "trophy" && trophyChallenge(step.itemId));
@@ -221,10 +221,10 @@ G.storyGoal = function () {
 
   if (G.storyComplete()) return Object.assign(base, {
     complete: true,
-    title: "The prophecy has a new ending",
+    title: "The map has room to grow",
     short: "The world is free to choose what comes next",
     objective: "Return to the roads, finish personal quests, and help Sunrise Town grow.",
-    reason: "Nobody proved that a hero can be a collection of lessons instead of one perfect destiny.",
+    reason: "Patchling's living map grows wherever people help each other find a way home.",
     progress: storyProgress(1, 1, "STORY COMPLETE"),
   });
 
@@ -236,7 +236,7 @@ G.storyGoal = function () {
         guide: "mastery", formId: "rat",
         title: "Live inside a borrowed answer", short: "Complete one Rat mastery quest",
         objective: "Become Rat, use its speed and poison, and complete one Rat mastery quest.",
-        reason: "Meeting a form is only an introduction. Understanding why its answer works is what makes it part of Nobody.",
+        reason: "Meeting a form is only an introduction. Understanding why its answer works is what makes it part of Patchling.",
         progress: storyProgress(ratDone, 1, "RAT MASTERY"),
       });
     }
@@ -244,15 +244,15 @@ G.storyGoal = function () {
       guide: "echo", formId: "rat",
       title: "Meet your first new shape", short: "Find the Rat Form Echo",
       objective: "Win a battle, watch for the shape it leaves behind, and approach Rat's echo.",
-      reason: "The first form proves that Nobody can carry a life beyond the one the prophecy expected.",
-      progress: storyProgress(2, 2, "NOBODY MASTERY"),
+      reason: "The first living patch carries a roadkeeper's memory and a new way through the world.",
+      progress: storyProgress(2, 2, "PATCHLING MASTERY"),
     });
     return Object.assign(base, {
       guide: "mastery", formId: "nobody",
-      title: "Become more than a blank", short: "Complete two Nobody mastery quests",
-      objective: "Explore Greenfield, follow the gold motes, and complete two of Nobody's mastery quests.",
+      title: "Learn your first stitches", short: "Complete two Patchling mastery quests",
+      objective: "Explore Greenfield, follow the gold motes, and complete two of Patchling's mastery quests.",
       reason: "Stars record lessons learned. Two lessons reveal the first path into another form.",
-      progress: storyProgress(nobodyDone, 2, "NOBODY MASTERY"),
+      progress: storyProgress(nobodyDone, 2, "PATCHLING MASTERY"),
     });
   }
 
@@ -269,7 +269,7 @@ G.storyGoal = function () {
       guide: "mastery",
       title: "Learn enough to leave Greenfield", short: `Earn ${next.stars - stars} more ⭐ for ${next.destination}`,
       objective: `Complete form mastery until the road to ${next.destination} opens at ${next.stars} stars.`,
-      reason: "Every new route tests whether Nobody can combine the lessons already carried.",
+      reason: "Every new route tests whether Patchling can combine the lessons already carried.",
       progress: storyProgress(stars, next.stars, "STARS"),
     });
     return Object.assign(base, {
@@ -352,7 +352,7 @@ G.storyGoal = function () {
         title: `Open the road to ${road}`, short: `Earn ${firstGate.cell.stars - stars} more ⭐ for ${road}`,
         objective: lesson ? `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. Then cross ${road} toward ${next.destination}.`
           : `Complete form lessons to open ${road}, then continue toward ${next.destination}.`,
-        reason: `The path to ${next.destination} runs through ${road}. The Worldbearer beyond it can wait while Nobody learns one more answer.`,
+        reason: `The path to ${next.destination} runs through ${road}. The Worldbearer beyond it can wait while Patchling learns one more answer.`,
         progress: storyProgress(stars, firstGate.cell.stars, "STARS"),
       });
     }
@@ -400,7 +400,7 @@ G.storyGoal = function () {
     guide: "boss", mapId: "godTrial", destination: "Final Firmament",
     title: "Answer the impossible ideal", short: "Enter the Final Firmament and face God",
     objective: "Find the northern Final Firmament in Greenfield and defeat the God of Every Form.",
-    reason: "God is every perfect answer at once. Nobody's final strength is knowing when to become something else.",
+    reason: "God is every perfect answer at once. Patchling's final strength is knowing when to become something else.",
     progress: storyProgress(1, 1, "FINAL EXAM READY"),
   });
 };
@@ -429,7 +429,7 @@ G.playStoryChapter = function (chapter, replay) {
 
 G.playStoryRecap = function (automatic) {
   const current = G.storyChapter ? G.storyChapter() : 0;
-  const lines = [["PREVIOUSLY IN NOBODY'S QUEST", "The world asked for one perfect Somebody. A persistent Nobody answered instead.", "#f4f4f4"]];
+  const lines = [["THE ROAD SO FAR", "A traveller stitched from an old map began mending the paths that people had forgotten.", "#f4f4f4"]];
   for (let chapter = 0; chapter <= current; chapter++) {
     const def = G.STORY_CHAPTERS[chapter];
     lines.push([`ACT ${chapter + 1} · ${def.title}`, def.summary, def.color]);
@@ -488,12 +488,12 @@ G.playStoryEnding = function (replay) {
   if (!replay && (story.endingSeen || endingQueued)) return false;
   endingQueued = true;
   const lines = [
-    ["THE STORY", "The last borrowed shape falls away. For the first time, Nobody stands before the world as only themself.", "#f4f4f4"],
+    ["THE STORY", "The last borrowed shape folds into the coat. Patchling's map is full of roads, with room at its edges for more.", "#f4f4f4"],
     ["GOD OF EVERY FORM", "I was every answer at once. You were willing to become the next question.", "#fff3c2"],
-    ["ARCHIVIST ERRATA", "The prophecy says: A chosen hero will save the world. I have made one correction.", "#d9a7ff"],
-    ["ARCHIVIST ERRATA", "A choosing hero will help the world save itself.", "#d9a7ff"],
-    ["PEBBLE", "So Nobody did it.", "#73eff7"],
-    ["MAYOR MAYBE", "Exactly. We shall put that on the banner and confuse historians forever.", "#ffcd75"],
+    ["ARCHIVIST ERRATA", "The first map ended here. Yours has paths reaching right off the page.", "#d9a7ff"],
+    ["ARCHIVIST ERRATA", "A road stays alive when people carry each other home.", "#d9a7ff"],
+    ["PEBBLE", "One last stitch. Then breakfast. You promised.", "#73eff7"],
+    ["MAYOR MAYBE", "A public breakfast! At last, a civic project with a sensible budget.", "#ffcd75"],
     ["THE STORY", "The roads do not close. They lead home, outward, and everywhere a different answer is needed.", "#f4f4f4"],
   ];
   queueDialogue(lines, () => G.showStoryEnding());
@@ -514,11 +514,11 @@ G.showStoryEnding = function () {
   const forms = G.unlockedForms ? G.unlockedForms().length : 1;
   const residents = G.state.town && G.state.town.residents || 0;
   overlay.innerHTML = `<main class="ending-panel" role="dialog" aria-modal="true" aria-label="Story complete">
-    <span class="eyebrow">THE PROPHECY, CORRECTED</span><div class="ending-mark">○ ✦ ☀</div>
-    <h1>Nobody, Together</h1>
-    <p>The world asked for one perfect hero. Nobody answered with every imperfect lesson they were willing to share.</p>
+    <span class="eyebrow">THE LIVING MAP</span><div class="ending-mark">○ ✦ ☀</div>
+    <h1>Every Road Home</h1>
+    <p>Patchling's coat carries every lesson shared along the way. Beyond its seams, the roads keep growing.</p>
     <div class="ending-stats"><span><strong>${G.state.stars}</strong> stars</span><span><strong>${forms}</strong> forms</span><span><strong>${marks}/6</strong> World Marks</span><span><strong>${residents}</strong> neighbours</span></div>
-    <blockquote>“A choosing hero will help the world save itself.”</blockquote>
+    <blockquote>“A road stays alive when people carry each other home.”</blockquote>
     <button data-ending-close>Return to the living world</button>
   </main>`;
   overlay.classList.remove("hidden");
@@ -530,7 +530,7 @@ G.showStoryEnding = function () {
     G.storyEndingOpen = false;
     G.updateStoryEndingInput = null;
     if (G.menuController) G.menuController.reset(overlay);
-    G.ui.banner("THE END · AND EVERY ROAD AFTER", "The prophecy is complete. The roads, the town, and every unfinished promise remain yours.");
+    G.ui.banner("THE END · AND EVERY ROAD AFTER", "Your map is mended. The roads, the town, and every unfinished promise remain yours.");
   });
   // Controller path (main.js calls this per frame): A or B turns the page —
   // on TV this DOM button can't be reached any other way.

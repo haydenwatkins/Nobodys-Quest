@@ -36,7 +36,7 @@
     bellkeeper: ["Final Resonance", "Procession Bell", "Cathedral Clapper", "The Last Bell", "balanced"],
     lanternWisp: ["Guiding Flame", "Festival Wake", "Sunless Lantern", "All Roads Home", "ranged"],
     colossus: ["Continental Will", "Mountain Walk", "Atlas Fist", "Move the Horizon", "tank"],
-    god: ["Merciful Limit", "Creation Spark", "Crown of Every Answer", "Nobody's Answer", "bruiser"],
+    god: ["Merciful Limit", "Creation Spark", "Crown of Every Answer", "Patchling's Answer", "bruiser"],
   };
   const colors = ["#f4f4f4", "#a7f070", "#94b0c2", "#ffcd75", "#d9a7ff", "#73eff7", "#ef7d57", "#41a6f6"];
   const damageTypes = ["blunt", "sharp", "sharp", "light", "dark", "blunt", "dark", "light"];
@@ -156,7 +156,7 @@
     bellkeeper: [["The Bell Without Wind","shattercoast",8,15,"hold","A barnacled bell rings only when the sea is silent."],["The Buried Procession","frostbellTundra",23,8,"sequence","Frozen footprints circle a bell beneath the snow."],["The Last Resonance","stormspinePeaks",36,18,"champion","The storm repeats one final note from beyond the peak."]],
     lanternWisp: [["The Light Under Snow","frostbellTundra",8,14,"waypoints","A warm path glows beneath the western snowfield."],["The Unlit Road","stormspinePeaks",23,8,"mixed","Three empty lanterns mark a road the storm cannot see."],["All Roads' Hearth","titanGrave",36,18,"champion","Every lost lantern points toward one small fire under the titan."]],
     colossus: [["The Mirrored Footprint","glasswaterDesert",8,14,"hold","A footprint large as a pond fills with reflected mountains."],["The Kneeling Peak","stormspinePeaks",36,17,"native","One peak has lowered itself as if waiting for a command."],["Atlas Heart","titanGrave",23,9,"champion","At the grave's center, the world takes one slow breath."]],
-    god: [["The Smallest Prayer","titanGrave",8,14,"sequence","A prayer too small for any god waits beside the ancient road."],["The Answerless Star","starfallRuins",23,9,"mixed","The eastern star asks a question no prophecy prepared for."],["Nobody's Horizon","overworld",60,36,"champion","Return to the crossroads where the world first chose the wrong name."]],
+    god: [["The Smallest Prayer","titanGrave",8,14,"sequence","A prayer too small for any god waits beside the ancient road."],["The Answerless Star","starfallRuins",23,9,"mixed","The eastern star asks a question no prophecy prepared for."],["Patchling's Horizon","overworld",60,36,"champion","Return to the crossroads where the first stitch opened a road."]],
   };
 
   const challengeCopy = {

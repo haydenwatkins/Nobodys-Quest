@@ -1,14 +1,14 @@
 /* ============================================================
-   NOBODY — the form you start as. A little blank someone.
+   PATCHLING — a mended canvas traveller. The legacy save ID stays nobody.
    ============================================================ */
 
 "use strict";
 
 registerForm({
   id: "nobody",
-  name: "Nobody",
+  name: "Patchling",
   icon: "👤",
-  tagline: "A little blank someone with a big future.",
+  tagline: "A little canvas traveller, stitched from old maps and new hopes.",
   start: true,                 // the only form that starts unlocked
 
   speed: 80,

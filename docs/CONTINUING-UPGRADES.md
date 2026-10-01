@@ -17,6 +17,10 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Original traveller and opening identity (September 30)
+
+The protagonist is now Patchling, a living canvas traveller stitched from an old map, with a folded hood, seams, copper map patch, repaired teal coat and mint scarf. The opening, chapter scenes, recap, ending, NPC references and save labels now follow forgotten roads being mended through shared talents. The existing `nobody` ID, chapter IDs/numbers, quests, cosmetics, save keys and mechanics remain unchanged. All 391 tests pass. Chrome at 667x375 showed Patchling's actual opening sprite, name and matching dialogue portrait without horizontal overflow. Default and signature pose sheets were inspected; physical hardware and ordinary campaign balance remain outstanding. Continue the remaining form/guardian art, then environments and NPCs; this is a first originality pass, not a publishing clearance or complete cosmetic review.
+
 ### Cute armored pair (September 30)
 
 Knight and Eclipse Knight now have rounded armor proportions, clear lit helmet eyes, soft capes, attached shield grips and consistent sword length through the strike. Knight retains all 48 directional frames; Orchard guards share his sprite. Eclipse retains his violet identity, curved moon horns and crescent shield. Footprints, native Slash performance, guard behavior, wards and boss hazards are unchanged. The full suite passed 389 tests; targeted tests passed again after final sword/horn geometry refinements. Enlarged directional sheets and Chrome's real Ember Ridge introduction at 667x375 were inspected without horizontal overflow. These dialogue-paused scenes do not establish ordinary combat balance or physical hardware performance.

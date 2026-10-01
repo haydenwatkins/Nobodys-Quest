@@ -142,7 +142,7 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     }
     if (G.state.expeditionRun && G.failManyfoldExpedition) {
       G.events.emit("ko", Object.assign({ expedition: true }, knockoutSource));
-      G.failManyfoldExpedition("Nobody was carried home from the shifting path.");
+      G.failManyfoldExpedition("Patchling was carried home from the shifting path.");
       return true;
     }
     G.sfx.play("ko");
