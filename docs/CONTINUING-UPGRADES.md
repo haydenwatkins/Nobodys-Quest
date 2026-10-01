@@ -17,6 +17,10 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Hearthdrake and the Wayglass Court (October 1)
+
+Dragon and Riftblade now have original Hearthdrake/Wayglass Duelist identities and 48 directional poses. Mira, Wayglass Keeper, has a visible face, woven hood, copper-bound braid and articulated knife gesture. The renamed court/sigil retains its IDs, routes, reward and three-phase returning-blade rhythm; all footprints, passives and native cast rules remain. All 395 tests passed; focused art/portrait/opening checks pass after fixing Errata incorrectly receiving a Rat portrait. Full default/signature pose sheets and Chrome at 667x375 court/introduction and field scenes were inspected without horizontal overflow. Dialogue-paused visual checks do not establish ordinary fight balance or physical-device performance. Next: Mole with its regional guardian, then Vampire with its guardian, in art-ledger order.
+
 ### Copperwick Brewer and Cloudcap Conductor (September 30)
 
 Alchemist and Stormcaller now have original visible calling identities and 48 directional frames: a friendly field brewer with forehead goggles/apron/satchel and a cloud-capped weather keeper with a soft mantle/brass cuffs. Existing footprints, immediate casts, passives, ability/save IDs and unlocks remain unchanged. The landscape identity panel accommodates their longer names. All 393 tests pass, with targeted art/opening checks passing after the final HUD adjustment. Full default/signature sheets and live Chrome at 667x375 were inspected; a real flask cast rendered successfully. Physical hardware and ordinary encounter balance remain outstanding. Next: Dragon, then Riftblade with its regional guardian, continuing the full art ledger before environment/NPC and playthrough work.

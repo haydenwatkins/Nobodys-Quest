@@ -8,9 +8,9 @@
 
 registerForm({
   id: "riftblade",
-  name: "Riftblade",
+  name: "Wayglass Duelist",
   icon: "🌀",
-  tagline: "Throw the horizon, chase it down, and cut your way back out.",
+  tagline: "A nimble roadkeeper whose glass blades remember every shortcut home.",
 
   speed: 110,
   hearts: 5,
@@ -26,8 +26,8 @@ registerForm({
 
   // The Riftblade Adept drops this sigil. The boss demonstrates the form's
   // dash-and-return rhythm before the player is allowed to equip it.
-  unlock: { type: "challenge", hint: "Defeat the Adept and learn a mighty form", requirements: [
-    { type: "item", item: "riftblade-sigil", hint: "Win the Riftblade Sigil" },
+  unlock: { type: "challenge", hint: "Defeat Mira and learn a mighty form", requirements: [
+    { type: "item", item: "riftblade-sigil", hint: "Win the Wayglass Sigil" },
     { type: "formLevel", form: "dragon", level: 2 },
   ] },
 

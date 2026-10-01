@@ -38,6 +38,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Hearthdrake and the Wayglass Court (October 1)
+
+Hearthdrake has copper-red scales, a rounded muzzle, short ivory horns, distinct membranous wings, four feet and a tapered tail. Its 48 directional frames distinguish belly plates from back scales. Wayglass Duelist has a visible face, rounded travel cap, folded scarf and paired glass knives; Mira, Wayglass Keeper has a woven hood, copper-bound braid and larger knives. Their 28x19, 19x19 and 25x24 world footprints, native cast timing, three-cut rhythm, ward, returning blades, arena routes and rewards remain unchanged. Visible names, sigil and court text follow the original roadkeeper identities; internal IDs remain stable.
+
+The full 395-test suite passed, including all guardian phases and returning-blade recovery. A live portrait check then revealed Errata matching RAT inside her name; exact leading-name matching fixes it, and the four focused art/portrait/opening checks pass afterward. Default and signature 48-pose sheets and all four Mira indices were inspected. Chrome at 667x375 rendered Hearthdrake and Mira's real court introduction, then the Duelist at Lantern Reach, with no horizontal overflow. Dialogue paused the combat checks; this does not establish ordinary fight balance or physical-device performance. Existing cosmetic accessories remain for later review.
+
 ### Copperwick Brewer and Cloudcap Conductor
 
 Both now have 48 directional idle/walk/cast/guard frames. Brewer has forehead goggles that leave the face visible, a copper apron pocket, herb satchel and a glass flask held by an attached hand. Conductor has a cloud-soft cap, warm face, violet mantle, brass cuffs and an illuminated casting gesture. Their existing 18x18 and 19x19 world footprints, ability IDs, passive rules and immediate cast behavior remain unchanged. The field identity panel now makes room for longer calling names while preserving the level and space beside boss/story guidance.
@@ -62,8 +68,8 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Frog | Shipped September 30: sculpted cheeks/body, eyes, feet and tongue |
 | Alchemist / Copperwick Brewer | Shipped September 30: forehead goggles, warm face, field apron, herb satchel and articulated glass flask |
 | Stormcaller / Cloudcap Conductor | Shipped September 30: soft cloud cap, warm face, violet mantle, brass cuffs and directional casting |
-| Dragon | Pending: cute strong muzzle, coherent wings/feet/tail |
-| Riftblade | Pending: readable face, less angular coat, paired blades |
+| Dragon / Hearthdrake | Shipped October 1: rounded muzzle, horns, four feet, wings, tapered tail and directional scale/belly detail |
+| Riftblade / Wayglass Duelist | Shipped October 1: visible face, travel cap, folded scarf and paired glass knives in all directions |
 | Mole | Pending: rounded fur, separate paws and digging intent |
 | Vampire | Pending: charming face, coherent cape/arms in all directions |
 | Jester | Pending: expressive face, soft fabric and playful gestures |
@@ -84,7 +90,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Ancient Treant | Shipped September 30, registry and Orchard variants |
 | Mire Queen | Shipped September 30: regal jade frog, crown/petal collar, feet and tongue |
 | Eclipse Knight | Shipped September 30: violet armor, moon horns, crescent shield |
-| Riftblade Adept | Pending: approachable masked duelist, coherent throwing pose |
+| Riftblade Adept / Mira, Wayglass Keeper | Shipped October 1: visible face, woven hood, braid, soft mantle and articulated knife gesture |
 | Mole Monarch | Pending: cute royal mole, clear digging paws |
 | Countess Carmine | Pending: charming countess, shaped cape and casting arms |
 | Royal Fool | Pending: playful expressive face, natural pie/card poses |

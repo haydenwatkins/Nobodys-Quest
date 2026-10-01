@@ -113,7 +113,7 @@ test('Dragon preparation teaches earned parent arts without introducing another 
   const goal = G.storyGoal();
   assert.equal(goal.guide, 'mastery');
   assert.equal(goal.formId, 'frog');
-  assert.match(goal.short, /Dragon/);
+  assert.match(goal.short, /Hearthdrake/);
   assert.ok(G.masteryLessons(Infinity).some(entry => entry.quest.id === goal.questId));
   assert.ok(!G.guidanceTarget().text.includes('Tail Sweep'));
   G.state.stars = 24;

@@ -645,7 +645,7 @@ registerAbility({
 
 registerAbility({
   id: "riftRush",
-  description: "Dash through enemies with Dark damage. As Riftblade, land with a crowd-shoving afterimage.",
+  description: "Dash through enemies with Dark damage. As Wayglass Duelist, land with a crowd-shoving afterimage.",
   name: "Rift Rush",
   icon: "💫",
   type: "dark",

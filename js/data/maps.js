@@ -124,7 +124,7 @@ registerMap({
 
 registerMap({
   id: "riftbladeTrial",
-  name: "Riftblade Trial",
+  name: "Wayglass Court",
   visualTheme: "riftblade",
   playerStart: { x: 2, y: 8 },
   bossTrial: { exit: { map: "overworld", x: 118, y: 18 }, delay: 1.5 },
@@ -132,7 +132,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 18 } },
     "B": { tile: "floor", enemy: "riftbladeAdept" },
-    "m": { tile: "floor", message: "Sharp attacks break the Adept's ward. Step off the marked throws and wait for the blades to return, then close in during the pause." },
+    "m": { tile: "floor", message: "Sharp attacks break Mira's ward. Step off the marked throws and wait for the blades to return, then close in during the pause." },
     "H": { tile: "floor", chest: { heal: true, name: "a perfectly folded star-cookie" } },
     "R": { tile: "rock", on: "floor" },
   },

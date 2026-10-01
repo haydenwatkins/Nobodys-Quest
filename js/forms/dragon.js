@@ -6,9 +6,9 @@
 
 registerForm({
   id: "dragon",
-  name: "Dragon",
+  name: "Hearthdrake",
   icon: "🐉",
-  tagline: "All wings, horns, sweeping tail, and responsibly rationed fire.",
+  tagline: "A sturdy hearth dragon who warms waystations and keeps a little fire for the road.",
 
   speed: 65,
   hearts: 7,

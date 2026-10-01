@@ -10,6 +10,8 @@ The protagonist is now **Patchling**, a living traveller stitched from an old ro
 
 The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satchel, a field apron and a luminous glass flask; this calling tends the road lamps and gathers their fuel. The **Cloudcap Conductor** guides wandering weather with brass cuffs, a cloud-soft felt cap and a violet mantle. Both have visible warm faces and deliberate directional gestures. Their legacy `alchemist`/`stormcaller` IDs remain stable.
 
+**Hearthdrake** warms waystations: copper-red scales, a rounded muzzle, short ivory horns, readable membranous wings and four small feet. The **Wayglass Duelist** carries glass knives, a rounded travel cap and folded scarf; the blades remember shortcuts home. **Mira, Wayglass Keeper**, guards the Wayglass Court in a woven hood with a copper-bound braid and larger paired knives. Her calling and trial retain `riftblade`, `riftbladeAdept`, `riftbladeTrial` and `riftblade-sigil` internally. The court's routes, ward, returning-blade rhythm and rewards remain unchanged.
+
 ## Next original-identity work
 
 1. Patchling's first identity pass is complete. Keep the living-map premise coherent as other calling identities, character art, cosmetics, environments and NPCs are reviewed. Do not treat the current signature skins or all late dialogue as a completed originality review.

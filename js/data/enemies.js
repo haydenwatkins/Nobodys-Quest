@@ -585,7 +585,7 @@ registerEnemy({
 
 registerEnemy({
   id: "riftbladeAdept",
-  name: "Riftblade Adept",
+  name: "Mira, Wayglass Keeper",
   hp: 52, speed: 56, damage: 2,
   behavior: "chase", aggro: 170,
   size: 18, heavy: true, miniboss: true,
@@ -597,19 +597,19 @@ registerEnemy({
     telegraph: 0.48, chargeSpeed: 175, chargeDur: 0.34,
     antiKiteRange: 104, chaseScale: 1.34,
     introLines: [
-      "The blade always returns. My library books do not.",
+      "My blades remember every shortcut. They also remember the long way home.",
       "Step off the marked throws. Wait for the blades to return, then make your point.",
       "Three beats, one opening. Tap an ability when you are ready.",
     ],
     phaseLine: "Better. Now follow three blades and one terrible metaphor.",
     phaseThreeLine: "Final lesson: every blade comes home. Try not to be there.",
     knockoutLine: "The rhythm broke. Catch your breath and begin again.",
-    defeatLine: "The rhythm is yours. Please return it by Tuesday.",
+    defeatLine: "You found a new route. Keep the sigil; I will keep the roads.",
     rematchLine: "Again? Good. The blade was getting bored.",
   },
   trophy: "riftblade-sigil",
-  trophyName: "Riftblade Sigil",
-  location: "Riftblade Trial",
+  trophyName: "Wayglass Sigil",
+  location: "Wayglass Court",
   sprite: {
     palette: {
       k: "#1a1c2c", v: "#3b2f73", p: "#8153c1", c: "#73eff7",
