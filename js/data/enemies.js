@@ -659,7 +659,7 @@ registerEnemy({
 
 /* ---- FORM TRIAL BOSSES — each teaches the form it guards ---- */
 registerEnemy({
-  id: "moleMonarch", name: "Mole Monarch",
+  id: "moleMonarch", name: "Bram, Tunnelwarden",
   hp: 56, speed: 52, damage: 2, behavior: "chase", aggro: 175,
   size: 19, heavy: true, miniboss: true,
   ward: { types: ["blunt"], hp: 6 },
@@ -671,17 +671,17 @@ registerEnemy({
     patterns: ["burrow", "royalStomp"],
     intro: "THIS WAS A PRIVATE TUNNEL",
     introLines: [
-      "You tracked mud into my private tunnel.",
-      "I respect the technique. I object to the visitor.",
+      "These roots hold up the oldest roads. I keep the tunnels underneath them tidy.",
+      "You tracked mud in. An impressive amount for someone your size.",
       "When I surface, get outside the cracked circle. Then answer loudly while I find my crown.",
     ],
     phaseLine: "Fine. I am filing a noise complaint from below!",
     phaseThreeLine: "Royal decree: the entire floor is now a tunnel!",
     knockoutLine: "Back to the surface with you. My tunnel, my rules.",
-    defeatLine: "Take the crown. It was terrible for digging anyway.",
+    defeatLine: "Take the root crown. Listen to the soil; it remembers where everyone was going.",
     rematchLine: "The surface person is back. Everybody look busy.",
   },
-  trophy: "mole-crown", trophyName: "Mole Crown", location: "The Royal Burrow",
+  trophy: "mole-crown", trophyName: "Copper Root Crown", location: "The Royal Burrow",
   sprite: {
     palette: { k: "#1a1c2c", b: "#6b4a2b", t: "#8a6538", s: "#d8b06a", y: "#ffcd75", w: "#f4f4f4", p: "#ef7d57" },
     frames: [[

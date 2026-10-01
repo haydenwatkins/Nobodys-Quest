@@ -743,7 +743,7 @@ registerAbility({
 registerAbility({
   id: "faultLine",
   name: "Fault Line",
-  description: "A piercing ground fracture briefly stuns each foe it crosses, then bursts at its end. Mole adds a delayed aftershock.",
+  description: "A piercing ground fracture briefly stuns each foe it crosses, then bursts at its end. Tunneltuft adds a delayed aftershock.",
   icon: "〰️",
   type: "blunt",
   style: "area",

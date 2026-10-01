@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Tunneltuft and Bram, Tunnelwarden (October 1)
+
+Tunneltuft has rounded soft fur, a warm muzzle, fitted headlamp band, small neckerchief and articulated digging paws in 48 directional poses. Bram wears a copper root crown attached to its band and a work bib, with broader attached paws and a clear face. Their 19x15 and 26x21 footprints, internal IDs, native cast timing, third-tap eruption, Burrow Blitz, Aftershock, wards and boss warnings remain unchanged. Visible names and Copper Root Crown now describe keepers of the roads beneath the roots.
+
+Default/signature directional sheets and all four Bram indices were inspected. All 399 checks pass across the full run and the focused rerun of an updated dialogue assertion, including the real-input three-tap rhythm, immediate damage, stun, appearance compatibility and existing boss escape/recovery tests. Chrome at 667x375 rendered both in The Royal Burrow, with no horizontal overflow; the first local load missed a legends script, and a reload rendered successfully. These dialogue-paused browser checks do not establish ordinary encounter balance or physical-device performance. Continue Vampire with its regional guardian next.
+
 ### Hearthdrake and the Wayglass Court (October 1)
 
 Hearthdrake has copper-red scales, a rounded muzzle, short ivory horns, distinct membranous wings, four feet and a tapered tail. Its 48 directional frames distinguish belly plates from back scales. Wayglass Duelist has a visible face, rounded travel cap, folded scarf and paired glass knives; Mira, Wayglass Keeper has a woven hood, copper-bound braid and larger knives. Their 28x19, 19x19 and 25x24 world footprints, native cast timing, three-cut rhythm, ward, returning blades, arena routes and rewards remain unchanged. Visible names, sigil and court text follow the original roadkeeper identities; internal IDs remain stable.
@@ -72,7 +78,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Stormcaller / Cloudcap Conductor | Shipped September 30: soft cloud cap, warm face, violet mantle, brass cuffs and directional casting |
 | Dragon / Hearthdrake | Shipped October 1: rounded muzzle, horns, four feet, wings, tapered tail and directional scale/belly detail |
 | Riftblade / Wayglass Duelist | Shipped October 1: visible face, travel cap, folded scarf and paired glass knives in all directions |
-| Mole | Pending: rounded fur, separate paws and digging intent |
+| Mole / Tunneltuft | Shipped October 1: soft fur, warm muzzle, fitted headlamp and 48 directional digging poses |
 | Vampire | Pending: charming face, coherent cape/arms in all directions |
 | Jester | Pending: expressive face, soft fabric and playful gestures |
 | Turtle | Pending: sculpted shell/feet/head, defensive poses |
@@ -93,7 +99,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Mire Queen | Shipped September 30: regal jade frog, crown/petal collar, feet and tongue |
 | Eclipse Knight | Shipped September 30: violet armor, moon horns, crescent shield |
 | Riftblade Adept / Mira, Wayglass Keeper | Shipped October 1: visible face, woven hood, braid, soft mantle and articulated knife gesture |
-| Mole Monarch | Pending: cute royal mole, clear digging paws |
+| Mole Monarch / Bram, Tunnelwarden | Shipped October 1: warm face, broad digging paws, work bib and fitted copper root crown |
 | Countess Carmine | Pending: charming countess, shaped cape and casting arms |
 | Royal Fool | Pending: playful expressive face, natural pie/card poses |
 | Admiral Tortoise | Pending: proud naval turtle with sculpted shell and limbs |

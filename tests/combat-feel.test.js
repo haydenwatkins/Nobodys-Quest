@@ -600,7 +600,7 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
   G.updateEnemies(0.016);
   assert.equal(G.state.bossCutscene.lines.length, 3);
   G.updateBossCutscene(G.BOSS_CUTSCENE_LINE_SECONDS + 0.01);
-  assert.match(spoken, /respect the technique/i, "boss cutscene should advance through personality lines");
+  assert.equal(spoken, monarch.def.boss.introLines[1], "boss cutscene should advance through personality lines");
   G.state.bossCutscene = null;
 }
 

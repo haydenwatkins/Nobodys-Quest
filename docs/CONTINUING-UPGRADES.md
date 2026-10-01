@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Tunneltuft and Bram's root roads (October 1)
+
+Mole now appears as Tunneltuft, a soft-furred tunnel scout with a fitted headlamp and 48 directional digging poses. Bram, Tunnelwarden, has rounded paws, a clear warm face, a work bib and a copper root crown attached to its band. Their existing footprints, save IDs, three-tap eruption, Burrow Blitz/Aftershock and three-phase warning/recovery rules remain intact. Visible names, unlock text and the Copper Root Crown follow the roadkeeper identity.
+
+Directional default/signature sheets and all four Bram indices were inspected. All 399 checks pass across the full run and the focused rerun of an updated dialogue assertion, including real-input, art compatibility, detached-decoration and boss-warning checks. Chrome at 667x375 rendered both in the real Royal Burrow without horizontal overflow after reloading a missed local script. The scene was dialogue-paused; physical devices and ordinary encounter balance remain untested. Next: Vampire and its regional guardian, then the rest of the character ledger before environments/NPCs and playthrough upgrades.
+
 ### Remove detached character decorations (October 1)
 
 The Orchard reward ribbon was drawn as a loose shape in front of every form. The entire detached cosmetic layer is now removed: reward ribbons/halos/crowns, global dye accessories, signature-skin particles and fixed-position legend-arm ornaments. Appearance choices retain their authored sprite artwork; earned items, unlocks, legend charge/ultimates and reward stats remain intact. Do not reintroduce this category during the art pass; equipment and clothing should belong to the character's authored silhouette.

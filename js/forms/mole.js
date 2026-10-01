@@ -6,9 +6,9 @@
 
 registerForm({
   id: "mole",
-  name: "Mole",
+  name: "Tunneltuft",
   icon: "🐹",
-  tagline: "Treats the battlefield like a floor with a very loose definition.",
+  tagline: "A soft-furred tunnel scout who listens for lost roads beneath the roots.",
 
   speed: 75,
   hearts: 6,
@@ -22,8 +22,8 @@ registerForm({
     { id: "faultLine", level: 2 },
   ],
 
-  unlock: { type: "challenge", hint: "Outdig the Mole Monarch", requirements: [
-    { type: "item", item: "mole-crown", hint: "Win the Mole Crown" },
+  unlock: { type: "challenge", hint: "Outdig Bram, Tunnelwarden", requirements: [
+    { type: "item", item: "mole-crown", hint: "Win the Copper Root Crown" },
     { type: "formLevel", form: "frog", level: 3 },
   ] },
 

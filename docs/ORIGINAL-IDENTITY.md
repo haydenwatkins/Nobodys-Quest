@@ -14,6 +14,8 @@ The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satche
 
 ## Next original-identity work
 
+**Tunneltuft** listens for forgotten roads beneath the roots, wearing a fitted leather headlamp band and green neckerchief. **Bram, Tunnelwarden**, keeps the root-supported roads sound: rounded digging paws, a warm pink muzzle, copper root crown attached to its band, and a work bib. Their visible names and Copper Root Crown follow this role, while `mole`, `moleMonarch`, `mole-crown`, lessons and combat rules retain their existing identities.
+
 1. Patchling's first identity pass is complete. Keep the living-map premise coherent as other calling identities, character art, cosmetics, environments and NPCs are reviewed. Do not treat the current signature skins or all late dialogue as a completed originality review.
 2. Give each remaining calling a distinct material and role rather than reproducing another game's class cast. Review recent Rat/Knight/Frog and guardian work under this requirement too; refine when there is a concrete overlap or weak identity, not just to repeat a passing batch.
 3. Complete all form and boss art before environmental work. Then inventory every region, terrain set, vegetation, structures, props, landmarks and readable interaction cues. Preserve routes, collision, boss warnings and visual hierarchy.
