@@ -2,15 +2,15 @@
 
 October 1, 2026. The fresh character pass covers all 24 forms and 19 boss definitions. This ledger starts the separate environment pass across all 40 runtime maps; NPC world sprites and portraits follow before campaign/playthrough work. Original living-road identity, cute detailed pixel art, readable routes/interaction cues and preserved saves remain required. Shared materials do not count as a completed region review.
 
-First bounded batch: Orchard Road/Heartwood foliage and ground. Layered authored half-world-pixel leaf clusters, bark grain, grown roots, detailed apples, broad grass patches, herbs, gravel and wet shore edges replace flat vector canopies and uniform ground. Canopies fade around nearby characters, including NPCs; reduced motion uses a still frame. Geometry, collision, routes, gates, interactions and rewards stay unchanged. Structural/interactive props and arena edges remain pending in both regions.
+Completed first environments: **Orchard Road and Heartwood (2/40 maps)**. Layered pixel canopies, bark grain, grown roots, apples, broad grass patches, herbs, gravel and wet shore edges now accompany patched-canvas carts, timber/plaster mill and eight-pose waterwheel, copper bell station, rooted arches, sluice, stone culvert, root barrier, bridge boards, notices, camps, fences, stumps, memory stones and the practice target. Interactive states remain recognizable; the wheel moves only with flowing water, and reduced motion holds still frames. Canopies fade near travellers and NPCs. Collision, routes, gates, interactions and rewards are unchanged. Guardian ground fields remain readable gameplay warnings.
 
-Validation: all 427 regression checks pass, including native opening gates/rewards/save compatibility, delivery routes/refuge and canopy visibility/state preservation. All foliage frames were inspected in both pixel settings at gameplay size and enlarged. Real-renderer arrival/mill/glade frames and save-disabled Chrome scenery fixtures at 667x375 were inspected. These fixtures hold simulation for visual review; they do not establish ordinary playthrough balance or physical-device performance.
+Validation: all 428 regression checks pass, including actual culvert interaction, sluice/wheel state and reduced motion, opening saves/rewards, delivery routes/refuge and canopy visibility/state preservation. Every authored foliage and prop frame was inspected in both pixel settings at gameplay size and enlarged; native arrival/cart/culvert/mill/bell/glade renders and save-disabled Chrome landscape fixtures at 667x375 were reviewed. Fixtures hold simulation for visual review; physical devices and ordinary playthrough balance remain untested. NPC sprites and portraits are a later phase.
 
 ## Direction and omissions
 
 Ground should remain quieter than characters and hazard tells. Use clustered leaves, sculpted wood/stone, worn route materials and deliberate regional landmarks. Preserve interaction recognition, doors/returns, landmark positions and warning hierarchy. Review every terrain family, structure, vegetation, prop, interior, trial and Worldback; runtime terrain inventory below supplements rather than replaces inspection of renderer-specific landmarks and procedural details.
 
-Next: finish Orchard Road/Heartwood's cart, mill/wheel, sluice, bell, arch, notice, camp, fences, stumps and memory stones; then Lantern Reach/Toll Bridge/Sunrise Quay. Continue Greenfield/town/house and early campaign regions, form courts, Worldbearer regions/Worldbacks, final arena and repeatable arenas. Complete all environmental regions before NPC sprites/portraits. Existing guardian fields and ground marks remain gameplay warnings rather than decorative art.
+Next: Lantern Reach/Toll Bridge/Sunrise Quay, including terrain, river vegetation, lamps/gates, working boats and town structures. Continue Greenfield/town/house and early campaign regions, form courts, Worldbearer regions/Worldbacks, final arena and repeatable arenas. Complete all environmental regions before NPC sprites/portraits. Existing guardian fields and ground marks remain gameplay warnings rather than decorative art.
 
 ## Runtime map coverage
 
@@ -51,8 +51,8 @@ Next: finish Orchard Road/Heartwood's cart, mill/wheel, sluice, bell, arch, noti
 | The Walking Belfry (bellWorldback) | bellkeeper | floor, rock | renderer landmarks / shared props | Pending |
 | The Storm Lantern (lanternWorldback) | lantern | floor, rock | renderer landmarks / shared props | Pending |
 | The Heart Under Stone (colossusWorldback) | colossus | floor, rock | renderer landmarks / shared props | Pending |
-| Greenfield · Orchard Road (orchardRoad) | mistwood | path, grass | sign, cart, banner, mill, sluice, bell, camp, arch, stump, apple, fence, stone | Partial: foliage/ground; structures and props pending |
-| Mistwood · The Heartwood (heartwood) | mistwood | path, grass | arch, stone, stump | Partial: foliage/ground; structures and props pending |
+| Greenfield · Orchard Road (orchardRoad) | mistwood | path, grass | sign, cart, banner, mill, sluice, bell, camp, arch, stump, apple, fence, stone | Complete: foliage, ground, structures/props |
+| Mistwood · The Heartwood (heartwood) | mistwood | path, grass | arch, stone, stump | Complete: foliage, ground, structures/props |
 | The Lantern Reach (lanternReach) | sunkenMarsh | path, grass | cart, lantern, camp, rainGate, milepost, willow, reed, wreck, drain, satchel | Pending |
 | The Old Toll Bridge (tollCourt) | sunkenMarsh | path, grass | tollArch, lantern, ledger, reed | Pending |
 | Sunrise Town · The Quay (sunriseQuay) | overworld | path, grass | bakery, letterHouse, birthdayHouse, cart, well, camp, lantern, bunting, willow, apple, flowerbed, bench, fence, reed, boat | Pending |

@@ -12,3 +12,12 @@ test('authored Orchard canopies keep characters visible, respect reduced motion,
   assert.equal(JSON.stringify(G.state.grid),grid);assert.equal(JSON.stringify([p.x,p.y,n.x,n.y]),position);
   r.load('heartwood');r.drain();G.drawOpeningProp(ctx,'apple',x,y,6);assert.equal(draws.pop().sprite,G.openingScenery.heartwood);
 });
+
+test('the authored mill and gates follow the real culvert interaction without changing saved route geometry',()=>{
+  const r=runtime(),{G}=r;r.load('orchardRoad');r.drain();G.state.opening.cart=true;G.state.formId='rat';G.state.claimedForms.push('rat');const P=G.openingScenery.props,draws=[],ctx=new Proxy({},{get:()=>()=>{},set:()=>true});G.drawSprite=(c,s,f)=>draws.push({sprite:s,frame:f});
+  G.drawOpeningProp(ctx,'mill',624,352,2);assert.equal(draws.pop().frame,0);G.drawOpeningProp(ctx,'sluice',544,384,2);assert.equal(draws.pop().sprite,P.sluiceClosed);G.drawOpeningProp(ctx,'arch',872,72,2);assert.equal(draws.pop().sprite,P.archClosed);
+  Object.assign(G.state.player,{x:27*16+8,y:24*16+8});assert.equal(G.openingInteractionCandidate().id,'culvert');G.tryOpeningInteraction();r.drain();assert.equal(G.state.opening.sluice,true);
+  const grid=JSON.stringify(G.state.grid);G.drawOpeningProp(ctx,'sluice',544,384,2);assert.equal(draws.pop().sprite,P.sluiceOpen);G.drawOpeningProp(ctx,'mill',624,352,2);const wheel=draws.pop();assert.equal(wheel.sprite,P.wheel);assert.ok(wheel.frame>0);
+  G.reducedMotion=true;G.drawOpeningProp(ctx,'mill',624,352,2);assert.equal(draws.pop().frame,0);assert.equal(JSON.stringify(G.state.grid),grid);
+  for(const hd of [true,false]){G.hdPilot=hd;for(const sprite of Object.values(P)){const s=G.activeSpriteDefinition(sprite);for(const frame of s.frames)for(const row of frame)for(const p of row)assert.ok(p==='.'||s.palette[p]);}}
+});

@@ -78,6 +78,18 @@
   }
   function prop(c,kind,x,y,time,skipDelivery=false){
     if(!skipDelivery&&G.drawDeliveryProp&&G.drawDeliveryProp(c,kind,x,y,time))return;
+    const props=freshOrchard()&&G.openingScenery&&G.openingScenery.props;
+    if(props){
+      if(kind==='mill'){G.drawSprite(c,props.mill,0,x-2,y+4,false);const f=G.state.opening.sluice&&!G.reducedMotion?Math.floor(time*.65/(Math.PI/8))%8:0;G.drawSprite(c,props.wheel,f,x+30,y+11,false);return;}
+      let id=kind,frame=0,ox=0,oy=3;
+      if(kind==='arch')id=G.state.mapId==='heartwood'||G.state.opening.bell?'archOpen':'archClosed';
+      if(kind==='sluice'){id=G.state.opening.sluice?'sluiceOpen':'sluiceClosed';oy=4;}
+      if(kind==='cart'){ox=4;oy=7;}if(kind==='banner'){ox=7;oy=2;}if(kind==='sign')oy=2;
+      if(kind==='camp'){oy=4;frame=G.reducedMotion?0:Math.floor(time*4)%4;}
+      if(kind==='stump')oy=4;if(kind==='fence')ox=1;
+      if(kind==='bell'&&!G.reducedMotion&&(G.state.openingBellT||0)>0)frame=Math.sin(time*10)>.25?1:Math.sin(time*10)<-.25?3:0;
+      if(props[id]){G.drawSprite(c,props[id],frame,x+ox,y+oy,false);return;}
+    }
     if(kind==='apple'){tree(c,x,y,x+y,true);return;}
     if(kind==='cart'){
       ellipse(c,x,y+3,23,6,'rgba(26,36,35,.3)');
@@ -149,8 +161,9 @@
   G.drawOpeningGround=(c,cam,time)=>{
     if(!here())return;
     if(G.state.mapId==='orchardRoad'){
-      if(G.state.opening.sluice){for(let x=27*16;x<=35*16;x+=6){rect(c,x,24*16,5,15,C.wood);rect(c,x,24*16,5,1,C.gold);} }
-      else {const x=30*16,y=24*16;for(let i=0;i<4;i++){poly(c,[[x-24,y+13],[x+i*9,y-17],[x+13+i*9,y+14]],C.woodDark);}ellipse(c,27*16+16,24*16+6,7,8,C.ink);}
+      const props=G.openingScenery&&G.openingScenery.props;
+      if(G.state.opening.sluice){for(let x=27*16;x<=35*16;x+=6){if(props)G.drawSprite(c,props.bridgePlank,0,x+3,24*16+16,false);else{rect(c,x,24*16,5,15,C.wood);rect(c,x,24*16,5,1,C.gold);}}}
+      else {const x=30*16,y=24*16;if(props){G.drawSprite(c,props.rootGate,0,x+8,y+14,false);G.drawSprite(c,props.culvert,0,27*16+16,y+14,false);}else{for(let i=0;i<4;i++){poly(c,[[x-24,y+13],[x+i*9,y-17],[x+13+i*9,y+14]],C.woodDark);}ellipse(c,27*16+16,24*16+6,7,8,C.ink);}}
       // Dam apron, millrace foam, and a sunlit scattering of fallen apples.
       for(let i=0;i<15;i++){const x=35*16+rand(i,14)*110,y=27*16+rand(i,71)*55;if(G.world.cellAt(x,y).tile==='water')rect(c,x,y,4,1,'#a0c1ac');}
     }else if(G.state.mapId==='heartwood'){
@@ -174,7 +187,7 @@
       list.push({y:py,fn:()=>{c.save();if(Math.abs(s.player.x-px)<24&&s.player.y<py&&s.player.y>py-43)c.globalAlpha=.32;tree(c,px,py,x+y,false);c.restore();}});
     }
     const dummy=s.enemies.find(e=>e.def.practice);
-    if(dummy)list.push({y:dummy.y,fn:()=>{const x=dummy.x,y=dummy.y;rect(c,x-2,y-23,4,24,C.wood);rect(c,x-13,y-18,26,3,C.woodDark);ellipse(c,x,y-20,7,8,C.woodDark);ellipse(c,x,y-21,6,6,C.gold);rect(c,x-4,y-23,2,2,C.woodDark);rect(c,x+2,y-23,2,2,C.woodDark);rect(c,x-2,y-19,5,1,C.woodDark);}});
+    if(dummy)list.push({y:dummy.y,fn:()=>{const x=dummy.x,y=dummy.y;if(freshOrchard()&&G.openingScenery?.props){G.drawSprite(c,G.openingScenery.props.practice,0,x,y+3,false);return;}rect(c,x-2,y-23,4,24,C.wood);rect(c,x-13,y-18,26,3,C.woodDark);ellipse(c,x,y-20,7,8,C.woodDark);ellipse(c,x,y-21,6,6,C.gold);rect(c,x-4,y-23,2,2,C.woodDark);rect(c,x+2,y-23,2,2,C.woodDark);rect(c,x-2,y-19,5,1,C.woodDark);}});
     return list;
   };
   G.drawOpeningAtmosphere=(c,cam)=>{
