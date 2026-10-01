@@ -46,14 +46,15 @@
   G.openingDrawables=c=>{
     const list=oldDraw(c);if(G.state.mapId!==map)return list;
     const at=xy(sign);
-    list.push({y:at.y+3,fn:()=>{
+    list.push({y:at.y-4,fn:()=>{
+      if(G.drawPrairieCourierSign&&G.drawPrairieCourierSign(c,at.x,at.y))return;
       const {x,y}=at;c.save();c.fillStyle="#49352d";c.fillRect(x-2,y-25,4,29);
       c.fillStyle="#5d4236";c.fillRect(x-30,y-29,60,20);c.fillStyle="#efdda1";c.fillRect(x-28,y-27,56,16);
       c.fillStyle="#49352d";c.font="7px monospace";c.textAlign="center";c.fillText("COURIER",x,y-20);c.fillText("CAMP SOUTH",x,y-13);
       c.fillStyle="#da9860";c.beginPath();c.moveTo(x-8,y-7);c.lineTo(x+8,y-7);c.lineTo(x,y+2);c.closePath();c.fill();c.restore();
     }});
     points.forEach((point,i)=>{const {x,y}=xy(point),next=active?.step===i;
-      list.push({y:y+3,fn:()=>{c.save();c.fillStyle="#49352d";c.fillRect(x-1,y-26,3,28);c.fillStyle="#d7b97b";c.fillRect(x,y-26,1,27);
+      list.push({y:y-4,fn:()=>{if(G.drawPrairieCheckpoint&&G.drawPrairieCheckpoint(c,x,y,i,active))return;c.save();c.fillStyle="#49352d";c.fillRect(x-1,y-26,3,28);c.fillStyle="#d7b97b";c.fillRect(x,y-26,1,27);
         c.fillStyle=next?"#fff3c2":active&&i<active.step?"#71b884":"#da9860";c.fillRect(x+2,y-26,13,11);c.fillRect(x+2,y-15,8,3);
         c.fillStyle="#302638";c.font="8px monospace";c.fillText(String(i+1),x+5,y-17);
         if(i===3){c.fillStyle="#76533b";c.fillRect(x-12,y-9,24,7);c.fillStyle="#efdda1";c.fillRect(x-7,y-10,9,3);}

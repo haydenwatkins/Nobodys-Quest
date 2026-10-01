@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawGroveTile && G.drawGroveTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawPrairieTile && G.drawPrairieTile(ctx, cell, x, y, time)) ||
+      (G.drawGroveTile && G.drawGroveTile(ctx, cell, x, y, time)) ||
       (G.drawStarfallTile && G.drawStarfallTile(ctx, cell, x, y, time)) ||
       (G.drawRidgeTile && G.drawRidgeTile(ctx, cell, x, y, time)) ||
       (G.drawMarshTile && G.drawMarshTile(ctx, cell, x, y, time)) ||
@@ -906,7 +907,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawGrovePortal || !G.drawGrovePortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawPrairiePortal || !G.drawPrairiePortal(ctx, cell, x, y)) &&
+        (!G.drawGrovePortal || !G.drawGrovePortal(ctx, cell, x, y)) &&
         (!G.drawStarfallPortal || !G.drawStarfallPortal(ctx, cell, x, y)) &&
         (!G.drawRidgePortal || !G.drawRidgePortal(ctx, cell, x, y)) &&
         (!G.drawMarshPortal || !G.drawMarshPortal(ctx, cell, x, y)) &&
@@ -951,7 +953,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawGroveNotice || !G.drawGroveNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawPrairieNotice || !G.drawPrairieNotice(ctx, cell, x, y)) &&
+        (!G.drawGroveNotice || !G.drawGroveNotice(ctx, cell, x, y)) &&
         (!G.drawStarfallNotice || !G.drawStarfallNotice(ctx, cell, x, y)) &&
         (!G.drawRidgeNotice || !G.drawRidgeNotice(ctx, cell, x, y)) &&
         (!G.drawMarshNotice || !G.drawMarshNotice(ctx, cell, x, y)) &&
@@ -1230,6 +1233,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.prairieScenery && s.mapId === "sunstepPrairie") return;
     if ((G.homeScenery && s.mapId === "playerHouse") || (G.ridgeScenery && s.mapId === "emberRidge") || (G.starfallScenery && s.mapId === "starfallRuins")) return;
     const theme = s.mapDef && s.mapDef.visualTheme;
     const biome = biomePalette();
@@ -1265,6 +1269,7 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawPrairieCache && G.drawPrairieCache(ctx, ch)) return;
     if (G.drawGroveSeedCache && G.drawGroveSeedCache(ctx, ch)) return;
     if (ch.food) {
       if (G.drawGrovePantry && G.drawGrovePantry(ctx, ch, time)) return;
@@ -1532,6 +1537,7 @@ G.world = (() => {
   }
 
   function drawWorldwakeState(ctx, time) {
+    if (G.drawPrairieCamp && G.drawPrairieCamp(ctx, time)) return;
     const s = G.state;
     if (!s.mapDef.worldwake || !G.ensureWorldwake) return;
     const campaign = G.ensureWorldwake();
@@ -1575,6 +1581,7 @@ G.world = (() => {
   // They organize a scene and suggest safety without adding collision to the
   // game's already busy mobile-sized paths.
   function drawFenceRun(ctx, fence) {
+    if (G.drawPrairieFence && G.drawPrairieFence(ctx, fence)) return;
     if (G.drawMarshFence && G.drawMarshFence(ctx, fence)) return;
     if (G.drawTownFence && G.drawTownFence(ctx, fence)) return;
     const T = G.TILE;
@@ -1644,6 +1651,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawPrairiePost && G.drawPrairiePost(ctx, post, awake, near)) return;
     if (G.drawGrovePost && G.drawGrovePost(ctx, post, awake, near)) return;
     if (G.drawStarfallPost && G.drawStarfallPost(ctx, post, awake, near)) return;
     if (G.drawRidgePost && G.drawRidgePost(ctx, post, awake, near)) return;
