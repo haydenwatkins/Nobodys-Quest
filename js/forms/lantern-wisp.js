@@ -2,8 +2,8 @@
 "use strict";
 
 registerForm({
-  id: "lanternWisp", name: "Lantern Wisp", icon: "🏮",
-  tagline: "A brave little light that carries its own safe place through even the worst storm.",
+  id: "lanternWisp", name: "Wickling", icon: "🏮",
+  tagline: "A warm little hearth light who carries a safe place through the mountain storm.",
   speed: 108, hearts: 4, slots: 2,
   passive: { id: "safeLight", name: "Safe Light",
     description: "Area abilities and dash landings leave brief lantern circles that swallow hostile projectiles." },

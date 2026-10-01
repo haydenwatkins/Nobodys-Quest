@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Wickling and Mallow's storm glass (October 1)
+
+At 72% weekly and 29% five-hour usage, Lantern Wisp/Mallow's fresh pass began. Wickling has a warm flame face inside rounded storm glass, bowed copper ribs, hinged shutters and joined handles/feet; Mallow has a broader weathered lantern and warm older flame face. Loose ornamental wisps are absent. Their 48 directional player poses/four guardian indices retain footprints, save IDs, native Wick Lash/light burst, Safe Light, drift, Lantern Mark/Ember and storm refuge/recovery.
+
+All 420 regression checks pass. Default/signature poses and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed actual Wickling and Mallow through a save-disabled local fixture without horizontal overflow or console errors. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 22/24 forms and 16/19 boss definitions. Continue Colossus/Atlas in Titan Grave, then final calling/guardian and Tollkeeper, followed by environments/NPCs before playthrough work.
+
 ### Chimelet and Bongle's warm bells (October 1)
 
 At 71% weekly and 24% five-hour usage, Bellkeeper/Bongle's fresh pass began. Chimelet has rounded hammered bronze, warm eyes/cheeks, joined cast-metal loop/handles, engraved rim and attached swinging clapper; Bongle has older teal metal, a broad bronze lip and a warm face. The old frayed ribbon is absent. Their 72 directional ringing/peal/silence player frames/four guardian indices retain footprints, save IDs, third peal, Resonance, silence, Echo Mark/Clapper and delayed-echo warning/recovery.

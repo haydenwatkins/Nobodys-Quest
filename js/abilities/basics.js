@@ -1235,7 +1235,7 @@ registerAbility({
 
 registerAbility({
   id: "ghostlight", name: "Ghostlight", icon: "🏮", type: "light", style: "area",
-  description: "Release a burst of light. As Lantern Wisp, leave a circle that swallows enemy shots.",
+  description: "Release a burst of light. As Wickling, leave a circle that swallows enemy shots.",
   mana: 4, cooldown: 1.05,
   use(user) {
     G.combat.areaBurst(user, { ability: "ghostlight", range: 39, damage: 2, type: "light",
@@ -1245,7 +1245,7 @@ registerAbility({
 
 registerAbility({
   id: "lanternDrift", name: "Lantern Drift", icon: "💫", type: "light", style: "dash",
-  description: "Dash through enemies and land in a burst of light. As Lantern Wisp, leave a protective circle at your landing.",
+  description: "Dash through enemies and land in a burst of light. As Wickling, leave a protective circle at your landing.",
   mana: 4, cooldown: 1.15,
   use(user) {
     G.combat.dash(user, { ability: "lanternDrift", dist: 72, speed: 330, damage: 1, type: "light", color: "#ffcd75",

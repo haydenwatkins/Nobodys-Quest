@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Wickling and Mallow (October 1)
+
+Lantern Wisp now appears as Wickling, with a warm flame face inside rounded storm glass, bowed copper ribs, hinged shutters and joined handles/feet. Mallow has a broader weathered lantern with a warm older flame face. Loose ornamental wisps are absent. The 48 directional player poses/four guardian indices preserve 19x20/26x26 footprints, stable IDs, native dark Wick Lash/light burst, Safe Light, drift, Lantern Mark/Ember and storm refuge/recovery.
+
+All 420 regression checks pass. Default/signature sheets, all guardian indices and both pixel settings were inspected at gameplay size and enlarged. Native lash/light-circle, drift, Stormspine route/refuge/recovery and Ember checks pass. Chrome at 667x375 displayed actual Wickling and Mallow through a save-disabled local fixture without horizontal overflow or console errors. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 22/24 forms and 16/19 boss definitions. Continue Colossus/Atlas in Titan Grave, then final calling/guardian and Tollkeeper before environments/NPCs.
+
 ### Chimelet and Bongle (October 1)
 
 Bellkeeper now appears as Chimelet: rounded hammered bronze, warm eyes/cheeks, joined cast-metal loop/handles, engraved rim and attached swinging clapper. Bongle has older teal metal, a broad bronze lip and a warm face. The old frayed ribbon is absent. All 72 directional ringing/peal/silence player frames and four guardian indices retain 21x20/27x26 footprints, stable IDs, third peal, Resonance, silence, Echo Mark/Clapper and delayed-echo warning/recovery.
@@ -151,7 +157,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Golem / Cobblekin | Shipped October 1: friendly carved face, moss rooted in stone, separate rounded joints and 48 directional poses |
 | Weaver / Silkstep | Shipped October 1: warm spider face, eight joined legs, fitted woven wrap, held needle and 48 directional poses |
 | Bellkeeper / Chimelet | Shipped October 1: rounded bronze metalwork, warm face, joined loop/handles/clapper and all 72 directional cast poses |
-| Lantern Wisp | Pending: flame expression, clear cage and soft wisps |
+| Lantern Wisp / Wickling | Shipped October 1: warm flame face, rounded storm glass, bowed copper frame, joined handles/feet, hinged shutters and 48 directional poses |
 | Colossus | Pending: powerful friendly anatomy, distinct from Golem |
 | God | Pending: charming original keeper, clear mantle and attached arms; no floating halo |
 
@@ -172,7 +178,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Pillar, Old Mason | Shipped October 1: weathered pale stone, warm carved face, fitted canvas apron, held trowel and grounded casting palms |
 | Tess, Silk Matriarch | Shipped October 1: older ivory spider face, cranberry silk, eight joined legs, fitted wrap, held needle/reel |
 | Bongle, Bell Titan | Shipped October 1: rounded teal metalwork, bronze lip, warm face and joined clapper; source/indices preserved |
-| Mallow, Lantern Keeper | Pending: charming flame/cage guardian, readable casting pose |
+| Mallow, Lantern Keeper | Shipped October 1: warm older flame face, broad weathered lantern and hinged casting shutters; source/indices preserved |
 | Atlas, Last Worldbearer | Pending: strong gentle face and worldheart stone anatomy |
 | God of Every Form | Pending: cute final guardian with regal, coherent gestures |
 | Tollkeeper | Pending: charming clockwork coat/face, clear staff and mechanisms |
