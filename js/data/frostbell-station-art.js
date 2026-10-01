@@ -1,0 +1,10 @@
+/* Frostbell's joined snow roofs and fitted bronze waystation bells. */
+"use strict";
+(()=>{
+ const A=G.authoredPixelArt,S=G.frostbellStations={},pal={k:'#405764',a:'#66818c',b:'#94adb2',c:'#c3d8d3',d:'#e8efdf',i:'#5f6056',j:'#858573',l:'#b3b49a',m:'#ddd9b7',n:'#796744',o:'#b2945f',p:'#dbc58a',q:'#efe0ae'};
+ const build=(id,w,h,fn)=>S[id]=A.compactSprite(A.authored(w,h,pal,fn));
+ build('arch',80,80,(g,v)=>{for(const x of [8,62]){g.poly([[x-3,75],[x-1,19],[x+7,19],[x+10,75]],'k');g.rect(x+1,24,5,45,'i');g.line(x+2,27,x+2,64,'l',1);g.rect(x-4,70,15,7,'a');g.line(x-2,72,x+7,72,'c',1);g.line(x+3,31,x+6,35,'j',1);g.rect(x,48,8,3,'a');}g.poly([[3,24],[7,11],[22,4],[58,4],[73,11],[77,24]],'k');g.poly([[8,19],[12,12],[24,8],[56,8],[68,12],[72,19]],'a');g.line(11,19,68,19,'b',2);g.poly([[7,11],[21,3],[59,3],[73,11],[70,15],[55,11],[23,11],[10,15]],'c');g.line(23,5,57,5,'d',2);g.rect(36,19,8,10,'k');g.line(39,21,39,27,'b',1);g.poly([[35,28],[35,24],[45,24],[45,28]],'n');g.poly([[27,50],[30,35],[35,29],[45,29],[50,35],[53,50]],'n');g.poly([[32,46],[34,36],[38,32],[44,33],[47,37],[49,46]],'o');g.line(36,35,34,44,'q',2);g.rect(25,47,30,7,'n');g.rect(28,48,24,3,'p');g.line(30,49,48,49,'q',1);g.rect(38,54,4,7,'n');g.ellipse(40,61,4,3,'o');g.put(39,59,'p');g.line(8,25,17,31,'a',2);g.line(62,31,71,25,'a',2);g.put(66+v%2,14,'d');});
+ build('echoSlab',32,32,g=>{g.rect(0,0,32,32,'k');g.rect(1,1,30,29,'a');g.line(2,2,29,2,'d',2);g.line(2,27,29,27,'c',2);g.poly([[7,17],[10,9],[16,6],[22,9],[25,17],[20,24],[11,24]],'b');g.line(13,12,19,12,'d',1);g.line(12,16,20,16,'c',1);g.line(14,20,18,20,'m',1);g.line(3,7,3,23,'b',1);g.line(28,7,28,23,'k',1);});
+ G.drawFrostbellArch=(c,x,y)=>{if(G.state.mapId!=='frostbellTundra')return false;c.save();const hidden=a=>a&&Math.abs(a.x-x)<20&&a.y>y-46&&a.y<y-8;if(hidden(G.state.player)||(G.state.npcs||[]).some(hidden))c.globalAlpha*=.35;G.drawSprite(c,S.arch,G.reducedMotion?0:Math.floor(G.state.time*.35)%4,x,y-8,false);c.restore();return true;};
+ G.drawFrostbellEchoSlab=(c,x,y)=>{if(G.state.mapId!=='frostbellTundra')return false;G.drawSprite(c,S.echoSlab,0,x,y+8,false);return true;};
+})();

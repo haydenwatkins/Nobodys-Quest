@@ -36,7 +36,9 @@ Ground should remain quieter than characters and hazard tells. Use clustered lea
 
 Shattercoast now has five distinct teaching-house facades, quiet coast materials, fitted earned keepsakes in its Chronicle and shared pantry/atlas/rail materials. Fourteen assets/all frames/both pixel settings and controlled landscape scenes were inspected. Four focused checks and two final scenery checks pass; all 465 regression checks pass (421 classic and 44 isolated Last Light preview checks). Native routes, actual Chronicle reward, recovery, all five trial entrances and both regional crossings remain intact. The corresponding court interiors remain pending, along with physical hardware and normal combat-balance playthroughs.
 
-Next: Frostbell and the remaining campaign regions, form courts, Worldbearer regions/Worldbacks, final arena and repeatable arenas. Complete all environmental regions before NPC sprites/portraits. Existing guardian fields and ground marks remain gameplay warnings rather than decorative art.
+Frostbell station batch: five joined snow-roofed bell arches and twelve saved Echo slabs are authored. Two assets/all frames/both pixel settings and controlled landscape arch/crossing/native-warning scenes were inspected; seven focused checks pass, all 467 full regression checks pass. The remainder of this environment is still pending, so coverage remains 19/40 complete maps.
+
+Next: finish Frostbell and the remaining campaign regions, form courts, Worldbearer regions/Worldbacks, final arena and repeatable arenas. Complete all environmental regions before NPC sprites/portraits. Existing guardian fields and ground marks remain gameplay warnings rather than decorative art.
 
 ## Runtime map coverage
 
@@ -68,7 +70,7 @@ Next: Frostbell and the remaining campaign regions, form courts, Worldbearer reg
 | Hanging Gardens (hangingGardens) | planted Mason terraces | grass, path, water, rock, tree | arches, flower boxes, raised stone crossings, cache, atlas, caravan, notices, exits, victory bloom | Complete: planted masonry and native Stone-road states |
 | Rootdeep Hollow (rootdeepHollow) | rooted silk chambers | grass, path, tree | six doorways, silk lamps, woven crossings, fungi, cache, atlas, camp, notices, exits, victory bloom | Complete: root craft and native Thread-road states |
 | Glasswater Desert (glasswaterDesert) | fitted prism craft | grass, path, rock | sundial, five meridian stones, six revealed slabs, Lantern gate, cache, atlas, caravan, notice, return | Complete: glass-bearing stone and native alignment/gate states |
-| Frostbell Tundra (frostbellTundra) | frostbell | grass, path | renderer landmarks / shared props | Pending |
+| Frostbell Tundra (frostbellTundra) | snow-roofed bell stations / legacy terrain | grass, path | five joined bell arches, twelve actual earned Echo slabs | Partial: stations/slabs complete; terrain, cache, notices, atlas/camp, restoration details and final region review pending |
 | Stormspine Peaks (stormspinePeaks) | stormspine | grass, path | renderer landmarks / shared props | Pending |
 | Titan Grave (titanGrave) | titan | grass, path | renderer landmarks / shared props | Pending |
 | The Sky Sovereign's Back (griffinWorldback) | griffin | floor, rock | renderer landmarks / shared props | Pending |
