@@ -38,6 +38,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Copperwick Brewer and Cloudcap Conductor
+
+Both now have 48 directional idle/walk/cast/guard frames. Brewer has forehead goggles that leave the face visible, a copper apron pocket, herb satchel and a glass flask held by an attached hand. Conductor has a cloud-soft cap, warm face, violet mantle, brass cuffs and an illuminated casting gesture. Their existing 18x18 and 19x19 world footprints, ability IDs, passive rules and immediate cast behavior remain unchanged. The field identity panel now makes room for longer calling names while preserving the level and space beside boss/story guidance.
+
+All 393 tests pass; after the final HUD width adjustment, focused art and opening progression tests pass again. Default and signature full-pose sheets were inspected. Chrome at 667x375 rendered both real Lantern Reach appearances; an actual keyboard flask cast produced the flask and recovery indicator. No horizontal overflow appeared. These are desktop-browser checks, not physical-device or ordinary encounter-balance evidence. Existing skin accessory treatments remain for the cosmetic review.
+
 ### Patchling: an original protagonist
 
 The starting traveller now has a folded canvas hood with stitching, a copper map patch, repaired teal coat, small boots and mint scarf. All 48 directional poses retain the existing 28x24 footprint and Slap performance. The opening road, six chapter scenes, recap, ending, NPC references and save labels use the living-map premise; the legacy `nobody` ID, chapter IDs/numbers, quest IDs, cosmetic IDs and rewards remain unchanged. Pip's wooden dragon is Thimble.
@@ -54,8 +60,8 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Ranger / Bramble Scout | Shipped September 30: generous leaf hood, clear face, articulated bow |
 | Wizard / Starwick Sage | Shipped September 30: old sage face/beard, soft robe, directional staff casting |
 | Frog | Shipped September 30: sculpted cheeks/body, eyes, feet and tongue |
-| Alchemist | Pending: clear face/goggles, satchel and bottle-hand anatomy |
-| Stormcaller | Pending: softer mantle, face and natural casting arms |
+| Alchemist / Copperwick Brewer | Shipped September 30: forehead goggles, warm face, field apron, herb satchel and articulated glass flask |
+| Stormcaller / Cloudcap Conductor | Shipped September 30: soft cloud cap, warm face, violet mantle, brass cuffs and directional casting |
 | Dragon | Pending: cute strong muzzle, coherent wings/feet/tail |
 | Riftblade | Pending: readable face, less angular coat, paired blades |
 | Mole | Pending: rounded fur, separate paws and digging intent |

@@ -17,6 +17,10 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Copperwick Brewer and Cloudcap Conductor (September 30)
+
+Alchemist and Stormcaller now have original visible calling identities and 48 directional frames: a friendly field brewer with forehead goggles/apron/satchel and a cloud-capped weather keeper with a soft mantle/brass cuffs. Existing footprints, immediate casts, passives, ability/save IDs and unlocks remain unchanged. The landscape identity panel accommodates their longer names. All 393 tests pass, with targeted art/opening checks passing after the final HUD adjustment. Full default/signature sheets and live Chrome at 667x375 were inspected; a real flask cast rendered successfully. Physical hardware and ordinary encounter balance remain outstanding. Next: Dragon, then Riftblade with its regional guardian, continuing the full art ledger before environment/NPC and playthrough work.
+
 ### Original traveller and opening identity (September 30)
 
 The protagonist is now Patchling, a living canvas traveller stitched from an old map, with a folded hood, seams, copper map patch, repaired teal coat and mint scarf. The opening, chapter scenes, recap, ending, NPC references and save labels now follow forgotten roads being mended through shared talents. The existing `nobody` ID, chapter IDs/numbers, quests, cosmetics, save keys and mechanics remain unchanged. All 391 tests pass. Chrome at 667x375 showed Patchling's actual opening sprite, name and matching dialogue portrait without horizontal overflow. Default and signature pose sheets were inspected; physical hardware and ordinary campaign balance remain outstanding. Continue the remaining form/guardian art, then environments and NPCs; this is a first originality pass, not a publishing clearance or complete cosmetic review.

@@ -222,13 +222,18 @@
     const s=G.state,p=s.player,form=G.playerForm();
     c.save();c.textBaseline='top';
     const hp=G.playerHp(),max=G.playerMaxHearts();
-    panel(c,6,6,Math.max(64,max*7+10),27);
+    const level=' · '+G.formLevel(form.id);let name=form.name;
+    c.font="7px 'VT323', monospace";
+    const identityWidth=Math.max(64,max*7+10,Math.min(88,Math.ceil(c.measureText(name+level).width)+10));
+    while(name.length>1&&c.measureText(name+level).width>identityWidth-10)name=name.slice(0,-1);
+    if(name!==form.name)name=name.slice(0,-1)+'…';
+    panel(c,6,6,identityWidth,27);
     for(let i=0;i<max;i++){
       c.fillStyle=i<hp?'#db8e8c':'#51605c';const x=11+i*7;
       c.fillRect(x,10,2,3);c.fillRect(x+3,10,2,3);c.fillRect(x+1,12,3,3);c.fillRect(x+2,15,1,1);
     }
     c.fillStyle='#344b54';c.fillRect(11,20,51,2);c.fillStyle='#85c0bb';c.fillRect(11,20,51*p.mana/p.manaMax,2);
-    text(c,form.name+' · '+G.formLevel(form.id),11,25,'#e4dbbc',7);
+    text(c,name+level,11,25,'#e4dbbc',7);
     const boss=s.enemies.find(e=>!e.dead&&e.def.miniboss&&e.bossEngaged);
     if(boss){
       panel(c,100,6,146,23);text(c,boss.def.name,107,9,'#e9d39f',9);

@@ -6,9 +6,9 @@
 
 registerForm({
   id: "alchemist",
-  name: "Alchemist",
+  name: "Copperwick Brewer",
   icon: "⚗️",
-  tagline: "Every bottle is labeled, and every label says probably explosive.",
+  tagline: "A cheerful field brewer who bottles wild herbs and lights the copper road lamps.",
 
   speed: 75,
   hearts: 4,

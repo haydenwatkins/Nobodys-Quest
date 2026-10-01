@@ -6,9 +6,9 @@
 
 registerForm({
   id: "stormcaller",
-  name: "Stormcaller",
+  name: "Cloudcap Conductor",
   icon: "🌩️",
-  tagline: "Carries thunder in both hands and absolutely no umbrella.",
+  tagline: "A cloud-capped roadkeeper who coaxes wandering storms into a useful rhythm.",
 
   speed: 85,
   hearts: 4,

@@ -8,6 +8,8 @@ The first visible calling identities are **Bramble Scout**, a leaf-cloaked pathk
 
 The protagonist is now **Patchling**, a living traveller stitched from an old road map. A folded canvas hood, repaired teal coat, copper map patch and mint scarf replace the blank-white identity. Forms become memories of roadkeepers carried as living patches. The opening, chapter scenes, recap, ending, recurring NPC references, title subtitle and save chapter labels follow this premise. The old `nobody` form ID, chapter IDs/numbers, quests, save keys, cosmetic IDs and combat rules remain stable. The public title is still a working title for later review.
 
+The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satchel, a field apron and a luminous glass flask; this calling tends the road lamps and gathers their fuel. The **Cloudcap Conductor** guides wandering weather with brass cuffs, a cloud-soft felt cap and a violet mantle. Both have visible warm faces and deliberate directional gestures. Their legacy `alchemist`/`stormcaller` IDs remain stable.
+
 ## Next original-identity work
 
 1. Patchling's first identity pass is complete. Keep the living-map premise coherent as other calling identities, character art, cosmetics, environments and NPCs are reviewed. Do not treat the current signature skins or all late dialogue as a completed originality review.
