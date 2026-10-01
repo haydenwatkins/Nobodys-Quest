@@ -900,7 +900,7 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal) {
+    if (cell.portal && (!G.drawTownPortal || !G.drawTownPortal(ctx, cell, x, y))) {
       const locked = !portalOpen(cell);
       if (cell.portalStyle === "trial") {
         const glow = 0.45 + 0.25 * Math.sin(time * 4);
@@ -1548,6 +1548,7 @@ G.world = (() => {
   // They organize a scene and suggest safety without adding collision to the
   // game's already busy mobile-sized paths.
   function drawFenceRun(ctx, fence) {
+    if (G.drawTownFence && G.drawTownFence(ctx, fence)) return;
     const T = G.TILE;
     const length = Math.max(1, Math.floor(fence.length || 1));
     const palette = fencePalette(fence.style);

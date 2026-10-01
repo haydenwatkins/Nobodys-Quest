@@ -346,6 +346,7 @@
     }
 
     for (const detail of s.townDecorations || []) {
+      if (G.drawTownDetail && G.drawTownDetail(ctx, detail)) continue;
       const x = Math.round(detail.x), y = Math.round(detail.y);
       if (detail.kind === "mailbox") {
         ctx.fillStyle = "#6b4a2b"; ctx.fillRect(x, y - 5, 2, 7);
@@ -383,7 +384,8 @@
       }
     }
 
-    if (s.mapId === "town" && G.townFestivalActive && G.townFestivalActive()) {
+    if (s.mapId === "town" && G.townFestivalActive && G.townFestivalActive() &&
+        (!G.drawTownFestival || !G.drawTownFestival(ctx))) {
       const worldWidth = s.mapW * G.TILE;
       ctx.fillStyle = "#6b4a2b";
       ctx.fillRect(3 * G.TILE, 7 * G.TILE, worldWidth - 6 * G.TILE, 1);
