@@ -31,7 +31,7 @@
   G.openingDrawables=c=>{
     const list=oldDraw(c);if(G.state.mapId!==map)return list;
     for(const bell of bells){const x=bell.x*16+8,y=bell.y*16+8,lit=has(bell.id);
-      list.push({y:y+3,fn:()=>{c.save();c.fillStyle="#3b3439";c.fillRect(x-9,y-24,3,27);c.fillRect(x+7,y-24,3,27);c.fillRect(x-11,y-26,23,4);
+      list.push({y:y-4,fn:()=>{if(G.drawMistwoodBell&&G.drawMistwoodBell(c,bell,lit))return;c.save();c.fillStyle="#3b3439";c.fillRect(x-9,y-24,3,27);c.fillRect(x+7,y-24,3,27);c.fillRect(x-11,y-26,23,4);
         c.fillStyle="#92704c";c.fillRect(x-8,y-24,1,25);c.fillRect(x+8,y-24,1,25);
         c.fillStyle=lit?"#ffcd75":"#8a8464";c.fillRect(x-3,y-21,7,10);c.fillRect(x-5,y-13,11,3);c.fillRect(x,y-10,2,3);
         c.fillStyle=lit?"#fff3c2":"#b6ad82";c.fillRect(x-2,y-20,2,6);

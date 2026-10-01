@@ -248,7 +248,8 @@ G.ui = (() => {
   }
 
   function drawNpcChatter(c, cam) {
-    if (dialogueData || G.state.bossCutscene) return;
+    if (dialogueData || G.state.bossCutscene ||
+        G.state.enemies.some(e => e.def.miniboss && e.bossEngaged && !e.dead)) return;
     const p = G.state.player;
     const active = (G.state.npcs || []).filter((npc) => npc.bubble &&
       npc.bubble.delay <= 0 && npc.bubble.t > 0 &&
@@ -638,7 +639,8 @@ G.ui = (() => {
     }
 
     const entranceFocus = G.nearGreenfieldEntrance && G.nearGreenfieldEntrance();
-    if (!drawBossBar(c) && !entranceFocus) drawLocationChip(c);
+    const bossBarShown = drawBossBar(c);
+    if (!bossBarShown && !entranceFocus) drawLocationChip(c);
 
     /* stars (top right) */
     const starTxt = `⭐${G.state.stars}`;
@@ -650,7 +652,7 @@ G.ui = (() => {
 
     if (!G.state.bossCutscene) {
       // Let travellers see the actual gate; health, stars, warnings and arts stay.
-      if (!entranceFocus) {
+      if (!entranceFocus && !bossBarShown) {
         drawMinimap(c);
         drawStoryTracker(c);
         drawQuestTracker(c);

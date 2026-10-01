@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawGreenfieldTile && G.drawGreenfieldTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawMistwoodTile && G.drawMistwoodTile(ctx, cell, x, y, time)) ||
+      (G.drawGreenfieldTile && G.drawGreenfieldTile(ctx, cell, x, y, time)) ||
       (G.drawMeadowTile && G.drawMeadowTile(ctx, cell, x, y, time));
     if (!meadow) switch (cell.tile) {
       case "grass": {
@@ -901,7 +902,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawTownPortal || !G.drawTownPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawMistwoodPortal || !G.drawMistwoodPortal(ctx, cell, x, y)) &&
+        (!G.drawTownPortal || !G.drawTownPortal(ctx, cell, x, y)) &&
         (!G.drawGreenfieldPortal || !G.drawGreenfieldPortal(ctx, cell, x, y, !portalOpen(cell)))) {
       const locked = !portalOpen(cell);
       if (cell.portalStyle === "trial") {
@@ -941,7 +943,7 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawMeadowNotice || !G.drawMeadowNotice(ctx, cell, x, y))) { // signpost
+    if (cell.message && (!G.drawMistwoodNotice || !G.drawMistwoodNotice(ctx, cell, x, y)) && (!G.drawMeadowNotice || !G.drawMeadowNotice(ctx, cell, x, y))) { // signpost
       ctx.fillStyle = "#6b4a2b";
       ctx.fillRect(px + 7, py + 7, 2, 7);
       ctx.fillStyle = "#d8b06a";
@@ -1251,6 +1253,7 @@ G.world = (() => {
     const px = ch.x * T, py = ch.y * T;
     if (ch.food) {
       if (G.drawHomePantry && G.drawHomePantry(ctx, ch, time)) return;
+      if (G.drawMistwoodPantry && G.drawMistwoodPantry(ctx, ch, time)) return;
       if (G.drawGreenfieldPantry && G.drawGreenfieldPantry(ctx, ch, time)) return;
       // Renewable food is a picnic hamper, not a one-time treasure chest.
       // The cloth and refill bar make its different rules visible at a glance.
@@ -1621,6 +1624,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawMistwoodPost && G.drawMistwoodPost(ctx, post, awake, near)) return;
     if (G.drawGreenfieldPost && G.drawGreenfieldPost(ctx, post, awake, near)) return;
     const pulse = 0.28 + Math.abs(Math.sin(time * 3.2)) * 0.28;
 
