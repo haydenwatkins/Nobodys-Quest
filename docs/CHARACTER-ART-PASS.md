@@ -2,6 +2,8 @@
 
 Requested September 30, 2026. Ben wants cute characters; Hayden wants fairly high fidelity and cool designs without awkward or odd-looking shapes. This is a fresh review of **every form and boss**, including recently upgraded art. Preserve detailed pixel art, recognizable identities, gameplay timing, hitboxes, saves, and phone landscape readability.
 
+Expanded scope: the user wants original characters rather than copied Nobody Saves the World identities, may publish someday, and has added environmental art and eventually every NPC portrait/world sprite. Read `ORIGINAL-IDENTITY.md`. The character ledger below is only the first phase; it does not imply environment or NPC coverage is complete. Art for all of these phases precedes further playthrough upgrades. The resumed loop uses the remaining weekly allowance up to exhaustion; the old 50% stop is superseded and the banked reset remains untouched.
+
 ## Direction and acceptance
 
 Use rounded, deliberate silhouettes, expressive eyes with restrained highlights, natural limb attachments, and short readable gestures. Detail should explain cloth, metal, fur, bark, and magic rather than create noisy decorative pixels. Avoid stiff rectangular torsos, hidden faces, spindly ambiguous limbs, and interchangeable stone lumps. Cute bosses can still look powerful through scale, posture, equipment, and clear attack intent. Do not apply one face or identical proportions to the whole roster.
@@ -28,17 +30,23 @@ Knight now has rounded steel plates, small boots, a soft cape and clear helmet e
 
 The full 389-test suite passed; after the final sword/horn geometry refinement, targeted opening-art tests passed again, including real Slash damage once and skin/dye/direction compatibility. Enlarged directional idle/strike sheets and the actual Ember Ridge introduction in Chrome at 667x375 were inspected with no horizontal overflow. Combat was paused by dialogue for the live visual check; ordinary fight pacing and physical hardware remain untested.
 
+## Bramble Scout and Starwick Sage
+
+The former Ranger now has rounded boots/torso, a generous leaf hood and visible eyes/cheeks. His front/rear drawing hand meets the bow rather than extending away from its grip; the existing fixed-aim draw/release timing, once-only arrow, travel cancellation and shifting rules remain. The former Wizard becomes a soft-robed old sage with a visible face/beard, felt cap and walnut starlight staff. All four directions now have idle, six walking beats and three casting beats (48 frames). Native Curse still fires immediately with real recoil and no new windup, displacement or mana cost. Both original footprints remain.
+
+All 391 tests pass, including immediate real Curse casting and the existing Scout draw/release checks. All directional poses and their signature-skin variants were rendered and inspected. Chrome at 667x375 showed both actual Lantern Reach appearances and their new names without horizontal overflow. A first local load omitted early script resources and failed to boot; reloading fetched the missing resources and rendered successfully. No persistent implementation fault reproduced. These dialogue-paused scenes are visual checks, not campaign balance or physical-device evidence.
+
 ## Coverage ledger
 
 The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, plus the separate Orchard Treant. This is a baseline audit, not acceptance of every remaining frame. Each pending entry needs the detailed design/pose pass above. Continue early forms and their corresponding regional guardians before late regions; campaign/balance work resumes after this art priority.
 
 | Form | Fresh pass |
 |---|---|
-| Nobody | Shipped September 30 |
+| Nobody | Cute baseline shipped; original mended-traveller identity next |
 | Rat | Shipped September 30 |
 | Knight | Shipped September 30: rounded steel plates, clear helmet eyes, all directions |
-| Ranger | Pending: friendly hooded face; articulated bow poses |
-| Wizard | Pending: face visibility, rounded robe, convincing hands/staff |
+| Ranger / Bramble Scout | Shipped September 30: generous leaf hood, clear face, articulated bow |
+| Wizard / Starwick Sage | Shipped September 30: old sage face/beard, soft robe, directional staff casting |
 | Frog | Shipped September 30: sculpted cheeks/body, eyes, feet and tongue |
 | Alchemist | Pending: clear face/goggles, satchel and bottle-hand anatomy |
 | Stormcaller | Pending: softer mantle, face and natural casting arms |

@@ -14,19 +14,21 @@
     g.poly([[cx-8,cy+3],[cx+6,cy+4],[cx+10-stride*3,44],[cx+1,41],[cx-9-stride*2,45],[cx-11,30]],'k');
     g.poly([[cx-7,cy+5],[cx+4,cy+6],[cx+7-stride*3,41],[cx,38],[cx-7-stride*2,42],[cx-8,29]],'a');
     g.line(cx-6,28,cx-6-stride*2,39,'b',2);
-    const dx=side?3:5;
-    line(g,cx-dx,hip,cx-dx+Math.round(stride*4),48-Math.round(Math.max(0,stride)*2),'h',3);
-    line(g,cx+dx,hip,cx+dx-Math.round(stride*4),48-Math.round(Math.max(0,-stride)*2),'g',3);
-    g.rect(cx-dx-2+Math.round(stride*4),48,6,2,'k');g.rect(cx+dx-2-Math.round(stride*4),48,6,2,'k');
+    const dx=side?3:4;
+    line(g,cx-dx,hip,cx-dx+Math.round(stride*2),47-Math.round(Math.max(0,stride)),'h',3);
+    line(g,cx+dx,hip,cx+dx-Math.round(stride*2),47-Math.round(Math.max(0,-stride)),'g',3);
+    g.ellipse(cx-dx+Math.round(stride*2),48,4,2,'k');g.ellipse(cx+dx-Math.round(stride*2),48,4,2,'k');
+    g.line(cx-dx-2+Math.round(stride*2),47,cx-dx+1+Math.round(stride*2),47,'g',1);
+    g.line(cx+dx-2-Math.round(stride*2),47,cx+dx+1-Math.round(stride*2),47,'i',1);
     // Quiver projects above one shoulder; the rear view exposes its full length.
     g.poly([[cx-10,cy+3],[cx-5,cy+2],[cx-3,36],[cx-10,37]],'k');g.poly([[cx-8,cy+4],[cx-5,cy+4],[cx-5,34],[cx-8,35]],'h');
     for(let i=0;i<3;i++){const x=cx-11+i*3;g.line(x,cy+7,x-2,cy-5-i%2*2,'g',1);g.line(x-2,cy-5-i%2*2,x-4,cy-7-i%2*2,'e',2);}
-    g.poly([[cx-6,cy+8],[cx+6,cy+8],[cx+7,37],[cx,42],[cx-7,37]],'k');
-    g.poly([[cx-4,cy+9],[cx+4,cy+9],[cx+5,36],[cx,39],[cx-5,36]],'b');g.line(cx-3,cy+10,cx-3,34,'c',2);
+    g.ellipse(cx,33-bob,9,10,'k');g.ellipse(cx,32-bob,8,9,'b');
+    g.ellipse(cx-2,30-bob,5,6,'c');g.line(cx-3,cy+10,cx-3,34,'d',1);
     g.line(cx-5,cy+9,cx+4,36,'g',2);g.rect(cx-6,36,12,2,'h');g.rect(cx,36,3,2,'j');
     // Braced bow arm and drawing hand remain distinct through the three beats.
     const vertical=attack&&!side,sign=back?-1:1;
-    const handX=attack?cx+13:cx+10,handY=vertical?cy+(back?-10:16):attack?cy+10:cy+16;
+    const handX=vertical?cx:attack?cx+13:cx+10,handY=vertical?cy+(back?-10:16):attack?cy+10:cy+16;
     line(g,cx+5,cy+10,handX,handY,'b',3);g.rect(handX,handY-1,3,3,'f');
     const pullX=vertical?cx:drawn?cx-1:released?cx-7:cx-8,pullY=vertical?handY-sign*(drawn?10:3):attack?cy+10:cy+16;
     line(g,cx-5,cy+10,pullX,pullY,'b',3);g.rect(pullX,pullY-1,3,3,'f');
@@ -45,13 +47,13 @@
       if(drawn){g.line(pullX-1,by,bx+10,by,'o',1);g.poly([[bx+10,by-2],[bx+13,by],[bx+10,by+2]],'e');g.line(pullX+1,by,pullX-2,by-3,'i',1);}
     }
     if(released){g.line(cx-9,cy+9,cx-12,cy+6,'f',2);}
-    // Hood peak, shadowed face, narrow eyes, and a russet scarf.
-    g.poly([[cx-10,cy+3],[cx-9,cy-7],[cx-3,cy-14],[cx+5,cy-11],[cx+10,cy-4],[cx+9,cy+7],[cx-6,cy+8]],'k');
-    g.poly([[cx-8,cy+2],[cx-7,cy-6],[cx-2,cy-12],[cx+4,cy-9],[cx+8,cy-3],[cx+7,cy+5],[cx-5,cy+6]],'b');
-    g.poly([[cx-6,cy-5],[cx-2,cy-10],[cx+4,cy-7],[cx+6,cy-3],[cx,cy-5]],'c');g.line(cx-3,cy-8,cx,cy-9,'d',1);
+    // A round leaf hood frames the face; the quiver remains behind the head.
+    g.ellipse(cx,cy-1,11,12,'k');g.ellipse(cx,cy-2,10,11,'b');g.ellipse(cx-3,cy-5,6,7,'c');
+    g.line(cx-5,cy-9,cx-1,cy-11,'d',1);g.put(cx-7,cy-8,'d');
     if(!back){
-      const hx=cx+(side?3:0);g.poly([[hx-5,cy-2],[hx+5,cy-1],[hx+4,cy+6],[hx-2,cy+7],[hx-5,cy+3]],'a');
-      g.poly([[hx-4,cy],[hx+4,cy],[hx+3,cy+5],[hx-1,cy+6],[hx-4,cy+3]],'f');g.rect(hx+(side?2:-3),cy+1,2,2,'k');if(!side)g.rect(hx+2,cy+1,2,2,'k');
+      const hx=cx+(side?3:0);g.ellipse(hx,cy+2,7,8,'a');g.ellipse(hx,cy+1,6,7,'f');g.ellipse(hx-2,cy-1,4,4,'j');
+      for(const x of side?[hx+2]:[hx-4,hx+2]){g.rect(x,cy,2,3,'k');g.put(x,cy,'e');}
+      g.line(hx+(side?3:-1),cy+5,hx+(side?4:1),cy+5,'g',1);g.put(hx-4,cy+4,'i');if(!side)g.put(hx+4,cy+4,'i');
     }else{g.line(cx,cy-9,cx+3,cy+5,'a',1);g.line(cx-3,cy+5,cx+4,cy+5,'c',1);}
     g.poly([[cx-7,cy+7],[cx+6,cy+7],[cx+7,cy+10],[cx-4,cy+11]],'i');g.line(cx-5,cy+8,cx+4,cy+8,'j',1);
     g.poly([[cx-5,cy+9],[cx-9,cy+17],[cx-5,cy+16],[cx-3,cy+10]],'h');

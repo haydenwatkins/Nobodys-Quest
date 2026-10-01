@@ -67,8 +67,8 @@ assert.match(update.text, /Form Echo can now emerge/);
 
 const stormChoice = G.formUnlockSteps("stormcaller").find((step) => step.kind === "choice");
 assert.equal(stormChoice.options.length, 2);
-assert.match(stormChoice.detail, /Wizard Lv/);
-assert.match(stormChoice.detail, /Ranger Lv/);
+assert.match(stormChoice.detail, /Starwick Sage Lv/);
+assert.match(stormChoice.detail, /Bramble Scout Lv/);
 
 const finalStep = G.formUnlockSteps("god")[0];
 assert.equal(finalStep.kind, "portfolio", "the Form Lab must describe the live finale rule");

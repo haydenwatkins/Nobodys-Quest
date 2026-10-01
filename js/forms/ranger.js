@@ -6,9 +6,9 @@
 
 registerForm({
   id: "ranger",
-  name: "Ranger",
+  name: "Bramble Scout",
   icon: "🏹",
-  tagline: "Why walk up to danger when arrows can do the walking?",
+  tagline: "A leaf-cloaked pathkeeper whose bright-fletched arrows lead friends home.",
 
   speed: 85,
   hearts: 3,

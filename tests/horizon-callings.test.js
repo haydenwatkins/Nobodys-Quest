@@ -46,7 +46,7 @@ test('the horizon leads through the Crest, Knight practice, and a real Ranger ec
   goal = G.storyGoal();
   assert.equal(goal.guide, 'mastery');
   assert.equal(goal.formId, 'knight');
-  assert.match(goal.short, /Ranger/);
+  assert.match(goal.short, /Bramble Scout/);
   assert.equal(goal.questId, G.forms.knight.quests[0].id);
   // Use actual frontal guard contact, not synthetic quest completion.
   const p = G.state.player;

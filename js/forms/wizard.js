@@ -4,9 +4,9 @@
 
 registerForm({
   id: "wizard",                      // lowercase, no spaces
-  name: "Wizard",
+  name: "Starwick Sage",
   icon: "🧙",
-  tagline: "Old, wise, and slightly explosive.",
+  tagline: "A kindly roadside sage who keeps lost starlight in a walnut staff.",
 
 
   speed: 70,                  // zoomy! (limit is 140)
