@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Skylens Mapper and Nell, Starpath Keeper (October 1)
+
+The former Astronomer and Professor Perihelion now appear as visible-faced night-route scholars. Skylens Mapper has soft dark hair, warm skin, brass spectacles, a blue field coat and a segmented telescope held in the hand. Older Nell has ivory curls, stitched star-chart details and a larger instrument. Their faces replace the oversized orbital head rings. The Starpath Observatory retains its arena ID; their 21x20/26x25 footprints, 48 directional player poses/four guardian indices, save IDs, Orrery Key, fourth-shot alignment and three-phase orbital-band safety remain unchanged.
+
+All 409 regression checks pass; focused art/decoration checks pass after the final pupil refinement. Complete default/signature sheets, every guardian index, and both pixel settings at gameplay scale and enlarged were inspected. Real input launches exactly one needle immediately; only the fourth passes through a second foe, and each foe takes damage once per shot. Existing gravity, orbital warning/refuge/recovery and interruption checks pass. Chrome at 667x375 displayed the pair in the actual observatory without horizontal overflow. Story recap paused combat; physical-device and ordinary encounter-balance checks remain outstanding. Continue Druid with its Shattercoast guardian next, before remaining character, environment and NPC art.
+
 ### Foldstep Fox and Sumi, Foldroad Keeper (October 1)
 
 The former Samurai and Paper Ronin now appear as warm-faced fox routekeepers. Foldstep Fox wears a short indigo wrap coat, mint belt and map case; older Sumi has silver fur, a teal pleated coat and coral/ivory collar. Their tails join their bodies and their hands hold the blades through every pose. The Foldroad Hall, Wayfold Crane and Moonfold appearance preserve the existing arena, reward and skin IDs. Their 20x20/25x25 footprints, 48 directional player poses/four guardian indices, timed third draw, dash, wards and marked fold-cut escape/recovery remain unchanged.
@@ -109,7 +115,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Jester / Pocket Trouper | Shipped October 1: rounded stage coat, beret, warm face and 48 directional hand-held card poses |
 | Turtle / Harborback | Shipped October 1: rounded scuted shell, expressive terrapin face, attached flippers and fitted neck cloth in all directions |
 | Samurai / Foldstep Fox | Shipped October 1: warm fox face, indigo wrap coat, map case, joined tail and held blade in every direction |
-| Astronomer | Pending: readable face, rounded coat, deliberate instrument |
+| Astronomer / Skylens Mapper | Shipped October 1: warm face, brass spectacles, blue field coat and held segmented telescope in every direction |
 | Druid | Pending: face distinct from branches, organic costume/gesture |
 | Griffin | Pending: coherent eagle/lion anatomy, soft beak and proud wings |
 | Golem | Pending: rounded stone body with separate limbs and expression |
@@ -117,7 +123,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Bellkeeper | Pending: rounded bell silhouette and charming face, all casts |
 | Lantern Wisp | Pending: flame expression, clear cage and soft wisps |
 | Colossus | Pending: powerful friendly anatomy, distinct from Golem |
-| God | Pending: charming regal silhouette, clear mantle/halo/arms |
+| God | Pending: charming original keeper, clear mantle and attached arms; no floating halo |
 
 | Boss | Fresh pass |
 |---|---|
@@ -130,7 +136,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Royal Fool / Tansy, Caravan Star | Shipped October 1: teal stage coat, copper-tied braid and attached pie/card gestures |
 | Admiral Tortoise / Marlo, Breakwater Keeper | Shipped October 1: rounded harbor turtle, dock cap, fitted bib and shell-following rope harness |
 | Paper Ronin / Sumi, Foldroad Keeper | Shipped October 1: silver fox face, pleated teal/coral coat, joined tail and articulated held blade |
-| Professor Perihelion | Pending: scholarly face, clear instruments and coat |
+| Professor Perihelion / Nell, Starpath Keeper | Shipped October 1: visible older face, ivory curls, brass spectacles, stitched star chart and held telescope |
 | Grandmother Briar | Pending: kind powerful gardener, readable face/hands |
 | Aurelia, Sky Sovereign | Pending: cute regal griffin, coherent wings and talons |
 | Pillar, Old Mason | Pending: rounded stone mason, distinct arm/body shapes |

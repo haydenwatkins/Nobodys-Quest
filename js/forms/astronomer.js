@@ -2,14 +2,14 @@
 "use strict";
 
 registerForm({
-  id: "astronomer", name: "Astronomer", icon: "🔭",
-  tagline: "Charts six impossible stars and politely asks gravity to tidy the battlefield.",
+  id: "astronomer", name: "Skylens Mapper", icon: "🔭",
+  tagline: "Finds homeward paths in the night sky with brass lenses and patient calculations.",
   speed: 86, hearts: 4, slots: 2,
   passive: { id: "gravityTouch", name: "Gravity Touch",
     description: "Area bursts and explosions draw enemies toward their center." },
   basic: "starNeedle",
   abilities: [{ id: "constellation", level: 1 }, { id: "gravityWell", level: 2 }],
-  unlock: { type: "challenge", hint: "Correct Professor Perihelion's orbit", requirements: [
+  unlock: { type: "challenge", hint: "Trace Nell's quiet orbit", requirements: [
     { type: "item", item: "orrery-key", hint: "Win the Orrery Key" },
     { type: "formLevel", form: "stormcaller", level: 4 },
   ] },

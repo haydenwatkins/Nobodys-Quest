@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Skylens Mapper and the Starpath Observatory (October 1)
+
+Astronomer and Professor Perihelion now appear as original night-route scholars Skylens Mapper and Nell, Starpath Keeper. Warm faces, brass spectacles, soft hair, blue field coats and held telescopes replace the orbital head rings. Nell's ivory curls and stitched chart distinguish the guardian. The Starpath Observatory retains its ID, routes, Orrery Key and unlock conditions. Their source footprints, 48 directional player poses/four guardian indices, immediate fourth-shot alignment, gravity and orbital warning/refuge/recovery remain unchanged.
+
+All 409 regression checks pass, with focused art/decoration checks passing after the final pupil refinement. Complete default/signature pose sheets and every guardian index were inspected, including both pixel settings at gameplay scale and enlarged. Real-input fourth-needle, gravity and three-phase orbit checks pass. Chrome at 667x375 displayed the actual pair without horizontal overflow; story recap paused combat, so physical-device and ordinary encounter-balance checks remain outstanding. The fresh-pass ledger now records 16/24 forms and 10/19 boss definitions. Continue Druid with its Shattercoast guardian, then the rest of the character roster before environments, NPCs and playthrough work.
+
 ### Foldstep Fox and the Foldroad Hall (October 1)
 
 Samurai and Paper Ronin now appear as original fox routekeepers Foldstep Fox and Sumi, Foldroad Keeper. Warm faces, wrap coats, fitted belts, joined tails and articulated blade grips replace the rigid masked/hat figures. The Foldroad Hall, Wayfold Crane and Moonfold appearance preserve internal IDs, saves, reward routes and unlock requirements. Source footprints, 48 directional player poses/four guardian indices, timed third draw, movement passive, dash and three-phase fold-cut warning/escape/recovery remain unchanged.

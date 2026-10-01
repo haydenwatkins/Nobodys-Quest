@@ -859,7 +859,7 @@ registerEnemy({
 });
 
 registerEnemy({
-  id: "professorPerihelion", name: "Professor Perihelion",
+  id: "professorPerihelion", name: "Nell, Starpath Keeper",
   hp: 66, speed: 48, damage: 2, behavior: "shooter", shootEvery: 1.5, aggro: 195,
   shotColor: "#73eff7", size: 19, heavy: true, miniboss: true,
   ward: { types: ["light"], hp: 7 },
@@ -869,19 +869,19 @@ registerEnemy({
     telegraph: 0.54, chargeSpeed: 0, chargeDur: 0,
     antiKiteRange: 118, chaseScale: 1.2,
     patterns: ["stars", "orbitalBand", "nova"],
-    intro: "THE ORRERY REFUSES TO BE WRONG",
+    intro: "THE NIGHT SKY KEEPS A ROAD HOME",
     introLines: [
-      "My calculations predicted a hero at precisely... yesterday.",
+      "I chart the night paths so late travellers can find the lamps at home.",
       "Do not touch the brass planets. They are mostly glue.",
       "Stand between the two bright circles. The middle orbit is safe. My mathematics insists.",
     ],
     phaseLine: "A fascinating error! I shall solve it with additional stars.",
     phaseThreeLine: "Gravity, kindly stop being theoretical and grab our guest.",
     knockoutLine: "The result is reproducible. Rest, then challenge the data.",
-    defeatLine: "Peer review accepted. Please take the key and fix my calendar.",
+    defeatLine: "Take the Orrery Key. If the stars lead you home a day late, please check my calendar.",
     rematchLine: "A second data point! Try to be statistically dramatic.",
   },
-  trophy: "orrery-key", trophyName: "Orrery Key", location: "The Crooked Observatory",
+  trophy: "orrery-key", trophyName: "Orrery Key", location: "The Starpath Observatory",
   sprite: {
     palette: { k: "#1a1c2c", v: "#3b2f73", p: "#8153c1", b: "#41a6f6", c: "#73eff7", y: "#ffcd75", w: "#f4f4f4", s: "#94b0c2" },
     frames: [[

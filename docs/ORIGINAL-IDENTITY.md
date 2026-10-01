@@ -14,6 +14,8 @@ The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satche
 
 ## Next original-identity work
 
+**Skylens Mapper** finds homeward routes in the night sky: warm skin, soft dark hair, brass spectacles, a blue field coat and a hand-held segmented telescope. **Nell, Starpath Keeper**, charts the paths to home lamps in the Starpath Observatory, with ivory curls, a calm older face and stitched star-chart details. Their identities retain `astronomer`, `professorPerihelion` and `astronomerTrial`; the Orrery Key, fourth-shot alignment, gravity and safe orbital band remain unchanged.
+
 **Foldstep Fox** is a nimble map courier in a short indigo wrap coat, mint belt and copper map case, with a warm fox face, joined tail and deliberate blade grip. **Sumi, Foldroad Keeper**, folds route maps that lead travellers home: silver fur, a pleated teal coat, coral/ivory collar and calm older face. The Foldroad Hall, Wayfold Crane and Moonfold look retain `samuraiTrial`, `paper-crane` and `moonRonin`; `samurai`/`paperRonin`, all cut/dash clocks and the marked fold sequence remain stable.
 
 **Harborback** is a patient terrapin shorekeeper with copper-toned shell scutes, clear flippers and a fitted teal neck cloth. **Marlo, Breakwater Keeper**, keeps little boats' homeward route sound, wearing a rolled dock cap, work bib and rope harness against his shell. Their calling, guardian and arena retain `turtle`, `admiralTortoise` and `turtleTrial`; the Tide Shell, wards, jab/brace/counter rhythm and marked tide channel remain unchanged.
