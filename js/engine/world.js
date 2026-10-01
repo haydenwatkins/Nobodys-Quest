@@ -945,7 +945,7 @@ G.world = (() => {
       ctx.fillRect(px + 5, py + 5, 6, 1);
       ctx.fillRect(px + 5, py + 7, 4, 1);
     }
-    if (cell.townPlot) {
+    if (cell.townPlot && !(G.homeScenery && G.state.mapId === 'town')) {
       const built = G.townHouseBuilt && G.townHouseBuilt(cell.townPlot);
       if (built) {
         ctx.fillStyle = "#6b4a2b";
@@ -1091,6 +1091,7 @@ G.world = (() => {
   // arenas keep exactly the same tiles, rocks, spawns, and collision.
   function drawTrialFloor(ctx, time) {
     const s = G.state;
+    if (G.homeScenery && s.mapId === "playerHouse") return;
     const theme = s.mapDef && s.mapDef.visualTheme;
     if (!theme) return;
     const styles = {
@@ -1207,6 +1208,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.homeScenery && s.mapId === "playerHouse") return;
     const theme = s.mapDef && s.mapDef.visualTheme;
     const biome = biomePalette();
     const texture = biome && biome.texture || "meadow";
@@ -1242,6 +1244,7 @@ G.world = (() => {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
     if (ch.food) {
+      if (G.drawHomePantry && G.drawHomePantry(ctx, ch, time)) return;
       // Renewable food is a picnic hamper, not a one-time treasure chest.
       // The cloth and refill bar make its different rules visible at a glance.
       ctx.fillStyle = "rgba(26,28,44,0.35)";
@@ -1458,6 +1461,7 @@ G.world = (() => {
 
   function drawPlayerHouse(ctx) {
     const s = G.state;
+    if (G.drawSettlementHomes && G.drawSettlementHomes(ctx)) return;
     if (!s.grid) return;
     let minX = Infinity, minY = Infinity, maxX = -1, maxY = -1;
     for (let y = 0; y < s.mapH; y++) {
@@ -1647,9 +1651,11 @@ G.world = (() => {
     const y1 = Math.min(s.mapH - 1, Math.ceil((cam.y + G.H) / T));
     for (let y = y0; y <= y1; y++)
       for (let x = x0; x <= x1; x++)
-        if (!G.drawOpeningTile || !G.drawOpeningTile(ctx, s.grid[y][x], x, y, time))
+        if ((!G.drawHomeTile || !G.drawHomeTile(ctx, s.grid[y][x], x, y, time)) &&
+            (!G.drawOpeningTile || !G.drawOpeningTile(ctx, s.grid[y][x], x, y, time)))
           drawTile(ctx, s.grid[y][x], x, y, time);
     if (G.drawOpeningGround) G.drawOpeningGround(ctx, cam, time);
+    if (G.drawHomeRoom) G.drawHomeRoom(ctx);
     drawTrialFloor(ctx, time);
     drawAmbientDetails(ctx, cam, time);
     if (G.drawLivingWorldGround) G.drawLivingWorldGround(ctx, cam, time);
