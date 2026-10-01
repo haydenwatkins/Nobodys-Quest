@@ -44,7 +44,7 @@
   G.openingDrawables=c=>{
     const list=oldDraw(c);if(G.state.mapId!=="emberRidge")return list;
     for(const f of fires){const x=f.x*16+8,y=f.y*16+8,lit=has(f.id),fighting=active?.fire.id===f.id;
-      list.push({y:y+7,fn:()=>{
+      list.push({y:y-4,fn:()=>{
         if(G.drawRidgeFire&&G.drawRidgeFire(c,f,lit,fighting))return;
         c.save();c.fillStyle="#292733";c.fillRect(x-14,y-5,28,12);
         c.fillStyle="#8a6858";c.fillRect(x-13,y+3,26,5);c.fillRect(x-16,y-4,5,8);c.fillRect(x+11,y-4,5,8);

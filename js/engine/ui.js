@@ -659,7 +659,7 @@ G.ui = (() => {
         drawQuestTracker(c);
       }
       drawWardHint(c, cam);
-      const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c);
+      const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c, cam);
       if (!interactionShown && !entranceFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
       drawWayfinderHint(c);
       drawTutorial(c);

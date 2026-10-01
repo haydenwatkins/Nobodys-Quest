@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawRidgeTile && G.drawRidgeTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawStarfallTile && G.drawStarfallTile(ctx, cell, x, y, time)) ||
+      (G.drawRidgeTile && G.drawRidgeTile(ctx, cell, x, y, time)) ||
       (G.drawMarshTile && G.drawMarshTile(ctx, cell, x, y, time)) ||
       (G.drawMistwoodTile && G.drawMistwoodTile(ctx, cell, x, y, time)) ||
       (G.drawGreenfieldTile && G.drawGreenfieldTile(ctx, cell, x, y, time)) ||
@@ -904,7 +905,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawRidgePortal || !G.drawRidgePortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawStarfallPortal || !G.drawStarfallPortal(ctx, cell, x, y)) &&
+        (!G.drawRidgePortal || !G.drawRidgePortal(ctx, cell, x, y)) &&
         (!G.drawMarshPortal || !G.drawMarshPortal(ctx, cell, x, y)) &&
         (!G.drawMistwoodPortal || !G.drawMistwoodPortal(ctx, cell, x, y)) &&
         (!G.drawTownPortal || !G.drawTownPortal(ctx, cell, x, y)) &&
@@ -947,7 +949,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawRidgeNotice || !G.drawRidgeNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawStarfallNotice || !G.drawStarfallNotice(ctx, cell, x, y)) &&
+        (!G.drawRidgeNotice || !G.drawRidgeNotice(ctx, cell, x, y)) &&
         (!G.drawMarshNotice || !G.drawMarshNotice(ctx, cell, x, y)) &&
         (!G.drawMistwoodNotice || !G.drawMistwoodNotice(ctx, cell, x, y)) && (!G.drawMeadowNotice || !G.drawMeadowNotice(ctx, cell, x, y))) { // signpost
       ctx.fillStyle = "#6b4a2b";
@@ -1106,7 +1109,7 @@ G.world = (() => {
   // arenas keep exactly the same tiles, rocks, spawns, and collision.
   function drawTrialFloor(ctx, time) {
     const s = G.state;
-    if ((G.homeScenery && s.mapId === "playerHouse") || (G.ridgeScenery && s.mapId === "emberRidge")) return;
+    if ((G.homeScenery && s.mapId === "playerHouse") || (G.ridgeScenery && s.mapId === "emberRidge") || (G.starfallScenery && s.mapId === "starfallRuins")) return;
     const theme = s.mapDef && s.mapDef.visualTheme;
     if (!theme) return;
     const styles = {
@@ -1223,7 +1226,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
-    if ((G.homeScenery && s.mapId === "playerHouse") || (G.ridgeScenery && s.mapId === "emberRidge")) return;
+    if ((G.homeScenery && s.mapId === "playerHouse") || (G.ridgeScenery && s.mapId === "emberRidge") || (G.starfallScenery && s.mapId === "starfallRuins")) return;
     const theme = s.mapDef && s.mapDef.visualTheme;
     const biome = biomePalette();
     const texture = biome && biome.texture || "meadow";
@@ -1260,6 +1263,7 @@ G.world = (() => {
     const px = ch.x * T, py = ch.y * T;
     if (ch.food) {
       if (G.drawHomePantry && G.drawHomePantry(ctx, ch, time)) return;
+      if (G.drawStarfallPantry && G.drawStarfallPantry(ctx, ch, time)) return;
       if (G.drawRidgePantry && G.drawRidgePantry(ctx, ch, time)) return;
       if (G.drawMarshPantry && G.drawMarshPantry(ctx, ch, time)) return;
       if (G.drawMistwoodPantry && G.drawMistwoodPantry(ctx, ch, time)) return;
@@ -1634,6 +1638,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawStarfallPost && G.drawStarfallPost(ctx, post, awake, near)) return;
     if (G.drawRidgePost && G.drawRidgePost(ctx, post, awake, near)) return;
     if (G.drawMarshPost && G.drawMarshPost(ctx, post, awake, near)) return;
     if (G.drawMistwoodPost && G.drawMistwoodPost(ctx, post, awake, near)) return;

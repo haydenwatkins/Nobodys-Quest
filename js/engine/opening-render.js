@@ -228,14 +228,16 @@
       if(e.openingMode==='windup'&&!e.dead){const a=e.openingAim;c.save();c.translate(e.x,e.y-4);c.rotate(Math.atan2(a.y,a.x));rect(c,5,-7,38,14,'rgba(242,207,139,.17)');rect(c,5,-7,38,1,C.gold);rect(c,5,7,38,1,C.gold);c.restore();}
     }
   };
-  G.drawOpeningPrompt=c=>{
+  G.drawOpeningPrompt=(c,cam)=>{
     if(G.ui.dialogueOpen||G.ui.menuOpen||G.state.bossCutscene)return false;
     const at=G.openingInteractionCandidate();if(!at)return;
     const prefix=G.input.isTouch?'A · ':G.input.hasGamepad?'A · ':'J / E · ';
     const label=prefix+at.label;
     c.save();c.font="9px 'VT323', monospace";const w=c.measureText(label).width+16;
-    rect(c,(320-w)/2,136,w,16,'rgba(32,45,50,.94)');rect(c,(320-w)/2,136,2,16,C.gold);
-    c.fillStyle=C.paper;c.textBaseline='top';c.fillText(label,(320-w)/2+8,140);c.restore();return true;
+    const x=(G.W-w)/2,p=G.state.player;let y=136;
+    if(cam&&p){const px=p.x-cam.x,py=p.y-cam.y;if(px+12>x&&px-12<x+w&&py+4>y&&py-24<y+16)y=Math.max(45,Math.min(117,Math.floor(py-40)));}
+    rect(c,x,y,w,16,'rgba(32,45,50,.94)');rect(c,x,y,2,16,C.gold);
+    c.fillStyle=C.paper;c.textBaseline='top';c.fillText(label,x+8,y+4);c.restore();return true;
   };
 })();
 
@@ -245,7 +247,7 @@
   const here=()=>G.state&&G.state.mapDef&&G.state.mapDef.openingLandscape;
   function text(c,label,x,y,color='#f0dfb2',size=9){c.font=`${size}px 'VT323', monospace`;c.fillStyle=color;c.fillText(label,x,y);}
   function panel(c,x,y,w,h){c.fillStyle='rgba(30,44,44,.88)';c.fillRect(x,y,w,h);c.fillStyle='#ac9566';c.fillRect(x,y,1,h);}
-  G.drawOpeningHud=(c)=>{
+  G.drawOpeningHud=(c,cam)=>{
     if(!here())return false;
     const s=G.state,p=s.player,form=G.playerForm();
     c.save();c.textBaseline='top';
@@ -302,7 +304,7 @@
       }
       text(c,G.input.hasGamepad?'B  FORMS   R3  MIX':'Q  FORMS   F  MIX',205,163,'#f0dfb2',8);
     }
-    if(!G.ui.dialogueOpen)G.drawOpeningPrompt(c);
+    if(!G.ui.dialogueOpen)G.drawOpeningPrompt(c,cam);
     c.restore();return true;
   };
   G.drawOpeningDialogue=(c,d,wrap)=>{

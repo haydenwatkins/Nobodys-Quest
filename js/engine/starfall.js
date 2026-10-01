@@ -42,8 +42,9 @@
   const oldDraw=G.openingDrawables;
   G.openingDrawables=c=>{
     const list=oldDraw(c);if(G.state.mapId!=="starfallRuins")return list;
-    for(const l of [...lenses,instrument])list.push({y:l.y*16+14,fn:()=>{
+    for(const l of [...lenses,instrument])list.push({y:l.y*16+4,fn:()=>{
       const x=l.x*16+8,y=l.y*16+8,done=has(l.id),center=l===instrument;
+      if(G.drawStarfallMechanism&&G.drawStarfallMechanism(c,l,done,center,lenses))return;
       c.save();c.fillStyle="#292746";c.fillRect(x-13,y-4,26,12);c.fillStyle="#8389b3";c.fillRect(x-10,y+4,20,3);
       if(center){
         c.fillStyle="#ad8e69";c.fillRect(x-17,y-21,3,27);c.fillRect(x+14,y-21,3,27);c.fillRect(x-17,y-21,34,3);
