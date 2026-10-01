@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawStarfallTile && G.drawStarfallTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawGroveTile && G.drawGroveTile(ctx, cell, x, y, time)) ||
+      (G.drawStarfallTile && G.drawStarfallTile(ctx, cell, x, y, time)) ||
       (G.drawRidgeTile && G.drawRidgeTile(ctx, cell, x, y, time)) ||
       (G.drawMarshTile && G.drawMarshTile(ctx, cell, x, y, time)) ||
       (G.drawMistwoodTile && G.drawMistwoodTile(ctx, cell, x, y, time)) ||
@@ -905,7 +906,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawStarfallPortal || !G.drawStarfallPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawGrovePortal || !G.drawGrovePortal(ctx, cell, x, y)) &&
+        (!G.drawStarfallPortal || !G.drawStarfallPortal(ctx, cell, x, y)) &&
         (!G.drawRidgePortal || !G.drawRidgePortal(ctx, cell, x, y)) &&
         (!G.drawMarshPortal || !G.drawMarshPortal(ctx, cell, x, y)) &&
         (!G.drawMistwoodPortal || !G.drawMistwoodPortal(ctx, cell, x, y)) &&
@@ -949,7 +951,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawStarfallNotice || !G.drawStarfallNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawGroveNotice || !G.drawGroveNotice(ctx, cell, x, y)) &&
+        (!G.drawStarfallNotice || !G.drawStarfallNotice(ctx, cell, x, y)) &&
         (!G.drawRidgeNotice || !G.drawRidgeNotice(ctx, cell, x, y)) &&
         (!G.drawMarshNotice || !G.drawMarshNotice(ctx, cell, x, y)) &&
         (!G.drawMistwoodNotice || !G.drawMistwoodNotice(ctx, cell, x, y)) && (!G.drawMeadowNotice || !G.drawMeadowNotice(ctx, cell, x, y))) { // signpost
@@ -1082,7 +1085,8 @@ G.world = (() => {
     const T = G.TILE;
     const px = x * T, py = y * T;
     if (cell.tile === "water") {
-      const water = (G.marshWaterColors && G.marshWaterColors()) ||
+      const water = (G.groveWaterColors && G.groveWaterColors()) ||
+        (G.marshWaterColors && G.marshWaterColors()) ||
         (G.greenfieldWaterColors && G.greenfieldWaterColors()) ||
         biomePalette() && biomePalette().water || ["#293a9b", "#41a6f6", "#73eff7"];
       ctx.fillStyle = water[2];
@@ -1261,7 +1265,9 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawGroveSeedCache && G.drawGroveSeedCache(ctx, ch)) return;
     if (ch.food) {
+      if (G.drawGrovePantry && G.drawGrovePantry(ctx, ch, time)) return;
       if (G.drawHomePantry && G.drawHomePantry(ctx, ch, time)) return;
       if (G.drawStarfallPantry && G.drawStarfallPantry(ctx, ch, time)) return;
       if (G.drawRidgePantry && G.drawRidgePantry(ctx, ch, time)) return;
@@ -1638,6 +1644,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawGrovePost && G.drawGrovePost(ctx, post, awake, near)) return;
     if (G.drawStarfallPost && G.drawStarfallPost(ctx, post, awake, near)) return;
     if (G.drawRidgePost && G.drawRidgePost(ctx, post, awake, near)) return;
     if (G.drawMarshPost && G.drawMarshPost(ctx, post, awake, near)) return;

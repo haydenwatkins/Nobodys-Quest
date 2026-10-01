@@ -2,7 +2,7 @@
 
 Requested September 30, 2026. Ben wants cute characters; Hayden wants fairly high fidelity and cool designs without awkward or odd-looking shapes. This is a fresh review of **every form and boss**, including recently upgraded art. Preserve detailed pixel art, recognizable identities, gameplay timing, hitboxes, saves, and phone landscape readability.
 
-Expanded scope: the user wants original characters rather than copied Nobody Saves the World identities, may publish someday, and has added environmental art and eventually every NPC portrait/world sprite. Read `ORIGINAL-IDENTITY.md`. The character ledger below is only the first phase; it does not imply environment or NPC coverage is complete. Art for all of these phases precedes further playthrough upgrades. The resumed loop uses the remaining weekly allowance up to exhaustion; the old 50% stop is superseded and the banked reset remains untouched.
+Expanded scope: the user wants original characters rather than copied Nobody Saves the World identities, may publish someday, and has added environmental art and eventually every NPC portrait/world sprite. Read `ORIGINAL-IDENTITY.md`. The character ledger below is only the first phase; it does not imply environment or NPC coverage is complete. Art for all of these phases precedes further playthrough upgrades. The user redeemed the reset themselves and set the resumed loop to approximately 50% total weekly usage consumed; this supersedes the former exhaustion target. Leave future reset credits untouched.
 
 ## Direction and acceptance
 

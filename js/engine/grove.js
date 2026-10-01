@@ -34,7 +34,8 @@
   G.openingDrawables=c=>{
     const list=oldDraw(c);if(G.state.mapId!==map)return list;
     const planted=has(reward),x=tx*16+8,y=ty*16+8;
-    list.push({y:y+7,fn:()=>{
+    list.push({y:y-4,fn:()=>{
+      if(G.drawGroveShelter&&G.drawGroveShelter(c,x,y,planted))return;
       c.save();c.fillStyle="#493d35";c.fillRect(x-12,y-5,24,12);c.fillStyle="#a17b4f";c.fillRect(x-10,y-7,20,5);
       c.fillStyle="#d5bd8d";c.fillRect(x-5,y-6,10,2);
       if(planted){c.fillStyle="#6b4a2b";c.fillRect(x-2,y-26,4,22);
@@ -45,7 +46,7 @@
       c.restore();
     }});
     if(planted)for(const [fx,fy]of [[3,12],[7,15],[4,16],[8,13],[12,8],[15,9],[17,8]])list.push({y:fy*16+8,fn:()=>{
-      const x=fx*16+8,y=fy*16+8;c.save();c.fillStyle="#257179";c.fillRect(x,y-5,2,7);
+      const x=fx*16+8,y=fy*16+8;if(G.drawGroveFlower&&G.drawGroveFlower(c,x,y))return;c.save();c.fillStyle="#257179";c.fillRect(x,y-5,2,7);
       c.fillStyle="#ffcd75";c.fillRect(x-2,y-8,6,4);c.fillStyle="#fff3c2";c.fillRect(x,y-7,2,2);c.restore();
     }});
     return list;
