@@ -2,11 +2,11 @@
 "use strict";
 
 registerForm({
-  id: "colossus", name: "Colossus", icon: "⛰️",
-  tagline: "A mountain-sized promise: once a swing begins, nothing in the world can make it flinch.",
+  id: "colossus", name: "Cragback", icon: "⛰️",
+  tagline: "A gentle cliff-bear whose broad shoulders remember every homeward path.",
   speed: 48, hearts: 8, slots: 2,
   passive: { id: "worldweight", name: "Worldweight",
-    description: "While attacking, Colossus cannot be shoved or interrupted; melee and area arts hurl foes farther." },
+    description: "While attacking, Cragback cannot be shoved or interrupted; melee and area arts hurl foes farther." },
   basic: "pillarFist",
   abilities: [{ id: "earthShoulder", level: 1 }, { id: "worldBreak", level: 2 }],
   unlock: { type: "challenge", hint: "Reach the heartbeat beneath Titan Grave", requirements: [

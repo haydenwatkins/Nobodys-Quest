@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Cragback and Atlas (October 1)
+
+Colossus now appears as Cragback, a gentle basalt cliff-bear with rounded ears, soft carved muzzle, broad joined paws, rooted shoulder moss and a coral worldheart seam. Atlas has older russet stone, pale brows/muzzle and larger paws. A single clear head and joined bear anatomy replace the old overhead globe/body-face. The 48 directional player poses/four guardian indices retain 25x23/30x28 footprints, stable IDs, immediate Pillar Fist, Worldweight, shoulder/break, Worldheart/Lodestone and Titan grid/refuge/recovery.
+
+All 422 regression checks pass, including real-input fist damage once and Worldweight preserving position/pose while retaining incoming damage, alongside shoulder, ward, travel and three-phase field coverage. Default/signature sheets, guardian indices and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed actual Cragback and Atlas through a save-disabled local fixture without horizontal overflow or console errors. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is 23/24 forms and 17/19 boss definitions. The final calling/guardian and Tollkeeper remain before environment/NPC work.
+
 ### Wickling and Mallow (October 1)
 
 Lantern Wisp now appears as Wickling, with a warm flame face inside rounded storm glass, bowed copper ribs, hinged shutters and joined handles/feet. Mallow has a broader weathered lantern with a warm older flame face. Loose ornamental wisps are absent. The 48 directional player poses/four guardian indices preserve 19x20/26x26 footprints, stable IDs, native dark Wick Lash/light burst, Safe Light, drift, Lantern Mark/Ember and storm refuge/recovery.
@@ -158,7 +164,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Weaver / Silkstep | Shipped October 1: warm spider face, eight joined legs, fitted woven wrap, held needle and 48 directional poses |
 | Bellkeeper / Chimelet | Shipped October 1: rounded bronze metalwork, warm face, joined loop/handles/clapper and all 72 directional cast poses |
 | Lantern Wisp / Wickling | Shipped October 1: warm flame face, rounded storm glass, bowed copper frame, joined handles/feet, hinged shutters and 48 directional poses |
-| Colossus | Pending: powerful friendly anatomy, distinct from Golem |
+| Colossus / Cragback | Shipped October 1: soft basalt bear face, round ears, broad joined paws, rooted moss, worldheart seam and 48 directional poses |
 | God | Pending: charming original keeper, clear mantle and attached arms; no floating halo |
 
 | Boss | Fresh pass |
@@ -179,6 +185,6 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Tess, Silk Matriarch | Shipped October 1: older ivory spider face, cranberry silk, eight joined legs, fitted wrap, held needle/reel |
 | Bongle, Bell Titan | Shipped October 1: rounded teal metalwork, bronze lip, warm face and joined clapper; source/indices preserved |
 | Mallow, Lantern Keeper | Shipped October 1: warm older flame face, broad weathered lantern and hinged casting shutters; source/indices preserved |
-| Atlas, Last Worldbearer | Pending: strong gentle face and worldheart stone anatomy |
+| Atlas, Last Worldbearer | Shipped October 1: older russet mountain bear, pale brows/muzzle, joined broad paws and worldheart seam; source/indices preserved |
 | God of Every Form | Pending: cute final guardian with regal, coherent gestures |
 | Tollkeeper | Pending: charming clockwork coat/face, clear staff and mechanisms |

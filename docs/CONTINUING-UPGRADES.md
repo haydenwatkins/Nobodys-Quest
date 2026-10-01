@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Cragback and Atlas's mountain hearts (October 1)
+
+At 73% weekly and 35% five-hour usage, Colossus/Atlas's fresh pass began. Cragback is a gentle basalt cliff-bear with round ears, a carved muzzle, broad joined paws, moss rooted in the shoulders and a coral worldheart seam; Atlas has older russet stone, pale brows/muzzle and larger mountain paws. The old overhead globe/body-face is replaced by coherent bear anatomy. Their 48 directional player poses/four guardian indices retain 25x23/30x28 footprints, save IDs, immediate Pillar Fist, Worldweight, shoulder/break, Worldheart/Lodestone and all Titan route/grid/refuge/recovery rules.
+
+All 422 regression checks pass. Default/signature poses and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed actual Cragback and Atlas through a save-disabled local fixture without horizontal overflow or console errors. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 23/24 forms and 17/19 boss definitions. Continue the final calling/guardian, then Tollkeeper, followed by environments/NPCs before playthrough work. The final guardian represents the impossible demand for one perfect answer: preserve that story role when developing its original identity, rather than turning it into an unrelated mentor.
+
 ### Wickling and Mallow's storm glass (October 1)
 
 At 72% weekly and 29% five-hour usage, Lantern Wisp/Mallow's fresh pass began. Wickling has a warm flame face inside rounded storm glass, bowed copper ribs, hinged shutters and joined handles/feet; Mallow has a broader weathered lantern and warm older flame face. Loose ornamental wisps are absent. Their 48 directional player poses/four guardian indices retain footprints, save IDs, native Wick Lash/light burst, Safe Light, drift, Lantern Mark/Ember and storm refuge/recovery.

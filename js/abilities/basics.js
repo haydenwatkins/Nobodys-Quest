@@ -1255,7 +1255,7 @@ registerAbility({
 
 registerAbility({
   id: "pillarFist", name: "Pillar Fist", icon: "✊", type: "blunt", style: "melee",
-  description: "Commit to a heavy punch. As Colossus, attacks resist knockback while still taking damage.",
+  description: "Commit to a heavy punch. As Cragback, attacks resist knockback while still taking damage.",
   mana: 0, cooldown: 0.55,
   use(user) {
     G.combat.meleeArc(user, { ability: "pillarFist", range: 28, arcDeg: 170, damage: 2, type: "blunt",
