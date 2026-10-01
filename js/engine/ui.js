@@ -273,6 +273,15 @@ G.ui = (() => {
           y < other.y + other.h + 3 && y + height + 3 > other.y;
         if (overlaps) y = Math.max(37, other.y - height - 4);
       }
+      // Incidental speech must not hide a traveller beneath a nearby speaker.
+      // Include the tail and shadow; the bubble timer continues normally.
+      const sprite = G.forms[G.state.formId] && G.forms[G.state.formId].sprite;
+      const metrics = sprite && G.spriteMetrics ? G.spriteMetrics(sprite) : { w: 24, h: 28 };
+      const px = p.x - cam.x, py = p.y - cam.y;
+      const halfWidth = Math.max(12, metrics.w / 2) + 2;
+      const bodyHeight = Math.max(28, metrics.h) + 2;
+      if (x < px + halfWidth && x + width + 2 > px - halfWidth &&
+          y < py + 4 && y + height + 5 > py - bodyHeight) continue;
       placed.push({ x, y, w: width, h: height });
 
       const remaining = Math.min(bubble.duration || 2.25, bubble.t);
