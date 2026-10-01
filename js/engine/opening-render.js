@@ -16,7 +16,7 @@
       rect(c,px,py,16,16,C.water);
       for(let i=0;i<3;i++){const wx=px+Math.floor(rand(x+i,y)*12),wy=py+3+i*4;rect(c,wx,wy,3+Math.floor(r*5),1,i===0?'#619696':'#50848a');}
       if(Math.floor(time*2+r*5)%4===0)rect(c,px+4,py+6,5,1,C.blue);
-      if(freshOrchard())for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){
+      if((freshOrchard()||G.state.mapId==='sunriseQuay'))for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){
         const n=G.state.grid[y+dy]&&G.state.grid[y+dy][x+dx];if(!n||n.tile==='water')continue;
         if(dx){rect(c,px+(dx>0?15:0),py,1,16,'#345b59');if(r>.5)rect(c,px+(dx>0?13:1),py+4,2,5,'#61928b');}
         else{rect(c,px,py+(dy>0?15:0),16,1,'#345b59');if(r>.5)rect(c,px+4,py+(dy>0?13:1),5,1,'#85aaa0');}
@@ -24,7 +24,7 @@
       return true;
     }
     const grass=night?['#4c6450','#506852','#536b54']:['#70825b','#73865e','#778861'];
-    const groundPatch=freshOrchard()?rand(Math.floor((x+(Math.floor(y/4)%2)*2)/5),Math.floor(y/4)):rand(Math.floor(x/3),Math.floor(y/3));
+    const groundPatch=(freshOrchard()||G.state.mapId==='sunriseQuay')?rand(Math.floor((x+(Math.floor(y/4)%2)*2)/5),Math.floor(y/4)):rand(Math.floor(x/3),Math.floor(y/3));
     const color=t==='tree'?C.dark:t==='path'?['#b09a71','#b6a17b','#b5a079'][Math.floor(r*3)]:grass[Math.floor(groundPatch*3)];
     rect(c,px,py,16,16,color);
     if(t==='tree'){
@@ -36,7 +36,7 @@
       if(r>.7){rect(c,px+9,py+9,2,7,C.woodDark);rect(c,px+8,py+9,1,5,C.wood);}
     }else if(t==='path'){
       for(let i=0;i<3;i++)rect(c,px+Math.floor(rand(x+i,y+4)*14),py+Math.floor(rand(y+i,x+4)*14),2,1,i===0?'#c5b58c':'#9c8c69');
-      if(freshOrchard()&&r>.55){const sx=px+3+Math.floor(r*7),sy=py+4+Math.floor(rand(y+9,x)*7);rect(c,sx,sy,3,1,'#a28c68');rect(c,sx,sy-1,2,1,'#d2be94');if(r>.85)rect(c,sx+3,sy+3,1,1,'#d2be94');}
+      if((freshOrchard()||G.state.mapId==='sunriseQuay')&&r>.55){const sx=px+3+Math.floor(r*7),sy=py+4+Math.floor(rand(y+9,x)*7);rect(c,sx,sy,3,1,'#a28c68');rect(c,sx,sy-1,2,1,'#d2be94');if(r>.85)rect(c,sx+3,sy+3,1,1,'#d2be94');}
       for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){
         const n=G.state.grid[y+dy]&&G.state.grid[y+dy][x+dx];
         if(n&&n.tile==='grass'){
@@ -46,7 +46,7 @@
       }
     }else{
       if(r>.25){const ox=px+Math.floor(r*12),oy=py+Math.floor(rand(y+5,x)*12);rect(c,ox,oy,1,3,night?'#698563':'#92a472');rect(c,ox+2,oy+1,1,2,night?'#698563':'#92a472');}
-      if(freshOrchard()&&r>.62){const ox=px+3+Math.floor(rand(y+13,x+3)*8),oy=py+4+Math.floor(r*7);rect(c,ox,oy+2,3,1,night?'#425e49':'#657c50');rect(c,ox-1,oy,2,1,night?'#75956b':'#a3b17b');rect(c,ox+2,oy-1,2,1,night?'#66815e':'#8b9e68');if(r>.91)rect(c,ox+3,oy+1,1,1,C.gold);}
+      if((freshOrchard()||G.state.mapId==='sunriseQuay')&&r>.62){const ox=px+3+Math.floor(rand(y+13,x+3)*8),oy=py+4+Math.floor(r*7);rect(c,ox,oy+2,3,1,night?'#425e49':'#657c50');rect(c,ox-1,oy,2,1,night?'#75956b':'#a3b17b');rect(c,ox+2,oy-1,2,1,night?'#66815e':'#8b9e68');if(r>.91)rect(c,ox+3,oy+1,1,1,C.gold);}
       if(r>.93){rect(c,px+6,py+7,1,4,C.shade);rect(c,px+5,py+6,3,2,night?'#a6c8a3':'#e5ce91');}
       if(t==='rock'){
         poly(c,[[px+2,py+13],[px+1,py+7],[px+6,py+3],[px+12,py+5],[px+15,py+13]],'#485c54');
@@ -78,7 +78,7 @@
   }
   function prop(c,kind,x,y,time,skipDelivery=false){
     if(!skipDelivery&&G.drawDeliveryProp&&G.drawDeliveryProp(c,kind,x,y,time))return;
-    const props=freshOrchard()&&G.openingScenery&&G.openingScenery.props;
+    const props=(freshOrchard()||G.state.mapDef?.deliveryLandscape)&&G.openingScenery&&G.openingScenery.props;
     if(props){
       if(kind==='mill'){G.drawSprite(c,props.mill,0,x-2,y+4,false);const f=G.state.opening.sluice&&!G.reducedMotion?Math.floor(time*.65/(Math.PI/8))%8:0;G.drawSprite(c,props.wheel,f,x+30,y+11,false);return;}
       let id=kind,frame=0,ox=0,oy=3;

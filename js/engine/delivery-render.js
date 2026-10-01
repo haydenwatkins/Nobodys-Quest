@@ -10,6 +10,7 @@
   function glow(c,x,y,r=21){oval(c,x,y,r,r*.55,'rgba(247,206,126,.07)');oval(c,x,y,r*.65,r*.4,'rgba(247,206,126,.09)');}
   function lamp(c,x,y,on,t){
     if(on)glow(c,x,y-12,26);
+    if(G.deliveryScenery){G.drawSprite(c,G.deliveryScenery[on?'lampOn':'lampOff'],G.reducedMotion?0:Math.floor(t*3)%4,x,y+3,false);return;}
     rect(c,x-1,y-29,3,31,C.ink);poly(c,[[x-7,y-28],[x+6,y-28],[x+4,y-15],[x-5,y-15]],C.ink);
     rect(c,x-4,y-26,7,9,on?'#e6bb74':'#536772');if(on){rect(c,x-2,y-25,3,7,C.paper);rect(c,x-2,y-25,1,7,'#fff0cd');}
     rect(c,x-7,y-29,13,2,C.gold);rect(c,x-5,y-16,9,2,C.gold);rect(c,x-1,y-27,1,12,C.wood);
@@ -17,10 +18,11 @@
   }
   G.drawDeliveryProp=(c,kind,x,y,t)=>{
     const s=G.state,p=d(),quay=s.mapId==='sunriseQuay';
-    if(kind==='departure'){if(s.opening.complete){lamp(c,x,y,true,t);rect(c,x-18,y-23,37,10,C.wood);rect(c,x-16,y-22,32,7,C.paper);rect(c,x-11,y-19,21,1,C.wood);poly(c,[[x+10,y-21],[x+14,y-19],[x+10,y-17]],C.wood);}return true;}
+    if(kind==='departure'){if(s.opening.complete){lamp(c,x,y,true,t);if(G.deliveryScenery){G.drawSprite(c,G.deliveryScenery.departure,0,x,y-10,false);return true;}rect(c,x-18,y-23,37,10,C.wood);rect(c,x-16,y-22,32,7,C.paper);rect(c,x-11,y-19,21,1,C.wood);poly(c,[[x+10,y-21],[x+14,y-19],[x+10,y-17]],C.wood);}return true;}
     if(!here())return false;
     if(kind==='trailhead'){
       if(!p.complete)return true;
+      if(G.deliveryScenery){glow(c,x,y-5,18);G.drawSprite(c,G.deliveryScenery.trailhead,0,x,y+8,false);return true;}
       glow(c,x,y-5,18);rect(c,x-12,y-5,3,8,C.wood);rect(c,x+10,y-5,3,8,C.wood);
       poly(c,[[x-18,y-13],[x+15,y-13],[x+19,y-3],[x-15,y-3]],C.ink);
       poly(c,[[x-16,y-12],[x-4,y-15],[x+4,y-11],[x+14,y-13],[x+16,y-5],[x+4,y-3],[x-4,y-7],[x-13,y-4]],C.paper);
@@ -30,6 +32,14 @@
     if(kind==='cart'&&s.mapId==='lanternReach'&&p.lamps[0]===2&&x===120)return true;
     if(kind==='lantern'){
       const on=quay?p.parcels.length>0:s.mapId==='tollCourt'?true:p.lamps[x<400?0:1]>0;lamp(c,x,y,on,t);return true;
+    }
+    const art=G.deliveryScenery;
+    if(art){
+      if(kind==='apple'){const behind=a=>a&&Math.abs(a.x-x)<24&&a.y<y&&a.y>y-44;c.save();if(behind(s.player)||(s.npcs||[]).some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,G.openingScenery.apple,G.reducedMotion?0:Math.floor(t*.55+x)%4,x,y+3,false);c.restore();return true;}
+      if(kind==='willow'){const behind=a=>a&&Math.abs(a.x-x)<32&&a.y<y&&a.y>y-53;c.save();if(behind(s.player)||(s.npcs||[]).some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);oval(c,x,y+2,21,5,'rgba(25,36,43,.24)');G.drawSprite(c,art.willow,G.reducedMotion?0:Math.floor(t*.6+x)%4,x,y+3,false);c.restore();return true;}
+      if(kind==='rainGate'||kind==='tollArch'){const open=kind==='tollArch'?p.keeper:p.lamps[x<500?0:1]===2;G.drawSprite(c,art[open?'gateOpen':'gateClosed'],0,x,y+26,false);return true;}
+      const id=kind==='ledger'?'milepost':kind;
+      if(art[id]){if(kind==='satchel'&&p.salvage)return true;let oy=kind==='reed'?3:kind==='milepost'||kind==='ledger'?3:kind==='boat'||kind==='wreck'?4:kind==='bunting'?0:3;G.drawSprite(c,art[id],G.reducedMotion?0:Math.floor(t*.7)%4,x,y+oy,false);return true;}
     }
     if(kind==='rainGate'||kind==='tollArch'){
       const open=kind==='tollArch'?p.keeper:p.lamps[x<500?0:1]===2;
@@ -59,6 +69,8 @@
       for(let i=0;i<3;i++)rect(c,x-6,y-20+i*3,12-i*2,1,C.wood);return true;
     }
     if(['bakery','letterHouse','birthdayHouse'].includes(kind)){
+      if(art){const delivered=p.parcels.includes({bakery:'bread',letterHouse:'letter',birthdayHouse:'present'}[kind]);oval(c,x+3,y+2,30,7,'rgba(29,42,44,.22)');if(delivered)glow(c,x-13,y-17,24);G.drawSprite(c,art[kind+(delivered?'Warm':'Cold')],G.reducedMotion?0:Math.floor(t*.7)%4,x,y+4,false);return true;}
+
       const delivered=p.parcels.includes({bakery:'bread',letterHouse:'letter',birthdayHouse:'present'}[kind]);
       oval(c,x+3,y+2,30,7,'rgba(29,42,44,.22)');rect(c,x-23,y-38,46,39,C.wood);rect(c,x-21,y-36,42,35,kind==='letterHouse'?'#9eabb0':'#c5b397');
       for(let i=0;i<4;i++){rect(c,x-20,y-33+i*9,40,1,'#a69581');for(let j=0;j<4;j++)rect(c,x-18+j*10+(i%2)*3,y-33+i*9,1,8,'#b4a48c');}
@@ -96,15 +108,19 @@
     if(!here()||G.state.mapId==='sunriseQuay')return oldTile(c,cell,x,y,t);
     const px=x*16,py=y*16,r=G.util.hash2(x+7,y+11);
     if(cell.tile==='water'){
-      rect(c,px,py,16,16,r>.6?'#416773':'#456b76');for(let i=0;i<2;i++)rect(c,px+(r*9+i*4)%12,py+4+i*7,4,1,'#658790');return true;
+      const patch=G.util.hash2(Math.floor(x/4),Math.floor(y/3));rect(c,px,py,16,16,patch>.5?'#456b76':'#416773');
+      for(let i=0;i<2;i++)rect(c,px+(r*9+i*4)%12,py+4+i*7,4,1,'#62848c');
+      for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){const n=G.state.grid[y+dy]?.[x+dx];if(!n||n.tile==='water')continue;if(dx){rect(c,px+(dx>0?15:0),py,1,16,'#36585c');if(r>.5)rect(c,px+(dx>0?13:1),py+3,1,6,'#819e99');}else{rect(c,px,py+(dy>0?15:0),16,1,'#36585c');if(r>.5)rect(c,px+4,py+(dy>0?13:1),6,1,'#819e99');}}
+      return true;
     }
     if(cell.tile==='path'){
-      rect(c,px,py,16,16,'#899893');
-      for(let i=0;i<3;i++){const yy=py+i*5,offset=((x+y+i)%3)*3;rect(c,px,yy,16,1,'#778983');rect(c,px+offset,yy,1,5,'#778983');rect(c,px+offset+1,yy+1,Math.min(8,15-offset),1,'#9fa9a0');}
-      if(r>.78){rect(c,px+3,py+7,8,2,'#78969a');rect(c,px+4,py+7,4,1,'#a5b7b2');}
-      else if(r<.2){rect(c,px+2,py+3,3,1,'#637d71');rect(c,px+12,py+12,2,1,'#657e72');}return true;
+      rect(c,px,py,16,16,'#899893');const offset=(y%2)*8;
+      if(y%2===0){rect(c,px,py,16,1,'#71877f');rect(c,px+1,py+1,14,1,'#a2afa4');}
+      if((x+offset)%3===0){rect(c,px+3,py,1,16,'#768a81');rect(c,px+4,py+2,1,12,'#9eada1');}
+      if(r>.8){rect(c,px+6,py+8,6,2,'#75969a');rect(c,px+7,py+8,3,1,'#a8bab3');}else if(r<.18){rect(c,px+9,py+7,1,4,'#687f71');rect(c,px+10,py+10,3,1,'#687f71');}
+      return true;
     }
-    rect(c,px,py,16,16,r>.5?'#61786e':'#5d746b');if(r>.25){const xx=px+3+r*7,yy=py+3+r*5;rect(c,xx,yy,1,4,'#8aa18a');rect(c,xx+2,yy+2,1,3,'#8aa18a');rect(c,xx-2,yy+3,1,2,'#47685c');}
+    const patch=G.util.hash2(Math.floor((x+(Math.floor(y/4)%2)*2)/5),Math.floor(y/4));rect(c,px,py,16,16,patch>.5?'#61786e':'#5d746b');if(r>.25){const xx=px+3+r*7,yy=py+3+r*5;rect(c,xx,yy,1,4,'#8aa18a');rect(c,xx+2,yy+2,1,3,'#8aa18a');rect(c,xx-2,yy+3,1,2,'#47685c');}
     if(r>.9){rect(c,px+10,py+7,1,4,C.green);rect(c,px+9,py+6,3,2,'#b6b7a0');}return true;
   };
   G.drawDeliveryHazard=(c,h)=>{
