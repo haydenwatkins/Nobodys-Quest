@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Cobblekin and Pillar's garden masonry (October 1)
+
+At 69% weekly and 11% five-hour usage, Golem/Pillar's fresh pass began. Cobblekin has rounded joined river stones, a clear carved face, a mossy forelock and quartz chest keystone. Pillar has weathered pale stone, a gentle face, fitted canvas apron, a held trowel and grounded casting palms. Their 48 directional player poses/four guardian indices keep the source footprints, save IDs, third punch, Masonry cover, monolith, Stone Mark/Plumbline, garden routes and terrace warning/recovery unchanged.
+
+All 416 regression checks pass. All poses and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed the actual pair without horizontal overflow, with story recap pausing combat; ordinary encounter balance and physical-device checks remain outstanding. The ledger now covers 19/24 forms and 13/19 boss definitions. Continue Weaver with Tess in Rootdeep, then the rest of the roster, environments and NPCs before playthrough work.
+
 ### Galecrest Courier and Aurelia's cliffpost (October 1)
 
 The fresh five-hour window resumed at 68% weekly usage. Griffin now appears as Galecrest Courier, with rounded lion/eagle anatomy, a soft expressive beak, layered honey wings, fitted teal neckcloth and a leather dispatch pouch. Older Aurelia has an ivory ruff, broad blue feather fan and fitted copper chest harness. Her dialogue connects the restored canyon winds to homeward letters. Their source footprints, 48 directional player poses/four guardian indices, stable IDs, Wingbeat/Slipstream, volley/dive, Sky Mark/Plume, ward and all gust escape/recovery remain unchanged; no detached crown or ornament returns.

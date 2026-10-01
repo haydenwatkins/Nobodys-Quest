@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Cobblekin and Pillar (October 1)
+
+Golem now appears as Cobblekin, a friendly stone roadmender with rounded joined limbs, clear carved face, a mossy forelock and quartz keystone fitted into the chest. Older Pillar has weathered pale stone, a canvas mason's apron, a held trowel and broad grounded casting palms. The player has 48 directional poses; the guardian retains four indices. Their 22x21/28x26 footprints, stable IDs, native third-punch rhythm, Masonry cover, monolith, Stone Mark/Plumbline and three-phase terrace recovery remain unchanged.
+
+All 416 regression checks pass. Complete default/signature sheets and all guardian indices were inspected, including both pixel settings at gameplay scale and enlarged. Real-input third-punch and paid Rampart/hostile-only cover, monolith, garden routes, terrace recovery and Plumbline checks pass. Chrome at 667x375 displayed the actual pair without horizontal overflow, with story recap pausing combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 19/24 forms and 13/19 boss definitions. Continue Weaver with Tess in Rootdeep, before remaining character, environment and NPC art.
+
 ### Galecrest Courier and Aurelia (October 1)
 
 Griffin now appears as Galecrest Courier, a feathered cliffpost courier with rounded lion haunches, a soft expressive eagle face, layered honey wings, fitted teal neckcloth and leather dispatch pouch. Aurelia's older ivory ruff, broad blue feather fan and copper chest harness distinguish the guardian. The courier has 48 directional idle/walk/strike/guard frames; Aurelia retains four guardian indices. Their 28x19/30x22 footprints, save IDs, Sky Mark/Plume, combat timing, gust escape/recovery, ward and regional unlock remain unchanged. No detached crown or ornament returns.
@@ -130,7 +136,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Astronomer / Skylens Mapper | Shipped October 1: warm face, brass spectacles, blue field coat and held segmented telescope in every direction |
 | Druid / Hedgehare | Shipped October 1: soft hare face, folded ear, sage apron and basket/pruning cane carried in every direction |
 | Griffin / Galecrest Courier | Shipped October 1: rounded lion/eagle anatomy, expressive beak, layered joined wings, dispatch pouch and 48 directional poses |
-| Golem | Pending: rounded stone body with separate limbs and expression |
+| Golem / Cobblekin | Shipped October 1: friendly carved face, moss rooted in stone, separate rounded joints and 48 directional poses |
 | Weaver | Pending: friendly spider face, attached readable legs |
 | Bellkeeper | Pending: rounded bell silhouette and charming face, all casts |
 | Lantern Wisp | Pending: flame expression, clear cage and soft wisps |
@@ -151,7 +157,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Professor Perihelion / Nell, Starpath Keeper | Shipped October 1: visible older face, ivory curls, brass spectacles, stitched star chart and held telescope |
 | Grandmother Briar | Shipped October 1: warm grandmother face, silver braid, straw hat, fitted work apron and carried garden tools |
 | Aurelia, Sky Sovereign | Shipped October 1: older ivory ruff, broad blue feather fan, copper chest harness and clear talons; source/indices preserved |
-| Pillar, Old Mason | Pending: rounded stone mason, distinct arm/body shapes |
+| Pillar, Old Mason | Shipped October 1: weathered pale stone, warm carved face, fitted canvas apron, held trowel and grounded casting palms |
 | Tess, Silk Matriarch | Pending: friendly silk guardian, attached readable limbs |
 | Bongle, Bell Titan | Pending: powerful round bell, expression and metal detail |
 | Mallow, Lantern Keeper | Pending: charming flame/cage guardian, readable casting pose |

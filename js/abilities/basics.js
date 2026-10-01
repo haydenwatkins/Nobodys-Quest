@@ -1136,7 +1136,7 @@ registerAbility({
 
 registerAbility({
   id: "rampartPulse", name: "Rampart Pulse", icon: "🧱", type: "light", style: "area",
-  description: "Push nearby enemies away. As Golem, this also raises a temporary screen against enemy shots.",
+  description: "Push nearby enemies away. As Cobblekin, this also raises a temporary screen against enemy shots.",
   mana: 3, cooldown: 1.0,
   use(user) {
     G.combat.areaBurst(user, { ability: "rampartPulse", range: 34, damage: 1, type: "light",

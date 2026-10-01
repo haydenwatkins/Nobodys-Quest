@@ -2,8 +2,8 @@
 "use strict";
 
 registerForm({
-  id: "golem", name: "Golem", icon: "🗿",
-  tagline: "A walking fortress whose loudest spells leave something useful standing behind.",
+  id: "golem", name: "Cobblekin", icon: "🗿",
+  tagline: "A patient roadmender whose mossy hands turn loose stones into a way home.",
   speed: 58, hearts: 8, slots: 2,
   passive: { id: "masonry", name: "Masonry",
     description: "Area abilities raise a short-lived stone screen that blocks enemy projectiles but never your own." },
