@@ -7,8 +7,8 @@ test('opening heroes and Knight retain footprints, directional poses, and dyes i
     const dyed=G.costumedSprite(source),signature=G.signatureSprite(source,G.skinForForm(id));
     for(const sprite of [source,dyed,signature])for(const hd of [true,false]){
       G.hdPilot=hd;const active=G.activeSpriteDefinition(sprite),m=G.spriteMetrics(sprite);
-      // The existing skin renderer pads five source pixels on each side.
-      const padding=sprite===signature?(hd?5:10):0;
+      // All looks preserve the original authored silhouette.
+      const padding=0;
       assert.equal(m.w,28+padding);assert.equal(m.h,24+padding);assert.equal(active.frames.length,48);
       for(const dir of ['south','east','north','west']){
         const set=active.directional[dir];

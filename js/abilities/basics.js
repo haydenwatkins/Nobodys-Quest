@@ -767,7 +767,7 @@ registerAbility({
 registerAbility({
   id: "bloodBite",
   name: "Blood Bite",
-  description: "Every five enemies bitten restore one heart. Extra bite progress carries into the next heal; Vampire turns overhealing into temporary armor.",
+  description: "Every five enemies bitten restore one heart. Extra bite progress carries into the next heal; Velvetwing turns overhealing into temporary armor.",
   icon: "🦇",
   type: "sharp",
   style: "melee",

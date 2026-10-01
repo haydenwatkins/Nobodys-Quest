@@ -1,6 +1,20 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
 
+test('every signature look preserves all authored pixels and footprints without stamped ornaments',()=>{
+  const {G}=runtime();
+  for(const form of Object.values(G.forms)){
+    const skin=G.skinForForm(form.id);if(!skin)continue;
+    const source=form.sprite,look=G.signatureSprite(source,skin);
+    for(const hd of [true,false]){
+      G.hdPilot=hd;const base=G.activeSpriteDefinition(source),dressed=G.activeSpriteDefinition(look);
+      assert.deepEqual(dressed.frames,base.frames,form.id+' keeps every directional pose and occupied pixel');
+      assert.deepEqual(G.spriteMetrics(look),G.spriteMetrics(source),form.id+' has no padding or displaced feet');
+      assert.notDeepEqual(dressed.palette,base.palette,form.id+' retains its earned material colors');
+    }
+  }
+});
+
 test('earned ribbons, crowns and legends never add detached shapes to any character appearance',()=>{
   const {G}=runtime();
   const calls=[],ctx=new Proxy({}, {

@@ -1,12 +1,22 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
+
+test('Vesper keeps all four boss indices and the existing court footprint',()=>{
+  const {G}=runtime(),sprite=G.enemies.countessCarmine.sprite;
+  for(const hd of [true,false]){
+    G.hdPilot=hd;const active=G.activeSpriteDefinition(sprite),m=G.spriteMetrics(sprite);
+    assert.equal(m.w,25);assert.equal(m.h,25);assert.equal(active.frames.length,4);
+    assert.notDeepEqual(active.frames[0],active.frames[2]);
+    for(const frame of active.frames)for(const row of frame)for(const px of row)assert.ok(px==='.'||active.palette[px]);
+  }
+});
 test('Vampire keeps its world footprint and directional poses through dyes and both rendering resolutions',()=>{
   const {G}=runtime();const source=G.forms.vampire.sprite;
   G.state.costumeId='trailblazer';G.state.costumesUnlocked=['classic','trailblazer'];
-  for(const [sprite,footprint]of [[source,20],[G.costumedSprite(source),20],[G.signatureSprite(source,G.skinForForm('vampire')),25]]){
+  for(const [sprite,footprint]of [[source,20],[G.costumedSprite(source),20],[G.signatureSprite(source,G.skinForForm('vampire')),20]]){
     for(const hd of [true,false]){
       G.hdPilot=hd;const active=G.activeSpriteDefinition(sprite),metrics=G.spriteMetrics(sprite);
-      const expected=footprint===25&&!hd?30:footprint; // Existing signature ornaments pad each source grid by five pixels.
+      const expected=footprint; // Every appearance keeps the authored silhouette.
       assert.equal(metrics.w,expected);assert.equal(metrics.h,expected);
       for(const dir of ['south','east','north','west']){
         for(const mode of ['idle','walk','attack'])for(const index of active.directional[dir][mode]){

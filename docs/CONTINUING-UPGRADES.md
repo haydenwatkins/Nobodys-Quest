@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Velvetwing and the Dusk Court (October 1)
+
+Vampire and Countess Carmine now appear as original bat roadkeepers Velvetwing and Vesper, Dusk Host: warm expressive faces/ears, deliberate folded wings attached to their arms, fitted plum/rose workwear and sewn copper details. The Dusk Court/Duskflower Seal retain internal IDs, routes and rewards. The 20x20/25x25 footprints, 48 directional player poses/four guardian indices, bite/healing, dash, wards and three-phase waltz escape/recovery remain unchanged.
+
+The skin review exposed generic halo/cape stamps still inside frames. All 24 signature looks now preserve the exact authored silhouettes/poses/footprints while retaining their earned material colors and save IDs. Wardrobe descriptions follow the actual colors. All 401 tests pass; complete default/signature pose sheets, all four Vesper indices and the full signature roster were inspected. Chrome at 667x375 showed the actual court and a paused Daybreaker fixture without horizontal overflow. Physical-device and ordinary encounter-balance checks remain outstanding. This supersedes earlier signature-padding/accessory notes. Continue Jester with its regional guardian next, then the rest of the art ledger before environments, NPCs and playthrough upgrades.
+
 ### Tunneltuft and Bram's root roads (October 1)
 
 Mole now appears as Tunneltuft, a soft-furred tunnel scout with a fitted headlamp and 48 directional digging poses. Bram, Tunnelwarden, has rounded paws, a clear warm face, a work bib and a copper root crown attached to its band. Their existing footprints, save IDs, three-tap eruption, Burrow Blitz/Aftershock and three-phase warning/recovery rules remain intact. Visible names, unlock text and the Copper Root Crown follow the roadkeeper identity.

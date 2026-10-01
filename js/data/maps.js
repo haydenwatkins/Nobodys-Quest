@@ -191,7 +191,7 @@ registerMap({
 });
 
 registerMap({
-  id: "vampireTrial", name: "Carmine Court", playerStart: { x: 3, y: 8 },
+  id: "vampireTrial", name: "The Dusk Court", playerStart: { x: 3, y: 8 },
   visualTheme: "vampire",
   bossTrial: { exit: { map: "overworld", x: 50, y: 78 }, delay: 1.5 },
   legend: {

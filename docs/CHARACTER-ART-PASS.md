@@ -40,6 +40,14 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Velvetwing and Vesper, Dusk Host (October 1)
+
+The former Vampire is now an original bat roadkeeper with expressive ears, a warm muzzle, plum waistcoat and folded membranes attached to shoulders and thumbs. Vesper has a rose coat, soft ivory ruff, sewn duskflower brooch and larger casting wings. Their 20x20 and 25x25 footprints, 48 directional player poses/four boss indices, internal IDs, bite/healing, dash and waltz rules remain intact. The renamed Dusk Court and Duskflower Seal retain their routes and save keys.
+
+The signature review exposed halo/cape ornaments still stamped into the sprite grids. That generic builder is removed across all 24 looks: each now retains the exact source poses, occupied pixels, footprint and feet, using its earned material palette. Unlock/save IDs and wardrobe choices remain. Descriptions now name colors instead of removed ornament shapes. This supersedes older notes about five-pixel signature padding and deferred accessory review. `tools/render-character-review.cjs --skins` can inspect the complete wardrobe.
+
+All 48 default/signature poses and four Vesper indices were inspected, along with the three-page wardrobe sheet covering every signature look. All 401 tests pass, including real immediate bite/pose, healing/overflow, wardrobe/save progression, guardian warning/escape/recovery and all-form decoration checks. Chrome at 667x375 showed both characters in the actual Dusk Court without horizontal overflow. An additional paused local fixture displayed Daybreaker on the real player. The live world was dialogue-paused; this is visual browser evidence, not physical-device or ordinary encounter-balance validation. Next: Jester and its regional guardian.
+
 ### Tunneltuft and Bram, Tunnelwarden (October 1)
 
 Tunneltuft has rounded soft fur, a warm muzzle, fitted headlamp band, small neckerchief and articulated digging paws in 48 directional poses. Bram wears a copper root crown attached to its band and a work bib, with broader attached paws and a clear face. Their 19x15 and 26x21 footprints, internal IDs, native cast timing, third-tap eruption, Burrow Blitz, Aftershock, wards and boss warnings remain unchanged. Visible names and Copper Root Crown now describe keepers of the roads beneath the roots.
@@ -79,7 +87,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Dragon / Hearthdrake | Shipped October 1: rounded muzzle, horns, four feet, wings, tapered tail and directional scale/belly detail |
 | Riftblade / Wayglass Duelist | Shipped October 1: visible face, travel cap, folded scarf and paired glass knives in all directions |
 | Mole / Tunneltuft | Shipped October 1: soft fur, warm muzzle, fitted headlamp and 48 directional digging poses |
-| Vampire | Pending: charming face, coherent cape/arms in all directions |
+| Vampire / Velvetwing | Shipped October 1: velvet ears, warm muzzle, fitted waistcoat and attached directional membrane wings |
 | Jester | Pending: expressive face, soft fabric and playful gestures |
 | Turtle | Pending: sculpted shell/feet/head, defensive poses |
 | Samurai | Pending: cute face under hat, coherent robe and sword grip |
@@ -100,7 +108,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Eclipse Knight | Shipped September 30: violet armor, moon horns, crescent shield |
 | Riftblade Adept / Mira, Wayglass Keeper | Shipped October 1: visible face, woven hood, braid, soft mantle and articulated knife gesture |
 | Mole Monarch / Bram, Tunnelwarden | Shipped October 1: warm face, broad digging paws, work bib and fitted copper root crown |
-| Countess Carmine | Pending: charming countess, shaped cape and casting arms |
+| Countess Carmine / Vesper, Dusk Host | Shipped October 1: expressive bat face, ivory ruff, sewn duskflower brooch and attached casting wings |
 | Royal Fool | Pending: playful expressive face, natural pie/card poses |
 | Admiral Tortoise | Pending: proud naval turtle with sculpted shell and limbs |
 | Paper Ronin | Pending: clear cute face, folded robe and sword grip |

@@ -4,8 +4,10 @@ const {createCanvas}=require(require.resolve('@napi-rs/canvas',{paths:[process.e
 const {G}=require('./lib/classic-runtime.cjs')(createCanvas);
 const out=process.argv[2];if(!out)throw Error('Pass an output directory');
 fs.mkdirSync(out,{recursive:true});
-const groups={forms:G.formOrder.map(id=>({id,...G.forms[id]})),bosses:Object.values(G.enemies).filter(e=>e.miniboss)};
-groups.bosses.push({id:'ancientTreant-opening',name:'Treant / Orchard battle',sprite:G.openingTreantSprite});
+const skins=process.argv.includes('--skins');
+const groups={forms:G.formOrder.map(id=>({id,...G.forms[id],sprite:skins?G.signatureSprite(G.forms[id].sprite,G.skinForForm(id)):G.forms[id].sprite})),bosses:Object.values(G.enemies).filter(e=>e.miniboss)};
+if(skins)delete groups.bosses;
+else groups.bosses.push({id:'ancientTreant-opening',name:'Treant / Orchard battle',sprite:G.openingTreantSprite});
 for(const [kind,list]of Object.entries(groups)){
   for(let page=0;page<Math.ceil(list.length/9);page++){
     const w=360,h=300,canvas=createCanvas(w*3,h*3),c=canvas.getContext('2d');

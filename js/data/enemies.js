@@ -699,7 +699,7 @@ registerEnemy({
 });
 
 registerEnemy({
-  id: "countessCarmine", name: "Countess Carmine",
+  id: "countessCarmine", name: "Vesper, Dusk Host",
   hp: 58, speed: 65, damage: 2, behavior: "chase", aggro: 180,
   size: 19, heavy: true, miniboss: true,
   ward: { types: ["dark"], hp: 6 },
@@ -711,17 +711,17 @@ registerEnemy({
     patterns: ["vampireDash", "crimsonWaltz"],
     intro: "MIDNIGHT HAS EXCELLENT TIMING",
     introLines: [
-      "Welcome. I would offer refreshments, but that feels threatening.",
-      "Try not to bleed on the cape. It is already very committed.",
+      "Welcome to the dusk court. Every traveller deserves a warm stop before the long night.",
+      "A little dance keeps the chill away. Mind the wings; they are also my best coat.",
       "After my dash, find the pale opening in the waltz. Even midnight leaves room for a partner.",
     ],
     phaseLine: "I have counted to two. Conveniently, this is phase two!",
     phaseThreeLine: "Now this is a proper midnight dance. Do keep up.",
     knockoutLine: "A dramatic faint! Excellent form. Try the door again later.",
-    defeatLine: "A fine performance. Nine out of ten. Lost one point for sunlight.",
+    defeatLine: "Take the duskflower seal. When you find a traveller out after dark, make room for them.",
     rematchLine: "Back already? Delightful. I barely finished brooding.",
   },
-  trophy: "crimson-seal", trophyName: "Crimson Seal", location: "Carmine Court",
+  trophy: "crimson-seal", trophyName: "Duskflower Seal", location: "The Dusk Court",
   sprite: {
     palette: { k: "#1a1c2c", d: "#2d1b2e", v: "#5d275d", r: "#b13e53", c: "#ef7d57", w: "#f4f4f4", s: "#94b0c2" },
     frames: [[

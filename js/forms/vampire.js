@@ -6,9 +6,9 @@
 
 registerForm({
   id: "vampire",
-  name: "Vampire",
+  name: "Velvetwing",
   icon: "🧛",
-  tagline: "Polite, relentless, and only one good combo away from feeling better.",
+  tagline: "A velvet-eared keeper who carries warmth along the roads after dusk.",
 
   speed: 105,
   hearts: 5,
@@ -22,8 +22,8 @@ registerForm({
     { id: "bloodMoon", level: 2 },
   ],
 
-  unlock: { type: "challenge", hint: "Survive Countess Carmine's midnight recital", requirements: [
-    { type: "item", item: "crimson-seal", hint: "Win the Crimson Seal" },
+  unlock: { type: "challenge", hint: "Join Vesper's dusk recital", requirements: [
+    { type: "item", item: "crimson-seal", hint: "Win the Duskflower Seal" },
     { type: "formLevel", form: "wizard", level: 3 },
   ] },
 

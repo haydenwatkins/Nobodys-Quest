@@ -36,7 +36,7 @@ assert.ok(G.COSTUMES.every((costume) => !["damage", "health", "hearts", "speed",
   "costumes must remain mechanically neutral");
 assert.equal(G.FORM_SKINS.length, 24, "every launch form should receive a signature skin");
 assert.equal(new Set(G.FORM_SKINS.map((skin) => skin.formId)).size, 24,
-  "signature skins should belong to distinct forms rather than being global palette swaps");
+  "signature colors should belong to distinct forms");
 assert.ok(G.FORM_SKINS.every((skin) => skin.unlockLevel === 3), "skin mastery should use one legible rule");
 assert.ok(G.FORM_SKINS.every((skin) => !["damage", "health", "hearts", "speed", "mana"].some((key) => key in skin)),
   "signature skins must remain mechanically neutral");
@@ -45,9 +45,9 @@ const nobodySkin = G.skinById("cardboardHero");
 const tinyNobody = { palette: { k: "#1a1c2c", w: "#f4f4f4" }, frames: [[".kk.", "kwwk", ".kk."]] };
 const signature = G.signatureSprite(tinyNobody, nobodySkin);
 assert.notEqual(signature, tinyNobody);
-assert.notDeepEqual(Array.from(signature.frames[0]), Array.from(tinyNobody.frames[0]),
-  "a signature skin should rebuild the frame silhouette, not merely remap colors");
-assert.ok(signature.frames[0].length > tinyNobody.frames[0].length, "signature silhouettes need room for authored accessories");
+assert.deepEqual(Array.from(signature.frames[0]), Array.from(tinyNobody.frames[0]),
+  "signature colors must preserve the authored silhouette without generic decorations");
+assert.notEqual(signature.palette.w, tinyNobody.palette.w, "earned looks still change material colors");
 assert.equal(G.signatureSprite(tinyNobody, nobodySkin), signature, "signature sprites should be cached");
 
 const normalizedSkins = G.normalizeSkins(["cardboardHero", "fake", "cardboardHero"], {

@@ -74,8 +74,8 @@ for (const id of G.formOrder) {
   const skin = G.skinForForm(id);
   const source = G.forms[id].sprite;
   const variant = G.signatureSprite(source, skin);
-  assert.notDeepEqual(Array.from(variant.frames[0]), Array.from(source.frames[0]),
-    `${id}'s signature must change its silhouette`);
+  assert.deepEqual(Array.from(variant.frames[0]), Array.from(source.frames[0]),
+    `${id}'s signature must preserve its authored silhouette`);
   for (const frame of variant.frames) for (const row of frame) for (const pixel of row)
     assert.ok(pixel === "." || pixel === " " || variant.palette[pixel],
       `${skin.name} uses unknown sprite color '${pixel}'`);
