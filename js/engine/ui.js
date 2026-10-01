@@ -637,7 +637,8 @@ G.ui = (() => {
       pantryX += w + 2;
     }
 
-    if (!drawBossBar(c)) drawLocationChip(c);
+    const entranceFocus = G.nearGreenfieldEntrance && G.nearGreenfieldEntrance();
+    if (!drawBossBar(c) && !entranceFocus) drawLocationChip(c);
 
     /* stars (top right) */
     const starTxt = `⭐${G.state.stars}`;
@@ -648,12 +649,15 @@ G.ui = (() => {
     c.fillText(starTxt, G.W - sw - 1, 8);
 
     if (!G.state.bossCutscene) {
-      drawMinimap(c);
-      drawStoryTracker(c);
-      drawQuestTracker(c);
+      // Let travellers see the actual gate; health, stars, warnings and arts stay.
+      if (!entranceFocus) {
+        drawMinimap(c);
+        drawStoryTracker(c);
+        drawQuestTracker(c);
+      }
       drawWardHint(c, cam);
       const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c);
-      if (!interactionShown && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
+      if (!interactionShown && !entranceFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
       drawWayfinderHint(c);
       drawTutorial(c);
       drawAbilityBar(c, p);

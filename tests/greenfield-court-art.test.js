@@ -1,0 +1,22 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
+const ids={moleTrial:'burrowCourt',vampireTrial:'duskCourt',jesterTrial:'trouperCourt',riftbladeTrial:'wayglassCourt',godTrial:'wayheartCourt'};
+function capture(G){const draws=[],ctx=new Proxy({globalAlpha:1,measureText:t=>({width:String(t).length*5})},{get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)});G.drawSprite=(c,s,f)=>draws.push({s,f});return {ctx,draws};}
+function portals(G){return G.state.grid.flatMap((row,y)=>row.flatMap((cell,x)=>ids[cell.portal?.map]?[{cell,x,y,id:ids[cell.portal.map]}]:[]));}
+test('all five authored court entrances retain their real star, mastery and Worldmark locks and travel routes',()=>{
+ const r=runtime(),{G}=r;r.load('overworld');r.drain();const {ctx,draws}=capture(G),gates=portals(G),grid=JSON.stringify(G.state.grid);assert.equal(gates.length,5);
+ for(const gate of gates){const {cell,x,y,id}=gate;G.state.stars=0;G.state.items=[];G.state.worldwake.marks=[];G.questsDone=[];assert.ok(G.world.portalBlockReason(cell));
+  for(const hd of [true,false]){G.hdPilot=hd;draws.length=0;const journal=JSON.stringify(G.state.worldwake);G.world.draw(ctx,{x:Math.max(0,x*16-100),y:Math.max(0,y*16-100)},3);assert.ok(draws.some(d=>d.s===G.greenfieldScenery[id]&&d.f===1),id);assert.equal(JSON.stringify(G.state.worldwake),journal);const bounds=G.greenfieldCourtLayout(x,y);assert.ok(bounds.x>=24&&bounds.x+24<=G.state.mapW*16);assert.ok(bounds.bottom>=32&&bounds.bottom<=G.state.mapH*16-22);}
+  if(cell.masteryPortfolio){G.state.stars=99;assert.ok(G.world.portalBlockReason(cell),'stars cannot bypass the final portfolio');G.state.worldwake.marks=['sky','stone','thread','echo','light','heart'];const forms=G.formOrder.filter(f=>f!=='god');G.questsDone=forms.flatMap(f=>G.forms[f].quests.slice(0,2).map(q=>q.id));assert.ok(G.world.portalBlockReason(cell));for(const f of forms.slice(0,6))G.questsDone.push(...G.forms[f].quests.slice(2).map(q=>q.id));assert.equal(G.world.portalBlockReason(cell),null);G.state.worldwake.marks.pop();assert.ok(G.world.portalBlockReason(cell),'the last Worldmark still matters');G.state.worldwake.marks.push('heart');}
+  else{G.state.stars=cell.stars-1;assert.ok(G.world.portalBlockReason(cell));G.state.stars=cell.stars;}
+  assert.equal(G.world.portalBlockReason(cell),null);draws.length=0;G.drawGreenfieldTrial(ctx,cell,x,y,false);assert.equal(draws.pop().f,0);Object.assign(G.state.player,{x:x*16+8,y:y*16+8});assert.equal(G.nearGreenfieldEntrance(),true);G.world.checkTriggers(.5);assert.equal(G.state.mapId,cell.portal.map);assert.equal(G.drawGreenfieldTrial(ctx,cell,x,y,false),false);r.load('overworld');r.drain();assert.equal(JSON.stringify(G.state.grid),grid);
+ }
+});
+test('entrance focus clears nonessential HUD cards only during approach and restores them away from the gate in desktop and touch layouts',()=>{
+ const r=runtime(),{G}=r;r.load('overworld');r.drain();r.run('js/engine/ui.js');const c=r.nodes.get('ui').getContext('2d'),labels=[];c.fillText=t=>labels.push(String(t));G.drawGuidanceHud=()=>labels.push('NAVIGATION CHIP');
+ for(const touch of [false,true]){G.input.isTouch=touch;Object.assign(G.state.player,{x:968,y:40});assert.equal(G.nearGreenfieldEntrance(),true);labels.length=0;G.ui.drawHUD({x:808,y:0});assert.ok(!labels.some(t=>/Greenfield|GREENFIELD|NAVIGATION CHIP/.test(t)));assert.ok(labels.some(t=>/Patchling/.test(t)),'health/form and combat information remain');Object.assign(G.state.player,{x:968,y:100});assert.equal(G.nearGreenfieldEntrance(),false);labels.length=0;G.ui.drawHUD({x:808,y:0});assert.ok(labels.some(t=>/Greenfield|GREENFIELD/.test(t)));assert.ok(labels.includes('NAVIGATION CHIP'));}
+ r.load('town');assert.equal(G.nearGreenfieldEntrance(),false);
+});
+
+test('Greenfield restored Heart Road arch follows the actual Worldheart Mark while the Titan region awaits its own art pass',()=>{
+ const r=runtime(),{G}=r;r.load('overworld');r.drain();const {ctx,draws}=capture(G),S=G.greenfieldScenery;for(const lit of [false,true]){G.state.worldwake.marks=lit?['heart']:[];draws.length=0;const record=JSON.stringify(G.state.worldwake);for(const item of G.openingDrawables(ctx))item.fn();assert.ok(draws.some(d=>d.s===S.heartRoadArch&&d.f===(lit?0:1)));assert.equal(JSON.stringify(G.state.worldwake),record);assert.equal(!!G.world.portalBlockReason(G.state.grid[0][114]),!lit);}r.load('titanGrave');assert.equal(G.drawGreenfieldHeartArch(ctx,10,10,true),false);
+});

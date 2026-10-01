@@ -1305,6 +1305,7 @@ G.world = (() => {
   // a tiny code-drawn facade so new trials only need a portalTheme in maps.js.
   function drawTrialLandmark(ctx, cell, x, y, time) {
     if (cell.portalStyle !== "trial") return;
+    if (G.drawGreenfieldTrial && G.drawGreenfieldTrial(ctx, cell, x, y, !portalOpen(cell))) return;
     const T = G.TILE;
     const inwardX = x === 0 ? 8 : x === G.state.mapW - 1 ? -8 : 0;
     const inwardY = y === 0 ? 8 : y === G.state.mapH - 1 ? -8 : 0;

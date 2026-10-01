@@ -12,7 +12,7 @@
     c.fillRect(x-1,y-30,2,10);c.fillRect(x-4,y-27,8,3);c.restore();}});
   }
   const lit=G.hasWorldMark("heart"),x=(map==="titanGrave"?23:114)*16+8,y=(map==="titanGrave"?27:2)*16+8;
-  list.push({y:y-8,fn:()=>{c.save();
+  list.push({y:y-8,fn:()=>{if(G.drawGreenfieldHeartArch&&G.drawGreenfieldHeartArch(c,x,y,lit))return;c.save();
    c.fillStyle="#353344";c.fillRect(x-20,y-7,40,6);
    c.fillStyle=lit?"#9a7380":"#686679";
    for(const side of [-1,1]){c.fillRect(x+side*15-2,y-32,5,25);c.fillRect(x+side*15-4,y-9,9,4);}
