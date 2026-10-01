@@ -117,7 +117,7 @@
         "When people stopped going anywhere, the great carriers concluded that nowhere must be sacred.",
       ],
       5: [
-        "The God of Every Form was built from our demand for one answer to every problem.",
+        "Meridian, the Perfect Map, was built from our demand for one answer to every problem.",
         "You joined the broken paths together. I have left room on the map for whatever grows next.",
       ],
     }, "robe"),
@@ -264,7 +264,7 @@
         "Six marks open the last path. Or decorate a very intimidating loyalty card.",
       ],
       4: [
-        "The God of Every Form is not divine. It is everyone wishing for a hero who never needs help.",
+        "Meridian is not divine. The Perfect Map is everyone wishing for a hero who never needs help.",
         "Perfection has no friends, no spare answers, and a truly exhausting temper.",
       ],
       5: [

@@ -73,10 +73,10 @@ G.STORY_CHAPTERS = [
     id: "together", icon: "☀", color: "#fff3c2",
     title: "Every Road Home",
     thesis: "The world does not need one perfect answer. It needs every good answer willing to change.",
-    summary: "With the horizon restored, Patchling faces the impossible ideal that sealed the roads: the God of Every Form.",
+    summary: "With the horizon restored, Patchling faces the impossible ideal that sealed the roads: Meridian, the Perfect Map.",
     scene: [
       ["THE LAST WORLDBEARER", "I carried every road here for you. I cannot carry the final step."],
-      ["ARCHIVIST ERRATA", "The God of Every Form was built from our demand for one answer to every problem."],
+      ["ARCHIVIST ERRATA", "Meridian, the Perfect Map, was built from our demand for one answer to every problem."],
       ["PEBBLE", "Fortunately, you have never been one thing for more than a few heartbeats."],
       ["THE STORY", "At the northern edge of Greenfield, the Final Firmament opens."],
     ],
@@ -398,9 +398,9 @@ G.storyGoal = function () {
   }
   return Object.assign(base, {
     guide: "boss", mapId: "godTrial", destination: "Final Firmament",
-    title: "Answer the impossible ideal", short: "Enter the Final Firmament and face God",
-    objective: "Find the northern Final Firmament in Greenfield and defeat the God of Every Form.",
-    reason: "God is every perfect answer at once. Patchling's final strength is knowing when to become something else.",
+    title: "Answer the impossible ideal", short: "Enter the Final Firmament and face Meridian",
+    objective: "Find the northern Final Firmament in Greenfield and defeat Meridian, the Perfect Map.",
+    reason: "Meridian demands one perfect answer to every road. Patchling's final strength is knowing when to become something else.",
     progress: storyProgress(1, 1, "FINAL EXAM READY"),
   });
 };
@@ -489,7 +489,7 @@ G.playStoryEnding = function (replay) {
   endingQueued = true;
   const lines = [
     ["THE STORY", "The last borrowed shape folds into the coat. Patchling's map is full of roads, with room at its edges for more.", "#f4f4f4"],
-    ["GOD OF EVERY FORM", "I was every answer at once. You were willing to become the next question.", "#fff3c2"],
+    ["MERIDIAN", "I was every answer at once. You were willing to become the next question.", "#fff3c2"],
     ["ARCHIVIST ERRATA", "The first map ended here. Yours has paths reaching right off the page.", "#d9a7ff"],
     ["ARCHIVIST ERRATA", "A road stays alive when people carry each other home.", "#d9a7ff"],
     ["PEBBLE", "One last stitch. Then breakfast. You promised.", "#73eff7"],

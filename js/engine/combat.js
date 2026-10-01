@@ -108,7 +108,7 @@ G.combat = (() => {
         && (style === 'melee' || style === 'area') ? 1 : 0;
       const wardDamage = opts.damage + wardBonus;
       enemy.ward.hp -= wardDamage;
-      G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "GOD!" : wardDamage, wardHitColor);
+      G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "WAYHEART!" : wardDamage, wardHitColor);
       knockback(enemy, opts, 0.7);
       impactFeedback(enemy, { ...opts, damage: wardDamage, hitStop: Math.min(opts.hitStop || 0.025, 0.025), shake: 0.08 }, wardHitColor);
       if (enemy.ward.hp <= 0) {

@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Wayheart and Meridian's living maps (October 1)
+
+At 74% weekly and 43% five-hour usage, the final calling/guardian pass began. Wayheart is Patchling's completed living map, with a warm folded-canvas face, stitched teal route coat, carried map and brass route quill. Meridian, the Perfect Map, has a meticulous indigo chart coat, pale folded face, map ledger and attached compass staff. No floating halo, crown or orbiting ornaments remain. Meridian keeps the impossible-ideal story role: demanding one perfect answer sealed the roads. Chapter recap, final guidance, NPC lore and ending now follow that identity; native ability names are Waylight, Crossroads Ring and Dusk Compass. Internal `god`/`godAvatar`, ability/quest/item/save IDs, footprints, combat and mastery gate remain stable.
+
+All 424 regression checks pass. The 48 directional player poses/four guardian indices, earned appearances and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed the actual pair through a save-disabled local fixture without overflow or console errors. Story recap pauses combat; ordinary encounter balance and physical-device checks remain outstanding. Coverage is now 24/24 forms and 18/19 boss definitions. Finish Tollkeeper's fresh pass, then inventory and upgrade environments in region order, followed by every NPC world sprite/portrait before playthrough work.
+
 ### Cragback and Atlas's mountain hearts (October 1)
 
 At 73% weekly and 35% five-hour usage, Colossus/Atlas's fresh pass began. Cragback is a gentle basalt cliff-bear with round ears, a carved muzzle, broad joined paws, moss rooted in the shoulders and a coral worldheart seam; Atlas has older russet stone, pale brows/muzzle and larger mountain paws. The old overhead globe/body-face is replaced by coherent bear anatomy. Their 48 directional player poses/four guardian indices retain 25x23/30x28 footprints, save IDs, immediate Pillar Fist, Worldweight, shoulder/break, Worldheart/Lodestone and all Titan route/grid/refuge/recovery rules.

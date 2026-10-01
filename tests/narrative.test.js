@@ -96,7 +96,7 @@ for (const [id, def] of Object.entries(G.NPCS)) {
 }
 
 const wholeStory = lines.join(" ");
-for (const idea of ["Unfinished", "Patchling", "Worldbearers", "God of Every Form"])
+for (const idea of ["Unfinished", "Patchling", "Worldbearers", "Meridian, the Perfect Map"])
   assert.ok(wholeStory.includes(idea), "the discoverable dialogue must explain " + idea);
 
 G.state = {

@@ -1288,8 +1288,8 @@ registerAbility({
 
 registerAbility({
   id: "divineSpark",
-  description: "Fire a powerful bolt of light. As God, your attacks can break any ward type.",
-  name: "Divine Spark",
+  description: "Fire a powerful bolt of roadlight. As Wayheart, your attacks can break any ward type.",
+  name: "Waylight",
   icon: "☀️",
   type: "light",
   style: "projectile",
@@ -1310,7 +1310,7 @@ registerAbility({
 registerAbility({
   id: "judgmentRing",
   description: "Release a full-circle burst of light that drives nearby enemies away.",
-  name: "Judgment Ring",
+  name: "Crossroads Ring",
   icon: "⚖️",
   type: "light",
   style: "area",
@@ -1330,7 +1330,7 @@ registerAbility({
 registerAbility({
   id: "voidStar",
   description: "Pierce enemies with a dark star, then burst at the end of its flight. Targets already pierced take no extra burst damage.",
-  name: "Void Star",
+  name: "Dusk Compass",
   icon: "✴️",
   type: "dark",
   style: "area",

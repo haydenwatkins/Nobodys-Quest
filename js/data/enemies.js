@@ -1201,7 +1201,7 @@ registerEnemy({
 });
 
 registerEnemy({
-  id: "godAvatar", name: "God of Every Form",
+  id: "godAvatar", name: "Meridian, the Perfect Map",
   hp: 82, speed: 62, damage: 2, behavior: "chase", aggro: 190,
   size: 22, heavy: true, miniboss: true,
   ward: { types: ["light", "dark"], hp: 10 },
@@ -1211,16 +1211,16 @@ registerEnemy({
     telegraph: 0.48, chargeSpeed: 195, chargeDur: 0.34,
     antiKiteRange: 118, chaseScale: 1.3,
     patterns: ["charge", "foldCuts", "cards", "tideWall", "eclipseSweep", "orbitalBand", "gardenBeds", "nova"],
-    intro: "THE FINAL FORM HAS BEEN EXPECTING YOU",
+    intro: "THE PERFECT MAP LEAVES NO ROOM FOR MORE",
     introLines: [
-      "I know everything. Except where I put my keys.",
-      "Show me every lesson. I promise to grade on a curve.",
+      "I drew one perfect road to every door. Then I forbade the world to change.",
+      "Your seams are crooked, Patchling. And yet they lead somewhere my map cannot.",
       "Read the folds, find the channel, step behind the crescent, and hold the orbit. Your teachers sent excellent notes.",
     ],
     phaseLine: "Good. I was running out of easy questions.",
     phaseThreeLine: "No more questions. Show me the answer every form discovered.",
     knockoutLine: "Not yet. Mastery waits outside until you are ready.",
-    defeatLine: "Excellent. You may be God now. I am taking a lunch break.",
+    defeatLine: "Leave a little blank canvas, Wayheart. Tomorrow may need a road neither of us knows.",
     rematchLine: "Office hours again? Very well. One final final exam.",
   },
   trophy: "god-spark", trophyName: "Spark of Every Form", location: "The Final Firmament",

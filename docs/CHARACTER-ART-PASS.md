@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Wayheart and Meridian (October 1)
+
+The final calling now appears as Wayheart, Patchling's completed living map: a warm folded-canvas face, stitched teal route coat, carried map and brass route quill. Meridian, the Perfect Map, has a pale folded face, meticulous indigo chart coat, map ledger and an attached compass staff. The impossible-ideal story role remains: demanding one perfect answer sealed the roads. Chapter recap, NPC lore, final guidance and ending use the original identity. No floating halo, crown or orbiting ornaments remain. Their 26x24/29x27 footprints, 48 directional player poses/four guardian indices, internal IDs, mastery gate, Providence, any-ward rule and every exam warning/recovery remain stable.
+
+All 424 regression checks pass, including real-input immediate Waylight, an unmatched ward opening once, paid light/dark arts, Providence across form changes/phases and all final-exam lesson fields. Default/signature sheets and both pixel settings were inspected at gameplay size and enlarged. Chrome at 667x375 displayed actual Wayheart and Meridian through a save-disabled local fixture without overflow or console errors. Story recap pauses combat; ordinary balance and physical-device checks remain outstanding. Coverage is now 24/24 forms and 18/19 boss definitions. Tollkeeper remains before environment/NPC work.
+
 ### Cragback and Atlas (October 1)
 
 Colossus now appears as Cragback, a gentle basalt cliff-bear with rounded ears, soft carved muzzle, broad joined paws, rooted shoulder moss and a coral worldheart seam. Atlas has older russet stone, pale brows/muzzle and larger paws. A single clear head and joined bear anatomy replace the old overhead globe/body-face. The 48 directional player poses/four guardian indices retain 25x23/30x28 footprints, stable IDs, immediate Pillar Fist, Worldweight, shoulder/break, Worldheart/Lodestone and Titan grid/refuge/recovery.
@@ -165,7 +171,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Bellkeeper / Chimelet | Shipped October 1: rounded bronze metalwork, warm face, joined loop/handles/clapper and all 72 directional cast poses |
 | Lantern Wisp / Wickling | Shipped October 1: warm flame face, rounded storm glass, bowed copper frame, joined handles/feet, hinged shutters and 48 directional poses |
 | Colossus / Cragback | Shipped October 1: soft basalt bear face, round ears, broad joined paws, rooted moss, worldheart seam and 48 directional poses |
-| God | Pending: charming original keeper, clear mantle and attached arms; no floating halo |
+| God / Wayheart | Shipped October 1: warm folded canvas face, stitched teal route coat, carried map/quill and 48 directional poses; no halo or orbit ornaments |
 
 | Boss | Fresh pass |
 |---|---|
@@ -186,5 +192,5 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Bongle, Bell Titan | Shipped October 1: rounded teal metalwork, bronze lip, warm face and joined clapper; source/indices preserved |
 | Mallow, Lantern Keeper | Shipped October 1: warm older flame face, broad weathered lantern and hinged casting shutters; source/indices preserved |
 | Atlas, Last Worldbearer | Shipped October 1: older russet mountain bear, pale brows/muzzle, joined broad paws and worldheart seam; source/indices preserved |
-| God of Every Form | Pending: cute final guardian with regal, coherent gestures |
+| God of Every Form / Meridian, the Perfect Map | Shipped October 1: pale folded face, indigo chart coat, held map ledger/compass staff and coherent casting arms; source/indices preserved |
 | Tollkeeper | Pending: charming clockwork coat/face, clear staff and mechanisms |
