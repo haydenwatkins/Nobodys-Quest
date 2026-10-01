@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawStormspineTile && G.drawStormspineTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawTitanTile && G.drawTitanTile(ctx, cell, x, y, time)) ||
+      (G.drawStormspineTile && G.drawStormspineTile(ctx, cell, x, y, time)) ||
       (G.drawFrostbellTile && G.drawFrostbellTile(ctx, cell, x, y, time)) ||
       (G.drawCoastTile && G.drawCoastTile(ctx, cell, x, y, time)) ||
       (G.drawGlasswaterTile && G.drawGlasswaterTile(ctx, cell, x, y, time)) ||
@@ -914,7 +915,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawStormspinePortal || !G.drawStormspinePortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawTitanPortal || !G.drawTitanPortal(ctx, cell, x, y)) &&
+        (!G.drawStormspinePortal || !G.drawStormspinePortal(ctx, cell, x, y)) &&
         (!G.drawFrostbellPortal || !G.drawFrostbellPortal(ctx, cell, x, y)) &&
         (!G.drawCoastPortal || !G.drawCoastPortal(ctx, cell, x, y)) &&
         (!G.drawGlasswaterPortal || !G.drawGlasswaterPortal(ctx, cell, x, y)) &&
@@ -967,7 +969,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawStormspineNotice || !G.drawStormspineNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawTitanNotice || !G.drawTitanNotice(ctx, cell, x, y)) &&
+        (!G.drawStormspineNotice || !G.drawStormspineNotice(ctx, cell, x, y)) &&
         (!G.drawFrostbellNotice || !G.drawFrostbellNotice(ctx, cell, x, y)) &&
         (!G.drawCoastNotice || !G.drawCoastNotice(ctx, cell, x, y)) &&
         (!G.drawGlasswaterNotice || !G.drawGlasswaterNotice(ctx, cell, x, y)) &&
@@ -1257,6 +1260,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.titanScenery && s.mapId === "titanGrave") return;
     if (G.stormspineScenery && s.mapId === "stormspinePeaks") return;
     if (G.frostbellScenery && s.mapId === "frostbellTundra") return;
     if (G.coastScenery && s.mapId === "shattercoast") return;
@@ -1299,6 +1303,7 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawTitanCache && G.drawTitanCache(ctx, ch)) return;
     if (G.drawStormspineCache && G.drawStormspineCache(ctx, ch)) return;
     if (G.drawFrostbellCache && G.drawFrostbellCache(ctx, ch)) return;
     if (G.drawCoastPantry && G.drawCoastPantry(ctx, ch)) return;
@@ -1575,6 +1580,7 @@ G.world = (() => {
   }
 
   function drawWorldwakeState(ctx, time) {
+    if (G.drawTitanCamp && G.drawTitanCamp(ctx, time)) return;
     if (G.drawStormspineCamp && G.drawStormspineCamp(ctx, time)) return;
     if (G.drawFrostbellCamp && G.drawFrostbellCamp(ctx, time)) return;
     if (G.drawGlasswaterCamp && G.drawGlasswaterCamp(ctx, time)) return;
@@ -1625,6 +1631,7 @@ G.world = (() => {
   // They organize a scene and suggest safety without adding collision to the
   // game's already busy mobile-sized paths.
   function drawFenceRun(ctx, fence) {
+    if (G.drawTitanFence && G.drawTitanFence(ctx, fence)) return;
     if (G.drawStormspineFence && G.drawStormspineFence(ctx, fence)) return;
     if (G.drawFrostbellFence && G.drawFrostbellFence(ctx, fence)) return;
     if (G.drawCoastFence && G.drawCoastFence(ctx, fence)) return;
@@ -1702,6 +1709,7 @@ G.world = (() => {
     const x = Math.round(post.x);
     const y = Math.round(post.y);
     const near = G.nearWayfinderPost && G.nearWayfinderPost();
+    if (G.drawTitanPost && G.drawTitanPost(ctx, post, awake, near)) return;
     if (G.drawStormspinePost && G.drawStormspinePost(ctx, post, awake, near)) return;
     if (G.drawFrostbellPost && G.drawFrostbellPost(ctx, post, awake, near)) return;
     if (G.drawCoastPost && G.drawCoastPost(ctx, post, awake, near)) return;
