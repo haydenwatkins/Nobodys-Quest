@@ -144,7 +144,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Paper Ronin / Sumi, Foldroad Keeper | Shipped October 1: silver fox face, pleated teal/coral coat, joined tail and articulated held blade |
 | Professor Perihelion / Nell, Starpath Keeper | Shipped October 1: visible older face, ivory curls, brass spectacles, stitched star chart and held telescope |
 | Grandmother Briar | Shipped October 1: warm grandmother face, silver braid, straw hat, fitted work apron and carried garden tools |
-| Aurelia, Sky Sovereign | Pending: cute regal griffin, coherent wings and talons |
+| Aurelia, Sky Sovereign | Pending: cute regal griffin, coherent wings and talons; detached default crown removed October 1, source/indices preserved |
 | Pillar, Old Mason | Pending: rounded stone mason, distinct arm/body shapes |
 | Tess, Silk Matriarch | Pending: friendly silk guardian, attached readable limbs |
 | Bongle, Bell Titan | Pending: powerful round bell, expression and metal detail |

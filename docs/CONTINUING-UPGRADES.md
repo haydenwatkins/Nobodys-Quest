@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Windscar art preflight and crown cleanup (October 1)
+
+The five-hour window was still 97% used, with weekly usage at 67%, so the full Griffin/Aurelia redesign is not started. Current pose sheets expose angular flat torsos, ambiguous wing/leg attachments, little facial expression and only four source indices. Aurelia also had a detached cyan crown baked into her default source art; that stamp is removed without changing any other pixels, dimensions, animation indices or gameplay. All seven focused boss-art, three-phase gust and Plume checks pass; all four poses and both pixel settings were inspected at gameplay size and enlarged. This small cleanup has no live-browser or physical-device check. The loop remains active and the banked reset untouched.
+
+Next substantial pair: inspect and redesign Griffin/Aurelia at 56x38/60x44 source dimensions (28x19/30x22 world), with rounded eagle/lion anatomy, attached feathered wings, clear talons, a soft expressive beak and distinct Windscar keeper identities. Preserve `griffin`/`skySovereign`, Wingbeat/Slipstream, Sky Dive, Sky Mark/Plume, all gust escape/recovery and saved unlocks. Do not count the crown cleanup as the fresh character pass; both entries remain pending. Check live allowance before starting it.
+
 ### Hedgehare and Briar's Walking Garden (October 1)
 
 Druid now appears as original garden neighbour Hedgehare: soft fur, folded ear, clear face, a fitted sage apron and seedling basket/pruning cane carried in its paws. Briar has a warm grandmother face, silver braid, straw hat and practical work apron/tools. Their source footprints, 48 directional player poses/four guardian indices, save IDs, Elder Acorn, native poison/Seedbed, rooting and three-phase flowerbed warning/refuge/recovery remain unchanged.
