@@ -9,13 +9,19 @@ Keep the game's pixel-art personality, form mixing, exploration, and depth. Make
 
 ## Current priority: cute, detailed form and boss art
 
-The user's September 30 direction takes priority over the campaign/build communication queue: cute, fairly detailed original art, with cool designs and no odd-looking shapes. The fresh character pass now covers all 24 forms and 19 boss definitions, including both Treant variants; recent upgrades were not exempt. See [the complete coverage ledger and acceptance direction](CHARACTER-ART-PASS.md). All 426 regression checks pass, with pose/earned-appearance inspection in both pixel settings and controlled Chrome landscape scenes. Physical hardware and ordinary encounter balance remain untested. Next: inventory and upgrade environments across every region in order, then every NPC portrait/world sprite before campaign/playthrough upgrades. The character ledger does not imply those phases or a publication review are complete.
+The user's September 30 direction takes priority over the campaign/build communication queue: cute, fairly detailed original art, with cool designs and no odd-looking shapes. The fresh character pass covers all 24 forms and 19 boss definitions, including both Treant variants; recent upgrades were not exempt. See [the character ledger](CHARACTER-ART-PASS.md). The [environment ledger](ENVIRONMENT-ART-PASS.md) inventories all 40 runtime maps; Orchard Road/Heartwood foliage and ground are the first partial batch. All 427 regression checks pass, with rendered checks in both pixel settings and controlled Chrome landscape scenes. Physical hardware and ordinary encounter balance remain untested. Finish structures/interactive props in those first regions, then all remaining environments in order, followed by every NPC portrait/world sprite before campaign/playthrough upgrades. Neither the environment/NPC phases nor a publication review are complete.
 
 ### Cute marsh relatives (September 30)
 
 Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attached feet and visible tongue gestures. The Queen retains her regal silhouette with a gold/enamel crown and petal collar. Their existing source dimensions, two pixel settings, four-pose indexing, cast behavior and boss hazards remain unchanged. All 389 tests pass. Both enlarged four-pose sheets and Chrome's actual Sunken Marsh scene at 667x375 were inspected; no horizontal overflow appeared. Physical-device and ordinary combat-balance playthroughs remain outstanding. Continue the art ledger, including Knight, Ranger, Wizard and Eclipse Knight before later-region designs.
 
 ## Campaign progression and build depth queue
+
+### First environmental batch: Orchard foliage and ground (October 1)
+
+At 76% weekly and 56% five-hour usage, the environment pass began after the complete form/boss ledger. The new ledger inventories all 40 runtime maps, including courts, Worldbacks, interiors and repeatable arenas. Orchard Road/Heartwood now have authored detailed pixel canopies, layered leaves, bark grain, grown roots and apples, with broader grass patches, herbs, gravel and wet shore edges. Canopies fade around nearby NPCs as well as the player; reduced motion keeps a still frame. Route geometry, collision, gates, interactions and rewards remain unchanged. Structures/interactive props remain pending: this is partial coverage of the first two regions.
+
+All 427 regression checks pass, including native opening progression/save/reward, delivery/refuge and canopy visibility/state preservation. Every foliage frame was inspected in both pixel settings at gameplay size and enlarged. Native arrival/mill/glade renders and save-disabled Chrome scenery fixtures at 667x375 were inspected without horizontal overflow or console errors. Fixtures hold simulation for visual review; physical devices and ordinary balance remain outstanding. Next: finish Orchard/Heartwood cart, mill/wheel, sluice, bell, arch, notice, camp, fences, stumps and memory stones, then delivery roads/quay before later regions. NPC sprites/portraits follow the full environment pass.
 
 ### Tollkeeper completes the character roster (October 1)
 

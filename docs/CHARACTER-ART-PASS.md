@@ -40,6 +40,8 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+The fresh form/boss phase is complete. Track the separate 40-map environment phase in [ENVIRONMENT-ART-PASS.md](ENVIRONMENT-ART-PASS.md); its first Orchard/Heartwood foliage/ground batch is partial, with structures/props and all other regions pending. Every NPC world sprite and portrait still needs a fresh review after environments.
+
 ### Tollkeeper (October 1)
 
 The Tollkeeper is now a riveted bronze river-otter with round ears, warm muzzle/whiskers, rolled rain hood, rounded fitted coat, receipts tucked into sewn pockets, joined tail, bound leather ledger and a lantern held on a short chain. Its 52x55 footprint, four guardian indices, hitbox, warning pose, flood/sweep/refuge clocks and delivery/save rewards remain stable. Shared-module quay NPCs remain for their separate later review.

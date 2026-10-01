@@ -8,6 +8,7 @@
   function poly(c,points,color){c.fillStyle=color;c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}
   function ellipse(c,x,y,rx,ry,color){c.fillStyle=color;c.beginPath();c.ellipse(x,y,rx,ry,0,0,Math.PI*2);c.fill();}
   const rand=G.util.hash2;
+  const freshOrchard=()=>G.state.mapId==='orchardRoad'||G.state.mapId==='heartwood';
   G.drawOpeningTile=(c,cell,x,y,time)=>{
     if(!here())return false;
     const px=x*16,py=y*16,t=cell.tile,r=rand(x+41,y+77),night=G.state.mapId==='heartwood';
@@ -15,10 +16,16 @@
       rect(c,px,py,16,16,C.water);
       for(let i=0;i<3;i++){const wx=px+Math.floor(rand(x+i,y)*12),wy=py+3+i*4;rect(c,wx,wy,3+Math.floor(r*5),1,i===0?'#619696':'#50848a');}
       if(Math.floor(time*2+r*5)%4===0)rect(c,px+4,py+6,5,1,C.blue);
+      if(freshOrchard())for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){
+        const n=G.state.grid[y+dy]&&G.state.grid[y+dy][x+dx];if(!n||n.tile==='water')continue;
+        if(dx){rect(c,px+(dx>0?15:0),py,1,16,'#345b59');if(r>.5)rect(c,px+(dx>0?13:1),py+4,2,5,'#61928b');}
+        else{rect(c,px,py+(dy>0?15:0),16,1,'#345b59');if(r>.5)rect(c,px+4,py+(dy>0?13:1),5,1,'#85aaa0');}
+      }
       return true;
     }
     const grass=night?['#4c6450','#506852','#536b54']:['#70825b','#73865e','#778861'];
-    const color=t==='tree'?C.dark:t==='path'?['#b09a71','#b6a17b','#b5a079'][Math.floor(r*3)]:grass[Math.floor(rand(Math.floor(x/3),Math.floor(y/3))*3)];
+    const groundPatch=freshOrchard()?rand(Math.floor((x+(Math.floor(y/4)%2)*2)/5),Math.floor(y/4)):rand(Math.floor(x/3),Math.floor(y/3));
+    const color=t==='tree'?C.dark:t==='path'?['#b09a71','#b6a17b','#b5a079'][Math.floor(r*3)]:grass[Math.floor(groundPatch*3)];
     rect(c,px,py,16,16,color);
     if(t==='tree'){
       // A joined canopy, with darker recesses and clustered leaf shapes.
@@ -29,6 +36,7 @@
       if(r>.7){rect(c,px+9,py+9,2,7,C.woodDark);rect(c,px+8,py+9,1,5,C.wood);}
     }else if(t==='path'){
       for(let i=0;i<3;i++)rect(c,px+Math.floor(rand(x+i,y+4)*14),py+Math.floor(rand(y+i,x+4)*14),2,1,i===0?'#c5b58c':'#9c8c69');
+      if(freshOrchard()&&r>.55){const sx=px+3+Math.floor(r*7),sy=py+4+Math.floor(rand(y+9,x)*7);rect(c,sx,sy,3,1,'#a28c68');rect(c,sx,sy-1,2,1,'#d2be94');if(r>.85)rect(c,sx+3,sy+3,1,1,'#d2be94');}
       for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){
         const n=G.state.grid[y+dy]&&G.state.grid[y+dy][x+dx];
         if(n&&n.tile==='grass'){
@@ -38,6 +46,7 @@
       }
     }else{
       if(r>.25){const ox=px+Math.floor(r*12),oy=py+Math.floor(rand(y+5,x)*12);rect(c,ox,oy,1,3,night?'#698563':'#92a472');rect(c,ox+2,oy+1,1,2,night?'#698563':'#92a472');}
+      if(freshOrchard()&&r>.62){const ox=px+3+Math.floor(rand(y+13,x+3)*8),oy=py+4+Math.floor(r*7);rect(c,ox,oy+2,3,1,night?'#425e49':'#657c50');rect(c,ox-1,oy,2,1,night?'#75956b':'#a3b17b');rect(c,ox+2,oy-1,2,1,night?'#66815e':'#8b9e68');if(r>.91)rect(c,ox+3,oy+1,1,1,C.gold);}
       if(r>.93){rect(c,px+6,py+7,1,4,C.shade);rect(c,px+5,py+6,3,2,night?'#a6c8a3':'#e5ce91');}
       if(t==='rock'){
         poly(c,[[px+2,py+13],[px+1,py+7],[px+6,py+3],[px+12,py+5],[px+15,py+13]],'#485c54');
@@ -48,6 +57,12 @@
     return true;
   };
   function tree(c,x,y,seed,apple){
+    if(freshOrchard()&&G.openingScenery){
+      const sprite=G.openingScenery[G.state.mapId==='heartwood'?'heartwood':apple?'apple':'forest'];
+      const behind=a=>a&&Math.abs(a.x-x)<24&&a.y<y&&a.y>y-44;
+      c.save();if(behind(G.state.player)||(G.state.npcs||[]).some(behind))c.globalAlpha=Math.min(typeof c.globalAlpha==='number'?c.globalAlpha:1,.35);
+      ellipse(c,x+3,y+2,18,5,'rgba(25,43,37,.23)');G.drawSprite(c,sprite,G.reducedMotion?0:Math.floor((G.state.time||0)*.55+seed)%4,x,y+3,false);c.restore();return;
+    }
     ellipse(c,x+4,y+2,18,5,'rgba(25,43,37,.23)');
     poly(c,[[x-5,y],[x-3,y-19],[x+4,y-22],[x+5,y],[x+10,y+3],[x+2,y+2],[x-1,y-1],[x-8,y+3]],C.woodDark);
     rect(c,x-1,y-18,3,16,C.wood);rect(c,x-1,y-17,1,12,'#a27c55');
