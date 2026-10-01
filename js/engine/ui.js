@@ -366,7 +366,20 @@ G.ui = (() => {
     c.fillText(mixLabel, mixX + 4, G.H - 15);
   }
 
-  function drawMinimap(c) {
+  // Optional field panels yield to the authored traveller, in screen coordinates.
+  // This only affects painting; lesson, guidance and tutorial state keep running.
+  function coversTraveller(cam, x, y, w, h) {
+    const p = G.state.player;
+    const sprite = G.forms[G.state.formId] && G.forms[G.state.formId].sprite;
+    const metrics = sprite && G.spriteMetrics ? G.spriteMetrics(sprite) : { w: 24, h: 28 };
+    const px = p.x - cam.x, py = p.y - cam.y;
+    const halfWidth = Math.max(12, metrics.w / 2) + 2;
+    const height = Math.max(28, metrics.h) + 2;
+    return x < px + halfWidth && x + w > px - halfWidth &&
+      y < py + 4 && y + h > py - height;
+  }
+
+  function drawMinimap(c, cam) {
     if (G.input.isTouch) return;
     const s = G.state;
     if (!s.grid || s.mapW <= 0 || s.mapH <= 0) return;
@@ -374,6 +387,7 @@ G.ui = (() => {
     const h = 42;
     const x0 = G.W - w - 5;
     const y0 = 21;
+    if (coversTraveller(cam, x0, y0, w, h)) return;
     const step = Math.max(1, Math.ceil(Math.max(s.mapW / (w - 4), s.mapH / (h - 4))));
     const sx = (w - 4) / s.mapW;
     const sy = (h - 4) / s.mapH;
@@ -408,7 +422,7 @@ G.ui = (() => {
     c.fillRect(x0 + 1 + Math.floor((s.player.x / G.TILE) * sx), y0 + 1 + Math.floor((s.player.y / G.TILE) * sy), 3, 3);
   }
 
-  function drawQuestTracker(c) {
+  function drawQuestTracker(c, cam) {
     const field = G.fieldMasteryQuest && G.fieldMasteryQuest();
     const automatic = G.relevantMasteryQuests ? G.relevantMasteryQuests(3) : [];
     const lessons = field ? [field, ...automatic.filter(entry => entry.quest.id !== field.quest.id)].slice(0, 3) : automatic;
@@ -418,6 +432,7 @@ G.ui = (() => {
     const boxW = 118;
     const x = G.W - boxW - 5;
     const y = G.input.isTouch ? 45 : 67;
+    if (coversTraveller(cam, x, y, boxW, 27)) return;
     const pulse = G.state.masteryHudPulse > 0;
 
     c.fillStyle = "rgba(26,28,44,0.78)";
@@ -446,7 +461,7 @@ G.ui = (() => {
     c.fillRect(x + 4, y + 21, Math.round((boxW - 8) * progress / Math.max(1, quest.count)), 3);
   }
 
-  function drawTutorial(c) {
+  function drawTutorial(c, cam) {
     const prompt = G.tutorial && G.tutorial.prompt();
     if (!prompt) return;
     const touch = G.input.isTouch;
@@ -454,6 +469,7 @@ G.ui = (() => {
     const boxH = touch ? 20 : 24;
     const x = touch ? 5 : Math.round((G.W - boxW) / 2);
     const y = touch ? 60 : G.H - boxH - 26;
+    if (coversTraveller(cam, x, y, boxW, boxH)) return;
     c.fillStyle = "rgba(26,28,44,0.9)";
     c.fillRect(x, y, boxW, boxH);
     c.fillStyle = "#73eff7";
@@ -466,13 +482,14 @@ G.ui = (() => {
     c.fillText(fitText(c, prompt.text, boxW - 10), x + 5, y + (touch ? 10 : 12));
   }
 
-  function drawStoryTracker(c) {
+  function drawStoryTracker(c, cam) {
     if (!G.storyGoal || G.state.bossCutscene || G.ui.dialogueOpen) return;
     if (G.guidanceShowStoryCard && !G.guidanceShowStoryCard()) return;
     const goal = G.storyGoal();
     const boxW = 190;
     const x = 5;
     const y = 38;
+    if (coversTraveller(cam, x, y, boxW, 18)) return;
     c.fillStyle = "rgba(26,28,44,0.82)";
     c.fillRect(x, y, boxW, 18);
     c.fillStyle = goal.act.color;
@@ -663,15 +680,15 @@ G.ui = (() => {
     if (!G.state.bossCutscene) {
       // Let travellers see the actual gate; health, stars, warnings and arts stay.
       if (!entranceFocus && !encounterFocus) {
-        drawMinimap(c);
-        drawStoryTracker(c);
-        drawQuestTracker(c);
+        drawMinimap(c, cam);
+        drawStoryTracker(c, cam);
+        drawQuestTracker(c, cam);
       }
       drawWardHint(c, cam);
       const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c, cam);
-      if (!interactionShown && !entranceFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
+      if (!interactionShown && !entranceFocus && !encounterFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
       drawWayfinderHint(c);
-      drawTutorial(c);
+      drawTutorial(c, cam);
       drawAbilityBar(c, p);
     }
     } // standard HUD; the opening keeps its own compact field layout
