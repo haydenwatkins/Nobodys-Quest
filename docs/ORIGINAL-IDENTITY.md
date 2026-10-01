@@ -14,6 +14,8 @@ The **Copperwick Brewer** carries copper-rimmed forehead goggles, an herb satche
 
 ## Next original-identity work
 
+**Pocket Trouper** carries a hand-held fan of cards in a fitted plum stage coat, teal neckcloth and rounded felt beret. **Tansy, Caravan Star**, takes a travelling show along the reopened roads: a teal coat, copper-tied braid, pastry and cards held in articulated hands. The Wayward Stage and Curtain Bell preserve `jesterTrial` and `jester-bell`; `jester`/`royalFool` and all card, ricochet, pie and warning mechanics stay stable.
+
 **Velvetwing** is a velvet-eared bat keeper of the dusk roads, with a plum waistcoat, copper clasp, warm muzzle and folded membrane wings joined to its thumbs and shoulders. **Vesper, Dusk Host**, welcomes night travellers in The Dusk Court: a rose coat, soft ivory ruff, sewn duskflower brooch and broader expressive wings. Their calling, guardian, court and seal retain `vampire`, `countessCarmine`, `vampireTrial` and `crimson-seal` internally; bite/healing, dash, ward and waltz timing remain unchanged. Generic signature ornament stamps are removed across the roster; all earned look IDs remain as alternate material palettes.
 
 **Tunneltuft** listens for forgotten roads beneath the roots, wearing a fitted leather headlamp band and green neckerchief. **Bram, Tunnelwarden**, keeps the root-supported roads sound: rounded digging paws, a warm pink muzzle, copper root crown attached to its band, and a work bib. Their visible names and Copper Root Crown follow this role, while `mole`, `moleMonarch`, `mole-crown`, lessons and combat rules retain their existing identities.

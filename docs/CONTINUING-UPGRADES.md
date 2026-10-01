@@ -17,6 +17,12 @@ Frog and Mire Queen now have rounded jade bodies, clear highlighted eyes, attach
 
 ## Campaign progression and build depth queue
 
+### Pocket Trouper and the Wayward Stage (October 1)
+
+Jester and the Royal Fool now appear as travelling theatre players Pocket Trouper and Tansy, Caravan Star. Soft coats, fitted berets, warm faces, gripped cards and Tansy's pie/braid replace the rigid split-hat figures. Their source footprints, 48 directional player poses/four guardian indices, stable save IDs, third-throw joker, ricochets, pie warnings and escape/recovery rules remain intact. The Wayward Stage and Curtain Bell retain arena/reward IDs; field guidance uses the new calling name.
+
+Full default/signature directional sheets and Tansy's four indices were inspected. All 403 tests pass, with focused art/guidance checks passing after the final naming copy. Real-input joker, wardrobe/decoration, ricochet and three-phase pie behavior remain covered. Chrome at 667x375 displayed the actual pair without horizontal overflow. Dialogue paused the world; physical-device and ordinary encounter-balance validation remain outstanding. Next: Turtle and its Shattercoast guardian; continue every form/boss before environment, NPC and playthrough work.
+
 ### Velvetwing and the Dusk Court (October 1)
 
 Vampire and Countess Carmine now appear as original bat roadkeepers Velvetwing and Vesper, Dusk Host: warm expressive faces/ears, deliberate folded wings attached to their arms, fitted plum/rose workwear and sewn copper details. The Dusk Court/Duskflower Seal retain internal IDs, routes and rewards. The 20x20/25x25 footprints, 48 directional player poses/four guardian indices, bite/healing, dash, wards and three-phase waltz escape/recovery remain unchanged.

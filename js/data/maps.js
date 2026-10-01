@@ -205,7 +205,7 @@ registerMap({
 });
 
 registerMap({
-  id: "jesterTrial", name: "The Crooked Court", playerStart: { x: 3, y: 8 },
+  id: "jesterTrial", name: "The Wayward Stage", playerStart: { x: 3, y: 8 },
   visualTheme: "jester",
   bossTrial: { exit: { map: "overworld", x: 118, y: 60 }, delay: 1.5 },
   legend: {

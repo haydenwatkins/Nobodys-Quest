@@ -6,9 +6,9 @@
 
 registerForm({
   id: "jester",
-  name: "Jester",
+  name: "Pocket Trouper",
   icon: "🃏",
-  tagline: "Wins every argument by throwing the punchline at somebody else.",
+  tagline: "A travelling player with a pocket of cards and a welcome for every roadside audience.",
 
   speed: 90,
   hearts: 4,
@@ -22,8 +22,8 @@ registerForm({
     { id: "encore", level: 2 },
   ],
 
-  unlock: { type: "challenge", hint: "Get the last laugh from the Royal Fool", requirements: [
-    { type: "item", item: "jester-bell", hint: "Win the Jester Bell" },
+  unlock: { type: "challenge", hint: "Share the stage with Tansy, Caravan Star", requirements: [
+    { type: "item", item: "jester-bell", hint: "Win the Curtain Bell" },
     { type: "any", options: [
       { type: "formLevel", form: "alchemist", level: 3 },
       { type: "formLevel", form: "riftblade", level: 3 },

@@ -881,7 +881,7 @@ registerAbility({
 registerAbility({
   id: "encore",
   name: "Encore!",
-  description: "A light card bounces through up to five distinct foes along clear paths. Jester adds one more bounce.",
+  description: "A light card bounces through up to five distinct foes along clear paths. Pocket Trouper adds one more bounce.",
   icon: "🎪",
   type: "light",
   style: "projectile",

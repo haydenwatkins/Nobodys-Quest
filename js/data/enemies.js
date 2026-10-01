@@ -739,7 +739,7 @@ registerEnemy({
 });
 
 registerEnemy({
-  id: "royalFool", name: "The Royal Fool",
+  id: "royalFool", name: "Tansy, Caravan Star",
   hp: 54, speed: 54, damage: 1, behavior: "shooter", shootEvery: 1.65, aggro: 185,
   shotColor: "#ffcd75", size: 19, heavy: true, miniboss: true,
   ward: { types: ["sharp"], hp: 6 },
@@ -750,17 +750,17 @@ registerEnemy({
     patterns: ["cards", "pieRain", "cards", "nova"],
     intro: "THE COURT IS NOW IN SILLY SESSION",
     introLines: [
-      "Why did the hero cross the arena? Poor boundary awareness.",
+      "We bring a show to every reopened road. Tonight, you get the best seat: on the stage.",
       "No refunds. The pie is a combat pie.",
       "Watch the pie shadows. The punchline lands exactly where I promised. A first for this court.",
     ],
     phaseLine: "Intermission is cancelled due to excessive competence!",
     phaseThreeLine: "Final act! More cards, fewer sensible decisions!",
     knockoutLine: "That is a wrap! Please exit through the embarrassing door.",
-    defeatLine: "You win. My final joke is the repair bill.",
+    defeatLine: "Take the curtain bell. Ring it when the road feels lonely; someone will always want a show.",
     rematchLine: "Same hero, new material. Let us both pretend to be surprised.",
   },
-  trophy: "jester-bell", trophyName: "Jester Bell", location: "The Crooked Court",
+  trophy: "jester-bell", trophyName: "Curtain Bell", location: "The Wayward Stage",
   sprite: {
     palette: { k: "#1a1c2c", r: "#b13e53", b: "#3b5dc9", y: "#ffcd75", w: "#f4f4f4", p: "#8153c1" },
     frames: [[

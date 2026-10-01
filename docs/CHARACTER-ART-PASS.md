@@ -40,6 +40,12 @@ All 391 tests pass, including immediate real Curse casting and the existing Scou
 
 ## Coverage ledger
 
+### Pocket Trouper and Tansy, Caravan Star (October 1)
+
+The former Jester now has a rounded plum stage coat, teal neckcloth, fitted beret, clear warm face, small boots and a fan of cards gripped in an articulated hand. Tansy's teal coat, copper-tied braid and hand-held pie distinguish the guardian. Their 20x20/25x25 footprints, 48 directional player poses/four boss indices, save IDs, card/ricochet rhythm, pie warnings, escape times and recovery remain intact. The Wayward Stage and Curtain Bell retain the existing arena/reward IDs.
+
+All default/signature directional poses and Tansy's four indices were inspected. All 403 tests pass, including real-input joker, wardrobe/decoration, ricochet and three-phase pie-warning/recovery checks; focused art/guidance checks also pass after the final naming copy. Chrome at 667x375 rendered both in the real Wayward Stage without horizontal overflow. The scene was dialogue-paused; it is visual browser evidence, not ordinary fight pacing or physical-device validation. Next: Turtle and its Shattercoast guardian.
+
 ### Velvetwing and Vesper, Dusk Host (October 1)
 
 The former Vampire is now an original bat roadkeeper with expressive ears, a warm muzzle, plum waistcoat and folded membranes attached to shoulders and thumbs. Vesper has a rose coat, soft ivory ruff, sewn duskflower brooch and larger casting wings. Their 20x20 and 25x25 footprints, 48 directional player poses/four boss indices, internal IDs, bite/healing, dash and waltz rules remain intact. The renamed Dusk Court and Duskflower Seal retain their routes and save keys.
@@ -88,7 +94,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Riftblade / Wayglass Duelist | Shipped October 1: visible face, travel cap, folded scarf and paired glass knives in all directions |
 | Mole / Tunneltuft | Shipped October 1: soft fur, warm muzzle, fitted headlamp and 48 directional digging poses |
 | Vampire / Velvetwing | Shipped October 1: velvet ears, warm muzzle, fitted waistcoat and attached directional membrane wings |
-| Jester | Pending: expressive face, soft fabric and playful gestures |
+| Jester / Pocket Trouper | Shipped October 1: rounded stage coat, beret, warm face and 48 directional hand-held card poses |
 | Turtle | Pending: sculpted shell/feet/head, defensive poses |
 | Samurai | Pending: cute face under hat, coherent robe and sword grip |
 | Astronomer | Pending: readable face, rounded coat, deliberate instrument |
@@ -109,7 +115,7 @@ The initial contact-sheet audit inspected all 24 forms and 19 boss definitions, 
 | Riftblade Adept / Mira, Wayglass Keeper | Shipped October 1: visible face, woven hood, braid, soft mantle and articulated knife gesture |
 | Mole Monarch / Bram, Tunnelwarden | Shipped October 1: warm face, broad digging paws, work bib and fitted copper root crown |
 | Countess Carmine / Vesper, Dusk Host | Shipped October 1: expressive bat face, ivory ruff, sewn duskflower brooch and attached casting wings |
-| Royal Fool | Pending: playful expressive face, natural pie/card poses |
+| Royal Fool / Tansy, Caravan Star | Shipped October 1: teal stage coat, copper-tied braid and attached pie/card gestures |
 | Admiral Tortoise | Pending: proud naval turtle with sculpted shell and limbs |
 | Paper Ronin | Pending: clear cute face, folded robe and sword grip |
 | Professor Perihelion | Pending: scholarly face, clear instruments and coat |
