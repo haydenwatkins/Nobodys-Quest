@@ -115,3 +115,5 @@ The first eight common road foes now share the world's sage, clay, cloth and riv
 Tide Crab, Star Mote and Sun Hopper now extend that original creature language with rounded pink shore claws, connected night-seed petals and folded amber meadow limbs. Star Mote's face belongs to a joined living body; loose anonymous sparkle stamping is absent. Their native combat and saved IDs remain stable.
 
 The later roads now have independently authored silk-spider Loomlings, sand-glass Mirage Skater geckos, soft Bell Moths and mossy Cairn Walkers. Joined bodies and quiet material highlights replace detached sparkle/spike silhouettes. Their generic names and native IDs remain unchanged; this does not complete NPC or publication review.
+
+The orchard now has original round seed creatures and a wooden Hollow Watchman whose copper cap, teal work tabard, staff and buckler belong to its authored body. It is visually independent of playable Knight; native IDs, thrust/recovery, routes and save progress remain stable. Regular foes have fresh art; NPCs and publication review remain pending.

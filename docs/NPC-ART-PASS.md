@@ -1,6 +1,6 @@
 # NPC art coverage
 
-October 1, 2026. This is a primary-source inventory and handoff, not completed art. The final orchard foe batch is under regression validation; regular foes now have 18/18 authored bodies. Review every named character, every resident appearance and every dialogue speaker next. Keep native IDs, placement, routines, interactions and saved progress. Detailed, cute, original bodies and recognizable faces should replace generic shared silhouettes; deliberate equipment belongs in the authored sprite.
+October 1, 2026. This is a primary-source inventory and handoff, not completed art. The final orchard foe batch is complete; regular foes now have 18/18 authored bodies. Review every named character, every resident appearance and every dialogue speaker next. Keep native IDs, placement, routines, interactions and saved progress. Detailed, cute, original bodies and recognizable faces should replace generic shared silhouettes; deliberate equipment belongs in the authored sprite.
 
 ## Named world sprites: 0/13 fresh reviews complete
 
