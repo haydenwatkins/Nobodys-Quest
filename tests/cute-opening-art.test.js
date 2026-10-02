@@ -40,6 +40,6 @@ test('opening heroes keep their real attacks and guardians keep their battle art
   const r=runtime();r.load('heartwood');r.drain();
   const treant=r.G.state.enemies.find(e=>e.def.id==='ancientTreant');
   assert.ok(treant);assert.equal(treant.def.sprite,r.G.openingTreantSprite);assert.equal(treant.def.size,34);
-  assert.equal(r.G.enemies.orchardGuard.sprite,r.G.forms.knight.sprite);
+  assert.notEqual(r.G.enemies.orchardGuard.sprite,r.G.forms.knight.sprite);
   r.load('emberRidge');r.drain();assert.equal(r.G.state.enemies.find(e=>e.def.id==='eclipseKnight').def.sprite,r.G.enemies.eclipseKnight.sprite);
 });
