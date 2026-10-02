@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawStarpathTile && G.drawStarpathTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawHedgewayTile && G.drawHedgewayTile(ctx, cell, x, y, time)) ||
+      (G.drawStarpathTile && G.drawStarpathTile(ctx, cell, x, y, time)) ||
       (G.drawFoldroadTile && G.drawFoldroadTile(ctx, cell, x, y, time)) ||
       (G.drawBastionTile && G.drawBastionTile(ctx, cell, x, y, time)) ||
       (G.drawFirmamentTile && G.drawFirmamentTile(ctx, cell, x, y, time)) ||
@@ -923,7 +924,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawStarpathPortal || !G.drawStarpathPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawHedgewayPortal || !G.drawHedgewayPortal(ctx, cell, x, y)) &&
+        (!G.drawStarpathPortal || !G.drawStarpathPortal(ctx, cell, x, y)) &&
         (!G.drawFoldroadPortal || !G.drawFoldroadPortal(ctx, cell, x, y)) &&
         (!G.drawBastionPortal || !G.drawBastionPortal(ctx, cell, x, y)) &&
         (!G.drawFirmamentPortal || !G.drawFirmamentPortal(ctx, cell, x, y)) &&
@@ -985,7 +987,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawStarpathNotice || !G.drawStarpathNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawHedgewayNotice || !G.drawHedgewayNotice(ctx, cell, x, y)) &&
+        (!G.drawStarpathNotice || !G.drawStarpathNotice(ctx, cell, x, y)) &&
         (!G.drawFoldroadNotice || !G.drawFoldroadNotice(ctx, cell, x, y)) &&
         (!G.drawBastionNotice || !G.drawBastionNotice(ctx, cell, x, y)) &&
         (!G.drawFirmamentNotice || !G.drawFirmamentNotice(ctx, cell, x, y)) &&
@@ -1167,6 +1170,7 @@ G.world = (() => {
   // arenas keep exactly the same tiles, rocks, spawns, and collision.
   function drawTrialFloor(ctx, time) {
     const s = G.state;
+    if (G.hedgewayScenery && s.mapId === "druidTrial") return;
     if (G.starpathScenery && s.mapId === "astronomerTrial") return;
     if (G.foldroadScenery && s.mapId === "samuraiTrial") return;
     if (G.bastionScenery && s.mapId === "turtleTrial") return;
@@ -1292,6 +1296,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.hedgewayScenery && s.mapId === "druidTrial") return;
     if (G.starpathScenery && s.mapId === "astronomerTrial") return;
     if (G.foldroadScenery && s.mapId === "samuraiTrial") return;
     if (G.bastionScenery && s.mapId === "turtleTrial") return;
@@ -1343,6 +1348,7 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawHedgewayCache && G.drawHedgewayCache(ctx, ch)) return;
     if (G.drawStarpathCache && G.drawStarpathCache(ctx, ch)) return;
     if (G.drawFoldroadCache && G.drawFoldroadCache(ctx, ch)) return;
     if (G.drawBastionCache && G.drawBastionCache(ctx, ch)) return;

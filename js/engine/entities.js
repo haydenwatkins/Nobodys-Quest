@@ -830,11 +830,11 @@ G.drawBossHazards = function (ctx) {
     } else if (h.kind === "rootBloom") {
       ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#a7f070";ctx.setLineDash(active?[]:[3,2]);ctx.stroke();ctx.setLineDash([]);
-      if(active){
+      if(active&&(!G.drawHedgewayBloom||!G.drawHedgewayBloom(ctx,h))){
         ctx.strokeStyle="#b99c6b";ctx.lineWidth=3;
         for(const dx of [-9,0,9]){ctx.beginPath();ctx.moveTo(h.x+dx,h.y+7);ctx.lineTo(h.x+dx-3,h.y-4);ctx.lineTo(h.x+dx+2,h.y-12);ctx.stroke();}
         ctx.fillStyle=h.bloomColor||"#a7f070";for(const dx of [-9,0,9])ctx.fillRect(h.x+dx,h.y-14,5,3);
-      }else{ctx.beginPath();ctx.arc(h.x,h.y,h.radius*Math.min(1,local/h.warning),0,Math.PI*2);ctx.stroke();}
+      }else if(!active){ctx.beginPath();ctx.arc(h.x,h.y,h.radius*Math.min(1,local/h.warning),0,Math.PI*2);ctx.stroke();}
     } else if (h.kind === "mirePool") {
       // The full disk is always shown; the inner ring counts down to eruption.
       ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
@@ -1818,6 +1818,7 @@ G.drawProjectiles = function (ctx) {
       ctx.fillStyle=pr.ability==='tripleShot'?'#89b2a1':'#b87968';
       ctx.fillRect(-7,-2,3,1);ctx.fillRect(-8,2,3,1);ctx.restore();continue;
     }
+    if (G.drawHedgewaySeed && G.drawHedgewaySeed(ctx, pr)) continue;
     if (G.drawBastionShell && G.drawBastionShell(ctx, pr)) continue;
     if (pr.shape !== "card" && pr.shape !== "pie") {
       ctx.save();
