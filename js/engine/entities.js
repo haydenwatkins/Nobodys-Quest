@@ -1818,6 +1818,7 @@ G.drawProjectiles = function (ctx) {
       ctx.fillStyle=pr.ability==='tripleShot'?'#89b2a1':'#b87968';
       ctx.fillRect(-7,-2,3,1);ctx.fillRect(-8,2,3,1);ctx.restore();continue;
     }
+    if (G.drawBastionShell && G.drawBastionShell(ctx, pr)) continue;
     if (pr.shape !== "card" && pr.shape !== "pie") {
       ctx.save();
       ctx.globalAlpha = 0.2;

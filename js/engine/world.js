@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawFirmamentTile && G.drawFirmamentTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawBastionTile && G.drawBastionTile(ctx, cell, x, y, time)) ||
+      (G.drawFirmamentTile && G.drawFirmamentTile(ctx, cell, x, y, time)) ||
       (G.drawStageTile && G.drawStageTile(ctx, cell, x, y, time)) ||
       (G.drawDuskTile && G.drawDuskTile(ctx, cell, x, y, time)) ||
       (G.drawBurrowTile && G.drawBurrowTile(ctx, cell, x, y, time)) ||
@@ -920,7 +921,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawFirmamentPortal || !G.drawFirmamentPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawBastionPortal || !G.drawBastionPortal(ctx, cell, x, y)) &&
+        (!G.drawFirmamentPortal || !G.drawFirmamentPortal(ctx, cell, x, y)) &&
         (!G.drawStagePortal || !G.drawStagePortal(ctx, cell, x, y)) &&
         (!G.drawDuskPortal || !G.drawDuskPortal(ctx, cell, x, y)) &&
         (!G.drawBurrowPortal || !G.drawBurrowPortal(ctx, cell, x, y)) &&
@@ -979,7 +981,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawFirmamentNotice || !G.drawFirmamentNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawBastionNotice || !G.drawBastionNotice(ctx, cell, x, y)) &&
+        (!G.drawFirmamentNotice || !G.drawFirmamentNotice(ctx, cell, x, y)) &&
         (!G.drawStageNotice || !G.drawStageNotice(ctx, cell, x, y)) &&
         (!G.drawDuskNotice || !G.drawDuskNotice(ctx, cell, x, y)) &&
         (!G.drawBurrowNotice || !G.drawBurrowNotice(ctx, cell, x, y)) &&
@@ -1158,6 +1161,7 @@ G.world = (() => {
   // arenas keep exactly the same tiles, rocks, spawns, and collision.
   function drawTrialFloor(ctx, time) {
     const s = G.state;
+    if (G.bastionScenery && s.mapId === "turtleTrial") return;
     if (G.firmamentScenery && s.mapId === "godTrial") return;
     if (G.stageScenery && s.mapId === "jesterTrial") return;
     if (G.duskScenery && s.mapId === "vampireTrial") return;
@@ -1280,6 +1284,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.bastionScenery && s.mapId === "turtleTrial") return;
     if (G.firmamentScenery && s.mapId === "godTrial") return;
     if (G.stageScenery && s.mapId === "jesterTrial") return;
     if (G.duskScenery && s.mapId === "vampireTrial") return;
@@ -1328,6 +1333,7 @@ G.world = (() => {
   function drawChest(ctx, ch, time) {
     const T = G.TILE;
     const px = ch.x * T, py = ch.y * T;
+    if (G.drawBastionCache && G.drawBastionCache(ctx, ch)) return;
     if (G.drawFirmamentCache && G.drawFirmamentCache(ctx, ch)) return;
     if (G.drawStageCache && G.drawStageCache(ctx, ch)) return;
     if (G.drawDuskCache && G.drawDuskCache(ctx, ch)) return;
