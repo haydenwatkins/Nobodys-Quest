@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawDungeonTile && G.drawDungeonTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawWorldbackTile && G.drawWorldbackTile(ctx, cell, x, y, time)) ||
+      (G.drawDungeonTile && G.drawDungeonTile(ctx, cell, x, y, time)) ||
       (G.drawShiftingTile && G.drawShiftingTile(ctx, cell, x, y, time)) ||
       (G.drawColiseumTile && G.drawColiseumTile(ctx, cell, x, y, time)) ||
       (G.drawHedgewayTile && G.drawHedgewayTile(ctx, cell, x, y, time)) ||
@@ -927,7 +928,8 @@ G.world = (() => {
     drawTerrainEdges(ctx, cell, x, y);
 
     /* extra decorations on top of the base tile */
-    if (cell.portal && (!G.drawDungeonPortal || !G.drawDungeonPortal(ctx, cell, x, y)) &&
+    if (cell.portal && (!G.drawWorldbackPortal || !G.drawWorldbackPortal(ctx, cell, x, y)) &&
+        (!G.drawDungeonPortal || !G.drawDungeonPortal(ctx, cell, x, y)) &&
         (!G.drawColiseumPortal || !G.drawColiseumPortal(ctx, cell, x, y)) &&
         (!G.drawHedgewayPortal || !G.drawHedgewayPortal(ctx, cell, x, y)) &&
         (!G.drawStarpathPortal || !G.drawStarpathPortal(ctx, cell, x, y)) &&
@@ -992,7 +994,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawDungeonNotice || !G.drawDungeonNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawWorldbackNotice || !G.drawWorldbackNotice(ctx, cell, x, y)) &&
+        (!G.drawDungeonNotice || !G.drawDungeonNotice(ctx, cell, x, y)) &&
         (!G.drawShiftingNotice || !G.drawShiftingNotice(ctx, cell, x, y)) &&
         (!G.drawColiseumNotice || !G.drawColiseumNotice(ctx, cell, x, y)) &&
         (!G.drawHedgewayNotice || !G.drawHedgewayNotice(ctx, cell, x, y)) &&
@@ -1178,6 +1181,7 @@ G.world = (() => {
   // arenas keep exactly the same tiles, rocks, spawns, and collision.
   function drawTrialFloor(ctx, time) {
     const s = G.state;
+    if (G.isAuthoredWorldback && G.isAuthoredWorldback()) return;
     if (G.shiftingScenery && s.mapId === "manyfoldExpedition") return;
     if (G.coliseumScenery && s.mapId === "gauntletArena") return;
     if (G.hedgewayScenery && s.mapId === "druidTrial") return;
@@ -1306,6 +1310,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.isAuthoredWorldback && G.isAuthoredWorldback()) return;
     if (G.shiftingScenery && s.mapId === "manyfoldExpedition") return;
     if (G.coliseumScenery && s.mapId === "gauntletArena") return;
     if (G.hedgewayScenery && s.mapId === "druidTrial") return;
