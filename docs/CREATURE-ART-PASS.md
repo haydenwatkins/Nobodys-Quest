@@ -21,20 +21,20 @@ October 1, 2026. Forms/bosses are 24/24 and 19/19; environments are 40/40. This 
 
 All four frames, both directions and both settings were inspected at native size and enlarged; thirty held Chrome landscape scenes include native habitats and four explicitly placed marsh samples. Seven final behavioral/state checks pass, including all native species across all maps, unchanged drawing state and fleeing, and reduced-motion poses. The latest broad result is the preceding 527-check Worldback run. Physical devices/ordinary encounter balance remain untested. Edge HUD/control occlusion remains a separate follow-up.
 
-## Regular foes: 0/18 complete
+## Regular foes: 8/18 complete
 
 The primary agent inspected the full native roster together. Most still rely on small legacy silhouettes, while the opening guard has a larger authored directional set. Review every definition, including those recently improved. Keep existing footprints and combat behavior. More detail should distinguish harmless wildlife from hostile relatives without relying on generic glow stamps.
 
 | ID | Current logical sprite size | Status |
 |---|---|---|
-| slime | 12x8 | Pending |
-| bat | 14x8 | Pending |
-| bones | 12x14 | Pending |
-| wisp | 10x11 | Pending |
-| brute | 18x16 | Pending |
-| thornling | 10x9 | Pending |
-| pebblebeast | 12x10 | Pending |
-| shade | 10x9 | Pending |
+| slime | 12x8 | Complete |
+| bat | 14x8 | Complete |
+| bones | 12x14 | Complete |
+| wisp | 10x11 | Complete |
+| brute | 18x16 | Complete |
+| thornling | 10x9 | Complete |
+| pebblebeast | 12x10 | Complete |
+| shade | 10x9 | Complete |
 | tideCrab | 15x10 | Pending |
 | starMote | 13x11 | Pending |
 | sunHopper | 14x10 | Pending |
@@ -45,5 +45,7 @@ The primary agent inspected the full native roster together. Most still rely on 
 | orchardTangle | 15x15 | Pending |
 | orchardSpitter | 15x15 | Pending |
 | orchardGuard | 28x24 | Pending: review all authored directions/poses |
+
+The first eight now have authored dew-bud, cave-bat, caped bone-scout, cloth-wisp, clay-guardian, briar-bud, river-stone and stitched-hood bodies. All original logical footprints and two-beat frames remain. Fifteen final focused combat, ward, wildlife and art checks pass. All eight were inspected in both directions/poses/pixel settings at native size and enlarged, with twenty-one final controlled Chrome landscape scenes including native wards, matching breaks, status tells and two actual shooter volleys. No final console errors or overflow appeared. These held placements do not establish ordinary encounter balance or physical-device support. The latest full suite is the preceding 527-check Worldback run. Nearby mastery cards and large guidance arrows can obscure foes; repair that next.
 
 After foes, inventory all named/ambient NPC sprites and portraits before campaign upgrades. Pickups, shared combat effects, and HUD/control occlusion still need a final shared-art/readability audit; do not equate map completion with all art being finished.
