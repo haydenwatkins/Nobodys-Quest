@@ -113,3 +113,5 @@ Shared wildlife has an original cohesive living-road treatment: rounded rabbits/
 The first eight common road foes now share the world's sage, clay, cloth and river-stone materials through independently authored rounded bodies. Dew-bud blobs, cave bats, caped bone scouts, sewn wisps/hoods, clay guardians, briar buds and walking mossy stones retain their generic visible names and internal combat IDs. These designs extend the original road-world direction; they do not complete NPC, branding or publication review.
 
 Tide Crab, Star Mote and Sun Hopper now extend that original creature language with rounded pink shore claws, connected night-seed petals and folded amber meadow limbs. Star Mote's face belongs to a joined living body; loose anonymous sparkle stamping is absent. Their native combat and saved IDs remain stable.
+
+The later roads now have independently authored silk-spider Loomlings, sand-glass Mirage Skater geckos, soft Bell Moths and mossy Cairn Walkers. Joined bodies and quiet material highlights replace detached sparkle/spike silhouettes. Their generic names and native IDs remain unchanged; this does not complete NPC or publication review.

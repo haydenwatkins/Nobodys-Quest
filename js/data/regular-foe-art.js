@@ -120,6 +120,46 @@
     eye(g,10,6);eye(g,16,6);g.line(13,10,15,10,'f',1);g.put(8,9,'q');g.put(20,9,'q');
     g.line(10,12,8,14+f,'h',2);g.line(18,12,20,14-f,'h',2);
   });
+  make('loomling',13,10,(g,f)=>{
+    // Four joined leg pairs and a soft silk abdomen, without loose thread stamps.
+    for(const side of [-1,1]) {const x=n=>13+side*n;
+      for(const [n,y] of [[8,7],[10,10],[10,14],[8,17]]) {
+        g.line(x(4),11,x(n),y+f,'k',2);g.line(x(n),y+f,x(n+2),y+2+f,'k',2);
+        g.line(x(4),11,x(n),y+f,'n',1);g.line(x(n),y+f,x(n+2),y+2+f,'n',1);
+      }
+    }
+    g.ellipse(13,10,7,8,'k');g.ellipse(13,9,6,7,'m');g.ellipse(12,7,4,4,'n');
+    g.ellipse(13,13,6,5,'k');g.ellipse(13,12,5,4,'o');eye(g,9,11);eye(g,15,11);
+    g.line(12,16,14,16,'m',1);g.put(8,15,'q');g.put(18,15,'q');g.line(11,5,15,5,'d',1);
+  });
+  make('mirageSkater',12,10,(g,f)=>{
+    // A sand-glass gecko with a curled tail and broad, joined skating toes.
+    g.line(10,11,5,12+f,'k',3);g.line(5,12+f,2,9+f,'k',2);g.line(2,9+f,3,6+f,'k',2);
+    g.line(10,11,5,12+f,'s',2);g.line(5,12+f,2,9+f,'s',1);
+    for(const [x,dx]of [[10,-f],[18,f]]) {g.line(x,13,x+dx-1,17,'k',2);g.line(x,13,x+dx-1,17,'r',1);g.line(x+dx-3,18,x+dx+1,18,'t',1);}
+    g.ellipse(13,11,7,5,'k');g.ellipse(13,10,6,4,'r');g.ellipse(12,9,4,2,'s');
+    g.ellipse(16,6,7,5,'k');g.ellipse(16,6,6,4,'e');g.ellipse(15,4,4,2,'d');
+    eye(g,12,5);eye(g,18,5);g.line(15,9,19,9,'f',1);g.put(10,8,'q');g.put(21,8,'q');
+    g.line(15,11,13,14-f,'s',2);g.put(8,9,'t');
+  });
+  make('bellMoth',14,10,(g,f)=>{
+    for(const side of [-1,1]) {const x=n=>14+side*n;
+      g.poly([[x(2),10],[x(9),f?4:1],[x(13),f?6:3],[x(12),11],[x(8),15],[x(4),13]],'k');
+      g.poly([[x(3),10],[x(9),f?6:3],[x(11),f?7:5],[x(10),11],[x(8),13],[x(4),12]],'s');
+      g.ellipse(x(8),9,3,3,'d');g.line(x(7),12,x(10),12,'e',1);g.put(x(8),13,'e');
+    }
+    g.ellipse(14,13,4,6,'k');g.ellipse(14,12,3,5,'g');g.line(12,14,16,14,'e',1);
+    g.line(11,5,9,1,'k',1);g.line(17,5,19,1,'k',1);
+    g.ellipse(14,8,5,5,'k');g.ellipse(14,7,4,4,'d');eye(g,11,7);eye(g,15,7);g.put(14,11,'h');
+  });
+  make('cairnWalker',14,12,(g,f)=>{
+    for(const [x,dx]of [[9,-f],[19,f]]) {g.rect(x-3+dx,18,6,5,'k');g.rect(x-2+dx,19,4,3,'a');g.line(x-2+dx,22,x+1+dx,22,'c',1);}
+    g.ellipse(14,15,11,6,'k');g.ellipse(14,14,10,5,'a');g.ellipse(12,12,7,3,'b');
+    g.line(8,13,5,16,'c',1);g.line(20,14,23,15,'b',1);g.line(12,17,16,17,'i',2);
+    g.ellipse(14,7,9,7,'k');g.ellipse(14,7,8,6,'b');g.ellipse(12,5,6,3,'c');
+    eye(g,9,7);eye(g,17,7);g.line(13,11,15,11,'a',1);g.put(7,10,'q');g.put(21,10,'q');
+    g.ellipse(10,2,3,1,'j');g.line(19,2,20,5,'a',1);g.put(9,1,'l');g.line(4,15,2,17,'b',2);g.line(24,15,26,17,'b',2);
+  });
   for(const [id,sprite] of Object.entries(art)) G.enemies[id].sprite=sprite;
   G.regularFoeArtIds=Object.keys(art);
 })();
