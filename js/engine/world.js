@@ -767,7 +767,8 @@ G.world = (() => {
     const px = x * T, py = y * T;
     const rnd = G.util.hash2(x, y);
 
-    const meadow = (G.drawColiseumTile && G.drawColiseumTile(ctx, cell, x, y, time)) ||
+    const meadow = (G.drawShiftingTile && G.drawShiftingTile(ctx, cell, x, y, time)) ||
+      (G.drawColiseumTile && G.drawColiseumTile(ctx, cell, x, y, time)) ||
       (G.drawHedgewayTile && G.drawHedgewayTile(ctx, cell, x, y, time)) ||
       (G.drawStarpathTile && G.drawStarpathTile(ctx, cell, x, y, time)) ||
       (G.drawFoldroadTile && G.drawFoldroadTile(ctx, cell, x, y, time)) ||
@@ -989,7 +990,8 @@ G.world = (() => {
       }
       }
     }
-    if (cell.message && (!G.drawColiseumNotice || !G.drawColiseumNotice(ctx, cell, x, y)) &&
+    if (cell.message && (!G.drawShiftingNotice || !G.drawShiftingNotice(ctx, cell, x, y)) &&
+        (!G.drawColiseumNotice || !G.drawColiseumNotice(ctx, cell, x, y)) &&
         (!G.drawHedgewayNotice || !G.drawHedgewayNotice(ctx, cell, x, y)) &&
         (!G.drawStarpathNotice || !G.drawStarpathNotice(ctx, cell, x, y)) &&
         (!G.drawFoldroadNotice || !G.drawFoldroadNotice(ctx, cell, x, y)) &&
@@ -1173,6 +1175,7 @@ G.world = (() => {
   // arenas keep exactly the same tiles, rocks, spawns, and collision.
   function drawTrialFloor(ctx, time) {
     const s = G.state;
+    if (G.shiftingScenery && s.mapId === "manyfoldExpedition") return;
     if (G.coliseumScenery && s.mapId === "gauntletArena") return;
     if (G.hedgewayScenery && s.mapId === "druidTrial") return;
     if (G.starpathScenery && s.mapId === "astronomerTrial") return;
@@ -1300,6 +1303,7 @@ G.world = (() => {
   function drawAmbientDetails(ctx, cam, time) {
     if (G.reducedMotion) return;
     const s = G.state;
+    if (G.shiftingScenery && s.mapId === "manyfoldExpedition") return;
     if (G.coliseumScenery && s.mapId === "gauntletArena") return;
     if (G.hedgewayScenery && s.mapId === "druidTrial") return;
     if (G.starpathScenery && s.mapId === "astronomerTrial") return;
