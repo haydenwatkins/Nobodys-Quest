@@ -277,6 +277,12 @@ G.ui = (() => {
           y < other.y + other.h + 3 && y + height + 3 > other.y;
         if (overlaps) y = Math.max(37, other.y - height - 4);
       }
+      // A top-edge clamp or stacked bubble may cover the speaking character.
+      if (npc.def.sprite && npc.def.sprite.integratedEquipment && G.spriteMetrics) {
+        const body = G.spriteMetrics(npc.def.sprite), nx = npc.x - cam.x, ny = npc.y - cam.y;
+        if (x < nx + body.w / 2 + 2 && x + width + 2 > nx - body.w / 2 - 2 &&
+            y < ny + 2 && y + height + 5 > ny - body.h - 2) continue;
+      }
       // Incidental speech must not hide a traveller beneath a nearby speaker.
       // Include the tail and shadow; the bubble timer continues normally.
       const sprite = G.forms[G.state.formId] && G.forms[G.state.formId].sprite;

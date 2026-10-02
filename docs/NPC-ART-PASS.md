@@ -2,12 +2,12 @@
 
 October 2, 2026. This tracks completed and pending NPC art against the primary-source roster. The final orchard foe batch is complete; regular foes now have 18/18 authored bodies. Review every named character, every resident appearance and every dialogue speaker next. Keep native IDs, placement, routines, interactions and saved progress. Detailed, cute, original bodies and recognizable faces should replace generic shared silhouettes; deliberate equipment belongs in the authored sprite.
 
-## Named world sprites: 3/13 fresh reviews complete
+## Named world sprites: 4/13 fresh reviews complete
 
 | ID | Visible name | Logical footprint | Native placement maps | Status |
 |---|---|---|---|---|
 | pebble | Pebble | 18x22 | overworld, shattercoast, town, mistwood, emberRidge, starfallRuins, sunstepPrairie, windscarCanyon, frostbellTundra, titanGrave, orchardRoad, sunriseQuay | Complete |
-| mayorMaybe | Mayor Maybe | 10x10 | overworld, town | Pending |
+| mayorMaybe | Mayor Maybe | 18x22 | overworld, town | Complete |
 | errata | Archivist Errata | 9x10 | dungeon, mistwood, starfallRuins, rootdeepHollow, glasswaterDesert, titanGrave | Pending |
 | parcel | Courier Parcel | 18x22 | overworld, shattercoast, sunkenMarsh, sunstepPrairie, glasswaterDesert, frostbellTundra, orchardRoad, lanternReach, sunriseQuay | Complete |
 | pending | Sir Pending | 18x22 | dungeon, town, emberRidge, hangingGardens, orchardRoad | Complete |
@@ -47,3 +47,11 @@ Pebble now has a warm rounded face, silver hair, blue guide coat and held bound 
 Opening/delivery portrait matching now recognizes Pebble, Parcel/Courier Parcel (including the other-side subtitle), and Ser/Sir Pending. Long speaker headers show an ellipsis. These three opening crops are reviewed; the standard dialogue has no portrait yet, and other speaker/narration/object matching remains pending. Do not equate this alias repair with complete portrait coverage.
 
 Fifteen final focused art/talk/save/routine/opening/delivery/dialogue/chatter/HUD/scenery checks pass. All four poses, both facings and both settings were inspected at native size and enlarged; twelve final held Chrome 667x375 scenes cover all native bodies in both settings, actual conversations for all three, both classic short aliases, guidance/talk clearance and incidental speech. The first held guide placement crowded the talk label and the traveller stood under a tree; these were corrected before the final review. No final errors or overflow appeared, the fixture is removed and viewport reset. Latest broad evidence is the preceding orchard 536/537 full run plus five passing fixture-repair checks; no new full-run claim is made for this trio. Physical devices/ordinary playthrough balance remain untested. Next review Mayor Maybe, Archivist Errata and Auntie Alias, then the remaining four base people, three quay people and six resident appearances; finish all portrait coverage before campaign work.
+
+## Mayor Maybe complete (October 2)
+
+Mayor Maybe now has round spectacles, a warm moustached face, plum coat, fitted waistcoat and a hand-held civic agenda. Four 18x22 poses include writing and a joined waving arm; both pixel settings and mirrored facings share the authored identity. The former 10x10 drawn template grows without changing native road/town placement, personalities, routine/talk rules, chapter selection or saved conversation keys. Its tools use the existing integrated-equipment path. The opening speaker crop resolves the existing full name; standard dialogue remains text-only pending the full portrait phase.
+
+Top-clamped or stacked incidental speech now yields if it would cover an integrated character's own head, as well as the traveller. Timers continue and clear speech returns. Fourteen final focused art/dialogue/chatter/routine/save/HUD checks pass, including all four integrated people at clipped and readable positions. All four Mayor poses, both facings and both settings were inspected at native size and enlarged; ten final Chrome 667x375 views cover native road/town bodies in both settings, native conversations, a controlled opening portrait and clipped/readable speech. An initially transient-looking classic conversation header was rechecked in a fresh, font-loaded capture and was clear. No final errors or overflow appeared; the fixture is removed and viewport reset. Some peripheral NPCs can still sit behind optional mastery cards; retain that for the shared readability audit. Latest broad evidence remains the preceding orchard run and five passing fixture-repair checks; this single-person batch uses focused validation. Physical hardware/ordinary playthrough balance remain untested.
+
+Next bounded named batch: Archivist Errata, Auntie Alias and Dr. Provisional. Then Groundskeeper Moss, Captain Lastminute, Oracle Probably, all three quay people and six resident appearances. Finish full portrait/speaker coverage and shared readability/effects before campaign work.
