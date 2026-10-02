@@ -14,6 +14,7 @@ function fakeContext() {
   return {
     fillStyle: "", font: "", globalAlpha: 1, textBaseline: "top",
     setTransform() {}, clearRect() {}, fillRect() {}, fillText() {},
+    save() {}, restore() {}, translate() {},
     measureText(text) { return { width: String(text).length * 5 }; },
   };
 }
@@ -42,12 +43,12 @@ const context = vm.createContext({
     },
     sfx: { ensure() {}, play(name) { sounds.push(name); } },
     state: {
-      player: { mana: 6, manaMax: 6, cooldowns: {}, passiveBarrier: 0 },
+      player: { x: 160, y: 120, mana: 6, manaMax: 6, cooldowns: {}, passiveBarrier: 0 },
       enemies: [], stars: 0, formId: "nobody", mapId: "overworld",
       mapDef: { name: "Overworld" }, mapW: 0, mapH: 0, grid: [], time: 0,
       bossCutscene: null,
     },
-    fx: [], abilities: {}, DAMAGE_TYPES: {},
+    fx: [], forms: {}, abilities: {}, DAMAGE_TYPES: {},
     playerForm: () => ({ id: "nobody", icon: "?", name: "Nobody" }),
     playerMaxHearts: () => 4, playerHp: () => 4, formLevel: () => 1,
     pinnedQuests: () => [], getLoadout: () => [],

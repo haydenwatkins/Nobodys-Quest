@@ -33,6 +33,7 @@ G.ui = (() => {
   const uiCanvas = document.getElementById("ui");
   const uiCtx = uiCanvas.getContext("2d");
   let uiScale = 4;
+  let statusBounds = null; // Current-frame status placement, never saved.
 
   const FONT_HEAD = '"Press Start 2P", "Courier New", monospace';
   const FONT_BODY = '"VT323", "Courier New", monospace';
@@ -217,7 +218,7 @@ G.ui = (() => {
     }
   }
 
-  function drawLocationChip(c) {
+  function drawLocationChip(c, cam) {
     const s = G.state;
     const name = s.mapDef && s.mapDef.name ? s.mapDef.name : s.mapId;
     const touch = G.input.isTouch;
@@ -225,8 +226,10 @@ G.ui = (() => {
     const enemies = s.enemies.filter((e) => !e.dead).length;
     const label = touch ? name.toUpperCase() : `${name}  enemies:${enemies}`;
     const w = c.measureText(label).width + 8;
+    const x = Math.round(G.W / 2 - w / 2);
+    if (fieldPanelBlocked(cam, x, 5, w, 11)) return;
     c.fillStyle = "rgba(26,28,44,0.72)";
-    c.fillRect(Math.round(G.W / 2 - w / 2), 5, w, 11);
+    c.fillRect(x, 5, w, 11);
     c.fillStyle = touch ? "#73eff7" : "#c8d8e0";
     c.fillText(label, Math.round(G.W / 2 - w / 2) + 4, 8);
   }
@@ -282,6 +285,7 @@ G.ui = (() => {
       const bodyHeight = Math.max(28, metrics.h) + 2;
       if (x < px + halfWidth && x + width + 2 > px - halfWidth &&
           y < py + 4 && y + height + 5 > py - bodyHeight) continue;
+      if (statusOverlaps(x, y, width + 2, height + 5)) continue;
       placed.push({ x, y, w: width, h: height });
 
       const remaining = Math.min(bubble.duration || 2.25, bubble.t);
@@ -379,6 +383,36 @@ G.ui = (() => {
       y < py + 4 && y + h > py - height;
   }
 
+  function statusOverlaps(x, y, w, h) {
+    const b = statusBounds;
+    return b && x < b.x + b.w + 3 && x + w + 3 > b.x &&
+      y < b.y + b.h + 3 && y + h + 3 > b.y;
+  }
+
+  function fieldPanelBlocked(cam, x, y, w, h) {
+    return coversTraveller(cam, x, y, w, h) || statusOverlaps(x, y, w, h);
+  }
+
+  function placeStatus(cam, width) {
+    // Keep essential information opaque; use a clear anchor when the traveller
+    // reaches the north wall. Reserve the map/pause buttons at the right edge.
+    const boss = G.state.enemies.some(e => e.def.miniboss && e.bossEngaged && !e.dead);
+    const bossX = Math.round((G.W - 150) / 2);
+    const blocked = (x, y) => coversTraveller(cam, x, y, width, 30) ||
+      (boss && x < bossX + 153 && x + width + 3 > bossX && y < 25 && y + 33 > 4);
+    let x = 5, y = 5;
+    if (blocked(x, y)) {
+      x = Math.max(5, G.W - 60 - width);
+      if (blocked(x, y)) {
+        x = 5;
+        y = 40;
+        if (coversTraveller(cam, x, y, width, 30))
+          y = Math.max(40, Math.ceil(G.state.player.y - cam.y + 10));
+      }
+    }
+    return { x, y, w: width, h: 30 };
+  }
+
   function drawMinimap(c, cam) {
     if (G.input.isTouch) return;
     const s = G.state;
@@ -387,7 +421,7 @@ G.ui = (() => {
     const h = 42;
     const x0 = G.W - w - 5;
     const y0 = 21;
-    if (coversTraveller(cam, x0, y0, w, h)) return;
+    if (fieldPanelBlocked(cam, x0, y0, w, h)) return;
     const step = Math.max(1, Math.ceil(Math.max(s.mapW / (w - 4), s.mapH / (h - 4))));
     const sx = (w - 4) / s.mapW;
     const sy = (h - 4) / s.mapH;
@@ -432,7 +466,7 @@ G.ui = (() => {
     const boxW = 118;
     const x = G.W - boxW - 5;
     const y = G.input.isTouch ? 45 : 67;
-    if (coversTraveller(cam, x, y, boxW, 27)) return;
+    if (fieldPanelBlocked(cam, x, y, boxW, 27)) return;
     const pulse = G.state.masteryHudPulse > 0;
 
     c.fillStyle = "rgba(26,28,44,0.78)";
@@ -469,7 +503,7 @@ G.ui = (() => {
     const boxH = touch ? 20 : 24;
     const x = touch ? 5 : Math.round((G.W - boxW) / 2);
     const y = touch ? 60 : G.H - boxH - 26;
-    if (coversTraveller(cam, x, y, boxW, boxH)) return;
+    if (fieldPanelBlocked(cam, x, y, boxW, boxH)) return;
     c.fillStyle = "rgba(26,28,44,0.9)";
     c.fillRect(x, y, boxW, boxH);
     c.fillStyle = "#73eff7";
@@ -489,7 +523,7 @@ G.ui = (() => {
     const boxW = 190;
     const x = 5;
     const y = 38;
-    if (coversTraveller(cam, x, y, boxW, 18)) return;
+    if (fieldPanelBlocked(cam, x, y, boxW, 18)) return;
     c.fillStyle = "rgba(26,28,44,0.82)";
     c.fillRect(x, y, boxW, 18);
     c.fillStyle = goal.act.color;
@@ -581,6 +615,7 @@ G.ui = (() => {
     // the transform blows it up to full screen resolution.
     c.setTransform(uiScale, 0, 0, uiScale, 0, 0);
     c.clearRect(0, 0, G.W, G.H);
+    statusBounds = null;
     c.textBaseline = "top";
 
     const p = G.state.player;
@@ -602,9 +637,23 @@ G.ui = (() => {
 
     const openingHud = G.drawOpeningHud && G.drawOpeningHud(c, cam);
     if (!openingHud) {
-    /* hearts */
     const maxH = G.playerMaxHearts();
     const hp = G.playerHp();
+    c.font = `6px ${FONT_HEAD}`;
+    const label = `${form.icon} ${form.name} Lv${G.formLevel(form.id)}`;
+    const chipW = c.measureText(label).width + 6;
+    const pantryBuffs = [];
+    if (p.pantryGuard > 0) pantryBuffs.push({ text: "WARD", color: "#ffcd75" });
+    if (p.pantryHasteT > 0) pantryBuffs.push({ text: "FAST", color: "#ef7d57" });
+    if (p.pantryQuickT > 0) pantryBuffs.push({ text: "QUICK", color: "#73eff7" });
+    if (p.pantryMagnetT > 0) pantryBuffs.push({ text: "MAG", color: "#d9a7ff" });
+    c.font = `5px ${FONT_HEAD}`;
+    const buffsW = pantryBuffs.reduce((w, buff) => w + c.measureText(buff.text).width + 7, 0);
+    statusBounds = placeStatus(cam, Math.max(chipW + buffsW + 3, maxH * 9 + (p.passiveBarrier || 0) * 7 + 3, 43));
+    c.save();
+    c.translate(statusBounds.x - 5, statusBounds.y - 5);
+
+    /* hearts */
     for (let i = 0; i < maxH; i++) {
       const x = 6 + i * 9, y = 6;
       c.fillStyle = i < hp ? "#b13e53" : "#333c57";
@@ -640,18 +689,11 @@ G.ui = (() => {
 
     /* current form chip */
     c.font = `6px ${FONT_HEAD}`;
-    const label = `${form.icon} ${form.name} Lv${G.formLevel(form.id)}`;
-    const chipW = c.measureText(label).width + 6;
     c.fillStyle = "rgba(26,28,44,0.65)";
     c.fillRect(5, 24, chipW, 11);
     c.fillStyle = "#f4f4f4";
     c.fillText(label, 8, 27);
 
-    const pantryBuffs = [];
-    if (p.pantryGuard > 0) pantryBuffs.push({ text: "WARD", color: "#ffcd75" });
-    if (p.pantryHasteT > 0) pantryBuffs.push({ text: "FAST", color: "#ef7d57" });
-    if (p.pantryQuickT > 0) pantryBuffs.push({ text: "QUICK", color: "#73eff7" });
-    if (p.pantryMagnetT > 0) pantryBuffs.push({ text: "MAG", color: "#d9a7ff" });
     let pantryX = 8 + chipW;
     c.font = `5px ${FONT_HEAD}`;
     for (const buff of pantryBuffs) {
@@ -664,10 +706,12 @@ G.ui = (() => {
       pantryX += w + 2;
     }
 
+    c.restore();
+
     const entranceFocus = G.world && G.world.nearPortal && G.world.nearPortal(56);
     const bossBarShown = drawBossBar(c);
     const encounterFocus = bossBarShown || (G.state.mapId === "emberRidge" && G.ridgeSurvey && G.ridgeSurvey().active);
-    if (!encounterFocus && !entranceFocus) drawLocationChip(c);
+    if (!encounterFocus && !entranceFocus) drawLocationChip(c, cam);
 
     /* stars (top right) */
     const starTxt = `⭐${G.state.stars}`;
