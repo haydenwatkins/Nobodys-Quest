@@ -199,6 +199,25 @@
   };
 
   G.drawWildlife = function (ctx, creature) {
+    const sprite = G.wildlifeArt && G.wildlifeArt[creature.kind];
+    if (sprite && G.drawSprite) {
+      const bob = G.reducedMotion || creature.def.aquatic ? 0 :
+        Math.round(Math.sin(creature.phase) * (creature.def.flying ? 2 : 1));
+      const frame = G.reducedMotion ? 0 : ((Math.floor(creature.phase * 1.7) % 4) + 4) % 4;
+      const x = Math.round(creature.x), y = Math.round(creature.y + bob);
+      ctx.save();
+      if (creature.def.ground) {
+        ctx.save();
+        ctx.globalAlpha *= 0.25;
+        ctx.fillStyle = "#35424b";
+        ctx.fillRect(x - 4, y + 2, 8, 2);
+        ctx.restore();
+      }
+      if (creature.def.aquatic) ctx.globalAlpha *= 0.75;
+      G.drawSprite(ctx, sprite, frame, x, y + 4, !!creature.facingLeft);
+      ctx.restore();
+      return;
+    }
     const x = Math.round(creature.x);
     const bob = creature.def.aquatic ? 0 : Math.round(Math.sin(creature.phase) * (creature.def.flying ? 2 : 1));
     const y = Math.round(creature.y + bob);
