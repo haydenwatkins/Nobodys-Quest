@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const ids=['slime','bat','bones','wisp','brute','thornling','pebblebeast','shade'];
+const ids=['slime','bat','bones','wisp','brute','thornling','pebblebeast','shade','tideCrab','starMote','sunHopper'];
 const withoutSprite=def=>JSON.stringify(Object.fromEntries(Object.entries(def).filter(([k])=>k!=='sprite')));
 
 test('early foe redesigns keep native footprints, gameplay definitions and the two-beat clock',()=>{

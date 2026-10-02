@@ -84,6 +84,42 @@
     g.line(8,12,12,12,'a',1);g.line(7,4,10,3,'n',1);g.line(6,14,7,15,'o',1);g.line(13,14,14,15,'o',1);
     g.line(3,11,1,13+f,'n',2);g.line(17,11,19,13-f,'n',2);
   });
+  make('tideCrab',15,10,(g,f)=>{
+    for(const side of [-1,1]) {
+      const x=n=>15+side*n;
+      for(const [n,y] of [[6,13],[7,16]]) {g.line(x(n),y,x(11+f),y+2,'k',2);g.line(x(n),y,x(10+f),y+1,'g',1);}
+      g.line(x(5),11,x(10),7+f,'k',3);g.line(x(5),11,x(10),7+f,'p',2);
+      g.ellipse(x(11),5+f,3,4,'k');g.ellipse(x(11),5+f,2,3,'h');g.line(x(10),2+f,x(11),5+f,'p',1);
+    }
+    g.ellipse(15,12,9,6,'k');g.ellipse(15,11,8,5,'p');g.ellipse(14,9,6,3,'q');
+    g.line(10,6,10,3,'k',2);g.line(20,6,20,3,'k',2);eye(g,9,3);eye(g,19,3);
+    g.line(13,13,17,13,'k',1);g.put(8,11,'d');g.put(22,11,'d');
+    g.line(11,8,14,6,'h',1);g.line(16,6,19,8,'h',1);
+  });
+  make('starMote',13,11,(g,f)=>{
+    // A joined night-seed flower: petals belong to a visible living body.
+    const y=11+f;
+    for(const [x,dy,rx,ry] of [[13,-7,3,4],[6,-3,4,3],[20,-3,4,3],[8,5,3,4],[18,5,3,4]]) {
+      g.ellipse(x,y+dy,rx,ry,'k');g.ellipse(x,y+dy,rx-1,ry-1,'e');
+      g.line(x-1,y+dy-1,x+1,y+dy-1,'d',1);
+    }
+    g.ellipse(13,y,7,6,'k');g.ellipse(13,y,6,5,'r');g.ellipse(12,y-1,4,3,'s');
+    eye(g,9,y-2);eye(g,15,y-2);g.ellipse(13,y+3,2,1,'m');
+    g.put(7,y+2,'q');g.put(19,y+2,'q');g.put(12,y-4,'t');
+  });
+  make('sunHopper',14,10,(g,f)=>{
+    // Warm meadow hopper with folded haunches and a connected antenna pair.
+    for(const side of [-1,1]) {const x=n=>14+side*n;
+      g.line(x(5),11,x(10),13-f,'k',3);g.line(x(10),13-f,x(7+f),17,'k',2);
+      g.line(x(5),11,x(10),13-f,'g',2);g.line(x(10),13-f,x(7+f),17,'e',1);
+      g.line(x(7+f),17,x(11+f),17,'k',2);
+    }
+    g.ellipse(14,12,7,6,'k');g.ellipse(14,11,6,5,'g');g.ellipse(13,10,4,3,'e');
+    g.line(10,4,8,1,'k',1);g.line(18,4,20,1,'k',1);
+    g.ellipse(14,7,7,5,'k');g.ellipse(14,7,6,4,'e');g.ellipse(13,5,4,2,'d');
+    eye(g,10,6);eye(g,16,6);g.line(13,10,15,10,'f',1);g.put(8,9,'q');g.put(20,9,'q');
+    g.line(10,12,8,14+f,'h',2);g.line(18,12,20,14-f,'h',2);
+  });
   for(const [id,sprite] of Object.entries(art)) G.enemies[id].sprite=sprite;
   G.regularFoeArtIds=Object.keys(art);
 })();
