@@ -70,7 +70,7 @@ test('range help draws the hit boundary without breadcrumbs that encourage closi
     arc(x, y, radius) { arcs.push({ x, y, radius }); }, fillRect(...args) { rects.push(args); } };
   G.drawWorldGuidance(ctx, { x: 0, y: 0 }, 1);
   assert.ok(arcs.some(a => a.x === 280 && a.y === 144 && a.radius === 100));
-  assert.equal(rects.length, 9, 'one target pip and eight boundary pips, without approach breadcrumbs');
+  assert.equal(rects.length, 10, 'two ground ticks and eight boundary pips, without approach breadcrumbs');
   G.state.time += 14; arcs.length = 0;
   G.drawWorldGuidance(ctx, { x: 0, y: 0 }, 1);
   assert.ok(!arcs.some(a => a.radius === 100), 'large practice geometry retires after help expires');

@@ -390,7 +390,16 @@ G.ui = (() => {
   }
 
   function fieldPanelBlocked(cam, x, y, w, h) {
-    return coversTraveller(cam, x, y, w, h) || statusOverlaps(x, y, w, h);
+    if (coversTraveller(cam, x, y, w, h) || statusOverlaps(x, y, w, h)) return true;
+    const p = G.state.player;
+    return (G.state.enemies || []).some(e => {
+      if (e.dead || Math.hypot(e.x - p.x, e.y - p.y) > 112) return false;
+      const metrics = e.def.sprite && G.spriteMetrics ? G.spriteMetrics(e.def.sprite) : { w: e.def.size || 16, h: e.def.size || 16 };
+      const scale = e.def.boss?.spriteScale || 1;
+      const px = e.x + (e.hitKickX || 0) - cam.x, py = e.y + (e.hitKickY || 0) - cam.y;
+      const half = metrics.w * scale / 2 + 3, height = metrics.h * scale + 10;
+      return x < px + half && x + w > px - half && y < py + 4 && y + h > py - height;
+    });
   }
 
   function placeStatus(cam, width) {

@@ -365,6 +365,7 @@
       color: quest.event === "sign" ? G.GUIDANCE_COLORS.story : G.GUIDANCE_COLORS.form,
       icon: quest.event === "sign" ? "◇" : lesson.form.icon,
       destination: quest.event === "sign" ? "the nearby sign" : "a safe practice fight",
+      entity: target.def ? target : null,
       text,
     });
   }
@@ -655,6 +656,14 @@
     }
   };
 
+  function guidanceActor(target) {
+    const e = target.entity || (target.def ? target : null);
+    if (!e || e.dead || !e.def?.sprite) return null;
+    const metrics = G.spriteMetrics ? G.spriteMetrics(e.def.sprite) : { w: e.def.size || 16, h: e.def.size || 16 };
+    const scale = e.def.boss?.spriteScale || 1;
+    return { w: metrics.w * scale, h: metrics.h * scale };
+  }
+
   G.drawWorldGuidance = function (ctx, cam, time) {
     const target = refreshTarget(false);
     if (!target || target.spatial === false) return;
@@ -676,7 +685,14 @@
     }
     const onScreen = target.x >= cam.x - 12 && target.x <= cam.x + G.W + 12 &&
       target.y >= cam.y - 12 && target.y <= cam.y + G.H + 12;
-    if (onScreen) {
+    const actor = guidanceActor(target);
+    if (onScreen && actor) {
+      // Small ground ticks point to the foe without covering its face or ward.
+      ctx.globalAlpha = active ? 0.9 : 0.34;
+      ctx.fillStyle = target.color;
+      for (const side of [-1, 1])
+        ctx.fillRect(Math.round(target.x + side * (actor.w / 2 + 4)) - 1, Math.round(target.y + 3), 3, 1);
+    } else if (onScreen) {
       const pulse = 0.55 + Math.sin((time || 0) * 4) * 0.18;
       ctx.globalAlpha = active ? 0.9 : 0.34;
       ctx.strokeStyle = target.color;
@@ -722,8 +738,11 @@
     const angle = Math.atan2(sy - centerY, sx - centerX);
     const radiusX = G.W / 2 - 14, radiusY = G.H / 2 - 22;
     const scale = Math.min(Math.abs(radiusX / (Math.cos(angle) || 0.001)), Math.abs(radiusY / (Math.sin(angle) || 0.001)));
+    const actor = guidanceActor(target);
+    const above = sy - (actor ? actor.h + 14 : 18);
+    if (onScreen && actor && above < 10) return;
     const x = onScreen ? G.util.clamp(sx, 12, G.W - 12) : centerX + Math.cos(angle) * scale;
-    const y = onScreen ? G.util.clamp(sy - 18, 20, G.H - 28) : centerY + Math.sin(angle) * scale;
+    const y = onScreen ? G.util.clamp(above, actor ? 10 : 20, G.H - 28) : centerY + Math.sin(angle) * scale;
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.rotate(angle + Math.PI / 2);
@@ -733,7 +752,7 @@
     ctx.fillStyle = target.color;
     ctx.beginPath(); ctx.moveTo(0, -6); ctx.lineTo(4, 4); ctx.lineTo(-4, 4); ctx.closePath(); ctx.fill();
     ctx.restore();
-    if (active) {
+    if (active && !(onScreen && actor)) {
       ctx.font = "5px 'Press Start 2P', monospace";
       const label = `${target.icon} ${String(target.destination).toUpperCase()}`;
       const width = Math.min(G.W - 30, ctx.measureText(label).width + 10);
