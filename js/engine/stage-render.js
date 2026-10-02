@@ -7,7 +7,7 @@
  G.drawStageNotice=(c,cell,x,y)=>{if(!here()||!cell.message)return false;G.drawSprite(c,S.notice,0,x*16+8,y*16+16,false);return true;};
  G.drawStageCache=(c,ch)=>{if(!here())return false;const x=ch.x*16+8,y=ch.y*16+16;G.drawSprite(c,S.custardPantry,ch.opened?1:0,x,y,false);if(ch.food&&ch.opened){const progress=1-Math.min(1,Math.max(0,(ch.readyAt||0)-Date.now())/G.PANTRY_REFILL_MS);rect(c,x-10,y-5,20,1,'#463b4c');rect(c,x-10,y-5,Math.round(20*progress),1,'#aac1af');}return true;};
  // Keep the original flight (16x11) and impact (24x16) footprints.
- G.drawStagePie=(c,x,y,impact=false)=>{if(!here())return false;G.drawSprite(c,impact?S.pieImpact:S.combatPie,0,x,y+(impact?8:3),false);return true;};
+ G.drawStagePie=(c,x,y,impact=false)=>{if(!here()&&G.state?.mapId!=="gauntletArena")return false;G.drawSprite(c,impact?S.pieImpact:S.combatPie,0,x,y+(impact?8:3),false);return true;};
  const old=G.openingDrawables;
  G.openingDrawables=c=>{const list=old(c);if(!here())return list;for(let ty=0;ty<G.state.mapH;ty++)for(let tx=0;tx<G.state.mapW;tx++)if(G.state.grid[ty][tx].tile==='rock'){const x=tx*16+8,y=ty*16+16;list.push({y:y-1,fn:()=>{c.save();const hidden=a=>a&&Math.abs(a.x-x)<17&&a.y<y&&a.y>y-38;if(hidden(G.state.player)||(G.state.npcs||[]).some(hidden))c.globalAlpha*=.35;G.drawSprite(c,S.propCase,0,x,y,false);c.restore();}});}for(const [id,tx,bottom]of [['curtain',9,44],['curtain',18,44],['curtain',24,44],['poster',5,32]]){const x=tx*16+8,y=bottom;list.push({y:16,fn:()=>{c.save();const hidden=a=>a&&Math.abs(a.x-x)<26&&a.y<y&&a.y>y-42;if(hidden(G.state.player)||(G.state.npcs||[]).some(hidden))c.globalAlpha*=.35;G.drawSprite(c,S[id],0,x,y,false);c.restore();}});}return list;};
 })();
