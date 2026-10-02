@@ -460,10 +460,13 @@
 
   G.drawNpc = function (ctx, npc) {
     const p = G.state.player;
-    const bob = Math.sin(npc.anim * Math.PI) * 0.45;
+    const integrated = !!npc.def.sprite.integratedEquipment;
+    const headHeight = integrated && G.spriteMetrics ? G.spriteMetrics(npc.def.sprite).h : 8;
+    const bob = G.reducedMotion ? 0 : Math.sin(npc.anim * Math.PI) * 0.45;
     G.drawShadow(ctx, npc.x, npc.y, 10);
-    const mode = npc.path && npc.path.length ? "walk" : "idle";
-    const frame = G.spriteFrame ? G.spriteFrame(npc.def.sprite, mode, mode === "idle" ? G.state.time + npc.seed : npc.anim) : Math.floor(npc.anim) % 2;
+    const mode = npc.path && npc.path.length ? "walk" : integrated && npc.activity ? "work" : "idle";
+    const tick = G.reducedMotion ? 0 : mode === "walk" ? npc.anim : G.state.time + npc.seed;
+    const frame = G.spriteFrame ? G.spriteFrame(npc.def.sprite, mode, tick) : Math.floor(tick) % 2;
     G.drawSprite(ctx, npc.def.sprite, frame, npc.x, npc.y + bob, npc.facingLeft);
     if (npc.guidancePoint) {
       const side = npc.facingLeft ? -1 : 1;
@@ -471,13 +474,13 @@
       ctx.save();
       ctx.globalAlpha = 0.75 + pulse * 0.2;
       ctx.fillStyle = "#ffcd75";
-      ctx.fillRect(Math.round(npc.x + side * 8), Math.round(npc.y - 9 + bob), side * 5, 2);
-      ctx.translate(Math.round(npc.x), Math.round(npc.y - 25 - pulse * 2));
+      if (!integrated) ctx.fillRect(Math.round(npc.x + side * 8), Math.round(npc.y - 9 + bob), side * 5, 2);
+      ctx.translate(Math.round(npc.x), Math.round(npc.y - (integrated ? headHeight + 24 : 25) - (G.reducedMotion ? 1 : pulse * 2)));
       ctx.rotate(Math.PI / 4);
       ctx.fillRect(-3, -3, 6, 6);
       ctx.restore();
     }
-    if (npc.activity) {
+    if (npc.activity && !integrated) {
       const side = npc.facingLeft ? -7 : 6;
       const ax = Math.round(npc.x + side), ay = Math.round(npc.y + 1 + bob);
       ctx.save();
@@ -509,7 +512,7 @@
 
     const selected = G.npcTalkCandidate && G.npcTalkCandidate() === npc;
 
-    const y = Math.round(npc.y - 18 + bob);
+    const y = Math.round(npc.y - Math.max(18, headHeight + 10) + bob);
     ctx.save();
     ctx.fillStyle = "rgba(26,28,44,0.9)";
     const prompt = selected ? (G.input.hasGamepad ? "A TALK" : G.input.isTouch ? "TALK" : "E TALK") : "...";

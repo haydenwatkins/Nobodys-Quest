@@ -270,7 +270,8 @@ G.ui = (() => {
       width = Math.min(98, width);
       const height = 13 + lines.length * 9;
       let x = Math.round(G.util.clamp(npc.x - cam.x - width / 2, 4, G.W - width - 4));
-      let y = Math.round(G.util.clamp(npc.y - cam.y - height - 23, 37, G.H - height - 34));
+      const headGap = npc.def.sprite && npc.def.sprite.integratedEquipment && G.spriteMetrics ? Math.max(23, G.spriteMetrics(npc.def.sprite).h + 7) : 23;
+      let y = Math.round(G.util.clamp(npc.y - cam.y - height - headGap, 37, G.H - height - 34));
       for (const other of placed) {
         const overlaps = x < other.x + other.w + 3 && x + width + 3 > other.x &&
           y < other.y + other.h + 3 && y + height + 3 > other.y;
