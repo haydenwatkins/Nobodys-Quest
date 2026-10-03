@@ -1,10 +1,11 @@
-/* Chest contents: recognizable objects; the sharp HUD explains their purpose. */
+/* Earned ground gifts: recognizable objects with a sharp purpose cue. */
 "use strict";
 (() => {
   const A = G.authoredPixelArt;
   G.treasureInfo = {
     "trophy-heartwood-crown": { name: "Heartwood Crown", purpose: "+1 star · choose a Keepsake in Build", shape: "crown" },
     "trophy-mire-pearl": { name: "Mire Pearl", purpose: "+1 star · light Pebble's beacon", shape: "pearl" },
+    "trophy-eclipse-sigil": { name: "Eclipse Sigil", purpose: "+1 star · choose a Keepsake in Build", shape: "sigil" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -20,7 +21,14 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, palette, (g, frame) => {
-      if (shape === "pearl") {
+      if (shape === "sigil") {
+        // A small metal medallion, with its eclipse inset into the face.
+        g.ellipse(14, 6, 4, 5, "k"); g.ellipse(14, 6, 2, 3, "a");
+        g.ellipse(14, 19, 12, 11, "k"); g.ellipse(14, 19, 10, 9, "b");
+        g.ellipse(14, 18, 9, 8, "a"); g.ellipse(14, 18, 7, 6, "i");
+        g.ellipse(11, 16, 4, 4, "h"); g.ellipse(14, 15, 4, 4, "i");
+        g.line(18, 14, 20, 16, "c", 1); g.line(9, 25, 19, 25, "b", 2);
+      } else if (shape === "pearl") {
         g.ellipse(14, 19, 11, 11, "k"); g.ellipse(14, 19, 9, 9, "e");
         g.ellipse(13, 17, 8, 8, "d"); g.ellipse(11, 15, 4, 4, "c");
         g.line(12, 25, 19, 23, "h", 2); g.line(17, 12, 20, 17, "a", 1);

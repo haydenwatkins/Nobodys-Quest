@@ -69,6 +69,48 @@ test('pending Treant victory survives travel/save and suppresses another guardia
   assert.equal(G.state.stars,saved.stars,'normalizing owned loot never replays its star');
 });
 
+test('Eclipse victory leaves an uncredited Sigil, preserves the return route, and exposes its optional Keepsake only after collection', () => {
+  const r = fixture('emberRidge'), { G } = r, sigil = 'trophy-eclipse-sigil', p = G.state.player;
+  G.state.stars = 7; const stars = G.state.stars;
+  const knight = G.state.enemies.find(e => e.def.id === 'eclipseKnight');
+  knight.bossIntroT = 0; knight.bossEngaged = true;
+  Object.assign(p,{x:knight.x,y:knight.y});
+  const strike = {ability:'shadowBolt',type:'dark',fromX:knight.x-20,fromY:knight.y};
+  G.combat.damageEnemy(knight,{...strike,damage:6}); assert.equal(knight.ward.hp,0);
+  G.combat.damageEnemy(knight,{...strike,damage:100}); r.drain(); assert.ok(knight.dead);
+  assert.equal(G.ridgeSurvey().knight,false); assert.equal(G.carryKeepsake('eclipse'),false);
+  assert.equal(G.state.stars,stars); assert.equal(G.storyGoal().itemId,sigil);
+  const saved = G.loadSaveData(); assert.equal(saved.groundRewards[0].item,sigil);
+  // Walk out of the actual court without crossing the gift below the duel.
+  G.input.vec={x:0,y:0};G.world.checkTriggers(.5);r.drain();G.input.vec={x:-1,y:0};
+  for(let step=0;step<240&&G.state.mapId==='emberRidge';step++){
+    G.world.moveBox(p,-2,0);G.world.checkTriggers(.02);r.drain();
+  }
+  assert.equal(G.state.mapId,'overworld');assert.ok(G.world.isSafeSpawn(p.x,p.y));
+  assert.ok(G.groundRewardFor(sigil));assert.equal(G.state.stars,stars);
+  // Use the real seven-star entrance from a safe neighbouring approach.
+  let entrance;
+  for(let y=0;y<G.state.mapH;y++)for(let x=0;x<G.state.mapW;x++)
+    if(G.state.grid[y][x].portal?.map==='emberRidge')entrance={x,y};
+  assert.ok(entrance);const approach=[[1,0],[-1,0],[0,1],[0,-1]].find(([dx,dy])=>G.world.isSafeSpawn((entrance.x+dx)*16+8,(entrance.y+dy)*16+8));
+  assert.ok(approach);Object.assign(p,{x:(entrance.x+approach[0])*16+8,y:(entrance.y+approach[1])*16+8});
+  G.input.vec={x:0,y:0};G.world.checkTriggers(.5);r.drain();G.input.vec={x:-approach[0],y:-approach[1]};
+  for(let step=0;step<40&&G.state.mapId==='overworld';step++){
+    G.world.moveBox(p,-approach[0]*1.5,-approach[1]*1.5);G.world.checkTriggers(.02);r.drain();
+  }
+  assert.equal(G.state.mapId,'emberRidge');assert.ok(!G.state.enemies.some(e=>e.def.id==='eclipseKnight'));
+  assert.equal(G.ridgeSurvey().knight,false);assert.equal(G.guidanceTarget().reward,G.groundRewardFor(sigil));
+  // Native movement reaches the east court again before claiming the gift.
+  for(let step=0;step<240&&p.x<knight.x;step++)G.world.moveBox(p,Math.min(2,knight.x-p.x),0);
+  collect(r,sigil);assert.equal(G.state.stars,stars+1);assert.equal(G.ridgeSurvey().knight,true);
+  assert.equal(G.activeKeepsake(),null);assert.equal(G.carryKeepsake('eclipse'),true);
+  assert.equal(G.loadSaveData().groundRewards.length,0);
+  r.load('emberRidge');r.drain();defeat(r,'eclipseKnight','dark');
+  assert.equal(G.state.stars,stars+1);assert.equal(G.groundRewardFor(sigil),null);
+  G.state.groundRewards=G.normalizeGroundRewards(saved.groundRewards);
+  assert.equal(G.state.groundRewards.length,0,'legacy ownership cannot replay a saved Sigil/star');
+});
+
 test('the opening promise guides collect then return, and final collection hooks run only after the Crown is claimed', () => {
   const r = fixture(), { G } = r; G.state.opening.complete = false;
   Object.assign(G.state.opening,{started:true,notice:true,cart:true,sluice:true,bell:true});

@@ -116,3 +116,32 @@ test('the sharp purpose cue preserves actors, ground contents and fixed controls
   assert.ok(labels.some(label => label.text === "Knight's Crest"), 'the paper HUD also presents the ground contents');
   assert.ok(labels.some(label => label.text === 'Discover the Knight'));
 });
+
+test('a crowded Heartwood touch view keeps the Crown purpose visible beneath the echo without covering controls', () => {
+  const r = runtime(), { G } = r;
+  G.state.opening.complete = G.state.delivery.complete = true;
+  G.state.claimedForms = ['rat','knight'];
+  G.questsDone = Object.values(G.forms).flatMap(form => form.quests.map(q => q.id));
+  r.load('heartwood');r.drain();G.state.bossCutscene=null;
+  const treant = G.state.enemies.find(e=>e.def.id==='ancientTreant');
+  G.state.enemies=[treant];Object.assign(G.state.player,{x:treant.x+14,y:treant.y});
+  treant.ward.hp=0;treant.hp=1;treant.bossIntroT=0;
+  G.combat.damageEnemy(treant,{ability:'slap',damage:2,type:'blunt',fromX:treant.x+14,fromY:treant.y});r.drain();
+  const crown=G.groundRewardFor('trophy-heartwood-crown');assert.ok(crown);
+  G.state.formEchoes=G.normalizeFormEchoes([{formId:'dragon',mapId:'heartwood',x:treant.x,y:treant.y,source:'victory',needsLeave:true}]);
+  r.run('js/engine/ui.js');G.getLoadout(G.state.formId);G.input.isTouch=true;
+  const c=r.nodes.get('ui').getContext('2d'),labels=[],rects=[];
+  c.measureText=text=>({width:text.length*3.5});c.fillText=text=>labels.push(text);
+  c.fillRect=(x,y,w,h)=>rects.push({x,y,w,h,color:c.fillStyle});
+  const cam={x:Math.max(0,Math.min(G.state.mapW*16-G.W,G.state.player.x-G.W/2)),y:Math.max(0,Math.min(G.state.mapH*16-G.H,G.state.player.y-G.H/2-4))};
+  const before=JSON.stringify(G.state);
+  for(const hd of [true,false]){
+    G.hdPilot=hd;labels.length=rects.length=0;G.ui.drawHUD(cam);
+    assert.ok(labels.includes('Heartwood Crown'));assert.ok(labels.includes('+1 star · choose a Keepsake in Build'));
+    assert.ok(labels.some(text=>/Walk over.*collect/.test(text)));
+    const cue=rects.find(rect=>rect.color==='rgba(26,28,44,.94)');assert.ok(cue);
+    assert.ok(cue.x>=84&&cue.x+cue.w<=G.W-68,'the centred cue clears both touch control corners');
+    assert.ok(cue.y+cue.h<=G.H-4,'the cue stays inside the field frame');
+  }
+  assert.equal(JSON.stringify(G.state),before,'cue placement leaves saved progress alone');
+});
