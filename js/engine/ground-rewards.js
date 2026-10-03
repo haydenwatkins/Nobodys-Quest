@@ -1,11 +1,12 @@
 /* Earned contents survive travel separately from temporary combat drops. */
 "use strict";
 (() => {
+  const guardianSources = ["ancientTreant", "mireQueen"];
   function definition(item, source = "chest") {
     if (source === "guardian") {
-      // First proven guardian source. Other trophy producers remain on the audit queue.
-      const enemy = G.enemies.ancientTreant;
-      return enemy && enemy.trophy === item ? { name: enemy.trophyName, stars: 1, enemy } : null;
+      // Proven sources; other trophy producers remain on the audit queue.
+      const enemy = guardianSources.map(id => G.enemies[id]).find(enemy => enemy && enemy.trophy === item);
+      return enemy ? { name: enemy.trophyName, stars: 1 } : null;
     }
     for (const map of Object.values(G.maps || {}))
       for (const cell of Object.values(map.legend || {}))
@@ -54,7 +55,7 @@
     return reward;
   };
   G.revealGuardianReward = enemy => {
-    if (enemy.def.id !== "ancientTreant" || G.state.items.includes(enemy.def.trophy)) return null;
+    if (!guardianSources.includes(enemy.def.id) || G.state.items.includes(enemy.def.trophy)) return null;
     const existing = G.groundRewardFor(enemy.def.trophy);
     if (existing) return existing;
     const reward = Object.assign({ source: "guardian", item: enemy.def.trophy, mapId: G.state.mapId,

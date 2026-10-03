@@ -3,7 +3,7 @@
 (() => {
   const requests = [
     {id:"beacon", npc:"pebble", name:"Pebble", title:"A light for the late boat", x:22, y:20, reward:8,
-      task:"Defeat the Mire Queen in Sunken Marsh and bring her pearl to Pebble at the centre of Sunrise Quay. Dark magic breaks her ward.",
+      task:"Defeat the Mire Queen in Sunken Marsh, collect her pearl from the ground, then bring it to Pebble at the centre of Sunrise Quay. Dark magic breaks her ward.",
       ready:()=>G.state.items.includes("trophy-mire-pearl"),
       ask:"The late boat follows our harbour light. Which is unfortunate, because our harbour light is a bucket. The Mire Queen’s pearl could shine through this fog. Parcel’s cart goes back to Orchard Road; Greenfield is west from there, and the marsh lies farther west.",
       thanks:"A pearl! I’ll set it above the quay. You may keep calling it a trophy. I shall call it a lighthouse with a very small budget. The late boat has something to steer by again.",
@@ -46,6 +46,13 @@
     if(!selected.ready){
       if(r.id==="beacon"){
         mapId="sunkenMarsh";
+        const gift=G.groundRewardFor&&G.groundRewardFor("trophy-mire-pearl");
+        if(gift){
+          mapId=gift.mapId;
+          if(G.state.mapId===mapId)return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,
+            x:gift.x,y:gift.y,tileX:Math.floor(gift.x/G.TILE),tileY:Math.floor(gift.y/G.TILE),reward:gift,
+            text:"The Mire Queen is defeated. Collect her pearl from the ground, then return to Pebble on Sunrise Quay."};
+        }
         const queen=G.state.enemies.find(e=>e.id==="mireQueen"&&!e.dead);
         if(G.state.mapId===mapId && queen){x=Math.floor(queen.x/G.TILE);y=Math.floor(queen.y/G.TILE);text="The Mire Queen holds the pearl. Break her ward with dark magic, step clear of bubbles, then use her recovery to attack.";}
         else if(G.state.mapId===mapId)return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",spatial:false,destination:r.title,text:"Search the marsh for the Mire Queen’s pearl, then return to Pebble on Sunrise Quay."};
@@ -116,4 +123,3 @@
     return list;
   };
 })();
-

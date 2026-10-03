@@ -8,11 +8,11 @@ function fixture(map = 'heartwood') {
   r.load(map); r.drain(); G.state.bossCutscene = null;
   return r;
 }
-function defeat(r) {
-  const { G } = r, enemy = G.state.enemies.find(e => e.def.id === 'ancientTreant');
+function defeat(r, id = 'ancientTreant', type = 'blunt') {
+  const { G } = r, enemy = G.state.enemies.find(e => e.def.id === id);
   assert.ok(enemy); Object.assign(G.state.player, {x:enemy.x,y:enemy.y});
   enemy.ward.hp = 0; enemy.hp = 1; enemy.bossIntroT = 0;
-  G.combat.damageEnemy(enemy, {ability:'slap',damage:2,type:'blunt',fromX:enemy.x-10,fromY:enemy.y});
+  G.combat.damageEnemy(enemy, {ability:'slap',damage:2,type,fromX:enemy.x-10,fromY:enemy.y});
   assert.ok(enemy.dead); r.drain(); return enemy;
 }
 
@@ -30,6 +30,30 @@ test('native Treant victory reveals a real Crown/star bundle and credits it exac
   r.load('mistwood'); r.drain(); defeat(r);
   assert.equal(G.state.items.filter(item=>item===crown).length,1); assert.equal(G.state.stars,stars+1);
   assert.equal(G.groundRewardFor(crown),null); assert.equal(pickups.filter(item=>item===crown).length,1);
+});
+
+test('the Pearl stays pending across travel/knockout, then a followed beacon promise switches to Pebble and pays once on return', () => {
+  const r = fixture('sunkenMarsh'), { G } = r, pearl = 'trophy-mire-pearl';
+  G.followSunriseRequest('beacon'); const stars = G.state.stars;
+  const queen = defeat(r,'mireQueen','dark'), point = {x:queen.x,y:queen.y};
+  assert.equal(G.state.stars,stars); assert.equal(G.followedSunriseRequest().ready,false);
+  assert.match(G.guidanceTarget().text,/Collect her pearl/); assert.equal(G.guidanceTarget().reward,G.groundRewardFor(pearl));
+  r.load('sunriseQuay'); r.drain(); assert.equal(G.followedSunriseRequest().ready,false);
+  assert.equal(G.followedSunriseRequest().followed,true); assert.ok(G.groundRewardFor(pearl));
+  r.load('sunkenMarsh'); r.drain(); assert.ok(!G.state.enemies.some(e=>e.def.id==='mireQueen'));
+  G.state.player.invuln=0;G.damagePlayer(100);r.drain();assert.ok(G.groundRewardFor(pearl));
+  Object.assign(G.state.player,point);collect(r,pearl);
+  assert.equal(G.state.stars,stars+1);assert.equal(G.followedSunriseRequest().ready,true);
+  assert.equal(G.marshSurvey().queen,true);assert.equal(G.state.keepsakeId,null);
+  r.load('sunriseQuay');r.drain();G.state.enemies=[];
+  assert.equal(G.guidanceTarget().tileX,22);assert.equal(G.guidanceTarget().tileY,20);
+  Object.assign(G.state.player,{x:22*16+8,y:20*16+8});const spirit=G.ensureTown().spirit;
+  assert.equal(G.deliveryCandidate().id,'beacon');assert.equal(G.tryOpeningInteraction(),true);r.drain();
+  assert.equal(G.ensureTown().spirit,spirit+8);assert.equal(G.followedSunriseRequest(),null);
+  assert.ok(G.state.items.includes(pearl),'lighting the beacon does not consume the campaign trophy');
+  assert.match(G.npcDialogue('pebble',0,0),/turnips/);
+  G.state.town=G.normalizeTown(G.loadSaveData().town);G.tryOpeningInteraction();r.drain();
+  assert.equal(G.ensureTown().spirit,spirit+8);assert.equal(G.ensureTown().requests.filter(id=>id==='beacon').length,1);
 });
 
 test('pending Treant victory survives travel/save and suppresses another guardian fight until the gift is claimed', () => {

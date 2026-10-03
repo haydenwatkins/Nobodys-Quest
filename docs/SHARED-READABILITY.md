@@ -13,6 +13,8 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Ordinary heart/mana drops | Complete: recognizable heart/flask art, ground contact, collection feedback, quiet-motion fade |
 | Persistent chest contents | Complete for ten item identities: durable ground reveal, purpose, movement claim and preserved legacy ownership |
 | Ancient Treant gift | Complete: durable Crown/star, collect/return task, preserved victory and legacy credit |
+| Mire Queen gift and beacon promise | Complete: durable Pearl/star, ground-to-return guidance, saved victory, beacon and later-return response |
+| Nearby Form Echo clearance | Optional regular cards clear actual nearby echo bodies/markers; native paint assertion and scene review passed |
 | Other persistent items and every reward source | Source audit in progress; see `GROUND-REWARDS.md`; do not silently exempt categories |
 
 ## Cobblekin cover complete
@@ -38,3 +40,5 @@ Eight focused pickup, Drain mastery and Cobblekin checks passed. All pickup pose
 ## Persistent chest contents complete
 
 All ten current item chests now reveal real ground objects and credit their unique item/bundled heal on collection. The sharp purpose cue clears actors/contents/controls; optional regular cards yield, and the paper lesson card returns after pickup. Contents survive travel, browser reload and gentle knockout and follow relocated caches. See `GROUND-REWARDS.md` for exact coverage, source contract and validation. The Ancient Treant’s Crown/star subsequently uses the same durable ground contract and switches the task from collection to returning to Parcel. Seventeen focused integration checks, thirteen path/echo/art checks and twelve inspected native final-blow/reload/collection views passed, with repeated cases. Other boss trophies, regional gifts and currency categories remain unfinished.
+
+The Mire Queen subsequently uses the durable contract, with a followed beacon request staying unready until actual Pearl collection. Twenty-two progression checks, twelve HUD/echo/guardian checks and one native-paint cue check passed, with repeated cases; twenty final touch/TV views were inspected. Optional regular cards now also clear nearby Form Echo bodies/markers after visual review caught an overlap. See `GROUND-REWARDS.md` for exact fixture limits. Legend relics and fixed/paper HUD combinations remain part of the shared audit.

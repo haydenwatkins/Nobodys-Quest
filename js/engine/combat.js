@@ -233,7 +233,7 @@ G.combat = (() => {
       else G.ui.toast(repeatVictory);
       return;
     }
-    if (enemy.def.id === "ancientTreant" && G.revealGuardianReward) {
+    if (G.revealGuardianReward) {
       const reward = G.revealGuardianReward(enemy);
       if (reward) {
         const line = enemy.def.boss && enemy.def.boss.defeatLine;

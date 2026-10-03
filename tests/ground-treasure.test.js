@@ -86,6 +86,13 @@ test('the sharp purpose cue preserves actors, ground contents and fixed controls
   context.measureText = text => ({ width: text.length * 3.5 });
   context.fillText = (text,x,y) => labels.push({text,x,y});
   context.fillRect = (x,y,w,h) => rects.push({x,y,w,h,color:context.fillStyle});
+  G.state.formEchoes = G.normalizeFormEchoes([{formId:'ranger',mapId:'dungeon',x:80,y:98,source:'battle',needsLeave:false}]);
+  const echoPaint = [], paintSprite = G.drawSprite;
+  const scratch = new Proxy({measureText: text => ({width:text.length*5}),fillText(text,x,y){echoPaint.push({x:x-text.length*2.5,y:y-7,w:text.length*5,h:7});}}, {get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)});
+  G.drawSprite = (context,sprite,frame,x,y,flip,scale=1) => {
+    const body = G.spriteMetrics(sprite);echoPaint.push({x:x-body.w*scale/2,y:y-body.h*scale,w:body.w*scale,h:body.h*scale});
+  };
+  G.drawFormEcho(scratch,G.state.formEchoes[0]);G.drawSprite=paintSprite;
   // Normal boot/use creates the existing default loadout before field painting.
   G.getLoadout(G.state.formId);
   const reward = G.groundRewardFor('knights-crest'), before = JSON.stringify(G.state);
@@ -99,6 +106,7 @@ test('the sharp purpose cue preserves actors, ground contents and fixed controls
     const overlaps = actor => cue.x < actor.x+actor.w && cue.x+cue.w > actor.x && cue.y < actor.y+actor.h && cue.y+cue.h > actor.y;
     assert.equal(overlaps({x:reward.x-10,y:reward.y-18,w:20,h:22}), false);
     assert.equal(overlaps({x:G.state.player.x-14,y:G.state.player.y-30,w:28,h:34}), false);
+    for(const paint of echoPaint)assert.equal(overlaps(paint),false,'the cue clears the native Form Echo sprite/marker painting');
     if (touch) {assert.ok(cue.x+cue.w <= G.W-68);assert.ok(cue.y+cue.h <= G.H-68);}
   }
   assert.equal(JSON.stringify(G.state), before);

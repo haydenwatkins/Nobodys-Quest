@@ -419,6 +419,15 @@ G.ui = (() => {
       return x < px + half && x + w > px - half && y < py + 4 && y + h > py - height;
     });
     if (foeBlocked) return true;
+    if ((G.formEchoesHere ? G.formEchoesHere() : []).some(echo => {
+      if (Math.hypot(echo.x - p.x, echo.y - p.y) > 112) return false;
+      const sprite = G.forms[echo.formId]?.sprite;
+      if (!sprite) return false;
+      const metrics = G.spriteMetrics ? G.spriteMetrics(sprite) : { w: 24, h: 28 };
+      const px = echo.x - cam.x, py = echo.y - cam.y;
+      const half = Math.max(18, metrics.w / 2 + 4), height = Math.max(32, metrics.h + 9);
+      return x < px + half && x + w > px - half && y < py + 6 && y + h > py - height;
+    })) return true;
     return (G.state.npcs || []).some(npc => {
       if (Math.hypot(npc.x - p.x, npc.y - p.y) > 112) return false;
       const sprite = npc.def && npc.def.sprite;

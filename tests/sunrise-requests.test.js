@@ -60,6 +60,8 @@ test('the harbour beacon connects a real Queen victory to a permanent, once-only
  const queen=G.state.enemies.find(e=>e.id==='mireQueen');assert.equal(G.guidanceTarget().tileX,Math.floor(queen.x/G.TILE));
  queen.bossEngaged=true;queen.bossIntroT=0;G.state.bossCutscene=null;
  G.combat.damageEnemy(queen,{damage:5,type:'dark'});G.combat.damageEnemy(queen,{damage:100,type:'dark'});
+ r.drain();assert.equal(G.followedSunriseRequest().ready,false);assert.match(G.guidanceTarget().text,/Collect her pearl/);
+ Object.assign(G.state.player,{x:queen.x,y:queen.y});require('./helpers/collect-treasure.cjs')(r,'trophy-mire-pearl');
  assert.ok(G.state.items.includes('trophy-mire-pearl'));assert.equal(G.followedSunriseRequest().ready,true);
  r.load('sunriseQuay');r.drain();visit(G,22,20);assert.equal(G.deliveryCandidate().id,'beacon');
  const before=G.state.town.spirit;G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+8);assert.equal(G.followedSunriseRequest(),null);
