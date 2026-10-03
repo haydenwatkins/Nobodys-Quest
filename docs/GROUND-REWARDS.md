@@ -113,6 +113,14 @@ Purpose cards can now use a narrower clear column or a lower central anchor in e
 
 Reusable tooling: `node tools/render-review-sheet.cjs [captureDirectory] [outputDirectory]` makes ordered touch and controller review sheets from the browser captures without modifying their originals. It uses the same optional developer Canvas dependency as the existing atlases; game delivery still needs no install/build step.
 
+## Worldheart gift complete
+
+Atlas leaves a coral heart carved into a small warm stone monument, distinct from the Titan Memory souvenir. Collection credits the Worldheart and one star together, then opens the existing two-way road between Titan Grave and the final trial approach. Pending victory survives travel and real save boot without another Atlas fight. The older Stormspine and Glasswater exits remain usable while the gift waits. Purified-region reconstruction and optional Atlas Keepsake choice retain their native behavior.
+
+The native source-consumer case includes all five earlier Marks, physically crosses both older exits before claim, collects by collision, and verifies the separate five-star World at Peace favor and Worldwake Crown pay once. The final entrance still requires earned form mastery; owning all six Marks does not bypass it. Both new heart-road portals are crossed in both directions, saved restoration includes twenty-eight details, and legacy ownership/rematches cannot duplicate credit. Currency and favor gifts remain explicitly unconverted.
+
+Seven focused Worldheart/return-road/whole-road/progression cases passed. Four controlled browser cases passed, and twenty touch/TV views were inspected in both settings: native weakened-ward final blow, pending real save/boot, actual movement collection, owned real boot and both heart-road directions. Full gift purpose/collection instructions are checked in actual HUD painting. All heartstone poses/settings were inspected in the reward atlas. Touch movement uses keyboard steering; touch actions and TV pad inputs are native. These desktop fixtures do not establish full-fight balance or physical-device behavior.
+
 ## Next bounded implementation
 
-Audit Atlas's Worldheart ground gift against both existing return exits, the new two-way heart road, six-Mark favors and the final portfolio gate before conversion. Eleven guardian definitions, regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.
+Align the selected NPC promise with the current-task headline and journey menu, reusing existing request/campaign state. Ten guardian definitions, regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.

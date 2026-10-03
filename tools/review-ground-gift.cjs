@@ -10,6 +10,7 @@ const scenarios={
  oldMason:{map:'hangingGardens',item:'trophy-old-mason',stars:24,form:'nobody',button:'a',mark:'stone',crossings:[['upper',248,152,0,48],['lower',248,280,0,48]]},
  silkMatriarch:{map:'rootdeepHollow',item:'trophy-silk-matriarch',stars:40,form:'wizard',button:'b',mark:'thread',crossings:[['western',232,328,48,0],['eastern',440,328,48,0]]},
  bellTitan:{map:'frostbellTundra',item:'trophy-bell-titan',stars:40,form:'ranger',button:'b',mark:'echo',crossings:[['western',248,280,0,64],['eastern',472,280,0,64]]},
+ lastWorldbearer:{map:'titanGrave',item:'trophy-last-worldbearer',stars:40,form:'nobody',button:'a',mark:'heart'},
  lanternKeeper:{map:'stormspinePeaks',item:'trophy-lantern-keeper',stars:40,form:'wizard',button:'b',mark:'light',crossings:[['western',248,280,0,80],['eastern',456,280,0,80]]},
 };
 const guardian=process.argv[2]||'eclipseKnight',scenario=scenarios[guardian];
@@ -37,7 +38,7 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_
    G.state.opening.complete=G.state.delivery.complete=true;G.state.claimedForms=['rat','knight','wizard',...(scenario.form?[scenario.form]:[])];G.state.stars=scenario.stars;G.state.items=['orchard-ribbon','keeper-lantern','sunrise-seal'];G.questsDone=Object.values(G.forms).flatMap(form=>form.quests.map(q=>q.id));Object.assign(G.ensureTown(),{founded:true,introduced:true,residents:4,spirit:20});G.setForm(scenario.form||'wizard');G.world.load(scenario.map);G.setHdPilot(hd);G.state.bossCutscene=null;
    const e=G.state.enemies.find(e=>e.def.id===guardian);G.state.enemies=[e];window.reviewGuardian=e;e.bossEngaged=true;e.bossIntroT=0;if(scenario.mark)e.bossRecoverT=999;e.ward.hp=1;e.hp=1;const safe=G.world.safeArrival(e.x+(scenario.mark?110:36),e.y);Object.assign(G.state.player,safe,{dir:{x:-1,y:0},invuln:999,mana:G.playerMaxMana()});
    // Wizard's dark spell matches both Queen/Knight wards. Treant uses its native blunt basic art.
-   if(guardian==='ancientTreant'||guardian==='oldMason'){G.setForm('nobody');Object.assign(G.state.player,{x:e.x+14,y:e.y,dir:{x:-1,y:0}});}
+   if(guardian==='ancientTreant'||guardian==='oldMason'||guardian==='lastWorldbearer'){G.setForm('nobody');Object.assign(G.state.player,{x:e.x+14,y:e.y,dir:{x:-1,y:0}});}
   },{hd,guardian,scenario});await drain();await frames(80);
   for(let i=0;i<8&&!await page.evaluate(()=>window.reviewGuardian.dead);i++){await action(scenario.button||(guardian==='ancientTreant'?'a':'b'));await drain();}
   assert.equal(await page.evaluate(()=>window.reviewGuardian.dead),true);
@@ -100,6 +101,19 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_
      assert.ok(await page.evaluate(({x,y,dx,dy})=>dx?G.state.player.x>=x+dx:G.state.player.y>=y+dy,{x,y,dx,dy}),`${name} passage crossed through native movement`);
      assert.ok(fs.existsSync(`${out}/${mode}-${hd?'hd':'base'}-crossing-${name}.png`));
     }
+   }
+   if(scenario.mark==='heart'){
+    async function heartRoad(from,to,tileX,tileY,dy){
+     await page.evaluate(({tileX,tileY})=>{G.state.enemies=[];G.state.projectiles=[];G.state.bossHazards=[];Object.assign(G.state.player,{x:tileX*16+8,y:tileY*16+8});},{tileX,tileY});await frames(20);
+     const key=dy>0?'ArrowDown':'ArrowUp';
+     if(mode==='controller')await page.evaluate(dy=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,dy,0,0],b:[0,0,0,0]})),dy);else await page.keyboard.down(key);
+     for(let i=0;i<60&&await page.evaluate(()=>G.state.mapId)===from;i++){await frames(1);if(await page.evaluate(()=>G.ui.dialogueOpen))await drain();}
+     if(mode==='controller')await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:[0,0,0,0]})));else await page.keyboard.up(key);
+     assert.equal(await page.evaluate(()=>G.state.mapId),to);await drain();await frames(80);await drain();
+     assert.equal(await page.evaluate(()=>G.world.isSafeSpawn(G.state.player.x,G.state.player.y)),true);
+     await page.screenshot({path:`${out}/${mode}-${hd?'hd':'base'}-${to==='overworld'?'road-home':'road-back'}.png`});
+    }
+    await heartRoad('titanGrave','overworld',23,27,1);await heartRoad('overworld','titanGrave',114,1,-1);
    }
    assert.equal(await page.evaluate(()=>G.state.stars),scenario.stars+1);
   }

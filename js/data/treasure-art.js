@@ -11,6 +11,7 @@
     "trophy-silk-matriarch": { name: "Thread Mark", purpose: "+1 star · opens woven passages", shape: "spindle" },
     "trophy-bell-titan": { name: "Echo Mark", purpose: "+1 star · bridges the frozen lakes", shape: "echoBell" },
     "trophy-lantern-keeper": { name: "Lantern Mark", purpose: "+1 star · lights the ridge passages", shape: "lamp" },
+    "trophy-last-worldbearer": { name: "Worldheart Mark", purpose: "+1 star · opens the road home", shape: "heartstone" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -26,7 +27,14 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "spindle") {
+      if (shape === "heartstone") {
+        g.poly([[4, 10], [6, 4], [11, 2], [14, 5], [17, 2], [22, 4], [24, 10], [22, 20], [14, 28], [6, 20]], "k");
+        g.poly([[6, 10], [8, 5], [11, 4], [14, 8], [17, 4], [20, 5], [22, 10], [20, 19], [14, 25], [8, 19]], "b");
+        g.poly([[8, 10], [9, 6], [11, 6], [14, 10], [17, 6], [19, 7], [20, 11], [18, 18], [14, 22], [10, 18]], "j");
+        g.line(9, 10, 10, 8, "c", 2); g.line(10, 8, 12, 10, "c", 1);
+        g.line(14, 13, 14, 18, "a", 2); g.line(12, 15, 16, 15, "a", 2);
+        g.poly([[7, 26], [21, 26], [24, 30], [4, 30]], "k"); g.line(7, 28, 21, 28, "a", 2);
+      } else if (shape === "spindle") {
         g.rect(12, 1, 4, 29, "k"); g.rect(13, 2, 2, 27, "b");
         g.ellipse(14, 7, 10, 4, "k"); g.ellipse(14, 6, 8, 2, "a");
         g.ellipse(14, 26, 10, 4, "k"); g.ellipse(14, 25, 8, 2, "b");
