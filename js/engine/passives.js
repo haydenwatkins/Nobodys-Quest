@@ -519,11 +519,7 @@ G.passives = (() => {
     ctx.save();
     for (const wall of G.state.passiveShelters || []) {
       ctx.globalAlpha = Math.min(0.75, wall.t * 0.5);
-      ctx.fillStyle = "#6b665b";
-      ctx.fillRect(Math.round(wall.x - 12), Math.round(wall.y - 4), 24, 8);
-      ctx.fillStyle = "#ffcd75";
-      ctx.fillRect(Math.round(wall.x - 10), Math.round(wall.y - 5), 7, 2);
-      ctx.fillRect(Math.round(wall.x + 2), Math.round(wall.y - 5), 8, 2);
+      G.drawRampartScreen(ctx, wall);
     }
     for (const light of G.state.safeLights || []) {
       ctx.globalAlpha = Math.min(0.45, light.t * 0.28);

@@ -6,7 +6,7 @@ registerForm({
   tagline: "A patient roadmender whose mossy hands turn loose stones into a way home.",
   speed: 58, hearts: 8, slots: 2,
   passive: { id: "masonry", name: "Masonry",
-    description: "Area abilities raise a short-lived stone screen that blocks enemy projectiles but never your own." },
+    description: "Area abilities raise a brief shot-filter field. Enemy shots stop; you, your friends and your shots pass through." },
   basic: "stoneKnuckle",
   abilities: [{ id: "rampartPulse", level: 1 }, { id: "rollingMonolith", level: 2 }],
   unlock: { type: "challenge", hint: "Climb the Old Mason in the Hanging Gardens", requirements: [
