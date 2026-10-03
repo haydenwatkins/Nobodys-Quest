@@ -1223,6 +1223,17 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
 .ending-panel blockquote { margin: 20px auto; color: #d9a7ff; font-size: 24px; line-height: 1.25; }
 .ending-panel button { min-height: 48px; padding: 12px 18px; border: 2px solid #fff3c2; border-radius: 9px; background: #5d4963; color: #fff3c2; font: 8px "Press Start 2P", monospace; }
 
+/* Keep the final page and its return action together on landscape phones. */
+@media (orientation: landscape) and (max-height: 500px) {
+  #story-ending .ending-panel { padding: 12px 17px; }
+  #story-ending .ending-mark { margin: 5px; font-size: 24px; }
+  #story-ending h1 { margin: 7px 0; font-size: clamp(21px, 4vw, 30px); }
+  #story-ending .ending-panel > p { margin: 8px 0; font-size: 17px; }
+  #story-ending .ending-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 12px 0; }
+  #story-ending .ending-stats span { padding: 8px 4px; font-size: 15px; }
+  #story-ending .ending-panel blockquote { margin: 12px 0; font-size: 18px; }
+}
+
 /* ---------- Form Workshop (validation errors for Ben) ---------- */
 
 #workshop-errors {

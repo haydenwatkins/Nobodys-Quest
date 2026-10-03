@@ -20,6 +20,7 @@
     "mole-crown": { name: "Copper Root Crown", purpose: "+1 star · Tunneltuft path", shape: "copperCrown" },
     "crimson-seal": { name: "Duskflower Seal", purpose: "+1 star · Velvetwing path", shape: "waxSeal" },
     "jester-bell": { name: "Curtain Bell", purpose: "+1 star · Pocket Trouper path", shape: "curtainBell" },
+    "god-spark": { name: "Spark of Every Form", purpose: "+1 star · Roadlight path · story ending", shape: "livingSpark" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -35,7 +36,17 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "wayglass") {
+      if (shape === "livingSpark") {
+        // A sewn glass flame: all roads meet inside one tangible keepsake.
+        g.poly([[14,1],[18,7],[24,12],[25,20],[21,25],[7,25],[3,20],[4,12],[10,7]],"k");
+        g.poly([[14,4],[17,10],[21,13],[22,19],[18,23],[10,23],[6,19],[7,13],[11,10]],"a");
+        g.poly([[14,7],[14,15],[8,18],[8,13],[12,11]],"d");
+        g.poly([[14,7],[17,12],[20,14],[20,19],[14,15]],"h");
+        g.poly([[14,15],[19,20],[17,22],[11,22],[8,19]],"j");
+        g.line(14,8,14,20,"c",2);g.line(10,13,18,17,"c",1);g.put(9,12,"c");
+        g.rect(10,24,8,3,"k");g.rect(11,25,6,1,"b");
+        g.poly([[9,27],[19,27],[23,31],[5,31]],"k");g.line(9,29,19,29,"a",2);
+      } else if (shape === "wayglass") {
         g.ellipse(14, 5, 5, 4, "k");g.ellipse(14, 5, 3, 2, "a");
         g.poly([[4, 9], [11, 6], [12, 16], [10, 26], [2, 18]], "k");
         g.poly([[6, 10], [9, 9], [10, 16], [9, 22], [5, 18]], "d");g.line(6, 11, 6, 17, "c", 1);

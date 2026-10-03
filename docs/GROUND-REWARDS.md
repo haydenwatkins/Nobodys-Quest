@@ -15,7 +15,7 @@ October 3, 2026. This is a working source audit, not a claim that all rewards ha
 | Tess / Thread Mark | Durable spindle/star; collection opens both lower root passages | Complete; native third-Mark caravan favor remains separate |
 | Bongle / Echo Mark | Durable golden handbell/star; collection bridges both frozen lakes | Complete; saved crossings and later Echo gate preserved |
 | Mallow / Lantern Mark | Durable warm brass lamp/star; collection opens both lit ridge cuts | Complete; pending exits use the existing Echo rule |
-| Other miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | Final Spark trophy and separate Tollkeeper delivery producer remain |
+| Other miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | All eighteen trophy producers covered; separate Tollkeeper delivery producer remains |
 | Treasure chests (`world.js`) | Open box reveals durable ground contents; walking over them grants the unique item and its native bundled heal | Complete for all ten current chest item identities; new authored items have parcel/purpose fallback |
 | Regional mechanisms and quest gifts | Direct item grants in opening, delivery, prairie, grove, marsh, ridge, mistwood, starfall, glasswater and shattercoast | Inspect each native trigger and purpose before conversion; protect return dialogue and route gates |
 | Worldwake favors, marks and final rewards (`worldwake.js`, `endgame.js`) | Persisted accomplishments and immediate item/star/spirit grants | Separate accomplished task from uncollected gift; no replay of legacy thanks |
@@ -145,6 +145,16 @@ Sixteen controlled browser cases passed; forty-eight ground/reloaded/collected t
 
 Coverage is now seventeen of eighteen trophy guardians. The final Spark and the Tollkeeper’s separate producer remain. Currency and completion sources are not counted as converted by trophy coverage.
 
+## Final Spark and ending complete
+
+Meridian leaves a small glass flame fitted into a sewn frame and brass base. Its cue names the Roadlight path and story ending. Defeat alone preserves the final victory without awarding the Spark or starting the ending. The original exit and mastery-gated re-entry remain usable while the saved gift waits; a second Meridian does not spawn over it. Collection credits the native star and enables the maintained mastery/form path, then queues the existing ending once. The separate Guardian Compass pays three stars and twenty spirit exactly once when this completes the eighteen-trophy collection; the ending's stats include that completed bundle. The Compass itself remains an unconverted completion reward.
+
+Seven focused finale/mastery/handoff/story cases passed, including the corrected new native pending/collection case. Its initial fixture omitted an already-founded town, so the real first-town introduction and ward-break spirit were mistaken for gift credit; the final case records established town state and measures spirit after the ward. It checks physical exit/re-entry, actual collision collection, ending return, saved ending ownership, optional rematch and no replay. Roadlight still needs earned mastery even with the Spark.
+
+Four controlled touch/TV browser cases passed; twenty ground/reloaded/collected/ending/owned-boot views were inspected in both settings. Real native actions defeat a weakened Meridian, real save boot restores the pending gift, movement claims it, actual touch and TV A close the ending, and owned boot preserves credit without another ending. Full cues are checked in actual painting. Review caught the phone-landscape return button below the viewport. A short-height landscape layout now fits the page and its 48-pixel return button without scrolling; the browser asserts button bounds before tapping. Native Form Echo dialogue remains enabled, and the original optional Meridian rematch still appears on owned boot. These fixtures do not establish full-fight balance or physical-device compatibility.
+
+All Spark poses/settings were inspected in the atlas. Trophy coverage is now eighteen of eighteen. The nineteenth guardian definition, the Tollkeeper, has no trophy and uses a separate delivery producer, which remains queued.
+
 ## Next bounded implementation
 
-Audit the final Spark’s mastery gate, pending exits, ending dialogue/overlay and saved post-ending exploration before conversion. Then audit the Tollkeeper’s separate opening-delivery source. Regional gifts, town/request/currency rewards, challenge return rewards and relic/echo systems remain unfinished.
+Convert the Tollkeeper’s separately audited opening-delivery source: retain the defeated bridge checkpoint and safe exits, reveal the lantern/star bundle, guide collection before parcel delivery, and preserve legacy ownership without duplicate credit. Regional gifts, town/request/currency rewards, challenge return rewards and relic/echo systems remain unfinished.

@@ -1,7 +1,7 @@
 /* Earned contents survive travel separately from temporary combat drops. */
 "use strict";
 (() => {
-  const guardianSources = ["ancientTreant", "mireQueen", "eclipseKnight", "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer", "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar", "riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool"];
+  const guardianSources = ["ancientTreant", "mireQueen", "eclipseKnight", "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer", "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar", "riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar"];
   function definition(item, source = "chest") {
     if (source === "guardian") {
       // Proven sources; other trophy producers remain on the audit queue.
