@@ -15,7 +15,7 @@ October 3, 2026. This is a working source audit, not a claim that all rewards ha
 | Tess / Thread Mark | Durable spindle/star; collection opens both lower root passages | Complete; native third-Mark caravan favor remains separate |
 | Bongle / Echo Mark | Durable golden handbell/star; collection bridges both frozen lakes | Complete; saved crossings and later Echo gate preserved |
 | Mallow / Lantern Mark | Durable warm brass lamp/star; collection opens both lit ridge cuts | Complete; pending exits use the existing Echo rule |
-| Other miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | Eleven definitions remain queued, including Worldwake mark consumers |
+| Other miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | Final Spark trophy and separate Tollkeeper delivery producer remain |
 | Treasure chests (`world.js`) | Open box reveals durable ground contents; walking over them grants the unique item and its native bundled heal | Complete for all ten current chest item identities; new authored items have parcel/purpose fallback |
 | Regional mechanisms and quest gifts | Direct item grants in opening, delivery, prairie, grove, marsh, ridge, mistwood, starfall, glasswater and shattercoast | Inspect each native trigger and purpose before conversion; protect return dialogue and route gates |
 | Worldwake favors, marks and final rewards (`worldwake.js`, `endgame.js`) | Persisted accomplishments and immediate item/star/spirit grants | Separate accomplished task from uncollected gift; no replay of legacy thanks |
@@ -135,6 +135,16 @@ Touch movement uses keyboard steering and touch actions are native; TV movement/
 
 Coverage is now thirteen of eighteen trophy guardians. The nineteenth miniboss definition is the Tollkeeper, whose opening delivery gift is a separate producer and remains on the audit. No currency, town or final-completion source has been silently counted as a ground pickup.
 
+## Four specialist trial gifts complete
+
+Mira leaves an angular teal Wayglass Sigil, Bram a copper root crown with three peaks, Vesper a friendly flower-shaped wax seal with attached ribbons and Tansy a brass curtain bell with a purple bow. Their four poses in both settings distinguish them from the existing eclipse medallion, wooden crown and Echo handbell. Full ground cues name the corresponding Wayglass Duelist, Tunneltuft, Velvetwing and Pocket Trouper form paths.
+
+Four native specialist cases and two existing form-path/Wayfinder cases passed. Each case defeats the real full ward, verifies pending ownership without premature item/star/form credit, physically crosses the original trial exit and star-gated Greenfield re-entry, restores saved pending ownership and collects through collision movement. Collection credits one star and enables the existing earned Form Echo; it does not automatically claim the form. Original optional rematches remain available after collection, with no duplicate gift/star. Legacy owned items discard stale pending copies. No separate Keepsake effect exists for these four trophies.
+
+Sixteen controlled browser cases passed; forty-eight ground/reloaded/collected touch/TV views were inspected in both settings. Actual native action input defeats deliberately weakened guardians, real save boot restores unclaimed gifts and movement collects them once. Complete purpose and collection text is verified in actual HUD painting. All object poses/settings were inspected in the atlas. Touch movement uses keyboard steering; touch actions and TV bridge actions/movement are native. Legitimate Form Echo ceremonies remain enabled. No page errors or horizontal overflow appeared. These checks do not establish balanced full fights or physical-device behavior.
+
+Coverage is now seventeen of eighteen trophy guardians. The final Spark and the Tollkeeper’s separate producer remain. Currency and completion sources are not counted as converted by trophy coverage.
+
 ## Next bounded implementation
 
-Audit Wayglass, Royal Burrow, Dusk Court and Wayward Stage gifts and native return/form/relic consumers before conversion. Five trophy guardians and the Tollkeeper’s separate opening-delivery source remain, along with regional gifts, town/request/currency rewards, challenge return rewards and relic/echo systems. The final Spark requires its own finale audit.
+Audit the final Spark’s mastery gate, pending exits, ending dialogue/overlay and saved post-ending exploration before conversion. Then audit the Tollkeeper’s separate opening-delivery source. Regional gifts, town/request/currency rewards, challenge return rewards and relic/echo systems remain unfinished.

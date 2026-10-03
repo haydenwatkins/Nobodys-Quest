@@ -16,6 +16,10 @@
     "paper-crane": { name: "Wayfold Crane", purpose: "+1 star · Foldstep Fox path · coastal cairn", shape: "crane" },
     "orrery-key": { name: "Orrery Key", purpose: "+1 star · Skylens Mapper path · coastal cairn", shape: "orbitKey" },
     "elder-acorn": { name: "Elder Acorn", purpose: "+1 star · Hedgehare path · coastal cairn", shape: "acorn" },
+    "riftblade-sigil": { name: "Wayglass Sigil", purpose: "+1 star · Wayglass Duelist path", shape: "wayglass" },
+    "mole-crown": { name: "Copper Root Crown", purpose: "+1 star · Tunneltuft path", shape: "copperCrown" },
+    "crimson-seal": { name: "Duskflower Seal", purpose: "+1 star · Velvetwing path", shape: "waxSeal" },
+    "jester-bell": { name: "Curtain Bell", purpose: "+1 star · Pocket Trouper path", shape: "curtainBell" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -31,7 +35,33 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "shell") {
+      if (shape === "wayglass") {
+        g.ellipse(14, 5, 5, 4, "k");g.ellipse(14, 5, 3, 2, "a");
+        g.poly([[4, 9], [11, 6], [12, 16], [10, 26], [2, 18]], "k");
+        g.poly([[6, 10], [9, 9], [10, 16], [9, 22], [5, 18]], "d");g.line(6, 11, 6, 17, "c", 1);
+        g.poly([[17, 6], [25, 10], [26, 18], [17, 28], [15, 17]], "k");
+        g.poly([[19, 9], [23, 12], [23, 17], [18, 23], [17, 17]], "e");g.line(20, 11, 21, 16, "d", 2);
+        g.line(12, 15, 15, 15, "a", 2);g.line(12, 20, 15, 20, "a", 1);g.put(18, 13, "c");
+      } else if (shape === "copperCrown") {
+        g.poly([[2, 9], [8, 13], [14, 3], [20, 13], [26, 9], [24, 28], [4, 28]], "k");
+        g.poly([[5, 13], [9, 17], [14, 8], [19, 17], [23, 13], [22, 25], [6, 25]], "b");
+        g.line(7, 23, 21, 23, "j", 2);g.line(7, 26, 21, 26, "a", 1);
+        g.line(14, 11, 14, 20, "a", 2);g.line(14, 16, 10, 19, "a", 1);g.line(14, 16, 18, 19, "a", 1);
+        g.ellipse(14, 22, 3, 2, "g");g.put(13, 21, "f");
+      } else if (shape === "waxSeal") {
+        g.poly([[7, 18], [14, 19], [11, 31], [7, 27], [3, 29]], "k");g.poly([[9, 20], [12, 21], [10, 27], [7, 25], [6, 26]], "h");
+        g.poly([[14, 19], [21, 18], [25, 29], [21, 27], [17, 31]], "k");g.poly([[16, 21], [19, 20], [22, 26], [19, 25], [18, 27]], "j");
+        for(const [x,y]of [[9,8],[18,8],[6,15],[21,15],[14,20]]){g.ellipse(x,y,6,6,"k");g.ellipse(x,y,4,4,"j");}
+        g.ellipse(14,13,7,7,"k");g.ellipse(14,13,5,5,"h");g.ellipse(14,13,3,3,"j");
+        g.line(12,11,15,11,"c",1);g.line(15,11,16,14,"i",1);g.line(16,14,13,16,"i",1);g.put(13,13,"a");
+      } else if (shape === "curtainBell") {
+        g.ellipse(14,9,5,5,"k");g.ellipse(14,9,3,3,"a");
+        g.poly([[5,2],[12,3],[14,6],[16,3],[23,2],[23,9],[17,9],[14,7],[11,9],[5,9]],"k");
+        g.poly([[7,4],[11,5],[13,6],[10,7],[7,7]],"h");g.poly([[17,5],[21,4],[21,7],[18,7],[15,6]],"i");g.put(14,6,"c");
+        g.poly([[9,12],[19,12],[22,23],[25,26],[24,29],[4,29],[3,26],[6,23]],"k");
+        g.poly([[11,14],[17,14],[20,24],[22,26],[6,26],[8,24]],"a");g.line(11,16,10,23,"c",2);g.line(17,16,19,24,"b",2);
+        g.line(6,27,22,27,"j",1);g.rect(12,28,4,3,"k");g.rect(13,29,2,1,"a");
+      } else if (shape === "shell") {
         g.poly([[2, 18], [3, 10], [8, 4], [14, 2], [21, 5], [25, 12], [25, 20], [20, 27], [10, 29], [4, 25]], "k");
         g.poly([[4, 18], [5, 11], [9, 6], [14, 4], [20, 7], [23, 13], [23, 20], [18, 25], [10, 27], [6, 23]], "f");
         g.line(7, 19, 8, 12, "c", 2); g.line(8, 12, 14, 8, "c", 2);
