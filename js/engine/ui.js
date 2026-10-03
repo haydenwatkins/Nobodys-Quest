@@ -460,17 +460,22 @@ G.ui = (() => {
     if (!reward || G.ui.dialogueOpen || G.state.bossCutscene) return null;
     const info = G.groundRewardInfo(reward);
     c.font = `8px ${FONT_BODY}`;
-    const lines = [info.name, info.purpose, "Walk over the treasure to collect"];
-    const w = Math.min(210, Math.ceil(Math.max(...lines.map(line => c.measureText(line).width))) + 12), h = 36;
+    const content = [info.name, info.purpose, "Walk over the treasure to collect"];
+    const naturalWidth = Math.min(210, Math.ceil(Math.max(...content.map(line => c.measureText(line).width))) + 12);
     const right = G.input.isTouch ? G.W - 68 : G.W - 5;
-    for (const y of opening ? [39, 68, 106, G.H - h - 6] : [68, 106, 39]) for (const x of [5, Math.max(5, right - w), Math.round((G.W - w) / 2)]) {
-      if (x + w > right || y + h > G.H - (G.input.isTouch ? 4 : 23)) continue;
-      if (G.input.isTouch && y + h > G.H - 68 && x < 84) continue;
-      // Use the clear centre below a crowded opening field, while preserving
-      // an actual interaction prompt and the lower control corners.
-      if (opening && y + h > 125 && G.openingInteractionCandidate?.()) continue;
-      if (fieldPanelBlocked(cam, x, y, w, h)) continue;
-      return { x, y, w, h, lines };
+    for (const w of [...new Set([naturalWidth, Math.min(naturalWidth, 140), Math.min(naturalWidth, 118)])]) {
+      // Keep the entire explanation when a narrow clear column is available.
+      const lines = content.flatMap(line => wrapText(c, line, w - 12)), h = 6 + lines.length * 10;
+      const lower = G.H - h - (G.input.isTouch ? 6 : 23);
+      const anchors = opening ? [39, 68, 106, lower, 5] : [68, 106, 39, lower, 5];
+      for (const y of anchors) for (const x of [5, Math.max(5, right - w), Math.round((G.W - w) / 2)]) {
+        if (x + w > right || y + h > G.H - (G.input.isTouch ? 4 : 23)) continue;
+        if (G.input.isTouch && y + h > G.H - 68 && x < 84) continue;
+        // Keep the real interaction prompt and both lower control corners clear.
+        if (y + h > 125 && G.openingInteractionCandidate?.()) continue;
+        if (fieldPanelBlocked(cam, x, y, w, h)) continue;
+        return { x, y, w, h, lines };
+      }
     }
     return null;
   }

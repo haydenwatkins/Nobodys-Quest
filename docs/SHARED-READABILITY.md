@@ -16,6 +16,7 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Ancient Treant gift | Complete: durable Crown/star, collect/return task, preserved victory and legacy credit |
 | Mire Queen gift and beacon promise | Complete: durable Pearl/star, ground-to-return guidance, saved victory, beacon and later-return response |
 | Eclipse Knight gift | Complete: durable Sigil/star, native exit/re-entry, optional Keepsake after collection |
+| Tess / Bongle / Mallow gifts | Complete: saved ground spindle/handbell/lamp, two native passages each and full-purpose native review |
 | Pillar / Stone Mark gift | Complete: saved plumb weight/star, both native garden crossings and peaceful revisit |
 | Aurelia / Sky Mark gift | Complete: saved ground Mark/star, native awakening, lifts and peaceful revisit |
 | Nearby Form Echo clearance | Optional regular cards clear actual nearby echo bodies/markers; native paint assertion and scene review passed |
@@ -62,3 +63,5 @@ Three new native-paint/timing cases passed, along with six guardian integration 
 The paper opening HUD retains its existing banner and hidden-toast timing. Fixed/paper combinations, Legend relics and threat/effect contrast remain on the shared audit. The earlier stacked-notice findings above are resolved for the standard field by this batch.
 
 Pillar's Stone Mark subsequently uses the saved ground contract and restores both native garden crossings. Eighteen focused progression/art/Keepsake checks, six status/feedback checks and seven final guidance/feedback checks passed, with repeated cases; twenty final touch/TV views and all new art poses were inspected. Review exposed a celebration over earned stars and destination text under notices. Actual star-counter bounds now reserve space before optional cards, and native destination text yields through the shared clearance check and returns afterward. See `GROUND-REWARDS.md` for the source audit and fixture limits.
+
+Thread, Echo and Lantern gifts subsequently use the durable ground contract with native saved restoration, both pending exits and peaceful revisits. Ten source/route cases, twelve build/path/Worldwake cases and twelve final gift/status/feedback cases passed, with repeated cases. Sixty final touch/TV views and all new art poses/settings were inspected. Purpose cards now wrap complete text at narrower widths and can use a lower central anchor in either layout. The browser review approaches gifts with native movement before requiring actual name/purpose/instruction painting; distant initial ranged captures were not missing-cue evidence. `tools/render-review-sheet.cjs` provides reusable capture review. See `GROUND-REWARDS.md` for exact coverage and fixture limits.

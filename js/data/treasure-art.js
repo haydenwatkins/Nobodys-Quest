@@ -8,6 +8,9 @@
     "trophy-eclipse-sigil": { name: "Eclipse Sigil", purpose: "+1 star · choose a Keepsake in Build", shape: "sigil" },
     "trophy-sky-sovereign": { name: "Sky Mark", purpose: "+1 star · awakens the wind lifts", shape: "plume" },
     "trophy-old-mason": { name: "Stone Mark", purpose: "+1 star · raises garden crossings", shape: "plumbline" },
+    "trophy-silk-matriarch": { name: "Thread Mark", purpose: "+1 star · opens woven passages", shape: "spindle" },
+    "trophy-bell-titan": { name: "Echo Mark", purpose: "+1 star · bridges the frozen lakes", shape: "echoBell" },
+    "trophy-lantern-keeper": { name: "Lantern Mark", purpose: "+1 star · lights the ridge passages", shape: "lamp" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -23,7 +26,30 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "plumbline") {
+      if (shape === "spindle") {
+        g.rect(12, 1, 4, 29, "k"); g.rect(13, 2, 2, 27, "b");
+        g.ellipse(14, 7, 10, 4, "k"); g.ellipse(14, 6, 8, 2, "a");
+        g.ellipse(14, 26, 10, 4, "k"); g.ellipse(14, 25, 8, 2, "b");
+        g.rect(7, 8, 14, 17, "k"); g.rect(9, 9, 10, 15, "h");
+        for (const y of [10, 14, 18, 22]) g.line(9, y, 18, y + 1, "c", 2);
+        g.line(19, 14, 23, 17, "d", 2); g.line(23, 17, 23, 22, "d", 2);
+        g.line(23, 22, 20, 24, "d", 2); g.put(13, 5, "c");
+      } else if (shape === "echoBell") {
+        g.poly([[10, 1], [18, 1], [19, 4], [16, 11], [12, 11], [9, 4]], "k");
+        g.rect(12, 3, 4, 7, "b"); g.line(12, 3, 15, 3, "a", 1);
+        g.poly([[9, 10], [19, 10], [22, 22], [26, 24], [25, 28], [3, 28], [2, 24], [6, 22]], "k");
+        g.poly([[10, 12], [18, 12], [20, 22], [23, 25], [5, 25], [8, 22]], "a");
+        g.line(11, 13, 9, 21, "c", 2); g.line(17, 13, 19, 23, "b", 2);
+        g.line(5, 26, 23, 26, "b", 2); g.rect(12, 26, 4, 5, "k"); g.rect(13, 27, 2, 3, "c");
+      } else if (shape === "lamp") {
+        g.ellipse(14, 7, 7, 6, "k"); g.ellipse(14, 7, 5, 4, "a"); g.ellipse(14, 7, 3, 3, "k");
+        g.poly([[6, 10], [22, 10], [25, 15], [25, 25], [21, 30], [7, 30], [3, 25], [3, 15]], "k");
+        g.rect(6, 14, 16, 12, "b"); g.rect(8, 15, 12, 9, "j");
+        g.poly([[14, 13], [18, 19], [17, 24], [11, 24], [10, 20]], "a");
+        g.poly([[14, 17], [16, 21], [14, 24], [12, 22]], "c");
+        g.line(6, 12, 22, 12, "a", 2); g.line(7, 28, 21, 28, "a", 2);
+        g.line(7, 15, 7, 24, "c", 1); g.line(21, 15, 21, 24, "a", 1);
+      } else if (shape === "plumbline") {
         // A mason's hanging weight: fitted grey stone, moss and an inset arch.
         g.line(14, 1, 14, 8, "k", 4); g.line(14, 2, 14, 7, "a", 2);
         g.poly([[10, 7], [18, 7], [25, 19], [14, 30], [3, 19]], "k");
