@@ -25,6 +25,7 @@ G.ui = (() => {
   const dialogueQueue = [];    // deliberate, player-advanced story text
   let dialogueData = null;     // {speaker, text, accent, shown, age, onClose}
   let dialoguePointerAdvance = false;
+  let dialoguePointerChoice = null, dialogueChoiceBounds = [];
   let menuOpen = false;
   let workshopOpen = false;
   let btnCache = "";
@@ -46,7 +47,12 @@ G.ui = (() => {
   uiCanvas.addEventListener("pointerdown", (event) => {
     if (!dialogueData) return;
     event.preventDefault();
-    dialoguePointerAdvance = true;
+    if (dialogueData.offerActive) {
+      const rect=uiCanvas.getBoundingClientRect();
+      const x=(event.clientX-rect.left)*G.W/rect.width,y=(event.clientY-rect.top)*G.H/rect.height;
+      const choice=dialogueChoiceBounds.findIndex(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);
+      if(choice>=0)dialoguePointerChoice=choice;
+    } else dialoguePointerAdvance = true;
     if (G.sfx && G.sfx.ensure) G.sfx.ensure();
   });
 
@@ -83,6 +89,7 @@ G.ui = (() => {
   function showNextDialogue() {
     dialogueData = dialogueQueue.shift() || null;
     dialoguePointerAdvance = false;
+    dialoguePointerChoice = null;dialogueChoiceBounds = [];
     if (dialogueData) {
       dialogueData.shown = 0;
       dialogueData.age = 0;
@@ -100,6 +107,7 @@ G.ui = (() => {
       text: String(text || ""),
       accent: opts.accent || "#ffcd75",
       onClose: typeof opts.onClose === "function" ? opts.onClose : null,
+      offer: opts.offer && typeof opts.offer.onAccept === "function" ? opts.offer : null,
     });
     if (!dialogueData) showNextDialogue();
   }
@@ -112,10 +120,40 @@ G.ui = (() => {
       if (G.sfx && G.sfx.play) G.sfx.play("menu");
       return;
     }
+    if (dialogueData.offer && !dialogueData.offerActive) {
+      dialogueData.offerActive=true;
+      dialogueData.text=String(dialogueData.offer.prompt||"Would you like to help?");
+      dialogueData.shown=dialogueData.text.length;dialogueData.age=0;
+      dialoguePointerAdvance=false;dialoguePointerChoice=null;dialogueChoiceBounds=[];
+      G.input.clearTaps();return;
+    }
     const finished = dialogueData;
     dialogueData = null;
     if (finished.onClose) finished.onClose();
     if (!dialogueData) showNextDialogue();
+  }
+
+  function answerDialogueOffer(accepted) {
+    const finished=dialogueData;
+    dialogueData=null;dialoguePointerChoice=null;dialogueChoiceBounds=[];
+    G.input.clearTaps();
+    if(accepted)finished.offer.onAccept();
+    else if(typeof finished.offer.onDefer==="function")finished.offer.onDefer();
+    if(finished.onClose)finished.onClose();
+    if(!dialogueData)showNextDialogue();
+  }
+
+  function drawDialogueChoices(c,d,x,y,w,paper) {
+    const gap=5,buttonW=(w-gap)/2;
+    dialogueChoiceBounds=[{x,y,w:buttonW,h:22},{x:x+buttonW+gap,y,w:buttonW,h:22}];
+    const labels=["I'll help","Maybe later"];
+    c.font=`10px ${FONT_BODY}`;
+    dialogueChoiceBounds.forEach((b,i)=>{
+      c.fillStyle=paper?"#94734e":"#43536b";c.fillRect(b.x,b.y,b.w,b.h);
+      c.fillStyle=paper?"#f8edcd":"#f4f4f4";
+      const key=G.input.isTouch?"":G.input.hasGamepad?(i?"B · ":"A · "):(i?"ESC · ":"ENTER · ");
+      const label=key+labels[i];c.fillText(label,b.x+(b.w-c.measureText(label).width)/2,b.y+6);
+    });
   }
 
   function update(dt) {
@@ -135,14 +173,21 @@ G.ui = (() => {
       G.state.masteryHudPulse = Math.max(0, G.state.masteryHudPulse - dt);
     if (dialogueData) {
       dialogueData.age += dt;
-      dialogueData.shown = Math.min(
-        dialogueData.text.length,
-        dialogueData.shown + dt * 48
-      );
-      const action = dialoguePointerAdvance ||
-        ["a", "b", "c", "swap", "map", "pause", "interact"].some((button) => G.input.tapped(button));
-      dialoguePointerAdvance = false;
-      if (action) advanceDialogue();
+      if(dialogueData.offerActive){
+        const decline=G.input.tapped("swap")||G.input.tapped("back")||G.input.tapped("pause");
+        const accept=G.input.tapped("a")||G.input.tapped("interact");
+        const choice=dialoguePointerChoice;dialoguePointerChoice=null;
+        if(dialogueData.age>=.12&&(choice!==null||accept||decline))answerDialogueOffer(choice!==null?choice===0:accept&&!decline);
+      }else{
+        dialogueData.shown = Math.min(
+          dialogueData.text.length,
+          dialogueData.shown + dt * 48
+        );
+        const action = dialoguePointerAdvance ||
+          ["a", "b", "c", "swap", "map", "pause", "interact"].some((button) => G.input.tapped(button));
+        dialoguePointerAdvance = false;
+        if (action) advanceDialogue();
+      }
     }
     syncButtons();
   }
@@ -185,7 +230,7 @@ G.ui = (() => {
     const allLines = wrapText(c, d.text, textWidth);
     const visibleLines = wrapText(c, visible, textWidth);
     const lineCount = Math.max(1, allLines.length);
-    const boxH = Math.max(G.drawDialoguePortrait ? 55 : 0, 27 + lineCount * 11);
+    const boxH = Math.max(G.drawDialoguePortrait ? 55 : 0, 27 + lineCount * 11) + (d.offerActive?28:0);
     const boxY = G.H - boxH - 7;
 
     c.fillStyle = "rgba(12,14,25,0.48)";
@@ -213,7 +258,8 @@ G.ui = (() => {
       y += 11;
     }
 
-    if (d.shown >= d.text.length) {
+    if(d.offerActive)drawDialogueChoices(c,d,boxX+inset,boxY+boxH-29,textWidth,false);
+    else if (d.shown >= d.text.length) {
       const prompt = G.input.isTouch ? "TAP TO CONTINUE" : G.input.hasGamepad ? "A  CONTINUE" : "SPACE / ENTER";
       c.font = `5px ${FONT_HEAD}`;
       const promptW = c.measureText(prompt).width;
@@ -3060,7 +3106,7 @@ G.ui = (() => {
   }
 
   return {
-    toast, banner, dialogue, update, drawHUD, resizeOverlay, fieldPanelBlocked,
+    toast, banner, dialogue, update, drawHUD, resizeOverlay, fieldPanelBlocked, drawDialogueChoices,
     openMenu, openMap, openExpedition, closeMenu, toggleMenu, updateControllerMenu,
     showWorkshop, updateWorkshopController,
     openFormWheel, closeFormWheel, aimFormWheel, commitFormWheel, updateFormWheel,

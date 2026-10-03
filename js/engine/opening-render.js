@@ -321,7 +321,7 @@
     const speaker=d.speaker.toUpperCase();
     c.font="11px 'VT323', monospace";
     const lines=wrap(c,d.text,235),visible=wrap(c,d.text.slice(0,Math.floor(d.shown)),235);
-    const h=Math.max(55,30+lines.length*11),y=174-h;
+    const h=Math.max(55,30+lines.length*11)+(d.offerActive?28:0),y=174-h;
     c.fillStyle='rgba(24,34,35,.24)';c.fillRect(0,0,320,180);
     // Offset paper edges, folded corners and a wax seal form a dialogue object.
     c.fillStyle='rgba(20,30,30,.5)';c.fillRect(10,y+4,303,h);
@@ -333,7 +333,8 @@
     text(c,speaker.length>35?speaker.slice(0,34)+'…':speaker,65,y+7,'#65464a',8);
     c.font="11px 'VT323', monospace";c.fillStyle='#354841';
     visible.forEach((line,i)=>c.fillText(line,65,y+19+i*11));
-    if(d.shown>=d.text.length){
+    if(d.offerActive)G.ui.drawDialogueChoices(c,d,65,y+h-29,235,true);
+    else if(d.shown>=d.text.length){
       const prompt=G.input.isTouch?'TAP TO CONTINUE':G.input.hasGamepad?'A · CONTINUE':'SPACE · CONTINUE';
       c.font="6px 'VT323', monospace";c.fillStyle='#7f7056';c.fillText(prompt,303-c.measureText(prompt).width,y+h-9);
     }

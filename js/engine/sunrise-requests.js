@@ -101,7 +101,15 @@
       claimed().push(r.id);if(G.ensureTown().followedRequest===r.id)G.ensureTown().followedRequest=null;G.ensureTown().spirit+=r.reward;G.saveGame();
       G.ui.banner(r.title.toUpperCase(),`${r.name}’s thanks · ${r.reward} town spirit`);
     }
-    G.ui.dialogue(r.name.toUpperCase(),done?r.after:ready?r.thanks:r.ask,{accent:"#e7bd78"});
+    const offer=!done&&!ready&&G.ensureTown().followedRequest!==r.id?{
+      prompt:`Follow “${r.title}” for ${r.name}? You can set it aside in Journey.`,
+      onAccept:()=>{
+        if(!G.followSunriseRequest(r.id))return;
+        G.ui.banner(`A PROMISE TO ${r.name.toUpperCase()}`,G.sunriseRequestTask().short);
+        G.requestGuidance?.(true);
+      }
+    }:null;
+    G.ui.dialogue(r.name.toUpperCase(),done?r.after:ready?r.thanks:r.ask,{accent:"#e7bd78",offer});
     G.input.clearTaps();return true;
   };
   G.npcDialogue=(id,chapter,index)=>{
