@@ -20,7 +20,7 @@ G.ui = (() => {
     : G.activeKeepsake?.()?.id === 'spindle' ? "Tess's Spindle: +1 nearby foe."
     : G.activeKeepsake?.()?.id === 'clapper' ? "Bongle's Clapper: 3+ foes return 1 extra mana." : '';
   const recoverySeconds = ab => Math.round((G.abilityCooldown ? G.abilityCooldown(ab) : ab.cooldown) * 100) / 100;
-  const toasts = [];           // {text, t, dur}
+  const toasts = [];           // {text, t, dur, visible}
   let bannerData = null;       // {title, sub, t}
   const dialogueQueue = [];    // deliberate, player-advanced story text
   let dialogueData = null;     // {speaker, text, accent, shown, age, onClose}
@@ -35,6 +35,8 @@ G.ui = (() => {
   let uiScale = 4;
   let statusBounds = null; // Current-frame status placement, never saved.
   let rewardCue = null;
+  let feedbackBounds = [];
+  let bossHeaderBounds = null, wardHintBounds = null;
 
   const FONT_HEAD = '"Press Start 2P", "Courier New", monospace';
   const FONT_BODY = '"VT323", "Courier New", monospace';
@@ -65,12 +67,12 @@ G.ui = (() => {
   function toast(text, dur) {
     // don't stack the exact same message
     if (toasts.length && toasts[toasts.length - 1].text === text) return;
-    toasts.push({ text, t: 0, dur: dur || 2 });
+    toasts.push({ text, t: 0, dur: dur || 2, visible: false });
     if (toasts.length > 3) toasts.shift();
   }
 
   function banner(title, sub) {
-    bannerData = { title, sub: sub || "", t: 0 };
+    bannerData = { title, sub: sub || "", t: 0, visible: false };
   }
 
   function setDialogueCapture(active) {
@@ -118,11 +120,15 @@ G.ui = (() => {
 
   function update(dt) {
     for (let i = toasts.length - 1; i >= 0; i--) {
-      toasts[i].t += dt;
+      // Standard field notices get reading time only while actually displayed.
+      // The paper HUD retains its existing deliberately hidden toast expiry.
+      if (toasts[i].visible || G.state?.mapDef?.openingLandscape) toasts[i].t += dt;
+      toasts[i].visible = false;
       if (toasts[i].t > toasts[i].dur) toasts.splice(i, 1);
     }
     if (bannerData) {
-      bannerData.t += dt;
+      if (bannerData.visible || G.state?.mapDef?.openingLandscape) bannerData.t += dt;
+      bannerData.visible = false;
       if (bannerData.t > 3.2) bannerData = null;
     }
     if (G.state && G.state.masteryHudPulse > 0)
@@ -299,6 +305,7 @@ G.ui = (() => {
       if (statusOverlaps(x, y, width + 2, height + 5)) continue;
       if (rewardCue && x < rewardCue.x + rewardCue.w && x + width + 2 > rewardCue.x &&
           y < rewardCue.y + rewardCue.h && y + height + 5 > rewardCue.y) continue;
+      if (feedbackOverlaps(x, y, width + 2, height + 5)) continue;
       placed.push({ x, y, w: width, h: height });
 
       const remaining = Math.min(bubble.duration || 2.25, bubble.t);
@@ -402,10 +409,18 @@ G.ui = (() => {
       y < b.y + b.h + 3 && y + h + 3 > b.y;
   }
 
+  function feedbackOverlaps(x, y, w, h) {
+    return feedbackBounds.some(box => x < box.x + box.w + 2 && x + w + 2 > box.x &&
+      y < box.y + box.h + 2 && y + h + 2 > box.y);
+  }
+
   function fieldPanelBlocked(cam, x, y, w, h) {
     if (coversTraveller(cam, x, y, w, h) || statusOverlaps(x, y, w, h)) return true;
     if (rewardCue && x < rewardCue.x + rewardCue.w && x + w > rewardCue.x &&
         y < rewardCue.y + rewardCue.h && y + h > rewardCue.y) return true;
+    if (feedbackOverlaps(x, y, w, h)) return true;
+    if ([bossHeaderBounds, wardHintBounds].some(box => box && x < box.x + box.w + 2 && x + w + 2 > box.x &&
+        y < box.y + box.h + 2 && y + h + 2 > box.y)) return true;
     if ((G.groundRewardsHere ? G.groundRewardsHere() : []).some(reward =>
       x < reward.x - cam.x + 10 && x + w > reward.x - cam.x - 10 &&
       y < reward.y - cam.y + 4 && y + h > reward.y - cam.y - 18)) return true;
@@ -469,6 +484,59 @@ G.ui = (() => {
     for (let i = 0; i < lines.length; i++) {
       c.fillStyle = i === 0 ? "#f4d39c" : "#f4f4f4";
       c.fillText(fitText(c, lines[i], w - 12), x + 6, y + 4 + i * 10);
+    }
+  }
+
+  function planFieldFeedback(c, cam) {
+    const plan = [];
+    if (dialogueData || menuOpen || G.state.bossCutscene ||
+        G.state.enemies.some(enemy => !enemy.dead && enemy.def.miniboss && enemy.bossEngaged)) return plan;
+    const right = G.W - (G.input.isTouch ? 68 : 5);
+    function place(notice, heading, text) {
+      for (const w of [196, 160, 128]) {
+        if (w > right - 5) continue;
+        c.font = `6px ${FONT_HEAD}`;
+        const titles = heading ? wrapText(c, heading, w - 12) : [];
+        c.font = `9px ${FONT_BODY}`;
+        const lines = text ? wrapText(c, text, w - 12) : [];
+        const h = 8 + titles.length * 10 + lines.length * 10;
+        for (const y of [39, 68, 106, 5]) for (const x of [5, right - w]) {
+          if (y + h > G.H - 23) continue;
+          if (G.input.isTouch && y + h > G.H - 68 && x < 84) continue;
+          // The native prompt has its own actor-aware lower anchor.
+          if (y + h > 125 && G.openingInteractionCandidate?.()) continue;
+          if (fieldPanelBlocked(cam, x, y, w, h)) continue;
+          const box = { x, y, w, h };
+          feedbackBounds.push(box);
+          plan.push({ notice, titles, lines, ...box });
+          return;
+        }
+      }
+    }
+    for (const notice of toasts) {
+      if (rewardCue && notice.text.startsWith(rewardCue.lines[0] + " revealed")) continue;
+      place(notice, "", notice.text);
+    }
+    if (bannerData) place(bannerData, bannerData.title, bannerData.sub);
+    return plan;
+  }
+
+  function drawFieldFeedback(c, plan) {
+    for (const card of plan) {
+      const { notice, titles, lines, x, y, w, h } = card;
+      notice.visible = true;
+      const alpha = titles.length
+        ? notice.t < .2 ? notice.t / .2 : notice.t > 2.7 ? (3.2 - notice.t) / .5 : 1
+        : notice.t > notice.dur - .3 ? (notice.dur - notice.t) / .3 : 1;
+      c.globalAlpha = Math.max(0, alpha) * .95;
+      c.fillStyle = "rgba(26,28,44,.9)"; c.fillRect(x, y, w, h);
+      c.fillStyle = titles.length ? "#ffcd75" : "#d9a7ff"; c.fillRect(x, y, 2, h);
+      let by = y + 4;
+      c.font = `6px ${FONT_HEAD}`; c.fillStyle = "#ffcd75";
+      for (const line of titles) { c.fillText(line, x + 6, by); by += 10; }
+      c.font = `9px ${FONT_BODY}`; c.fillStyle = "#f4f4f4";
+      for (const line of lines) { c.fillText(line, x + 6, by); by += 10; }
+      c.globalAlpha = 1;
     }
   }
 
@@ -638,6 +706,7 @@ G.ui = (() => {
     const x = Math.round(G.util.clamp(nearest.x - cam.x - w / 2, 2, G.W - w - 2));
     const h = formLabel ? 18 : 10;
     const y = Math.round(G.util.clamp(nearest.y - cam.y - nearest.def.size - h - 8, 2, G.H - h - 2));
+    wardHintBounds = { x, y, w, h };
     c.fillStyle = "rgba(26,28,44,0.85)";
     c.fillRect(x, y, w, h);
     c.fillStyle = type.color;
@@ -655,6 +724,7 @@ G.ui = (() => {
     const w = 150;
     const x = Math.round((G.W - w) / 2);
     const y = 4;
+    bossHeaderBounds = { x, y, w, h: 17 };
     const color = (boss.def.boss && boss.def.boss.color) || "#ffcd75";
     const phaseLabel = ["I", "II", "III"][boss.bossPhase - 1] || String(boss.bossPhase);
     const round = G.state.gauntletRun
@@ -696,6 +766,9 @@ G.ui = (() => {
     c.clearRect(0, 0, G.W, G.H);
     statusBounds = null;
     rewardCue = null;
+    feedbackBounds = [];
+    bossHeaderBounds = wardHintBounds = null;
+    let fieldFeedback = [];
     c.textBaseline = "top";
 
     const p = G.state.player;
@@ -790,8 +863,10 @@ G.ui = (() => {
 
     const entranceFocus = G.world && G.world.nearPortal && G.world.nearPortal(56);
     const bossBarShown = drawBossBar(c);
+    if (!G.state.bossCutscene) drawWardHint(c, cam);
     const encounterFocus = bossBarShown || (G.state.mapId === "emberRidge" && G.ridgeSurvey && G.ridgeSurvey().active);
     rewardCue = placeRewardCue(c, cam);
+    fieldFeedback = planFieldFeedback(c, cam);
     if (!encounterFocus && !entranceFocus) drawLocationChip(c, cam);
 
     /* stars (top right) */
@@ -809,7 +884,6 @@ G.ui = (() => {
         drawStoryTracker(c, cam);
         drawQuestTracker(c, cam);
       }
-      drawWardHint(c, cam);
       const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c, cam);
       if (!rewardCue && !interactionShown && !entranceFocus && !encounterFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
       if (!rewardCue) drawWayfinderHint(c);
@@ -821,27 +895,10 @@ G.ui = (() => {
     drawNpcChatter(c, cam);
     drawRewardCue(c);
 
-    /* toasts (word-wrapped so long messages fit) */
-    c.font = `9px ${FONT_BODY}`;
-    let ty = G.input.isTouch ? 5 : (G.fieldMasteryQuest && G.fieldMasteryQuest() ? 99 : 67);
-    for (const t of G.state.bossCutscene || openingHud ? [] : toasts) {
-      if (rewardCue && t.text.startsWith(rewardCue.lines[0] + " revealed")) continue;
-      const alpha = t.t > t.dur - 0.3 ? (t.dur - t.t) / 0.3 : 1;
-      c.globalAlpha = Math.max(0, alpha) * 0.95;
-      for (const line of wrapText(c, t.text, G.W - 40)) {
-        const w = c.measureText(line).width + 8;
-        c.fillStyle = "#1a1c2c";
-        c.fillRect(Math.round(G.W / 2 - w / 2), ty, w, 11);
-        c.fillStyle = "#f4f4f4";
-        c.fillText(line, Math.round(G.W / 2 - w / 2) + 4, ty + 1);
-        ty += 12;
-      }
-      c.globalAlpha = 1;
-      ty += 2;
-    }
+    drawFieldFeedback(c, fieldFeedback);
 
     /* banner (quest done / new form!) */
-    if (bannerData) {
+    if (openingHud && bannerData) {
       const b = bannerData;
       const alpha = b.t < 0.2 ? b.t / 0.2 : b.t > 2.7 ? (3.2 - b.t) / 0.5 : 1;
       c.globalAlpha = Math.max(0, alpha);

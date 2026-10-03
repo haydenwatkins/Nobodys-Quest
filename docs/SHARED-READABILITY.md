@@ -9,6 +9,7 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Essential status/guardian headers | Existing reviewed behaviour retained |
 | Optional regular-HUD cards covering nearby NPCs | Complete: native named/resident body and marker clearance; cards restore when clear |
 | Incidental speech | Existing traveller/speaker clearance retained; crowded combinations remain to review |
+| Standard-field transient feedback | Complete: compact full-text notices, native actor/status clearance and reading time after dialogue/guardian encounter |
 | Shared effects and threat/reward contrast | Audit pending |
 | Ordinary heart/mana drops | Complete: recognizable heart/flask art, ground contact, collection feedback, quiet-motion fade |
 | Persistent chest contents | Complete for ten item identities: durable ground reveal, purpose, movement claim and preserved legacy ownership |
@@ -50,3 +51,11 @@ The Eclipse Knight subsequently leaves an authored Sigil/star bundle. Seventeen 
 Crowded paper/touch fields now have a lower central reward-cue anchor when there is no interaction prompt. It clears the real gift/echo and both touch control corners. Seven existing HUD cases and the corrected native crowded-Crown fixture passed; twelve final Crown views were inspected. The three-source browser tool passed all twelve mode/setting combinations.
 
 Aurelia’s Sky Mark subsequently uses the durable contract, awakens native wind lifts after collection and preserves both pending exits and peaceful later visits. Twenty final touch/TV views and every feather-clasp pose were inspected. Native touch review continues to expose stacked collection/Build/path notices and large banners covering status/actors; shared feedback is the next bounded readability batch.
+
+## Standard-field feedback complete
+
+Collection/Build/path notices and celebration banners now share compact cards with full wrapped text. Their actual painted bounds reserve room before optional location/story/guidance cards and incidental speech. Cards clear nearby authored travellers, NPCs, foes and echoes, essential status, ground gifts/purpose cues, native boss headers/ward hints and control corners. Reading time advances only while a standard-field notice appears; dialogue, menus, introductions and an engaged living guardian hold notices until the field is clear. The existing three-toast cap, duplicate suppression and single-banner replacement remain. Painting does not change saved progress, grants or combat.
+
+Three new native-paint/timing cases passed, along with six guardian integration cases in the preceding run and two foe-HUD cases in the final run. Tests check real heart/mana/form painting, full text, no card overlap, all input modes/settings, unchanged game state, dialogue-delayed expiry and guardian-delayed celebration. Twenty final Sky Mark browser views were inspected in both settings with touch/TV controls across reveal, real reload, movement collection and both lift directions. The existing controlled final-blow fixture limits apply; desktop Chromium does not establish physical-device behavior.
+
+The paper opening HUD retains its existing banner and hidden-toast timing. Fixed/paper combinations, Legend relics and threat/effect contrast remain on the shared audit. The earlier stacked-notice findings above are resolved for the standard field by this batch.

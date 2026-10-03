@@ -85,4 +85,4 @@ Twenty final touch/TV views were inspected in both settings: real Ranger attack 
 
 ## Next bounded implementation
 
-Address the stacked collection/Build/path announcements seen in native touch review before extending the remaining fifteen trophy definitions. Keep actual reward credit and essential status visible; preserve honest reward explanations. Then audit the Old Mason's Stone Mark and rebuilt garden crossings. Regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.
+Standard-field collection/Build/path announcements now use compact full-text cards with actor/status/control clearance and visible reading time; see `SHARED-READABILITY.md` for validation and the remaining paper/fixed limits. Next audit the Old Mason's Stone Mark and rebuilt garden crossings before extending the remaining fifteen trophy definitions. Regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.
