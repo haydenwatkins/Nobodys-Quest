@@ -7,6 +7,7 @@
     "trophy-mire-pearl": { name: "Mire Pearl", purpose: "+1 star · light Pebble's beacon", shape: "pearl" },
     "trophy-eclipse-sigil": { name: "Eclipse Sigil", purpose: "+1 star · choose a Keepsake in Build", shape: "sigil" },
     "trophy-sky-sovereign": { name: "Sky Mark", purpose: "+1 star · awakens the wind lifts", shape: "plume" },
+    "trophy-old-mason": { name: "Stone Mark", purpose: "+1 star · raises garden crossings", shape: "plumbline" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -21,8 +22,20 @@
   G.treasureArt = {};
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
-    G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, palette, (g, frame) => {
-      if (shape === "plume") {
+    G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
+      if (shape === "plumbline") {
+        // A mason's hanging weight: fitted grey stone, moss and an inset arch.
+        g.line(14, 1, 14, 8, "k", 4); g.line(14, 2, 14, 7, "a", 2);
+        g.poly([[10, 7], [18, 7], [25, 19], [14, 30], [3, 19]], "k");
+        g.poly([[11, 9], [17, 9], [22, 19], [14, 27], [6, 19]], "e");
+        g.poly([[11, 9], [14, 10], [14, 27], [6, 19]], "d");
+        g.line(9, 19, 9, 16, "k", 2); g.line(9, 16, 14, 13, "k", 2);
+        g.line(14, 13, 19, 16, "k", 2); g.line(19, 16, 19, 19, "k", 2);
+        g.line(10, 18, 10, 16, "c", 1); g.line(10, 16, 14, 14, "c", 1);
+        g.line(14, 14, 18, 16, "a", 1); g.line(18, 16, 18, 18, "a", 1);
+        g.line(12, 22, 14, 24, "c", 1); g.line(14, 24, 17, 21, "a", 1);
+        g.rect(6, 18, 3, 3, "g"); g.line(7, 18, 8, 20, "f", 1);
+      } else if (shape === "plume") {
         g.poly([[5, 24], [3, 16], [6, 7], [15, 1], [20, 2], [20, 10], [14, 20]], "k");
         g.poly([[6, 19], [6, 12], [10, 5], [16, 3], [18, 4], [17, 10], [12, 19]], "d");
         g.poly([[12, 25], [13, 15], [21, 6], [25, 6], [26, 13], [21, 24]], "k");

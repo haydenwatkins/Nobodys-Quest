@@ -25,7 +25,7 @@ test('compact full-text feedback clears the traveller, essential status and fixe
   const { G, rects, labels, draw } = fixture();
   G.ui.toast('Sky Mark collected. One star earned.', 4);
   G.ui.toast('The wind lifts are awake.', 4);
-  G.ui.banner('NEW BUILD CHOICE', 'Weigh its gift and price in Build.');
+  G.ui.banner('ACT 4 · THE WAKING ROADS', 'The oldest roads were never grown. They were promises that carried people forward.');
   const before = JSON.stringify(G.state);
   for (const hd of [true, false]) for (const mode of ['touch', 'controller', 'keyboard']) {
     G.hdPilot = hd; G.input.isTouch = mode === 'touch'; G.input.hasGamepad = mode === 'controller'; draw();
@@ -34,7 +34,8 @@ test('compact full-text feedback clears the traveller, essential status and fixe
     const mana = rects.find(rect => rect.w === 42 && rect.h === 5); assert.ok(mana);
     const chip = rects.find(rect => rect.color === 'rgba(26,28,44,0.65)' && rect.x === mana.x - 1 && rect.y === mana.y + 8);
     assert.ok(chip);
-    const essentialPaint = [mana, chip, ...rects.filter(rect => ['#b13e53', '#333c57'].includes(rect.color) && rect.h <= 3 && rect.y < mana.y)];
+    const stars = rects.find(rect => rect.color === 'rgba(26,28,44,0.65)' && rect.x > G.W / 2 && rect.y === 5); assert.ok(stars);
+    const essentialPaint = [mana, chip, stars, ...rects.filter(rect => ['#b13e53', '#333c57'].includes(rect.color) && rect.h <= 3 && rect.y < mana.y)];
     const body = G.spriteMetrics(G.playerForm().sprite);
     for (const card of cards) {
       assert.ok(!overlaps(card, { x: G.state.player.x - body.w / 2, y: G.state.player.y - body.h, w: body.w, h: body.h }));
@@ -68,4 +69,24 @@ test('celebration waits through an active guardian encounter while the native bo
   G.state.enemies = []; draw(); G.ui.update(.2); draw();
   assert.match(labels.join(' '), /NEW BUILD CHOICE/);
   assert.match(labels.join(' '), /A gift to weigh after this fight\./);
+});
+
+test('the native destination label yields to field notices and returns when their reading time finishes', () => {
+  const { G, rects, labels, draw } = fixture();
+  G.guidanceTarget = () => ({ x: 1000, y: 1000, kind: 'travel', spatial: true, color: '#ffcd75', icon: '◇', destination: 'Rootdeep Hollow' });
+  G.requestGuidance(false);
+  G.ui.toast('Stone Mark · +1 star · raises garden crossings', 4);
+  G.ui.toast("Mason's Plumbline can shape your build. Visit Build / Keepsakes to choose its gift and price.", 4);
+  G.input.hasGamepad = true;
+  for (const [x,y] of [[160,96],[200,100],[90,145],[300,140]]) {
+    Object.assign(G.state.player, { x, y }); draw();
+    const notices = rects.filter(rect => rect.color === 'rgba(26,28,44,.9)');
+    const destination = rects.find(rect => rect.color === 'rgba(26,28,44,0.86)' && rect.h === 12);
+    if (destination) for (const notice of notices) assert.ok(!overlaps(notice, destination), 'optional destination text clears real notice painting');
+  }
+  Object.assign(G.state.player, { x: 160, y: 96 });
+  // Settle the real queue through drawing and update, then renew native guidance.
+  for (let i = 0; i < 80; i++) { draw(); G.ui.update(.1); }
+  G.requestGuidance(false); draw();
+  assert.ok(labels.some(label => label.includes('ROOTDEEP HOLLOW')));
 });

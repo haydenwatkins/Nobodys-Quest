@@ -70,7 +70,12 @@ test('the whole Worldwake road stays passable and hands each victory to the next
     assert.equal(boss.ward.hp, 0);
     G.combat.damageEnemy(boss, { ability, type, damage: boss.hp + 10, knockback: 0, fromX: boss.x - 20, fromY: boss.y });
     r.drain();
-    assert.ok(G.hasWorldMark(mark), `${mark} is awarded after ${bossId}`);
+    if (G.groundRewardFor(boss.def.trophy)) {
+      assert.equal(G.hasWorldMark(mark), false, `${mark} waits for its real ground gift`);
+      Object.assign(G.state.player, { x: boss.x, y: boss.y });
+      require('./helpers/collect-treasure.cjs')(r, boss.def.trophy);
+    }
+    assert.ok(G.hasWorldMark(mark), `${mark} is awarded after collecting ${bossId}'s gift`);
     if (mark === 'thread') assert.ok(G.state.stars >= 28, 'travel and guardian favors naturally open Shattercoast');
   }
   assert.ok(traveled.includes('shattercoast'), 'the western return visits the coastal hub');

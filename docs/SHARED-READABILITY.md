@@ -16,6 +16,7 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Ancient Treant gift | Complete: durable Crown/star, collect/return task, preserved victory and legacy credit |
 | Mire Queen gift and beacon promise | Complete: durable Pearl/star, ground-to-return guidance, saved victory, beacon and later-return response |
 | Eclipse Knight gift | Complete: durable Sigil/star, native exit/re-entry, optional Keepsake after collection |
+| Pillar / Stone Mark gift | Complete: saved plumb weight/star, both native garden crossings and peaceful revisit |
 | Aurelia / Sky Mark gift | Complete: saved ground Mark/star, native awakening, lifts and peaceful revisit |
 | Nearby Form Echo clearance | Optional regular cards clear actual nearby echo bodies/markers; native paint assertion and scene review passed |
 | Other persistent items and every reward source | Source audit in progress; see `GROUND-REWARDS.md`; do not silently exempt categories |
@@ -59,3 +60,5 @@ Collection/Build/path notices and celebration banners now share compact cards wi
 Three new native-paint/timing cases passed, along with six guardian integration cases in the preceding run and two foe-HUD cases in the final run. Tests check real heart/mana/form painting, full text, no card overlap, all input modes/settings, unchanged game state, dialogue-delayed expiry and guardian-delayed celebration. Twenty final Sky Mark browser views were inspected in both settings with touch/TV controls across reveal, real reload, movement collection and both lift directions. The existing controlled final-blow fixture limits apply; desktop Chromium does not establish physical-device behavior.
 
 The paper opening HUD retains its existing banner and hidden-toast timing. Fixed/paper combinations, Legend relics and threat/effect contrast remain on the shared audit. The earlier stacked-notice findings above are resolved for the standard field by this batch.
+
+Pillar's Stone Mark subsequently uses the saved ground contract and restores both native garden crossings. Eighteen focused progression/art/Keepsake checks, six status/feedback checks and seven final guidance/feedback checks passed, with repeated cases; twenty final touch/TV views and all new art poses were inspected. Review exposed a celebration over earned stars and destination text under notices. Actual star-counter bounds now reserve space before optional cards, and native destination text yields through the shared clearance check and returns afterward. See `GROUND-REWARDS.md` for the source audit and fixture limits.

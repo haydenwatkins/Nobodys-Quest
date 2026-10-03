@@ -36,7 +36,7 @@ G.ui = (() => {
   let statusBounds = null; // Current-frame status placement, never saved.
   let rewardCue = null;
   let feedbackBounds = [];
-  let bossHeaderBounds = null, wardHintBounds = null;
+  let bossHeaderBounds = null, wardHintBounds = null, starBounds = null;
 
   const FONT_HEAD = '"Press Start 2P", "Courier New", monospace';
   const FONT_BODY = '"VT323", "Courier New", monospace';
@@ -419,7 +419,7 @@ G.ui = (() => {
     if (rewardCue && x < rewardCue.x + rewardCue.w && x + w > rewardCue.x &&
         y < rewardCue.y + rewardCue.h && y + h > rewardCue.y) return true;
     if (feedbackOverlaps(x, y, w, h)) return true;
-    if ([bossHeaderBounds, wardHintBounds].some(box => box && x < box.x + box.w + 2 && x + w + 2 > box.x &&
+    if ([bossHeaderBounds, wardHintBounds, starBounds].some(box => box && x < box.x + box.w + 2 && x + w + 2 > box.x &&
         y < box.y + box.h + 2 && y + h + 2 > box.y)) return true;
     if ((G.groundRewardsHere ? G.groundRewardsHere() : []).some(reward =>
       x < reward.x - cam.x + 10 && x + w > reward.x - cam.x - 10 &&
@@ -767,7 +767,7 @@ G.ui = (() => {
     statusBounds = null;
     rewardCue = null;
     feedbackBounds = [];
-    bossHeaderBounds = wardHintBounds = null;
+    bossHeaderBounds = wardHintBounds = starBounds = null;
     let fieldFeedback = [];
     c.textBaseline = "top";
 
@@ -865,17 +865,19 @@ G.ui = (() => {
     const bossBarShown = drawBossBar(c);
     if (!G.state.bossCutscene) drawWardHint(c, cam);
     const encounterFocus = bossBarShown || (G.state.mapId === "emberRidge" && G.ridgeSurvey && G.ridgeSurvey().active);
-    rewardCue = placeRewardCue(c, cam);
-    fieldFeedback = planFieldFeedback(c, cam);
-    if (!encounterFocus && !entranceFocus) drawLocationChip(c, cam);
-
-    /* stars (top right) */
+    /* Reserve and paint the earned-star counter before optional field cards. */
+    c.font = `6px ${FONT_HEAD}`;
     const starTxt = `⭐${G.state.stars}`;
     const sw = c.measureText(starTxt).width + 6;
     c.fillStyle = "rgba(26,28,44,0.65)";
-    c.fillRect(G.W - sw - 4, 5, sw, 11);
+    starBounds = { x: G.W - sw - 4, y: 5, w: sw, h: 11 };
+    c.fillRect(starBounds.x, starBounds.y, sw, 11);
     c.fillStyle = "#ffcd75";
     c.fillText(starTxt, G.W - sw - 1, 8);
+
+    rewardCue = placeRewardCue(c, cam);
+    fieldFeedback = planFieldFeedback(c, cam);
+    if (!encounterFocus && !entranceFocus) drawLocationChip(c, cam);
 
     if (!G.state.bossCutscene) {
       // Let travellers see the actual gate; health, stars, warnings and arts stay.
@@ -3051,7 +3053,7 @@ G.ui = (() => {
   }
 
   return {
-    toast, banner, dialogue, update, drawHUD, resizeOverlay,
+    toast, banner, dialogue, update, drawHUD, resizeOverlay, fieldPanelBlocked,
     openMenu, openMap, openExpedition, closeMenu, toggleMenu, updateControllerMenu,
     showWorkshop, updateWorkshopController,
     openFormWheel, closeFormWheel, aimFormWheel, commitFormWheel, updateFormWheel,

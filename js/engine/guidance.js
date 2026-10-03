@@ -737,7 +737,9 @@
       const label = `✦ ${String(target.destination).toUpperCase()}`;
       const width = ctx.measureText(label).width + 10;
       ctx.fillStyle = "rgba(26,28,44,0.88)";
-      ctx.fillRect(Math.round((G.W - width) / 2), G.H - 45, width, 12);
+      const left = Math.round((G.W - width) / 2);
+      if (G.ui?.fieldPanelBlocked?.(cam, left, G.H - 45, width, 12)) return;
+      ctx.fillRect(left, G.H - 45, width, 12);
       ctx.fillStyle = target.color;
       ctx.fillText(label, Math.round((G.W - width) / 2) + 5, G.H - 41);
       return;
@@ -768,7 +770,9 @@
       const label = `${target.icon} ${String(target.destination).toUpperCase()}`;
       const width = Math.min(G.W - 30, ctx.measureText(label).width + 10);
       ctx.fillStyle = "rgba(26,28,44,0.86)";
-      ctx.fillRect(Math.round((G.W - width) / 2), G.H - 45, width, 12);
+      const left = Math.round((G.W - width) / 2);
+      if (G.ui?.fieldPanelBlocked?.(cam, left, G.H - 45, width, 12)) return;
+      ctx.fillRect(left, G.H - 45, width, 12);
       ctx.fillStyle = target.color;
       ctx.fillText(label, Math.round((G.W - width) / 2) + 5, G.H - 41);
     }
