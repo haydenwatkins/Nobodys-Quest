@@ -15,6 +15,7 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Ancient Treant gift | Complete: durable Crown/star, collect/return task, preserved victory and legacy credit |
 | Mire Queen gift and beacon promise | Complete: durable Pearl/star, ground-to-return guidance, saved victory, beacon and later-return response |
 | Eclipse Knight gift | Complete: durable Sigil/star, native exit/re-entry, optional Keepsake after collection |
+| Aurelia / Sky Mark gift | Complete: saved ground Mark/star, native awakening, lifts and peaceful revisit |
 | Nearby Form Echo clearance | Optional regular cards clear actual nearby echo bodies/markers; native paint assertion and scene review passed |
 | Other persistent items and every reward source | Source audit in progress; see `GROUND-REWARDS.md`; do not silently exempt categories |
 
@@ -47,3 +48,5 @@ The Mire Queen subsequently uses the durable contract, with a followed beacon re
 The Eclipse Knight subsequently leaves an authored Sigil/star bundle. Seventeen focused progression/route/Keepsake checks and twelve inspected native touch/TV views passed. `tools/review-ground-gift.cjs` now provides reusable controlled final-blow/reload/collection fixtures for the three converted early guardians. Existing stacked collection/Build toasts can still crowd fixed status; this is recorded as unfinished shared feedback work.
 
 Crowded paper/touch fields now have a lower central reward-cue anchor when there is no interaction prompt. It clears the real gift/echo and both touch control corners. Seven existing HUD cases and the corrected native crowded-Crown fixture passed; twelve final Crown views were inspected. The three-source browser tool passed all twelve mode/setting combinations.
+
+Aurelia’s Sky Mark subsequently uses the durable contract, awakens native wind lifts after collection and preserves both pending exits and peaceful later visits. Twenty final touch/TV views and every feather-clasp pose were inspected. Native touch review continues to expose stacked collection/Build/path notices and large banners covering status/actors; shared feedback is the next bounded readability batch.

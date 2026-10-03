@@ -86,6 +86,7 @@ G.bossPreparation = () => {
   const s=G.state;
   if(!s || s.expeditionRun)return null;
   const promise=G.followedSunriseRequest?.();
+  if(promise?.id==="beacon"&&!promise.ready&&G.groundRewardFor?.("trophy-mire-pearl"))return null;
   const goal=promise?.id==="beacon"&&!promise.ready?{guide:"boss",mapId:"sunkenMarsh"}:G.storyGoal();
   if(goal?.guide!=="boss" || goal.complete)return null;
   const map=G.maps[goal.mapId];

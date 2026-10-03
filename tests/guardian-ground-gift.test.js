@@ -38,6 +38,7 @@ test('the Pearl stays pending across travel/knockout, then a followed beacon pro
   const queen = defeat(r,'mireQueen','dark'), point = {x:queen.x,y:queen.y};
   assert.equal(G.state.stars,stars); assert.equal(G.followedSunriseRequest().ready,false);
   assert.match(G.guidanceTarget().text,/Collect her pearl/); assert.equal(G.guidanceTarget().reward,G.groundRewardFor(pearl));
+  assert.equal(G.bossPreparation(),null,'the followed promise retires fight advice while its Pearl is on the ground');
   r.load('sunriseQuay'); r.drain(); assert.equal(G.followedSunriseRequest().ready,false);
   assert.equal(G.followedSunriseRequest().followed,true); assert.ok(G.groundRewardFor(pearl));
   r.load('sunkenMarsh'); r.drain(); assert.ok(!G.state.enemies.some(e=>e.def.id==='mireQueen'));
@@ -124,4 +125,41 @@ test('the opening promise guides collect then return, and final collection hooks
   assert.equal(G.openingGoal().short,'Return to Parcel at the cart');
   assert.ok(G.state.items.includes('guardian-compass')); assert.equal(G.state.stars,stars+4,'native final-compass reward plus Crown star');
   G.updatePickups(.05); assert.equal(G.state.stars,stars+4);
+});
+
+test('Aurelia leaves a saved Sky Mark whose collection awakens the wind lifts once while both return roads stay usable', () => {
+  const r=fixture('windscarCanyon'),{G}=r,cross=require('./helpers/cross-road.cjs'),mark='trophy-sky-sovereign';
+  G.state.stars=24;const stars=G.state.stars;
+  const boss=defeat(r,'skySovereign','sharp'),point={x:boss.x,y:boss.y};
+  assert.equal(G.activeWorldbearer(),null);assert.equal(G.hasWorldMark('sky'),false);
+  assert.equal(G.windscarLiftSurvey().unlocked,false);assert.equal(G.worldwakePurified('windscarCanyon'),false);
+  assert.equal(G.carryKeepsake('plume'),false);assert.equal(G.state.stars,stars);
+  assert.equal(G.storyGoal().itemId,mark);assert.equal(G.guidanceTarget().reward,G.groundRewardFor(mark));
+  const saved=G.loadSaveData();assert.ok(saved.groundRewards.some(reward=>reward.item===mark));
+  assert.ok(!saved.worldwake.marks.includes('sky'));assert.ok(!saved.items.includes(mark));
+  cross(r,'sunstepPrairie');cross(r,'windscarCanyon');
+  assert.ok(!G.state.enemies.some(e=>e.def.id==='skySovereign'));assert.ok(G.groundRewardFor(mark));
+  cross(r,'hangingGardens');cross(r,'windscarCanyon');
+  assert.ok(!G.state.enemies.some(e=>e.def.id==='skySovereign'));assert.equal(G.windscarLiftSurvey().unlocked,false);
+  const claimStars=G.state.stars; // Visiting three regions can legitimately earn a caravan favor.
+  // Move the fixture back to the native victory point; collection itself walks.
+  Object.assign(G.state.player,point);collect(r,mark);
+  assert.equal(G.state.stars,claimStars+1);assert.equal(G.ensureWorldwake().marks.filter(id=>id==='sky').length,1);
+  assert.equal(G.windscarLiftSurvey().unlocked,true);assert.equal(G.worldwakePurified('windscarCanyon'),true);
+  assert.equal(G.activeWorldMarkDiscipline(),null);assert.equal(G.activeKeepsake(),null);
+  assert.equal(G.storyGoal().mapId,'hangingGardens');
+  r.load('windscarCanyon');r.drain();assert.equal(G.state.restorationDetails.length,28);
+  G.state.enemies=[];G.state.projectiles=[];G.state.bossHazards=[];
+  Object.assign(G.state.player,{x:11*16+8,y:20*16+8});
+  assert.match(G.openingInteractionCandidate().label,/Ride the wind lift up/);
+  assert.equal(G.tryOpeningInteraction(),true);assert.equal(G.state.player.x,33*16+8);
+  assert.equal(G.tryOpeningInteraction(),true);assert.equal(G.state.player.x,11*16+8);
+  assert.equal(G.state.stars,claimStars+1);
+  r.load('windscarCanyon');r.drain();assert.ok(!G.state.enemies.some(e=>e.def.id==='skySovereign'),'the purified region preserves its native peaceful revisit');
+  // A deliberate native rematch actor cannot grant a second unique trophy.
+  G.state.enemies.push(G.makeEnemy('skySovereign',point.x,point.y));defeat(r,'skySovereign','sharp');
+  assert.equal(G.state.stars,claimStars+1);assert.equal(G.groundRewardFor(mark),null);
+  assert.equal(G.ensureWorldwake().marks.filter(id=>id==='sky').length,1);
+  G.state.groundRewards=G.normalizeGroundRewards(saved.groundRewards);
+  assert.equal(G.state.groundRewards.length,0,'legacy owned Mark cannot replay the ground gift');
 });

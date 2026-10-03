@@ -85,6 +85,11 @@ test('a 24-star traveler crosses into Worldwake, meets the first guardian, and e
   assert.equal(boss.ward.hp, 0);
   G.combat.damageEnemy(boss, { ability: 'slash', damage: 100, type: 'sharp', knockback: 0, fromX: boss.x - 20, fromY: boss.y });
   r.drain();
+  assert.ok(!G.state.items.includes('trophy-sky-sovereign'));
+  assert.equal(G.hasWorldMark('sky'),false);
+  assert.equal(G.storyGoal().itemId,'trophy-sky-sovereign');
+  Object.assign(G.state.player,{x:boss.x,y:boss.y});
+  require('./helpers/collect-treasure.cjs')(r,'trophy-sky-sovereign');
   assert.ok(G.state.items.includes('trophy-sky-sovereign'));
   assert.ok(G.hasWorldMark('sky'));
   assert.equal(G.storyGoal().mapId, 'hangingGardens');

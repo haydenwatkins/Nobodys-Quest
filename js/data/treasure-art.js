@@ -6,6 +6,7 @@
     "trophy-heartwood-crown": { name: "Heartwood Crown", purpose: "+1 star · choose a Keepsake in Build", shape: "crown" },
     "trophy-mire-pearl": { name: "Mire Pearl", purpose: "+1 star · light Pebble's beacon", shape: "pearl" },
     "trophy-eclipse-sigil": { name: "Eclipse Sigil", purpose: "+1 star · choose a Keepsake in Build", shape: "sigil" },
+    "trophy-sky-sovereign": { name: "Sky Mark", purpose: "+1 star · awakens the wind lifts", shape: "plume" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -21,7 +22,15 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, palette, (g, frame) => {
-      if (shape === "sigil") {
+      if (shape === "plume") {
+        g.poly([[5, 24], [3, 16], [6, 7], [15, 1], [20, 2], [20, 10], [14, 20]], "k");
+        g.poly([[6, 19], [6, 12], [10, 5], [16, 3], [18, 4], [17, 10], [12, 19]], "d");
+        g.poly([[12, 25], [13, 15], [21, 6], [25, 6], [26, 13], [21, 24]], "k");
+        g.poly([[15, 22], [16, 16], [22, 9], [24, 9], [24, 13], [20, 22]], "e");
+        g.line(8, 26, 16, 5, "c", 2); g.line(15, 27, 23, 11, "d", 2);
+        g.poly([[5, 23], [18, 22], [20, 28], [7, 30]], "k");
+        g.poly([[7, 25], [17, 24], [18, 27], [8, 28]], "a"); g.put(12, 26, "c");
+      } else if (shape === "sigil") {
         // A small metal medallion, with its eclipse inset into the face.
         g.ellipse(14, 6, 4, 5, "k"); g.ellipse(14, 6, 2, 3, "a");
         g.ellipse(14, 19, 12, 11, "k"); g.ellipse(14, 19, 10, 9, "b");
