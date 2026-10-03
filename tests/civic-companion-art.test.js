@@ -5,8 +5,8 @@ test('Mayor Maybe has four integrated civic poses in both settings and preserves
  Object.assign(G.state.player,{x:n.x+12,y:n.y});const key=n.id+':'+G.storyChapter(),count=G.state.npcTalk[key]||0;assert.equal(G.npcTalkCandidate(),n);assert.equal(G.tryNpcTalk(),true);r.drain();assert.equal(G.state.npcTalk[key],count+1);assert.equal(JSON.stringify(n.home),home);assert.equal(n.def.name,name);assert.equal(JSON.stringify(n.def.chapters),chapters);G.saveGame();assert.equal(G.loadSaveData().npcTalk[key],count+1);
  r.load('town');r.drain();assert.ok(G.state.npcs.some(n=>n.id==='mayorMaybe'&&n.def.sprite===G.NPCS.mayorMaybe.sprite));
 });
-test('Mayor dialogue crop uses its own agenda-bearing body and drawing work or waving does not mutate actor state',()=>{
+test('Mayor dialogue crop uses its own composed civic portrait and drawing work or waving does not mutate actor state',()=>{
  const r=runtime(),{G}=r;r.load('overworld');r.drain();G.state.enemies=[];const n=G.state.npcs.find(n=>n.id==='mayorMaybe'),draws=[],ctx=new Proxy({measureText:t=>({width:t.length*5})},{get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)});G.drawSprite=(c,s,f,x,y,flip)=>draws.push({s,f,flip});Object.assign(G.state.player,{x:n.x+12,y:n.y});
  for(const hd of [true,false])for(const left of [true,false])for(const activity of ['notes','wave']){G.hdPilot=hd;Object.assign(n,{path:[],facingLeft:left,activity});const before=JSON.stringify(n);draws.length=0;G.drawNpc(ctx,n);assert.equal(draws[0].s,n.def.sprite);assert.equal(draws[0].flip,left);assert.equal(JSON.stringify(n),before);}
- r.load('orchardRoad');r.drain();draws.length=0;assert.equal(G.drawOpeningDialogue(ctx,{speaker:'MAYOR MAYBE',text:'Good road.',shown:99},(c,t)=>[t]),true);assert.equal(draws[0].s,G.NPCS.mayorMaybe.sprite);
+ r.load('orchardRoad');r.drain();draws.length=0;assert.equal(G.drawOpeningDialogue(ctx,{speaker:'MAYOR MAYBE',text:'Good road.',shown:99},(c,t)=>[t]),true);assert.equal(draws[0].s,G.dialoguePortraits.mayorMaybe);
 });

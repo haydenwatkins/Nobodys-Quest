@@ -14,6 +14,6 @@ test('integrated work poses keep tools in the authored body and talk/guidance cl
 });
 test('actual opening dialogue uses Parcel and Pending aliases instead of an unrelated guardian',()=>{
  const r=runtime(),{G}=r;r.load('orchardRoad');r.drain();const drawn=[],ctx=new Proxy({globalAlpha:1,measureText:t=>({width:t.length*5})},{get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)});G.drawSprite=(c,s)=>drawn.push(s);
- for(const hd of [true,false])for(const [speaker,id]of [['PEBBLE','pebble'],['PARCEL','parcel'],['PARCEL, FROM THE OTHER SIDE','parcel'],['COURIER PARCEL · A RUMOR','parcel'],['SER PENDING','pending'],['! Sir Pending · A Stitch in the Road','pending']]){G.hdPilot=hd;drawn.length=0;assert.equal(G.drawOpeningDialogue(ctx,{speaker,text:'The road is open.',shown:99},(c,t)=>[t]),true);assert.equal(drawn[0],G.NPCS[id].sprite);}
+ for(const hd of [true,false])for(const [speaker,id]of [['PEBBLE','pebble'],['PARCEL','parcel'],['PARCEL, FROM THE OTHER SIDE','parcel'],['COURIER PARCEL · A RUMOR','parcel'],['SER PENDING','pending'],['! Sir Pending · A Stitch in the Road','pending']]){G.hdPilot=hd;drawn.length=0;assert.equal(G.drawOpeningDialogue(ctx,{speaker,text:'The road is open.',shown:99},(c,t)=>[t]),true);assert.equal(drawn[0],G.dialoguePortraits[id]);}
  assert.equal(G.roadCompanionSpeaker('PARCELMAN'),null);
 });

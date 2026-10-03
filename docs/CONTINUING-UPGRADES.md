@@ -1,6 +1,6 @@
 # Continuing upgrade plan
 
-October 3 cloud handoff: read [the concise current roadmap](CLOUD-ROADMAP.md) for current authorization and checkpoint. All thirteen named NPC world sprites and six town resident appearances are complete. Dedicated portraits/speaker identity are next. Latest user instruction authorizes continued active-session work until its available limit; weekly usage remains unreadable. The local heartbeat remains paused, and this cloud session cannot edit its settings. Historical budget stops and coverage below are not the current checkpoint.
+October 3 cloud handoff: read [the concise current roadmap](CLOUD-ROADMAP.md) for current authorization and checkpoint. All thirteen named NPC world sprites and six town resident appearances are complete. Current portrait/speaker coverage is also complete. Cobblekin cover, shared readability and ground-item presentation are next. Latest user instruction authorizes continued active-session work until its available limit; weekly usage remains unreadable. The local heartbeat remains paused, and this cloud session cannot edit its settings. Historical budget stops and coverage below are not the current checkpoint.
 
 Updated October 2, 2026. This tracks the classic Nobody's Quest transformation; the separate Last Light brief remains its own completed assignment and review record.
 

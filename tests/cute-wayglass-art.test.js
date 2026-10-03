@@ -4,7 +4,7 @@ test('Errata uses the archivist portrait rather than matching RAT inside her nam
   const r=runtime(),{G}=r;r.load('lanternReach');r.drain();
   const drawn=[],noop=()=>{},c=new Proxy({measureText:t=>({width:t.length*4})},{get:(o,k)=>o[k]||noop,set:(o,k,v)=>(o[k]=v,true)});
   G.drawSprite=(_ctx,sprite)=>drawn.push(sprite);
-  for(const [speaker,sprite]of [['ARCHIVIST ERRATA',G.NPCS.errata.sprite],['RAT',G.forms.rat.sprite],['PATCHLING',G.forms.nobody.sprite]]){
+  for(const [speaker,sprite]of [['ARCHIVIST ERRATA',G.dialoguePortraits.errata],['RAT',G.forms.rat.sprite],['PATCHLING',G.forms.nobody.sprite]]){
     drawn.length=0;assert.equal(G.drawOpeningDialogue(c,{speaker,text:'The road remembers.',shown:99},t=>[t]),true);assert.equal(drawn[0],sprite);
   }
 });

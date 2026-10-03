@@ -173,10 +173,12 @@ G.ui = (() => {
     const boxW = G.W - 14;
 
     c.font = `11px ${FONT_BODY}`;
-    const allLines = wrapText(c, d.text, boxW - 18);
-    const visibleLines = wrapText(c, visible, boxW - 18);
+    const inset = G.drawDialoguePortrait ? 56 : 9;
+    const textWidth = boxW - inset - 9;
+    const allLines = wrapText(c, d.text, textWidth);
+    const visibleLines = wrapText(c, visible, textWidth);
     const lineCount = Math.max(1, allLines.length);
-    const boxH = 27 + lineCount * 11;
+    const boxH = Math.max(G.drawDialoguePortrait ? 55 : 0, 27 + lineCount * 11);
     const boxY = G.H - boxH - 7;
 
     c.fillStyle = "rgba(12,14,25,0.48)";
@@ -193,13 +195,14 @@ G.ui = (() => {
 
     c.font = `6px ${FONT_HEAD}`;
     c.fillStyle = d.accent;
-    c.fillText(d.speaker.toUpperCase(), boxX + 9, boxY + 7);
+    c.fillText(fitText(c, d.speaker.toUpperCase(), textWidth), boxX + inset, boxY + 7);
+    if (G.drawDialoguePortrait) G.drawDialoguePortrait(c, d.speaker, boxX + 8, boxY + 9, 39);
 
     c.font = `11px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
     let y = boxY + 17;
     for (const line of visibleLines) {
-      c.fillText(line, boxX + 9, y);
+      c.fillText(line, boxX + inset, y);
       y += 11;
     }
 

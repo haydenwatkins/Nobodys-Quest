@@ -78,7 +78,7 @@ test('existing speaker resolution draws each authored cloud companion rather tha
   for (const [speaker, id] of speakers) for (const hd of [true, false]) {
     G.hdPilot = hd; draws.length = 0;
     assert.equal(G.drawOpeningDialogue(ctx, { speaker, text: 'Good roads need good neighbours.', shown: 99 }, (c, text) => [text]), true);
-    assert.equal(draws[0], G.NPCS[id].sprite);
+    assert.equal(draws[0], G.dialoguePortraits[id]);
   }
   assert.equal(G.quayCompanionSpeaker('BRINDLEBERRY'), null);
 });
