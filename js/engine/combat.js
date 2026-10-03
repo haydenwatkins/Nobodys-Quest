@@ -233,6 +233,18 @@ G.combat = (() => {
       else G.ui.toast(repeatVictory);
       return;
     }
+    if (enemy.def.id === "ancientTreant" && G.revealGuardianReward) {
+      const reward = G.revealGuardianReward(enemy);
+      if (reward) {
+        const line = enemy.def.boss && enemy.def.boss.defeatLine;
+        G.state.shake = Math.max(G.state.shake, .45);
+        burst(enemy.x, enemy.y - enemy.h() / 2, "#ffcd75", 24);
+        const message = `${line ? `“${line}” ` : ""}${enemy.def.trophyName} is on the ground nearby. Walk over it to collect its gift and +1 ⭐.`;
+        if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, message, {accent: enemy.def.boss?.color || "#ffcd75"});
+        else G.ui.toast(message, 4);
+        return;
+      }
+    }
     G.state.items.push(trophy);
     G.state.stars += 1;
     G.sfx.play("quest");

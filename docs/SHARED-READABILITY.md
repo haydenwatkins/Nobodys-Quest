@@ -12,6 +12,7 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Shared effects and threat/reward contrast | Audit pending |
 | Ordinary heart/mana drops | Complete: recognizable heart/flask art, ground contact, collection feedback, quiet-motion fade |
 | Persistent chest contents | Complete for ten item identities: durable ground reveal, purpose, movement claim and preserved legacy ownership |
+| Ancient Treant gift | Complete: durable Crown/star, collect/return task, preserved victory and legacy credit |
 | Other persistent items and every reward source | Source audit in progress; see `GROUND-REWARDS.md`; do not silently exempt categories |
 
 ## Cobblekin cover complete
@@ -36,4 +37,4 @@ Eight focused pickup, Drain mastery and Cobblekin checks passed. All pickup pose
 
 ## Persistent chest contents complete
 
-All ten current item chests now reveal real ground objects and credit their unique item/bundled heal on collection. The sharp purpose cue clears actors/contents/controls; optional regular cards yield, and the paper lesson card returns after pickup. Contents survive travel, browser reload and gentle knockout and follow relocated caches. See `GROUND-REWARDS.md` for exact coverage, source contract and validation. Boss trophies, regional gifts and currency categories remain unfinished.
+All ten current item chests now reveal real ground objects and credit their unique item/bundled heal on collection. The sharp purpose cue clears actors/contents/controls; optional regular cards yield, and the paper lesson card returns after pickup. Contents survive travel, browser reload and gentle knockout and follow relocated caches. See `GROUND-REWARDS.md` for exact coverage, source contract and validation. The Ancient Treant’s Crown/star subsequently uses the same durable ground contract and switches the task from collection to returning to Parcel. Seventeen focused integration checks, thirteen path/echo/art checks and twelve inspected native final-blow/reload/collection views passed, with repeated cases. Other boss trophies, regional gifts and currency categories remain unfinished.

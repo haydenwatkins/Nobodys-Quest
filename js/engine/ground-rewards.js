@@ -1,7 +1,12 @@
-/* Earned chest contents survive travel separately from temporary combat drops. */
+/* Earned contents survive travel separately from temporary combat drops. */
 "use strict";
 (() => {
-  function definition(item) {
+  function definition(item, source = "chest") {
+    if (source === "guardian") {
+      // First proven guardian source. Other trophy producers remain on the audit queue.
+      const enemy = G.enemies.ancientTreant;
+      return enemy && enemy.trophy === item ? { name: enemy.trophyName, stars: 1, enemy } : null;
+    }
     for (const map of Object.values(G.maps || {}))
       for (const cell of Object.values(map.legend || {}))
         if (cell.chest && cell.chest.item === item) return cell.chest;
@@ -14,11 +19,11 @@
   G.normalizeGroundRewards = saved => {
     const seen = new Set(), owned = (G.state && G.state.items) || [];
     return (Array.isArray(saved) ? saved : []).flatMap(raw => {
-      if (!raw || raw.source !== "chest" || typeof raw.item !== "string" || !definition(raw.item) ||
+      if (!raw || !["chest", "guardian"].includes(raw.source) || typeof raw.item !== "string" || !definition(raw.item, raw.source) ||
           owned.includes(raw.item) || seen.has(raw.item) || !G.maps[raw.mapId] ||
           !Number.isFinite(raw.x) || !Number.isFinite(raw.y)) return [];
       seen.add(raw.item);
-      return [{ source: "chest", item: raw.item, mapId: raw.mapId, x: raw.x, y: raw.y }];
+      return [{ source: raw.source, item: raw.item, mapId: raw.mapId, x: raw.x, y: raw.y }];
     });
   };
   G.groundRewardsHere = () => rewards().filter(reward => reward.mapId === G.state.mapId && !G.state.items.includes(reward.item));
@@ -48,10 +53,18 @@
     G.ui.toast(`${info.name} revealed · ${info.purpose} · Walk over it to collect`, 4);
     return reward;
   };
+  G.revealGuardianReward = enemy => {
+    if (enemy.def.id !== "ancientTreant" || G.state.items.includes(enemy.def.trophy)) return null;
+    const existing = G.groundRewardFor(enemy.def.trophy);
+    if (existing) return existing;
+    const reward = Object.assign({ source: "guardian", item: enemy.def.trophy, mapId: G.state.mapId,
+      revealUntil: (G.state.time || 0) + .45 }, revealPoint(enemy.x, enemy.y));
+    rewards().push(reward); G.saveGame(); return reward;
+  };
   G.restoreGroundRewards = () => {
     G.state.groundRewards = G.normalizeGroundRewards(rewards());
     for (const reward of G.groundRewardsHere()) {
-      const chest = G.state.chests.find(ch => ch.chest.item === reward.item);
+      const chest = reward.source === "chest" && G.state.chests.find(ch => ch.chest.item === reward.item);
       if (chest) {
         chest.opened = true;
         if (!G.state.opened.includes(chest.key)) G.state.opened.push(chest.key);
@@ -63,7 +76,7 @@
   };
   G.groundRewardInfo = reward => {
     const authored = G.treasureInfo && G.treasureInfo[reward.item];
-    return authored || { name: definition(reward.item)?.name || reward.item, purpose: "A treasure for your journey" };
+    return authored || { name: definition(reward.item, reward.source)?.name || reward.item, purpose: "A treasure for your journey" };
   };
   G.updateGroundRewards = () => {
     const s = G.state, p = s.player;
@@ -72,16 +85,22 @@
     s.groundRewards = rewards().filter(reward => !s.items.includes(reward.item));
     for (const reward of G.groundRewardsHere()) {
       if ((s.time || 0) < (reward.revealUntil || 0) || G.util.dist(p.x, p.y, reward.x, reward.y) >= 8) continue;
-      const chest = definition(reward.item);
+      const prize = definition(reward.item, reward.source);
       s.groundRewards = rewards().filter(other => other.item !== reward.item);
       s.items.push(reward.item);
-      if (chest.heal) p.damageTaken = 0;
+      if (prize.heal) p.damageTaken = 0;
+      s.stars += prize.stars || 0;
       const info = G.groundRewardInfo(reward);
-      G.sfx.play("pickup");
-      G.ui.toast(`${info.name} · ${info.purpose}${chest.heal ? " · Hearts restored" : ""}`, 4);
+      G.sfx.play(reward.source === "guardian" ? "quest" : "pickup");
+      G.ui.toast(`${info.name} · ${info.purpose}${prize.heal ? " · Hearts restored" : ""}`, 4);
       G.events.emit("pickup", { item: reward.item });
       G.checkUnlocks();
-      if (G.leaveReadyFormEchoAt) G.leaveReadyFormEchoAt(reward.x, reward.y, "treasure");
+      if (G.leaveReadyFormEchoAt) G.leaveReadyFormEchoAt(reward.x, reward.y, reward.source === "guardian" ? "victory" : "treasure");
+      if (reward.source === "guardian") {
+        const pathUpdate = G.formPathItemUpdate && G.formPathItemUpdate(reward.item);
+        if (pathUpdate && G.ui.dialogue) G.ui.dialogue("✦ FORM PATH UPDATED", pathUpdate.text, { accent: "#d9a7ff" });
+        if (G.checkGuardianCollectionReward) G.checkGuardianCollectionReward(false);
+      }
       G.saveGame();
       // Listeners can change maps or open a modal. Do not claim a second gift there.
       if (s.mapId !== reward.mapId || G.ui.dialogueOpen) break;

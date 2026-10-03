@@ -3,6 +3,7 @@
 (() => {
   const A = G.authoredPixelArt;
   G.treasureInfo = {
+    "trophy-heartwood-crown": { name: "Heartwood Crown", purpose: "+1 star · choose a Keepsake in Build", shape: "crown" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -18,7 +19,15 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, palette, (g, frame) => {
-      if (shape === "crest") {
+      if (shape === "crown") {
+        g.poly([[3, 9], [8, 16], [14, 7], [20, 16], [25, 9], [24, 28], [4, 28]], "k");
+        g.poly([[5, 14], [8, 19], [14, 11], [20, 19], [23, 14], [22, 26], [6, 26]], "b");
+        g.line(7, 24, 21, 24, "a", 2); g.ellipse(14, 21, 2, 2, "d");
+        g.poly([[3, 8], [2, 4], [5, 3], [9, 7], [7, 11]], "g");
+        g.poly([[12, 7], [11, 2], [15, 1], [18, 5], [15, 9]], "g");
+        g.poly([[21, 10], [20, 6], [24, 3], [27, 5], [25, 10]], "g");
+        g.line(3, 5, 6, 8, "f", 2); g.line(13, 3, 15, 6, "f", 2); g.line(24, 5, 23, 8, "f", 2);
+      } else if (shape === "crest") {
         g.poly([[4, 3], [14, 1], [24, 3], [23, 20], [14, 29], [5, 20]], "k");
         g.poly([[6, 5], [14, 3], [22, 5], [21, 19], [14, 26], [7, 19]], "a");
         g.poly([[9, 7], [19, 7], [18, 18], [14, 22], [10, 18]], "e");

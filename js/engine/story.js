@@ -219,6 +219,15 @@ G.storyGoal = function () {
   const marks = (G.state && G.state.worldwake && G.state.worldwake.marks) || [];
   const base = { chapter, act, mapId: "overworld", destination: "Greenfield", complete: false };
 
+  const gift = (G.state.groundRewards || []).find(reward => reward.source === "guardian" && !items.has(reward.item));
+  if (gift) return Object.assign(base, {
+    guide: "item", itemId: gift.item, mapId: gift.mapId, destination: G.maps[gift.mapId].name,
+    title: "A guardian left a gift", short: `Collect the ${G.groundRewardInfo(gift).name}`,
+    objective: "The guardian is defeated. Walk over its gift on the ground to collect it.",
+    reason: "Your victory is safe. Its gift waits for you even if you leave the road.",
+    progress: storyProgress(0, 1, "GUARDIAN GIFT"),
+  });
+
   if (G.storyComplete()) return Object.assign(base, {
     complete: true,
     title: "The map has room to grow",

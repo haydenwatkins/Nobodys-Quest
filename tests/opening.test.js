@@ -47,7 +47,7 @@ const before=G.state.player.damageTaken;G.updateOpening(.1);assert.equal(G.state
 G.cancelBossHazards(boss);assert.equal(G.state.openingHazards.length,0);
 boss.hp=2;r.load('heartwood');boss=G.state.enemies.find(e=>e.id==='ancientTreant');assert.equal(boss.hp,boss.def.hp);
 // Finish through real damage/ward/trophy code, then earn the reward once.
-boss.bossIntroT=0;clear('ancientTreant');G.updateOpening(.05);r.drain();
+boss.bossIntroT=0;clear('ancientTreant');r.drain();require('./helpers/collect-treasure.cjs')(r,'trophy-heartwood-crown');G.updateOpening(.05);r.drain();
 assert.ok(G.state.items.includes('trophy-heartwood-crown'));assert.equal(G.openingGoal().mapId,'orchardRoad');
 r.load();at(22,37);const spirit=G.state.town.spirit;assert.ok(G.tryOpeningInteraction());r.drain();
 assert.ok(G.state.opening.complete);assert.ok(G.state.items.includes('orchard-ribbon'));assert.equal(G.state.town.spirit,spirit+5);

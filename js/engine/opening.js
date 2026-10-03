@@ -36,8 +36,10 @@
   G.openingGoal=()=>{
     if(!G.openingActive())return null;
     const o=progress(),won=G.state.items.includes('trophy-heartwood-crown');
+    const gift=G.groundRewardFor&&G.groundRewardFor('trophy-heartwood-crown');
     let data;
     if(won)data=['A road is a promise','Return to Parcel at the cart',[22,37],6,'The Heartwood is open. Tell Parcel the deliveries can reach Sunrise Town.'];
+    else if(gift)return {chapter:0,act:G.STORY_CHAPTERS[0],title:'The keeper left a gift',short:'Collect the Heartwood Crown',objective:'The Ancient Treant is defeated. Walk over its crown to collect the gift, then bring Parcel the good news.',reason:'Your victory is safe; its gift waits on the ground.',mapId:gift.mapId,destination:G.maps[gift.mapId].name,guide:'opening',point:[gift.x/16-.5,gift.y/16-.5],progress:{value:6,total:7,label:'THE FIRST PROMISE'},complete:false};
     else if(!o.notice)data=['Someone has to answer','Read the notice beside the road',[12,35],0,'Step up to the notice. The stranded cart is just beyond it.'];
     else if(!o.cart)data=['The first person who needed you','Clear the tangles around Parcel’s cart',[20,34],1,'The little root creatures have trapped the courier. Drive them away.'];
     else if(!G.formUnlocked('rat'))data=['A smaller answer',G.formReady('rat')?'Meet the Rat echo':'Practice Slap at the straw post',[20,23],2,'Finish two Patchling lessons. Practice at the straw post if you need more Slap contacts, then meet the echo.'];

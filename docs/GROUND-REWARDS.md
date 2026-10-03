@@ -7,7 +7,8 @@ October 3, 2026. This is a working source audit, not a claim that all rewards ha
 | Source | Existing behavior | Remaining work |
 |---|---|---|
 | Ordinary combat hearts/mana (`entities.js`, `combat.js`) | Real temporary ground drops, native magnet/collection, twelve-second lifetime | Art and result feedback complete; intentionally distinct from durable earned rewards |
-| Miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | Durable trophy bundle, visible purpose, safe pending ownership, collection-triggered credit |
+| Ancient Treant trophy (`combat.js`) | Durable Crown/star bundle; defeated guardian stays absent while its gift is pending | First guardian source complete in Heartwood and Mistwood |
+| Other miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | Eighteen definitions remain queued, including Worldwake mark consumers |
 | Treasure chests (`world.js`) | Open box reveals durable ground contents; walking over them grants the unique item and its native bundled heal | Complete for all ten current chest item identities; new authored items have parcel/purpose fallback |
 | Regional mechanisms and quest gifts | Direct item grants in opening, delivery, prairie, grove, marsh, ridge, mistwood, starfall, glasswater and shattercoast | Inspect each native trigger and purpose before conversion; protect return dialogue and route gates |
 | Worldwake favors, marks and final rewards (`worldwake.js`, `endgame.js`) | Persisted accomplishments and immediate item/star/spirit grants | Separate accomplished task from uncollected gift; no replay of legacy thanks |
@@ -43,6 +44,16 @@ Thirty-six final controlled browser views were inspected: dungeon Crest, Glasswa
 
 Developer atlas: `node tools/render-reward-atlas.cjs /tmp/reward-atlas.png` reviews every ordinary/chest sprite, all poses and both settings at gameplay size and enlarged size. All current poses were inspected.
 
+## First guardian gift complete
+
+The native Treant defeat now leaves a small wooden crown with attached leaves on safe ground. Its Crown and one star are credited together when Patchling walks over it. The stable pending item records the victory: travel/reload does not respawn the same guardian over the unclaimed gift in Heartwood or Mistwood. After claiming, existing rematch behavior remains. Legacy owned Crowns cannot become a second gift or replay a star.
+
+The opening/campaign task switches from fighting to collecting, then to returning to Parcel. Existing kill-based lessons and contract credit remain at defeat; inventory-based form paths, pickup events, Keepsake availability and guardian-collection completion occur at claim. A Keepsake is a choice: pickup does not equip its health/speed tradeoff. The last-trophy test preserves the native Compass/+3-star reward exactly once after the Crown's one star. Ordinary boss heart/mana drops remain separate temporary resources.
+
+The source-consumer trace identified `awardMinibossTrophy`, the synchronous kill/map-return guard in `combat.js`, item prerequisites/form path updates, the guardian collection in `endgame.js`, inventory-defined rematch eligibility in `gauntlet.js`, opening/old-master goals, and the six trophy-to-Mark listeners in `worldwake.js`. Temporary Legend/expedition returns can happen before the trophy producer; preserve that guard. The Treant does not carry a Worldwake Mark. Mark-bearing guardians need an additional restoration/exit audit before conversion.
+
+Seventeen focused pending/chest/opening/delivery/request checks and thirteen guardian/path/echo/art checks passed, with repeated cases. Twelve final browser views were inspected in both settings and touch/TV layouts: actual attack input breaks the ward and defeats a deliberately weakened native Treant; the gift remains uncredited on the ground, survives real save/boot without a respawn, and real movement claims one star before the task changes to returning to Parcel. These are controlled final-blow fixtures, not complete balanced boss fights. No page errors or horizontal overflow appeared. The initial browser fixture indexed the enemy list after native dead-actor cleanup; it was corrected to track the actual defeated actor. Final still views settle existing town announcements before cue inspection.
+
 ## Next bounded implementation
 
-Trace miniboss trophy ownership before converting its producer: defeat must remain recorded while its item/star bundle is uncollected, repeated/reloaded encounters must not duplicate it, and exit/story/Worldwake triggers must remain reachable. Extend the existing pending-content contract only after those native consumers are identified. Regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.
+Continue the other eighteen trophy definitions in stages. Mire Queen is a useful next source because her Pearl feeds Brindle/harbour-beacon requests without a Worldwake Mark. Validate native victory, pending ownership/exit, repeat/save, once-only Pearl/star and the ready-to-return beacon request before broadening. Mark-bearing guardians additionally require saved restoration, gate and later-return coverage. Regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.

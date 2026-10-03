@@ -16,7 +16,7 @@ function open(r, map, item) {
 test('every authored chest item has safe ground contents and grants its native item/heal exactly once on movement', () => {
   const r = runtime(), { G } = r; G.state.opening.complete = true; G.state.delivery.complete = true;
   const pickups = []; G.events.on('pickup', event => pickups.push(event.item));
-  const cases = Object.entries(G.treasureInfo).map(([item]) => [Object.keys(G.maps).find(id =>
+  const cases = [...new Set(Object.values(G.maps).flatMap(map => Object.values(map.legend || {}).map(cell => cell.chest?.item).filter(Boolean)))].map(item => [Object.keys(G.maps).find(id =>
     Object.values(G.maps[id].legend || {}).some(cell => cell.chest?.item === item) &&
     G.maps[id].tiles.some(row => [...row].some(key => G.maps[id].legend[key]?.chest?.item === item))), item]);
   assert.equal(cases.length, 10);

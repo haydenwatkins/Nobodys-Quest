@@ -258,7 +258,9 @@ G.world = (() => {
         if (cell.portal) portalKeepouts.push({ x: cx, y: cy });
         const defeatedRuler = cell.enemy && def.worldBoss && cell.enemy === def.worldBoss.enemy
           && G.worldwakePurified && G.worldwakePurified(mapId);
-        if (cell.enemy && !defeatedRuler) {
+        const pendingTrophy = cell.enemy && G.enemies[cell.enemy]?.trophy && G.groundRewardFor &&
+          G.groundRewardFor(G.enemies[cell.enemy].trophy);
+        if (cell.enemy && !defeatedRuler && pendingTrophy?.source !== "guardian") {
           const enemy = G.makeEnemy(cell.enemy, cx, cy);
           const ruler = def.worldBoss && G.enemies[def.worldBoss.enemy];
           // A failed Worldbearer attempt should ask the player to learn the
