@@ -20,8 +20,10 @@
       if (x >= 0 && x < width && y >= 0 && y < height) cells[y][x] = color;
     };
     const rect = (x, y, w, h, color) => {
-      for (let yy = Math.round(y); yy < Math.round(y + h); yy++)
-        for (let xx = Math.round(x); xx < Math.round(x + w); xx++) put(xx, yy, color);
+      const left = Math.max(0, Math.round(x)), right = Math.min(width, Math.round(x + w));
+      const top = Math.max(0, Math.round(y)), bottom = Math.min(height, Math.round(y + h));
+      if (right <= left) return;
+      for (let yy = top; yy < bottom; yy++) cells[yy].fill(color, left, right);
     };
     const line = (x0, y0, x1, y1, color, weight) => {
       const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
@@ -32,12 +34,19 @@
       }
     };
     const ellipse = (cx, cy, rx, ry, color) => {
-      for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
-        for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++)
-          if (((x - cx) * (x - cx)) / (rx * rx) + ((y - cy) * (y - cy)) / (ry * ry) <= 1) put(x, y, color);
+      const left = Math.max(0, Math.floor(cx - rx)), right = Math.min(width - 1, Math.ceil(cx + rx));
+      const top = Math.max(0, Math.floor(cy - ry)), bottom = Math.min(height - 1, Math.ceil(cy + ry));
+      const rx2 = rx * rx, ry2 = ry * ry;
+      for (let y = top; y <= bottom; y++) {
+        const dy = y - cy, vertical = dy * dy / ry2;
+        for (let x = left; x <= right; x++) {
+          const dx = x - cx;
+          if (dx * dx / rx2 + vertical <= 1) cells[y][x] = color;
+        }
+      }
     };
     const poly = (points, color) => {
-      const minY = Math.floor(Math.min(...points.map((p) => p[1]))), maxY = Math.ceil(Math.max(...points.map((p) => p[1])));
+      const minY = Math.max(0, Math.floor(Math.min(...points.map((p) => p[1])))), maxY = Math.min(height - 1, Math.ceil(Math.max(...points.map((p) => p[1]))));
       for (let y = minY; y <= maxY; y++) {
         const cuts = [];
         for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
@@ -46,7 +55,10 @@
             cuts.push(a[0] + (y - a[1]) * (b[0] - a[0]) / (b[1] - a[1]));
         }
         cuts.sort((a, b) => a - b);
-        for (let i = 0; i + 1 < cuts.length; i += 2) for (let x = Math.ceil(cuts[i]); x <= Math.floor(cuts[i + 1]); x++) put(x, y, color);
+        for (let i = 0; i + 1 < cuts.length; i += 2) {
+          const left = Math.max(0, Math.ceil(cuts[i])), right = Math.min(width - 1, Math.floor(cuts[i + 1]));
+          if (left <= right) cells[y].fill(color, left, right + 1);
+        }
       }
     };
     return { width, height, cells, put, rect, line, ellipse, poly, rows: () => cells.map((row) => row.join("")) };
@@ -111,7 +123,11 @@
             const key = rows[y * 2 + yy] && rows[y * 2 + yy][x * 2 + xx] || ".";
             if (key !== "." && key !== " ") count.set(key, (count.get(key) || 0) + (key === K ? 0.9 : 1));
           }
-          row += count.size ? Array.from(count).sort((a, b) => b[1] - a[1])[0][0] : ".";
+          // A stable winner retains the first-seen colour on equal coverage.
+          // No temporary entry array or sort is needed for four source pixels.
+          let color = ".", coverage = 0;
+          for (const [key, amount] of count) if (amount > coverage) { color = key; coverage = amount; }
+          row += color;
         }
         out.push(row);
       }

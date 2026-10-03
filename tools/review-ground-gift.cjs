@@ -12,7 +12,7 @@ if(!scenario)throw new Error(`Unknown guardian ${guardian}; choose ${Object.keys
 const baseURL=process.argv[3]||'http://127.0.0.1:8000/',output=path.resolve(process.argv[4]||`/tmp/nobodys-quest-${guardian}-gift-scenes`);
 const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES||'node_modules']}));
 (async()=>{
- const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']}),out=output;fs.mkdirSync(out,{recursive:true});
+ const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']}),out=output;fs.mkdirSync(out,{recursive:true});
  try{for(const [mode,viewport]of [['touch',{width:667,height:375}],['controller',{width:1280,height:720}]])for(const hd of [true,false]){
   const ctx=await browser.newContext({viewport,hasTouch:mode==='touch',...(mode==='controller'?{userAgent:'NobodysQuestTV/1.0 Chromium review'}:{})}),page=await ctx.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(()=>{window.reviewClock=1000;window.requestAnimationFrame=cb=>(window.reviewFrame=cb,1);window.cancelAnimationFrame=()=>{};});

@@ -4,6 +4,8 @@ October 3, 2026. Start here for the 2D game. `CONTINUING-UPGRADES.md` retains th
 
 ## Active checkpoint
 
+Authored-art startup is optimized with all 894 generated definitions unchanged. The paired Chromium benchmark improved script startup about 38% and page load about 33%; see `STARTUP-PERFORMANCE.md` for conditions and reproducible tooling. Seventeen focused art/progression/save checks and four native touch/TV gift fixtures passed.
+
 Three early guardians now leave durable, authored Crown/Pearl/Sigil gifts; all ten chest identities and ordinary heart/mana art are complete. Named NPCs, residents and current dialogue portraits are complete. The beacon promise guides collection, return, visible consequence and later revisit. Optional regular cards clear nearby NPCs and Form Echoes. Evidence and fixture limits live in `GROUND-REWARDS.md`, `SHARED-READABILITY.md`, `NPC-ART-PASS.md` and `DIALOGUE-SPEAKERS.md`; do not reread the historical log for routine batches.
 
 Next reward source: audit Sky Sovereign's Plume/Mark, restored paths and exits before conversion. Shared audit also includes fixed/paper combinations, Legend relics and stacked collection/Build feedback. Sixteen guardian definitions plus regional/currency/challenge sources remain unfinished. The browser tool `node tools/review-ground-gift.cjs [guardian] [baseURL] [outputDir]` repeats early-guardian final-blow/reload/claim fixtures; a static server and Playwright/Chromium are required.
