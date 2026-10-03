@@ -1,9 +1,10 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const runtime = require('../tools/lib/classic-runtime.cjs');
-const placements = [['errata', 'mistwood'], ['alias', 'town'], ['provisional', 'sunkenMarsh']];
+const placements = [['errata', 'mistwood'], ['alias', 'town'], ['provisional', 'sunkenMarsh'],
+  ['moss', 'mistwood'], ['lastminute', 'shattercoast'], ['probably', 'starfallRuins']];
 
-test('roadside specialists retain native conversations, placements, and saved talk progress', () => {
+test('specialists and field companions retain native conversations, placements, and saved talk progress', () => {
   const r = runtime(), { G } = r;
   G.state.opening.complete = true;
   G.state.delivery.complete = true;
@@ -36,7 +37,7 @@ test('authored bodies preserve drawing state, mirrored routines, quiet poses, an
     translate(x, y) { markers.push({ x, y }); },
   }, { get: (o, k) => o[k] ?? (() => {}), set: (o, k, v) => (o[k] = v, true) });
   G.drawSprite = (c, sprite, frame, x, y, flip) => draws.push({ sprite, frame, x, y, flip });
-  for (const id of G.workshopCompanionArtIds) {
+  for (const id of [...G.workshopCompanionArtIds, ...G.fieldCompanionArtIds]) {
     const sprite = G.NPCS[id].sprite;
     assert.equal(sprite.integratedEquipment, true);
     for (const hd of [true, false]) {
@@ -64,12 +65,12 @@ test('authored bodies preserve drawing state, mirrored routines, quiet poses, an
   }
 });
 
-test('existing speaker resolution draws each specialist rather than a fallback guardian', () => {
+test('existing speaker resolution draws each specialist and field companion rather than a fallback guardian', () => {
   const r = runtime(), { G } = r;
   r.load('orchardRoad'); r.drain();
   const draws = [], ctx = new Proxy({ measureText: text => ({ width: text.length * 5 }) }, { get: (o, k) => o[k] ?? (() => {}) });
   G.drawSprite = (c, sprite) => draws.push(sprite);
-  for (const id of G.workshopCompanionArtIds) for (const hd of [true, false]) {
+  for (const id of [...G.workshopCompanionArtIds, ...G.fieldCompanionArtIds]) for (const hd of [true, false]) {
     G.hdPilot = hd; draws.length = 0;
     assert.equal(G.drawOpeningDialogue(ctx, { speaker: G.NPCS[id].name.toUpperCase() + ' · A RUMOR', text: 'Good roads need good neighbours.', shown: 99 }, (c, text) => [text]), true);
     assert.equal(draws[0], G.NPCS[id].sprite);

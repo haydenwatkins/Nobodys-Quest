@@ -2,7 +2,7 @@
 
 October 2, 2026. This tracks completed and pending NPC art against the primary-source roster. The final orchard foe batch is complete; regular foes now have 18/18 authored bodies. Review every named character, every resident appearance and every dialogue speaker next. Keep native IDs, placement, routines, interactions and saved progress. Detailed, cute, original bodies and recognizable faces should replace generic shared silhouettes; deliberate equipment belongs in the authored sprite.
 
-## Named world sprites: 7/13 fresh reviews complete
+## Named world sprites: 10/13 fresh reviews complete
 
 | ID | Visible name | Logical footprint | Native placement maps | Status |
 |---|---|---|---|---|
@@ -13,9 +13,9 @@ October 2, 2026. This tracks completed and pending NPC art against the primary-s
 | pending | Sir Pending | 18x22 | dungeon, town, emberRidge, hangingGardens, orchardRoad | Complete |
 | alias | Auntie Alias | 18x22 | overworld, dungeon, town, whispering-grove, hangingGardens, stormspinePeaks | Complete |
 | provisional | Dr. Provisional | 18x22 | overworld, shattercoast, sunkenMarsh, emberRidge, windscarCanyon, rootdeepHollow | Complete |
-| moss | Groundskeeper Moss | 10x10 | overworld, mistwood, sunkenMarsh, whispering-grove, sunstepPrairie, hangingGardens, rootdeepHollow | Pending |
-| lastminute | Captain Lastminute | 10x10 | shattercoast, windscarCanyon, frostbellTundra, stormspinePeaks, titanGrave | Pending |
-| probably | Oracle Probably | 9x10 | starfallRuins, whispering-grove, glasswaterDesert, stormspinePeaks, titanGrave | Pending |
+| moss | Groundskeeper Moss | 18x22 | overworld, mistwood, sunkenMarsh, whispering-grove, sunstepPrairie, hangingGardens, rootdeepHollow | Complete |
+| lastminute | Captain Lastminute | 18x22 | shattercoast, windscarCanyon, frostbellTundra, stormspinePeaks, titanGrave | Complete |
+| probably | Oracle Probably | 18x22 | starfallRuins, whispering-grove, glasswaterDesert, stormspinePeaks, titanGrave | Complete |
 | quayBaker | Baker Brindle | 21x24 | sunriseQuay | Pending |
 | quayMara | Mara | 21x24 | sunriseQuay | Pending |
 | quayPip | Pip | 21x24 | sunriseQuay | Pending |
@@ -65,3 +65,9 @@ Native NPC definitions, chapter lines, talk keys, placements and interaction rul
 Ten focused checks passed across specialist/native conversations, save round trips, render-state preservation, mirrored routines, reduced motion, head markers, opening speaker resolution, previous road/civic art and incidental speech. Current art sheets were inspected at native/enlarged sizes for all four poses, both facings and both settings. Twelve final controlled Chromium 667x375 touch scenes cover native Mistwood/Town/Marsh placements and actual conversations in both settings; all reported no script errors or horizontal overflow. Initial entry banners obscured the world captures; the final review advances past those banners. Fixtures use fresh contexts and disable saving; they are not ordinary balance playthroughs or physical-device tests. Existing peripheral actors under optional cards remain in the shared readability queue.
 
 `node tools/render-npc-atlas.cjs OUTPUT_DIRECTORY [NPC_ID ...]` now provides a reusable review sheet using the shipped script order. Coverage is 7/13 named world sprites. No full regression pass is claimed for this batch.
+
+## Field companions complete (October 3, cloud)
+
+Moss wears a straw hat and practical apron with a held watering can; Lastminute wears a captain’s cap and brass-button coat with a folded map and telescope; Probably has a pale side braid, purple cape with an attached crescent clasp, and a held forecast chart. All have four authored 18x22 poses in both facings and pixel settings. Native dialogue, map placement, routine state, talk keys and saved conversations are preserved.
+
+Ten focused checks passed, including native conversations/save round trips for all six new cloud companions, mirrored/quiet routine drawing, clear head markers, previous road/civic art and incidental speech. All pose sheets and twelve controlled touch-landscape world/talk captures were inspected. Native Mistwood/Shattercoast/Starfall scenes reported no script errors or horizontal overflow. Standard dialogue remains text-only; peripheral actors behind optional cards remain queued for shared readability. No full-suite or physical-device pass is claimed. Named world coverage is 10/13; next are Brindle, Mara and Pip.

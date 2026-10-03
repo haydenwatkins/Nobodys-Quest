@@ -6,9 +6,9 @@ October 3, 2026. Start here for the 2D game. `CONTINUING-UPGRADES.md` retains th
 
 The cloud conversation has read the recent handoff from the local conversation **2D Nobody's Quest**. Continue the existing 2D game, its original cast, earned progress, controller/touch mappings, and approachable content authoring. The separate `3d/` game is outside this roadmap.
 
-The cloud handoff baseline is `c9caad0`. Current recorded art coverage: 24/24 forms, 19/19 boss definitions, 40/40 maps, 12/12 wildlife species, 18/18 regular foes, and 7/13 named NPC world sprites after the specialist batch below. Remaining NPCs, residents, portraits, shared readability, and item presentation are unfinished.
+The cloud handoff baseline is `c9caad0`. Current recorded art coverage: 24/24 forms, 19/19 boss definitions, 40/40 maps, 12/12 wildlife species, 18/18 regular foes, and 10/13 named NPC world sprites after the specialist batch below. Remaining NPCs, residents, portraits, shared readability, and item presentation are unfinished.
 
-The user renewed autonomous development authorization on October 3 with a cap of **70% total weekly usage consumed (30% remaining)** and asked the agent to solve automation. The prior local heartbeat was paused after 71%. Do not treat renewal as evidence of a weekly reset or a current usage reading. No reset credits, purchases or model changes to bypass limits are authorized. The cloud tool set exposes no automation editor or native account-usage reader. CLI diagnostics are recorded below; writing this file does not schedule work.
+The user renewed autonomous development authorization on October 3 with a cap of **70% total weekly usage consumed (30% remaining)** and asked the agent to solve automation. After the metering/scheduler diagnosis, the user explicitly instructed: "okay then just keep working until you hit your limit." Continue active-session development under that latest instruction; the weekly percentage remains unverified. The prior local heartbeat was paused after 71%. Do not treat renewal as evidence of a weekly reset or a current usage reading. No reset credits, purchases or model changes to bypass limits are authorized. The cloud tool set exposes no automation editor or native account-usage reader. CLI diagnostics are recorded below; writing this file does not schedule work.
 
 The user wants the agent to drive development and cannot playtest every upgrade. Routine implementation choices and desktop validation should not require their input. Occasional device/family feedback improves direction; it is not a gate for every batch.
 
@@ -40,8 +40,8 @@ PixiJS is a possible later renderer upgrade for a proven need for GPU batching, 
 
 ## Ordered implementation queue
 
-1. Next bounded NPC art batch: Groundskeeper Moss, Captain Lastminute, Oracle Probably. Review world sprites, actual conversations, routines, all poses/facings, and both pixel settings. Errata/Alias/Provisional are complete; do not redo them.
-2. Complete the three quay people, six resident appearances, and full portrait/speaker coverage. Keep the NPC ledger current; do not repeat finished bodies.
+1. Complete the remaining quay people: Brindle, Mara and Pip. Review world sprites, actual conversations and requests, routines, all poses/facings, and both pixel settings. All ten original base people are complete; do not redo them.
+2. Complete six resident appearances and full portrait/speaker coverage. Keep the NPC ledger current; do not repeat finished bodies.
 3. Complete shared readability, Cobblekin cover whose appearance matches collision, and the ground-item/reward-source audit. Dropped items must be recognizable on the ground, persist safely, and explain their use without requiring dialogue. Do not silently exempt reward categories.
 4. Build one complete NPC promise through the existing request/guidance foundation, with a shared current-task presentation. Use an existing region and existing accomplishments; demonstrate accept/help/return/consequence/revisit before broadening coverage.
 5. Apply that pattern to Worldwake: danger-aware requests, immediate victory reactions, later-return dialogue, visible recovery, and authored reasons to revisit. Inventory existing regional activities first.
@@ -63,7 +63,7 @@ Automate representative touch, controller-state, dialogue, pause/resume, resize,
 
 After each batch, update this checkpoint and the relevant ledger with the result, evidence, remaining issue, and exact next task. Report compactly when a milestone ships, a regression appears, or an outside action is needed. Continue automatically while the configured usage budget allows it.
 
-Authorized ongoing policy: stop at 70% total-weekly consumption, complete an already-started bounded batch safely at the threshold, then pause. Check live usage before a substantive batch and after shipping. If live usage cannot be read, do not claim to enforce the percentage cap or launch unattended runs; preserve a bounded completed checkpoint and resolve metering before extending the loop. Never use future reset credits or switch models to bypass a limit.
+Authorized ongoing policy: stop at 70% total-weekly consumption, complete an already-started bounded batch safely at the threshold, then pause. Check live usage before a substantive batch and after shipping. If live usage cannot be read, do not claim to enforce the percentage cap or launch unattended runs; preserve a bounded completed checkpoint and resolve metering before launching an unattended loop. The subsequent user instruction authorizes continuing the active session until its available limit; do not claim to measure a weekly threshold. Never use future reset credits or switch models to bypass a limit.
 
 A cloud filesystem and saved startup instructions do not create an always-running worker. A scheduler must invoke the task against this environment. The previous local heartbeat does not automatically move to the cloud. If scheduled-run configuration is unavailable, state that once and supply the resumable run brief; do not imply that this chat will work after its turn ends.
 
@@ -77,7 +77,7 @@ The cloud environment has Node, Chromium, Playwright, and canvas tooling; no gam
 
 This design review loaded the actual 2D opening at 667x375 with touch, 1024x768 with touch, and 1280x720 without touch. All three reported no script errors or horizontal overflow. Screenshots were inspected. These are desktop Chromium layout checks, not physical-device playtests or a complete opening walkthrough.
 
-The first cloud game batch completed Errata/Alias/Provisional world sprites and a reusable NPC atlas renderer. Ten focused checks and twelve final controlled touch-landscape views passed; all poses/facings/settings were inspected. See `NPC-ART-PASS.md`. No quest feature, engine migration, dedicated portrait system or scheduled automation is implemented by this checkpoint. Next substantive game batch is Moss/Lastminute/Probably.
+The first cloud game batch completed Errata/Alias/Provisional world sprites and a reusable NPC atlas renderer. Ten focused checks and twelve final controlled touch-landscape views passed; all poses/facings/settings were inspected. See `NPC-ART-PASS.md`. No quest feature, engine migration, dedicated portrait system or scheduled automation is implemented by this checkpoint. The subsequent field batch completed Moss/Lastminute/Probably with ten focused checks, twelve inspected native world/talk captures and all pose sheets. Next substantive game batch is Brindle/Mara/Pip.
 
 ## Automation and metering diagnosis (October 3)
 
@@ -87,4 +87,4 @@ The default CLI app-server initially failed because its runtime state is read-on
 
 The completed probe is `/workspace/cloud-setup/Nobodys-Quest/read-usage.py`; it returns window percentages/status only. It does not launch a model, consume reset credits, submit cloud jobs, edit the user's desktop automation, or schedule a loop. Retry after a supported authentication or native-tool change. Do not request raw account tokens or embed credentials in scripts. A shell timer without authenticated metering would not enforce the authorized budget and has not been launched.
 
-Current outside prerequisite: a supported scheduler plus authenticated account-usage access bound to this cloud task. Continue from the saved next batch once that capability is available; do not confuse a running HTTP server, saved configuration, or a prompt file with an active autonomous build loop.
+Current outside prerequisite: a supported scheduler plus authenticated account-usage access bound to this cloud task. An unattended loop requires that capability. Active-session work continues under the user's latest instruction; do not confuse a running HTTP server, saved configuration, or a prompt file with an active autonomous build loop.
