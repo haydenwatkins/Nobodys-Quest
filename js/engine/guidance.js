@@ -396,6 +396,33 @@
 
   G.worldMarkPracticeTarget = worldMarkPracticeTarget;
 
+  G.currentTask = function () {
+    const formEcho = G.guidedFormEcho?.();
+    const echo = formEcho || G.guidedLegendEcho?.();
+    if (echo) {
+      const form = G.forms[echo.formId], legend = !formEcho;
+      const place = G.maps[echo.mapId].name;
+      const short = legend ? `Visit ${form.name}'s Legend Echo` : `Meet ${form.name}'s Form Echo`;
+      return {kind:legend?"legend":"echo",mapId:echo.mapId,destination:place,short,title:short,
+        objective:legend?`Become ${form.name} and visit its Legend Echo in ${place}.`:`Approach ${form.name}'s Form Echo in ${place}.`,
+        label:legend?"A LEGEND IS WAITING":"A NEW FORM IS WAITING",color:legend?G.LEGEND_DEFS[echo.formId].color:G.GUIDANCE_COLORS.form,icon:form.icon,
+        complete:false,progress:{value:0,total:1,label:legend?"LEGEND ECHO":"FORM ECHO"}};
+    }
+    const request = G.sunriseRequestTask?.();
+    if (request) return request;
+    const mark = G.followedWorldMarkPractice?.();
+    if (mark) {
+      const region = Object.values(G.WORLDWAKE_MARKS).find(entry=>entry.id===mark.id).region;
+      return {kind:"mark",mapId:region,destination:G.maps[region].name,short:`Trace ${mark.name} home`,
+        title:`Trace ${mark.name} home`,objective:worldMarkPracticeTarget(mark).text,
+        label:"CARAVAN FIELD NOTES",color:G.GUIDANCE_COLORS.form,icon:mark.icon,complete:false,
+        progress:{value:Math.min(3,G.ensureWorldwake().markPractices.length),total:3,label:"CARAVAN FIELD NOTES"}};
+    }
+    const goal = G.storyGoal();
+    return {...goal,kind:"story",color:goal.act.color,icon:goal.act.icon,
+      label:goal.complete?"MAIN STORY · COMPLETE":`ACT ${goal.chapter + 1} · MAIN STORY`};
+  };
+
   G.guidanceTarget = function () {
     const s = G.state;
     if (!s || !s.player) return null;

@@ -123,4 +123,4 @@ Seven focused Worldheart/return-road/whole-road/progression cases passed. Four c
 
 ## Next bounded implementation
 
-Align the selected NPC promise with the current-task headline and journey menu, reusing existing request/campaign state. Ten guardian definitions, regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.
+Let children explicitly accept or defer NPC promises during conversation; the shared current-task headline is complete. Ten guardian definitions, regional gifts, town/request/currency rewards, challenge return rewards and existing relic/echo systems remain explicitly unconverted/audit-pending.

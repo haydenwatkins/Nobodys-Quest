@@ -270,13 +270,21 @@
       c.fillStyle='#40574a';c.fillRect(107,21,131,3);c.fillStyle='#bdc77d';c.fillRect(107,21,131*Math.max(0,boss.hp/boss.def.hp),3);
       if(boss.ward&&boss.ward.hp>0)text(c,boss.id==='ancientTreant'?'BARK WARD · BLUNT':'WARD · '+boss.ward.types.join(' / ').toUpperCase(),107,29,'#f0cf89',8);
     }else if(!G.ui.dialogueOpen){
-      const goal=G.openingGoal();
-      text(c,goal?goal.progress.label:s.mapDef.deliveryLandscape?'SUNRISE, TOGETHER':'THE FIRST PROMISE',102,8,'#f4e5bc',7);
+      const opening=G.openingGoal(),goal=opening||(s.delivery?.complete&&G.currentTask?G.currentTask():null);
       if(goal){
         c.font="9px 'VT323', monospace";
-        const w=Math.min(202,c.measureText(goal.short).width+10);panel(c,100,18,w,14);
-        text(c,goal.short,105,20,'#f3e4bd',9);
-      }else text(c,s.mapDef.deliveryLandscape?'A place to return to':'The road is open',102,20,'#d2dda8',9);
+        const w=Math.min(!opening&&G.input.isTouch?148:202,c.measureText(goal.short).width+10);
+        if(opening||!G.ui.fieldPanelBlocked?.(cam,100,6,w,26)){
+          text(c,goal.label||goal.progress.label,102,8,'#f4e5bc',7);
+          panel(c,100,18,w,14);c.font="9px 'VT323', monospace";
+          let short=goal.short;while(!opening&&short.length&&c.measureText(short).width>w-10)short=short.slice(0,-1);
+          if(short!==goal.short)short=short.slice(0,-1)+'…';
+          text(c,short,105,20,'#f3e4bd',9);
+        }
+      }else{
+        text(c,s.mapDef.deliveryLandscape?'SUNRISE, TOGETHER':'THE FIRST PROMISE',102,8,'#f4e5bc',7);
+        text(c,s.mapDef.deliveryLandscape?'A place to return to':'The road is open',102,20,'#d2dda8',9);
+      }
     }
     if(!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
       const lesson=G.fieldMasteryReward();

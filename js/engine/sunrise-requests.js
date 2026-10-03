@@ -38,11 +38,28 @@
     G.saveGame();return true;
   };
   G.followedSunriseRequest=()=>G.sunriseRequests().find(r=>r.followed&&!r.done)||null;
-  G.sunriseRequestTarget=()=>{
+  // A view of the existing promise, not another quest or saved progress counter.
+  G.sunriseRequestTask=()=>{
     const selected=G.followedSunriseRequest();
     if(!selected||G.state.expeditionRun)return null;
     const r=requests.find(r=>r.id===selected.id);
-    let mapId="sunriseQuay",x=r.x,y=r.y,text=`Visit ${r.name} on the quay. You have good news.`;
+    const places={beacon:["sunkenMarsh",22,20],recipes:["lanternReach",18,30],dragon:["sunriseQuay",35,20],welcome:["sunriseQuay",30,13]};
+    const steps={beacon:"Find the Mire Queen's pearl",recipes:"Find Brindle's recipes",dragon:"Win a Manyfold crossing",welcome:"Build the Welcome Lodge"};
+    const reasons={beacon:"Help the late boat find the harbour.",recipes:"Help Brindle bake her family's cinnamon knots again.",dragon:"Bring Pip and Thimble a real adventure story.",welcome:"Make a warm place for Mara's sister and her friends."};
+    const gift=!selected.ready&&r.id==="beacon"&&G.groundRewardFor?.("trophy-mire-pearl");
+    const [mapId,tileX,tileY]=selected.ready?["sunriseQuay",r.x,r.y]:gift?[gift.mapId,Math.floor(gift.x/G.TILE),Math.floor(gift.y/G.TILE)]:places[r.id];
+    return {kind:"request",requestId:r.id,name:r.name,ready:selected.ready,title:r.title,
+      short:selected.ready?`Return to ${r.name}`:gift?"Collect the Mire Queen's pearl":steps[r.id],
+      objective:selected.ready?`Return to ${r.name} on Sunrise Quay and share the good news.`:gift?"The Mire Queen is defeated. Collect her pearl from the ground, then return to Pebble on Sunrise Quay.":r.task,
+      reason:reasons[r.id],reward:`${r.reward} town spirit`,mapId,tileX,tileY,
+      destination:G.maps[mapId].name,color:G.GUIDANCE_COLORS.home,icon:"☀",complete:false,
+      label:`A PROMISE TO ${r.name.toUpperCase()}`,progress:{value:selected.ready?1:0,total:2,label:selected.ready?"GOOD NEWS · RETURN TO THE QUAY":"HELP, THEN RETURN"}};
+  };
+  G.sunriseRequestTarget=()=>{
+    const selected=G.sunriseRequestTask();
+    if(!selected)return null;
+    const r=requests.find(r=>r.id===selected.requestId);
+    let mapId=selected.mapId,x=selected.tileX,y=selected.tileY,text=selected.objective;
     if(!selected.ready){
       if(r.id==="beacon"){
         mapId="sunkenMarsh";

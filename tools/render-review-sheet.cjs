@@ -6,7 +6,7 @@ const { createCanvas, loadImage } = require(require.resolve('@napi-rs/canvas', {
   paths: [process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES || 'node_modules'],
 }));
 const input = path.resolve(process.argv[2] || '.'), output = path.resolve(process.argv[3] || input);
-const stages = ['ground','restored','collected','lift-up','lift-down','road-home','road-back','crossing-upper','crossing-lower','crossing-western','crossing-eastern'];
+const stages = ['ground','work','journal','atlas','restored','collect','collected','return','return-journal','kept','lift-up','lift-down','road-home','road-back','crossing-upper','crossing-lower','crossing-western','crossing-eastern'];
 (async () => {
   fs.mkdirSync(output, { recursive:true });
   for (const mode of ['touch','controller']) {

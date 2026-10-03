@@ -670,19 +670,19 @@ G.ui = (() => {
 
   function drawStoryTracker(c, cam) {
     if (!G.storyGoal || G.state.bossCutscene || G.ui.dialogueOpen) return;
-    if (G.guidanceShowStoryCard && !G.guidanceShowStoryCard()) return;
-    const goal = G.storyGoal();
+    const goal = G.currentTask();
+    if (goal.kind === "story" && G.guidanceShowStoryCard && !G.guidanceShowStoryCard()) return;
     const boxW = 190;
     const x = 5;
     const y = 38;
     if (fieldPanelBlocked(cam, x, y, boxW, 18)) return;
     c.fillStyle = "rgba(26,28,44,0.82)";
     c.fillRect(x, y, boxW, 18);
-    c.fillStyle = goal.act.color;
+    c.fillStyle = goal.color;
     c.fillRect(x, y, 2, 18);
     c.font = `4px ${FONT_HEAD}`;
-    c.fillStyle = goal.complete ? "#a7f070" : goal.act.color;
-    c.fillText(goal.complete ? "MAIN STORY · COMPLETE" : `ACT ${goal.chapter + 1} · MAIN STORY`, x + 5, y + 3);
+    c.fillStyle = goal.complete ? "#a7f070" : goal.color;
+    c.fillText(goal.label, x + 5, y + 3);
     c.font = `7px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
     c.fillText(fitText(c, goal.short, boxW - 10), x + 5, y + 9);
@@ -1519,7 +1519,8 @@ G.ui = (() => {
   function buildFieldTab() {
     const form = G.playerForm();
     const loadout = G.getLoadout(form.id);
-    const goal = G.storyGoal();
+    const goal = G.currentTask();
+    const campaign = goal.kind === "story" ? goal : G.storyGoal();
     const lesson = G.fieldMasteryQuest && G.fieldMasteryQuest();
     const mapName = G.state.mapDef && G.state.mapDef.name || G.state.mapId || "Unknown road";
     const artButtons = [1, 2].filter((slot) => slot <= form.slots).map((slot) => {
@@ -1547,17 +1548,16 @@ G.ui = (() => {
     const starfall=G.state.mapId==="starfallRuins"?G.starfallSurvey?.():null;
     const ridge=G.state.mapId==="emberRidge"?G.ridgeSurvey?.():null;
     const marsh=G.state.mapId==="sunkenMarsh"?G.marshSurvey?.():null;
-    const followedRequest=G.followedSunriseRequest?.();
-    const markPractice=G.followedWorldMarkPractice?.();
-    const practiceTarget=markPractice&&G.worldMarkPracticeTarget(markPractice);
-    const deliveryHandoff = G.state.delivery?.complete && goal.chapter <= 1 && !goal.complete && !G.state.expeditionRun;
+    const deliveryHandoff = G.state.delivery?.complete && campaign.chapter <= 1 && !campaign.complete && !G.state.expeditionRun;
     return `<section class="field-dashboard journey-home">
-      ${deliveryHandoff ? `<article class="journey-road"><strong>☀ The Long Way Home · Complete</strong><p>Your parcels reached Sunrise. Keep building your town, try a Manyfold crossing, or follow the next adventure below. Parcel’s cart connects the quay to Orchard Road and Greenfield.</p><button data-menu-route="town">Small promises · visit your neighbours</button></article>` : ""}
-      ${followedRequest?`<article class="journey-road"><span class="eyebrow">A PROMISE TO ${escapeHtml(followedRequest.name.toUpperCase())}</span><h3>${escapeHtml(followedRequest.title)}</h3><p>${escapeHtml(followedRequest.ready?`Return to ${followedRequest.name} on the quay.`:followedRequest.task)}</p><button data-follow-request="${followedRequest.id}">Show the way</button><button data-stop-request>Set aside</button></article>`:""}
-      ${markPractice?`<article class="journey-road"><span class="eyebrow">CARAVAN FIELD NOTES · ${Math.min(3,G.ensureWorldwake().markPractices.length)}/3</span><h3>${markPractice.icon} Trace ${escapeHtml(markPractice.name)} home</h3><p>${escapeHtml(practiceTarget?.text||"Follow this Mark's old road.")}</p><button data-act="mark-practice-trail">Trace this road</button><button data-mark-practice="">Set aside</button></article>`:""}
-      <article class="journey-hero"><span class="eyebrow">${escapeHtml(progress.label)}</span><h2>${escapeHtml(goal.short)}</h2>
-        <p>${escapeHtml(goal.objective)}</p><div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
-        <div class="journey-hero-actions"><button data-act="follow-trail">◆ Follow the main story</button><button data-menu-route="story">Story so far</button></div></article>
+      <article class="journey-hero"><span class="eyebrow">${escapeHtml(goal.kind === "story" ? progress.label : goal.label)}</span><h2>${escapeHtml(goal.short)}</h2>
+        ${goal.kind === "request" ? `<h3>${escapeHtml(goal.title)}</h3>` : ""}<p>${escapeHtml(goal.objective)}</p>
+        ${goal.reason && goal.kind !== "story" ? `<p>${escapeHtml(goal.reason)}${goal.reward ? ` Thanks: ${escapeHtml(goal.reward)}.` : ""}</p>` : ""}
+        <div class="story-progress"><span style="width:${Math.min(100,100*progress.value/Math.max(1,progress.total))}%"></span></div>
+        ${goal.kind !== "story" ? `<small>${escapeHtml(progress.label)}</small>` : ""}
+        <div class="journey-hero-actions">${goal.kind === "request" ? `<button data-follow-request="${goal.requestId}">Show the way</button><button data-stop-request>Set aside</button>` : goal.kind === "mark" ? `<button data-act="mark-practice-trail">Trace this road</button><button data-mark-practice="">Set aside</button>` : `<button data-act="current-trail">Show the way</button>`}
+          ${goal.kind !== "story" ? `<button data-act="follow-trail">Follow the main story</button>` : ""}<button data-menu-route="story">Story so far</button></div></article>
+      ${deliveryHandoff ? `<article class="journey-road"><strong>☀ The Long Way Home · Complete</strong><p>Your parcels reached Sunrise. Keep building your town, try a Manyfold crossing, or follow the next adventure above. Parcel’s cart connects the quay to Orchard Road and Greenfield.</p><button data-menu-route="town">Small promises · visit your neighbours</button></article>` : ""}
       ${glasswater?`<article class="journey-road"><span class="eyebrow">THE TRUE MERIDIAN</span><h3>${glasswater.aligned?"A road beneath the reflection":"The blind sundial"}</h3><p>${glasswater.aligned?`The central shelf has opened into a straight southern road. ${G.hasWorldMark("light")?"Your Lantern Mark opens Titan Grave's southern gate.":"The Lantern Mark is still required at Titan Grave's gate."}`:glasswater.prism?"Bring the Glasswater Prism to the sundial north of the crossroads to reveal the middle road.":"Search the eastern shelf for the Glasswater Prism. The sundial north of the crossroads has a socket waiting for it."}</p><p>${glasswater.aligned?"Rest at the southwest caravan fire.":"The eastern loop reaches the southern gate even before the shortcut opens. Rest at the southwest caravan fire."}</p></article>`:""}
       ${shattercoast?`<article class="journey-road"><span class="eyebrow">THE TIDEGLASS CHRONICLE</span><h3>${shattercoast.complete?"Four answers, one shore":"What the guardians left behind"}</h3><p>${shattercoast.gathered}/4 coastal keepsakes gathered. ${shattercoast.complete?"The tideglass cairn north of the coliseum remembers their lessons.":`Visit the four trial roads and bring their keepsakes to the tideglass cairn just northeast of the coliseum. ${shattercoast.missing.length?`Still waiting: ${escapeHtml(shattercoast.missing.join(", "))}.`:"All four are ready."}`}</p><p>The north road continues to Frostbell. The four approach plaques name each guardian's ward and safe answer.</p></article>`:""}
       ${G.state.mapId==="frostbellTundra"?`<article class="journey-road"><span class="eyebrow">THE FROZEN BELFRY</span><h3>${G.hasWorldMark("echo")?"Bongle's note holds the ice":"Listen for the second note"}</h3><p>${G.hasWorldMark("echo")?"Resonant ice now joins the north shore of both southern lakes to the lower causeway. Follow the golden chimes for a quicker route between the caravan side, the eastern road, and the Frostbell Chime.":"The southern arrival road meets the east road to Stormspine. Bell arches mark broad lake crossings; the southern causeway leads to a Frostbell Chime."} Rest at the western caravan fire.</p>${G.hasWorldMark("echo")?"":`<p>Bongle waits northeast. Light attacks break his ward. Step off each set of bright strips and watch for a second note crossing the first. His pause after the echo is your opening.</p>`}${G.hasWorldMark("echo")?`<p>Bongle's Clapper returns an extra mana when a chain connects three foes, but paid area arts cost 1 more. His Clear Echo Mark helps the chain reach its next voice.</p><button data-formlab-view="keepsakes" data-keepsake-inspect="clapper">Weigh Bongle's gift</button>`:""}</article>`:""}
@@ -1678,6 +1678,8 @@ G.ui = (() => {
     menuEl.querySelectorAll("[data-prep-art]").forEach(button=>button.addEventListener("click",()=>{
       if(G.equipBossPreparation(button.dataset.prepArt,Number(button.dataset.prepSlot))){btnCache="";buildMenu();}
     }));
+    const currentTrail=menuEl.querySelector('[data-act="current-trail"]');
+    if(currentTrail)currentTrail.addEventListener("click",()=>{closeMenu();G.requestGuidance(false);});
     const followTrail=menuEl.querySelector('[data-act="follow-trail"]');
     const markTrail=menuEl.querySelector('[data-act="mark-practice-trail"]');
     if(markTrail)markTrail.addEventListener("click",()=>{closeMenu();G.requestGuidance(false);});
@@ -2602,7 +2604,7 @@ G.ui = (() => {
     const current = atlasCurrentRegion();
     const selected = atlasSelectedRegion();
     const roadStop = G.journeyStop && G.journeyStop(selected.id);
-    const mainGoal = G.storyGoal ? G.storyGoal() : null;
+    const mainGoal = G.currentTask ? G.currentTask() : null;
     const canTravel = G.canWayfinderTravel();
     const legendEcho = G.legendEchoFor && G.legendEchoFor(G.state.formId);
     const legendRegion = legendEcho ? atlasRegionForMap(legendEcho.mapId) : null;
@@ -2809,7 +2811,7 @@ G.ui = (() => {
 
   function buildWayfinderTab() {
     const canTravel = G.canWayfinderTravel();
-    const goal = G.storyGoal();
+    const goal = G.currentTask();
     return `<div class="atlas-header">
       <div><h2>🧭 Wayfinder Atlas</h2><div class="tagline">See where you are, follow the roads, and travel between awakened posts.</div></div>
       <div class="atlas-view-tabs">
@@ -2817,7 +2819,7 @@ G.ui = (() => {
         <button data-atlas-view="local" class="${atlasView === "local" ? "active" : ""}">LOCAL</button>
       </div>
     </div>
-    <div class="atlas-story-callout"><span>${goal.act.icon}</span><div><strong>ACT ${goal.chapter + 1} · ${escapeHtml(goal.short)}</strong><small>${escapeHtml(goal.destination)} is marked as the main path.</small></div></div>
+    <div class="atlas-story-callout"><span>${goal.icon}</span><div><strong>${escapeHtml(goal.label)} · ${escapeHtml(goal.short)}</strong><small>Your current task leads to ${escapeHtml(goal.destination)}.</small></div></div>
     ${atlasView === "world" ? buildWorldAtlas() : buildLocalAtlas()}
     <div class="atlas-travel-rule ${canTravel ? "ready" : ""}">🧭 ${escapeHtml(G.wayfinderTravelReason())}</div>
     ${buildJourneyNotes()}`;
