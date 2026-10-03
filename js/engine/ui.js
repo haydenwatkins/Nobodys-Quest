@@ -402,13 +402,24 @@ G.ui = (() => {
   function fieldPanelBlocked(cam, x, y, w, h) {
     if (coversTraveller(cam, x, y, w, h) || statusOverlaps(x, y, w, h)) return true;
     const p = G.state.player;
-    return (G.state.enemies || []).some(e => {
+    const foeBlocked = (G.state.enemies || []).some(e => {
       if (e.dead || Math.hypot(e.x - p.x, e.y - p.y) > 112) return false;
       const metrics = e.def.sprite && G.spriteMetrics ? G.spriteMetrics(e.def.sprite) : { w: e.def.size || 16, h: e.def.size || 16 };
       const scale = e.def.boss?.spriteScale || 1;
       const px = e.x + (e.hitKickX || 0) - cam.x, py = e.y + (e.hitKickY || 0) - cam.y;
       const half = metrics.w * scale / 2 + 3, height = metrics.h * scale + 10;
       return x < px + half && x + w > px - half && y < py + 4 && y + h > py - height;
+    });
+    if (foeBlocked) return true;
+    return (G.state.npcs || []).some(npc => {
+      if (Math.hypot(npc.x - p.x, npc.y - p.y) > 112) return false;
+      const sprite = npc.def && npc.def.sprite;
+      if (!sprite) return false;
+      const metrics = G.spriteMetrics ? G.spriteMetrics(sprite) : { w: 14, h: 18 };
+      const px = npc.x - cam.x, py = npc.y - cam.y;
+      const half = Math.max(metrics.w / 2 + 3, npc.ambientOnly ? 0 : 14);
+      const headroom = npc.guidancePoint ? 30 : npc.ambientOnly ? 0 : 10;
+      return x < px + half && x + w > px - half && y < py + 4 && y + h > py - metrics.h - headroom - 3;
     });
   }
 
