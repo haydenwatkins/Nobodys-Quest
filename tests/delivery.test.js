@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
-const r=runtime(),{G}=r;
+const r=runtime(),{G}=r,collect=require('./helpers/collect-treasure.cjs');
 function at(x,y){Object.assign(G.state.player,{x:x*16+8,y:y*16+8});}
 function talk(){assert.ok(G.tryOpeningInteraction());r.drain();}
 function reachable(tx,ty){
@@ -43,7 +43,7 @@ G.state.player.x=h.x;G.state.player.y=h.y;G.updateOpening(1.6);assert.equal(G.st
 G.cancelBossHazards(boss);assert.equal(G.state.openingHazards.length,0);
 boss.openingTimer=0;G.updateOrchardBoss(boss,G.state.player,.1);assert.equal(G.state.openingHazards[0].kind,'tollSweep');
 boss.hp=1;reload();boss=G.state.enemies.find(e=>e.id==='tollkeeper');assert.equal(boss.hp,40);assert.equal(G.state.openingHazards.length,0);
-const stars=G.state.stars;kill(boss);G.updateOpening(.05);r.drain();assert.ok(G.state.delivery.keeper);assert.equal(G.state.stars,stars+1);assert.ok(reachable(33,17));
+const stars=G.state.stars;kill(boss);G.updateOpening(.05);r.drain();assert.ok(G.state.delivery.keeper);assert.equal(G.state.stars,stars);assert.ok(G.groundRewardFor('keeper-lantern'));assert.ok(reachable(33,17));const gift=G.groundRewardFor('keeper-lantern');assert.ok(reachable(Math.floor(gift.x/16),Math.floor(gift.y/16)));Object.assign(G.state.player,G.world.safeArrival(gift.x-32,gift.y));collect(r,'keeper-lantern');assert.equal(G.state.stars,stars+1);
 reload();assert.ok(G.state.enemies.every(e=>e.dead));assert.equal(G.state.stars,stars+1);
 
 r.load('sunriseQuay');G.updateOpening(.05);r.drain();

@@ -15,7 +15,7 @@ October 3, 2026. This is a working source audit, not a claim that all rewards ha
 | Tess / Thread Mark | Durable spindle/star; collection opens both lower root passages | Complete; native third-Mark caravan favor remains separate |
 | Bongle / Echo Mark | Durable golden handbell/star; collection bridges both frozen lakes | Complete; saved crossings and later Echo gate preserved |
 | Mallow / Lantern Mark | Durable warm brass lamp/star; collection opens both lit ridge cuts | Complete; pending exits use the existing Echo rule |
-| Other miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | All eighteen trophy producers covered; separate Tollkeeper delivery producer remains |
+| Other miniboss/guardian trophies (`combat.js`) | Trophy and star go straight to inventory on defeat; unlocks and later story react immediately | All eighteen trophy producers and the separate Tollkeeper delivery gift covered |
 | Treasure chests (`world.js`) | Open box reveals durable ground contents; walking over them grants the unique item and its native bundled heal | Complete for all ten current chest item identities; new authored items have parcel/purpose fallback |
 | Regional mechanisms and quest gifts | Direct item grants in opening, delivery, prairie, grove, marsh, ridge, mistwood, starfall, glasswater and shattercoast | Inspect each native trigger and purpose before conversion; protect return dialogue and route gates |
 | Worldwake favors, marks and final rewards (`worldwake.js`, `endgame.js`) | Persisted accomplishments and immediate item/star/spirit grants | Separate accomplished task from uncollected gift; no replay of legacy thanks |
@@ -155,6 +155,18 @@ Four controlled touch/TV browser cases passed; twenty ground/reloaded/collected/
 
 All Spark poses/settings were inspected in the atlas. Trophy coverage is now eighteen of eighteen. The nineteenth guardian definition, the Tollkeeper, has no trophy and uses a separate delivery producer, which remains queued.
 
+## Tollkeeper delivery gift complete
+
+The Tollkeeper leaves a weathered road lantern with a small bridge arch in its warm pane. Its purpose is honest: one star and a keepsake of the opened bridge; it has no invented combat effect. The delivery checkpoint, lit lamps and open bridge are recorded at defeat. Item/star ownership waits for physical collection. Pending gifts survive travel and save boot while the bridge guardian stays defeated, and the delivery headline/route point to the object before Brindle's parcel. Finishing the deliveries early does not hide the unclaimed gift. Legacy owned lanterns cannot produce a second star while missing bridge flags are repaired by victory.
+
+This uses the existing durable reward engine's explicitly defined delivery source; no second quest system or arbitrary saved reward amounts were added. The source audit includes both native exits, the bridge collision/projectile barrier, persistent keeper dialogue/checkpoint, native flood/sweep cancellation, collection events/unlock checks, delivery normalization and legacy ownership. Delivery completion and drain currency remain separate unconverted sources.
+
+Fourteen final chest/guardian/delivery/save checks passed, along with the updated existing full delivery scenario and three opening/refuge checks from the initial run. The two initial delivery fixture failures started farther from the gift than the helper's bounded two-hundred-pixel approach. Final fixtures use a verified reachable nearby start and native collision collection; portal tests cross both authored exits from neighbouring approaches. The browser fixture also initially included the already-owned lantern from its generic campaign setup; its delivery setup now records an unfinished crossing with no lantern.
+
+Four final native touch/TV cases passed and twenty ground/reloaded/collected/quay/bridge-return views were inspected in both settings. Actual attack input defeats a weakened Tollkeeper, real save boot restores its gift, movement claims one star, and native steering crosses into the quay and returns to a quiet bridge. The full purpose/instruction paints without dialogue. All lantern poses/settings were inspected in the atlas. Touch actions are native and movement uses keyboard steering; TV actions/movement use the native pad bridge. Existing Form Echo ceremonies stay enabled. No page errors or horizontal overflow appeared. These are desktop controlled fixtures, not complete balanced fights or physical-device tests.
+
+The nineteen guardian definitions are now covered by eighteen trophy sources plus this separately authored delivery producer. The broader reward audit remains unfinished.
+
 ## Next bounded implementation
 
-Convert the Tollkeeper’s separately audited opening-delivery source: retain the defeated bridge checkpoint and safe exits, reveal the lantern/star bundle, guide collection before parcel delivery, and preserve legacy ownership without duplicate credit. Regional gifts, town/request/currency rewards, challenge return rewards and relic/echo systems remain unfinished.
+Audit the Orchard Ribbon, rescued recipe book and Sunrise Seal: trace accomplishment flags, claim/return dialogue, request readiness, spirit rewards and saved route access before conversion. Then continue regional gifts, town/request/currency rewards, challenge return rewards and relic/echo systems. Do not count separate currencies or completion gifts as done from guardian coverage.

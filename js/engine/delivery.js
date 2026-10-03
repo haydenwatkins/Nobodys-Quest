@@ -28,12 +28,13 @@
   const locations={bread:[12,12],letter:[30,13],present:[28,26]};
   G.deliveryGoal=()=>{
     const s=G.state;if(!s)return null;const d=state();
-    if(d.complete||(!d.started&&!(s.opening&&s.opening.complete)))return null;
+    if((d.complete&&!(G.groundRewardFor&&G.groundRewardFor('keeper-lantern')))||(!d.started&&!(s.opening&&s.opening.complete)))return null;
     let mapId,point,short,objective,value;
     if(!d.started){mapId='orchardRoad';point=[26,37];short='Meet Parcel at the departure post';objective='Parcel can finally travel. Join the delivery beside the cart, a few steps east.';value=0;}
     else if(d.lamps[0]<2){mapId='lanternReach';point=[14,24];short=d.lamps[0]?'Clear the first lantern':'Raise the first lantern';objective='Follow the west bank to the unlit lantern. Drive back the creatures its light draws.';value=1;}
     else if(d.lamps[1]<2){mapId='lanternReach';point=[38,12];short=d.lamps[1]?'Clear the second lantern':'Raise the second lantern';objective='The first light opened the causeway. Carry it to the lantern on the far bank.';value=2;}
     else if(!d.keeper){mapId='tollCourt';point=[18,17];short='Cross the old toll bridge';objective='Follow the lamps east. When the bridge floods, shelter inside the marked lantern circle.';value=3;}
+    else if(G.groundRewardFor&&G.groundRewardFor('keeper-lantern')){const gift=G.groundRewardFor('keeper-lantern');mapId=gift.mapId;point=[Math.floor(gift.x/16),Math.floor(gift.y/16)];short="Collect the Keeper's Lantern";objective='The bridge is open. Walk over the lantern left by the Tollkeeper to collect it and one star, then bring the parcels to the quay.';value=4;}
     else if(d.parcels.length<3){const id=['bread','letter','present'].find(x=>!d.parcels.includes(x));mapId='sunriseQuay';point=locations[id];short={bread:'Bring the flour to Baker Brindle',letter:'Give Mara her letter',present:'Bring Pip the birthday present'}[id];objective='The quay is just across the bridge. Deliver the three parcels in any order.';value=4+d.parcels.length;}
     else {mapId='sunriseQuay';point=[8,20];short='Tell Parcel everyone received it';objective='Return to the cart. Three ordinary things have arrived at last.';value=7;}
     return {chapter:1,act:G.STORY_CHAPTERS[1],title:'The Long Way Home',short,objective,reason:'Opening a road matters because someone is waiting at the other end.',mapId,point,destination:G.maps[mapId].name,guide:'opening',progress:{value,total:8,label:'THE LONG WAY HOME'},complete:false};
@@ -147,7 +148,7 @@
     if(!here())return;const s=G.state,d=state();
     const e=s.enemies.find(e=>e.dead&&e.id===data.enemy&&e.x===data.x&&e.y===data.y);
     if(e&&e.deliveryKey&&!d.cleared.includes(e.deliveryKey))d.cleared.push(e.deliveryKey);
-    if(data.enemy==='tollkeeper'&&!d.keeper){d.keeper=true;d.started=true;d.lamps=[2,2];s.stars++;if(!s.items.includes('keeper-lantern'))s.items.push('keeper-lantern');G.cancelBossHazards(e);G.checkUnlocks();}
+    if(data.enemy==='tollkeeper'&&!d.keeper){d.keeper=true;d.started=true;d.lamps=[2,2];G.cancelBossHazards(e);if(e)G.revealDeliveryReward(e);G.checkUnlocks();}
     G.saveGame();
   });
   const oldUpdate=G.updateOpening;
@@ -160,7 +161,7 @@
       const [x,y]=i?[40,15]:[14,25];s.entryPoint={x:x*16+8,y:y*16+8};G.sfx.play('unlock');
       say('lit'+i,[['PARCEL',i?'Two lights. The bridge is just ahead. I can see the town windows from here.':'One light. One stretch of road we can trust. I will bring the cart up.']]);
     }
-    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','I kept counting what they owed. I forgot what the bridge was for.'],['PATCHLING','You could count who gets home.'],['THE TOLLKEEPER','Three parcels. Two travelers. Go on. I can start with that.']]);
+    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','I kept counting what they owed. I forgot what the bridge was for.'],['PATCHLING','You could count who gets home.'],['THE TOLLKEEPER',G.groundRewardFor('keeper-lantern')?'Take the lantern on the ground. One star for the road, and three parcels for the people waiting.':'Three parcels. Two travelers. Go on. I can start with that.']]);
     if(s.mapId==='sunriseQuay'&&d.keeper&&!d.complete)say('quay',[['PARCEL','There. The oven chimney. Mara’s blue door. Pip waiting on the step.'],['PATCHLING','They are still here.'],['PARCEL','Yes. Let us make that worth the wait.']]);
     for(const h of s.openingHazards||[]){h.t+=dt;if(!h.hit&&h.t>=h.warn&&h.t<h.warn+h.active&&!h.owner.dead&&!s.knockout&&G.openingHazardHits(h,s.player.x,s.player.y))h.hit=!!G.damagePlayer(1,h.owner.x,h.owner.y);}
     s.openingHazards=(s.openingHazards||[]).filter(h=>!h.owner.dead&&h.t<h.warn+h.active);

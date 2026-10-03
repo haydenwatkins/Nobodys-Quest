@@ -3,6 +3,7 @@
 (() => {
   const guardianSources = ["ancientTreant", "mireQueen", "eclipseKnight", "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer", "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar", "riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar"];
   function definition(item, source = "chest") {
+    if (source === "delivery") return item === "keeper-lantern" ? { name: "Keeper's Lantern", stars: 1 } : null;
     if (source === "guardian") {
       // Proven sources; other trophy producers remain on the audit queue.
       const enemy = guardianSources.map(id => G.enemies[id]).find(enemy => enemy && enemy.trophy === item);
@@ -20,7 +21,7 @@
   G.normalizeGroundRewards = saved => {
     const seen = new Set(), owned = (G.state && G.state.items) || [];
     return (Array.isArray(saved) ? saved : []).flatMap(raw => {
-      if (!raw || !["chest", "guardian"].includes(raw.source) || typeof raw.item !== "string" || !definition(raw.item, raw.source) ||
+      if (!raw || !["chest", "guardian", "delivery"].includes(raw.source) || typeof raw.item !== "string" || !definition(raw.item, raw.source) ||
           owned.includes(raw.item) || seen.has(raw.item) || !G.maps[raw.mapId] ||
           !Number.isFinite(raw.x) || !Number.isFinite(raw.y)) return [];
       seen.add(raw.item);
@@ -68,6 +69,14 @@
       revealUntil: (G.state.time || 0) + .45 }, revealPoint(enemy.x, enemy.y));
     rewards().push(reward); G.saveGame(); return reward;
   };
+  G.revealDeliveryReward = enemy => {
+    if (enemy.def.id !== "tollkeeper" || G.state.items.includes("keeper-lantern")) return null;
+    const existing = G.groundRewardFor("keeper-lantern");
+    if (existing) return existing;
+    const reward = Object.assign({ source: "delivery", item: "keeper-lantern", mapId: G.state.mapId,
+      revealUntil: (G.state.time || 0) + .45 }, revealPoint(enemy.x, enemy.y));
+    rewards().push(reward); G.saveGame(); return reward;
+  };
   G.restoreGroundRewards = () => {
     G.state.groundRewards = G.normalizeGroundRewards(rewards());
     for (const reward of G.groundRewardsHere()) {
@@ -98,7 +107,7 @@
       if (prize.heal) p.damageTaken = 0;
       s.stars += prize.stars || 0;
       const info = G.groundRewardInfo(reward);
-      G.sfx.play(reward.source === "guardian" ? "quest" : "pickup");
+      G.sfx.play(reward.source === "chest" ? "pickup" : "quest");
       G.ui.toast(`${info.name} · ${info.purpose}${prize.heal ? " · Hearts restored" : ""}`, 4);
       G.events.emit("pickup", { item: reward.item });
       G.checkUnlocks();

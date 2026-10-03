@@ -3,6 +3,7 @@
 // Run a static server first. Usage: node tools/review-ground-gift.cjs [guardian] [baseURL] [outputDir]
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const scenarios={
+ tollkeeper:{map:'tollCourt',item:'keeper-lantern',stars:3,form:'nobody',button:'a',delivery:true},
  godAvatar:{map:'godTrial',item:'god-spark',stars:40,form:'wizard',button:'b',recovery:true,finale:true},
  riftbladeAdept:{map:'riftbladeTrial',item:'riftblade-sigil',stars:28,form:'ranger',button:'a',recovery:true},
  moleMonarch:{map:'moleTrial',item:'mole-crown',stars:28,form:'nobody',button:'a',recovery:true},
@@ -44,16 +45,17 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_
   }
   async function drain(){for(let i=0;i<50&&await page.evaluate(()=>G.ui.dialogueOpen&&!G.storyEndingOpen);i++){await frames(5);if(mode==='touch')await page.touchscreen.tap(viewport.width/2,viewport.height/2);else await action();await frames(5);}assert.equal(await page.evaluate(()=>G.ui.dialogueOpen&&!G.storyEndingOpen),false);}
   await connect();await drain();await page.evaluate(({hd,guardian,scenario})=>{
-   G.state.opening.complete=G.state.delivery.complete=true;G.state.claimedForms=['rat','knight','wizard',...(scenario.form?[scenario.form]:[])];G.state.stars=scenario.stars;G.state.items=['orchard-ribbon','keeper-lantern','sunrise-seal'];G.questsDone=Object.values(G.forms).flatMap(form=>form.quests.map(q=>q.id));Object.assign(G.ensureTown(),{founded:true,introduced:true,residents:4,spirit:20});if(scenario.finale){G.state.items.push(...Object.values(G.enemies).filter(e=>e.miniboss&&e.trophy&&e.id!==guardian).map(e=>e.trophy));G.state.claimedForms=G.formOrder.filter(f=>!['nobody','god'].includes(f));G.questsDone=G.formOrder.filter(f=>f!=='god').flatMap(f=>G.forms[f].quests.map(q=>q.id));G.state.worldwake=G.normalizeWorldwake({favorsDone:G.WORLDWAKE_FAVORS.map(f=>f.id)},G.state);G.state.story=G.normalizeStory({prologueSeen:true,seenChapters:[0,1,2,3,4,5],lastChapter:5});}G.setForm(scenario.form||'wizard');G.world.load(scenario.map);G.setHdPilot(hd);G.state.bossCutscene=null;
-   const e=G.state.enemies.find(e=>e.def.id===guardian);G.state.enemies=[e];window.reviewGuardian=e;e.bossEngaged=true;e.bossIntroT=0;if(scenario.mark||scenario.recovery)e.bossRecoverT=999;e.ward.hp=1;e.hp=1;const safe=G.world.safeArrival(e.x+(scenario.mark||scenario.recovery?110:36),e.y);Object.assign(G.state.player,safe,{dir:{x:-1,y:0},invuln:999,mana:G.playerMaxMana()});
+   G.state.opening.complete=G.state.delivery.complete=true;if(scenario.delivery)G.state.delivery=G.normalizeDelivery({started:true,lamps:[2,2]});G.state.claimedForms=['rat','knight','wizard',...(scenario.form?[scenario.form]:[])];G.state.stars=scenario.stars;G.state.items=scenario.delivery?['orchard-ribbon']:['orchard-ribbon','keeper-lantern','sunrise-seal'];G.questsDone=Object.values(G.forms).flatMap(form=>form.quests.map(q=>q.id));Object.assign(G.ensureTown(),{founded:true,introduced:true,residents:4,spirit:20});if(scenario.finale){G.state.items.push(...Object.values(G.enemies).filter(e=>e.miniboss&&e.trophy&&e.id!==guardian).map(e=>e.trophy));G.state.claimedForms=G.formOrder.filter(f=>!['nobody','god'].includes(f));G.questsDone=G.formOrder.filter(f=>f!=='god').flatMap(f=>G.forms[f].quests.map(q=>q.id));G.state.worldwake=G.normalizeWorldwake({favorsDone:G.WORLDWAKE_FAVORS.map(f=>f.id)},G.state);G.state.story=G.normalizeStory({prologueSeen:true,seenChapters:[0,1,2,3,4,5],lastChapter:5});}G.setForm(scenario.form||'wizard');G.world.load(scenario.map);G.setHdPilot(hd);G.state.bossCutscene=null;
+   const e=G.state.enemies.find(e=>e.def.id===guardian);G.state.enemies=[e];window.reviewGuardian=e;e.bossEngaged=true;e.bossIntroT=0;if(scenario.mark||scenario.recovery)e.bossRecoverT=999;if(e.ward)e.ward.hp=1;e.hp=1;const safe=G.world.safeArrival(e.x+(scenario.mark||scenario.recovery?110:36),e.y);Object.assign(G.state.player,safe,{dir:{x:-1,y:0},invuln:999,mana:G.playerMaxMana()});
    // Wizard's dark spell matches both Queen/Knight wards. Treant uses its native blunt basic art.
-   if(guardian==='ancientTreant'||guardian==='oldMason'||guardian==='lastWorldbearer'||guardian==='admiralTortoise'||guardian==='moleMonarch'){G.setForm('nobody');Object.assign(G.state.player,{x:e.x+14,y:e.y,dir:{x:-1,y:0}});}
+   if(guardian==='ancientTreant'||guardian==='oldMason'||guardian==='lastWorldbearer'||guardian==='admiralTortoise'||guardian==='moleMonarch'||guardian==='tollkeeper'){G.setForm('nobody');Object.assign(G.state.player,{x:e.x+14,y:e.y,dir:{x:-1,y:0}});}
   },{hd,guardian,scenario});await drain();await frames(80);
   for(let i=0;i<8&&!await page.evaluate(()=>window.reviewGuardian.dead);i++){await action(scenario.button||(guardian==='ancientTreant'?'a':'b'));await drain();}
   assert.equal(await page.evaluate(()=>window.reviewGuardian.dead),true);
   assert.equal(await page.evaluate(item=>G.state.items.includes(item),scenario.item),false);
   assert.ok(await page.evaluate(item=>G.groundRewardFor(item),scenario.item));
   assert.equal(await page.evaluate(()=>G.state.stars),scenario.stars);
+  if(scenario.delivery){assert.equal(await page.evaluate(()=>G.state.delivery.keeper),true);assert.ok((await page.evaluate(()=>G.deliveryGoal().short)).includes('Collect'));}
   if(scenario.finale){assert.equal(await page.evaluate(()=>G.storyComplete()||G.storyEndingOpen||G.ensureStory().endingSeen),false);assert.equal(await page.evaluate(()=>G.formReady('god')),false);}
   if(scenario.mark)assert.equal(await page.evaluate(mark=>G.hasWorldMark(mark),scenario.mark),false);
   async function approachGift(stopDistance=0){
@@ -97,6 +99,21 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_
    assert.equal(await page.evaluate(()=>G.storyEndingOpen),false);assert.equal(await page.evaluate(()=>G.ensureStory().endingSeen),true);
    assert.equal(await page.evaluate(()=>G.state.items.filter(i=>i==='god-spark').length),1);assert.equal(await page.evaluate(()=>G.state.stars),scenario.stars+4);
    await page.screenshot({path:`${out}/${mode}-${hd?'hd':'base'}-owned-boot.png`});
+  }
+  if(scenario.delivery){
+   assert.equal(await page.evaluate(()=>G.deliveryGoal().mapId),'sunriseQuay');
+   async function crossBridge(from,to,x,y,dx){
+    await page.evaluate(({x,y})=>Object.assign(G.state.player,{x:x*16+8,y:y*16+8}),{x,y});await frames(20);await drain();
+    const key=dx>0?'ArrowRight':'ArrowLeft';
+    if(mode==='controller')await page.evaluate(dx=>window.__nqTvPad(JSON.stringify({t:'s',a:[dx,0,0,0],b:[0,0,0,0]})),dx);else await page.keyboard.down(key);
+    for(let i=0;i<60&&await page.evaluate(()=>G.state.mapId)===from;i++){await frames(1);if(await page.evaluate(()=>G.ui.dialogueOpen))await drain();}
+    if(mode==='controller')await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:[0,0,0,0]})));else await page.keyboard.up(key);
+    assert.equal(await page.evaluate(()=>G.state.mapId),to);await drain();await frames(40);await drain();
+    await page.screenshot({path:`${out}/${mode}-${hd?'hd':'base'}-${to==='sunriseQuay'?'road-home':'road-back'}.png`});
+   }
+   await crossBridge('tollCourt','sunriseQuay',32,17,1);await crossBridge('sunriseQuay','tollCourt',1,19,-1);
+   assert.equal(await page.evaluate(()=>G.state.enemies.some(e=>e.id==='tollkeeper'&&!e.dead)),false);
+   assert.equal(await page.evaluate(()=>G.state.stars),scenario.stars+1);
   }
   if(scenario.mark){
    assert.equal(await page.evaluate(mark=>G.hasWorldMark(mark),scenario.mark),true);
