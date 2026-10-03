@@ -2,7 +2,7 @@
 
 October 2, 2026. This tracks completed and pending NPC art against the primary-source roster. The final orchard foe batch is complete; regular foes now have 18/18 authored bodies. Review every named character, every resident appearance and every dialogue speaker next. Keep native IDs, placement, routines, interactions and saved progress. Detailed, cute, original bodies and recognizable faces should replace generic shared silhouettes; deliberate equipment belongs in the authored sprite.
 
-## Named world sprites: 10/13 fresh reviews complete
+## Named world sprites: 13/13 fresh reviews complete
 
 | ID | Visible name | Logical footprint | Native placement maps | Status |
 |---|---|---|---|---|
@@ -16,15 +16,15 @@ October 2, 2026. This tracks completed and pending NPC art against the primary-s
 | moss | Groundskeeper Moss | 18x22 | overworld, mistwood, sunkenMarsh, whispering-grove, sunstepPrairie, hangingGardens, rootdeepHollow | Complete |
 | lastminute | Captain Lastminute | 18x22 | shattercoast, windscarCanyon, frostbellTundra, stormspinePeaks, titanGrave | Complete |
 | probably | Oracle Probably | 18x22 | starfallRuins, whispering-grove, glasswaterDesert, stormspinePeaks, titanGrave | Complete |
-| quayBaker | Baker Brindle | 21x24 | sunriseQuay | Pending |
-| quayMara | Mara | 21x24 | sunriseQuay | Pending |
-| quayPip | Pip | 21x24 | sunriseQuay | Pending |
+| quayBaker | Baker Brindle | 21x24 | sunriseQuay | Complete |
+| quayMara | Mara | 21x24 | sunriseQuay | Complete |
+| quayPip | Pip | 21x24 | sunriseQuay | Complete |
 
 The runtime registry and actual map loads confirm thirteen named definitions. Ten base characters come from body/robe/wide templates in `js/data/npcs.js`; generic HD detail conversion does not constitute an authored review. Baker Brindle, Mara and Pip have newer delivery art and still require the same fresh review. Their physical roles, materials, face shapes, clothing and carried tools should distinguish them. Current four-frame counts are recorded from the active runtime, not assumed from the base source.
 
-## Town residents: pending
+## Town residents: 6/6 appearances complete
 
-A founded town with sixteen residents creates `resident-0` through `resident-15`, using six palette appearances, a shared 7x9 footprint and two poses. Default unbuilt-town loading produces none, so an empty initial scene is not evidence of missing or completed coverage. All six looks, both directions/poses, routines and conversation pairs need inspection. Preserve resident counts, safe placement, house routines and saved town state.
+A founded town still creates up to `resident-0` through `resident-15`. Six distinct authored 14x18 appearances replace the shared 7x9 template: short brown hair/green neckerchief, pale braid/blue apron, dark hair/plum vest, silver bun/olive apron and spectacles, warm curls/purple scarf, and pale bob/navy jacket. Nine poses include joined sweeping, watering and parcel-carrying tools, plus idle, walk and greeting. The existing resident IDs, count cap, safe homes, routes, ambient exchanges and town save data are preserved. Both settings/facings and all poses have been inspected.
 
 ## Portraits and dialogue identity: pending
 
@@ -71,3 +71,11 @@ Ten focused checks passed across specialist/native conversations, save round tri
 Moss wears a straw hat and practical apron with a held watering can; Lastminute wears a captain’s cap and brass-button coat with a folded map and telescope; Probably has a pale side braid, purple cape with an attached crescent clasp, and a held forecast chart. All have four authored 18x22 poses in both facings and pixel settings. Native dialogue, map placement, routine state, talk keys and saved conversations are preserved.
 
 Ten focused checks passed, including native conversations/save round trips for all six new cloud companions, mirrored/quiet routine drawing, clear head markers, previous road/civic art and incidental speech. All pose sheets and twelve controlled touch-landscape world/talk captures were inspected. Native Mistwood/Shattercoast/Starfall scenes reported no script errors or horizontal overflow. Standard dialogue remains text-only; peripheral actors behind optional cards remain queued for shared readability. No full-suite or physical-device pass is claimed. Named world coverage is 10/13; next are Brindle, Mara and Pip.
+
+## Quay neighbours and town residents complete (October 3, cloud)
+
+Brindle now has a flour-coloured chef’s hat and apron, warm moustached face, held loaf/tray and bread paddle. Mara has a silver bun, teal coat, fringed rose shawl, held letter and cup. Pip is visibly shorter, with a little cap, warm scarf and held wooden dragon. Their four 21x24 poses preserve native delivery/request identity. The real Brindle request exposed the old short-name fallback to Treant; an explicit quay alias resolver now shows Brindle correctly and rejects unrelated longer names.
+
+Delivery/request regressions and cloud companion art: 11 passing checks. Growing-town placement/routines/save/drawing/chatter/spending: 8 passing checks. Final alias/dialogue/road regressions: 7 passing checks. These are focused runs with some repeated cases, not a full regression result. All quay pose sheets, all six nine-pose resident sheets, twelve actual quay world/request views and twelve founded-town world views were inspected in both settings at 667x375 touch landscape. Brindle’s final corrected request portrait was reviewed again in both settings. No script errors or horizontal overflow appeared. Town scene fixtures preserve all sixteen native residents; their paired chatter is verified by simulation, not by claiming an ambient resident opens a conversation. Physical devices remain untested.
+
+Named world sprites are 13/13, town appearances 6/6. Dedicated portraits, explicit speaker classification, standard-dialogue portraits and shared readability are next. Some optional HUD cards still obscure peripheral actors; keep that shared audit queued.

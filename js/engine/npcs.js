@@ -148,7 +148,7 @@
       name: "Town Resident",
       icon: "•",
       chapters: {},
-      sprite: {
+      sprite: (G.townResidentArt && G.townResidentArt[index % G.townResidentArt.length]) || {
         palette: { h: colors[0], f: colors[1], c: colors[2], a: colors[3], b: "#352b42" },
         frames: residentFrames,
       },
@@ -464,7 +464,8 @@
     const headHeight = integrated && G.spriteMetrics ? G.spriteMetrics(npc.def.sprite).h : 8;
     const bob = G.reducedMotion ? 0 : Math.sin(npc.anim * Math.PI) * 0.45;
     G.drawShadow(ctx, npc.x, npc.y, 10);
-    const mode = npc.path && npc.path.length ? "walk" : integrated && npc.activity ? "work" : "idle";
+    const activityMode = npc.def.sprite.activityAnimations && npc.def.sprite.activityAnimations[npc.activity];
+    const mode = npc.path && npc.path.length ? "walk" : integrated && npc.activity ? activityMode || "work" : "idle";
     const tick = G.reducedMotion ? 0 : mode === "walk" ? npc.anim : G.state.time + npc.seed;
     const frame = G.spriteFrame ? G.spriteFrame(npc.def.sprite, mode, tick) : Math.floor(tick) % 2;
     G.drawSprite(ctx, npc.def.sprite, frame, npc.x, npc.y + bob, npc.facingLeft);

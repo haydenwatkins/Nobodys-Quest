@@ -6,7 +6,7 @@ October 3, 2026. Start here for the 2D game. `CONTINUING-UPGRADES.md` retains th
 
 The cloud conversation has read the recent handoff from the local conversation **2D Nobody's Quest**. Continue the existing 2D game, its original cast, earned progress, controller/touch mappings, and approachable content authoring. The separate `3d/` game is outside this roadmap.
 
-The cloud handoff baseline is `c9caad0`. Current recorded art coverage: 24/24 forms, 19/19 boss definitions, 40/40 maps, 12/12 wildlife species, 18/18 regular foes, and 10/13 named NPC world sprites after the specialist batch below. Remaining NPCs, residents, portraits, shared readability, and item presentation are unfinished.
+The cloud handoff baseline is `c9caad0`. Current recorded art coverage: 24/24 forms, 19/19 boss definitions, 40/40 maps, 12/12 wildlife species, 18/18 regular foes, and 13/13 named NPC world sprites after the specialist batch below. All six resident appearances are complete. Portraits, shared readability, and item presentation are unfinished.
 
 The user renewed autonomous development authorization on October 3 with a cap of **70% total weekly usage consumed (30% remaining)** and asked the agent to solve automation. After the metering/scheduler diagnosis, the user explicitly instructed: "okay then just keep working until you hit your limit." Continue active-session development under that latest instruction; the weekly percentage remains unverified. The prior local heartbeat was paused after 71%. Do not treat renewal as evidence of a weekly reset or a current usage reading. No reset credits, purchases or model changes to bypass limits are authorized. The cloud tool set exposes no automation editor or native account-usage reader. CLI diagnostics are recorded below; writing this file does not schedule work.
 
@@ -40,8 +40,8 @@ PixiJS is a possible later renderer upgrade for a proven need for GPU batching, 
 
 ## Ordered implementation queue
 
-1. Complete the remaining quay people: Brindle, Mara and Pip. Review world sprites, actual conversations and requests, routines, all poses/facings, and both pixel settings. All ten original base people are complete; do not redo them.
-2. Complete six resident appearances and full portrait/speaker coverage. Keep the NPC ledger current; do not repeat finished bodies.
+1. Complete dedicated portrait/speaker coverage across opening, delivery and standard dialogue. All thirteen named bodies and six resident appearances are complete; do not redo them. Resolve aliases and distinguish actual people/guardians from narration, mechanisms and objects. Unknown headings must remain neutral.
+2. Review portrait crops and long dialogue on phone landscape, touch/controller input and both settings. Keep the NPC ledger current.
 3. Complete shared readability, Cobblekin cover whose appearance matches collision, and the ground-item/reward-source audit. Dropped items must be recognizable on the ground, persist safely, and explain their use without requiring dialogue. Do not silently exempt reward categories.
 4. Build one complete NPC promise through the existing request/guidance foundation, with a shared current-task presentation. Use an existing region and existing accomplishments; demonstrate accept/help/return/consequence/revisit before broadening coverage.
 5. Apply that pattern to Worldwake: danger-aware requests, immediate victory reactions, later-return dialogue, visible recovery, and authored reasons to revisit. Inventory existing regional activities first.
@@ -77,7 +77,7 @@ The cloud environment has Node, Chromium, Playwright, and canvas tooling; no gam
 
 This design review loaded the actual 2D opening at 667x375 with touch, 1024x768 with touch, and 1280x720 without touch. All three reported no script errors or horizontal overflow. Screenshots were inspected. These are desktop Chromium layout checks, not physical-device playtests or a complete opening walkthrough.
 
-The first cloud game batch completed Errata/Alias/Provisional world sprites and a reusable NPC atlas renderer. Ten focused checks and twelve final controlled touch-landscape views passed; all poses/facings/settings were inspected. See `NPC-ART-PASS.md`. No quest feature, engine migration, dedicated portrait system or scheduled automation is implemented by this checkpoint. The subsequent field batch completed Moss/Lastminute/Probably with ten focused checks, twelve inspected native world/talk captures and all pose sheets. Next substantive game batch is Brindle/Mara/Pip.
+The first cloud game batch completed Errata/Alias/Provisional world sprites and a reusable NPC atlas renderer. Ten focused checks and twelve final controlled touch-landscape views passed; all poses/facings/settings were inspected. See `NPC-ART-PASS.md`. No quest feature, engine migration, dedicated portrait system or scheduled automation is implemented by this checkpoint. The subsequent field batch completed Moss/Lastminute/Probably with ten focused checks, twelve inspected native world/talk captures and all pose sheets. Brindle/Mara/Pip and all six town resident appearances are subsequently complete. Focused suites passed: 11 delivery/request/art checks, 8 crowd/save/routine checks and 7 final alias/dialogue checks, with some repeated cases. All pose sheets, twelve native quay world/request views and twelve founded-town world views were inspected; Brindle’s short request alias now resolves correctly. Next substantive batch is dedicated portraits and shared speaker identity.
 
 ## Automation and metering diagnosis (October 3)
 

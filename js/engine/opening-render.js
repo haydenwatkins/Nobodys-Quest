@@ -311,7 +311,7 @@
     if(!here())return false;
     c.save();c.textBaseline='top';
     const speaker=d.speaker.toUpperCase(),form=/^RAT(?:$|[, ·])/.test(speaker)?'rat':/^KNIGHT(?:$|[, ·])/.test(speaker)?'knight':speaker===G.forms.nobody.name.toUpperCase()?'nobody':null;
-    const npc=(G.roadCompanionSpeaker&&G.roadCompanionSpeaker(speaker))||Object.values(G.NPCS).find(n=>speaker.includes(n.name.toUpperCase()));
+    const npc=(G.roadCompanionSpeaker&&G.roadCompanionSpeaker(speaker))||(G.quayCompanionSpeaker&&G.quayCompanionSpeaker(speaker))||Object.values(G.NPCS).find(n=>speaker.includes(n.name.toUpperCase()));
     const sprite=form?G.forms[form].sprite:npc?npc.sprite:speaker.includes('TOLLKEEPER')?G.enemies.tollkeeper.sprite:G.enemies.ancientTreant.sprite;
     c.font="11px 'VT323', monospace";
     const lines=wrap(c,d.text,235),visible=wrap(c,d.text.slice(0,Math.floor(d.shown)),235);

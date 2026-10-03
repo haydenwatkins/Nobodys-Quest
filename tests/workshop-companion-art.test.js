@@ -2,9 +2,10 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const runtime = require('../tools/lib/classic-runtime.cjs');
 const placements = [['errata', 'mistwood'], ['alias', 'town'], ['provisional', 'sunkenMarsh'],
-  ['moss', 'mistwood'], ['lastminute', 'shattercoast'], ['probably', 'starfallRuins']];
+  ['moss', 'mistwood'], ['lastminute', 'shattercoast'], ['probably', 'starfallRuins'], ['quayBaker', 'sunriseQuay'],
+  ['quayMara', 'sunriseQuay'], ['quayPip', 'sunriseQuay']];
 
-test('specialists and field companions retain native conversations, placements, and saved talk progress', () => {
+test('authored cloud companions retain native conversations, placements, and saved talk progress', () => {
   const r = runtime(), { G } = r;
   G.state.opening.complete = true;
   G.state.delivery.complete = true;
@@ -37,7 +38,7 @@ test('authored bodies preserve drawing state, mirrored routines, quiet poses, an
     translate(x, y) { markers.push({ x, y }); },
   }, { get: (o, k) => o[k] ?? (() => {}), set: (o, k, v) => (o[k] = v, true) });
   G.drawSprite = (c, sprite, frame, x, y, flip) => draws.push({ sprite, frame, x, y, flip });
-  for (const id of [...G.workshopCompanionArtIds, ...G.fieldCompanionArtIds]) {
+  for (const id of [...G.workshopCompanionArtIds, ...G.fieldCompanionArtIds, ...G.quayCompanionArtIds]) {
     const sprite = G.NPCS[id].sprite;
     assert.equal(sprite.integratedEquipment, true);
     for (const hd of [true, false]) {
@@ -45,8 +46,9 @@ test('authored bodies preserve drawing state, mirrored routines, quiet poses, an
       const active = G.activeSpriteDefinition(sprite);
       for (const frame of active.frames) for (const row of frame) for (const pixel of row)
         assert.ok(pixel === '.' || active.palette[pixel], `${id}: valid palette`);
-      assert.equal(G.spriteMetrics(sprite).w, 18);
-      assert.equal(G.spriteMetrics(sprite).h, 22);
+      const quay = G.quayCompanionArtIds.includes(id), height = quay ? 24 : 22;
+      assert.equal(G.spriteMetrics(sprite).w, quay ? 21 : 18);
+      assert.equal(G.spriteMetrics(sprite).h, height);
       for (const left of [true, false]) for (const quiet of [true, false]) for (const mode of ['idle', 'walk', 'work']) {
         G.reducedMotion = quiet;
         const npc = { id, def: G.NPCS[id], x: 200, y: 150, seed: 0, anim: .5, facingLeft: left,
@@ -57,22 +59,26 @@ test('authored bodies preserve drawing state, mirrored routines, quiet poses, an
         G.drawNpc(ctx, npc);
         assert.equal(JSON.stringify(npc), before, 'rendering cannot change gameplay state');
         assert.equal(draws[0].sprite, sprite); assert.equal(draws[0].flip, left);
-        assert.ok(labels.find(rect => rect.h === 8).y + 8 <= npc.y - 22, 'talk label clears the head');
-        assert.ok(markers[0].y + 5 <= npc.y - 22, 'guidance marker clears the head');
+        assert.ok(labels.find(rect => rect.h === 8).y + 8 <= npc.y - height, 'talk label clears the head');
+        assert.ok(markers[0].y + 5 <= npc.y - height, 'guidance marker clears the head');
         if (quiet) { assert.equal(draws[0].frame, mode === 'work' ? 2 : 0); assert.equal(draws[0].y, npc.y); }
       }
     }
   }
 });
 
-test('existing speaker resolution draws each specialist and field companion rather than a fallback guardian', () => {
+test('existing speaker resolution draws each authored cloud companion rather than a fallback guardian', () => {
   const r = runtime(), { G } = r;
   r.load('orchardRoad'); r.drain();
   const draws = [], ctx = new Proxy({ measureText: text => ({ width: text.length * 5 }) }, { get: (o, k) => o[k] ?? (() => {}) });
   G.drawSprite = (c, sprite) => draws.push(sprite);
-  for (const id of [...G.workshopCompanionArtIds, ...G.fieldCompanionArtIds]) for (const hd of [true, false]) {
+  const speakers = [...G.workshopCompanionArtIds, ...G.fieldCompanionArtIds, ...G.quayCompanionArtIds]
+    .map(id => [G.NPCS[id].name.toUpperCase() + ' · A RUMOR', id])
+    .concat([['BRINDLE', 'quayBaker'], ['MARA', 'quayMara'], ['PIP', 'quayPip']]);
+  for (const [speaker, id] of speakers) for (const hd of [true, false]) {
     G.hdPilot = hd; draws.length = 0;
-    assert.equal(G.drawOpeningDialogue(ctx, { speaker: G.NPCS[id].name.toUpperCase() + ' · A RUMOR', text: 'Good roads need good neighbours.', shown: 99 }, (c, text) => [text]), true);
+    assert.equal(G.drawOpeningDialogue(ctx, { speaker, text: 'Good roads need good neighbours.', shown: 99 }, (c, text) => [text]), true);
     assert.equal(draws[0], G.NPCS[id].sprite);
   }
+  assert.equal(G.quayCompanionSpeaker('BRINDLEBERRY'), null);
 });
