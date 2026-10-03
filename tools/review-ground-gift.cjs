@@ -3,6 +3,10 @@
 // Run a static server first. Usage: node tools/review-ground-gift.cjs [guardian] [baseURL] [outputDir]
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const scenarios={
+ admiralTortoise:{map:'turtleTrial',item:'tide-shell',stars:28,form:'nobody',button:'a',recovery:true},
+ paperRonin:{map:'samuraiTrial',item:'paper-crane',stars:28,form:'ranger',button:'a',recovery:true},
+ professorPerihelion:{map:'astronomerTrial',item:'orrery-key',stars:28,form:'ranger',button:'b',recovery:true},
+ grandmotherBriar:{map:'druidTrial',item:'elder-acorn',stars:28,form:'wizard',button:'b',recovery:true},
  ancientTreant:{map:'heartwood',item:'trophy-heartwood-crown',stars:3},
  mireQueen:{map:'sunkenMarsh',item:'trophy-mire-pearl',stars:5},
  eclipseKnight:{map:'emberRidge',item:'trophy-eclipse-sigil',stars:7},
@@ -36,9 +40,9 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_
   async function drain(){for(let i=0;i<50&&await page.evaluate(()=>G.ui.dialogueOpen);i++){await frames(5);if(mode==='touch')await page.touchscreen.tap(viewport.width/2,viewport.height/2);else await action();await frames(5);}assert.equal(await page.evaluate(()=>G.ui.dialogueOpen),false);}
   await connect();await drain();await page.evaluate(({hd,guardian,scenario})=>{
    G.state.opening.complete=G.state.delivery.complete=true;G.state.claimedForms=['rat','knight','wizard',...(scenario.form?[scenario.form]:[])];G.state.stars=scenario.stars;G.state.items=['orchard-ribbon','keeper-lantern','sunrise-seal'];G.questsDone=Object.values(G.forms).flatMap(form=>form.quests.map(q=>q.id));Object.assign(G.ensureTown(),{founded:true,introduced:true,residents:4,spirit:20});G.setForm(scenario.form||'wizard');G.world.load(scenario.map);G.setHdPilot(hd);G.state.bossCutscene=null;
-   const e=G.state.enemies.find(e=>e.def.id===guardian);G.state.enemies=[e];window.reviewGuardian=e;e.bossEngaged=true;e.bossIntroT=0;if(scenario.mark)e.bossRecoverT=999;e.ward.hp=1;e.hp=1;const safe=G.world.safeArrival(e.x+(scenario.mark?110:36),e.y);Object.assign(G.state.player,safe,{dir:{x:-1,y:0},invuln:999,mana:G.playerMaxMana()});
+   const e=G.state.enemies.find(e=>e.def.id===guardian);G.state.enemies=[e];window.reviewGuardian=e;e.bossEngaged=true;e.bossIntroT=0;if(scenario.mark||scenario.recovery)e.bossRecoverT=999;e.ward.hp=1;e.hp=1;const safe=G.world.safeArrival(e.x+(scenario.mark||scenario.recovery?110:36),e.y);Object.assign(G.state.player,safe,{dir:{x:-1,y:0},invuln:999,mana:G.playerMaxMana()});
    // Wizard's dark spell matches both Queen/Knight wards. Treant uses its native blunt basic art.
-   if(guardian==='ancientTreant'||guardian==='oldMason'||guardian==='lastWorldbearer'){G.setForm('nobody');Object.assign(G.state.player,{x:e.x+14,y:e.y,dir:{x:-1,y:0}});}
+   if(guardian==='ancientTreant'||guardian==='oldMason'||guardian==='lastWorldbearer'||guardian==='admiralTortoise'){G.setForm('nobody');Object.assign(G.state.player,{x:e.x+14,y:e.y,dir:{x:-1,y:0}});}
   },{hd,guardian,scenario});await drain();await frames(80);
   for(let i=0;i<8&&!await page.evaluate(()=>window.reviewGuardian.dead);i++){await action(scenario.button||(guardian==='ancientTreant'?'a':'b'));await drain();}
   assert.equal(await page.evaluate(()=>window.reviewGuardian.dead),true);

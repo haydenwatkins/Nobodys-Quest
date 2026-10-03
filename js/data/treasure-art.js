@@ -12,6 +12,10 @@
     "trophy-bell-titan": { name: "Echo Mark", purpose: "+1 star · bridges the frozen lakes", shape: "echoBell" },
     "trophy-lantern-keeper": { name: "Lantern Mark", purpose: "+1 star · lights the ridge passages", shape: "lamp" },
     "trophy-last-worldbearer": { name: "Worldheart Mark", purpose: "+1 star · opens the road home", shape: "heartstone" },
+    "tide-shell": { name: "Tide Shell", purpose: "+1 star · Harborback path · coastal cairn", shape: "shell" },
+    "paper-crane": { name: "Wayfold Crane", purpose: "+1 star · Foldstep Fox path · coastal cairn", shape: "crane" },
+    "orrery-key": { name: "Orrery Key", purpose: "+1 star · Skylens Mapper path · coastal cairn", shape: "orbitKey" },
+    "elder-acorn": { name: "Elder Acorn", purpose: "+1 star · Hedgehare path · coastal cairn", shape: "acorn" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -27,7 +31,32 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "heartstone") {
+      if (shape === "shell") {
+        g.poly([[2, 18], [3, 10], [8, 4], [14, 2], [21, 5], [25, 12], [25, 20], [20, 27], [10, 29], [4, 25]], "k");
+        g.poly([[4, 18], [5, 11], [9, 6], [14, 4], [20, 7], [23, 13], [23, 20], [18, 25], [10, 27], [6, 23]], "f");
+        g.line(7, 19, 8, 12, "c", 2); g.line(8, 12, 14, 8, "c", 2);
+        g.line(14, 8, 20, 12, "g", 2); g.line(20, 12, 20, 20, "g", 2); g.line(20, 20, 13, 23, "g", 2);
+        g.line(13, 23, 10, 18, "g", 2); g.line(10, 18, 13, 14, "g", 2); g.line(13, 14, 16, 16, "g", 2);
+        g.line(6, 23, 11, 25, "d", 2);
+      } else if (shape === "crane") {
+        g.poly([[1, 12], [12, 17], [14, 21], [22, 8], [23, 3], [27, 6], [24, 8], [24, 15], [20, 24], [11, 27], [5, 22]], "k");
+        g.poly([[3, 14], [12, 19], [14, 23], [21, 12], [22, 7], [25, 6], [23, 9], [22, 15], [19, 22], [11, 25], [7, 21]], "c");
+        g.poly([[5, 3], [13, 10], [19, 22], [12, 23]], "k"); g.poly([[7, 6], [12, 11], [16, 20], [13, 21]], "h");
+        g.line(7, 15, 11, 22, "d", 1); g.line(11, 25, 19, 22, "e", 1); g.put(23, 7, "k");
+      } else if (shape === "orbitKey") {
+        g.ellipse(14, 10, 11, 9, "k"); g.ellipse(14, 10, 9, 7, "a"); g.ellipse(14, 10, 6, 5, "k");
+        g.ellipse(14, 10, 4, 3, "d"); g.line(7, 6, 19, 14, "c", 1); g.put(8, 7, "c");
+        g.rect(12, 17, 5, 14, "k"); g.rect(13, 18, 3, 11, "b"); g.line(13, 19, 13, 27, "a", 1);
+        g.rect(16, 23, 6, 4, "k"); g.rect(16, 24, 4, 2, "a"); g.rect(16, 28, 5, 3, "k"); g.rect(16, 29, 3, 1, "a");
+      } else if (shape === "acorn") {
+        g.poly([[4, 14], [24, 14], [23, 24], [17, 30], [12, 30], [6, 24]], "k");
+        g.poly([[6, 15], [22, 15], [21, 23], [16, 28], [13, 28], [8, 23]], "b");
+        g.line(9, 17, 10, 23, "a", 2); g.line(13, 26, 16, 26, "j", 1);
+        g.poly([[3, 15], [5, 9], [11, 6], [19, 6], [24, 10], [26, 15]], "k");
+        g.poly([[5, 13], [7, 10], [12, 8], [18, 8], [22, 11], [24, 13]], "h");
+        for(const x of [8,13,18])g.line(x, 10, x+2, 12, "i", 1);
+        g.line(14, 7, 14, 2, "k", 3); g.poly([[15, 4], [20, 1], [23, 3], [20, 6], [15, 6]], "g"); g.line(16, 4, 20, 3, "f", 1);
+      } else if (shape === "heartstone") {
         g.poly([[4, 10], [6, 4], [11, 2], [14, 5], [17, 2], [22, 4], [24, 10], [22, 20], [14, 28], [6, 20]], "k");
         g.poly([[6, 10], [8, 5], [11, 4], [14, 8], [17, 4], [20, 5], [22, 10], [20, 19], [14, 25], [8, 19]], "b");
         g.poly([[8, 10], [9, 6], [11, 6], [14, 10], [17, 6], [19, 7], [20, 11], [18, 18], [14, 22], [10, 18]], "j");

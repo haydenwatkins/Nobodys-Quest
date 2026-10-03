@@ -1,7 +1,7 @@
 /* Earned contents survive travel separately from temporary combat drops. */
 "use strict";
 (() => {
-  const guardianSources = ["ancientTreant", "mireQueen", "eclipseKnight", "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer"];
+  const guardianSources = ["ancientTreant", "mireQueen", "eclipseKnight", "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer", "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar"];
   function definition(item, source = "chest") {
     if (source === "guardian") {
       // Proven sources; other trophy producers remain on the audit queue.
@@ -36,11 +36,17 @@
 
   function revealPoint(x, y) {
     // Reveal beside the open box, on an accessible stretch of the same floor.
-    for (const [dx, dy] of [[0, 24], [24, 0], [-24, 0], [0, -24]]) {
-      if ([8, 16, 24].every(step => G.world.isSafeSpawn(x + dx * step / 24, y + dy * step / 24)))
-        return { x: x + dx, y: y + dy };
-    }
-    return G.world.safeArrival(x, y);
+    const trial=G.state.mapDef?.bossTrial&&!G.state.mapDef.bossTrial.worldBoss;
+    const offsets=[[0,24],[24,0],[-24,0],[0,-24],...(trial?[[-64,0],[64,0]]:[])];
+    const points=offsets.filter(([dx,dy])=>{
+      const length=Math.max(Math.abs(dx),Math.abs(dy));
+      for(let step=8;step<=length;step+=8)
+        if(!G.world.isSafeSpawn(x+dx*step/length,y+dy*step/length))return false;
+      return true;
+    }).map(([dx,dy])=>({x:x+dx,y:y+dy}));
+    // The camera stops at a trial's walls. Keep a wall-side gift out of the
+    // fixed touch controls, regardless of the input used to earn/save it.
+    return (trial&&points.find(p=>p.x>=64&&p.x<=G.state.mapW*G.TILE-80))||points[0]||G.world.safeArrival(x,y);
   }
   G.revealChestReward = chest => {
     const item = chest.chest.item;
