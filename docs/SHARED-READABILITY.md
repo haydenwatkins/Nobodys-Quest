@@ -11,7 +11,8 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Incidental speech | Existing traveller/speaker clearance retained; crowded combinations remain to review |
 | Shared effects and threat/reward contrast | Audit pending |
 | Ordinary heart/mana drops | Complete: recognizable heart/flask art, ground contact, collection feedback, quiet-motion fade |
-| Persistent items and every reward source | Source audit in progress; see `GROUND-REWARDS.md`; do not silently exempt categories |
+| Persistent chest contents | Complete for ten item identities: durable ground reveal, purpose, movement claim and preserved legacy ownership |
+| Other persistent items and every reward source | Source audit in progress; see `GROUND-REWARDS.md`; do not silently exempt categories |
 
 ## Cobblekin cover complete
 
@@ -32,3 +33,7 @@ Eight final focused checks passed across named/resident bodies and marker cleara
 Hearts now use recognizable coral heart art; mana uses a small blue glass flask. Both have ground shadows, restrained native motion and four authored poses in each pixel setting. Collection explains the result with “Heart restored” / “Mana restored”, or the corresponding full-cap notice. Reduced motion uses a steady pose and smooth expiry fade instead of bobbing and blinking. Magnet distance/speed, amounts, caps, ordinary twelve-second expiry and travel reset remain unchanged.
 
 Eight focused pickup, Drain mastery and Cobblekin checks passed. All pickup poses and four controlled touch-landscape ground/collected views were inspected in both settings. Real movement and the native magnet collected both drops with the correct health/mana changes; no page errors or horizontal overflow appeared. These browser fixtures placed ordinary source-format drops; they do not claim an enemy-kill walkthrough. Persistent trophies and quest gifts are not covered by this batch.
+
+## Persistent chest contents complete
+
+All ten current item chests now reveal real ground objects and credit their unique item/bundled heal on collection. The sharp purpose cue clears actors/contents/controls; optional regular cards yield, and the paper lesson card returns after pickup. Contents survive travel, browser reload and gentle knockout and follow relocated caches. See `GROUND-REWARDS.md` for exact coverage, source contract and validation. Boss trophies, regional gifts and currency categories remain unfinished.

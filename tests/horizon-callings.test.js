@@ -38,6 +38,7 @@ test('the horizon leads through the Crest, Knight practice, and a real Ranger ec
   const target = G.guidanceTarget();
   Object.assign(G.state.player, { x: target.x, y: target.y });
   G.world.checkTriggers(.5); r.drain();
+  require('./helpers/collect-treasure.cjs')(r, 'knights-crest');
   assert.ok(G.state.items.includes('knights-crest'));
   goal = G.storyGoal();
   assert.equal(goal.guide, 'echo');

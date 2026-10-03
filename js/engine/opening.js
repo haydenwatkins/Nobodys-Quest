@@ -42,7 +42,7 @@
     else if(!o.cart)data=['The first person who needed you','Clear the tangles around Parcel’s cart',[20,34],1,'The little root creatures have trapped the courier. Drive them away.'];
     else if(!G.formUnlocked('rat'))data=['A smaller answer',G.formReady('rat')?'Meet the Rat echo':'Practice Slap at the straw post',[20,23],2,'Finish two Patchling lessons. Practice at the straw post if you need more Slap contacts, then meet the echo.'];
     else if(!o.sluice)data=['Under the roots','Become Rat and enter the old culvert',[27,24],3,'The road is crushed under roots. Rat can slip through the culvert and release the sluice.'];
-    else if(!G.formUnlocked('knight'))data=['Someone kept watch','Recover the crest beside the mill',[38,25],4,'The mill keeper left a Knight’s Crest. Open the chest and meet the shape it leaves behind.'];
+    else if(!G.formUnlocked('knight'))data=['Someone kept watch','Recover the crest beside the mill',[38,25],4,'The mill keeper left a Knight’s Crest. Open the chest, collect its crest from the ground, then meet the shape it leaves behind.'];
     else if(!o.bell)data=['Let them hear you coming','Ring the watch bell',[46,14],5,'The watchmen gather near the bell. Clear the approach and ring it for the stranded town.'];
     else data=['The keeper of a closed road','Face the Ancient Treant',[16,6],5,'Go north through the root arch. Break the bark ward with a blunt move, then watch where the roots will rise.'];
     const mapId=won?road:o.bell?glade:road;
@@ -56,6 +56,8 @@
       const echo=G.formEchoFor('rat');if(echo&&echo.mapId===road){x=echo.x/16-.5;y=echo.y/16-.5;}
     }
     if(progress().sluice&&!G.formUnlocked('knight')){
+      const reward=G.groundRewardFor&&G.groundRewardFor('knights-crest');
+      if(reward&&reward.mapId===road){x=reward.x/16-.5;y=reward.y/16-.5;}
       const echo=G.formEchoFor('knight');if(echo&&echo.mapId===road){x=echo.x/16-.5;y=echo.y/16-.5;}
     }
     return {x:x*16+8,y:y*16+8,tileX:Math.floor(x),tileY:Math.floor(y),kind:'story',icon:'◇',color:'#f2cf8b',destination:goal.short,text:goal.objective};

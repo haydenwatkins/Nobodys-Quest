@@ -351,6 +351,7 @@ G.world = (() => {
     p.lastSafe = { x: p.x, y: p.y };
     s.entryPoint = { x: p.x, y: p.y };
     s.arrivalPoint = { x: p.x, y: p.y };
+    if (G.restoreGroundRewards) G.restoreGroundRewards();
     const returnPortals=[];
     for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(grid[y][x].portal?.map===previousMap)
       returnPortals.push({x:x*G.TILE+8,y:y*G.TILE+8});
@@ -604,28 +605,7 @@ G.world = (() => {
         if(ch.chest.item&&s.items.includes(ch.chest.item)){G.saveGame();continue;}
         G.sfx.play("unlock");
         G.spawnFx({ kind: "ring", x: cx, y: cy - 8, color: "#ffcd75", dur: 0.5 });
-        const chestMessages = [];
-        let pickedUpItem = null;
-        if (ch.chest.item) {
-          s.items.push(ch.chest.item);
-          pickedUpItem = ch.chest.item;
-          chestMessages.push("You found " + (ch.chest.name || ch.chest.item) + "!");
-        }
-        if (ch.chest.heal) {
-          s.player.damageTaken = 0;
-          chestMessages.push((ch.chest.name || "A snack") + " restored all your hearts.");
-        }
-        if (chestMessages.length) {
-          const chestText = chestMessages.join(" ");
-          if (G.ui.dialogue) G.ui.dialogue("🎁 TREASURE CHEST", chestText, { accent: "#ffcd75" });
-          else G.ui.toast(chestText, 3.5);
-        }
-        // Queue any follow-on reward story after the chest itself has spoken.
-        if (pickedUpItem) {
-          G.events.emit("pickup", { item: pickedUpItem });
-          G.checkUnlocks();
-          if (G.leaveReadyFormEchoAt) G.leaveReadyFormEchoAt(cx, cy, "treasure");
-        }
+        if (ch.chest.item && G.revealChestReward) G.revealChestReward(ch);
         G.saveGame();
       }
     }

@@ -1491,6 +1491,7 @@ G.updatePickups = function (dt) {
     }
     if (pk.t > 12) s.pickups.splice(i, 1); // fades away eventually
   }
+  if (G.updateGroundRewards) G.updateGroundRewards();
 };
 
 /* ================= DRAWING ================= */

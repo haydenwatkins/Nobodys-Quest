@@ -128,6 +128,7 @@
     stars: 0,
     items: [],
     opened: [],
+    groundRewards: [],
     pantries: {},
     known: [],
     claimedForms: [],
@@ -178,6 +179,7 @@
     s.items = save.items || [];
     s.keepsakeId = G.normalizeKeepsake(save.keepsakeId, s.items);
     s.opened = save.opened || [];
+    s.groundRewards = G.normalizeGroundRewards(save.groundRewards);
     s.pantries = save.pantries && typeof save.pantries === "object" ? save.pantries : {};
     s.known = save.known || [];
     // Saves from before explicit claiming already earned every known form.
@@ -493,6 +495,8 @@
     for (const creature of s.wildlife || [])
       drawables.push({ y: creature.y, fn: () => G.drawWildlife(ctx, creature) });
     for (const npc of s.npcs || []) drawables.push({ y: npc.y, fn: () => G.drawNpc(ctx, npc) });
+    for (const reward of G.groundRewardsHere())
+      drawables.push({ y: reward.y, fn: () => G.drawGroundReward(ctx, reward) });
     for (const formEcho of G.formEchoesHere ? G.formEchoesHere() : [])
       drawables.push({ y: formEcho.y, fn: () => G.drawFormEcho(ctx, formEcho) });
     for (const legendEcho of G.legendEchoesHere ? G.legendEchoesHere() : [])

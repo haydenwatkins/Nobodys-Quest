@@ -280,7 +280,7 @@
     }
     if(!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
       const lesson=G.fieldMasteryReward();
-      if(lesson){
+      if(lesson&&!(G.nearGroundReward&&G.nearGroundReward())){
         c.font="8px 'VT323', monospace";
         const count=lesson.progress+'/'+lesson.total,countWidth=c.measureText(count).width;
         const x=7,y=39,w=Math.min(199,Math.max(120,Math.ceil(c.measureText(lesson.quest.text).width+countWidth+19)));

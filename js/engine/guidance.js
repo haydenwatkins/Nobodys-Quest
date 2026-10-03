@@ -265,7 +265,7 @@
         x: chest.x * G.TILE + G.TILE / 2, y: chest.y * G.TILE + G.TILE / 2,
         tileX: chest.x, tileY: chest.y,
       }));
-      target = nearest(chests, s.player.x, s.player.y);
+      target = nearest([...chests, ...(G.groundRewardsHere ? G.groundRewardsHere() : [])], s.player.x, s.player.y);
     } else if (quest.event === "wardBreak") {
       const wardType = match.damageType || (quest.lessonArt && G.abilities[quest.lessonArt]?.type);
       const practice = quest.lessonPractice;
@@ -422,6 +422,17 @@
     }
     if (goal.guide === "mastery") return masteryTarget(goal);
 
+    if (goal.guide === "item" && G.groundRewardFor) {
+      const reward = G.groundRewardFor(goal.itemId);
+      if (reward) {
+        if (reward.mapId !== s.mapId) return routeTarget(Object.assign({}, goal, { mapId: reward.mapId }));
+        return {
+          x: reward.x, y: reward.y, tileX: Math.floor(reward.x / G.TILE), tileY: Math.floor(reward.y / G.TILE),
+          reward, kind: "story", color: G.GUIDANCE_COLORS.story, icon: "◇", destination: goal.destination,
+          text: `${G.groundRewardInfo(reward).name} is on the ground. Walk over it to collect.`,
+        };
+      }
+    }
     if (goal.mapId && goal.mapId !== s.mapId) return routeTarget(goal);
 
     if (goal.guide === "item") {

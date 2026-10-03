@@ -104,6 +104,7 @@ test('a missing Knight follows the Crest chest through the old dungeon to its Fo
   assert.ok(seen.has(`${target.tileX},${target.tileY}`), 'the dungeon entrance reaches the Crest chest');
   Object.assign(G.state.player, { x: target.x, y: target.y });
   G.world.checkTriggers(.5); r.drain();
+  require('./helpers/collect-treasure.cjs')(r, 'knights-crest');
   assert.ok(G.state.items.includes('knights-crest'));
   goal = G.storyGoal();
   assert.equal(goal.guide, 'echo');

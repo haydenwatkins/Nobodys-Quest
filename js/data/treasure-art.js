@@ -1,0 +1,80 @@
+/* Chest contents: recognizable objects; the sharp HUD explains their purpose. */
+"use strict";
+(() => {
+  const A = G.authoredPixelArt;
+  G.treasureInfo = {
+    "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
+    "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
+    "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
+    "windscar-feather": { name: "Windscar Feather", purpose: "A memento of Windscar", shape: "feather" },
+    "garden-keystone": { name: "Garden Keystone", purpose: "A memento of the gardens", shape: "stone" },
+    "rootdeep-silk": { name: "Rootdeep Silk", purpose: "A memento of Rootdeep", shape: "silk" },
+    "glasswater-prism": { name: "Glasswater Prism", purpose: "Fit into the northern sundial", shape: "prism" },
+    "frostbell-chime": { name: "Frostbell Chime", purpose: "A memento of Frostbell", shape: "bell" },
+    "stormglass-lantern": { name: "Stormglass Lantern", purpose: "A memento of Stormspine", shape: "lantern" },
+    "titan-memory": { name: "Titan's Smallest Memory", purpose: "A memento of Titan Grave", shape: "memory" },
+  };
+  G.treasureArt = {};
+  const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
+  for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
+    G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, palette, (g, frame) => {
+      if (shape === "crest") {
+        g.poly([[4, 3], [14, 1], [24, 3], [23, 20], [14, 29], [5, 20]], "k");
+        g.poly([[6, 5], [14, 3], [22, 5], [21, 19], [14, 26], [7, 19]], "a");
+        g.poly([[9, 7], [19, 7], [18, 18], [14, 22], [10, 18]], "e");
+        g.line(14, 8, 14, 19, "c", 2); g.line(10, 12, 18, 12, "c", 2);
+      } else if (shape === "seed") {
+        g.poly([[7, 13], [14, 9], [21, 13], [23, 23], [18, 29], [10, 29], [5, 23]], "k");
+        g.ellipse(14, 21, 7, 7, "b"); g.line(14, 17, 14, 26, "a", 2);
+        g.line(14, 14, 13, 6, "g", 2); g.poly([[13, 8], [6, 4], [4, 6], [9, 11], [13, 11]], "f");
+        g.poly([[14, 7], [20, 1], [24, 2], [22, 7], [15, 10]], "f");
+      } else if (shape === "ribbon") {
+        g.poly([[5, 2], [23, 2], [23, 17], [20, 17], [24, 28], [17, 26], [14, 30], [10, 26], [4, 28], [8, 17], [5, 17]], "k");
+        g.rect(7, 4, 14, 11, "j"); g.rect(10, 4, 3, 11, "c");
+        g.poly([[10, 15], [17, 15], [21, 25], [17, 23], [14, 27], [10, 23], [7, 25]], "j");
+        g.ellipse(14, 10, 4, 4, "a"); g.put(14, 9, "c");
+      } else if (shape === "feather") {
+        g.poly([[8, 24], [5, 16], [8, 8], [18, 1], [24, 3], [22, 13], [15, 22]], "k");
+        g.poly([[8, 17], [10, 9], [19, 3], [22, 4], [20, 12], [13, 21], [9, 22]], "d");
+        g.line(8, 29, 20, 5, "c", 2); g.line(11, 20, 18, 16, "c", 1); g.line(15, 12, 11, 10, "e", 1);
+      } else if (shape === "stone") {
+        g.poly([[4, 6], [24, 6], [21, 27], [7, 27]], "k");
+        g.poly([[6, 8], [22, 8], [19, 25], [9, 25]], "b"); g.line(7, 9, 21, 9, "a", 2);
+        g.line(13, 13, 13, 21, "c", 2); g.line(13, 13, 18, 12, "c", 2); g.ellipse(11, 22, 3, 2, "c");
+      } else if (shape === "silk") {
+        g.poly([[4, 8], [10, 3], [22, 3], [25, 8], [22, 27], [5, 27]], "k");
+        g.poly([[6, 9], [11, 5], [21, 5], [23, 9], [20, 25], [7, 25]], "h");
+        g.line(9, 11, 20, 10, "c", 2); g.line(10, 18, 20, 17, "i", 2); g.line(10, 23, 19, 22, "c", 2);
+      } else if (shape === "prism") {
+        g.poly([[14, 1], [25, 15], [17, 29], [4, 22]], "k");
+        g.poly([[14, 4], [22, 15], [16, 26], [7, 21]], "d");
+        g.poly([[14, 4], [15, 16], [7, 21]], "c"); g.poly([[15, 16], [22, 15], [16, 26]], "e");
+      } else if (shape === "bell") {
+        g.ellipse(14, 6, 4, 5, "k"); g.ellipse(14, 6, 2, 3, "a");
+        g.poly([[8, 10], [20, 10], [22, 21], [25, 24], [25, 27], [3, 27], [3, 24], [6, 21]], "k");
+        g.poly([[10, 12], [18, 12], [20, 22], [22, 24], [6, 24], [8, 22]], "d");
+        g.line(10, 13, 9, 21, "c", 2); g.ellipse(14, 28, 3, 2, "a");
+      } else if (shape === "lantern") {
+        g.ellipse(14, 6, 6, 5, "k"); g.ellipse(14, 6, 4, 3, "a");
+        g.rect(6, 9, 16, 21, "k"); g.rect(8, 12, 12, 15, "e");
+        g.rect(10, 14, 8, 11, "d"); g.poly([[14, 15], [17, 21], [14, 24], [11, 21]], "a");
+        g.line(7, 10, 20, 10, "a", 2); g.line(7, 28, 20, 28, "a", 2);
+      } else if (shape === "memory") {
+        g.poly([[8, 3], [17, 2], [23, 8], [23, 24], [18, 29], [6, 26], [3, 15]], "k");
+        g.poly([[9, 5], [16, 4], [21, 9], [21, 23], [17, 27], [8, 24], [5, 15]], "h");
+        g.line(9, 10, 17, 10, "i", 2); g.line(9, 17, 16, 17, "i", 2); g.line(12, 9, 12, 23, "c", 2);
+      } else {
+        g.rect(3, 8, 22, 21, "k"); g.rect(5, 10, 18, 17, "b"); g.rect(12, 10, 4, 17, "a"); g.rect(5, 15, 18, 3, "a");
+      }
+      // A surface glint, never a detached character ornament.
+      if (frame === 2) g.put(17, 14, "c");
+    }));
+
+  G.drawGroundReward = (ctx, reward) => {
+    const info = G.groundRewardInfo(reward), sprite = G.treasureArt[info.shape] || G.treasureArt.parcel;
+    const t = G.state.time || 0;
+    ctx.save(); G.drawShadow(ctx, reward.x, reward.y, 11);
+    G.drawSprite(ctx, sprite, G.spriteFrame(sprite, "idle", G.reducedMotion ? 0 : t), reward.x, reward.y + 2, false);
+    ctx.restore();
+  };
+})();

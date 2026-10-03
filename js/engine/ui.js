@@ -34,6 +34,7 @@ G.ui = (() => {
   const uiCtx = uiCanvas.getContext("2d");
   let uiScale = 4;
   let statusBounds = null; // Current-frame status placement, never saved.
+  let rewardCue = null;
 
   const FONT_HEAD = '"Press Start 2P", "Courier New", monospace';
   const FONT_BODY = '"VT323", "Courier New", monospace';
@@ -296,6 +297,8 @@ G.ui = (() => {
       if (x < px + halfWidth && x + width + 2 > px - halfWidth &&
           y < py + 4 && y + height + 5 > py - bodyHeight) continue;
       if (statusOverlaps(x, y, width + 2, height + 5)) continue;
+      if (rewardCue && x < rewardCue.x + rewardCue.w && x + width + 2 > rewardCue.x &&
+          y < rewardCue.y + rewardCue.h && y + height + 5 > rewardCue.y) continue;
       placed.push({ x, y, w: width, h: height });
 
       const remaining = Math.min(bubble.duration || 2.25, bubble.t);
@@ -401,6 +404,11 @@ G.ui = (() => {
 
   function fieldPanelBlocked(cam, x, y, w, h) {
     if (coversTraveller(cam, x, y, w, h) || statusOverlaps(x, y, w, h)) return true;
+    if (rewardCue && x < rewardCue.x + rewardCue.w && x + w > rewardCue.x &&
+        y < rewardCue.y + rewardCue.h && y + h > rewardCue.y) return true;
+    if ((G.groundRewardsHere ? G.groundRewardsHere() : []).some(reward =>
+      x < reward.x - cam.x + 10 && x + w > reward.x - cam.x - 10 &&
+      y < reward.y - cam.y + 4 && y + h > reward.y - cam.y - 18)) return true;
     const p = G.state.player;
     const foeBlocked = (G.state.enemies || []).some(e => {
       if (e.dead || Math.hypot(e.x - p.x, e.y - p.y) > 112) return false;
@@ -421,6 +429,35 @@ G.ui = (() => {
       const headroom = npc.guidancePoint ? 30 : npc.ambientOnly ? 0 : 10;
       return x < px + half && x + w > px - half && y < py + 4 && y + h > py - metrics.h - headroom - 3;
     });
+  }
+
+  function placeRewardCue(c, cam, opening = false) {
+    const reward = G.nearGroundReward && G.nearGroundReward();
+    if (!reward || G.ui.dialogueOpen || G.state.bossCutscene) return null;
+    const info = G.groundRewardInfo(reward);
+    c.font = `8px ${FONT_BODY}`;
+    const lines = [info.name, info.purpose, "Walk over the treasure to collect"];
+    const w = Math.min(210, Math.ceil(Math.max(...lines.map(line => c.measureText(line).width))) + 12), h = 36;
+    const right = G.input.isTouch ? G.W - 68 : G.W - 5;
+    for (const y of opening ? [39, 68, 106] : [68, 106, 39]) for (const x of [5, Math.max(5, right - w)]) {
+      if (G.input.isTouch && y + h > G.H - 68 && x < 84) continue;
+      if (opening && y + h > 125) continue;
+      if (fieldPanelBlocked(cam, x, y, w, h)) continue;
+      return { x, y, w, h, lines };
+    }
+    return null;
+  }
+
+  function drawRewardCue(c) {
+    if (!rewardCue) return;
+    const { x, y, w, h, lines } = rewardCue;
+    c.fillStyle = "rgba(26,28,44,.94)"; c.fillRect(x, y, w, h);
+    c.fillStyle = "#f4d39c"; c.fillRect(x, y, 2, h);
+    c.font = `8px ${FONT_BODY}`;
+    for (let i = 0; i < lines.length; i++) {
+      c.fillStyle = i === 0 ? "#f4d39c" : "#f4f4f4";
+      c.fillText(fitText(c, lines[i], w - 12), x + 6, y + 4 + i * 10);
+    }
   }
 
   function placeStatus(cam, width) {
@@ -646,6 +683,7 @@ G.ui = (() => {
     c.setTransform(uiScale, 0, 0, uiScale, 0, 0);
     c.clearRect(0, 0, G.W, G.H);
     statusBounds = null;
+    rewardCue = null;
     c.textBaseline = "top";
 
     const p = G.state.player;
@@ -741,6 +779,7 @@ G.ui = (() => {
     const entranceFocus = G.world && G.world.nearPortal && G.world.nearPortal(56);
     const bossBarShown = drawBossBar(c);
     const encounterFocus = bossBarShown || (G.state.mapId === "emberRidge" && G.ridgeSurvey && G.ridgeSurvey().active);
+    rewardCue = placeRewardCue(c, cam);
     if (!encounterFocus && !entranceFocus) drawLocationChip(c, cam);
 
     /* stars (top right) */
@@ -760,18 +799,21 @@ G.ui = (() => {
       }
       drawWardHint(c, cam);
       const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c, cam);
-      if (!interactionShown && !entranceFocus && !encounterFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
-      drawWayfinderHint(c);
+      if (!rewardCue && !interactionShown && !entranceFocus && !encounterFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
+      if (!rewardCue) drawWayfinderHint(c);
       drawTutorial(c, cam);
       drawAbilityBar(c, p);
     }
     } // standard HUD; the opening keeps its own compact field layout
+    if (openingHud) rewardCue = placeRewardCue(c, cam, true);
     drawNpcChatter(c, cam);
+    drawRewardCue(c);
 
     /* toasts (word-wrapped so long messages fit) */
     c.font = `9px ${FONT_BODY}`;
     let ty = G.input.isTouch ? 5 : (G.fieldMasteryQuest && G.fieldMasteryQuest() ? 99 : 67);
     for (const t of G.state.bossCutscene || openingHud ? [] : toasts) {
+      if (rewardCue && t.text.startsWith(rewardCue.lines[0] + " revealed")) continue;
       const alpha = t.t > t.dur - 0.3 ? (t.dur - t.t) / 0.3 : 1;
       c.globalAlpha = Math.max(0, alpha) * 0.95;
       for (const line of wrapText(c, t.text, G.W - 40)) {

@@ -133,6 +133,7 @@ G.saveGame = function () {
       stars: s.stars,
       items: s.items,
       opened: s.opened,
+      groundRewards: s.groundRewards,
       pantries: s.pantries,
       known: s.known,
       claimedForms: s.claimedForms,
