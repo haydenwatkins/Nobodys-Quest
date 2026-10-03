@@ -10,7 +10,8 @@ October 3, 2026. Named bodies, residents and current portrait/speaker coverage a
 | Optional regular-HUD cards covering nearby NPCs | Complete: native named/resident body and marker clearance; cards restore when clear |
 | Incidental speech | Existing traveller/speaker clearance retained; crowded combinations remain to review |
 | Shared effects and threat/reward contrast | Audit pending |
-| Ground items and every reward source | Audit pending; do not silently exempt reward categories |
+| Ordinary heart/mana drops | Complete: recognizable heart/flask art, ground contact, collection feedback, quiet-motion fade |
+| Persistent items and every reward source | Source audit in progress; see `GROUND-REWARDS.md`; do not silently exempt categories |
 
 ## Cobblekin cover complete
 
@@ -25,3 +26,9 @@ This changes the field's presentation and descriptions. It does not introduce an
 The regular HUD’s optional map, lesson, tutorial, story and guidance panels now yield when they would cover a nearby NPC’s authored body, talk label or guidance marker. The existing enemy/traveller/essential-status checks remain. Actual sprite metrics cover both named people and shorter residents; malformed speech-only records without a world sprite do not suppress the field UI. Distant and non-overlapping actors leave cards visible. No NPC route, speech timer, quest counter or other progression state changes during drawing.
 
 Eight final focused checks passed across named/resident bodies and marker clearance, all three input modes and both settings, previous enemy clearance, status positioning, save-preserved Crest visibility and incidental speech. Six inspected controlled touch-landscape views use native Mistwood Pebble with a distant/nearby/restored sequence in both settings. The card clears his nearby body and returns after the traveller moves away. No page errors or horizontal overflow appeared. Essential status, fixed touch controls and the paper opening HUD are not claimed to have universal NPC avoidance; those combinations remain part of the shared audit.
+
+## Ordinary health and mana drops complete
+
+Hearts now use recognizable coral heart art; mana uses a small blue glass flask. Both have ground shadows, restrained native motion and four authored poses in each pixel setting. Collection explains the result with “Heart restored” / “Mana restored”, or the corresponding full-cap notice. Reduced motion uses a steady pose and smooth expiry fade instead of bobbing and blinking. Magnet distance/speed, amounts, caps, ordinary twelve-second expiry and travel reset remain unchanged.
+
+Eight focused pickup, Drain mastery and Cobblekin checks passed. All pickup poses and four controlled touch-landscape ground/collected views were inspected in both settings. Real movement and the native magnet collected both drops with the correct health/mana changes; no page errors or horizontal overflow appeared. These browser fixtures placed ordinary source-format drops; they do not claim an enemy-kill walkthrough. Persistent trophies and quest gifts are not covered by this batch.

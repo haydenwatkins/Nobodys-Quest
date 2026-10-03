@@ -1477,11 +1477,14 @@ G.updatePickups = function (dt) {
     }
     if (d < 8) {
       if (pk.kind === "heart") {
-        G.healPlayer(1, "heart-pickup");
+        const healed = G.healPlayer(1, "heart-pickup");
         G.sfx.play("pickup");
+        if (G.ui && G.ui.toast) G.ui.toast(healed > 0 ? "Heart restored" : "Hearts full", 1.8);
       } else {
+        const before = p.mana;
         p.mana = Math.min(p.manaMax, p.mana + 3);
         G.sfx.play("mana");
+        if (G.ui && G.ui.toast) G.ui.toast(p.mana > before ? "Mana restored" : "Mana full", 1.8);
       }
       s.pickups.splice(i, 1);
       continue;
@@ -1771,6 +1774,7 @@ G.drawEnemy = function (ctx, e) {
 
 G.drawPickups = function (ctx) {
   for (const pk of G.state.pickups) {
+    if (G.drawPickupArt && G.drawPickupArt(ctx, pk)) continue;
     const bob = Math.sin(pk.t * 5) * 2;
     const x = Math.round(pk.x), y = Math.round(pk.y - 5 + bob);
     if (pk.t > 9 && Math.floor(pk.t * 8) % 2 === 0) continue; // blink before vanishing
