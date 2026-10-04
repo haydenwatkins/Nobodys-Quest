@@ -1,0 +1,22 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const runtime=require('../tools/lib/classic-runtime.cjs'),collect=require('./helpers/collect-treasure.cjs'),cross=require('./helpers/cross-road.cjs');
+const item='shattercoast-tideglass-chronicle',keepsakes=['tide-shell','paper-crane','orrery-key','elder-acorn'];
+function setup(){const r=runtime(),{G}=r;G.state.opening.complete=G.state.delivery.complete=true;G.state.stars=28;G.state.claimedForms=G.formOrder.filter(f=>!['nobody','god'].includes(f));G.questsDone=G.formOrder.flatMap(f=>G.forms[f].quests.map(q=>q.id));Object.assign(G.ensureTown(),{founded:true,introduced:true,spirit:20});r.load('shattercoast');r.drain();G.state.enemies=[];return r;}
+function cairn(G){Object.assign(G.state.player,{x:424,y:168});}
+test('Chronicle needs collected lessons, survives native knockout/travel/save, and credits the star/spirit bundle once',()=>{
+ const r=setup(),{G}=r,events=[];G.events.on('pickup',e=>{if(e.item===item)events.push(e.item);});cairn(G);
+ G.state.items.push(...keepsakes.slice(0,3));r.load('druidTrial');r.drain();const elder=G.state.enemies.find(e=>e.id==='grandmotherBriar');G.combat.damageEnemy(elder,{damage:elder.ward.hp,type:'dark',knockback:0});G.combat.damageEnemy(elder,{damage:100,type:'dark',knockback:0});r.drain();assert.ok(elder.dead);cross(r,'shattercoast');G.state.enemies=[];cairn(G);G.tryOpeningInteraction();r.drain();assert.equal(G.shattercoastChronicle().gathered,3);assert.equal(G.groundRewardFor(item),null,'an uncollected guardian gift cannot fill its hollow');
+ cross(r,'druidTrial');const acorn=G.groundRewardFor('elder-acorn');Object.assign(G.state.player,{x:acorn.x,y:acorn.y-24});collect(r,'elder-acorn');cross(r,'shattercoast');G.state.enemies=[];cairn(G);const stars=G.state.stars,spirit=G.ensureTown().spirit;G.state.player.damageTaken=2;G.tryOpeningInteraction();r.drain();
+ const gift={...G.groundRewardFor(item)};assert.equal(gift.source,'regional');assert.ok(G.world.isSafeSpawn(gift.x,gift.y));assert.ok(G.shattercoastChronicle().complete);assert.ok(G.shattercoastChronicle().pending);assert.ok(!G.state.items.includes(item));assert.equal(G.state.stars,stars);assert.equal(G.ensureTown().spirit,spirit);assert.equal(G.state.player.damageTaken,2,'the cairn does not add recovery');assert.equal(events.length,0);
+ G.tryOpeningInteraction();assert.match(r.messages.at(-1).text,/Chronicle waits beside the cairn/);r.drain();assert.equal(G.state.groundRewards.filter(g=>g.item===item).length,1);
+ G.state.player.invuln=0;G.damagePlayer(100);r.drain();assert.ok(G.groundRewardFor(item));assert.ok(G.shattercoastChronicle().complete);G.saveGame();const saved=G.loadSaveData();
+ cross(r,'frostbellTundra');assert.equal(G.groundRewardsHere().length,0);cross(r,'shattercoast');r.drain();G.state.enemies=[];
+ G.state.groundRewards=G.normalizeGroundRewards(saved.groundRewards.map(g=>({...g,stars:9999,spirit:9999})));r.load('shattercoast');r.drain();G.state.enemies=[];assert.ok(G.shattercoastChronicle().pending);assert.equal(G.state.stars,stars);
+ Object.assign(G.state.player,G.world.safeArrival(gift.x,gift.y-24));G.state.player.damageTaken=2;collect(r,item);assert.equal(G.state.stars,stars+1);assert.equal(G.ensureTown().spirit,spirit+8);assert.equal(events.length,1);assert.equal(G.state.player.damageTaken,2);assert.equal(G.shattercoastChronicle().pending,false);assert.equal(G.state.items.filter(i=>i===item).length,1);
+ cairn(G);G.tryOpeningInteraction();r.drain();assert.equal(G.state.stars,stars+1);assert.equal(G.ensureTown().spirit,spirit+8);assert.equal(G.revealRegionalReward(item,424,168),null);G.saveGame();assert.ok(G.loadSaveData().items.includes(item));assert.equal(G.normalizeGroundRewards(saved.groundRewards).length,0);
+});
+test('legacy Chronicles retain completion with missing old lessons; unearned or wrong-map receipts are rejected',()=>{
+ const r=setup(),{G}=r,raw={source:'regional',item,mapId:'shattercoast',x:424,y:192};
+ assert.equal(G.normalizeGroundRewards([raw]).length,0);G.state.items.push(...keepsakes);assert.equal(G.normalizeGroundRewards([{...raw,mapId:'overworld'}]).length,0);assert.equal(G.normalizeGroundRewards([raw,raw]).length,1);
+ G.state.items=[item];r.load('shattercoast');r.drain();G.state.enemies=[];cairn(G);G.tryOpeningInteraction();r.drain();assert.ok(G.shattercoastChronicle().complete);assert.equal(G.shattercoastChronicle().pending,false);assert.equal(G.groundRewardFor(item),null);assert.equal(G.state.stars,28);assert.equal(G.ensureTown().spirit,20);
+});

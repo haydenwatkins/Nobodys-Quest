@@ -35,6 +35,7 @@
     "mistwood-middle-road": { name: "Trail Bell Keepsake", purpose: "+6 town spirit · the middle road is open", shape: "trailBell" },
     "starfall-thread": { name: "Fallen Star Thread", purpose: "+8 town spirit · unlocks the Starstrider look", shape: "starThread" },
     "glasswater-meridian": { name: "Meridian Keepsake", purpose: "+6 town spirit · the meridian road is open", shape: "sunDialToken" },
+    "shattercoast-tideglass-chronicle": { name: "Tideglass Chronicle", purpose: "+1 star · +8 town spirit · four coastal lessons", shape: "tideBook" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -49,7 +50,7 @@
   G.treasureArt = {};
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
-    G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
+    G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : shape === "tideBook" ? { ...palette, b: "#438d94", e: "#285464", f: "#dfb979" } : palette, (g, frame) => {
       if (shape === "watchLantern") {
         g.ellipse(14,6,6,5,"k");g.ellipse(14,6,4,3,"b");g.ellipse(14,6,2,2,"k");
         g.poly([[7,10],[21,10],[24,15],[23,29],[5,29],[4,15]],"k");
@@ -114,6 +115,15 @@
         g.poly([[4,14],[24,14],[22,21],[17,23],[10,23],[5,20]],"j");g.line(6,15,22,15,"a",1);
         g.rect(12,20,5,6,"k");g.rect(13,21,3,3,"a");g.put(14,22,"c");
         for(const x of [8,11,19,22])g.put(x,18,"c");
+      } else if (shape === "tideBook") {
+        g.rect(5, 8, 18, 20, 'k'); g.rect(6, 9, 16, 18, 'b');
+        g.rect(7, 9, 3, 17, 'e'); g.rect(10, 10, 11, 14, 'b');
+        g.rect(10, 25, 11, 2, 'c'); g.rect(11, 25, 9, 1, 'd');
+        g.rect(12, 13, 6, 1, 'd'); g.rect(11, 15, 3, 1, 'c');
+        g.rect(14, 16, 3, 1, 'c'); g.rect(17, 15, 3, 1, 'c');
+        g.rect(12, 19, 6, 1, 'e'); g.rect(13, 20, 4, 1, 'c');
+        g.rect(21, 16, 3, 5, 'k'); g.rect(21, 17, 2, 3, 'f');
+        g.rect(22, 17, 1, 1, frame % 2 ? 'd' : 'c');
       } else if (shape === "recipeBook") {
         g.poly([[4,2],[24,2],[26,26],[23,31],[5,31],[2,28],[2,6]],"k");
         g.rect(5,5,18,20,"e");g.rect(4,5,4,20,"g");g.line(6,6,6,22,"f",1);

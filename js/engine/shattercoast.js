@@ -10,9 +10,11 @@
     { item: "elder-acorn", name: "Elder Acorn", color: "#d9a7ff" },
   ];
   const has = item => G.state.items.includes(item);
+  const remembered = () => has(reward) || !!G.groundRewardFor(reward);
   G.shattercoastChronicle = () => ({
     gathered: keepsakes.filter(entry => has(entry.item)).length,
-    complete: has(reward),
+    complete: remembered(),
+    pending: !!G.groundRewardFor(reward),
     missing: keepsakes.filter(entry => !has(entry.item)).map(entry => entry.name),
   });
   function candidate() {
@@ -21,7 +23,7 @@
         Math.hypot(s.player.x - x, s.player.y - y) > 28) return null;
     if (s.enemies.some(enemy => !enemy.dead && !enemy.def.practice &&
         Math.hypot(enemy.x - s.player.x, enemy.y - s.player.y) < 75)) return null;
-    return { kind: "tideglass-chronicle", label: has(reward) ? "Read the Tideglass Chronicle" : "Read the tideglass cairn", x, y };
+    return { kind: "tideglass-chronicle", label: remembered() ? "Read the Tideglass Chronicle" : "Read the tideglass cairn", x, y };
   }
   const oldCandidate = G.openingInteractionCandidate, oldInteract = G.tryOpeningInteraction;
   G.openingInteractionCandidate = () => candidate() || oldCandidate();
@@ -29,18 +31,15 @@
     if (!candidate()) return oldInteract();
     const survey = G.shattercoastChronicle();
     if (survey.complete) {
-      G.ui.dialogue("THE TIDEGLASS CHRONICLE", "A shell holds steady, a crane turns, an orrery finds its course, and an acorn takes root. Four answers keep the same shore alive.", { accent: "#73eff7" });
+      G.ui.dialogue("THE TIDEGLASS CHRONICLE", "A shell holds steady, a crane turns, an orrery finds its course, and an acorn takes root. Four answers keep the same shore alive." + (survey.pending ? " Your Chronicle waits beside the cairn. Walk over it to carry the four lessons home." : ""), { accent: "#73eff7" });
     } else if (survey.gathered < keepsakes.length) {
       G.ui.dialogue("THE TIDEGLASS CAIRN", `Four empty hollows face the guardians' roads. ${survey.gathered}/4 keepsakes answer. Still waiting: ${survey.missing.join(", ")}.`, { accent: "#73eff7" });
     } else {
-      G.state.items.push(reward);
-      G.state.stars += 1;
-      G.ensureTown().spirit += 8;
+      G.revealRegionalReward(reward, x, y);
       G.sfx.play("unlock");
       G.spawnFx({ kind: "ring", x, y: y - 12, color: "#73eff7", radius: 30, dur: .7 });
-      G.ui.dialogue("THE TIDEGLASS CHRONICLE", "The four keepsakes catch one wave of light. Defense, precision, curiosity, and care can share a road without becoming the same answer. The coast remembers who taught you.", { accent: "#73eff7" });
-      G.ui.banner("FOUR ANSWERS, ONE SHORE", "1 star · 8 town spirit");
-      G.checkUnlocks();
+      G.ui.dialogue("THE TIDEGLASS CHRONICLE", "The four keepsakes catch one wave of light. Defense, precision, curiosity, and care can share a road without becoming the same answer. A little book waits beside the cairn, ready to carry their lessons home.", { accent: "#73eff7" });
+      G.ui.banner("FOUR ANSWERS, ONE SHORE", "Collect the Chronicle beside the cairn · 1 star · 8 town spirit");
       G.saveGame();
     }
     G.input.clearTaps();
@@ -50,7 +49,7 @@
   G.openingDrawables = c => {
     const list = oldDraw(c);
     if (G.state.mapId !== map) return list;
-    const lit = has(reward);
+    const lit = remembered();
     list.push({ y: y - 4, fn: () => {
       if (G.drawCoastCairn && G.drawCoastCairn(c,x,y,lit)) return;
       c.save();

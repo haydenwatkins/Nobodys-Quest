@@ -24,7 +24,7 @@ for(const [id,map,item,form,type]of sources)test(`${id} saves a ground gift, pre
  G.saveGame();assert.ok(G.loadSaveData().items.includes(item));assert.ok(!G.loadSaveData().groundRewards.some(g=>g.item===item));
  const rematch=G.makeEnemy(id,e.x,e.y);rematch.ward.hp=0;G.combat.damageEnemy(rematch,{damage:100,type,knockback:0});r.drain();assert.equal(G.state.stars,stars+1);assert.equal(G.groundRewardFor(item),null);
  cross(r,'shattercoast');G.state.enemies=[];Object.assign(G.state.player,{x:26*16+8,y:10*16+8});
- const spirit=G.state.town.spirit,before=G.state.stars;G.tryOpeningInteraction();r.drain();
+ const spirit=G.state.town.spirit,before=G.state.stars;G.tryOpeningInteraction();r.drain();assert.equal(G.state.stars,before);assert.equal(G.state.town.spirit,spirit);assert.ok(G.shattercoastChronicle().pending);collect(r,'shattercoast-tideglass-chronicle');
  assert.equal(G.state.stars,before+1);assert.equal(G.state.town.spirit,spirit+8);assert.equal(G.shattercoastChronicle().complete,true);
  G.tryOpeningInteraction();r.drain();assert.equal(G.state.stars,before+1);assert.equal(G.state.town.spirit,spirit+8);
  cross(r,map);assert.ok(G.state.enemies.some(e=>e.id===id),'claimed trial keeps its original optional rematch');

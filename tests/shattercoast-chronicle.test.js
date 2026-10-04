@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const runtime = require('../tools/lib/classic-runtime.cjs');
@@ -20,6 +21,11 @@ test('the four coastal lessons give one persistent cairn reward, including on an
   assert.equal(G.shattercoastChronicle().gathered, 4);
   const stars = G.state.stars, spirit = G.state.town.spirit;
   assert.equal(G.tryOpeningInteraction(), true);
+  assert.equal(G.state.stars, stars);
+  assert.equal(G.state.town.spirit, spirit);
+  assert.ok(G.shattercoastChronicle().pending);
+  r.drain();
+  collect(r, 'shattercoast-tideglass-chronicle');
   assert.equal(G.state.stars, stars + 1);
   assert.equal(G.state.town.spirit, spirit + 8);
   assert.equal(G.state.items.filter(item => item === 'shattercoast-tideglass-chronicle').length, 1);

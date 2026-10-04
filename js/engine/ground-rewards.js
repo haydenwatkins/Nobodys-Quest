@@ -14,6 +14,8 @@
     "starfall-thread": { mapId: "starfallRuins", name: "Fallen Star Thread", spirit: 8,
       requires: ["starfall-dawn", "starfall-dusk", "starfall-midnight"] },
     "glasswater-meridian": { mapId: "glasswaterDesert", name: "Meridian Keepsake", spirit: 6, requires: "glasswater-prism" },
+    "shattercoast-tideglass-chronicle": { mapId: "shattercoast", name: "Tideglass Chronicle", stars: 1, spirit: 8,
+      requires: ["tide-shell", "paper-crane", "orrery-key", "elder-acorn"] },
   };
   function definition(item, source = "chest") {
     if (source === "regional") {
