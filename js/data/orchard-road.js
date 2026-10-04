@@ -35,7 +35,9 @@
   // Four 3-heart creatures provide twelve actual Slap contacts and the sign
   // provides the second Nobody lesson; no fabricated quest events are needed.
   [[17,32],[21,32],[23,35],[18,36]].forEach(p=>m.put(...p,'s'));
-  [[18,21],[22,22],[23,26]].forEach(p=>m.put(...p,'b'));
+  // Rat's first useful stretch is on the far bank: bite three different
+  // briars, earn Fester, then try it while clearing the mill approach.
+  [[36,26],[40,26],[42,24]].forEach(p=>m.put(...p,'b'));
   [[44,15],[49,13]].forEach(p=>m.put(...p,'g'));
   registerMap({id:'orchardRoad',name:'Greenfield · Orchard Road',biome:'mistwood',openingLandscape:true,
     playerStart:{x:7,y:37}, tiles:m.finish(),

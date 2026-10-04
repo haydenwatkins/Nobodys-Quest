@@ -10,28 +10,22 @@ function fixture() {
   return r;
 }
 
-test('borrowed lesson earns the source form mastery and keeps the original mix', () => {
-  const {G} = fixture();
-  const quest = G.forms.rat.quests.find(q => q.match?.ability === 'bite');
-  const old = [...G.getLoadout('knight')];
-  assert.ok(G.prepareMasteryLesson(quest.id, 2));
-  assert.equal(G.getLoadout('knight')[0], G.forms.knight.basic);
-  assert.equal(G.getLoadout('knight')[2], 'bite');
-  assert.deepEqual([...G.mixRecipeDetails('knight', 0).arts], old);
-  assert.equal(G.fieldMasteryQuest().quest.id, quest.id);
-  G.restoreDefaultLoadout('knight');
-  assert.notEqual(G.fieldMasteryQuest()?.quest.id, quest.id, 'a removed art must not keep an impossible field lesson active');
-  assert.ok(G.prepareMasteryLesson(quest.id, 2));
-  assert.equal(G.mixRecipes('knight').filter(Boolean).length, 1, 'repeated experiments do not duplicate the same backup');
-  const stars = G.state.stars, level = G.formLevel('rat');
-  for (let i=0; i<quest.count; i++) G.events.emit('hit', {ability:'bite'});
-  assert.ok(G.questsDone.includes(quest.id));
-  assert.equal(G.state.stars, stars+1);
-  assert.equal(G.formLevel('rat'), level+1);
-  assert.notEqual(G.fieldMasteryQuest()?.quest.id, quest.id);
-  assert.equal(G.state.formId, 'knight');
-  assert.ok(G.recallMixRecipe('knight', 0));
-  assert.deepEqual([...G.getLoadout('knight')], old);
+test('following Rat mastery wears Rat and preserves the Knight mix; borrowed Bite gives no Rat credit', () => {
+  const r=fixture(),{G}=r;
+  const quest=G.forms.rat.quests.find(q=>q.match?.ability==='bite');
+  G.getLoadout('knight')[2]='bite';const old=[...G.getLoadout('knight')];
+  const e=G.makeEnemy('slime',G.state.player.x+10,G.state.player.y);e.hp=999;
+  G.state.enemies.push(e);
+  G.combat.damageEnemy(e,{ability:'bite',damage:1,type:'dark',fromX:e.x-10,fromY:e.y});
+  assert.equal(G.questProgress(quest),0,'a borrowed move cannot level an unworn body');
+  assert.ok(G.prepareMasteryLesson(quest.id,2));assert.equal(G.state.formId,'rat');
+  assert.deepEqual([...G.getLoadout('knight')],old,'choosing a lesson leaves the previous build intact');
+  assert.equal(G.fieldMasteryQuest().quest.id,quest.id);
+  const stars=G.state.stars,level=G.formLevel('rat');
+  for(let i=0;i<quest.count;i++)G.combat.damageEnemy(e,{ability:'bite',damage:1,type:'dark',fromX:e.x-10,fromY:e.y});
+  assert.ok(G.questsDone.includes(quest.id));assert.equal(G.state.stars,stars+1);
+  assert.equal(G.formLevel('rat'),level+1);assert.equal(G.state.formId,'rat');
+  G.setForm('knight');assert.deepEqual([...G.getLoadout('knight')],old);
 });
 
 test('recipes and followed lesson survive serialization; malformed or newly locked arts do not equip', () => {
@@ -67,7 +61,8 @@ test('lesson choices exclude unearned arts and reject changing A or a completed 
   assert.ok(!G.masteryLessons(Infinity).some(e => e.quest.id === locked.id));
   assert.equal(G.prepareMasteryLesson(locked.id, 1), false);
   const bite = G.forms.rat.quests.find(q => q.match?.ability === 'bite');
-  assert.equal(G.prepareMasteryLesson(bite.id, 0), false);
+  assert.equal(G.prepareMasteryLesson(bite.id, 0), true,'following a native basic selects its form without replacing A');
+  assert.equal(G.getLoadout('rat')[0],G.forms.rat.basic);
   G.questsDone.push(bite.id);
   assert.equal(G.prepareMasteryLesson(bite.id, 1), false);
   assert.ok(G.masteryLessons(Infinity).every(e => !e.ability || G.availableAbilities().includes(e.ability)));

@@ -68,7 +68,7 @@ G.ensureExpeditionProgress = function () {
 };
 
 G.expeditionUnlocked = function () {
-  return !!(G.state && G.townUnlocked && G.townUnlocked() && G.unlockedForms && G.unlockedForms().length >= 2);
+  return !!(G.state && (G.systemIntroduced?.('sideAdventures')!==false || G.ensureExpeditionProgress().runs>0) && G.townUnlocked && G.townUnlocked() && G.unlockedForms && G.unlockedForms().length >= 2);
 };
 
 G.expeditionHeartBonus = function () {

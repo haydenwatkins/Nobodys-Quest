@@ -110,26 +110,26 @@
     const d=state(),s=G.state;
     if(at.id==='depart'){
       d.started=true;G.world.load(d.complete?'sunriseQuay':'lanternReach');
-      say('departure',[['PARCEL','Flour for the baker. A letter for Mara. A birthday present, only slightly chewed.'],['PATCHLING','Who has been keeping the road lights on?'],['PARCEL','No one lately. The lamps could use a keeper. Start with the one beside us.']]);
+      say('departure',[['PARCEL','Flour for Brindle, a letter for Mara, and Pip’s birthday present. They’ve all been waiting for me. Let’s get these home!'],['PATCHLING','It’s getting dark. Can we light those lamps?'],['PARCEL','Yes, please! Nobody’s reached them since the flood. Light the one beside us first; I’ll keep the cart close.']]);
     }else if(at.id==='rideBack')G.world.load('orchardRoad',{x:26,y:37});
     else if(at.id==='manyfold'){if(G.ui.openExpedition)G.ui.openExpedition(G.ensureExpeditionProgress().runs===0?3:undefined);}
     else if(at.id.startsWith('lamp')){
       const i=Number(at.id.slice(-1));d.lamps[i]=1;spawnWave(i);G.sfx.play('bossPhase');
-      say('lamp'+i,[['PARCEL',i?'They followed the light across. Clear the bank; I will keep the flame.':'The light woke something in the reeds. I have the cart. You have room to move.']]);
+      say('lamp'+i,[['PARCEL',i?'More root creatures! Clear the bank, please. I’ll keep the lamp safe.':'Oh no, there’s something moving in the reeds! I’ll stay with the cart. You’ve got room to dodge around it.']]);
     }else if(at.id==='drain'){
-      if(s.formId!=='rat')G.ui.dialogue('PEBBLE','Something pale is caught under that bank. A rat could follow the drain.',{accent:'#e7bd78'});
+      if(s.formId!=='rat')G.ui.dialogue('PEBBLE','There’s something caught under that bank! Try the drain as Rat; I think you’ll fit.',{accent:'#e7bd78'});
       else{move(20,33);if(!d.salvage){d.salvage=true;G.revealActivityReward('brindles-recipes',s.player.x,s.player.y);G.sfx.play('pickup');say('salvage',[['PATCHLING','A recipe book. The pages smell of cinnamon.'],['PARCEL','Brindle lost that in the flood. Walk over the book to collect it, then bring her the good news. Keep it dry.']]);}}
     }else if(at.id==='drainBack')move(18,30);
     else if(locations[at.id]){
       d.parcels.push(at.id);G.sfx.play('pickup');s.deliveryWarmT=3;
-      const lines={bread:[['BAKER BRINDLE',d.salvage?'My flour AND my recipes! I can stop calling the burnt ones a local tradition.':'Flour! I was down to making the smell of bread. Very popular. Not filling.'],['PATCHLING','You kept the oven warm.'],['BAKER BRINDLE','Someone had to believe something would arrive.']],
-        letter:[['MARA','From my sister. She is coming home. She thought I had stopped writing.'],['PATCHLING','The letters stopped. You didn’t.'],['MARA','I will put another cup out.']],
+      const lines={bread:[['BAKER BRINDLE',d.salvage?'My flour AND my recipes! I can stop calling the burnt ones a local tradition.':'Flour! I was down to making the smell of bread. Very popular. Not filling.'],['PATCHLING','You must have missed baking for everyone.'],['BAKER BRINDLE','I did! I kept checking the road. I’m so happy to have you all back.']],
+        letter:[['MARA','From my sister. She is coming home. She thought I had stopped writing.'],['PATCHLING','She must have missed you. I’m glad we got her letter here.'],['MARA','I will put another cup out.']],
         present:[['PIP','A wooden dragon! It has wheels!'],['PATCHLING','The best dragons do.'],['PIP','Will you stay until I make it fly?']]};
       say(at.id,lines[at.id]);
     }else if(at.id==='finish'){
       d.complete=true;const gift=G.revealActivityReward('sunrise-seal',at.x,at.y);
       G.healPlayer(G.playerMaxHearts(),'delivery');
-      say('home',[['PARCEL','Every name crossed off. That used to be an ordinary day.'],['PEBBLE','Patchling delivered everything. I am going to enjoy writing that down.'],['PATCHLING','Tomorrow there will be more.'],['PARCEL','Good. The road knows the way now.']]);
+      say('home',[['PARCEL','Everyone got their parcel! I was so worried we’d let them down. Thank you for staying with me.'],['PEBBLE','Welcome to Sunrise! You can come home here when you need a rest. Brindle’s been worrying about her lost recipe book—let’s check on her first.'],['PARCEL','The marsh is still flooded. Its queen is holding the harbour pearl. We’ll need dark magic when we go there. Your coat can learn a Wizard shape now; practice your Knight shield if it hasn’t appeared yet.'],['PATCHLING','First, cinnamon recipes. Then we’ll help with the harbour light.']]);
       G.ui.banner('THE LONG WAY HOME',gift?'Sunrise Seal waits nearby · walk over it for 8 town spirit':'Every parcel delivered · a place to return to');
     }
     G.saveGame();G.input.clearTaps();return true;
@@ -138,9 +138,10 @@
   G.npcDialogue=(id,chapter,index)=>{
     if(G.state&&G.state.mapId==='sunriseQuay'){
       const d=state();
-      if(id==='quayBaker'&&d.parcels.includes('bread'))return 'The first loaf is yours. Do not argue with someone holding a bread paddle.';
-      if(id==='quayMara'&&d.parcels.includes('letter'))return 'Two cups. One for today, one for when she gets here.';
+      if(id==='quayBaker'&&d.parcels.includes('bread'))return 'The first loaf is yours, dear. You’ve earned a warm lunch!';
+      if(id==='quayMara'&&d.parcels.includes('letter'))return 'I’ve put a cup out for my sister. I can’t wait to see her again.';
       if(id==='quayPip'&&d.parcels.includes('present'))return 'I named him Thimble. He is a very important dragon.';
+      if(id==='parcel'&&d.complete&&!G.systemIntroduced('sideAdventures'))return G.ensureTown().requests?.includes('recipes')?'Pebble’s worried about the late boat. Could you check on him at the centre of the quay?':'Brindle’s been worrying about her recipe book. She’s beside the bakery if you’d like to talk.';
       if(id==='parcel')return d.complete?'The map stand beside the east lantern leads into the Manyfold. New paths, borrowed powers, and something to bring home. I might let you carry the post next time.':'We made it. Brindle is by the oven, Mara by the east house, Pip down by the water.';
     }
     return oldTalk(id,chapter,index);
@@ -167,10 +168,10 @@
       d.lamps[i]=2;G.healPlayer(2,'lantern');s.player.mana=G.playerMaxMana();
       positionCourier();
       const [x,y]=i?[40,15]:[14,25];s.entryPoint={x:x*16+8,y:y*16+8};G.sfx.play('unlock');
-      say('lit'+i,[['PARCEL',i?'Two lights. The bridge is just ahead. I can see the town windows from here.':'One light. One stretch of road we can trust. I will bring the cart up.']]);
+      say('lit'+i,[['PARCEL',i?'Both lamps are lit! I can see the town windows past the bridge. We’re nearly home!':'That lamp makes such a difference. Thank you! I’ll bring the cart up now.']]);
     }
-    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','I kept counting what they owed. I forgot what the bridge was for.'],['PATCHLING','You could count who gets home.'],['THE TOLLKEEPER',G.groundRewardFor('keeper-lantern')?'Take the lantern on the ground. One star for the road, and three parcels for the people waiting.':'Three parcels. Two travelers. Go on. I can start with that.']]);
-    if(s.mapId==='sunriseQuay'&&d.keeper&&!d.complete)say('quay',[['PARCEL','There. The oven chimney. Mara’s blue door. Pip waiting on the step.'],['PATCHLING','They are still here.'],['PARCEL','Yes. Let us make that worth the wait.']]);
+    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','I’ve kept everyone waiting over an old toll. I’m sorry. You can cross now.'],['PATCHLING','Thank you! There are people waiting for us in Sunrise.'],['THE TOLLKEEPER',G.groundRewardFor('keeper-lantern')?'Take the lantern on the ground. One star for the road, and three parcels for the people waiting.':'Tell the people in Sunrise the bridge is open. I’m going to help keep it safe.']]);
+    if(s.mapId==='sunriseQuay'&&d.keeper&&!d.complete)say('quay',[['PARCEL','There’s Sunrise! Brindle’s oven is smoking, and Pip’s waiting by the water. Oh, I’m so relieved!'],['PATCHLING','Let’s go say hello! I want to see Pip open his present.'],['PARCEL','He’s going to love it. Brindle is by the bakery, Mara’s at the blue door, and Pip’s down by the water.']]);
     for(const h of s.openingHazards||[]){h.t+=dt;if(!h.hit&&h.t>=h.warn&&h.t<h.warn+h.active&&!h.owner.dead&&!s.knockout&&G.openingHazardHits(h,s.player.x,s.player.y))h.hit=!!G.damagePlayer(1,h.owner.x,h.owner.y);}
     s.openingHazards=(s.openingHazards||[]).filter(h=>!h.owner.dead&&h.t<h.warn+h.active);
   };

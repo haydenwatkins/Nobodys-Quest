@@ -9,13 +9,14 @@ registerForm({
     description: "Starting a melee art raises a brief frontal guard. Turn aside one blow to ready an Oathblade riposte. Perfect timing restores 1 mana and readies Oathblade immediately." },
   basic: "slash",
   abilities: [{ id: "shieldBash", level: 1 }, { id: "spinSlash", level: 2 }],
-  unlock: { type: "challenge", hint: "Recover a knight's lost crest", requirements: [
+  unlock: { type: "challenge", hint: "Learn Rat, then recover the mill keeper’s crest", requirements: [
     { type: "item", item: "knights-crest", hint: "Find the Knight's Crest" },
+    { type: "formLevel", form: "rat", level: 2, openingOnly: true },
   ] },
   quests: [
-    { text: "Turn aside 8 attacks with Oathguard", event: "parry", match: { form: "knight" }, count: 8 },
+    { text: "Turn aside 3 attacks with Oathguard", event: "parry", match: { form: "knight" }, count: 3 },
     { text: "Land 6 golden Oathblade ripostes", event: "hit", match: { ability: "slash", combo: "riposte" }, lessonForm: "knight", count: 6 },
-    { text: "Stun 10 baddies with Shield Advance", event: "status", match: { ability: "shieldBash", status: "stun" }, count: 10 },
+    { text: "Stun 3 baddies with Shield Advance", event: "status", match: { ability: "shieldBash", status: "stun" }, count: 3 },
     { text: "Drive back 3 baddies with one Hold the Line, 3 times", event: "multiHit", match: { ability: "spinSlash", combo: "hold-line", hits: { gte: 3 } }, count: 3 },
   ],
   sprite: {

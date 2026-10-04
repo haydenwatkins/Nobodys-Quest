@@ -88,5 +88,5 @@ test('the native destination label yields to field notices and returns when thei
   // Settle the real queue through drawing and update, then renew native guidance.
   for (let i = 0; i < 80; i++) { draw(); G.ui.update(.1); }
   G.requestGuidance(false); draw();
-  assert.ok(labels.some(label => label.includes('ROOTDEEP HOLLOW')));
+  assert.ok(!labels.some(label=>label.includes('ROOTDEEP HOLLOW')),'destination instructions belong in the fixed task dock, not another moving screen label');
 });

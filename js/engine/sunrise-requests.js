@@ -5,14 +5,14 @@
     {id:"beacon", npc:"pebble", name:"Pebble", title:"A light for the late boat", x:22, y:20, reward:8,
       task:"Defeat the Mire Queen in Sunken Marsh, collect her pearl from the ground, then bring it to Pebble at the centre of Sunrise Quay. Dark magic breaks her ward.",
       ready:()=>G.state.items.includes("trophy-mire-pearl"),
-      ask:"The late boat follows our harbour light. Which is unfortunate, because our harbour light is a bucket. The Mire Queen’s pearl could shine through this fog. Parcel’s cart goes back to Orchard Road; Greenfield is west from there, and the marsh lies farther west.",
-      thanks:"A pearl! I’ll set it above the quay. You may keep calling it a trophy. I shall call it a lighthouse with a very small budget. The late boat has something to steer by again.",
+      ask:"I’m worried about the late boat. Our harbour lamp can’t shine through this fog. The Mire Queen took its pearl when she flooded the marsh. Could you bring it back? Wizard’s dark magic will crack her ward. Try it on the little marsh creatures first. Parcel can take you back to Orchard Road; Greenfield and the marsh are west from there.",
+      thanks:"A pearl! I’ll set it above the quay. You may keep calling it a trophy. I shall call it a lighthouse with a very small budget. The late boat has something to steer by again. Pip’s been asking about the strange trail east of the quay. He’d love to hear about your next adventure.",
       after:"Three boats found us last night. One brought turnips. We must accept the consequences of our heroism."},
     {id:"recipes", npc:"quayBaker", name:"Brindle", title:"The cinnamon pages", x:12, y:12, reward:5,
       task:"Enter the Lantern Reach drain as Rat, collect Brindle’s recipe book from the ground, then return to her on Sunrise Quay.",
       ready:()=>G.state.items.includes("brindles-recipes") || (!!G.state.delivery.salvage && !G.groundRewardFor?.("brindles-recipes")),
       ask:"The flood took my cinnamon recipes. There’s a drain under the Lantern Reach bank. Small paws might manage where my bread paddle couldn’t.",
-      thanks:"Cinnamon knots! My mother put a thumbprint in every one. Come back hungry. I have years of catching up to bake.",
+      thanks:"My cinnamon recipes! I thought I’d lost Mum’s handwriting forever. Thank you! I’m baking a batch for you. Pebble’s worried about the boats—could you check on him next?",
       after:"That tray is for the road. The slightly enormous one is for you. I have a generous thumb."},
     {id:"dragon", npc:"quayPip", name:"Pip", title:"A dragon needs a story", x:28, y:26, reward:6,
       task:"Finish any Manyfold crossing, then tell Pip what you found. The trail stand is east of the quay.",
@@ -32,9 +32,15 @@
   const giftFor=r=>G.groundRewardFor(`sunrise-thanks-${r.id}`);
   const giftName=r=>G.treasureInfo?.[`sunrise-thanks-${r.id}`]?.name||`${r.name}'s thank-you gift`;
   const reminder=r=>giftFor(r)?` Your ${giftName(r)} waits beside me. Walk over it to collect your thanks.`:"";
-  G.sunriseRequests=()=>unlocked()?requests.map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,done:claimed().includes(r.id),pending:!!giftFor(r),giftName:giftName(r),ready:r.ready(),followed:G.ensureTown().followedRequest===r.id})):[];
+  function introduced(r) {
+    if(!G.state.opening?.started || G.state.opening.version<2 || claimed().includes(r.id) || G.ensureTown().followedRequest===r.id || r.ready())return true;
+    if(r.id==='recipes')return true;
+    if(r.id==='beacon')return claimed().includes('recipes');
+    return claimed().includes('beacon') && G.systemIntroduced('sideAdventures');
+  }
+  G.sunriseRequests=()=>unlocked()?requests.filter(introduced).map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,done:claimed().includes(r.id),pending:!!giftFor(r),giftName:giftName(r),ready:r.ready(),followed:G.ensureTown().followedRequest===r.id})):[];
   G.followSunriseRequest=id=>{
-    if(id!==null && (!unlocked() || !requests.some(r=>r.id===id) || claimed().includes(id)))return false;
+    if(id!==null && (!unlocked() || !requests.some(r=>r.id===id&&introduced(r)) || claimed().includes(id)))return false;
     G.ensureTown().followedRequest=id;
     G.formEchoGuide=null;G.legendEchoGuide=null;
     G.ensureWorldwake().practiceMark=null;
@@ -97,7 +103,7 @@
     const s=G.state;
     if(!unlocked() || s.mapId!=="sunriseQuay" || s.expeditionRun || G.ui.dialogueOpen || s.knockout || s.bossCutscene)return null;
     if(s.enemies.some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<88))return null;
-    const r=requests.find(r=>Math.hypot(s.player.x-(r.x*16+8),s.player.y-(r.y*16+8))<32);
+    const r=requests.find(r=>introduced(r)&&Math.hypot(s.player.x-(r.x*16+8),s.player.y-(r.y*16+8))<32);
     return r?{id:r.id,kind:"sunriseRequest",label:claimed().includes(r.id)?`Talk to ${r.name}`:r.ready()?`Good news for ${r.name}`:`Hear ${r.name}’s request`,x:r.x*16+8,y:r.y*16+8}:null;
   }
   const oldCandidate=G.deliveryCandidate, oldInteract=G.tryOpeningInteraction, oldTalk=G.npcDialogue;
@@ -123,14 +129,14 @@
     G.input.clearTaps();return true;
   };
   G.npcDialogue=(id,chapter,index)=>{
-    const r=unlocked()&&G.state.mapId==="sunriseQuay"&&requests.find(r=>r.npc===id);
+    const r=unlocked()&&G.state.mapId==="sunriseQuay"&&requests.find(r=>introduced(r)&&r.npc===id);
     return r?(claimed().includes(r.id)?r.after+reminder(r):r.ask):oldTalk(id,chapter,index);
   };
   const oldDraw=G.openingDrawables;
   G.openingDrawables=c=>{
     const list=oldDraw(c);
     if(!unlocked()||G.state.mapId!=="sunriseQuay")return list;
-    for(const r of requests){
+    for(const r of requests.filter(introduced)){
       const done=claimed().includes(r.id),x=r.x*16+8,y=r.y*16+8;
       list.push({y:y+2,fn:()=>{
         c.save();

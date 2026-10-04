@@ -1,5 +1,5 @@
 /* ============================================================
-   TUTORIAL — a short, persistent first-adventure guide.
+   CONTROLS — an optional, persistent practice guide.
 
    The prompts react to things the player actually does, so the
    same lesson works with a keyboard or touchscreen.
@@ -41,6 +41,7 @@ G.tutorial = (() => {
     },
   ];
 
+  let replaying = false;
   let step = 0;
   let done = false;
   let seen = false;
@@ -55,9 +56,10 @@ G.tutorial = (() => {
     const previouslySeen = !!(save && save.tutorialSeen);
     hintsShown = new Set(save && Array.isArray(save.tutorialHints) ? save.tutorialHints : []);
     seen = true;
-    // Existing adventures migrate quietly. A genuinely new adventure gets a
-    // brief first hint, then later lessons appear only when they are reached.
-    visibleFor = save ? 0 : 7;
+    // Teach the adventure through its people and encounters. This numbered
+    // controls guide only appears when explicitly requested.
+    visibleFor = 0;
+    replaying = false;
     step = G.util.clamp(step, 0, steps.length - 1);
     startX = G.state.player.x;
     startY = G.state.player.y;
@@ -65,7 +67,7 @@ G.tutorial = (() => {
   }
 
   function advance(expectedStep) {
-    if (done || step !== expectedStep) return;
+    if (!replaying || done || step !== expectedStep) return;
     if (step >= steps.length - 1) {
       done = true;
       G.sfx.play("quest");
@@ -87,7 +89,7 @@ G.tutorial = (() => {
   }
 
   function prompt() {
-    if (done || visibleFor <= 0) return null;
+    if (!replaying || done || visibleFor <= 0) return null;
     if (step === 3 && G.unlockedForms && G.unlockedForms().length < 2) return null;
     const current = steps[step];
     return {
@@ -102,6 +104,7 @@ G.tutorial = (() => {
   }
 
   function replay() {
+    replaying = true;
     step = 0;
     done = false;
     seen = true;

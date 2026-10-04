@@ -41,7 +41,7 @@ test('group mastery asks for enough live targets before drawing a field trail', 
   assert.equal(labelDraws, 0, 'the nonspatial label waits while its help toast is visible');
   G.state.time += 4.6;
   G.drawGuidanceHud(ctx, { x: 0, y: 0 });
-  assert.ok(labelDraws > 0, 'the label returns after the toast clears');
+  assert.equal(labelDraws,0,'nonspatial instructions stay in the fixed task/journal view instead of spawning another helper');
 });
 
 test('combo-only multi-hit lessons need two foes, and Mole requires the three it promises', () => {

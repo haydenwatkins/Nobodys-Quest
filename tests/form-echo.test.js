@@ -16,6 +16,7 @@ function run(file, suffix = "") {
 
 run("js/engine/core.js", ";this.G=G;");
 const G = context.G;
+run("js/engine/typography.js");
 const dialogues = [];
 const banners = [];
 const toasts = [];

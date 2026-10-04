@@ -37,15 +37,15 @@ test('borrowed bites count only actual healing; pickups, Blood Moon, and overflo
   p.damageTaken = 1; p.bloodPips = 14; foe();
   G.abilities.bloodBite.use(p);
   assert.equal(p.damageTaken, 0);
-  assert.equal(G.questProgress(q), 1, 'one missing heart caps the three-heart bite credit');
+  assert.equal(G.questProgress(q),0,'borrowed healing helps the current body but cannot level unworn Velvetwing');
   p.damageTaken = 1; G.healPlayer(1, 'heart-pickup');
   p.damageTaken = 1; G.healPlayer(1, 'bloodMoon');
-  assert.equal(G.questProgress(q), 1);
+  assert.equal(G.questProgress(q), 0);
   p.bloodPips = 4; G.abilities.bloodBite.use(p);
-  assert.equal(G.questProgress(q), 1, 'full-health healing cannot produce credit');
+  assert.equal(G.questProgress(q), 0, 'full-health healing cannot produce credit');
   G.events.emit('selfHeal', { ability: 'bloodBite', amount: 0 });
   G.events.emit('selfHeal', { ability: 'bloodBite', amount: NaN });
-  assert.equal(G.questProgress(q), 1);
+  assert.equal(G.questProgress(q), 0);
 });
 
 test('drain guidance reflects health, bite progress, and ward-protected practice foes', () => {

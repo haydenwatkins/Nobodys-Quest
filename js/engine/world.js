@@ -591,6 +591,7 @@ G.world = (() => {
         G.spawnFx({ kind: "spark", x: cx, y: cy - 9, color: "#fff3c2", dur: 0.45 });
       }
       if (ch.opened) continue;
+      if (G.openingChestReady && !G.openingChestReady(ch)) continue;
       if (ch.needsLeave) {
         if (!near) ch.needsLeave = false;
         continue;

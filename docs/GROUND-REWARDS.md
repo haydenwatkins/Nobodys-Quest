@@ -21,7 +21,7 @@ October 4, 2026. This is a working source audit, not a claim that all rewards ha
 | Worldwake favors, marks and final rewards (`worldwake.js`, `endgame.js`) | Persisted accomplishments and immediate item/star/spirit grants | Separate accomplished task from uncollected gift; no replay of legacy thanks |
 | Town, incidents, Sunrise requests, mastery | Spirit/stars and completion credit awarded by their existing systems | Audit presentation and reward ownership; do not silently exempt currency rewards |
 | Rival, expedition, gauntlet and Wayfinder | Records/contracts may restore campaign location before granting reward | Place durable rewards in the correct restored location; avoid stranding them in temporary arenas |
-| Form echoes | Existing visible world lesson/claim system | Retain its native ownership, legacy migration and automatic mastery credit |
+| Form echoes | Existing visible world lesson/claim system | Retain its native ownership and legacy migration; mastery credit belongs to the worn form |
 | Legend relics (`legends.js`) | Persisted pending rewards with real ground relic and explicit awakening | Retain and inspect the existing pattern; avoid a duplicate reward engine |
 | Save migrations (`main.js` and subsystem normalization) | Recover legacy earned items/forms quietly | Preserve existing ownership; never manufacture a second grant from migration |
 
@@ -253,3 +253,8 @@ Sixteen controlled source browser cases passed (four neighbours × touch/TV × H
 ## Remaining source inventory and next implementation
 
 Audit Worldwake's seven caravan favor payouts next. They currently mark favors complete and directly grant 2/2/2/2/3/4/5 stars; the last two also give the cloak/crown. Preserve immediate caravan-level and field-practice completion, collected-Mark requirements, costume ownership, native regional exits and quiet legacy migration. Prove First Footsteps' saved gift/collection path before broadening the other six, and choose accessible locations for any reward earned inside a temporary challenge. Other town currency, challenge return rewards and existing relic/echo presentation remain unfinished. Ben's shared font/rendering upgrade is covered in `TYPOGRAPHY.md`.
+
+
+## Opening pacing integration (October 4)
+
+The new opening keeps the Knight Crest cache closed until the mill briars are cleared and Rat's first mastery lesson is learned. Collection still grants the native item exactly once and leads to its Form Echo; no invisible ownership or immediate payout was added. The straw practice post provides a real poison/expiry recovery route if someone cleared the mill in another body. Brindle and Pebble's staged requests retain their physical book/Pearl collection, saved completion and separate pending thank-you gifts. This pacing batch does not convert the remaining reward producers.

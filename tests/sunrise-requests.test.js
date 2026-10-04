@@ -14,7 +14,7 @@ test('all three promises count past accomplishments and reward once across save 
  const r=setup(),{G,messages}=r;G.state.delivery.salvage=true;G.ensureExpeditionProgress().victories=1;G.state.town.projects.welcomeLodge=true;
  let spirit=G.state.town.spirit;
  for(const [id,x,y,reward] of [['recipes',12,12,5],['dragon',28,26,6],['welcome',30,13,5]]){
-  visit(G,x,y);assert.equal(G.deliveryCandidate().id,id);G.tryOpeningInteraction();assert.equal(G.state.town.spirit,spirit);if(id==='recipes')assert.ok(messages.some(m=>m.text.includes('Cinnamon knots')));r.drain();collect(r,`sunrise-thanks-${id}`);spirit+=reward;assert.equal(G.state.town.spirit,spirit);
+  visit(G,x,y);assert.equal(G.deliveryCandidate().id,id);G.tryOpeningInteraction();assert.equal(G.state.town.spirit,spirit);if(id==='recipes')assert.ok(messages.some(m=>m.text.includes('My cinnamon recipes')));r.drain();collect(r,`sunrise-thanks-${id}`);spirit+=reward;assert.equal(G.state.town.spirit,spirit);
   assert.ok(G.sunriseRequests().find(r=>r.id===id).done);
   G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));G.tryOpeningInteraction();assert.equal(G.state.town.spirit,spirit);
  }

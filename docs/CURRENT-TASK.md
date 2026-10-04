@@ -33,3 +33,10 @@ Reproduce with `node tools/review-promise-offers.cjs [baseURL] [outputDirectory]
 ## Brindle’s recovered book
 
 The recipe promise now follows the saved physical book: Rat entry, collection, return to Brindle, native thanks and later bakery visit. Leaving the isolated pocket before collection routes back to its bank drain and preserves Rat re-entry after save boot. Inside, breadcrumbs reach the actual book tile. Legacy salvage readiness remains. See `GROUND-REWARDS.md` and `tools/review-recipe-promise.cjs` for evidence and fixture limits.
+
+
+## Playtest pacing and stable guidance (October 4)
+
+New version-2 adventures recommend Brindle first, then reveal Pebble's harbour request after the book is returned. Pip/Mara's later requests appear after the harbour return, while prior accomplishments and saved selected promises remain usable. Nothing is auto-accepted. The same request ownership still supplies dialogue, Home, markers, Journey and the atlas.
+
+Both field docks now wrap the complete next action. The paper dock reserves the touch menu corner. Standard mastery shows one lesson for the worn form, and paper mastery includes the full next reward; optional cards yield during movement, unlock announcements and actor overlap. Offscreen arrows provide direction while onscreen targets retain native world markers. Reward cues and notices choose a position once and return there after yielding, instead of moving to another free space every frame. See `PLAYER-EXPERIENCE-RULES.md` for the research and shared authoring contract.

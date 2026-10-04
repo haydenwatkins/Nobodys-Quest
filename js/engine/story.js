@@ -27,10 +27,10 @@ G.STORY_CHAPTERS = [
     thesis: "A patch keeps the memory of the hands that made it.",
     summary: "Every recovered form adds a living patch to the traveller's map: another talent, another way to help.",
     scene: [
-      ["ARCHIVIST ERRATA", "These roads remember their keepers. Your cloth can carry those memories as living shapes."],
+      ["ARCHIVIST ERRATA", "That coat is made from our old road map! The shapes you’ve found belonged to people who used to look after these roads. I’m glad their skills can help again."],
       ["PEBBLE", "A pocket for every talent. Please leave one for lunch."],
       ["MAYOR MAYBE", "One hero with many jobs! At last, a staffing plan with no meetings."],
-      ["THE STORY", "New paths bloom across the cloth. Each patch remembers a kindness learned along the way."],
+      ["THE STORY", "With the orchard open, Parcel can bring the waiting deliveries to Sunrise."],
     ],
   },
   {
@@ -39,10 +39,10 @@ G.STORY_CHAPTERS = [
     thesis: "A perfect answer becomes a prison when the question changes.",
     summary: "Patchling challenges masters who mistook excellence for ownership and learns the weakness inside every perfect form.",
     scene: [
-      ["ARCHIVIST ERRATA", "The old masters guarded their forms until mastery hardened into possession."],
+      ["ARCHIVIST ERRATA", "The Treant closed the orchard because he was frightened. The Mire Queen flooded the marsh to keep her court to herself. Now people can’t get home. We need to talk some sense into the other guardians too."],
       ["PEBBLE", "They became perfect. It sounds exhausting."],
-      ["THE STORY", "Each master knows one road completely. Patchling survives by joining roads together."],
-      ["ARCHIVIST ERRATA", "Do not defeat what they are. Show them what they can no longer become."],
+      ["THE STORY", "The roads have different dangers. Patchling can choose a shape and a move that will help with each one."],
+      ["ARCHIVIST ERRATA", "I’m worried about the people beyond those blocked roads. Please check on them when you can."],
     ],
   },
   {
@@ -186,7 +186,7 @@ function formJourneyLead(formId, progress, seen = new Set(), horizon = false) {
       return { guide: "mastery", formId: option.id, questId: lesson.quest.id,
         title: `Learn the path to ${form.name}`, short: `Raise ${source.name} to level ${option.target} for ${form.name}`,
         objective: `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. ${source.name} needs level ${option.target} to awaken ${form.name}.`,
-        reason: `${form.name}'s path begins with a lesson from ${source.name}. Borrowed arts count for their original forms.`, progress };
+        reason: `${form.name}'s path begins with a lesson from ${source.name}. Wear each form to earn its mastery; borrowed arts still help in combat.`, progress };
     }
     for (const option of options) if (!G.formUnlocked(option.id)) {
       const earlier = formJourneyLead(option.id, progress, seen, horizon);
@@ -270,6 +270,15 @@ G.storyGoal = function () {
     { trophy: "trophy-mire-pearl", name: "Mire Queen", mapId: "sunkenMarsh", destination: "Sunken Marsh", stars: 4 },
     { trophy: "trophy-eclipse-sigil", name: "Eclipse Knight", mapId: "emberRidge", destination: "Ember Ridge", stars: 7 },
   ];
+  if (G.state.opening?.started && G.state.opening.version>=2 && G.state.delivery?.complete && !G.state.items.includes('trophy-mire-pearl') && !G.followedSunriseRequest?.()) {
+    const recipes=G.ensureTown().requests?.includes('recipes');
+    const lesson=!G.formUnlocked('wizard')&&recipes?formJourneyLead('wizard',storyProgress(0,1,'MAGIC FOR THE MARSH')):null;
+    if(lesson)return Object.assign(base,lesson);
+    return Object.assign(base,{guide:'opening',mapId:'sunriseQuay',point:recipes?[22,20]:[12,12],
+      title:recipes?'Help the harbour':'A friend at home',short:recipes?'Talk to Pebble about the harbour':'Ask Brindle about her recipe book',
+      objective:recipes?'Visit Pebble at the centre of Sunrise Quay. He is worried about boats getting lost in the fog.':'Talk to Brindle beside the bakery on Sunrise Quay. You can choose to help her find the cinnamon recipes.',
+      reason:'The deliveries are arriving again. Help the neighbours get their home back.',progress:storyProgress(0,1,'SUNRISE FRIENDS')});
+  }
   if (chapter === 1) {
     const defeated = masters.filter((master) => items.has(master.trophy)).length;
     const next = masters.find((master) => !items.has(master.trophy) && stars >= master.stars) ||
@@ -400,7 +409,7 @@ G.storyGoal = function () {
     return Object.assign(base, {
       guide: "mastery", formId: form.id, questId: lesson && lesson.quest.id,
       title: "Learn every path, master your favorites", short: `${exam.broad}/${exam.total} forms at level 3 · ${exam.specialists}/${exam.specialistGoal} mastered`,
-      objective: `${step} Bring every form to level 3 and six chosen forms to level 5. Borrowed arts count for their original forms.`,
+      objective: `${step} Bring every form to level 3 and six chosen forms to level 5. Wear each form to earn its mastery; borrowed arts still help in combat.`,
       reason: "The final answer needs experience with every shape and a handful of lessons carried all the way through.",
       progress,
     });

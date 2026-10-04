@@ -58,12 +58,12 @@
       hair: "#ddd4ba", skin: "#f2c7a5", coat: "#6377a8", accent: "#d9b45d",
     }, {
       0: [
-        "I was told to wait beside the road and point toward danger. Nobody remembered to tell me when to stop.",
-        "If anyone asks, I am a licensed companion. Please do not ask the license.",
+        "I’ve been waiting for someone to help Parcel. The road’s full of roots, and he can’t get his cart through.",
+        "I’m coming with you! I brought snacks. Well, one snack. We can share.",
       ],
       1: [
-        "You change shape whenever one answer fails. At last, a heroic habit I understand.",
-        "Your coat remembers everyone who lent you a hand. Very useful tailoring.",
+        "That Rat shape is so quick! I can barely keep up. Let me know before you dash off again.",
+        "People are starting to use the road again. That makes me happy. I missed having someone to walk with.",
       ],
       3: [
         "The roads woke up grumpy. In fairness, people have been walking all over them.",
@@ -79,13 +79,13 @@
       hair: "#70493e", skin: "#e7ad88", coat: "#8f4f71", accent: "#f3d56b",
     }, {
       0: [
-        "Welcome! A walking map is exactly what our missing roads need. Please sign the visitor book with a reasonably small footprint.",
-        "The town motto is 'All Roads Lead Home.' The roads have been ignoring it. Very disrespectful.",
-        "Monsters are unfinished chores with teeth. This is why I never floss near paperwork.",
+        "Welcome! I’m Mayor Maybe. People haven’t been able to reach their friends for weeks. I’m so glad you’ve come to help.",
+        "I promised everyone we’d get the roads open. I don’t quite know how yet. Please tell me if you find a way.",
+        "The root creatures have been getting bolder. Stay close to the paths until you’re ready to face them.",
       ],
       1: [
-        "Every abandoned duty left a shape behind. You call them forms. I call them unfinished business.",
-        "Please rescue the world before election day. I have promised the world that you will.",
+        "Parcel made it to Sunrise! I’m relieved. I was running out of reassuring things to say.",
+        "We’ve got one road open. Let’s help the people along it before we rush off to the next.",
       ],
       2: [
         "Those guardians guarded old promises. Mostly from anyone trying to keep them.",
@@ -101,16 +101,16 @@
       hair: "#b7b1c9", skin: "#c98c72", coat: "#4f577e", accent: "#8fd3c8",
     }, {
       0: [
-        "Your cloth was cut from the old road map. The places missing from it are still waiting to be found.",
-        "The Unfinished began as duties, vows, and one extremely overdue library book.",
+        "I stitched your coat from an old map. Some of its roads are blocked now. I’d love to see people traveling them again.",
+        "We call those root creatures the Unfinished. They’ve spread across roads that nobody has looked after. Watch out for the ones that spit!",
       ],
       1: [
-        "A form is a story about what someone can be. You borrow the story, not the person.",
-        "Borrowing their arts is scholarship. Violent, airborne scholarship.",
+        "Your coat can turn a roadkeeper’s memory into a shape. Rat can slip through drains; Knight can stop a swing with its shield.",
+        "Once Ser Pending shows you Quick Mix, you can carry a move from another shape. You still learn levels by wearing the shape itself.",
       ],
       2: [
-        "The old guardians were masters who mistook mastery for ownership.",
-        "Defeating a form's master proves you understand its weakness, which is awkward but educational.",
+        "The guardians used to protect travelers. I’m sad to see them blocking the roads instead.",
+        "You’ve already helped the Treant change his mind. I hope the other guardians will listen too. Be careful around their wards.",
       ],
       3: [
         "Worldbearers carried roads before maps were flat enough to fold. They remember every destination.",
@@ -126,11 +126,11 @@
       hair: "#4e372f", skin: "#d99a73", coat: "#b45b46", accent: "#f0c45c",
     }, {
       0: [
-        "I deliver anywhere! Except there, wherever there is, and uphill on Tuesdays.",
-        "Road tip: enter at one edge, leave at the opposite edge. Revolutionary, I know.",
+        "I’ve got flour, a letter, and a birthday present for Sunrise. I hate keeping people waiting.",
+        "Follow the worn path. If we get separated, I’ll wait with the cart.",
       ],
       1: [
-        "Your package says 'TO: THE WALKING MAP.' Please stay in one place until I finish the receipt.",
+        "Brindle waved me over as soon as she saw the flour. You should have seen her smile!",
         "I tried changing into a courier form. Turns out this is already my final form. Distressing.",
       ],
       3: [
@@ -147,16 +147,16 @@
       hair: "#d6d8dc", skin: "#bc8168", coat: "#6b6f7b", accent: "#d7a446",
     }, {
       0: [
-        "I swore to defend this road as soon as my oath receives final approval.",
-        "My sword is ceremonial. The ceremony is hitting monsters, but scheduling is difficult.",
+        "I’m trying to keep the watchmen off this road. I’ll be honest: their big swings make me nervous.",
+        "A shield helps when you face the swing. Don’t rush at a watchman while it’s winding up!",
       ],
       1: [
-        "You became a knight without seventeen countersignatures. Is that even heroic?",
-        "A duty left undone becomes Unfinished. Mine have formed a very orderly queue.",
+        "Look at that crest! The mill keeper would have been proud. Give that shield a try.",
+        "I’ll watch the road behind you. You’ve got enough to worry about up ahead.",
       ],
       2: [
-        "The masters taunt you because asking politely would make a disappointingly brief duel.",
-        "A duel is a conversation where every rebuttal has knockback.",
+        "The guardians don’t always listen at first. Keep your shield up and give them time to calm down.",
+        "You’ve been brave out there. Rest before the next fight; I’ll keep watch.",
       ],
       4: [
         "The old order wanted one perfect champion. It got me, so it built a god instead.",
@@ -168,16 +168,16 @@
       hair: "#6d3c6f", skin: "#9b654e", coat: "#3f8b78", accent: "#e99f68",
     }, {
       0: [
-        "Names are just tiny costumes for ideas. Mine has pockets.",
-        "A patch is a memory you can wear. Yours are turning into a very lively family album.",
+        "Come here, dear. Your coat’s caught on a thorn. There! I won’t have you setting off with a loose stitch.",
+        "That coat has room for all sorts of shapes. Try each new one for a while. You might find a favourite.",
       ],
       1: [
-        "Do not ask which form is the real you. Real things are allowed to change clothes.",
-        "Borrow one move from another form. Identity is a buffet, not assigned seating.",
+        "You’re still our Patchling, even with paws. You look happy in that little Rat shape.",
+        "Ser Pending can show you how to borrow a move in Quick Mix. Wearing a shape is how you learn its levels, though.",
       ],
       2: [
-        "The form masters became excellent at one thing and suspicious of all other things.",
-        "A form's nature is what remains between one strike and the next. Listen to that part.",
+        "The guardians used to visit us. I miss them. I hope you can help them open their roads again.",
+        "Each shape feels different to wear. Don’t worry about finding one perfect outfit. Pick what feels useful and fun.",
       ],
       5: [
         "You did not become everything. You let everything become useful together.",
@@ -189,12 +189,12 @@
       hair: "#3b414f", skin: "#d6a17c", coat: "#e5e4d2", accent: "#65a0a0",
     }, {
       0: [
-        "Diagnosis: the world has acute destiny and several dangerously swollen promises.",
-        "The Unfinished feed on neglected promises. Also crumbs. Mostly promises, but sweep anyway.",
+        "Let me see those scratches. The root creatures have been causing trouble all along the road. I’m worried about our travelers.",
+        "Find a campfire when you need a rest. I’d rather patch your coat than patch you!",
       ],
       1: [
-        "Forms are safe when taken as directed. Side effects include heroism and an alarming wardrobe.",
-        "Your mana is not exhaustion. It is the abilities taking turns like civilized explosions.",
+        "You seem quite comfortable changing shape! Try your new moves somewhere quiet before the next big fight.",
+        "If a special move won’t work, let your mana refill. Your basic attack is free, so you can keep defending yourself.",
       ],
       3: [
         "Worldbearers have chronic destiny retention. Treatment involves six marks and vigorous dodging.",
@@ -210,16 +210,16 @@
       hair: "#547446", skin: "#b87f60", coat: "#657b43", accent: "#b9c96b",
     }, {
       0: [
-        "Trees do move. Usually upward. Mistwood is showing off.",
-        "The slimes eat weeds. The weeds filed a complaint. I composted the paperwork.",
+        "The orchard’s roots have grown right across the road. I can’t prune them back on my own.",
+        "I’m worried about the old trees. They’ve never been this restless before.",
       ],
       1: [
-        "Every form leaves a different footprint. Rat prints are mostly punctuation.",
-        "The world is not scenery. It is your oldest party member and it never splits the treasure.",
+        "The Treant’s letting travelers through again! Thank you. I’ll start clearing the smaller paths.",
+        "Mind the flowers by the path. I planted those for the people coming home.",
       ],
       2: [
-        "Guardians grew around old responsibilities, like moss around a statue with opinions.",
-        "Face them, but pay attention. A good fight is a lesson wearing a crown and shouting.",
+        "The Queen has flooded the marsh around her court. I worry about the people whose paths went through there.",
+        "Watch the ground when a guardian gets angry. Its warning marks give you time to find a safe gap.",
       ],
       3: [
         "Rootdeep remembers when roots held the world together. It mentions this constantly.",
@@ -231,12 +231,12 @@
       hair: "#2f405c", skin: "#8f5f4c", coat: "#426080", accent: "#e6b75e",
     }, {
       0: [
-        "Shattercoast was discovered yesterday. Naturally, I have commanded it for years.",
-        "We named the coast after its rocks, its waves, and our evacuation plan.",
+        "I’m Captain Lastminute. We’ve been waiting for news from the inland roads. Are people getting home again?",
+        "The coast is rough, but we look after each other. There’s always room for one more at the camp.",
       ],
       2: [
-        "Lesser guardians are only lesser from very far away. Never say it where they can hear.",
-        "A gauntlet is several emergencies agreeing to stand in one line.",
+        "I hear you helped the orchard. Good work! Take a rest before heading farther out.",
+        "We’ve got more difficult challenges for experienced travelers. No rush—you’ve plenty to explore first.",
       ],
       3: [
         "Six Worldbearers once held the horizon steady. Then the horizon stopped sending thank-you notes.",
@@ -252,12 +252,12 @@
       hair: "#f2e4a8", skin: "#694b67", coat: "#493e75", accent: "#d68bd4",
     }, {
       0: [
-        "I foresee a little canvas traveller, many faces, and pockets full of food. Probably you.",
-        "My visions are never wrong. Their relationship with reality is merely informal.",
+        "Oh! You’re the traveler I saw in my dream. I’m Oracle Probably. I’m glad you made it here safely.",
+        "I dreamed the road was open again. I hope it comes true. My other dream was mostly about soup.",
       ],
       1: [
-        "The stars do not choose forms. They merely keep count while you choose for yourself.",
-        "You will master every shape except punctuality. This prophecy is already complete.",
+        "A new shape! How exciting. Wear it and try its moves—you’ll learn what it’s good at.",
+        "I’m happy to see people visiting again. Come back and tell me how your travels go.",
       ],
       3: [
         "Beyond the waking roads waits a grave for a titan that has neglected to be dead.",

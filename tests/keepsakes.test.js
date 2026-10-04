@@ -133,7 +133,7 @@ test('lesson experiments keep separate backups for different keepsake tradeoffs'
   const quest = G.forms.rat.quests.find(q => q.match?.ability === 'bite');
   G.carryKeepsake('heartwood'); G.saveMixRecipe('knight', 0);
   G.carryKeepsake('mire');
-  assert.equal(G.prepareMasteryLesson(quest.id, 1), true);
-  assert.equal(G.mixRecipeDetails('knight', 0).keepsake.id, 'heartwood');
+  G.keepCurrentMixRecipe('knight');assert.equal(G.prepareMasteryLesson(quest.id,1),true);
+  assert.equal(G.state.formId,'rat');assert.equal(G.mixRecipeDetails('knight', 0).keepsake.id, 'heartwood');
   assert.equal(G.mixRecipeDetails('knight', 1).keepsake.id, 'mire');
 });

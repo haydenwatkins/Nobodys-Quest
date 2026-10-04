@@ -123,6 +123,7 @@ const uiVm = vm.createContext({ console, Math, Date, Map, Set,
   navigator: { standalone: false }, screen: {}, confirm: () => false,
 });
 vm.runInContext(source("js/engine/core.js") + ";this.G=G;", uiVm, { filename: "core.js" });
+vm.runInContext(source("js/engine/typography.js"),uiVm);
 const wheelForms = Array.from({ length: 10 }, (_, i) => `form${i}`);
 uiVm.G.forms = Object.fromEntries(wheelForms.map((id, i) => [id, { id, name: `Form ${i}`, icon: String(i) }]));
 uiVm.G.state = { formId: "form0", player: {}, stars: 0 };

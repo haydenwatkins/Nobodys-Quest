@@ -14,6 +14,7 @@ function run(file, suffix = "") {
 
 run("js/engine/core.js", ";this.G = G;");
 const G = context.G;
+run("js/engine/typography.js");
 G.sfx = { play() {}, attack() {}, impact() {} };
 G.ui = { toast() {}, banner() {}, update() {} };
 G.saveGame = () => {};

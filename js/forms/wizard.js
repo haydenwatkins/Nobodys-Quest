@@ -25,6 +25,7 @@ registerForm({
   unlock: { type: "challenge", hint: "Gather experience and study a quick form", requirements: [
     { type: "stars", stars: 5 },
     { type: "formLevel", form: "rat", level: 2 },
+    { type: "formLevel", form: "knight", level: 2, openingOnly: true },
   ] },
 
   quests: [

@@ -156,7 +156,14 @@ G.ui = (() => {
     });
   }
 
+  const fieldQuiet={map:null,x:0,y:0,t:0};
   function update(dt) {
+    const p=G.state?.player;
+    if(p){
+      const moved=fieldQuiet.map!==G.state.mapId || Math.hypot(p.x-fieldQuiet.x,p.y-fieldQuiet.y)>.25 || Math.hypot(G.input.vec?.x||0,G.input.vec?.y||0)>.1;
+      fieldQuiet.t=moved?0:fieldQuiet.t+dt;
+      fieldQuiet.map=G.state.mapId;fieldQuiet.x=p.x;fieldQuiet.y=p.y;
+    }
     for (let i = toasts.length - 1; i >= 0; i--) {
       // Standard field notices get reading time only while actually displayed.
       // The paper HUD retains its existing deliberately hidden toast expiry.
@@ -309,12 +316,12 @@ G.ui = (() => {
   function drawNpcChatter(c, cam) {
     if (dialogueData || G.state.bossCutscene ||
         G.state.enemies.some(e => e.def.miniboss && e.bossEngaged && !e.dead)) return;
+    if(fieldQuiet.t<.45)return;
     const p = G.state.player;
     const active = (G.state.npcs || []).filter((npc) => npc.bubble &&
       npc.bubble.delay <= 0 && npc.bubble.t > 0 &&
       G.util.dist(npc.x, npc.y, p.x, p.y) < 125)
-      .sort((a, b) => G.util.dist(a.x, a.y, p.x, p.y) - G.util.dist(b.x, b.y, p.x, p.y))
-      .slice(0, 2);
+      .slice(0, 1);
     const placed = [];
     for (const npc of active) {
       const bubble = npc.bubble;
@@ -355,7 +362,7 @@ G.ui = (() => {
       placed.push({ x, y, w: width, h: height });
 
       const remaining = Math.min(bubble.duration || 2.25, bubble.t);
-      c.globalAlpha = remaining < 0.28 ? Math.max(0, remaining / 0.28) : 1;
+      c.globalAlpha = Math.min(1,(fieldQuiet.t-.45)/.2,remaining/.28);
       c.fillStyle = "rgba(15,16,27,0.94)";
       c.fillRect(x + 2, y + 2, width, height);
       c.fillStyle = "rgba(244,244,244,0.97)";
@@ -427,7 +434,7 @@ G.ui = (() => {
       c.fillText(G.input.hasGamepad ? "LT+RT ✦" : "R ✦", x + 4, y + 5);
     }
     const mixX = rank >= 3 ? 166 : 108;
-    const mixLabel = G.input.hasGamepad ? "R3 MIX" : "F MIX";
+    const mixLabel = (G.systemIntroduced?.("mix")!==false) ? (G.input.hasGamepad ? "R3 MIX" : "F MIX") : "";
     c.fillStyle = "rgba(26,28,44,0.72)";
     c.fillRect(mixX, G.H - 20, 43, 15);
     c.fillStyle = "#73eff7";
@@ -501,9 +508,17 @@ G.ui = (() => {
     });
   }
 
+  let rewardLayout=null;
   function placeRewardCue(c, cam, opening = false) {
     const reward = G.nearGroundReward && G.nearGroundReward();
     if (!reward || G.ui.dialogueOpen || G.state.bossCutscene) return null;
+    const key=[reward.item,reward.mapId,reward.x,reward.y,opening,G.input.isTouch,G.W,G.H].join(':');
+    if(rewardLayout?.key===key){
+      const box=rewardLayout.box;
+      if(fieldPanelBlocked(cam,box.x,box.y,box.w,box.h)){rewardLayout.blocked=true;return null;}
+      if(rewardLayout.blocked&&fieldQuiet.t<.6)return null;
+      rewardLayout.blocked=false;return box;
+    }
     const info = G.groundRewardInfo(reward);
     c.font = `600 8px ${FONT_BODY}`;
     const content = [info.name, info.purpose, "Walk over the treasure to collect"];
@@ -520,7 +535,7 @@ G.ui = (() => {
         // Keep the real interaction prompt and both lower control corners clear.
         if (y + h > 125 && G.openingInteractionCandidate?.()) continue;
         if (fieldPanelBlocked(cam, x, y, w, h)) continue;
-        return { x, y, w, h, lines };
+        const box={x,y,w,h,lines};rewardLayout={key,box,blocked:false};return box;
       }
     }
     return null;
@@ -544,6 +559,12 @@ G.ui = (() => {
         G.state.enemies.some(enemy => !enemy.dead && enemy.def.miniboss && enemy.bossEngaged)) return plan;
     const right = G.W - (G.input.isTouch ? 68 : 5);
     function place(notice, heading, text) {
+      if(notice.layout && notice.layout.touch===G.input.isTouch){
+        const card=notice.layout;
+        if(fieldPanelBlocked(cam,card.x,card.y,card.w,card.h)){notice.blocked=true;return;}
+        if(notice.blocked&&fieldQuiet.t<.6)return;
+        notice.blocked=false;feedbackBounds.push(card);plan.push({...card,notice});return;
+      }
       for (const w of [196, 160, 128]) {
         if (w > right - 5) continue;
         c.font = `800 6.5px ${FONT_HEAD}`;
@@ -559,7 +580,8 @@ G.ui = (() => {
           if (fieldPanelBlocked(cam, x, y, w, h)) continue;
           const box = { x, y, w, h };
           feedbackBounds.push(box);
-          plan.push({ notice, titles, lines, ...box });
+          notice.layout={titles,lines,...box,touch:G.input.isTouch};
+          plan.push({ notice, ...notice.layout });
           return;
         }
       }
@@ -656,19 +678,20 @@ G.ui = (() => {
 
   function drawQuestTracker(c, cam) {
     const field = G.fieldMasteryQuest && G.fieldMasteryQuest();
-    const automatic = G.relevantMasteryQuests ? G.relevantMasteryQuests(3) : [];
+    if(fieldQuiet.t<.6 || !(G.systemIntroduced?.("forms")!==false))return;
+    const automatic = G.relevantMasteryQuests ? G.relevantMasteryQuests(1) : [];
     const lessons = field ? [field, ...automatic.filter(entry => entry.quest.id !== field.quest.id)].slice(0, 3) : automatic;
     if (!lessons.length) return;
     const active = lessons[0];
     const { form, quest, progress, slot } = active;
-    const boxW = 118;
-    const x = G.W - boxW - 5;
-    const y = G.input.isTouch ? 45 : 67;
-    if (fieldPanelBlocked(cam, x, y, boxW, 27)) return;
+    const boxW=128,x=G.W-boxW-5,y=G.input.isTouch?45:80;
+    c.font = `600 8px ${FONT_BODY}`;
+    const lessonLines=wrapText(c,quest.text,boxW-10),boxH=28+lessonLines.length*10;
+    if(fieldPanelBlocked(cam,x,y,boxW,boxH))return;
     const pulse = G.state.masteryHudPulse > 0;
 
     c.fillStyle = "rgba(26,28,44,0.78)";
-    c.fillRect(x, y, boxW, 27);
+    c.fillRect(x, y, boxW, boxH);
     c.fillStyle = pulse ? "#a7f070" : "#ffcd75";
     c.fillRect(x, y, boxW, 1);
     c.font = `800 6.5px ${FONT_HEAD}`;
@@ -684,13 +707,13 @@ G.ui = (() => {
     const suffixW = c.measureText(suffix).width;
     const slotLabel = slot > 0 ? `${["A", "B", "C"][slot]} · ` : "";
     c.fillStyle = "#f4f4f4";
-    c.fillText(fitText(c, `${slotLabel}${quest.text}`, boxW - suffixW - 11), x + 4, y + 10);
+    lessonLines.forEach((line,i)=>c.fillText(line,x+4,y+13+i*10));
     c.fillStyle = pulse ? "#a7f070" : "#ffcd75";
-    c.fillText(suffix, x + boxW - suffixW - 4, y + 10);
+    c.fillText(suffix, x + boxW - suffixW - 4, y + boxH - 15);
     c.fillStyle = "#141724";
-    c.fillRect(x + 4, y + 21, boxW - 8, 3);
+    c.fillRect(x + 4, y + boxH - 4, boxW - 8, 3);
     c.fillStyle = pulse ? "#a7f070" : "#ffcd75";
-    c.fillRect(x + 4, y + 21, Math.round((boxW - 8) * progress / Math.max(1, quest.count)), 3);
+    c.fillRect(x + 4, y + boxH - 4, Math.round((boxW - 8) * progress / Math.max(1, quest.count)), 3);
   }
 
   function drawTutorial(c, cam) {
@@ -698,7 +721,8 @@ G.ui = (() => {
     if (!prompt) return;
     const touch = G.input.isTouch;
     const boxW = touch ? 158 : 184;
-    const boxH = touch ? 20 : 24;
+    c.font=`600 ${touch?8:9}px ${FONT_BODY}`;
+    const lines=wrapText(c,prompt.text,boxW-10),boxH=14+lines.length*11;
     const x = touch ? 5 : Math.round((G.W - boxW) / 2);
     const y = touch ? 60 : G.H - boxH - 26;
     if (fieldPanelBlocked(cam, x, y, boxW, boxH)) return;
@@ -711,27 +735,27 @@ G.ui = (() => {
     c.fillText(prompt.title, x + 5, y + 4);
     c.font = `600 ${touch ? 8 : 9}px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
-    c.fillText(fitText(c, prompt.text, boxW - 10), x + 5, y + (touch ? 10 : 12));
+    lines.forEach((line,i)=>c.fillText(line,x+5,y+13+i*11));
   }
 
   function drawStoryTracker(c, cam) {
     if (!G.storyGoal || G.state.bossCutscene || G.ui.dialogueOpen) return;
     const goal = G.currentTask();
     if (goal.kind === "story" && G.guidanceShowStoryCard && !G.guidanceShowStoryCard()) return;
-    const boxW = 190;
-    const x = 5;
-    const y = 38;
-    if (fieldPanelBlocked(cam, x, y, boxW, 18)) return;
+    const boxW=128,x=5,y=38;
+    c.font = `600 8px ${FONT_BODY}`;
+    const lines=wrapText(c,goal.short,boxW-10),boxH=13+lines.length*10;
+    if(fieldPanelBlocked(cam,x,y,boxW,boxH))return;
     c.fillStyle = "rgba(26,28,44,0.82)";
-    c.fillRect(x, y, boxW, 18);
+    c.fillRect(x, y, boxW, boxH);
     c.fillStyle = goal.color;
-    c.fillRect(x, y, 2, 18);
+    c.fillRect(x, y, 2, boxH);
     c.font = `800 6.5px ${FONT_HEAD}`;
     c.fillStyle = goal.complete ? "#a7f070" : goal.color;
     c.fillText(goal.label, x + 5, y + 3);
     c.font = `600 8px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
-    c.fillText(fitText(c, goal.short, boxW - 10), x + 5, y + 9);
+    lines.forEach((line,i)=>c.fillText(line,x+5,y+12+i*10));
   }
 
   function drawWardHint(c, cam) {
@@ -961,30 +985,31 @@ G.ui = (() => {
       const alpha = b.t < 0.2 ? b.t / 0.2 : b.t > 2.7 ? (3.2 - b.t) / 0.5 : 1;
       c.globalAlpha = Math.max(0, alpha);
 
+      const boxW=G.W-(G.input.isTouch?68:0);
       c.font = `800 8px ${FONT_HEAD}`;
-      const titleLines = wrapText(c, b.title, G.W - 24);
+      const titleLines = wrapText(c, b.title, boxW - 24);
       c.font = `600 10px ${FONT_BODY}`;
-      const subLines = b.sub ? wrapText(c, b.sub, G.W - 24) : [];
+      const subLines = b.sub ? wrapText(c, b.sub, boxW - 24) : [];
       const boxH = 10 + titleLines.length * 12 + subLines.length * 10;
       const boxY = Math.round((G.H - boxH) / 2 - 12);
 
       c.fillStyle = "rgba(26,28,44,0.88)";
-      c.fillRect(0, boxY, G.W, boxH);
+      c.fillRect(0, boxY, boxW, boxH);
       c.fillStyle = "#ffcd75";
-      c.fillRect(0, boxY, G.W, 1);
-      c.fillRect(0, boxY + boxH - 1, G.W, 1);
+      c.fillRect(0, boxY, boxW, 1);
+      c.fillRect(0, boxY + boxH - 1, boxW, 1);
 
       let by = boxY + 6;
       c.font = `800 8px ${FONT_HEAD}`;
       c.fillStyle = "#ffcd75";
       for (const line of titleLines) {
-        c.fillText(line, Math.round(G.W / 2 - c.measureText(line).width / 2), by);
+        c.fillText(line, Math.round(boxW / 2 - c.measureText(line).width / 2), by);
         by += 12;
       }
       c.font = `600 10px ${FONT_BODY}`;
       c.fillStyle = "#c8d8e0";
       for (const line of subLines) {
-        c.fillText(line, Math.round(G.W / 2 - c.measureText(line).width / 2), by);
+        c.fillText(line, Math.round(boxW / 2 - c.measureText(line).width / 2), by);
         by += 10;
       }
       c.globalAlpha = 1;
@@ -1008,7 +1033,9 @@ G.ui = (() => {
     const lo = G.getLoadout(G.state.formId);
     const p = G.state.player;
     const ids = ["btn-a", "btn-b", "btn-c"];
-    let sig = "";
+    const mixReady=G.systemIntroduced?.("mix")!==false;
+    const formsReady=G.systemIntroduced?.("forms")!==false;
+    let sig = `introduced:${mixReady}:${formsReady}:`;
     const labels = ids.map((elId, i) => {
       if (i === 0 && G.legendEchoCandidate && G.legendEchoCandidate()) {
         sig += "echo";
@@ -1027,6 +1054,8 @@ G.ui = (() => {
     sig += `legend${G.legendRank ? G.legendRank(G.state.formId) : 0}:${Math.floor(G.legendCharge ? G.legendCharge(G.state.formId) : 0)}`;
     if (sig === btnCache) return;
     btnCache = sig;
+    document.getElementById("touch-ui").dataset.mixReady=String(mixReady);
+    document.getElementById("btn-swap").style.visibility=formsReady?"visible":"hidden";
     labels.forEach((txt, i) => {
       const el = document.getElementById(ids[i]);
       el.textContent = txt;
@@ -1322,7 +1351,7 @@ G.ui = (() => {
 
   function openArtMixer(slot) {
     const form = G.state && G.playerForm && G.playerForm();
-    if (!form || menuOpen || formWheelOpen || dialogueData || artMixerOpen || form.slots < 1) return false;
+    if (!form || !(G.systemIntroduced?.("mix")!==false) || menuOpen || formWheelOpen || dialogueData || artMixerOpen || form.slots < 1) return false;
     artMixerSlot = G.util.clamp(Number(slot) || 1, 1, form.slots);
     artMixerPage = 0;
     artMixerOpen = true;
@@ -1398,6 +1427,7 @@ G.ui = (() => {
       { id: "forms", icon: "⚗", label: "Build", routes: [["forms", "Forms & arts"], ["quests", "Mastery"]] },
       { id: "world", icon: "🧭", label: "Travel", routes: [["map", "Atlas"]] },
     ];
+    if (!(G.systemIntroduced?.("forms")!==false)) sections.splice(1,1);
     const challenges = [];
     if (G.townUnlocked && G.townUnlocked()) challenges.push(["town", "Sunrise"]);
     if (G.expeditionUnlocked && G.expeditionUnlocked()) challenges.push(["expedition", "Manyfold"]);
@@ -1539,7 +1569,7 @@ G.ui = (() => {
     const form = G.forms[G.state.formId];
     return `<section class="lesson-book"><span class="eyebrow">THE BORROWED LESSON BOOK</span><h3>A little more somebody</h3>
       ${G.state.lessonQuestId ? '<button data-lesson-auto>Let the field choose my lesson</button>' : ""}
-      <p>Wearing ${escapeHtml(form.name)}. Borrow an art or become the form a lesson needs. Its original form earns mastery and you earn a star. An unused recipe card keeps your previous mix.</p>
+      <p>Wearing ${escapeHtml(form.name)}. Borrow an art or become the form a lesson needs. Only the form you wear earns mastery and a star. Borrowed moves still help you fight. An unused recipe card keeps your previous mix.</p>
       <div class="lesson-leaves">${lessons.map(entry => `<article><small>${escapeHtml(entry.form.name)} · ${entry.progress}/${entry.quest.count}</small>
         <h4>${escapeHtml(entry.quest.text)}</h4><p>${escapeHtml(entry.reward)}</p>
         ${entry.synergy ? `<p class="lesson-synergy">◆ ${escapeHtml(entry.synergy)}</p>` : ""}
@@ -1832,7 +1862,7 @@ G.ui = (() => {
     menuEl.querySelectorAll("[data-lesson]").forEach(button => button.addEventListener("click", () => {
       if (G.prepareMasteryLesson(button.dataset.lesson, Number(button.dataset.lessonSlot))) {
         btnCache = "";
-        G.ui.toast("Lesson followed. Progress earns mastery for its original form.", 3);
+        G.ui.toast("Lesson followed. Wear the lesson’s form to earn its mastery.", 3);
         buildMenu();
       }
     }));
@@ -1866,7 +1896,7 @@ G.ui = (() => {
       button.addEventListener("click", () => { labAbilityId = button.dataset.abilitySelect; labNativeArt=false; buildMenu(); }));
     const equipAbility = menuEl.querySelector('[data-act="equip-ability"]');
     if (equipAbility) equipAbility.addEventListener("click", () => {
-      if(labNativeArt || labSlot<1 || labSlot>G.forms[labFormId].slots || !G.availableAbilities().includes(labAbilityId))return;
+      if(!(G.systemIntroduced?.("mix")!==false) || labNativeArt || labSlot<1 || labSlot>G.forms[labFormId].slots || !G.availableAbilities().includes(labAbilityId))return;
       const lo = G.getLoadout(labFormId);
       lo[labSlot] = labAbilityId;
       btnCache = "";
@@ -2411,7 +2441,7 @@ G.ui = (() => {
           ${keepsakeArtNote(selected)?`<p>${escapeHtml(keepsakeArtNote(selected))}</p>`:""}
           ${selected.description?`<p class="ability-description">${escapeHtml(selected.description)}</p>`:""}
           <div class="synergy-callout ${synergy ? "good" : ""}">${synergy ? `★ ${escapeHtml(synergy)}` : `A flexible off-style choice. ${escapeHtml(activePassive.name)} will not modify it.`}</div></div>
-          <button data-act="equip-ability" ${labNativeArt||lo[labSlot] === selected.id ? "disabled" : ""}>${labNativeArt?"Native A · stays with this form":lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
+          <button data-act="equip-ability" ${!(G.systemIntroduced?.("mix")!==false)||labNativeArt||lo[labSlot] === selected.id ? "disabled" : ""}>${labNativeArt?"Native A · stays with this form":lo[labSlot] === selected.id ? `In slot ${["A", "B", "C"][labSlot]}` : `Equip to ${["A", "B", "C"][labSlot]}`}</button>
         </div>` : `<div class="empty-tray"><strong>No arts found</strong><span>Try another damage or attack combination.</span></div>`}
       </section>`;
   }
@@ -3112,6 +3142,7 @@ G.ui = (() => {
 
   return {
     toast, banner, dialogue, update, drawHUD, resizeOverlay, fieldPanelBlocked, drawDialogueChoices,
+    fieldQuiet:()=>fieldQuiet.t>=.6 && !bannerData,
     openMenu, openMap, openExpedition, closeMenu, toggleMenu, updateControllerMenu,
     showWorkshop, updateWorkshopController,
     openFormWheel, closeFormWheel, aimFormWheel, commitFormWheel, updateFormWheel,

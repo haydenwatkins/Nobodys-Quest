@@ -168,7 +168,7 @@
 
   G.formUnlockSteps = function (formId) {
     const form = G.forms[formId];
-    return rules(form).map((rule) => stepFor(rule, formId));
+    return rules(form).filter(rule=>!rule.openingOnly || (G.state.opening?.started&&G.state.opening.version>=2)).map((rule) => stepFor(rule, formId));
   };
 
   G.formPathProgress = function (formId) {

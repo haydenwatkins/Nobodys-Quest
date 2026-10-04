@@ -33,6 +33,7 @@ test('final preparation follows a missing guardian, its parent lesson, then the 
   assert.equal(goal.formId, 'knight');
   assert.ok(goal.questId);
   assert.ok(!G.guidanceTarget().text.includes('Shell Jab'), 'locked Turtle arts cannot be recommended');
+  assert.ok(G.prepareMasteryLesson(goal.questId,1));assert.equal(G.state.formId,'knight','parent mastery is practiced in its own form');
   const lesson = G.questById(goal.questId).quest;
   for (let i = 0; i < lesson.count; i++) G.events.emit(lesson.event, { ability: lesson.match.ability, status: lesson.match.status });
   assert.equal(G.formLevel('knight'), 4);

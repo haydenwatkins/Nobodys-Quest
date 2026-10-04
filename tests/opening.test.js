@@ -28,11 +28,16 @@ at(27,24);assert.equal(G.openingInteractionCandidate().id,'culvert');
 G.setForm('nobody');G.tryOpeningInteraction();r.drain();assert.equal(G.state.opening.sluice,false);
 G.setForm('rat');assert.ok(G.tryOpeningInteraction());r.drain();assert.ok(G.state.opening.sluice);assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));
 assert.ok(reachable(38,25),'mill chest is reachable after opening the crossing');
-at(38,25);G.world.checkTriggers(.1);r.drain();require('./helpers/collect-treasure.cjs')(r,'knights-crest');assert.ok(G.state.items.includes('knights-crest'));meet('knight');
+at(38,25);G.world.checkTriggers(.1);assert.equal(G.groundRewardFor('knights-crest'),null,'mill briars keep the crest out of reach');
+const briars=G.state.enemies.filter(e=>e.id==='orchardSpitter'&&!e.dead);assert.equal(briars.length,3);
+for(const e of briars)G.combat.damageEnemy(e,{ability:'bite',damage:1,type:'dark',status:{name:'poison',dur:4,dps:1},fromX:e.x-10,fromY:e.y});
+assert.equal(G.formLevel('rat'),2,'three different real poisoned briars earn Rat’s first level');assert.ok(G.getLoadout('rat').includes('fester'),'the new move is immediately usable');
+for(const e of briars)while(!e.dead)G.combat.damageEnemy(e,{ability:'fester',damage:1,type:'dark',fromX:e.x-10,fromY:e.y});
+G.updateOpening(.05);r.drain();at(38,25);G.world.checkTriggers(.1);r.drain();require('./helpers/collect-treasure.cjs')(r,'knights-crest');assert.ok(G.state.items.includes('knights-crest'));meet('knight');
 assert.ok(reachable(46,14),'watch bell is reachable');assert.ok(!reachable(54,1),'bell gate stays closed');
 clear('orchardGuard');at(46,14);G.tryOpeningInteraction();r.drain();assert.ok(G.state.opening.bell);assert.ok(reachable(54,1));
 // Every unique encounter and road milestone survives the actual save payload.
-G.saveGame();const saved=G.loadSaveData();assert.ok(saved.opening.sluice&&saved.opening.bell);assert.equal(saved.opening.defeated.length,6);
+G.saveGame();const saved=G.loadSaveData();assert.ok(saved.opening.sluice&&saved.opening.bell);assert.equal(saved.opening.defeated.length,9);
 G.state.opening=G.normalizeOpening(JSON.parse(JSON.stringify(saved.opening)));r.load();
 assert.equal(G.state.enemies.filter(e=>e.id==='orchardTangle'&&!e.dead).length,0);
 assert.equal(G.state.enemies.filter(e=>e.id==='orchardGuard'&&!e.dead).length,0);

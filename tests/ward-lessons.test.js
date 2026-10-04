@@ -52,9 +52,9 @@ for (const [formId, enemyId] of [['golem', 'tideCrab'], ['bellkeeper', 'starMote
 
 test('an unearned matching art never creates a false ward lesson', () => {
   const { G } = specialist('bellkeeper');
-  G.restoreDefaultLoadout('nobody');
+  G.setForm('nobody');G.restoreDefaultLoadout('nobody');
   assert.equal(G.guidanceTarget().spatial, false);
-  assert.match(G.guidanceTarget().text, /equip .*\./);
+  assert.match(G.guidanceTarget().text,/become Chimelet/);
   G.availableAbilities = () => ['slap'];
   assert.equal(G.masteryLessons(Infinity, 'bellkeeper').length, 0);
 });

@@ -1,18 +1,23 @@
 // Native input/save review shared by authored scenarios. No game grants here.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES||'node_modules']}));
-module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,dpr=1,modes=['touch','controller'],viewports={}}){
+module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,publishedHost=false,dpr=1,modes=['touch','controller'],viewports={}}){
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});fs.mkdirSync(out,{recursive:true});
  try{for(const mode of modes)for(const hd of [true,false]){
   const viewport=viewports[mode]||(mode==='touch'?{width:667,height:375}:{width:1280,height:720}),context=await browser.newContext({viewport,deviceScaleFactor:dpr,hasTouch:mode==='touch',...(mode==='controller'?{userAgent:'NobodysQuestTV/1.0 Chromium review'}:{})}),page=await context.newPage(),errors=[];
+  if(publishedHost)await page.route('https://quest-review.example/**',async route=>{
+   const requested=new URL(route.request().url()),file=path.join(__dirname,'../..',requested.pathname==='/'?'index.html':decodeURIComponent(requested.pathname)),ext=path.extname(file);
+   if(!fs.existsSync(file)){await route.fulfill({status:404,body:''});return;}
+   await route.fulfill({status:200,body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.woff2':'font/woff2','.png':'image/png','.svg':'image/svg+xml','.json':'application/json'})[ext]||'application/octet-stream'});
+  });
   page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(()=>{
-   window.reviewClock=1000;window.requestAnimationFrame=cb=>(window.reviewFrame=cb,1);window.cancelAnimationFrame=()=>{};window.reviewPaint=[];window.reviewRects=[];window.reviewPixelText=[];
+   window.reviewClock=1000;window.reviewFrameQueue=[];window.reviewFrameId=0;window.requestAnimationFrame=cb=>{const id=++window.reviewFrameId;window.reviewFrameQueue.push({id,cb});return id;};window.cancelAnimationFrame=id=>{window.reviewFrameQueue=window.reviewFrameQueue.filter(f=>f.id!==id);};window.reviewPaint=[];window.reviewRects=[];window.reviewPixelText=[];
    const fill=CanvasRenderingContext2D.prototype.fillText,rect=CanvasRenderingContext2D.prototype.fillRect,clear=CanvasRenderingContext2D.prototype.clearRect;
    CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...args){if(this.canvas.id==='ui')window.reviewPaint.push({text:String(text),x,y,font:this.font});if(this.canvas.id==='game')window.reviewPixelText.push(String(text));return fill.call(this,text,x,y,...args);};
    CanvasRenderingContext2D.prototype.fillRect=function(x,y,w,h){if(this.canvas.id==='ui')window.reviewRects.push({x,y,w,h,color:this.fillStyle});return rect.call(this,x,y,w,h);};
    CanvasRenderingContext2D.prototype.clearRect=function(...args){if(this.canvas.id==='ui'){window.reviewPaint=[];window.reviewRects=[];}return clear.apply(this,args);};
   });
-  const frames=n=>page.evaluate(n=>{for(let i=0;i<n;i++){const cb=window.reviewFrame;window.reviewFrame=null;window.reviewClock+=50;if(cb)cb(window.reviewClock);}},n);
+  const frames=n=>page.evaluate(n=>{for(let i=0;i<n;i++){const queue=window.reviewFrameQueue;window.reviewFrameQueue=[];window.reviewClock+=50;for(const {cb} of queue)cb(window.reviewClock);}},n);
   async function connect(){if(mode==='controller'){await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'c',id:'Review TV controller'})));await frames(1);assert.equal(await page.evaluate(()=>G.input.hasGamepad),true);}}
   async function pad(index){const b=Array(16).fill(0);b[index]=1;await page.evaluate(b=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b})),b);await frames(1);await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:Array(16).fill(0)})));await frames(5);}
   async function next(){if(mode==='controller')await pad(0);else{if(await page.evaluate(()=>G.ui.dialogueOpen))await page.touchscreen.tap(viewport.width/2,viewport.height/2);else{const b=await page.locator('#btn-a').boundingBox();assert.ok(b);await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);}await frames(6);}}
@@ -41,10 +46,11 @@ module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,
    }
    await release();await frames(1);await drain();assert.ok(await page.evaluate(({x,y})=>Math.hypot(G.state.player.x-x,G.state.player.y-y)<4,{x,y}),'native movement reaches the authored waypoint');
   }
-  async function boot(){await page.waitForFunction(()=>typeof G!=='undefined'&&G.state?.player);await connect();await drain();await frames(100);await drain();}
+  let titleCaptureDone=false;
+  async function boot(){await page.waitForFunction(()=>typeof G!=='undefined'&&G.state?.player);await connect();await page.evaluate(hd=>G.setHdPilot(hd),hd);if(await page.evaluate(()=>G.saveSlotScreenOpen)){if(mode==='controller')await pad(0);else await page.locator('[data-save-slot="1"]').tap();await frames(90);await page.evaluate(()=>window.reviewOpeningPaint=window.reviewPaint.map(p=>p.text).join(' '));if(publishedHost&&!titleCaptureDone){await page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-published-arrival.png`)});titleCaptureDone=true;}}await drain();await frames(100);await drain();}
   const shot=stage=>page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-${stage}.png`)});
   async function reload(){await page.evaluate(()=>G.saveGame());await page.reload();await boot();}
-  await page.goto(url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,walkTo,visibleGift,shot,reload});
+  await page.goto(publishedHost?new URL(new URL(url).pathname+new URL(url).search,'https://quest-review.example').href:url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,walkTo,visibleGift,shot,reload});
   assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);console.log(`PASS ${name} ${mode} ${hd?'HD':'BASE'}`);await context.close();
  }}finally{await browser.close();}
 };

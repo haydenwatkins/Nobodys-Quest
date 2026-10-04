@@ -154,6 +154,7 @@ h1, h2, .menu-tabs button, .menu-footer button, .abtn, #btn-map, #btn-pause {
   .legend-quest-callout { grid-template-columns:52px 1fr; padding:13px; }.legend-quest-icon { width:44px; height:44px; font-size:22px; }.legend-quest-callout button { grid-column:1/-1; width:100%; }
 }
 #btn-b::after { content:"HOLD MIX"; position:absolute; left:50%; bottom:-9px; transform:translateX(-50%); color:#73eff7; font:12px var(--font-game); white-space:nowrap; text-shadow:0 1px 2px #1a1c2c; }
+#touch-ui[data-mix-ready="false"] #btn-b::after { content:none; }
 
 /* ---------- Paused radial form selector ---------- */
 #form-wheel {

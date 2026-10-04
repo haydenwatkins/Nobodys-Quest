@@ -17,7 +17,7 @@ test('damage-type finishing quests offer earned arts that really advance mastery
   const griffin = G.forms.griffin.quests[3];
   const art = G.masteryLessons(Infinity, 'griffin')[0].ability;
   assert.equal(G.prepareMasteryLesson(griffin.id, 1), true);
-  assert.equal(G.getLoadout('nobody')[1], art);
+  assert.equal(G.getLoadout('griffin')[1], art);
   assert.equal(G.fieldMasteryQuest().quest.id, griffin.id);
   const stars = G.state.stars;
   G.events.emit('kill', { ability: art, damageType: 'blunt' });

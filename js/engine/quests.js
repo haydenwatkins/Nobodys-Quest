@@ -22,9 +22,8 @@
    No match at all? Then EVERY event of that type counts.
 
    Finishing a quest = +1 ⭐ and +1 level for that form.
-   IMPORTANT: quests count no matter which form you're wearing —
-   so you can do Rat quests as the Knight with Bite equipped.
-   That's on purpose. Mixing is the whole game!
+   Mastery belongs to the form being worn. Borrowed arts remain useful in
+   combat, but never level an unworn form. Saved accomplishments stay earned.
    ============================================================ */
 
 "use strict";
@@ -100,7 +99,7 @@ G.relevantMasteryQuests = function (limit) {
   const candidates = [];
   for (let formIndex = 0; formIndex < G.formOrder.length; formIndex++) {
     const id = G.formOrder[formIndex];
-    if (!G.formUnlocked(id)) continue;
+    if (!G.formUnlocked(id) || id !== formId) continue;
     const form = G.forms[id];
     for (let questIndex = 0; questIndex < (form.quests || []).length; questIndex++) {
       const quest = form.quests[questIndex];
@@ -149,8 +148,8 @@ G.finalExamMastery = function () {
     ready: !missingBreadth.length && specialists >= specialistGoal };
 };
 
-// The lesson book only offers arts already earned. Borrowing advances the
-// source form's quest, so a favorite body can carry several other lessons.
+// Choosing another form's lesson changes into that form. Borrowing an art
+// changes the combat build; it never grants passive mastery to its owner.
 G.masteryLessons = function (limit, formId, chosenOnly) {
   if (!G.state) return [];
   const available = new Set(G.availableAbilities());
@@ -163,7 +162,7 @@ G.masteryLessons = function (limit, formId, chosenOnly) {
       if (G.questsDone.includes(quest.id)) continue;
       if (chosenOnly && quest.id !== G.state.lessonQuestId) continue;
       const match = quest.match || {};
-      const requiredForm = quest.lessonForm || (quest.event === "parry" ? match.form : null);
+      const requiredForm = id;
       const lessonBody = requiredForm ? G.forms[requiredForm] : body;
       if (!lessonBody || (requiredForm && !G.formUnlocked(requiredForm))) continue;
       const lessonLoadout = requiredForm ? G.getLoadout(requiredForm) : loadout;
@@ -186,7 +185,7 @@ G.masteryLessons = function (limit, formId, chosenOnly) {
       const synergy = ability && G.passives ? G.passives.synergyText(lessonBody, G.abilities[ability]) : "";
       const reward = nextArt ? `Unlock ${G.abilities[nextArt.id].name} · +1 star` : `${form.name} level ${level + 1} · +1 star`;
       const score = (quest.id === G.state.lessonQuestId ? 1000 : 0) + (slot >= 0 ? 100 : 0) +
-        progress / Math.max(1, quest.count) * 60 + (synergy ? 20 : 0) + (id === body.id ? 10 : 0);
+        progress / Math.max(1, quest.count) * 60 + (synergy ? 20 : 0) + (id === body.id ? 200 : 0);
       entries.push({ form, quest, ability, slot, requiredForm, progress, reward, synergy, score });
     }
   }
@@ -248,7 +247,7 @@ G.events.on("*", (type, data) => {
     const f = G.forms[fid];
     if (f.invalid || !f.quests) continue;
     // you can only progress quests for forms you've unlocked
-    if (!G.formUnlocked(fid)) continue;
+    if (!G.formUnlocked(fid) || fid !== G.state.formId) continue;
 
     for (const q of f.quests) {
       if (q.event !== type) continue;
@@ -268,7 +267,8 @@ G.events.on("*", (type, data) => {
         if (pinIndex >= 0) G.state.pinnedQuestIds.splice(pinIndex, 1);
         G.state.stars += 1;
         G.sfx.play("quest");
-        G.ui.banner(`⭐ QUEST DONE! ${f.icon} ${f.name} is now level ${G.formLevel(fid)}!`, q.text);
+        const level=G.formLevel(fid),art=(f.abilities||[]).find(a=>a.level===level&&G.abilities[a.id]);
+        G.ui.banner(`${f.icon} ${f.name} · LEVEL ${level}!`,art?`${G.abilities[art.id].name} learned · try it in your next fight`:`${q.text} · +1 star`);
         G.events.emit("questDone", { quest: q.id, form: fid });
         G.checkUnlocks();
         G.saveGame();

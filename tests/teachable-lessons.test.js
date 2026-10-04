@@ -19,11 +19,11 @@ for (const [formId, questIndex, artId, event] of [
     const lesson = G.masteryLessons(Infinity, formId).find(entry => entry.quest.id === quest.id);
     assert.equal(lesson?.ability, artId);
     assert.equal(G.prepareMasteryLesson(quest.id, 1), true);
-    assert.equal(G.getLoadout('nobody')[1], artId);
+    assert.equal(G.state.formId,formId);assert.ok(G.getLoadout(formId).includes(artId));
     assert.equal(G.fieldMasteryQuest().quest.id, quest.id);
     G.events.emit(quest.event, event);
     assert.equal(G.questProgress(quest), 1);
-    G.restoreDefaultLoadout('nobody');
-    assert.notEqual(G.fieldMasteryQuest()?.quest.id, quest.id, 'an unequipped teaching art is no longer active');
+    G.setForm('nobody');
+    assert.notEqual(G.fieldMasteryQuest()?.quest.id, quest.id, 'an unworn body’s teaching art is no longer active');
   });
 }

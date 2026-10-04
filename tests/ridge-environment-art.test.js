@@ -17,6 +17,6 @@ test('the ash road, basalt boundaries, sewn standards and shared resting places 
 
 test('watchfire encounters keep guards visible beneath both HUD layouts and restore mastery after the actual victory',()=>{
  const r=runtime(),{G}=r;r.load('emberRidge');r.drain();r.run('js/engine/ui.js');const c=r.nodes.get('ui').getContext('2d'),labels=[];c.fillText=t=>labels.push(String(t));G.state.enemies=[];Object.assign(G.state.player,{x:168,y:72});G.tryOpeningInteraction();G.fieldMasteryQuest=()=>({form:G.forms.nobody,quest:G.forms.nobody.quests[0],progress:0,slot:0});
- for(const touch of [false,true]){G.input.isTouch=touch;labels.length=0;G.ui.drawHUD({x:8,y:0});assert.ok(!labels.some(t=>/MASTERY|EMBER RIDGE/.test(t)));assert.ok(labels.some(t=>/Patchling/.test(t)));}
- for(const e of G.state.enemies)e.dead=true;G.updateOpening(.05);collect(r,'ridge-coal-watch');for(const touch of [false,true]){G.input.isTouch=touch;labels.length=0;G.ui.drawHUD({x:8,y:0});assert.ok(labels.some(t=>/MASTERY/.test(t)));}assert.equal(G.ridgeSurvey().lit,1);
+ for(const touch of [false,true]){G.input.isTouch=touch;labels.length=0;G.ui.update(.01);G.ui.update(.7);G.ui.drawHUD({x:8,y:0});assert.ok(!labels.some(t=>/MASTERY|EMBER RIDGE/.test(t)));assert.ok(labels.some(t=>/Patchling/.test(t)));}
+ for(const e of G.state.enemies)e.dead=true;G.updateOpening(.05);collect(r,'ridge-coal-watch');G.ui.drawHUD({x:8,y:0});G.ui.update(5);Object.assign(G.state.player,{x:168,y:140});for(let i=0;i<40;i++){G.ui.drawHUD({x:8,y:0});G.ui.update(.2);}for(const touch of [false,true]){G.input.isTouch=touch;labels.length=0;G.ui.update(.01);G.ui.update(.7);G.ui.drawHUD({x:8,y:0});assert.ok(labels.some(t=>/MASTERY/.test(t)));}assert.equal(G.ridgeSurvey().lit,1);
 });

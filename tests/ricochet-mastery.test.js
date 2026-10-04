@@ -15,13 +15,13 @@ test('a native Jester follows a pair and earns ricochet credit from an ordinary 
   const lead=G.guidanceTarget();assert.equal(lead.entity,first);assert.match(lead.text,/every Wild Card a bounce/);
   fire();assert.equal(first.hp,49);assert.equal(second.hp,49);assert.equal(G.questProgress(q),1);
 });
-test('borrowed card guidance follows the third-throw rhythm and credit requires the actual follow-up',()=>{
+test('borrowed cards keep their third-throw combat rhythm but mastery asks for Jester and credits only Jester',()=>{
   const {G,p,q,foe,fire}=setup('nobody');foe(264);foe(264,188);
-  assert.match(G.guidanceTarget().text,/3 throws away/);fire();assert.equal(G.questProgress(q),0);
-  assert.match(G.guidanceTarget().text,/2 throws away/);fire();assert.equal(G.questProgress(q),0);
-  assert.match(G.guidanceTarget().text,/next throw is a golden joker/);fire();assert.equal(G.questProgress(q),1);
-  assert.equal(p.cardBeat,3);assert.match(G.guidanceTarget().text,/3 throws away/);
+  assert.equal(G.guidanceTarget().spatial,false);assert.match(G.guidanceTarget().text,/become Pocket Trouper/);
+  fire();fire();fire();assert.equal(p.cardBeat,3);assert.equal(G.questProgress(q),0,'the borrowed bounce works without leveling another body');
+  assert.ok(G.prepareMasteryLesson(q.id,1));assert.equal(G.state.formId,'jester');G.state.enemies.forEach((e,i)=>{e.x=264;e.y=i?188:152;});fire();assert.equal(G.questProgress(q),1);
 });
+
 test('the ricochet lead explains an empty, warded, distant, or wall-separated road',()=>{
   const {G,foe}=setup();const a=foe(264),b=foe(264,188);
   b.ward={types:['sharp'],hp:3};assert.equal(G.guidanceTarget().spatial,false);assert.match(G.guidanceTarget().text,/break their wards/);

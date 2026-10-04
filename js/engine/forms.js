@@ -193,6 +193,7 @@ function unlockRules(form) {
 
 function requirementMet(u, targetId) {
   if (!u) return false;
+  if(u.openingOnly && (!G.state.opening?.started || G.state.opening.version<2))return true;
   if (u.type === "level" || u.type === "formLevel") return G.formLevel(u.form) >= u.level;
   if (u.type === "item") return G.state.items.includes(u.item);
   if (u.type === "stars") return G.state.stars >= u.stars;
@@ -233,10 +234,25 @@ G.formUnlocked = function (id) {
   return claimed;
 };
 
+// The opening has two shapes to explore; delivery then introduces magic.
+// Previously claimed forms and old adventures keep all earned access.
+G.systemIntroduced = function (system) {
+  const s=G.state;if(!s)return false;
+  const legacy=!s.opening?.started || s.opening.version<2;
+  if(system==='forms')return legacy || G.formUnlocked('rat');
+  if(system==='mix')return legacy || !!(s.opening.bell || s.opening.complete);
+  if(system==='magic')return legacy || !!s.delivery?.complete;
+  if(system==='sideAdventures')return legacy || (s.items.includes('trophy-mire-pearl') && G.ensureTown().requests?.includes('beacon'));
+  return true;
+};
 G.formReady = function (id) {
   const f = G.forms[id];
   if (!f || f.invalid || f.start || G.formUnlocked(id)) return false;
   if ((G.state.claimedForms || []).includes(id)) return false;
+  if (G.state.opening?.started && G.state.opening.version>=2 && !['rat','knight'].includes(id)) {
+    if (!G.systemIntroduced('magic')) return false;
+    if (id!=='wizard' && !G.systemIntroduced('sideAdventures')) return false;
+  }
   return requirementsMet(id);
 };
 
@@ -387,7 +403,8 @@ G.getLoadout = function (formId) {
 
   // A progression update can re-lock a late form. Do not let an old save
   // keep borrowing abilities that are no longer earned.
-  const earned = new Set(G.availableAbilities());
+  const earned = new Set(G.systemIntroduced && !G.systemIntroduced("mix") ?
+    [f.basic, ...(f.abilities || []).filter(a=>a.level<=G.formLevel(formId)).map(a=>a.id)] : G.availableAbilities());
   for (let s = 1; s <= f.slots; s++) {
     if (lo[s] && !earned.has(lo[s])) lo[s] = null;
   }
@@ -460,7 +477,7 @@ G.mixRecipes = function (formId) {
 
 function recipeLessonFor(formId, arts, questId) {
   const lesson = G.questById && G.questById(questId);
-  if (!lesson || !G.formUnlocked(lesson.form.id) || G.questsDone.includes(lesson.quest.id)) return null;
+  if (!lesson || lesson.form.id!==formId || !G.formUnlocked(lesson.form.id) || G.questsDone.includes(lesson.quest.id)) return null;
   const quest = lesson.quest, match = quest.match || {};
   const teachingArt = match.ability || quest.lessonArt;
   const requiredForm = quest.lessonForm || match.form;

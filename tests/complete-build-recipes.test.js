@@ -9,7 +9,7 @@ function fixture() {
   G.state.formId = 'knight';
   G.state.worldwake.marks = ['sky', 'stone'];
   G.attuneWorldMark('sky');
-  const quest = G.forms.rat.quests.find(q => q.match?.ability === 'bite');
+  const quest=G.forms.knight.quests[0];G.getLoadout('knight')[1]='bite';
   G.prepareMasteryLesson(quest.id, 1);
   G.saveMixRecipe('knight', 2);
   return { ...r, quest };
@@ -34,8 +34,9 @@ test('a folded build restores its body, arts, Mark and lesson after save seriali
   assert.equal(G.activeWorldMarkDiscipline().id, 'sky');
   assert.equal(G.state.lessonQuestId, quest.id);
   assert.equal(G.state.player.mana, mana);
-  G.events.emit('hit', { ability: 'bite' });
-  assert.equal(G.questProgress(quest), 1, 'the recalled borrowed art advances the source lesson');
+  G.events.emit('hit',{ability:'bite'});assert.equal(G.questProgress(quest),0,'borrowed arts cannot satisfy unrelated body mastery');
+  const p=G.state.player;p.invincible=0;p.dir={x:1,y:0};p.knightGuardT=.5;p.knightPerfectT=.2;G.damagePlayer(1,p.x+12,p.y);
+  assert.equal(G.questProgress(quest),1,'the recalled Knight earns its own guard lesson');
 });
 
 test('missing Marks and blocked form changes reject a whole build without partial changes', () => {
@@ -79,10 +80,9 @@ test('arts-only cards preserve old behavior; completed lessons and no-Mark build
 test('experiment backups distinguish the same arts with different carried Marks', () => {
   const { G } = fixture();
   G.restoreDefaultLoadout('knight'); G.attuneWorldMark('stone');
-  const quest = G.forms.rat.quests.find(q => q.match?.ability === 'bite');
-  assert.equal(G.prepareMasteryLesson(quest.id, 1), true);
-  assert.equal(G.mixRecipes('knight')[0].mark, 'sky');
-  assert.equal(G.mixRecipes('knight')[1].mark, 'stone');
+  const quest=G.forms.knight.quests[0];G.getLoadout('knight')[1]='bite';
+  G.attuneWorldMark('sky');const sky=G.keepCurrentMixRecipe('knight');G.attuneWorldMark('stone');const stone=G.keepCurrentMixRecipe('knight');
+  assert.notEqual(sky,stone);assert.equal(G.mixRecipes('knight')[sky].mark,'sky');assert.equal(G.mixRecipes('knight')[stone].mark,'stone');
   const clean = G.normalizeMixRecipes({ knight: [{ version: 2, arts: ['fake', 'missing'], mark: 'fake', lesson: 'missing' }] });
   G.state.mixRecipes = clean;
   assert.equal(G.mixRecipeDetails('knight', 0).ready, false);
@@ -101,5 +101,6 @@ test('a card carries only lessons its saved form and arts can practice', () => {
   assert.equal(G.mixRecipes('knight')[1].lesson, null, 'Blunt ward practice needs a saved Blunt art');
   G.state.loadouts.knight[2] = 'stoneKnuckle';
   G.saveMixRecipe('knight', 1);
-  assert.equal(G.mixRecipes('knight')[1].lesson, G.forms.golem.quests[3].id);
+  assert.equal(G.mixRecipes('knight')[1].lesson,null,'a borrowed Blunt art still cannot carry another body’s mastery lesson');
+  G.state.lessonQuestId=G.forms.knight.quests[0].id;G.saveMixRecipe('knight',1);assert.equal(G.mixRecipes('knight')[1].lesson,G.forms.knight.quests[0].id);
 });

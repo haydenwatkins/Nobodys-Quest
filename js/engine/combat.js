@@ -78,6 +78,10 @@ G.combat = (() => {
     if (enemy.dead) return false;
     if (enemy.def.practice) {
       enemy.flash = .12;
+      // The opening post stays available if a player clears the road in
+      // another shape. Bite applies real poison, with its normal expiry.
+      if (enemy.id === "orchardPractice" && opts.ability === "bite" && opts.status?.name === "poison")
+        applyStatus(enemy, "poison", { ...opts.status, ability: opts.ability });
       if (opts.ability === "slap") G.events.emit("hit", { enemy: enemy.id, ability: "slap", damageType: "blunt", dist: 0 });
       G.sfx.play("hit");
       return true;

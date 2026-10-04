@@ -272,15 +272,13 @@
     }else if(!G.ui.dialogueOpen&&!(G.nearGroundReward&&G.nearGroundReward())){
       const opening=G.openingGoal(),goal=opening||(s.delivery?.complete&&G.currentTask?G.currentTask():null);
       if(goal){
-        c.font=G.text.font(9, 700);
-        const w=Math.min(!opening&&G.input.isTouch?148:202,c.measureText(goal.short).width+10);
-        if(opening||!G.ui.fieldPanelBlocked?.(cam,100,6,w,26)){
-          text(c,goal.label||goal.progress.label,102,8,'#f4e5bc',7);
-          panel(c,100,18,w,14);c.font=G.text.font(9, 700);
-          let short=goal.short;while(!opening&&short.length&&c.measureText(short).width>w-10)short=short.slice(0,-1);
-          if(short!==goal.short)short=short.slice(0,-1)+'…';
-          text(c,short,105,20,'#f3e4bd',9);
-        }
+        const x=100,y=6,w=G.W-x-(G.input.isTouch?68:6);
+        c.font=G.text.font(9,700);
+        const words=goal.short.split(/\s+/),lines=[];let line='';
+        for(const word of words){const next=line?line+' '+word:word;if(line&&c.measureText(next).width>w-12){lines.push(line);line=word;}else line=next;}if(line)lines.push(line);
+        panel(c,x,y,w,15+lines.length*11);
+        text(c,goal.kind==='request'?goal.label:opening?'PARCEL’S DELIVERY':'NEXT STEP',x+6,y+3,'#f4e5bc',7);
+        lines.forEach((line,i)=>text(c,line,x+6,y+14+i*11,'#f3e4bd',9));
       }else{
         text(c,s.mapDef.deliveryLandscape?'SUNRISE, TOGETHER':'THE FIRST PROMISE',102,8,'#f4e5bc',7);
         text(c,s.mapDef.deliveryLandscape?'A place to return to':'The road is open',102,20,'#d2dda8',9);
@@ -288,17 +286,19 @@
     }
     if(!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
       const lesson=G.fieldMasteryReward();
-      if(lesson&&!(G.nearGroundReward&&G.nearGroundReward())){
-        c.font=G.text.font(8, 700);
-        const count=lesson.progress+'/'+lesson.total,countWidth=c.measureText(count).width;
-        const x=7,y=39,w=Math.min(199,Math.max(120,Math.ceil(c.measureText(lesson.quest.text).width+countWidth+19)));
-        panel(c,x,y,w,23);
-        let label=lesson.quest.text;
-        while(label.length&&c.measureText(label).width>w-countWidth-19)label=label.slice(0,-1);
-        if(label!==lesson.quest.text)label=label.slice(0,-1)+'…';
-        text(c,label,x+5,y+3,'#ece0bf',8);text(c,count,x+w-countWidth-5,y+3,'#edc988',8);
-        text(c,lesson.reward,x+5,y+13,'#b4c5a3',7);
-        c.fillStyle='#425852';c.fillRect(x+4,y+22,w-8,1);c.fillStyle='#b5c28c';c.fillRect(x+4,y+22,(w-8)*lesson.progress/lesson.total,1);
+      if(lesson&&G.ui.fieldQuiet?.()&&G.systemIntroduced('forms')&&!(G.nearGroundReward&&G.nearGroundReward())){
+        c.font=G.text.font(8,700);
+        const x=7,y=72,w=128,lines=[];let line='';
+        for(const word of lesson.quest.text.split(/\s+/)){const next=line?line+' '+word:word;if(line&&c.measureText(next).width>w-10){lines.push(line);line=word;}else line=next;}if(line)lines.push(line);
+        c.font=G.text.font(7);const rewardLines=[];let rewardLine='';
+        for(const word of lesson.reward.split(/\s+/)){const next=rewardLine?rewardLine+' '+word:word;if(rewardLine&&c.measureText(next).width>w-10){rewardLines.push(rewardLine);rewardLine=word;}else rewardLine=next;}if(rewardLine)rewardLines.push(rewardLine);
+        const h=16+lines.length*10+rewardLines.length*9;
+        if(!G.ui.fieldPanelBlocked?.(cam,x,y,w,h)){
+          panel(c,x,y,w,h);lines.forEach((line,i)=>text(c,line,x+5,y+3+i*10,'#ece0bf',8));
+          text(c,lesson.progress+'/'+lesson.total+' · MASTERY',x+5,y+4+lines.length*10,'#edc988',7);
+          rewardLines.forEach((line,i)=>text(c,line,x+5,y+14+lines.length*10+i*9,'#b4c5a3',7));
+        }
+
       }
     }
     // Keep the lower corners free for the touch joystick and ability buttons.
@@ -310,7 +310,7 @@
         text(c,ab?ab.name:'—',x+15,162,'#f0e4c9',7);
         if(ab){const cd=p.cooldowns[ab.id]||0,duration=G.cooldownDuration?G.cooldownDuration(ab):ab.cooldown;c.fillStyle='#9cae86';c.fillRect(x+3,173,52*(1-Math.min(1,cd/duration)),1);}
       }
-      text(c,G.input.hasGamepad?'B  FORMS   R3  MIX':'Q  FORMS   F  MIX',205,163,'#f0dfb2',8);
+      if(G.systemIntroduced('forms'))text(c,(G.input.hasGamepad?'B  FORMS':'Q  FORMS')+(G.systemIntroduced('mix')?(G.input.hasGamepad?'   R3 MIX':'   F MIX'):''),205,163,'#f0dfb2',8);
     }
     if(!G.ui.dialogueOpen)G.drawOpeningPrompt(c,cam);
     c.restore();return {status:{x:6,y:6,w:identityWidth,h:27},

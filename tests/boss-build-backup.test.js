@@ -4,7 +4,7 @@ function setup(){
   G.state.town.followedRequest='beacon';G.state.claimedForms=['rat','ranger','wizard'];r.load('sunriseQuay');r.drain();
   G.state.formId='nobody';G.state.loadouts.nobody=['slap','bite','arrow'];
   G.state.items.push('trophy-sky-sovereign');G.state.worldwake.marks=['sky'];G.state.worldwake.attunedMark='sky';G.state.keepsakeId='plume';
-  G.state.lessonQuestId=G.forms.rat.quests[0].id;
+  G.state.lessonQuestId=G.forms.nobody.quests[0].id;
   Object.assign(G.state.player,{mana:7,manaRegenProgress:.3,cooldowns:{arrow:.4},cooldownDurations:{arrow:.45}});
   return r;
 }
@@ -24,7 +24,7 @@ test('borrowing a boss counter keeps and recalls the complete previous build wit
 test('different followed lessons and old arts-only cards do not stand in for a complete current build',()=>{
   const {G}=setup();const old=G.getLoadout('nobody').slice();G.state.mixRecipes={nobody:[old,null,null]};
   assert.equal(G.keepCurrentMixRecipe('nobody'),1);assert.equal(JSON.stringify(G.mixRecipes('nobody')[0]),JSON.stringify(old));
-  const first=G.state.lessonQuestId;G.state.lessonQuestId=G.forms.rat.quests[1].id;
+  const first=G.state.lessonQuestId;G.state.lessonQuestId=G.forms.nobody.quests[2].id;
   assert.equal(G.keepCurrentMixRecipe('nobody'),2);assert.equal(G.mixRecipes('nobody')[1].lesson,first);
   assert.equal(G.mixRecipes('nobody')[2].lesson,G.state.lessonQuestId);
 });

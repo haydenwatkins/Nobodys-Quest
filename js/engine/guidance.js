@@ -228,7 +228,7 @@
     if (!lesson) return null;
     const quest = lesson.quest;
     const match = quest.match || {};
-    const requiredForm = quest.lessonForm || (quest.event === "parry" ? match.form : null);
+    const requiredForm = lesson.form.id;
     if (requiredForm && s.formId !== requiredForm) return {
       kind: "form", color: G.GUIDANCE_COLORS.form, icon: G.forms[requiredForm]?.icon || "✦", spatial: false,
       destination: G.forms[requiredForm]?.name || lesson.form.name,
@@ -758,22 +758,12 @@
     const target = refreshTarget(false);
     if (!target) return;
     const active = runtime.activeUntil > now();
-    if (target.spatial === false) {
-      if (!active || runtime.toastUntil > now()) return;
-      ctx.font = G.text.font(6, 700);
-      const label = `✦ ${String(target.destination).toUpperCase()}`;
-      const width = ctx.measureText(label).width + 10;
-      ctx.fillStyle = "rgba(26,28,44,0.88)";
-      const left = Math.round((G.W - width) / 2);
-      if (G.ui?.fieldPanelBlocked?.(cam, left, G.H - 45, width, 12)) return;
-      ctx.fillRect(left, G.H - 45, width, 12);
-      ctx.fillStyle = target.color;
-      G.drawWorldText(ctx,label, Math.round((G.W - width) / 2) + 5, G.H - 41);
-      return;
-    }
+    // The task dock already names the destination. Guidance adds a direction,
+    // not another floating, sometimes over-wide copy of the instruction.
+    if(target.spatial===false)return;
     const sx = target.x - cam.x, sy = target.y - cam.y;
     const onScreen = sx >= 10 && sx <= G.W - 10 && sy >= 16 && sy <= G.H - 20;
-    if (onScreen && !active) return;
+    if (onScreen) return;
     const centerX = G.W / 2, centerY = G.H / 2;
     const angle = Math.atan2(sy - centerY, sx - centerX);
     const radiusX = G.W / 2 - 14, radiusY = G.H / 2 - 22;
@@ -792,17 +782,7 @@
     ctx.fillStyle = target.color;
     ctx.beginPath(); ctx.moveTo(0, -6); ctx.lineTo(4, 4); ctx.lineTo(-4, 4); ctx.closePath(); ctx.fill();
     ctx.restore();
-    if (active && !(onScreen && actor)) {
-      ctx.font = G.text.font(6, 700);
-      const label = `${target.icon} ${String(target.destination).toUpperCase()}`;
-      const width = Math.min(G.W - 30, ctx.measureText(label).width + 10);
-      ctx.fillStyle = "rgba(26,28,44,0.86)";
-      const left = Math.round((G.W - width) / 2);
-      if (G.ui?.fieldPanelBlocked?.(cam, left, G.H - 45, width, 12)) return;
-      ctx.fillRect(left, G.H - 45, width, 12);
-      ctx.fillStyle = target.color;
-      G.drawWorldText(ctx,label, Math.round((G.W - width) / 2) + 5, G.H - 41);
-    }
+
   };
 
   G.events.on("mapEnter", (data) => {

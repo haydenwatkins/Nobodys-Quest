@@ -319,7 +319,10 @@
   G.tutorial.init(save);
   G.resumeManyfoldExpedition();
   if (localBuilder) G.beginStorySession(save);
-  else G.showSaveSlotScreen(false);
+  else {
+    G.events.on('saveSlotReady', ({save: chosenSave})=>G.beginStorySession(chosenSave));
+    G.showSaveSlotScreen(false);
+  }
 
   /* ---------- the loop ---------- */
   let last = 0;
