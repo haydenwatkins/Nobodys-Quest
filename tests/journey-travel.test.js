@@ -18,9 +18,9 @@ test('the authored story and its destination survive leaving Orchard Road',()=>{
   G.state.opening.complete=true;r.load('orchardRoad');r.drain();
   G.state.delivery.started=true;
   const guide=G.guidanceTarget();
-  assert.equal(guide.link.map,'lanternReach');
-  assert.equal(guide.tileX,26);
-  assert.match(guide.text,/Parcel/);
+  assert.equal(guide.cell.portal.map,'lanternReach');
+  assert.equal(guide.tileX,63);
+  assert.match(guide.text,/Follow.*Lantern Reach/i);
 });
 
 test('old campaign saves keep their town and do not acquire the opening',()=>{
@@ -38,18 +38,19 @@ test('story road discoveries persist without counting as legacy regions',()=>{
   assert.equal(G.state.wayfinderPost,null,'do not draw a nonfunctional post on the story road');
 });
 
-test('local exits disclose real story gates and the cart route',()=>{
+test('local exits disclose real story gates and the connected delivery road',()=>{
   const r=runtime(),{G}=r;r.load();
   assert.match(G.localJourneyRoutes().find(route=>route.map==='heartwood').reason,/bell/);
   G.state.opening.bell=true;assert.equal(G.localJourneyRoutes().find(route=>route.map==='heartwood').reason,null);
-  G.state.opening.complete=true;assert.ok(G.localJourneyRoutes().some(route=>route.kind==='cart'&&route.map==='lanternReach'));
+  G.state.opening.complete=true;assert.ok(G.localJourneyRoutes().some(route=>route.kind==='road'&&route.map==='lanternReach'));
   r.load('lanternReach');assert.match(G.localJourneyRoutes().find(route=>route.map==='tollCourt').reason,/lanterns/);
 });
 
-test('eight road entrances cross with the actual feet box and retain safe return points',()=>{
+test('ten road entrances cross with the actual feet box and retain safe return points',()=>{
   const r=completed(),{G}=r;
   for(const [from,x,y,dx,dy,to]of [
     ['orchardRoad',2,36,-1,0,'overworld'],['overworld',59,45,-1,0,'orchardRoad'],
+    ['orchardRoad',61,37,1,0,'lanternReach'],['lanternReach',2,29,-1,0,'orchardRoad'],
     ['lanternReach',57,18,1,0,'tollCourt'],['tollCourt',2,17,-1,0,'lanternReach'],
     ['tollCourt',31,17,1,0,'sunriseQuay'],['sunriseQuay',2,19,-1,0,'tollCourt'],
     ['sunriseQuay',41,19,1,0,'town'],['town',2,8,-1,0,'sunriseQuay'],

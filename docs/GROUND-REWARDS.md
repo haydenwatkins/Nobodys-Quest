@@ -258,3 +258,8 @@ Audit Worldwake's seven caravan favor payouts next. They currently mark favors c
 ## Opening pacing integration (October 4)
 
 The new opening keeps the Knight Crest cache closed until the mill briars are cleared and Rat's first mastery lesson is learned. Collection still grants the native item exactly once and leads to its Form Echo; no invisible ownership or immediate payout was added. The straw practice post provides a real poison/expiry recovery route if someone cleared the mill in another body. Brindle and Pebble's staged requests retain their physical book/Pearl collection, saved completion and separate pending thank-you gifts. This pacing batch does not convert the remaining reward producers.
+
+
+## Connected opening roads (October 4)
+
+The previous Parcel cart jumps and instant Rat-drain entry/exit are superseded. Orchard Road and Lantern Reach now have reciprocal walkable road exits, and both Rat passages use visible narrow terrain. Discovering Brindle's book requires walking into its dry pocket; collection and later thanks preserve the existing three/five-spirit ownership contract. All saved pending gifts survive the road journey and return. See `CONNECTED-OPENING.md` and the updated recipe/Parcel native scenarios; earlier validation paragraphs remain historical evidence.

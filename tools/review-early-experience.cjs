@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),review=require('./lib/browser-review.cjs');
 review({url:process.argv[2]||'http://127.0.0.1:8000/?playtestMap=sunkenMarsh',out:process.argv[3]||'/tmp/nq-early-review',name:'published opening and paced shapes',publishedHost:true,
- async run({page,mode,hd,frames,next,drain,walkGift,shot,reload}){
+ async run({page,mode,hd,frames,next,drain,walkGift,walkTo,shot,reload}){
   assert.equal(await page.evaluate(()=>G.hdPilot),hd,'the native detail setting matches the capture');
   assert.equal(await page.evaluate(()=>location.hostname),'quest-review.example');
   assert.equal(await page.evaluate(()=>G.state.mapId),'orchardRoad','published hosts ignore builder map shortcuts');
@@ -34,6 +34,8 @@ review({url:process.argv[2]||'http://127.0.0.1:8000/?playtestMap=sunkenMarsh',ou
   assert.equal(await page.evaluate(()=>window.reviewPaint.some(p=>p.text.includes('MASTERY'))),false,'optional mastery waits for the unlock announcement');
   if(mode==='touch')assert.equal(await page.evaluate(()=>window.reviewPaint.filter(p=>p.y>=50&&p.y<105).every(p=>{const c=document.getElementById('ui').getContext('2d');c.font=p.font;return p.x+c.measureText(p.text).width<=G.W-68;})),true,'the complete announcement clears touch buttons');
   await page.evaluate(()=>{Object.assign(G.state.player,{x:27*16+8,y:24*16+8});});await next();await drain();
+  assert.equal(await page.evaluate(()=>G.state.opening.sluice),false);
+  await walkTo(34*16+8,24*16+8);await next();await drain();
   assert.equal(await page.evaluate(()=>G.state.opening.sluice),true);
   await page.evaluate(()=>{Object.assign(G.state.player,{x:38*16+8,y:25*16+8});G.world.checkTriggers(.1);});
   assert.equal(await page.evaluate(()=>!!G.groundRewardFor('knights-crest')),false,'crest waits for the mill play stretch');

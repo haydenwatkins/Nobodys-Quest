@@ -46,7 +46,9 @@
     else if(!o.notice)data=['Someone has to answer','Read the notice beside the road',[12,35],0,'Step up to the notice. The stranded cart is just beyond it.'];
     else if(!o.cart)data=['The first person who needed you','Clear the tangles around Parcel’s cart',[20,34],1,'The little root creatures have trapped the courier. Drive them away.'];
     else if(!G.formUnlocked('rat'))data=['A smaller answer',G.formReady('rat')?'Meet the Rat echo':'Practice Slap at the straw post',[20,23],2,'Finish two Patchling lessons. Practice at the straw post if you need more Slap contacts, then meet the echo.'];
-    else if(!o.sluice)data=['Under the roots','Become Rat and enter the old culvert',[27,24],3,'The road is crushed under roots. Rat can slip through the culvert and release the sluice.'];
+    else if(!o.sluice)data=G.state.mapId===road&&G.state.player.x>=29*16&&G.state.player.y<31*16?
+      ['Across the roots','Open the sluice on the far bank',[34,24],3,'Use the mill sluice beside the drain exit to open the bridge for Parcel.']:
+      ['Under the roots','Walk through the culvert as Rat',[27,24],3,'Become Rat and walk east through the low drain beneath the roots. Use the sluice on the far bank to open the bridge.'];
     else if(!G.openingMillClear()&&!G.formUnlocked('knight'))data=['Help at the mill','Bite the three briars beside the mill',[40,26],4,'Stay as Rat. Bite each briar to poison it; dodge its spit while the poison works. Clear the mill so Parcel can bring the cart across.'];
     else if(o.version>=2&&G.formLevel('rat')<2&&!G.formUnlocked('knight'))data=['Try Rat’s poison','Practice Bite at the straw post',[20,23],4,'Become Rat and bite the straw post. Let each poison fade before trying again. Learning Fester makes you ready for the keeper’s crest.'];
     else if(!G.formUnlocked('knight'))data=['Someone kept watch','Recover the crest beside the mill',[38,25],4,'The mill keeper left a Knight’s Crest. Open the chest, collect its crest from the ground, then meet the shape it leaves behind.'];
@@ -72,10 +74,14 @@
     return {x:x*16+8,y:y*16+8,tileX:Math.floor(x),tileY:Math.floor(y),kind:'story',icon:'◇',color:'#f2cf8b',destination:goal.short,text:goal.objective};
   };
   // Closed obstacles participate in movement, projectiles, and safe spawning.
+  G.smallPassageAt=(px,py)=>!!(G.state?.grid?.[Math.floor(py/G.TILE)]?.[Math.floor(px/G.TILE)]?.smallPassage &&
+    !(G.state.mapId===road&&progress().sluice));
   G.openingCellBlocked=(px,py)=>{
-    if(!G.state||G.state.mapId!==road)return false;
+    if(!G.state)return false;
+    if(G.smallPassageAt(px,py)&&G.state.formId!=='rat')return true;
+    if(G.state.mapId!==road)return false;
     const x=Math.floor(px/16),y=Math.floor(py/16),o=progress();
-    if(!o.sluice&&x>=29&&x<=32&&y===24)return true;
+    if(x===63&&y===37&&!o.complete&&!G.state.delivery?.started)return true;
     return !o.bell&&x>=53&&x<=55&&y===3;
   };
   const threats=()=>G.state.enemies.some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-G.state.player.x,e.y-G.state.player.y)<68);
@@ -83,7 +89,8 @@
     if(!here()||G.ui.dialogueOpen||G.state.knockout||threats())return null;
     const o=progress();
     if(G.state.mapId===road){
-      if(!o.sluice&&near(27,24,30))return {id:'culvert',label:G.state.formId==='rat'?'Slip through the culvert':'Culvert · Rat can fit',x:27*16+8,y:24*16+8};
+      if(!o.sluice&&near(27,24,30))return {id:'culvert',label:'Low culvert · walk through as Rat',x:27*16+8,y:24*16+8};
+      if(!o.sluice&&near(34,24,24))return {id:'sluice',label:'Open the mill sluice',x:34*16+8,y:24*16+8};
       if(!o.bell&&near(46,14,28))return {id:'bell',label:'Ring the watch bell',x:46*16+8,y:14*16+8};
       if(G.state.items.includes('trophy-heartwood-crown')&&!o.complete&&near(22,37,38))return {id:'home',label:'Tell Parcel the road is open',x:22*16+8,y:37*16+8};
     }
@@ -94,12 +101,12 @@
     const o=progress(),p=G.state.player;
     if(at.id==='culvert'){
       if(G.state.formId!=='rat')G.ui.dialogue('PEBBLE','I can see daylight through that drain. Try your Rat shape. Small is useful here.',{accent:'#d9a7ff'});
-      else {
-        o.sluice=true;p.x=35*16+8;p.y=24*16+8;p.dashing=null;p.lastSafe={x:p.x,y:p.y};
-        G.state.entryPoint={x:p.x,y:p.y};G.state.mapReveal=G.reducedMotion?0:.28;
+      else say('culvert',[['PEBBLE','You fit! Walk east through that low drain. The sluice lever is just beyond the roots. I’ll stay with Parcel.']]);
+    }else if(at.id==='sluice'){
+        o.sluice=true;p.lastSafe={x:p.x,y:p.y};
+        G.state.entryPoint={x:p.x,y:p.y};
         say('sluice', [['PARCEL, FROM THE OTHER SIDE','The bridge is open! Thank you! But those spitting briars are still blocking the mill. Can your Rat teeth help?'],['PATCHLING','I’ll bite them and duck out of the way. Keep the cart back until it’s safe!']]);
         G.healPlayer(2,'opening');G.sfx.play('unlock');G.saveGame();
-      }
     } else if(at.id==='bell'){
       if(!G.formUnlocked('knight'))G.ui.dialogue('SER PENDING','The mill keeper’s crest is still beside the water. Bring that lesson with you before you meet the keeper of these roots.',{accent:'#f2cf8b'});
       else {
@@ -130,6 +137,9 @@
     const s=G.state,o=progress();
     for(const e of s.enemies){
       e.openingKey=`${s.mapId}:${Math.round(e.x)},${Math.round(e.y)}`;
+      // Keep the first mill briar's saved identity after moving its post
+      // two tiles away from the sluice. Partial old clears stay cleared.
+      if(s.mapId===road&&e.id==='orchardSpitter'&&e.x===38*16+8&&e.y===26*16+8)e.openingKey=`${road}:${36*16+8},${26*16+8}`;
       if(o.defeated.includes(e.openingKey))e.dead=true;
       if(s.mapId===glade&&e.id==='ancientTreant'){
         e.def=Object.assign({},e.def,{aggro:170,size:34,sprite:G.openingTreantSprite||e.def.sprite,boss:Object.assign({},e.def.boss,{orchard:true,

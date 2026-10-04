@@ -19,7 +19,7 @@ r.load();assert.equal(G.workshopErrors.length,0);assert.equal(G.deliveryGoal(),n
 G.state.opening.complete=true;G.state.claimedForms=['rat','knight'];G.state.known=['nobody','rat','knight'];
 for(const e of G.state.enemies)if(e.id==='orchardTangle'){e.dead=true;G.state.opening.defeated.push(e.openingKey);}
 assert.equal(G.deliveryGoal().mapId,'orchardRoad');assert.ok(reachable(26,37));at(26,37);talk();
-assert.equal(G.state.mapId,'lanternReach');assert.ok(G.state.delivery.started);
+assert.equal(G.state.mapId,'orchardRoad');assert.ok(G.state.delivery.started);require('./helpers/cross-road.cjs')(r,'lanternReach');
 assert.ok(reachable(14,24));assert.ok(!reachable(38,12),'unlit first lantern blocks the real crossing');
 assert.ok(G.world.blocksProjectile(24*16+8,18*16+8));
 at(14,24);talk();assert.equal(G.state.delivery.lamps[0],1);assert.equal(G.state.enemies.length,3);
@@ -27,10 +27,10 @@ assert.equal(G.deliveryCandidate(),null,'combat cannot steal an attack for an in
 kill(G.state.enemies[0]);reload();assert.equal(G.state.enemies.length,2,'partial waves persist across reload');
 clearWave(0);assert.equal(G.state.delivery.lamps[0],2);assert.ok(reachable(38,12));assert.ok(!reachable(54,18));
 assert.ok(!G.world.blocksProjectile(24*16+8,18*16+8));
-assert.ok(reachable(18,30));at(18,30);G.state.formId='nobody';talk();assert.equal(G.state.delivery.salvage,false);
-G.state.formId='rat';const spirit=G.state.town.spirit;talk();assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));
+assert.ok(reachable(20,30));at(20,30);G.state.formId='nobody';talk();assert.equal(G.state.delivery.salvage,false);
+G.state.formId='rat';const spirit=G.state.town.spirit;talk();require('./helpers/walk-road.cjs')(r,[[20,33]]);assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));
 assert.ok(!G.state.items.includes('brindles-recipes'));assert.equal(G.state.town.spirit,spirit);collect(r,'brindles-recipes');assert.ok(G.state.items.includes('brindles-recipes'));assert.equal(G.state.town.spirit,spirit+3);
-reload();at(20,33);assert.equal(G.deliveryCandidate().id,'drainBack');talk();assert.equal(G.state.player.x,18*16+8);
+reload();at(20,33);require('./helpers/walk-road.cjs')(r,[[20,30]]);assert.equal(G.state.player.x,20*16+8);
 assert.equal(G.state.town.spirit,spirit+3);at(38,12);talk();clearWave(1);assert.equal(G.state.delivery.lamps[1],2);assert.ok(reachable(59,18));
 reload();assert.equal(G.state.enemies.length,0);assert.ok(reachable(59,18));
 
@@ -52,9 +52,9 @@ for(const [id,x,y]of [['present',28,26],['bread',12,12],['letter',30,13]]){
 }
 assert.ok(reachable(43,19),'existing town remains linked');at(8,20);const before=G.state.town.spirit;talk();
 assert.ok(G.state.delivery.complete);assert.equal(G.state.town.spirit,before);assert.ok(!G.state.items.includes('sunrise-seal'));collect(r,'sunrise-seal');assert.equal(G.state.town.spirit,before+8);assert.ok(G.state.items.includes('sunrise-seal'));
-reload();at(8,20);assert.equal(G.deliveryCandidate().id,'rideBack');assert.equal(G.state.town.spirit,before+8);assert.equal(G.deliveryGoal(),null);
+reload();at(8,20);assert.equal(G.deliveryCandidate(),null);assert.equal(G.state.town.spirit,before+8);assert.equal(G.deliveryGoal(),null);
 assert.match(G.npcDialogue('quayPip',0,0),/Thimble/);
-talk();assert.equal(G.state.mapId,'orchardRoad');talk();assert.equal(G.state.mapId,'sunriseQuay');assert.equal(G.state.town.spirit,before+8,'repeat cart trips cannot duplicate the delivery reward');
+for(const destination of ['tollCourt','lanternReach','orchardRoad','lanternReach','tollCourt','sunriseQuay'])require('./helpers/cross-road.cjs')(r,destination);assert.equal(G.state.town.spirit,before+8,'repeat road trips cannot duplicate the delivery reward');
 // Visiting via the old town cannot collect parcels or a final reward early.
 G.state.delivery=G.makeDelivery();r.load('sunriseQuay');at(28,26);assert.equal(G.deliveryCandidate(),null);
 assert.deepEqual(JSON.parse(JSON.stringify(G.normalizeDelivery(null))),JSON.parse(JSON.stringify(G.makeDelivery())));

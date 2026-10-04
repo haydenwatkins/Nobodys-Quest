@@ -29,7 +29,10 @@
   m.oval(39,30,5,3,'w'); m.oval(38,18,4,3,'w');
   m.road([[39,24],[39,27]],0);
   m.road([[11,36],[3,36],[1,36]]);
-  m.put(0,36,'E'); m.put(54,0,'H');
+  // The delivery road continues east from the cart, on the same map.
+  m.road([[26,37],[62,37]],1);
+  m.put(0,36,'E'); m.put(54,0,'H');m.put(63,37,'D');
+  for(let x=29;x<=32;x++)m.put(x,24,'u');
   for(let y=20;y<=22;y++)for(let x=37;x<=40;x++)m.put(x,y,'r');
   m.put(12,35,'N'); m.put(38,25,'C'); m.put(49,15,'F');
   // Four 3-heart creatures provide twelve actual Slap contacts and the sign
@@ -37,17 +40,19 @@
   [[17,32],[21,32],[23,35],[18,36]].forEach(p=>m.put(...p,'s'));
   // Rat's first useful stretch is on the far bank: bite three different
   // briars, earn Fester, then try it while clearing the mill approach.
-  [[36,26],[40,26],[42,24]].forEach(p=>m.put(...p,'b'));
+  [[38,26],[40,26],[42,24]].forEach(p=>m.put(...p,'b'));
   [[44,15],[49,13]].forEach(p=>m.put(...p,'g'));
   registerMap({id:'orchardRoad',name:'Greenfield · Orchard Road',biome:'mistwood',openingLandscape:true,
     playerStart:{x:7,y:37}, tiles:m.finish(),
     legend:{
       E:{tile:'path',portal:{map:'overworld',x:59,y:45},portalStyle:'gap'},
       H:{tile:'path',portal:{map:'heartwood',x:16,y:22},portalStyle:'gap'},
+      D:{tile:'path',portal:{map:'lanternReach',x:3,y:29},portalStyle:'gap'},
+      u:{tile:'path',smallPassage:true},
       N:{tile:'grass',message:'WANTED: SOMEBODY. The orchard road is closed. Deliveries, visitors, and help have stopped arriving. Please report to the stranded cart. — Sunrise Town'},
       C:{tile:'grass',chest:{item:'knights-crest',name:"the mill keeper's Knight's Crest"}},
       F:{tile:'grass',rest:true},
-      s:{tile:'grass',enemy:'orchardTangle'},b:{tile:'grass',enemy:'orchardSpitter'},g:{tile:'grass',enemy:'orchardGuard'},
+      s:{tile:'grass',enemy:'orchardTangle'},b:{tile:'grass',enemy:'orchardSpitter',guardPost:true},g:{tile:'grass',enemy:'orchardGuard'},
     },
     openingProps:[
       ['sign',12,35],['cart',21,35],['banner',8,35],['mill',39,22],['sluice',34,24],

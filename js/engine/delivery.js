@@ -29,8 +29,8 @@
   G.recipeGiftApproach=()=>{
     const gift=G.groundRewardFor&&G.groundRewardFor('brindles-recipes');if(!gift)return null;
     const s=G.state,inPocket=s.mapId===gift.mapId&&Math.abs(s.player.x-328)<32&&s.player.y>=33*16;
-    return {gift,inPocket,mapId:gift.mapId,point:inPocket?[gift.x/16-.5,gift.y/16-.5]:[18,30],
-      text:inPocket?'Walk over the recipe book to collect it, then return through the drain and bring Brindle the good news.':'Become Rat and enter the Lantern Reach drain again. The recipe book waits safely in the little pocket beneath the bank.'};
+    return {gift,inPocket,mapId:gift.mapId,point:inPocket?[gift.x/16-.5,gift.y/16-.5]:[20,30],
+      text:inPocket?'Walk over the recipe book to collect it, then walk back through the drain and bring Brindle the good news.':'Become Rat and walk south through the Lantern Reach drain again. The recipe book waits safely in the little pocket beneath the bank.'};
   };
   G.deliveryGoal=()=>{
     const s=G.state;if(!s)return null;const d=state();
@@ -39,7 +39,7 @@
     if(gift)return {chapter:1,act:G.STORY_CHAPTERS[1],title:'A gift for helping',short:`Collect the ${G.groundRewardInfo(gift).name}`,objective:approach?approach.text:`Walk over the gift on the ground. ${G.groundRewardInfo(gift).purpose}. The road and your unfinished promises remain open.`,reason:'Your help is remembered. Its gift waits even if you leave.',mapId:gift.mapId,point:approach?approach.point:[gift.x/16-.5,gift.y/16-.5],destination:G.maps[gift.mapId].name,guide:'opening',progress:{value:d.complete?8:d.keeper?4:0,total:8,label:'A THANK-YOU GIFT'},complete:false};
     if(d.complete||(!d.started&&!(s.opening&&s.opening.complete)))return null;
     let mapId,point,short,objective,value;
-    if(!d.started){mapId='orchardRoad';point=[26,37];short='Meet Parcel at the departure post';objective='Parcel can finally travel. Join the delivery beside the cart, a few steps east.';value=0;}
+    if(!d.started){mapId='orchardRoad';point=[26,37];short='Meet Parcel beside the east road';objective='Talk to Parcel beside the cart, then follow Orchard Road east toward the lanterns.';value=0;}
     else if(d.lamps[0]<2){mapId='lanternReach';point=[14,24];short=d.lamps[0]?'Clear the first lantern':'Raise the first lantern';objective='Follow the west bank to the unlit lantern. Drive back the creatures its light draws.';value=1;}
     else if(d.lamps[1]<2){mapId='lanternReach';point=[38,12];short=d.lamps[1]?'Clear the second lantern':'Raise the second lantern';objective='The first light opened the causeway. Carry it to the lantern on the far bank.';value=2;}
     else if(!d.keeper){mapId='tollCourt';point=[18,17];short='Cross the old toll bridge';objective='Follow the lamps east. When the bridge floods, shelter inside the marked lantern circle.';value=3;}
@@ -69,14 +69,13 @@
   G.deliveryCandidate=()=>{
     if(!G.state||!safe())return null;const d=state(),map=G.state.mapId;
     const option=(id,label,x,y,r)=>near(x,y,r)?{id,label,x:x*16+8,y:y*16+8}:null;
-    if(map==='orchardRoad'&&G.state.opening.complete)return option('depart',d.complete?'Ride to Sunrise Quay':d.started?'Return to the Lantern Reach':'Travel with Parcel',26,37);
+    if(map==='orchardRoad'&&G.state.opening.complete&&!d.started)return option('depart','Plan the road with Parcel',26,37);
     if(!here())return null;
     if(map==='lanternReach'){
       for(const i of [0,1])if(d.started&&d.lamps[i]===0&&(i===0||d.lamps[0]===2)){
         const [x,y]=i?[38,12]:[14,24],at=option('lamp'+i,'Raise the '+(i?'second':'first')+' lantern',x,y);if(at)return at;
       }
-      if(near(20,33,21))return {id:'drainBack',label:'Return through the drain',x:328,y:536};
-      if(!d.salvage||G.groundRewardFor('brindles-recipes'))return option('drain',G.state.formId==='rat'?(d.salvage?'Return for the recipe book':'Explore the storm drain'):'A small drain · Rat can fit',18,30,25);
+      if(!d.salvage||G.groundRewardFor('brindles-recipes'))return option('drain','Low drain · walk south as Rat',20,30,25);
     }
     if(map==='sunriseQuay'&&d.started&&d.keeper){
       if(d.complete&&G.expeditionUnlocked()){
@@ -86,13 +85,11 @@
         const at=option(id,{bread:'Deliver the flour',letter:'Deliver Mara’s letter',present:'Deliver the birthday present'}[id],x,y);if(at)return at;
       }
       if(d.parcels.length===3&&!d.complete)return option('finish','Tell Parcel the delivery is done',8,20);
-      if(d.complete)return option('rideBack','Ride back to Orchard Road',8,20);
     }
     return null;
   };
   const oldCandidate=G.openingInteractionCandidate,oldInteract=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>G.deliveryCandidate()||oldCandidate();
-  function move(x,y){const p=G.state.player;p.x=x*16+8;p.y=y*16+8;p.lastSafe={x:p.x,y:p.y};p.dashing=null;p.performance=null;}
   const waves=[[[13,22,'orchardGuard'],[18,25,'orchardGuard'],[18,20,'orchardSpitter']],[[34,13,'orchardGuard'],[39,16,'orchardGuard'],[37,10,'orchardSpitter']]];
   function spawnWave(i){
     const d=state();for(const [n,[x,y,id]]of waves[i].entries()){
@@ -109,18 +106,16 @@
     const at=G.deliveryCandidate();if(!at)return oldInteract();
     const d=state(),s=G.state;
     if(at.id==='depart'){
-      d.started=true;G.world.load(d.complete?'sunriseQuay':'lanternReach');
-      say('departure',[['PARCEL','Flour for Brindle, a letter for Mara, and Pip’s birthday present. They’ve all been waiting for me. Let’s get these home!'],['PATCHLING','It’s getting dark. Can we light those lamps?'],['PARCEL','Yes, please! Nobody’s reached them since the flood. Light the one beside us first; I’ll keep the cart close.']]);
-    }else if(at.id==='rideBack')G.world.load('orchardRoad',{x:26,y:37});
-    else if(at.id==='manyfold'){if(G.ui.openExpedition)G.ui.openExpedition(G.ensureExpeditionProgress().runs===0?3:undefined);}
+      d.started=true;
+      say('departure',[['PARCEL','Flour for Brindle, a letter for Mara, and Pip’s birthday present. They’ve all been waiting for me. Let’s get these home!'],['PARCEL','Follow this road east to Lantern Reach. The first lamp is on the west bank. I’ll bring the cart along once you’ve made the road safe.'],['PATCHLING','I’ll walk ahead and look for the lamp!']]);
+    }else if(at.id==='manyfold'){if(G.ui.openExpedition)G.ui.openExpedition(G.ensureExpeditionProgress().runs===0?3:undefined);}
     else if(at.id.startsWith('lamp')){
       const i=Number(at.id.slice(-1));d.lamps[i]=1;spawnWave(i);G.sfx.play('bossPhase');
       say('lamp'+i,[['PARCEL',i?'More root creatures! Clear the bank, please. I’ll keep the lamp safe.':'Oh no, there’s something moving in the reeds! I’ll stay with the cart. You’ve got room to dodge around it.']]);
     }else if(at.id==='drain'){
       if(s.formId!=='rat')G.ui.dialogue('PEBBLE','There’s something caught under that bank! Try the drain as Rat; I think you’ll fit.',{accent:'#e7bd78'});
-      else{move(20,33);if(!d.salvage){d.salvage=true;G.revealActivityReward('brindles-recipes',s.player.x,s.player.y);G.sfx.play('pickup');say('salvage',[['PATCHLING','A recipe book. The pages smell of cinnamon.'],['PARCEL','Brindle lost that in the flood. Walk over the book to collect it, then bring her the good news. Keep it dry.']]);}}
-    }else if(at.id==='drainBack')move(18,30);
-    else if(locations[at.id]){
+      else G.ui.dialogue('PEBBLE','Walk south through the low drain. There’s a dry little pocket under the bank. Come back the same way when you’ve had a look.',{accent:'#e7bd78'});
+    }else if(locations[at.id]){
       d.parcels.push(at.id);G.sfx.play('pickup');s.deliveryWarmT=3;
       const lines={bread:[['BAKER BRINDLE',d.salvage?'My flour AND my recipes! I can stop calling the burnt ones a local tradition.':'Flour! I was down to making the smell of bread. Very popular. Not filling.'],['PATCHLING','You must have missed baking for everyone.'],['BAKER BRINDLE','I did! I kept checking the road. I’m so happy to have you all back.']],
         letter:[['MARA','From my sister. She is coming home. She thought I had stopped writing.'],['PATCHLING','She must have missed you. I’m glad we got her letter here.'],['MARA','I will put another cup out.']],
@@ -142,12 +137,13 @@
       if(id==='quayMara'&&d.parcels.includes('letter'))return 'I’ve put a cup out for my sister. I can’t wait to see her again.';
       if(id==='quayPip'&&d.parcels.includes('present'))return 'I named him Thimble. He is a very important dragon.';
       if(id==='parcel'&&d.complete&&!G.systemIntroduced('sideAdventures'))return G.ensureTown().requests?.includes('recipes')?'Pebble’s worried about the late boat. Could you check on him at the centre of the quay?':'Brindle’s been worrying about her recipe book. She’s beside the bakery if you’d like to talk.';
-      if(id==='parcel')return d.complete?'The map stand beside the east lantern leads into the Manyfold. New paths, borrowed powers, and something to bring home. I might let you carry the post next time.':'We made it. Brindle is by the oven, Mara by the east house, Pip down by the water.';
+      if(id==='parcel')return d.complete?'The west road goes back through the toll bridge and Lantern Reach to the orchard. If you want a new outing, the map stand beside the east lantern leads into the Manyfold. New paths, borrowed powers, and something to bring home. I might let you carry the post next time.':'We made it. Brindle is by the oven, Mara by the east house, Pip down by the water.';
     }
     return oldTalk(id,chapter,index);
   };
   G.events.on('mapEnter',()=>{
     if(!here())return;const s=G.state,d=state();s.openingHazards=[];
+    if(s.mapId==='lanternReach'&&s.opening.complete&&!d.started){d.started=true;say('departure',[['PARCEL','Here are the lanterns! The first lamp is on this bank. Light it when you’re ready; I’ll keep the cart nearby.']]);}
     if(s.mapId==='lanternReach')for(const i of [0,1])if(d.lamps[i]===1)spawnWave(i);
     if(s.mapId==='tollCourt'&&d.keeper)for(const e of s.enemies)e.dead=true;
     for(const n of s.npcs){n.anchors=[n.home];n.routineT=999;if(n.id.startsWith('quay'))n.activity=null;}
@@ -163,6 +159,10 @@
   const oldUpdate=G.updateOpening;
   G.updateOpening=dt=>{
     oldUpdate(dt);if(!here())return;const s=G.state,d=state();s.deliveryWarmT=Math.max(0,(s.deliveryWarmT||0)-dt);
+    if(s.mapId==='lanternReach'&&s.formId==='rat'&&!d.salvage&&near(20,33,12)){
+      d.salvage=true;G.revealActivityReward('brindles-recipes',20*16+8,33*16+8);G.sfx.play('pickup');
+      say('salvage',[['PATCHLING','A recipe book! The pages smell of cinnamon. I’ll pick it up and bring it back to Brindle.'],['PEBBLE','Keep it dry! Walk back up the drain, then follow the lamps and bridge east to Sunrise.']]);G.saveGame();
+    }
     if(s.mapId==='lanternReach')for(const i of [0,1]){
       if(d.lamps[i]!==1||s.enemies.some(e=>!e.dead&&e.deliveryWave===i))continue;
       d.lamps[i]=2;G.healPlayer(2,'lantern');s.player.mana=G.playerMaxMana();

@@ -21,6 +21,8 @@ These are document benchmarks, not timed playtests of other games.
 7. New state transitions need fresh-start and partial-save coverage. A published-host title selection is part of startup, not a localhost-only test. Existing earned abilities and adventures must remain usable. New adventures use opening version 2; normalized version-1 and pre-opening adventures retain introduced-system access. Newly earned Wizard ownership never bypasses the harbour return.
 8. Compulsory progression must reward a varied set of familiar bodies and chosen favorites. It must not require completing the roster after passive mastery is removed. Sunstep opens at 18 stars, the coast at 22; Dragon needs four learned earlier shapes and one practiced advanced calling. The final portfolio asks for eight bodies at level 3 and three favorites at level 5, alongside all six World Marks and Meridian's actual defeat. Use shared `G.PACING` values and preserve optional depth. See `PROGRESSION-REVIEW.md` for the complete registry audit, native evidence and remaining session review.
 
+9. Make ordinary chapter travel physical. Friends explain the route while the player stays in place; authored roads join neighbouring maps. A small-form passage needs visible terrain and actual walking, with its useful action on the far side. Guidance must continue forward once inside, and the same path must provide a safe return. Preserve saved accomplishments and once-only gifts. See `CONNECTED-OPENING.md`.
+
 ## Prose rules
 
 Write spoken English that a child can follow on first hearing. Every story/request exchange should answer: who is speaking, what they want, how they feel, and what the player can do now.

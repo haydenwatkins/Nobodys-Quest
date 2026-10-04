@@ -2,9 +2,9 @@
    belong in the Atlas without changing the eight-region completion reward. */
 "use strict";
 G.JOURNEY_STOPS = [
-  {id:"orchardRoad",name:"Orchard Road",icon:"🌳",clue:"Help Parcel, open the culvert, and ring the watch bell."},
+  {id:"orchardRoad",name:"Orchard Road",icon:"🌳",clue:"Help Parcel, open the mill bridge, and ring the watch bell."},
   {id:"heartwood",name:"The Heartwood",icon:"🌲",clue:"The root arch at the north end of Orchard Road leads to the guardian."},
-  {id:"lanternReach",name:"Lantern Reach",icon:"🏮",clue:"Parcel's departure post leads here. Restore both lamps to cross the causeway."},
+  {id:"lanternReach",name:"Lantern Reach",icon:"🏮",clue:"Follow Orchard Road east from the cart. Restore both lamps to cross the causeway."},
   {id:"tollCourt",name:"Old Toll Bridge",icon:"🌧",clue:"East of the lanterns. Defeat the Tollkeeper to open the road to town."},
   {id:"sunriseQuay",name:"Sunrise Quay",icon:"☀",clue:"Deliver the parcels, then meet Parcel. The east road joins the town green."},
   {id:"town",name:"Town Green",icon:"🏡",clue:"Build homes and choose projects for the people you brought together."},
@@ -13,7 +13,7 @@ G.journeyStop = id => {
   const stop=G.JOURNEY_STOPS.find(stop => stop.id === id);
   if (!stop) return null;
   if (id === "sunriseQuay" && G.state?.delivery?.complete)
-    return {...stop,clue:"The deliveries are complete. Meet Parcel for a ride to Orchard Road, explore the Manyfold trail, or take the east road to your town."};
+    return {...stop,clue:"The deliveries are complete. Walk west through the bridge and lanterns to Orchard Road, explore the Manyfold trail, or take the east road to your town."};
   return stop;
 };
 const regionInfo = G.wayfinderRegionInfo;
@@ -46,17 +46,12 @@ G.events.on("mapEnter", ({map}) => {
   }
 });
 
-G.journeyTravelLinks = mapId => {
-  const s=G.state,d=s.delivery||{};
-  if(mapId==="orchardRoad" && s.opening?.complete)
-    return [{x:26,y:37,map:d.complete?"sunriseQuay":"lanternReach",label:d.complete?"Parcel's cart to Sunrise Quay":"Parcel's departure post",kind:"cart"}];
-  if(mapId==="sunriseQuay" && d.complete)
-    return [{x:8,y:20,map:"orchardRoad",label:"Parcel's cart to Orchard Road",kind:"cart"}];
-  return [];
-};
+// Keep the old integration hook empty: all early travel is a real road exit.
+G.journeyTravelLinks = () => [];
 
 G.journeyGateReason = (mapId,destination) => {
   const s=G.state,o=s.opening||{},d=s.delivery||{};
+  if(mapId==="orchardRoad"&&destination==="lanternReach"&&!o.complete&&!d.started)return "Help Parcel reopen the orchard road first.";
   if(mapId==="orchardRoad" && destination==="heartwood" && !o.bell) return "Ring the watch bell to open the root arch.";
   if(mapId==="lanternReach" && destination==="tollCourt" && d.lamps?.[1]!==2) return "Restore both lanterns to open the causeway.";
   if(mapId==="tollCourt" && destination==="sunriseQuay" && !d.keeper && (s.mapId!==mapId || s.player.x<28*G.TILE)) return "Defeat the Tollkeeper to cross the bridge.";

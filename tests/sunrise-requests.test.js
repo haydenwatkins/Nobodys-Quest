@@ -38,7 +38,7 @@ test('following a promise persists, routes across maps, and switches to its neig
  G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));
  assert.equal(G.followedSunriseRequest().id,'recipes');assert.equal(G.storyGoal().short,campaign);
  let target=G.guidanceTarget();assert.equal(target.kind,'home');assert.ok(target.tileX!==undefined);
- r.load('lanternReach');r.drain();target=G.guidanceTarget();assert.equal(target.tileX,18);assert.equal(target.tileY,30);assert.match(target.text,/Rat/);
+ r.load('lanternReach');r.drain();target=G.guidanceTarget();assert.equal(target.tileX,20);assert.equal(target.tileY,30);assert.match(target.text,/Rat/);
  G.state.delivery.salvage=true;assert.match(G.guidanceTarget().text,/Brindle/);
  r.load('sunriseQuay');r.drain();assert.equal(G.guidanceTarget().tileX,12);
  visit(G,12,12);G.tryOpeningInteraction();assert.equal(G.followedSunriseRequest(),null);

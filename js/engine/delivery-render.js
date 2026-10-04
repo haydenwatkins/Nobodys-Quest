@@ -103,6 +103,15 @@
     if(kind==='bench'){rect(c,x-9,y-4,21,3,C.wood);rect(c,x-10,y-12,23,5,C.wood);rect(c,x-8,y-8,2,11,C.dark);rect(c,x+9,y-8,2,11,C.dark);return true;}
     return false;
   };
+  const oldGround=G.drawOpeningGround;
+  G.drawOpeningGround=(c,cam,time)=>{
+    oldGround(c,cam,time);
+    if(G.state.mapId!=='lanternReach')return;
+    const x=20*16,y=31*16;
+    rect(c,x+3,y,10,32,C.ink);
+    rect(c,x+1,y,2,32,C.stone);rect(c,x+13,y,2,32,C.dark);
+    for(let i=0;i<4;i++){rect(c,x+1,y+i*8,2,1,C.light);rect(c,x+13,y+i*8,2,1,C.stone);}
+  };
   const oldTile=G.drawOpeningTile;
   G.drawOpeningTile=(c,cell,x,y,t)=>{
     if(!here()||G.state.mapId==='sunriseQuay')return oldTile(c,cell,x,y,t);

@@ -46,3 +46,8 @@ Both field docks now wrap the complete next action. The paper dock reserves the 
 The same request registry now includes `ridge-watch` and `starfall-lights`, saved in the existing town request/selection fields. Pending follows Dark-ward guardian work, Sigil collection and his return; Errata follows each remaining lens, the southern instrument, thread collection and her return. Regional targets follow the actual NPC actor and ground gift, with existing cross-map route help. Native accomplishments count even without an earlier acceptance. Regional returns record thanks and dialogue without inventing another payout.
 
 New adventures recommend these people after the harbour, before the open Worldwake road. Explicit mastery choices and the 18-star road retain priority. Optional local reports require their own Home explanation/choice and never replace the selected promise. Native/save/render evidence is in `REGIONAL-PROMISES.md`.
+
+
+## Connected opening traversal
+
+The early task now points through real roads. Parcel's route conversation leaves the player at the cart; Orchard Road's east exit leads to Lantern Reach and its west exit brings the player back. Rat walks beneath the roots to the far-bank lever and walks through the recipe drain to its saved book. Pending recipe guidance points to the actual mouth at tile 20,30, then the book inside; leaving and returning requires walking. See `CONNECTED-OPENING.md` for native/browser evidence and unchanged legacy credit.

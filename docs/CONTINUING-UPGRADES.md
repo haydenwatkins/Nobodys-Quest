@@ -636,3 +636,8 @@ Next substantive work: walk the campaign progression from delivery through the f
 
 ## Shipping approach
 Ship bounded, tested batches to main under the user's standing authorization. Include behavior tests for substantive changes and visual checks for art/layout. Follow failures and concrete playtest findings before expanding scope. Keep this plan current as priorities change.
+
+
+## Opening traversal, October 4
+
+Parcel's route conversation now leaves the player in place, with a real east branch connecting Orchard Road to Lantern Reach. The entire delivery road has normal return exits. Both Rat drains are physical passages, with the sluice operated on the far bank and Brindle's book discovered in its dry pocket. Guidance follows the real mouth/exits and continues to the lever once inside. Idle mill briars retain their posts so they cannot crowd the lever while the child explores; their native combat and legacy saved defeat credit remain. This adds no save schema or second quest engine. See `CONNECTED-OPENING.md` for final validation and fixture limits. The next roadmap batch remains the Legend/Mark/Manyfold introductions and a continuous Worldwake session.

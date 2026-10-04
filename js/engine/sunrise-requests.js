@@ -90,7 +90,7 @@
         destination:G.maps[mapId].name,color:G.GUIDANCE_COLORS.home,icon:"☀",complete:false,label:`A PROMISE TO ${r.name.toUpperCase()}`,
         progress:{value:selected.ready?2:step.value||0,total:3,label:selected.ready?"GOOD NEWS · TELL YOUR FRIEND":"HELP, THEN RETURN"}};
     }
-    const places={beacon:["sunkenMarsh",22,20],recipes:["lanternReach",18,30],dragon:["sunriseQuay",35,20],welcome:["sunriseQuay",30,13]};
+    const places={beacon:["sunkenMarsh",22,20],recipes:["lanternReach",20,30],dragon:["sunriseQuay",35,20],welcome:["sunriseQuay",30,13]};
     const steps={beacon:"Find the Mire Queen's pearl",recipes:"Find Brindle's recipes",dragon:"Win a Manyfold crossing",welcome:"Build the Welcome Lodge"};
     const reasons={beacon:"Help the late boat find the harbour.",recipes:"Help Brindle bake her family's cinnamon knots again.",dragon:"Bring Pip and Thimble a real adventure story.",welcome:"Make a warm place for Mara's sister and her friends."};
     const gift=!selected.ready&&G.groundRewardFor?.(r.id==="beacon"?"trophy-mire-pearl":r.id==="recipes"?"brindles-recipes":"");
@@ -132,7 +132,7 @@
         const approach=G.recipeGiftApproach();
         if(approach?.inPocket){const gift=approach.gift;return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,
           x:gift.x,y:gift.y,tileX:Math.floor(gift.x/G.TILE),tileY:Math.floor(gift.y/G.TILE),reward:gift,text:approach.text};}
-        mapId="lanternReach";[x,y]=approach?approach.point:[18,30];text=approach?approach.text:"Follow the bank to the drain, then become Rat to recover Brindle’s recipe book.";
+        mapId="lanternReach";[x,y]=approach?approach.point:[20,30];text=approach?approach.text:"Follow the bank to the low drain. Become Rat and walk south to recover Brindle’s recipe book.";
       }
       if(r.id==="dragon"){x=35;y=20;text="Choose a Manyfold crossing at the trail stand. Finish it and bring Pip a story.";}
       if(r.id==="welcome")return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",spatial:false,destination:r.title,text:"Open Home → Sunrise and build the Welcome Lodge in Civic Works (12 spirit). Then visit Mara on the quay."};

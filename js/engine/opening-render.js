@@ -163,7 +163,17 @@
     if(G.state.mapId==='orchardRoad'){
       const props=G.openingScenery&&G.openingScenery.props;
       if(G.state.opening.sluice){for(let x=27*16;x<=35*16;x+=6){if(props)G.drawSprite(c,props.bridgePlank,0,x+3,24*16+16,false);else{rect(c,x,24*16,5,15,C.wood);rect(c,x,24*16,5,1,C.gold);}}}
-      else {const x=30*16,y=24*16;if(props){G.drawSprite(c,props.rootGate,0,x+8,y+14,false);G.drawSprite(c,props.culvert,0,27*16+16,y+14,false);}else{for(let i=0;i<4;i++){poly(c,[[x-24,y+13],[x+i*9,y-17],[x+13+i*9,y+14]],C.woodDark);}ellipse(c,27*16+16,24*16+6,7,8,C.ink);}}
+      else {
+        const x=30*16,y=24*16;
+        c.save();if(G.smallPassageAt(G.state.player.x,G.state.player.y))c.globalAlpha=.35;
+        if(props)G.drawSprite(c,props.rootGate,0,x+8,y+14,false);
+        else for(let i=0;i<4;i++)poly(c,[[x-24,y+13],[x+i*9,y-17],[x+13+i*9,y+14]],C.woodDark);
+        c.restore();
+        // The dark floor and stone rims show the actual Rat corridor.
+        rect(c,29*16,y+3,4*16,10,C.ink);rect(c,29*16,y+1,4*16,2,'#9fa48a');rect(c,29*16,y+13,4*16,2,C.woodDark);
+        if(props)G.drawSprite(c,props.culvert,0,27*16+16,y+14,false);
+        else ellipse(c,27*16+16,24*16+6,7,8,C.ink);
+      }
       // Dam apron, millrace foam, and a sunlit scattering of fallen apples.
       for(let i=0;i<15;i++){const x=35*16+rand(i,14)*110,y=27*16+rand(i,71)*55;if(G.world.cellAt(x,y).tile==='water')rect(c,x,y,4,1,'#a0c1ac');}
     }else if(G.state.mapId==='heartwood'){

@@ -56,8 +56,8 @@ test('the guided Sunrise route uses native recipe recovery, Wizard discovery, Qu
  // have their own opening test. No town request is pre-completed here.
  G.state.opening.started=G.state.opening.complete=true;G.state.delivery=G.normalizeDelivery({version:1,complete:true});
  G.state.claimedForms=['rat','knight'];G.questsDone=[...G.forms.nobody.quests.slice(0,2),G.forms.rat.quests[0],G.forms.knight.quests[0]].map(q=>q.id);G.state.stars=5;
- G.state.formId='rat';r.load('lanternReach');r.drain();G.state.enemies=[];Object.assign(G.state.player,{x:296,y:488});
- assert.ok(G.tryOpeningInteraction());r.drain();collect(r,'brindles-recipes');
+ G.state.formId='rat';r.load('lanternReach');r.drain();G.state.enemies=[];Object.assign(G.state.player,{x:328,y:488});
+ assert.ok(G.tryOpeningInteraction());r.drain();require('./helpers/walk-road.cjs')(r,[[20,33]]);collect(r,'brindles-recipes');
  r.load('sunriseQuay');r.drain();G.state.enemies=[];Object.assign(G.state.player,{x:200,y:200});
  assert.ok(G.tryOpeningInteraction());r.drain();assert.ok(G.ensureTown().requests.includes('recipes'));assert.ok(G.groundRewardFor('sunrise-thanks-recipes'));
  assert.ok(G.sunriseRequests().some(q=>q.id==='beacon'));assert.equal(G.expeditionUnlocked(),false);assert.equal(G.formReady('wizard'),true);

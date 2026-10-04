@@ -16,11 +16,14 @@
   r.land(20,34,2,2);r.put(20,33,'.');
   r.path([[0,29],[10,29],[16,26],[16,18],[26,18],[33,14],[39,14],[43,18],[59,18]]);
   r.path([[14,24],[16,24]]);r.path([[35,14],[38,12]]);
+  // A visible low drain joins the bank to the recipe pocket. Its two
+  // narrow tiles need Rat; the pocket itself is ordinary walkable ground.
+  r.put(18,32,'w');r.put(19,32,'w');r.put(20,31,'u');r.put(20,32,'u');
   r.put(0,29,'O');r.put(59,18,'K');r.put(9,30,'F');r.put(40,15,'F');
   registerMap({id:'lanternReach',name:'The Lantern Reach',biome:'sunkenMarsh',openingLandscape:true,deliveryLandscape:true,
     playerStart:{x:5,y:29},tiles:r.tiles(),
-    legend:{O:{tile:'path',portal:{map:'orchardRoad',x:24,y:37},portalStyle:'gap'},K:{tile:'path',portal:{map:'tollCourt',x:5,y:17},portalStyle:'gap'},F:{tile:'grass',rest:true}},
-    openingProps:[['cart',7,30],['lantern',14,24],['lantern',38,12],['camp',9,30],['camp',40,15],['rainGate',24,18],['rainGate',46,18],['milepost',10,27],['milepost',43,17],['willow',9,24],['willow',20,29],['willow',29,12],['willow',40,8],['willow',21,21],['willow',12,19],['willow',33,20],['reed',22,23],['reed',27,21],['reed',44,23],['reed',51,24],['reed',11,32],['reed',8,27],['reed',22,28],['reed',23,20],['reed',31,10],['reed',41,17],['wreck',31,24],['drain',18,30],['satchel',20,33]],
+    legend:{O:{tile:'path',portal:{map:'orchardRoad',x:61,y:37},portalStyle:'gap'},K:{tile:'path',portal:{map:'tollCourt',x:5,y:17},portalStyle:'gap'},F:{tile:'grass',rest:true},u:{tile:'path',smallPassage:true}},
+    openingProps:[['cart',7,30],['lantern',14,24],['lantern',38,12],['camp',9,30],['camp',40,15],['rainGate',24,18],['rainGate',46,18],['milepost',10,27],['milepost',43,17],['willow',9,24],['willow',20,29],['willow',29,12],['willow',40,8],['willow',21,21],['willow',12,19],['willow',33,20],['reed',22,23],['reed',27,21],['reed',44,23],['reed',51,24],['reed',11,32],['reed',8,27],['reed',22,28],['reed',23,20],['reed',31,10],['reed',41,17],['wreck',31,24],['drain',20,31],['satchel',20,33]],
   });
   const b=shore(34,29);b.land(17,15,15,12);b.path([[0,17],[33,17]]);
   for(let y=9;y<=23;y++)for(let x=9;x<=26;x++)if(((x-18)/9)**2+((y-16)/8)**2<1)b.put(x,y,'p');
