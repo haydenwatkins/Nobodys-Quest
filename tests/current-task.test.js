@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
 function closeDialogue(r){for(let i=0;i<100&&r.G.ui.dialogueOpen;i++){r.taps.add('interact');r.G.ui.update(.1);}assert.equal(r.G.ui.dialogueOpen,false);}
@@ -21,7 +22,7 @@ test('the current promise follows actual victory, ground collection, save and on
  assert.equal(G.currentTask().progress.value,1);assert.equal(G.currentTask().complete,false,'returning remains part of the promise');
  r.load('sunriseQuay');r.drain();Object.assign(G.state.player,{x:22*16+8,y:20*16+8});
  assert.equal(G.guidanceTarget().tileX,22);assert.equal(G.deliveryCandidate().label,'Good news for Pebble');
- const spirit=G.state.town.spirit;G.tryOpeningInteraction();r.drain();
+ const spirit=G.state.town.spirit;G.tryOpeningInteraction();r.drain();assert.equal(G.state.town.spirit,spirit);collect(r,'sunrise-thanks-beacon');
  assert.equal(G.state.town.spirit,spirit+8);assert.equal(G.currentTask().kind,'story');
  G.tryOpeningInteraction();r.drain();assert.equal(G.state.town.spirit,spirit+8);assert.match(G.npcDialogue('pebble',0,0),/turnips/);
 });

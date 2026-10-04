@@ -31,6 +31,7 @@ test('Brindle’s accepted promise follows Rat entry, saved unclaimed book, safe
  assert.equal(G.ensureTown().spirit,23);assert.equal(G.currentTask().ready,true);assert.equal(G.currentTask().short,'Return to Brindle');
  assert.equal(G.deliveryCandidate().id,'drainBack');interact(r);at(G,18,30);assert.ok(!G.deliveryCandidate(),'the emptied pocket retains its original completed behavior');
  r.load('sunriseQuay');r.drain();at(G,12,12);assert.match(G.deliveryCandidate().label,/Good news/);interact(r);
+ assert.equal(G.ensureTown().spirit,23);collect(r,'sunrise-thanks-recipes');
  assert.equal(G.ensureTown().spirit,28);assert.ok(G.sunriseRequests().find(r=>r.id==='recipes').done);assert.ok(G.state.items.includes('brindles-recipes'));
  assert.equal(G.followedSunriseRequest(),null);G.saveGame();assert.ok(G.loadSaveData().town.requests.includes('recipes'));
  at(G,12,12);assert.ok(G.tryOpeningInteraction());assert.match(r.messages.at(-1).text,/generous thumb/);r.drain();assert.equal(G.ensureTown().spirit,28);

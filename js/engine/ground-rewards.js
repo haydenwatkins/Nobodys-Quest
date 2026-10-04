@@ -16,11 +16,16 @@
     "glasswater-meridian": { mapId: "glasswaterDesert", name: "Meridian Keepsake", spirit: 6, requires: "glasswater-prism" },
     "shattercoast-tideglass-chronicle": { mapId: "shattercoast", name: "Tideglass Chronicle", stars: 1, spirit: 8,
       requires: ["tide-shell", "paper-crane", "orrery-key", "elder-acorn"] },
+    "sunrise-thanks-beacon": { mapId: "sunriseQuay", name: "Harbour Candle", spirit: 8, request: "beacon" },
+    "sunrise-thanks-recipes": { mapId: "sunriseQuay", name: "Cinnamon Parcel", spirit: 5, request: "recipes" },
+    "sunrise-thanks-dragon": { mapId: "sunriseQuay", name: "Thimble's Badge", spirit: 6, request: "dragon" },
+    "sunrise-thanks-welcome": { mapId: "sunriseQuay", name: "Welcome Ribbon", spirit: 5, request: "welcome" },
   };
   function definition(item, source = "chest") {
     if (source === "regional") {
       const prize = regionalRewards[item];
-      return prize && [].concat(prize.requires || []).every(id => G.state.items.includes(id)) ? prize : null;
+      return prize && [].concat(prize.requires || []).every(id => G.state.items.includes(id)) &&
+        (!prize.request || (G.state.delivery?.complete && G.state.town?.requests?.includes(prize.request))) ? prize : null;
     }
     if (source === "activity") {
       if (item === "orchard-ribbon" && G.state.opening?.complete) return { name: "Orchard Ribbon", spirit: 5 };

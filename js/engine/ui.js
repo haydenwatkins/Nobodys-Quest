@@ -2880,7 +2880,7 @@ G.ui = (() => {
     const requests = G.sunriseRequests?.() || [];
     if (!requests.length) return "";
     return `<section class="form-card sunrise-promises"><span class="eyebrow">NAMES, NOT ERRANDS</span><h2>Small promises</h2><p>The parcels arrived. Life keeps going. Visit your neighbours on the quay.</p>
-      ${requests.map(r => `<article class="sunrise-promise ${r.done ? "kept" : ""}"><div><strong>${escapeHtml(r.title)}</strong><span>${escapeHtml(r.name)} · ${r.done ? "Promise kept" : r.ready ? "Good news — go tell them" : "Something to do"}</span></div><p>${r.done ? "Your kindness has left its mark on the quay." : escapeHtml(r.task)}</p><small>${r.done ? "Received" : "Thanks"}: ${r.reward} town spirit</small>${r.done?"":`<button data-follow-request="${r.id}" aria-pressed="${r.followed}">${r.followed?"Show the way":r.ready?`Visit ${escapeHtml(r.name)}`:"Follow this promise"}</button>`}</article>`).join("")}</section>`;
+      ${requests.map(r => `<article class="sunrise-promise ${r.done ? "kept" : ""}"><div><strong>${escapeHtml(r.title)}</strong><span>${escapeHtml(r.name)} · ${r.done ? "Promise kept" : r.ready ? "Good news — go tell them" : "Something to do"}</span></div><p>${r.pending ? `${escapeHtml(r.giftName)} waits beside ${escapeHtml(r.name)} on the quay. Walk over it to collect your thanks.` : r.done ? "Your kindness has left its mark on the quay." : escapeHtml(r.task)}</p><small>${r.pending ? "Waiting to collect" : r.done ? "Received" : "Thanks"}: ${r.reward} town spirit</small>${r.done?"":`<button data-follow-request="${r.id}" aria-pressed="${r.followed}">${r.followed?"Show the way":r.ready?`Visit ${escapeHtml(r.name)}`:"Follow this promise"}</button>`}</article>`).join("")}</section>`;
   }
 
   function buildTownTab() {

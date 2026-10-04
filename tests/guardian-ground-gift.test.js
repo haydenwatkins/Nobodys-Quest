@@ -50,6 +50,7 @@ test('the Pearl stays pending across travel/knockout, then a followed beacon pro
   assert.equal(G.guidanceTarget().tileX,22);assert.equal(G.guidanceTarget().tileY,20);
   Object.assign(G.state.player,{x:22*16+8,y:20*16+8});const spirit=G.ensureTown().spirit;
   assert.equal(G.deliveryCandidate().id,'beacon');assert.equal(G.tryOpeningInteraction(),true);r.drain();
+  assert.equal(G.ensureTown().spirit,spirit);collect(r,'sunrise-thanks-beacon');
   assert.equal(G.ensureTown().spirit,spirit+8);assert.equal(G.followedSunriseRequest(),null);
   assert.ok(G.state.items.includes(pearl),'lighting the beacon does not consume the campaign trophy');
   assert.match(G.npcDialogue('pebble',0,0),/turnips/);

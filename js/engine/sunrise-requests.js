@@ -29,7 +29,10 @@
   ];
   const unlocked=()=>!!(G.state && G.state.delivery?.complete);
   const claimed=()=>{const town=G.ensureTown();if(!Array.isArray(town.requests))town.requests=[];return town.requests;};
-  G.sunriseRequests=()=>unlocked()?requests.map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,done:claimed().includes(r.id),ready:r.ready(),followed:G.ensureTown().followedRequest===r.id})):[];
+  const giftFor=r=>G.groundRewardFor(`sunrise-thanks-${r.id}`);
+  const giftName=r=>G.treasureInfo?.[`sunrise-thanks-${r.id}`]?.name||`${r.name}'s thank-you gift`;
+  const reminder=r=>giftFor(r)?` Your ${giftName(r)} waits beside me. Walk over it to collect your thanks.`:"";
+  G.sunriseRequests=()=>unlocked()?requests.map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,done:claimed().includes(r.id),pending:!!giftFor(r),giftName:giftName(r),ready:r.ready(),followed:G.ensureTown().followedRequest===r.id})):[];
   G.followSunriseRequest=id=>{
     if(id!==null && (!unlocked() || !requests.some(r=>r.id===id) || claimed().includes(id)))return false;
     G.ensureTown().followedRequest=id;
@@ -104,8 +107,9 @@
     if(at?.kind!=="sunriseRequest")return oldInteract();
     const r=requests.find(r=>r.id===at.id), done=claimed().includes(r.id), ready=r.ready();
     if(!done&&ready){
-      claimed().push(r.id);if(G.ensureTown().followedRequest===r.id)G.ensureTown().followedRequest=null;G.ensureTown().spirit+=r.reward;G.saveGame();
-      G.ui.banner(r.title.toUpperCase(),`${r.name}’s thanks · ${r.reward} town spirit`);
+      claimed().push(r.id);if(G.ensureTown().followedRequest===r.id)G.ensureTown().followedRequest=null;
+      G.revealRegionalReward(`sunrise-thanks-${r.id}`,r.x*G.TILE+8,r.y*G.TILE+8);
+      G.ui.banner(r.title.toUpperCase(),`${r.name}’s thanks · collect the ${giftName(r)} for ${r.reward} town spirit`);
     }
     const offer=!done&&!ready&&G.ensureTown().followedRequest!==r.id?{
       prompt:`Follow “${r.title}” for ${r.name}? You can set it aside in Journey.`,
@@ -115,12 +119,12 @@
         G.requestGuidance?.(true);
       }
     }:null;
-    G.ui.dialogue(r.name.toUpperCase(),done?r.after:ready?r.thanks:r.ask,{accent:"#e7bd78",offer});
+    G.ui.dialogue(r.name.toUpperCase(),(done?r.after:ready?r.thanks:r.ask)+reminder(r),{accent:"#e7bd78",offer});
     G.input.clearTaps();return true;
   };
   G.npcDialogue=(id,chapter,index)=>{
     const r=unlocked()&&G.state.mapId==="sunriseQuay"&&requests.find(r=>r.npc===id);
-    return r?(claimed().includes(r.id)?r.after:r.ask):oldTalk(id,chapter,index);
+    return r?(claimed().includes(r.id)?r.after+reminder(r):r.ask):oldTalk(id,chapter,index);
   };
   const oldDraw=G.openingDrawables;
   G.openingDrawables=c=>{

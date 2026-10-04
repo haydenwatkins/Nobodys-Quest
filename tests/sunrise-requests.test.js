@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
 function setup(){const r=runtime();r.G.state.delivery=r.G.normalizeDelivery({complete:true});r.load('sunriseQuay');r.drain();r.G.state.enemies=[];return r;}
@@ -10,14 +11,14 @@ test('neighbour requests unlock after delivery and require the actual accomplish
  G.state.mapId='town';assert.notEqual(G.deliveryCandidate()?.kind,'sunriseRequest');
 });
 test('all three promises count past accomplishments and reward once across save normalization',()=>{
- const {G,messages}=setup();G.state.delivery.salvage=true;G.ensureExpeditionProgress().victories=1;G.state.town.projects.welcomeLodge=true;
- let spirit=G.state.town.spirit,saves=0;G.saveGame=()=>saves++;
+ const r=setup(),{G,messages}=r;G.state.delivery.salvage=true;G.ensureExpeditionProgress().victories=1;G.state.town.projects.welcomeLodge=true;
+ let spirit=G.state.town.spirit;
  for(const [id,x,y,reward] of [['recipes',12,12,5],['dragon',28,26,6],['welcome',30,13,5]]){
-  visit(G,x,y);assert.equal(G.deliveryCandidate().id,id);G.tryOpeningInteraction();spirit+=reward;assert.equal(G.state.town.spirit,spirit);
+  visit(G,x,y);assert.equal(G.deliveryCandidate().id,id);G.tryOpeningInteraction();assert.equal(G.state.town.spirit,spirit);if(id==='recipes')assert.ok(messages.some(m=>m.text.includes('Cinnamon knots')));r.drain();collect(r,`sunrise-thanks-${id}`);spirit+=reward;assert.equal(G.state.town.spirit,spirit);
   assert.ok(G.sunriseRequests().find(r=>r.id===id).done);
   G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));G.tryOpeningInteraction();assert.equal(G.state.town.spirit,spirit);
  }
- assert.equal(saves,3);assert.ok(messages.some(m=>m.text.includes('Cinnamon knots')));
+ assert.equal(G.loadSaveData().town.requests.length,3);assert.equal(G.loadSaveData().groundRewards.length,0);
  const c=new Proxy({},{get:()=>()=>{}});for(const d of G.openingDrawables(c))d.fn();
 });
 test('failed expeditions do not qualify and unsafe interactions cannot claim',()=>{
@@ -64,7 +65,7 @@ test('the harbour beacon connects a real Queen victory to a permanent, once-only
  Object.assign(G.state.player,{x:queen.x,y:queen.y});require('./helpers/collect-treasure.cjs')(r,'trophy-mire-pearl');
  assert.ok(G.state.items.includes('trophy-mire-pearl'));assert.equal(G.followedSunriseRequest().ready,true);
  r.load('sunriseQuay');r.drain();visit(G,22,20);assert.equal(G.deliveryCandidate().id,'beacon');
- const before=G.state.town.spirit;G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+8);assert.equal(G.followedSunriseRequest(),null);
+ const before=G.state.town.spirit;G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before);r.drain();collect(r,'sunrise-thanks-beacon');assert.equal(G.state.town.spirit,before+8);assert.equal(G.followedSunriseRequest(),null);
  G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+8);
  assert.ok(G.state.items.includes('trophy-mire-pearl'),'the campaign trophy stays in inventory');
  assert.match(G.npcDialogue('pebble',0,0),/turnips/);

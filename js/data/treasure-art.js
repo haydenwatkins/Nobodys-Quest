@@ -36,6 +36,10 @@
     "starfall-thread": { name: "Fallen Star Thread", purpose: "+8 town spirit · unlocks the Starstrider look", shape: "starThread" },
     "glasswater-meridian": { name: "Meridian Keepsake", purpose: "+6 town spirit · the meridian road is open", shape: "sunDialToken" },
     "shattercoast-tideglass-chronicle": { name: "Tideglass Chronicle", purpose: "+1 star · +8 town spirit · four coastal lessons", shape: "tideBook" },
+    "sunrise-thanks-beacon": { name: "Harbour Candle", purpose: "+8 town spirit · Pebble's thanks", shape: "harbourCandle" },
+    "sunrise-thanks-recipes": { name: "Cinnamon Parcel", purpose: "+5 town spirit · Brindle's thanks", shape: "cinnamonParcel" },
+    "sunrise-thanks-dragon": { name: "Thimble's Badge", purpose: "+6 town spirit · Pip's thanks", shape: "dragonBadge" },
+    "sunrise-thanks-welcome": { name: "Welcome Ribbon", purpose: "+5 town spirit · Mara's thanks", shape: "welcomeBow" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -51,7 +55,28 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : shape === "tideBook" ? { ...palette, b: "#438d94", e: "#285464", f: "#dfb979" } : palette, (g, frame) => {
-      if (shape === "watchLantern") {
+      if (shape === "harbourCandle") {
+        g.ellipse(14,27,10,4,'k');g.ellipse(14,26,8,3,'b');
+        g.rect(9,12,10,14,'k');g.rect(10,13,8,12,'c');g.rect(10,14,2,10,'a');
+        g.rect(12,12,2,4,'c');g.rect(16,12,2,3,'c');g.rect(13,9,2,4,'k');
+        g.ellipse(14,7,3,5,'j');g.ellipse(14,7+frame%2,2,3,'a');g.rect(14,7,1,2,'c');
+      } else if (shape === "cinnamonParcel") {
+        g.rect(4,13,20,15,'k');g.rect(5,14,18,12,'a');g.rect(6,23,16,3,'b');
+        g.poly([[5,14],[14,19],[23,14]],'c');g.rect(13,15,3,12,'g');g.rect(5,21,18,2,'g');
+        g.ellipse(11,10,4,4,'k');g.ellipse(17,10,4,4,'k');
+        g.ellipse(11,10,3,3,'b');g.ellipse(17,10,3,3,'b');g.rect(9,9,3,1,'a');g.rect(15,9,3,1,'a');
+        g.rect(11,10,1,1,'k');g.rect(17,10,1,1,'k');g.rect(15,21,2,2,frame%2?'c':'a');
+      } else if (shape === "dragonBadge") {
+        g.ellipse(14,18,11,11,'k');g.ellipse(14,18,9,9,'b');g.ellipse(14,18,7,7,'h');
+        g.poly([[8,19],[10,12],[13,16],[17,13],[20,15],[18,18],[19,22],[12,23]],'i');
+        g.rect(17,14,2,2,'c');g.rect(18,15,1,1,'k');g.rect(10,18,3,2,'c');g.rect(8,18,2,1,'h');
+        g.rect(7,8,4,2,'g');g.rect(17,8,4,2,'g');g.rect(13,25,3,1,frame%2?'c':'a');
+      } else if (shape === "welcomeBow") {
+        g.poly([[6,15],[12,17],[11,29],[7,26],[4,28]],'k');g.poly([[16,17],[22,15],[24,28],[20,26],[17,29]],'k');
+        g.poly([[7,17],[11,18],[10,26],[7,24],[6,25]],'h');g.poly([[17,18],[21,17],[22,25],[19,24],[18,26]],'h');
+        g.ellipse(9,13,7,6,'k');g.ellipse(19,13,7,6,'k');g.ellipse(9,13,5,4,'h');g.ellipse(19,13,5,4,'h');
+        g.rect(9,12,3,2,'i');g.rect(16,12,3,2,'i');g.rect(11,12,6,6,'k');g.rect(12,13,4,4,'a');g.rect(13,13,1,2,frame%2?'c':'h');
+      } else if (shape === "watchLantern") {
         g.ellipse(14,6,6,5,"k");g.ellipse(14,6,4,3,"b");g.ellipse(14,6,2,2,"k");
         g.poly([[7,10],[21,10],[24,15],[23,29],[5,29],[4,15]],"k");
         g.poly([[8,12],[20,12],[22,16],[6,16]],"b");g.line(8,12,19,12,"a",1);

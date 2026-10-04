@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const test=require('node:test'),assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
 function fixture(){const r=runtime(),{G}=r;G.state.opening.complete=G.state.delivery.complete=true;r.load('sunriseQuay');r.drain();G.state.enemies=[];r.run('js/engine/ui.js');
@@ -32,6 +33,7 @@ test('each native NPC offer explicitly follows and saves its promise once, while
 test('ready and completed accomplishments use native thanks instead of asking to accept them again; other dialogue remains deliberate and queued',()=>{
  const r=fixture(),{G}=r;G.state.delivery.salvage=true;Object.assign(G.state.player,{x:12*16+8,y:12*16+8});const before=G.state.town.spirit;
  G.tryOpeningInteraction();for(let i=0;i<12&&G.ui.dialogueOpen;i++){r.draw();assert.ok(!r.paint.some(t=>t.endsWith('Maybe later')));reply(r,'interact');}
+ assert.equal(G.state.town.spirit,before);collect(r,'sunrise-thanks-recipes');
  assert.equal(G.state.town.spirit,before+5);assert.equal(G.followedSunriseRequest(),null);
  G.tryOpeningInteraction();for(let i=0;i<12&&G.ui.dialogueOpen;i++)reply(r,'interact');assert.equal(G.state.town.spirit,before+5);
  let closed=0;G.ui.dialogue('PEBBLE','A small ordinary conversation.',{onClose:()=>closed++});G.ui.dialogue('BRINDLE','And another.');

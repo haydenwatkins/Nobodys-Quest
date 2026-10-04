@@ -28,6 +28,7 @@ review({url:process.argv[2],out:path.resolve(process.argv[3]||'/tmp/nobodys-ques
   await walkGift('brindles-recipes');assert.equal(await page.evaluate(()=>G.ensureTown().spirit),23);assert.equal(await page.evaluate(()=>G.currentTask().short),'Return to Brindle');await shot('collected');
   await next();await drain();assert.equal(await page.evaluate(()=>G.state.player.x),296);
   await page.evaluate(()=>{G.world.load('sunriseQuay');Object.assign(G.state.player,{x:12*16+8,y:12*16+8});});await drain();await frames(10);await next();await frames(80);await shot('thanks');await drain();
+  assert.equal(await page.evaluate(()=>G.ensureTown().spirit),23);await visibleGift('sunrise-thanks-recipes');await shot('thanks-ground');await walkGift('sunrise-thanks-recipes');
   assert.equal(await page.evaluate(()=>G.ensureTown().spirit),28);assert.equal(await page.evaluate(()=>G.sunriseRequests().find(r=>r.id==='recipes').done),true);
   await frames(100);await drain();await shot('kept');await reload();assert.equal(await page.evaluate(()=>G.ensureTown().spirit),28);assert.equal(await page.evaluate(()=>G.groundRewardFor('brindles-recipes')),null);
   await next();await frames(80);assert.ok((await page.evaluate(()=>window.reviewPaint.map(p=>p.text).join(' '))).includes('generous thumb'));await shot('revisit');await drain();assert.equal(await page.evaluate(()=>G.ensureTown().spirit),28);
