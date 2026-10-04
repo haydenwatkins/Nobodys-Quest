@@ -1,4 +1,4 @@
-/* Small promises make a place a home. Existing accomplishments count. */
+/* Neighbour promises reuse one selected task. Existing accomplishments count. */
 "use strict";
 (() => {
   const requests = [
@@ -25,20 +25,48 @@
       ready:()=>!!G.ensureTown().projects.welcomeLodge,
       ask:"My sister is bringing friends. Of course she is. Could we make a warm place for them to stay? A Welcome Lodge would be a beginning.",
       thanks:"A roof for every friend she’s collected. I’ve put a second chair outside. She always liked to sit where she could see the boats.",
-      after:"I moved her chair three times this morning. Waiting is easier when you can pretend it’s decorating."}
+      after:"I moved her chair three times this morning. Waiting is easier when you can pretend it’s decorating."},
+    {id:"ridge-watch", npc:"pending", name:"Ser Pending", mapId:"emberRidge", title:"Bring back the night watch", x:2, y:7, reward:0,
+      rewardText:"A safe guardian court", consequence:"Ser Pending can watch the road without the Eclipse Knight chasing travellers.",
+      task:"Talk to the Eclipse Knight in Ember Ridge's eastern court. Break his ward with Dark attacks, defeat him, collect his Sigil, then return to Ser Pending at the western entrance.",
+      ready:()=>G.state.items.includes("trophy-eclipse-sigil"),
+      ask:"I'm worried about the night watch. The Eclipse Knight won't let anyone past his court. He thinks the last light will go out if he leaves. Could you help me talk him into letting people through?",
+      tips:["He won't listen while that Dark ward is up. Wizard's Curse and Shadow Bolt can break it. The Ash watchfire is a good place to try your magic first, if you'd like.",
+        "When he marks a crescent, step behind it. Wait until his swing is over to attack. Bring his Sigil back so I know you've made it safely."],
+      thanks:"You're back! I was watching the court and worrying. The Knight has lowered his sword. Thank you. Errata is at Starfall's observatory, south of Greenfield. She needs help getting its lights working again.",
+      after:"Two travellers passed the court this morning! I waved so much my glove fell off. If you're going farther, check on Errata at Starfall's observatory."},
+    {id:"starfall-lights", npc:"errata", name:"Errata", mapId:"starfallRuins", title:"Lights for the lost road", x:14, y:1, reward:0,
+      rewardText:"Restored lenses and the Fallen Star Thread", consequence:"The observatory's lenses shine again, and Errata can read the eastern road.",
+      task:"Align Starfall's three lenses in the side galleries, use the instrument on the southern platform, collect its Fallen Star Thread, then return to Errata at the northern entrance.",
+      ready:()=>G.state.items.includes("starfall-thread"),
+      ask:"The observatory used to guide people home after dark. Its three lenses have slipped out of place. I'm worried about travellers missing the road. Would you help me get the lights working again?",
+      tips:["Visit the northwest, northeast and southeast galleries. Use each lens when the nearby creatures are cleared. Their light points toward the instrument on the southern platform.",
+        "Once all three are shining, use the instrument and collect the thread it leaves. Come back and tell me how it went. I'll keep your place in the map!"],
+      thanks:"Look at that starlight! The lenses are shining all the way down the galleries. Thank you for finding the thread. Now I can read the old eastern road toward Sunstep. Practice a shape you enjoy, then we'll see who's waiting beyond it.",
+      after:"I can see the road clearly again. Parcel has already asked for a copy of the map. He's very excited about having a route instead of a guess."}
   ];
   const unlocked=()=>!!(G.state && G.state.delivery?.complete);
   const claimed=()=>{const town=G.ensureTown();if(!Array.isArray(town.requests))town.requests=[];return town.requests;};
-  const giftFor=r=>G.groundRewardFor(`sunrise-thanks-${r.id}`);
+  const home=r=>r.mapId||"sunriseQuay";
+  const position=r=>{
+    const actor=r.mapId&&G.state.mapId===home(r)&&G.state.npcs?.find(n=>n.id===r.npc);
+    return actor?{x:actor.x,y:actor.y}:{x:r.x*G.TILE+8,y:r.y*G.TILE+8};
+  };
+  const giftFor=r=>r.reward>0?G.groundRewardFor(`sunrise-thanks-${r.id}`):null;
   const giftName=r=>G.treasureInfo?.[`sunrise-thanks-${r.id}`]?.name||`${r.name}'s thank-you gift`;
   const reminder=r=>giftFor(r)?` Your ${giftName(r)} waits beside me. Walk over it to collect your thanks.`:"";
   function introduced(r) {
+    if(r.mapId){
+      if(claimed().includes(r.id)||G.ensureTown().followedRequest===r.id||r.ready())return true;
+      const visited=G.state.mapId===home(r)||G.ensureWayfinder().discovered.includes(home(r));
+      return visited&&G.systemIntroduced('sideAdventures')&&(r.id==='ridge-watch'||claimed().includes('ridge-watch')||G.state.items.includes('trophy-eclipse-sigil'));
+    }
     if(!G.state.opening?.started || G.state.opening.version<2 || claimed().includes(r.id) || G.ensureTown().followedRequest===r.id || r.ready())return true;
     if(r.id==='recipes')return true;
     if(r.id==='beacon')return claimed().includes('recipes');
     return claimed().includes('beacon') && G.systemIntroduced('sideAdventures');
   }
-  G.sunriseRequests=()=>unlocked()?requests.filter(introduced).map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,done:claimed().includes(r.id),pending:!!giftFor(r),giftName:giftName(r),ready:r.ready(),followed:G.ensureTown().followedRequest===r.id})):[];
+  G.sunriseRequests=()=>unlocked()?requests.filter(introduced).map(r=>({id:r.id,name:r.name,title:r.title,task:r.task,reward:r.reward,rewardText:r.rewardText,consequence:r.consequence,mapId:home(r),place:G.maps[home(r)].name,done:claimed().includes(r.id),pending:!!giftFor(r),giftName:giftName(r),ready:r.ready(),followed:G.ensureTown().followedRequest===r.id})):[];
   G.followSunriseRequest=id=>{
     if(id!==null && (!unlocked() || !requests.some(r=>r.id===id&&introduced(r)) || claimed().includes(id)))return false;
     G.ensureTown().followedRequest=id;
@@ -52,6 +80,16 @@
     const selected=G.followedSunriseRequest();
     if(!selected||G.state.expeditionRun)return null;
     const r=requests.find(r=>r.id===selected.id);
+    if(r.mapId){
+      const step=r.id==='starfall-lights'?G.starfallPromiseStep():ridgeStep();
+      const at=position(r),mapId=selected.ready?home(r):step.mapId;
+      return {kind:"request",requestId:r.id,name:r.name,title:r.title,ready:selected.ready,
+        short:selected.ready?`Return to ${r.name}`:step.short,
+        objective:selected.ready?`Return to ${r.name} in ${G.maps[home(r)].name} and share the good news.`:step.objective,
+        reason:r.ask,reward:r.rewardText,mapId,tileX:selected.ready?Math.floor(at.x/G.TILE):step.tileX,tileY:selected.ready?Math.floor(at.y/G.TILE):step.tileY,
+        destination:G.maps[mapId].name,color:G.GUIDANCE_COLORS.home,icon:"☀",complete:false,label:`A PROMISE TO ${r.name.toUpperCase()}`,
+        progress:{value:selected.ready?2:step.value||0,total:3,label:selected.ready?"GOOD NEWS · TELL YOUR FRIEND":"HELP, THEN RETURN"}};
+    }
     const places={beacon:["sunkenMarsh",22,20],recipes:["lanternReach",18,30],dragon:["sunriseQuay",35,20],welcome:["sunriseQuay",30,13]};
     const steps={beacon:"Find the Mire Queen's pearl",recipes:"Find Brindle's recipes",dragon:"Win a Manyfold crossing",welcome:"Build the Welcome Lodge"};
     const reasons={beacon:"Help the late boat find the harbour.",recipes:"Help Brindle bake her family's cinnamon knots again.",dragon:"Bring Pip and Thimble a real adventure story.",welcome:"Make a warm place for Mara's sister and her friends."};
@@ -70,6 +108,12 @@
     if(!selected)return null;
     const r=requests.find(r=>r.id===selected.requestId);
     let mapId=selected.mapId,x=selected.tileX,y=selected.tileY,text=selected.objective;
+    if(r.mapId){
+      if(G.state.mapId!==mapId){const route=G.guidanceRouteTarget({mapId});return route?{...route,kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",text:`${route.text} ${text}`}:null;}
+      const gift=!selected.ready&&G.groundRewardFor(r.id==='ridge-watch'?'trophy-eclipse-sigil':'starfall-thread');
+      const at=selected.ready?position(r):gift?{x:gift.x,y:gift.y}:{x:x*G.TILE+8,y:y*G.TILE+8};
+      return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,x:at.x,y:at.y,tileX:Math.floor(at.x/G.TILE),tileY:Math.floor(at.y/G.TILE),text,...(gift?{reward:gift}:{})};
+    }
     if(!selected.ready){
       if(r.id==="beacon"){
         mapId="sunkenMarsh";
@@ -101,10 +145,10 @@
   };
   function candidate(){
     const s=G.state;
-    if(!unlocked() || s.mapId!=="sunriseQuay" || s.expeditionRun || G.ui.dialogueOpen || s.knockout || s.bossCutscene)return null;
+    if(!unlocked() || s.expeditionRun || G.ui.dialogueOpen || s.knockout || s.bossCutscene)return null;
     if(s.enemies.some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<88))return null;
-    const r=requests.find(r=>introduced(r)&&Math.hypot(s.player.x-(r.x*16+8),s.player.y-(r.y*16+8))<32);
-    return r?{id:r.id,kind:"sunriseRequest",label:claimed().includes(r.id)?`Talk to ${r.name}`:r.ready()?`Good news for ${r.name}`:`Hear ${r.name}’s request`,x:r.x*16+8,y:r.y*16+8}:null;
+    const r=requests.find(r=>home(r)===s.mapId&&introduced(r)&&Math.hypot(s.player.x-position(r).x,s.player.y-position(r).y)<32);
+    return r?{id:r.id,kind:"sunriseRequest",label:claimed().includes(r.id)?`Talk to ${r.name}`:r.ready()?`Good news for ${r.name}`:`Hear ${r.name}’s request`,...position(r)}:null;
   }
   const oldCandidate=G.deliveryCandidate, oldInteract=G.tryOpeningInteraction, oldTalk=G.npcDialogue;
   G.deliveryCandidate=()=>oldCandidate()||candidate();
@@ -114,8 +158,9 @@
     const r=requests.find(r=>r.id===at.id), done=claimed().includes(r.id), ready=r.ready();
     if(!done&&ready){
       claimed().push(r.id);if(G.ensureTown().followedRequest===r.id)G.ensureTown().followedRequest=null;
-      G.revealRegionalReward(`sunrise-thanks-${r.id}`,r.x*G.TILE+8,r.y*G.TILE+8);
-      G.ui.banner(r.title.toUpperCase(),`${r.name}’s thanks · collect the ${giftName(r)} for ${r.reward} town spirit`);
+      if(r.reward>0)G.revealRegionalReward(`sunrise-thanks-${r.id}`,r.x*G.TILE+8,r.y*G.TILE+8);
+      G.ui.banner(r.title.toUpperCase(),r.reward>0?`${r.name}’s thanks · collect the ${giftName(r)} for ${r.reward} town spirit`:r.consequence);
+      G.saveGame();
     }
     const offer=!done&&!ready&&G.ensureTown().followedRequest!==r.id?{
       prompt:`Follow “${r.title}” for ${r.name}? You can set it aside in Journey.`,
@@ -125,19 +170,28 @@
         G.requestGuidance?.(true);
       }
     }:null;
-    G.ui.dialogue(r.name.toUpperCase(),(done?r.after:ready?r.thanks:r.ask)+reminder(r),{accent:"#e7bd78",offer});
+    const pages=done?[r.after]:ready?[r.thanks]:[r.ask,...(r.tips||[])];
+    pages.forEach((text,i)=>G.ui.dialogue(r.name.toUpperCase(),text+reminder(r),{accent:"#e7bd78",...(i===pages.length-1?{offer}:{})}));
     G.input.clearTaps();return true;
   };
   G.npcDialogue=(id,chapter,index)=>{
-    const r=unlocked()&&G.state.mapId==="sunriseQuay"&&requests.find(r=>introduced(r)&&r.npc===id);
-    return r?(claimed().includes(r.id)?r.after+reminder(r):r.ask):oldTalk(id,chapter,index);
+    const r=unlocked()&&requests.find(r=>home(r)===G.state.mapId&&introduced(r)&&r.npc===id);
+    if(r)return claimed().includes(r.id)?r.after+reminder(r):r.ready()?r.thanks:r.ask;
+    const ridge=G.state.mapId==='emberRidge',starfall=G.state.mapId==='starfallRuins';
+    const lines=ridge&&id==='pebble'?[
+      G.state.items.includes('trophy-eclipse-sigil')?"The court is quiet again! Let's bring Ser Pending the good news. He was trying very hard not to look worried.":"Ser Pending hasn't taken his eyes off that court. I'm worried too. Let's hear what he needs before we go charging in.",
+      G.formUnlocked('ranger')?"That bow gives you some room! Try a distant shot while you're wearing Bramble Scout. I'd like to watch, from behind you.":"The watchfires are optional. If you'd like a little practice and a rest, Ser Pending knows the guards." ]:
+      ridge&&id==='provisional'?["I'm glad Ser Pending has someone to help. The Knight's been keeping everyone on edge. Rest at a watchfire if you need to catch your breath.","Watch the crescent on the ground. Step behind it, let the Knight finish his swing, then try your Dark attacks."]:
+      starfall&&id==='pebble'?[G.starfallSurvey().instrument?"The galleries are bright again! Errata will be so pleased. Let's make sure you've picked up the thread before we go tell her.":"I used to count the observatory lights on evening walks. I miss them. Let's help Errata get them shining again.","The lens beams point toward the southern instrument. There's mooncake in the southwest gallery if we need a break."]:
+      starfall&&id==='probably'?["I dreamed the lights were shining again. This time I think we can help the dream along. Errata is waiting at the northern entrance.","I like the little cup beside the Dusk lens. Someone wanted the late visitors to feel welcome. I'd have left them biscuits too."]:null;
+    return lines?lines[(index||0)%lines.length]:oldTalk(id,chapter,index);
   };
   const oldDraw=G.openingDrawables;
   G.openingDrawables=c=>{
     const list=oldDraw(c);
-    if(!unlocked()||G.state.mapId!=="sunriseQuay")return list;
-    for(const r of requests.filter(introduced)){
-      const done=claimed().includes(r.id),x=r.x*16+8,y=r.y*16+8;
+    if(!unlocked())return list;
+    for(const r of requests.filter(r=>home(r)===G.state.mapId&&introduced(r))){
+      const done=claimed().includes(r.id),{x,y}=position(r);
       list.push({y:y+2,fn:()=>{
         c.save();
         if(!done){
@@ -162,5 +216,23 @@
       }});
     }
     return list;
+  };
+  function ridgeStep(){
+    const gift=G.groundRewardFor('trophy-eclipse-sigil');
+    const knight=G.state.mapId==='emberRidge'&&G.state.enemies.find(e=>e.id==='eclipseKnight'&&!e.dead);
+    return {mapId:'emberRidge',tileX:gift?Math.floor(gift.x/G.TILE):knight?Math.floor(knight.x/G.TILE):24,
+      tileY:gift?Math.floor(gift.y/G.TILE):knight?Math.floor(knight.y/G.TILE):9,value:gift?1:0,
+      short:gift?'Collect the Eclipse Sigil':"Help Ser Pending at the eastern court",
+      objective:gift?'The Eclipse Knight has lowered his sword. Collect his Sigil from the ground, then return to Ser Pending.':"Face the Eclipse Knight in Ember Ridge's eastern court. Dark attacks break his ward. Step behind the marked crescent, then attack during his recovery."};
+  }
+  G.neighbourPromiseLead=()=>{
+    if(!unlocked()||!G.state.opening?.started||G.state.opening.version<2||!G.systemIntroduced('sideAdventures')||G.storyChapter()>=3||G.state.stars>=G.PACING.worldwakeStars||G.masteryLessons(1,null,true).length)return null;
+    const r=requests.find(r=>r.mapId&&!claimed().includes(r.id));
+    if(!r||G.state.stars<(r.id==='ridge-watch'?7:10))return null;
+    const at=position(r);
+    return {guide:'person',mapId:home(r),personId:r.npc,point:[Math.floor(at.x/G.TILE),Math.floor(at.y/G.TILE)],destination:G.maps[home(r)].name,
+      title:r.title,short:r.ready()?`Bring ${r.name} the good news`:`Talk to ${r.name} in ${G.maps[home(r)].name}`,
+      objective:r.ready()?`Visit ${r.name} in ${G.maps[home(r)].name}. Your help is ready to share.`:`Visit ${r.name} in ${G.maps[home(r)].name} and hear what is troubling the travellers. You can choose to help.`,
+      reason:r.id==='ridge-watch'?"The harbour is shining again. Ser Pending is worried about the night watch on the next road.":"Ser Pending's road is calmer. Errata needs a hand at the old observatory.",progress:{value:claimed().includes('ridge-watch')?1:0,total:2,label:'FRIENDS ON THE ROAD'}};
   };
 })();

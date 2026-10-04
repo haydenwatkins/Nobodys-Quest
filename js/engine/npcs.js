@@ -213,7 +213,9 @@
       const tile = nearestOpen(placement[1], placement[2], isOpen, occupied);
       if (!tile) continue;
       occupied.push(tile);
-      result.push(makeNpc(id, def, tile, isOpen, false));
+      const actor=makeNpc(id, def, tile, isOpen, false);
+      if(placement[3]?.stationary)actor.anchors=[tile];
+      result.push(actor);
     }
     if (mapId === "town") result.push(...makeTownResidents(isOpen, occupied));
     return result;

@@ -262,6 +262,7 @@ G.world = (() => {
           G.groundRewardFor(G.enemies[cell.enemy].trophy);
         if (cell.enemy && !defeatedRuler && pendingTrophy?.source !== "guardian") {
           const enemy = G.makeEnemy(cell.enemy, cx, cy);
+          enemy.guardPost = !!cell.guardPost;
           const ruler = def.worldBoss && G.enemies[def.worldBoss.enemy];
           // A failed Worldbearer attempt should ask the player to learn the
           // region's combat type, not juggle forms while re-clearing its road.

@@ -2,9 +2,9 @@
 "use strict";
 (() => {
   const lenses=[
-    {id:"starfall-dawn",name:"Dawn lens",x:5,y:5,color:"#ffcd75",story:"The first astronomer watched for departing ships. A note reads: Wave even when they cannot see you."},
-    {id:"starfall-dusk",name:"Dusk lens",x:24,y:5,color:"#ef7d57",story:"The second kept the windows lit for late arrivals. There is still a spare cup beside the telescope."},
-    {id:"starfall-midnight",name:"Midnight lens",x:24,y:14,color:"#b58ee6",story:"The third charted roads for people who had lost theirs. The final entry reads: Nobody is too far away."}
+    {id:"starfall-dawn",name:"Dawn lens",x:5,y:5,color:"#ffcd75",gallery:"northwest",story:"The Dawn lens shines again. An old note says, 'Wave to the departing boats. Someone might be watching.' A warm beam reaches toward the southern instrument."},
+    {id:"starfall-dusk",name:"Dusk lens",x:24,y:5,color:"#ef7d57",gallery:"northeast",story:"The Dusk lens shines again. There is a spare cup beside the telescope, ready for a late visitor. Its beam points toward the southern instrument."},
+    {id:"starfall-midnight",name:"Midnight lens",x:24,y:14,color:"#b58ee6",gallery:"southeast",story:"The Midnight lens shines again. Its keeper wrote, 'If someone loses their way, leave a light for them.' Its beam points toward the southern instrument."}
   ];
   const instrument={id:"starfall-thread",name:"Star instrument",x:15,y:15,color:"#73eff7"};
   const has=id=>G.state.items.includes(id);
@@ -12,6 +12,15 @@
   G.starfallSurvey=()=>({aligned:lenses.filter(l=>has(l.id)).length,thread:has(instrument.id),
     instrument:restored(instrument.id),pending:!!G.groundRewardFor(instrument.id),
     remaining:lenses.filter(l=>!has(l.id)).map(l=>l.name)});
+  G.starfallPromiseStep=()=>{
+    const next=lenses.find(l=>!has(l.id)),gift=G.groundRewardFor(instrument.id);
+    const target=next||instrument;
+    return {mapId:'starfallRuins',tileX:gift?Math.floor(gift.x/G.TILE):target.x,tileY:gift?Math.floor(gift.y/G.TILE):target.y,value:next?0:1,
+      short:gift?'Collect the Fallen Star Thread':next?`Align the ${next.name} in the ${next.gallery} gallery`:'Use the southern star instrument',
+      objective:gift?'The three lenses are shining. Collect the Fallen Star Thread from the ground, then return to Errata at the northern entrance.':next?
+        `Use the ${next.name} in Starfall's ${next.gallery} gallery after clearing nearby creatures (${G.starfallSurvey().aligned}/3 lenses aligned). The lenses point toward the southern instrument.`:
+        'All three lenses are aligned. Use the star instrument on the southern platform, then collect its thread and tell Errata at the northern entrance.'};
+  };
   function candidate(){
     const s=G.state;
     if(s.mapId!=="starfallRuins"||s.expeditionRun||s.knockout||s.bossCutscene||G.ui.dialogueOpen)return null;
@@ -30,7 +39,7 @@
       if(isInstrument){
         G.revealRegionalReward(r.id,r.x,r.y);
         G.healPlayer(G.playerMaxHearts(),"starfall");G.state.player.mana=G.playerMaxMana();
-        G.ui.dialogue("PATCHLING","A thread of starlight winds onto a little spindle. Not a prophecy. Just a road somebody left for whoever needed it. It waits beside the instrument, ready to carry home.",{accent:instrument.color});
+        G.ui.dialogue("PATCHLING","A little spindle of starlight! I'll pick it up and show Errata. The galleries are shining again. People should have a much easier time finding their way.",{accent:instrument.color});
         G.ui.banner("A ROAD THROUGH THE DARK","Hearts and mana restored · collect the Fallen Star Thread for 8 town spirit");
       }else{
         G.state.items.push(r.id);

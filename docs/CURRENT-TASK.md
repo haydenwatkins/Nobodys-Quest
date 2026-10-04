@@ -40,3 +40,9 @@ The recipe promise now follows the saved physical book: Rat entry, collection, r
 New version-2 adventures recommend Brindle first, then reveal Pebble's harbour request after the book is returned. Pip/Mara's later requests appear after the harbour return, while prior accomplishments and saved selected promises remain usable. Nothing is auto-accepted. The same request ownership still supplies dialogue, Home, markers, Journey and the atlas.
 
 Both field docks now wrap the complete next action. The paper dock reserves the touch menu corner. Standard mastery shows one lesson for the worn form, and paper mastery includes the full next reward; optional cards yield during movement, unlock announcements and actor overlap. Offscreen arrows provide direction while onscreen targets retain native world markers. Reward cues and notices choose a position once and return there after yielding, instead of moving to another free space every frame. See `PLAYER-EXPERIENCE-RULES.md` for the research and shared authoring contract.
+
+## Ridge and Starfall friends
+
+The same request registry now includes `ridge-watch` and `starfall-lights`, saved in the existing town request/selection fields. Pending follows Dark-ward guardian work, Sigil collection and his return; Errata follows each remaining lens, the southern instrument, thread collection and her return. Regional targets follow the actual NPC actor and ground gift, with existing cross-map route help. Native accomplishments count even without an earlier acceptance. Regional returns record thanks and dialogue without inventing another payout.
+
+New adventures recommend these people after the harbour, before the open Worldwake road. Explicit mastery choices and the 18-star road retain priority. Optional local reports require their own Home explanation/choice and never replace the selected promise. Native/save/render evidence is in `REGIONAL-PROMISES.md`.

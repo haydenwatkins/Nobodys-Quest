@@ -290,7 +290,7 @@
     town: [["mayorMaybe", 7, 6], ["alias", 10, 8], ["pending", 4, 9], ["pebble", 12, 5]],
     mistwood: [["moss", 13, 16], ["pebble", 22, 10], ["errata", 6, 5]],
     sunkenMarsh: [["provisional", 17, 9], ["parcel", 25, 10], ["moss", 9, 10]],
-    emberRidge: [["pending", 5, 9], ["pebble", 20, 8], ["provisional", 25, 15]],
+    emberRidge: [["pending", 2, 7, {stationary:true}], ["pebble", 20, 8], ["provisional", 25, 15]],
     dungeon: [["errata", 6, 12], ["pending", 23, 12], ["alias", 15, 8]],
     starfallRuins: [["errata", 14, 1], ["probably", 22, 15], ["pebble", 8, 17]],
     "whispering-grove": [["moss", 19, 2], ["alias", 8, 8], ["probably", 23, 14]],

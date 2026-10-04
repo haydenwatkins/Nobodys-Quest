@@ -438,6 +438,13 @@
     const goal = G.storyGoal();
     if (!goal || goal.complete) return null;
 
+    if(goal.guide==='person'){
+      if(s.mapId!==goal.mapId)return routeTarget(goal);
+      const actor=s.npcs?.find(n=>n.id===goal.personId);
+      const x=actor?actor.x:goal.point[0]*G.TILE+8,y=actor?actor.y:goal.point[1]*G.TILE+8;
+      return {kind:'home',color:G.GUIDANCE_COLORS.home,icon:'☀',destination:goal.title,x,y,tileX:Math.floor(x/G.TILE),tileY:Math.floor(y/G.TILE),text:goal.objective};
+    }
+
     if (goal.guide === "echo") {
       const echo = G.formEchoFor && G.formEchoFor(goal.formId);
       if (echo) return formEchoTarget(echo);

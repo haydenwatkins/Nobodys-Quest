@@ -10,7 +10,7 @@ test('every named speaker, form and guardian resolves by identity, while narrati
     assert.equal(speaker.sprite, G.dialoguePortraits[id]);
     assert.notEqual(speaker.sprite, npc.sprite, 'the portrait is composed separately from the world body');
   }
-  for (const [name, id] of [['PARCEL, FROM THE OTHER SIDE', 'parcel'], ['SER PENDING', 'pending'], ['BRINDLE', 'quayBaker'], ['◇ PEBBLE NOTICES', 'pebble']])
+  for (const [name, id] of [['ERRATA', 'errata'], ['PARCEL, FROM THE OTHER SIDE', 'parcel'], ['SER PENDING', 'pending'], ['BRINDLE', 'quayBaker'], ['◇ PEBBLE NOTICES', 'pebble']])
     assert.equal(G.resolveDialogueSpeaker(name).id, id);
   assert.equal(G.resolveDialogueSpeaker('THE LAST WORLDBEARER').id, 'lastWorldbearer');
   for (const [id, form] of Object.entries(G.forms)) {
@@ -23,7 +23,7 @@ test('every named speaker, form and guardian resolves by identity, while narrati
     for (const title of [`⚔ ${foe.name} ⚔`, `${foe.name} — PHASE II`, `${foe.name} — PHASE III`, ...(foe.boss?.domain ? [`⚔ WORLDBEARER OF ${foe.boss.domain.toUpperCase()} ⚔`] : [])])
       assert.equal(G.resolveDialogueSpeaker(title).id, id, title);
   }
-  for (const name of ['THE STORY', '🪧 SIGN', '🎁 TREASURE CHEST', 'BRINDLEBERRY', 'PARCELMAN', 'RATTLE', 'MARA’S LETTER', 'ARCHIVIST ERRATA’S DESK', 'THE BLIND SUNDIAL']) {
+  for (const name of ['THE STORY', '🪧 SIGN', '🎁 TREASURE CHEST', 'BRINDLEBERRY', 'PARCELMAN', 'RATTLE', 'MARA’S LETTER', 'ARCHIVIST ERRATA’S DESK', 'ERRATA’S DESK', 'ERRATUM', 'THE BLIND SUNDIAL']) {
     assert.equal(G.resolveDialogueSpeaker(name).sprite, null, name);
   }
 });

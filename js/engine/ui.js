@@ -1761,6 +1761,8 @@ G.ui = (() => {
     }));
     const currentTrail=menuEl.querySelector('[data-act="current-trail"]');
     if(currentTrail)currentTrail.addEventListener("click",()=>{closeMenu();G.requestGuidance(false);});
+    const reports=menuEl.querySelector('[data-act="introduce-reports"]');
+    if(reports)reports.addEventListener('click',()=>{if(G.introduceIncidents())changeMenuRoute('map');});
     const followTrail=menuEl.querySelector('[data-act="follow-trail"]');
     const markTrail=menuEl.querySelector('[data-act="mark-practice-trail"]');
     if(markTrail)markTrail.addEventListener("click",()=>{closeMenu();G.requestGuidance(false);});
@@ -2909,8 +2911,13 @@ G.ui = (() => {
   function buildSunriseRequests() {
     const requests = G.sunriseRequests?.() || [];
     if (!requests.length) return "";
-    return `<section class="form-card sunrise-promises"><span class="eyebrow">NAMES, NOT ERRANDS</span><h2>Small promises</h2><p>The parcels arrived. Life keeps going. Visit your neighbours on the quay.</p>
-      ${requests.map(r => `<article class="sunrise-promise ${r.done ? "kept" : ""}"><div><strong>${escapeHtml(r.title)}</strong><span>${escapeHtml(r.name)} · ${r.done ? "Promise kept" : r.ready ? "Good news — go tell them" : "Something to do"}</span></div><p>${r.pending ? `${escapeHtml(r.giftName)} waits beside ${escapeHtml(r.name)} on the quay. Walk over it to collect your thanks.` : r.done ? "Your kindness has left its mark on the quay." : escapeHtml(r.task)}</p><small>${r.pending ? "Waiting to collect" : r.done ? "Received" : "Thanks"}: ${r.reward} town spirit</small>${r.done?"":`<button data-follow-request="${r.id}" aria-pressed="${r.followed}">${r.followed?"Show the way":r.ready?`Visit ${escapeHtml(r.name)}`:"Follow this promise"}</button>`}</article>`).join("")}</section>`;
+    return `<section class="form-card sunrise-promises"><span class="eyebrow">FRIENDS ALONG THE ROAD</span><h2>Small promises</h2><p>Choose a friend to help. You can follow one promise at a time.</p>
+      ${requests.map(r => `<article class="sunrise-promise ${r.done ? "kept" : ""}"><div><strong>${escapeHtml(r.title)}</strong><span>${escapeHtml(r.name)} · ${escapeHtml(r.place)} · ${r.done ? "Promise kept" : r.ready ? "Good news — go tell them" : "Something to do"}</span></div><p>${r.pending ? `${escapeHtml(r.giftName)} waits beside ${escapeHtml(r.name)} in ${escapeHtml(r.place)}. Walk over it to collect your thanks.` : r.done ? escapeHtml(r.consequence||"Your help is remembered by your neighbours.") : escapeHtml(r.task)}</p><small>${r.reward?`${r.pending ? "Waiting to collect" : r.done ? "Received" : "Thanks"}: ${r.reward} town spirit`:escapeHtml(r.rewardText)}</small>${r.done?"":`<button data-follow-request="${r.id}" aria-pressed="${r.followed}">${r.followed?"Show the way":r.ready?`Visit ${escapeHtml(r.name)}`:"Follow this promise"}</button>`}</article>`).join("")}</section>`;
+  }
+
+  function buildLocalReports(){
+    if(!G.incidentsAvailable?.())return '';
+    return `<section class="form-card"><span class="eyebrow">OPTIONAL HELP</span><h2>Local reports</h2><p>People sometimes need a hand along roads you've visited. Help by fighting creatures or trying different forms and moves. Reports have no deadlines, and your chosen promise stays in Journey.</p>${G.incidentsUnlocked()?`<button data-menu-route="map">Read reports on the World map</button>`:`<button data-act="introduce-reports">Show local reports</button>`}</section>`;
   }
 
   function buildTownTab() {
@@ -2921,7 +2928,7 @@ G.ui = (() => {
         <h2>☀️ Found Your Town</h2>
         <div class="tagline">Claim your first new form to begin a home that grows with every kind of adventure.</div>
         <button data-act="found-town">Found town</button>
-      </div>${buildSunriseRequests()}`;
+      </div>${buildSunriseRequests()}${buildLocalReports()}`;
     }
 
     const capacity = G.townCapacity();
@@ -2951,7 +2958,7 @@ G.ui = (() => {
       <div class="town-main-actions"><button data-act="visit-town" ${G.townTravelReason()?"disabled":""}>Return to Sunrise</button><button data-act="rename-town">Rename</button></div>
       ${G.townTravelReason()?`<p>${escapeHtml(G.townTravelReason())}</p>`:""}
     </section>
-    ${buildSunriseRequests()}
+    ${buildSunriseRequests()}${buildLocalReports()}
     <section class="form-card town-works">
       <span class="eyebrow">LANDMARK PROJECTS</span><h2>🏗️ Civic Works</h2>
       <div class="tagline">Each project changes Sunrise Town, helps it flourish, and takes its place among the streets.</div>

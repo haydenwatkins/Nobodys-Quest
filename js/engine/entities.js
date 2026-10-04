@@ -1413,7 +1413,9 @@ G.updateEnemies = function (dt) {
         // dedicated orbit/retreat movement above.
         const a = G.util.angleTo(e.x, e.y, p.x, p.y);
         if (d < 60) { mx = -Math.cos(a); my = -Math.sin(a); }
-      } else {
+      } else if (!e.guardPost) {
+        // Authored watch guards hold their posts outside aggro range.
+        // Chasing, shooting, stun and knockback still use their native rules.
         // amble around
         e.wanderT -= dt;
         if (e.wanderT <= 0) {

@@ -279,6 +279,8 @@ G.storyGoal = function () {
       objective:recipes?'Visit Pebble at the centre of Sunrise Quay. He is worried about boats getting lost in the fog.':'Talk to Brindle beside the bakery on Sunrise Quay. You can choose to help her find the cinnamon recipes.',
       reason:'The deliveries are arriving again. Help the neighbours get their home back.',progress:storyProgress(0,1,'SUNRISE FRIENDS')});
   }
+  const neighbourLead=G.neighbourPromiseLead?.();
+  if(neighbourLead)return Object.assign(base,neighbourLead);
   if (chapter === 1) {
     const defeated = masters.filter((master) => items.has(master.trophy)).length;
     const next = masters.find((master) => !items.has(master.trophy) && stars >= master.stars) ||

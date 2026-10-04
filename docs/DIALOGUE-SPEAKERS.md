@@ -27,3 +27,7 @@ All thirteen busts and all twenty-four form/nineteen guardian cards were inspect
 Thirty final controlled browser captures cover paper Brindle dialogue, standard Errata/Probably dialogue, neutral narration and a guardian card at phone 667x375, tablet 1024x768 and TV 1280x720 in both settings. Phone/tablet continuation uses actual touch events. TV continuation uses the real injected Android TV pad bridge and confirms the controller is recognized. An initial fixture had pending world-entry messages mixed into its deliberately injected message; the final fixture drains those before asserting a single-message queue. All final captures were inspected and reported no page errors or horizontal overflow. This is desktop Chromium/bridge emulation, not physical Safari/Android/TV or viewing-distance evidence.
 
 `node tools/render-dialogue-atlas.cjs OUTPUT_DIRECTORY --all` exports the current complete card audit in pages of twenty, using shipped script order. The default exports NPCs and representative other identities. These review files are developer artifacts; the game remains a static site with no build dependency.
+
+## Regional short names (October 4)
+
+The Ridge/Starfall scene review found that the new `ERRATA` heading used neutral narration despite her existing portrait. It now has an explicit short-name alias to Archivist Errata. Longer unrelated desk/object headings remain neutral, with native resolver/painting regression coverage. `REGIONAL-PROMISES.md` records the regional browser scenes and final validation.

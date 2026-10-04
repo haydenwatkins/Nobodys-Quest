@@ -7,7 +7,7 @@
 
 "use strict";
 
-G.SUNRISE_REQUEST_IDS = ["recipes", "dragon", "welcome", "beacon"];
+G.SUNRISE_REQUEST_IDS = ["recipes", "dragon", "welcome", "beacon", "ridge-watch", "starfall-lights"];
 
 G.makeTown = function () {
   return {

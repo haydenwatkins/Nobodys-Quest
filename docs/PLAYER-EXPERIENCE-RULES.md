@@ -17,7 +17,7 @@ These are document benchmarks, not timed playtests of other games.
 3. Every unlock needs an immediate use and a stretch to enjoy it. Rat fits the culvert, then poisons three distinct briars on the mill bank; that earns its first mastery level and Fester before the crest is accessible. If the briars were cleared in another body, the straw post accepts native Bite poison with normal expiry so the lesson cannot be missed. Knight practices its shield against committed watchmen and continues using it on the delivery road. Wizard arrives for the marsh's dark ward after delivery and Knight practice. More forms and Manyfold wait for the harbour promise's return.
 4. Mastery requires wearing its form. Borrowed arts still support combinations, but never passively level their source form or other unlocked forms. Choosing another form’s lesson changes into that form. Preserve every previously earned level, star, claimed form, reward and request.
 5. Tune the first lesson around authored opportunities. Three authored briars and three well-timed parries are concrete learning; respawning foes to meet an inflated opening counter is not. Later bodies usually learn their second art in six native contacts; preserve range, damage-type, group, combo, status and ward conditions in specialization. Do not reduce every later specialization to the same easy counter.
-6. Introduce systems in the world before access. The opening explains form changing, Ser Pending explains mixing at the bell, and the delivery's return introduces home and the need for dark magic. The numbered controls guide is available on request; it does not run over the adventure automatically.
+6. Introduce systems in the world before access. The opening explains form changing, Ser Pending explains mixing at the bell, and the delivery's return introduces home and the need for dark magic. Optional local reports wait for the harbour return, a plain Home explanation and a deliberate choice; old introduced reports retain access. The numbered controls guide is available on request; it does not run over the adventure automatically.
 7. New state transitions need fresh-start and partial-save coverage. A published-host title selection is part of startup, not a localhost-only test. Existing earned abilities and adventures must remain usable. New adventures use opening version 2; normalized version-1 and pre-opening adventures retain introduced-system access. Newly earned Wizard ownership never bypasses the harbour return.
 8. Compulsory progression must reward a varied set of familiar bodies and chosen favorites. It must not require completing the roster after passive mastery is removed. Sunstep opens at 18 stars, the coast at 22; Dragon needs four learned earlier shapes and one practiced advanced calling. The final portfolio asks for eight bodies at level 3 and three favorites at level 5, alongside all six World Marks and Meridian's actual defeat. Use shared `G.PACING` values and preserve optional depth. See `PROGRESSION-REVIEW.md` for the complete registry audit, native evidence and remaining session review.
 
@@ -39,13 +39,14 @@ Write spoken English that a child can follow on first hearing. Every story/reque
 | Pebble | Friendly companion; attentive to worried neighbours, practical encouragement and occasional snack jokes. |
 | Parcel | Busy courier who cares about recipients; relief after each delivery, concrete route knowledge. |
 | Ser Pending | Protective and a little nervous; demonstrates shield timing and cheers practice. |
-| Errata | Interested archivist; explains one observed event, feels responsible for the old map. |
+| Errata | Interested archivist; worries about travellers losing the night road, explains one observed event, feels responsible for the old map. |
 | Mayor Maybe | Welcoming, worried about residents; mild administrative humour after a clear point. |
 | Brindle | Warm baker attached to family recipes; affection, loss and delight expressed through real kitchen details. |
 | Mara | Quiet affection and anticipation for her sister; ordinary domestic details. |
 | Pip | Excitable child; direct questions and imaginative play with Thimble. |
 | Treant | Frightened protector who shut the road; admits his mistake and lifts the branches. |
 | Mire Queen | Proud, possessive of her court’s light; reluctantly recognizes the boats need it. |
+| Eclipse Knight | Anxious night guard; fears losing the last watchfire, admits he frightened travellers, offers a friendly practice rematch. |
 
 ## Guidance rules
 
@@ -66,3 +67,9 @@ The full Node run completed with 584 passed, zero failed/skipped cases. Final de
 Encounter fixtures control positioning/AI and the long-task layout fixture removes actors; separate native tests cover real actor clearance and recipe/Queen/Pebble returns. This proves integration and bounded presentation, not elapsed campaign pacing, unmodified fight balance or physical Android TV/Safari performance. The subsequent full-registry/post-harbour audit is recorded in `PROGRESSION-REVIEW.md`; continue the regional emotional-dialogue and continuous-session review next.
 
 Reproduce logic with `node --test --test-concurrency=6 tests/*.test.js`. Browser review requires developer Playwright and Chromium (`CHROMIUM_EXECUTABLE_PATH` may override the binary). The scenario's default capture directory is `/tmp/nq-early-review`; create review sheets only after all four source cases pass with `node tools/render-review-sheet.cjs /tmp/nq-early-review /tmp/nq-early-sheets`.
+
+## Regional application
+
+Ridge and Starfall now apply the same contract to existing activities: a concerned person, useful advice, an explicit promise, actual victory/lens work, ground collection, return and a changed later conversation. Pending recommends Errata; Errata explains the eastern road. These are recommendations, not new mandatory gates. Dark attacks, the crescent recovery window, any-order lenses and once-only gift payouts keep their native rules. See `REGIONAL-PROMISES.md` for the authored entry check and controlled chapter evidence.
+
+Keep incidental report counts and map-entry lists on the Atlas. Optional background activities must not repeatedly announce extra errands over an accepted promise. Their existing completion feedback remains after deliberate introduction.

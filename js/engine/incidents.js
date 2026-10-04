@@ -33,8 +33,21 @@ G.ensureIncidents = function () {
   return G.state.incidents;
 };
 
+G.incidentsAvailable = function () {
+  return !!(G.state && G.townUnlocked && G.townUnlocked() &&
+    (!G.state.opening?.started || G.state.opening.version<2 || G.ensureIncidents().unlocked || G.systemIntroduced?.('sideAdventures')));
+};
 G.incidentsUnlocked = function () {
-  return !!(G.state && G.townUnlocked && G.townUnlocked());
+  return G.incidentsAvailable() && (!G.state.opening?.started || G.state.opening.version<2 || G.ensureIncidents().unlocked);
+};
+// The existing saved unlock flag now also records the deliberate introduction.
+// Previously active reports and pre-opening adventures retain their access.
+G.introduceIncidents = function () {
+  if(!G.incidentsAvailable())return false;
+  const first=!G.ensureIncidents().unlocked;
+  G.ensureIncidents().unlocked=true;G.refreshIncidents(true);
+  if(first)G.ui.banner('OPTIONAL LOCAL REPORTS','Help along familiar roads at your own pace. Reports and progress are on the World map; there are no deadlines.');
+  G.saveGame();return true;
 };
 
 function discoveredIncidentMaps() {
@@ -164,8 +177,8 @@ function trackIncident(event, data) {
     }
     const progress = incident.unique ? incident.seen.length : incident.count;
     if (progress >= incident.goal) finishIncident(incident);
-    else if (progress === 1 || progress === incident.goal - 1)
-      G.ui.toast(`${incident.icon} ${incident.name}: ${G.incidentProgressLabel(incident)}`, 2);
+    // Progress belongs on the Atlas. Ordinary attacks/swaps do not announce
+    // another objective over a chosen promise or combat lesson.
   }
 }
 
@@ -175,6 +188,6 @@ for (const event of ["kill", "abilityUse", "swap", "wardBreak"])
 G.events.on("mapEnter", (data) => {
   if (!G.incidentsUnlocked()) return;
   G.refreshIncidents(true);
-  const here = G.incidentsForMap(data.map);
-  if (here.length) G.ui.toast(`⚑ ${here.map((incident) => incident.name).join(" · ")}`, 2.8);
+  // Entering a road keeps its selected purpose. Optional reports remain in
+  // the Atlas instead of listing several errands at the top of the field.
 });
