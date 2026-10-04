@@ -32,10 +32,19 @@ module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run}
    assert.equal(await page.evaluate(({item,distance})=>{const r=G.groundRewardFor(item),p=G.state.player;return r?Math.hypot(r.x-p.x,r.y-p.y)<=distance:G.state.items.includes(item);},{item,distance}),true,'native movement reaches the gift');
   }
   async function visibleGift(item){await frames(1);assert.equal(await page.evaluate(item=>{const r=G.nearGroundReward(),text=window.reviewPaint.map(p=>p.text).join(' ');return r?.item===item&&text.includes(G.groundRewardInfo(r).name)&&text.includes(G.groundRewardInfo(r).purpose)&&text.includes('Walk over the treasure to collect');},item),true,'the actual HUD paints complete name/purpose/collection text');}
+  async function walkTo(x,y){
+   for(let i=0;i<800;i++){
+    const v=await page.evaluate(({x,y})=>({dx:x-G.state.player.x,dy:y-G.state.player.y}),{x,y});if(Math.hypot(v.dx,v.dy)<3)break;
+    if(mode==='controller')await page.evaluate(({dx,dy})=>{const m=Math.hypot(dx,dy);window.__nqTvPad(JSON.stringify({t:'s',a:[dx/m,dy/m,0,0],b:Array(16).fill(0)}));},v);
+    else{const key=Math.abs(v.dx)>Math.abs(v.dy)?(v.dx>0?'ArrowRight':'ArrowLeft'):(v.dy>0?'ArrowDown':'ArrowUp');for(const k of ['ArrowRight','ArrowLeft','ArrowDown','ArrowUp'])if(k===key)await page.keyboard.down(k);else await page.keyboard.up(k);}
+    await frames(1);if(await page.evaluate(()=>G.ui.dialogueOpen)){await release();await drain();}
+   }
+   await release();await frames(1);await drain();assert.ok(await page.evaluate(({x,y})=>Math.hypot(G.state.player.x-x,G.state.player.y-y)<4,{x,y}),'native movement reaches the authored waypoint');
+  }
   async function boot(){await page.waitForFunction(()=>typeof G!=='undefined'&&G.state?.player);await connect();await drain();await frames(100);await drain();}
   const shot=stage=>page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-${stage}.png`)});
   async function reload(){await page.evaluate(()=>G.saveGame());await page.reload();await boot();}
-  await page.goto(url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,visibleGift,shot,reload});
+  await page.goto(url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,walkTo,visibleGift,shot,reload});
   assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);console.log(`PASS ${name} ${mode} ${hd?'HD':'BASE'}`);await context.close();
  }}finally{await browser.close();}
 };

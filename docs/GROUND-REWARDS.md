@@ -185,6 +185,29 @@ Thirteen final recipe/delivery/request/current-task checks passed. The added nat
 
 The reusable `tools/lib/browser-review.cjs` keeps native input/save/painting checks shared without granting gameplay rewards. Reproduce this scenario with `node tools/review-recipe-promise.cjs [baseURL] [outputDirectory]`.
 
+## Prairie courier gift complete (October 4)
+
+A green-and-coral Courier Satchel now carries the first successful circuit’s six spirit. Finishing saves the personal-best time immediately and reveals the satchel beside the caravan desk. A repeat while it waits can improve the record without moving or duplicating the gift. Claiming pays the authored six spirit once. The desk’s completed appearance follows the accomplishment, and Journey explicitly distinguishes an unclaimed satchel from a claimed award. Save boot restores town accomplishments before validating pending gifts; no save format changed.
+
+Sixteen final courier/parcel/chest/save cases passed, followed by nine courier/interaction-prompt cases after the Journey update (overlap). Tests check both original roads, legacy ownership, invalid completion records, arbitrary saved spirit amounts, repeated pending runs and real movement collection. The first road fixture omitted the existing 24-star entry requirement; its earned-entry state was corrected without changing the gate.
+
+Four final touch/TV browser cases passed in both art settings. Actual steering follows native terrain through the entire timed circuit and a repeat, with Rat, an earned-entry setup and cleared combat. Real save boot preserves the satchel and once-only six spirit. Twenty-four ground/Journey/restored/collected/repeat/owned-boot views and every satchel atlas pose were inspected. The Journey screen is opened through its native API to isolate text presentation. These desktop fixtures do not establish physical-device behavior or full encounters with enemies.
+
+Reproduce with `node tools/review-prairie-courier.cjs [baseURL] [outputDirectory]`. Shared review now provides native waypoint steering as well as gift collection.
+
+## Remaining regional source inventory
+
+| Region | Accomplishment and immediate world effect | Unconverted award |
+| --- | --- | --- |
+| Grove | Plant Whispering Seed; `grove-home-tree` restores the shelter/central path and recovery | Six spirit |
+| Marsh | Two sluice flags weaken the Queen’s ward; Rat opens the wreck hatch | Two spirit per sluice; Old Ferry Token and six spirit |
+| Ridge | Two watchfire flags light the fires after their guards; recover hearts/mana | Three spirit per fire |
+| Mistwood | Three bell flags; `mistwood-middle-road` opens the central path and recovery | Six spirit |
+| Starfall | Three lens flags enable the instrument | Fallen Star Thread/eight spirit; ownership also feeds Wayfinder and costume consumers |
+| Glasswater | Fit the Prism; `glasswater-meridian` opens the shelf road; Lantern Mark still gates Titan | Six spirit |
+
+Mechanism/road flags already represent visible accomplishments. Any conversion must preserve their effects independently of currency collection, trace their consumers and retain legacy completion. NPC thanks, regional favors, town rewards, challenge return rewards and relic/echo systems remain unfinished.
+
 ## Next bounded implementation
 
-Convert Prairie’s courier keepsake and its six spirit while preserving the repeatable timed course and personal-best record. Inventory the Grove, Marsh, Ridge, Mistwood, Starfall and Glasswater accomplishment flags separately from their physical gifts and currencies; road restoration, lit mechanisms and recovery must remain available independently of an unclaimed gift. Continue town/request/currency rewards, challenge return rewards and relic/echo systems. NPC thanks and separate completion currencies remain explicitly unfinished.
+Ben requested clearer, less pixelated text throughout the game. Upgrade the shared fonts and rendering first, verify touch/TV and both art settings, then return to the Marsh award sources and the remaining regional inventory above.

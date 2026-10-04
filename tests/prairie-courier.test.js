@@ -1,4 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
+const collect=require('./helpers/collect-treasure.cjs');
+const cross=require('./helpers/cross-road.cjs');
 function setup(){const r=runtime();r.load('sunstepPrairie');r.drain();r.G.state.enemies=[];return r;}
 const points=[[12,8],[31,8],[34,20],[11,20]];
 function go(G,[x,y]){Object.assign(G.state.player,{x:x*16+8,y:y*16+8});}
@@ -9,8 +11,9 @@ test('courier checkpoints connect to camp and the ordinary region exits',()=>{
  for(const [x,y]of [...points,[0,14],[45,14],[7,20]])assert.ok(seen.has(x+','+y));for(const [x,y]of points)assert.ok(G.world.isSafeSpawn(x*16+8,y*16+8));
 });
 test('courier progress respects order, rewards once and retains only the best time',()=>{
- const {G}=setup();start(G);go(G,points[2]);G.updateOpening(1);assert.equal(G.prairieSurvey().active.step,0);const spirit=G.ensureTown().spirit;
- for(const p of points){go(G,p);G.updateOpening(2);}assert.equal(G.prairieSurvey().active,null);assert.equal(G.prairieSurvey().best,9);assert.equal(G.ensureTown().spirit,spirit+6);
+ const r=setup(),{G}=r;start(G);go(G,points[2]);G.updateOpening(1);assert.equal(G.prairieSurvey().active.step,0);const spirit=G.ensureTown().spirit;
+ for(const p of points){go(G,p);G.updateOpening(2);}assert.equal(G.prairieSurvey().active,null);assert.equal(G.prairieSurvey().best,9);assert.equal(G.ensureTown().spirit,spirit);
+ assert.ok(G.groundRewardFor('sunstep-courier'));collect(r,'sunstep-courier');assert.equal(G.ensureTown().spirit,spirit+6);
  start(G);for(const p of points){go(G,p);G.updateOpening(3);}assert.equal(G.prairieSurvey().best,9);assert.equal(G.ensureTown().spirit,spirit+6);
  start(G);for(const p of points){go(G,p);G.updateOpening(1);}assert.equal(G.prairieSurvey().best,4);assert.equal(G.normalizeTown(G.state.town).prairieBest,4);
 });
@@ -27,4 +30,26 @@ test('courier invitation waits for safety, appears once, and never starts the ti
  G.state.enemies=[];G.ui.menuOpen=true;G.updateOpening(.02);assert.equal(G.ensureTown().prairieInvited,false);G.ui.menuOpen=false;G.updateOpening(.02);
  assert.equal(G.ensureTown().prairieInvited,true);assert.equal(G.prairieSurvey().active,null);assert.equal(notices.filter(s=>s.includes('COURIER WANTED')).length,1);
  G.state.town=G.normalizeTown(JSON.parse(JSON.stringify(G.state.town)));r.load('sunstepPrairie');r.drain();G.state.enemies=[];go(G,[11,14]);G.updateOpening(.02);assert.equal(notices.filter(s=>s.includes('COURIER WANTED')).length,1);
+});
+
+test('an unclaimed courier satchel preserves the record through repeats, both roads and save normalization, then pays once',()=>{
+ const r=setup(),{G}=r;G.state.stars=24;Object.assign(G.ensureTown(),{founded:true,introduced:true,spirit:20});
+ const pickups=[];G.events.on('pickup',e=>pickups.push(e.item));start(G);for(const p of points){go(G,p);G.updateOpening(2);}
+ const gift=G.groundRewardFor('sunstep-courier');assert.ok(gift);assert.ok(G.world.isSafeSpawn(gift.x,gift.y));assert.ok(G.prairieSurvey().done);assert.equal(G.ensureTown().spirit,20);
+ start(G);for(const p of points){go(G,p);G.updateOpening(1);}assert.equal(G.prairieSurvey().best,4);assert.equal(G.groundRewardFor('sunstep-courier'),gift);assert.equal(G.ensureTown().spirit,20);
+ G.saveGame();const saved=G.loadSaveData();assert.equal(saved.town.prairieBest,4);assert.ok(!saved.items.includes('sunstep-courier'));
+ cross(r,'windscarCanyon');cross(r,'sunstepPrairie');cross(r,'overworld');cross(r,'sunstepPrairie');r.drain();G.state.enemies=[];
+ G.state.town=G.normalizeTown(saved.town);G.state.groundRewards=G.normalizeGroundRewards(saved.groundRewards.map(g=>({...g,spirit:9999})));r.load('sunstepPrairie');r.drain();G.state.enemies=[];
+ assert.equal(G.groundRewardFor('sunstep-courier').x,gift.x);assert.equal(G.groundRewardFor('sunstep-courier').y,gift.y);go(G,points[3]);collect(r,'sunstep-courier');
+ assert.equal(G.ensureTown().spirit,26);assert.equal(pickups.filter(item=>item==='sunstep-courier').length,1);assert.equal(G.normalizeGroundRewards(saved.groundRewards).length,0);
+ start(G);for(const p of points){go(G,p);G.updateOpening(1);}assert.equal(G.ensureTown().spirit,26);assert.equal(G.groundRewardFor('sunstep-courier'),null);
+ G.saveGame();assert.equal(G.loadSaveData().town.spirit,26);
+});
+
+test('unearned courier gifts are rejected and legacy owned satchels cannot replay their six spirit',()=>{
+ const {G}=setup(),raw={source:'activity',item:'sunstep-courier',mapId:'sunstepPrairie',x:184,y:352};
+ assert.equal(G.normalizeGroundRewards([raw]).length,0);
+ for(const best of [0,-1,46,NaN,Infinity,'4']){G.ensureTown().prairieBest=best;assert.equal(G.normalizeGroundRewards([raw]).length,0);}
+ G.ensureTown().prairieBest=4;G.state.items.push('sunstep-courier');const spirit=G.ensureTown().spirit;
+ start(G);for(const p of points){go(G,p);G.updateOpening(1);}assert.equal(G.groundRewardFor('sunstep-courier'),null);assert.equal(G.ensureTown().spirit,spirit);
 });

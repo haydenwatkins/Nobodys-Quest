@@ -6,7 +6,7 @@
   const sign={x:11,y:17};
   const desk=points[3];let active=null;
   const xy=p=>({x:p.x*16+8,y:p.y*16+8});
-  G.prairieSurvey=()=>({active:active?{step:active.step,time:Math.max(0,limit-active.elapsed),next:points[active.step].name}:null,best:G.ensureTown().prairieBest||null,done:G.state.items.includes(reward)});
+  G.prairieSurvey=()=>({active:active?{step:active.step,time:Math.max(0,limit-active.elapsed),next:points[active.step].name}:null,best:G.ensureTown().prairieBest||null,done:G.state.items.includes(reward)||!!G.groundRewardFor(reward),pending:!!G.groundRewardFor(reward)});
   const oldCandidate=G.openingInteractionCandidate,oldInteract=G.tryOpeningInteraction;
   function candidate(){const s=G.state,p=xy(desk);
     if(s.mapId!==map||s.expeditionRun||s.knockout||s.bossCutscene||G.ui.dialogueOpen||Math.hypot(s.player.x-p.x,s.player.y-p.y)>28)return null;
@@ -39,8 +39,8 @@
     if(active.step<points.length){G.ui.toast(`Checkpoint ${active.step}/4 · next: ${points[active.step].name}`,2);return;}
     const time=Math.round(active.elapsed*100)/100;active=null;const town=G.ensureTown();
     const record=!town.prairieBest||time<town.prairieBest;if(record)town.prairieBest=time;
-    const first=!s.items.includes(reward);if(first){s.items.push(reward);town.spirit+=6;}
-    G.ui.toast(`Delivery in ${time.toFixed(2)}s${record?" · personal best!":""}${first?" · 6 town spirit":""}`,5);G.saveGame();
+    if(!s.items.includes(reward))G.revealActivityReward(reward,xy(desk).x,xy(desk).y);
+    G.ui.toast(`Delivery in ${time.toFixed(2)}s${record?" · personal best!":""}${G.groundRewardFor(reward)?" · Courier Satchel waits at the desk · walk over it for 6 town spirit":""}`,5);G.saveGame();
   };
   const oldDraw=G.openingDrawables;
   G.openingDrawables=c=>{

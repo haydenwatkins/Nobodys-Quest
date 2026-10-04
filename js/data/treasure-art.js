@@ -25,6 +25,7 @@
     "orchard-ribbon": { name: "Orchard Ribbon", purpose: "+5 town spirit · a keepsake of Parcel's open road", shape: "orchardBow" },
     "sunrise-seal": { name: "Sunrise Seal", purpose: "+8 town spirit · a keepsake of three deliveries", shape: "sunriseSeal" },
     "brindles-recipes": { name: "Brindle's Recipes", purpose: "+3 town spirit · return to Brindle", shape: "recipeBook" },
+    "sunstep-courier": { name: "Courier Satchel", purpose: "+6 town spirit · a keepsake of your courier circuit", shape: "courierSatchel" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -40,7 +41,16 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "recipeBook") {
+      if (shape === "courierSatchel") {
+        g.poly([[5,12],[5,6],[9,2],[19,2],[23,6],[23,12],[20,12],[20,7],[18,5],[10,5],[8,7],[8,12]],"k");
+        g.line(7,10,7,7,"b",2);g.line(8,6,11,4,"a",2);g.line(12,4,18,4,"a",2);g.line(20,6,21,10,"b",2);
+        g.poly([[10,7],[21,8],[20,16],[9,15]],"k");g.rect(11,9,8,6,"c");g.line(13,11,17,11,"b",1);
+        g.poly([[3,12],[24,12],[26,16],[25,28],[21,31],[6,31],[2,27],[2,16]],"k");
+        g.rect(5,15,18,12,"g");g.line(6,17,6,26,"f",1);g.line(7,29,20,29,"b",1);
+        g.poly([[4,14],[24,14],[22,21],[17,23],[10,23],[5,20]],"j");g.line(6,15,22,15,"a",1);
+        g.rect(12,20,5,6,"k");g.rect(13,21,3,3,"a");g.put(14,22,"c");
+        for(const x of [8,11,19,22])g.put(x,18,"c");
+      } else if (shape === "recipeBook") {
         g.poly([[4,2],[24,2],[26,26],[23,31],[5,31],[2,28],[2,6]],"k");
         g.rect(5,5,18,20,"e");g.rect(4,5,4,20,"g");g.line(6,6,6,22,"f",1);
         g.rect(9,7,11,14,"a");g.ellipse(14,14,4,4,"b");g.ellipse(14,14,2,2,"j");g.put(13,13,"c");

@@ -179,6 +179,9 @@
     s.items = save.items || [];
     s.keepsakeId = G.normalizeKeepsake(save.keepsakeId, s.items);
     s.opened = save.opened || [];
+    // Activity rewards validate against saved accomplishments such as the
+    // courier record. Restore those before normalizing their pending gifts.
+    s.town = G.normalizeTown(save.town || save.cult);
     s.groundRewards = G.normalizeGroundRewards(save.groundRewards);
     s.pantries = save.pantries && typeof save.pantries === "object" ? save.pantries : {};
     s.known = save.known || [];
@@ -199,7 +202,6 @@
     s.skinsUnlocked = skins.unlocked;
     s.skinByForm = skins.equipped;
     s.pinnedQuestIds = Array.isArray(save.pinnedQuestIds) ? save.pinnedQuestIds.slice(0, 3) : [];
-    s.town = G.normalizeTown(save.town || save.cult);
     s.heroBoard = G.normalizeHeroBoard(save.heroBoard);
     s.wayfinder = G.normalizeWayfinder(save.wayfinder, save);
     s.worldwake = G.normalizeWorldwake(save.worldwake, save);
