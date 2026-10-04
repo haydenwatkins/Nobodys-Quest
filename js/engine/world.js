@@ -177,13 +177,13 @@ G.world = (() => {
     }
     if (cell.masteryPortfolio && !(G.state.items || []).includes("god-spark")) {
       const exam = G.finalExamMastery();
-      if (exam.missingBreadth.length) {
-        const shown = exam.missingBreadth.slice(0, 4).map((id) => `${G.forms[id].name} (level ${G.formLevel(id)})`);
-        if (exam.missingBreadth.length > shown.length) shown.push(`${exam.missingBreadth.length - shown.length} more forms`);
-        requirements.push(`Learn every form to level 3 (${exam.broad}/${exam.total} ready). Begin with ${readableList(shown)}.`);
+      if (exam.broad < exam.breadthGoal) {
+        const available=exam.missingBreadth.filter(id=>G.formUnlocked(id));
+        const shown=available.slice(0,3).map(id=>`${G.forms[id].name} (level ${G.formLevel(id)})`);
+        requirements.push(`Learn ${exam.breadthGoal} forms of your choice to level 3 (${exam.broad}/${exam.breadthGoal} ready). ${shown.length?`You can practice ${readableList(shown)}.`:'Discover another shape, then practice its own moves.'}`);
       }
       if (exam.specialists < exam.specialistGoal)
-        requirements.push(`Master ${exam.specialistGoal} forms of your choice to level 5 (${exam.specialists}/${exam.specialistGoal} mastered). Borrowed arts earn lessons for their original forms.`);
+        requirements.push(`Master ${exam.specialistGoal} forms of your choice to level 5 (${exam.specialists}/${exam.specialistGoal} mastered). Wear each chosen form to earn its mastery.`);
     }
 
     if (cell.mark && !(G.hasWorldMark && G.hasWorldMark(cell.mark))) {

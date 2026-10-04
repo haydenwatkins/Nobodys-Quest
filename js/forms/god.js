@@ -28,16 +28,16 @@ registerForm({
     { id: "voidStar", level: 2 },
   ],
 
-  unlock: { type: "challenge", maintain: true, hint: "Learn every form, master six favorites, then pass the final exam", requirements: [
+  unlock: { type: "challenge", maintain: true, hint: "Learn eight shapes, master three favorites, then face Meridian", requirements: [
     { type: "finalExamMastery" },
     { type: "item", item: "god-spark", hint: "Defeat Meridian, the Perfect Map" },
   ] },
 
   quests: [
-    { text: "Hit 12 baddies with Waylight", event: "hit", match: { ability: "divineSpark" }, count: 12 },
-    { text: "Break 4 wards after ascending", event: "wardBreak", count: 4 },
-    { text: "Defeat 10 baddies with Light damage", event: "kill", match: { damageType: "light" }, count: 10 },
-    { text: "Defeat 6 baddies with Dark damage", event: "kill", match: { damageType: "dark" }, count: 6 },
+    { text: "Land 6 Waylight hits", event: "hit", match: { ability: "divineSpark" }, count: 6 },
+    { text: "Break 2 wards after ascending", event: "wardBreak", count: 2 },
+    { text: "Defeat 6 baddies with Light damage", event: "kill", match: { damageType: "light" }, count: 6 },
+    { text: "Defeat 4 baddies with Dark damage", event: "kill", match: { damageType: "dark" }, count: 4 },
   ],
 
   sprite: {

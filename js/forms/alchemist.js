@@ -28,10 +28,10 @@ registerForm({
   ] },
 
   quests: [
-    { text: "Bonk 10 baddies with a bottle", event: "hit", match: { ability: "bottleBonk" }, count: 10 },
-    { text: "Blast 12 baddies with Volatile Flask", event: "hit", match: { ability: "volatileFlask" }, count: 12 },
+    { text: "Land 6 Bottle Bonk hits", event: "hit", match: { ability: "bottleBonk" }, count: 6 },
+    { text: "Land 6 Volatile Flask hits", event: "hit", match: { ability: "volatileFlask" }, count: 6 },
     { text: "Catch 3 baddies in one flask blast, twice", event: "multiHit", match: { ability: "volatileFlask", hits: { gte: 3 } }, count: 2 },
-    { text: "Infect 10 baddies with Miasma Flask", event: "hit", match: { ability: "miasmaFlask" }, count: 10 },
+    { text: "Land 6 Miasma Flask hits", event: "hit", match: { ability: "miasmaFlask" }, count: 6 },
   ],
 
   sprite: {

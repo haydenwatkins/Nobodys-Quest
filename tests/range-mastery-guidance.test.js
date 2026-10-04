@@ -89,7 +89,7 @@ test('the rendered mastery tracker keeps a followed range lesson ahead of a busi
   G.guidanceShowStoryCard=()=>false;G.currentTask=()=>({kind:'story',short:'Practice at range',label:'MAIN STORY',color:'#ffcd75'});
   G.ui.update(.01);G.ui.update(.7);G.ui.drawHUD({ x: 0, y: 0 });
   assert.ok(texts.some(text => text.includes(quest.text)));
-  assert.ok(texts.includes('1/8'));
+  assert.ok(texts.includes(`1/${quest.count}`));
   assert.ok(!texts.some(text => text.includes(automatic.text)));
   G.questsDone.push(quest.id); texts.length = 0;
   G.ui.update(.01);G.ui.update(.7);G.ui.drawHUD({ x: 0, y: 0 });

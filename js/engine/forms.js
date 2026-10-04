@@ -160,6 +160,8 @@ G.validateCrossRefs = function () {
           err(`Its unlock rule points at form "${u.form}" which doesn't exist.`);
         if (["allFormsLevel", "previousFormsLevel"].includes(u.type) && (typeof u.level !== "number" || u.level < 1))
           err("Its mastery unlock rule needs a level of at least 1.");
+        if (u.type === "previousFormsLevel" && u.count !== undefined && (!Number.isInteger(u.count) || u.count < 1))
+          err("A chosen-form mastery rule needs a positive whole number of forms.");
         if (u.type === "any") {
           if (!Array.isArray(u.options) || !u.options.length) err("An 'any' unlock requirement needs some options.");
           else u.options.forEach(checkRule);
@@ -209,10 +211,8 @@ function requirementMet(u, targetId) {
   }
   if (u.type === "previousFormsLevel") {
     const targetIndex = G.formOrder.indexOf(targetId);
-    return G.formOrder.slice(0, targetIndex).every((otherId) => {
-      const other = G.forms[otherId];
-      return other && !other.invalid && G.formLevel(otherId) >= u.level;
-    });
+    const earlier=G.formOrder.slice(0,targetIndex).filter(id=>G.forms[id]&&!G.forms[id].invalid);
+    return earlier.filter(id=>G.formLevel(id)>=u.level).length >= (u.count || earlier.length);
   }
   return false;
 }
@@ -317,10 +317,10 @@ G.unlockHint = function (id) {
     if (u.type === "stars") return `${done}${G.state.stars}/${u.stars} stars`;
     if (u.type === "claimedForms") return `${done}${(G.state.claimedForms || []).length}/${u.count} forms awakened`;
     if (u.type === "allFormsLevel") return `${done}Every other form at level ${u.level}`;
-    if (u.type === "previousFormsLevel") return `${done}Every previous form at level ${u.level}`;
+    if (u.type === "previousFormsLevel") return `${done}${u.count ? u.count+" earlier forms" : "Every previous form"} at level ${u.level}`;
     if (u.type === "finalExamMastery") {
       const exam = G.finalExamMastery();
-      return `${done}Every form level 3 (${exam.broad}/${exam.total}) and ${exam.specialistGoal} forms level 5 (${exam.specialists}/${exam.specialistGoal})`;
+      return `${done}${exam.breadthGoal} forms level 3 (${Math.min(exam.broad,exam.breadthGoal)}/${exam.breadthGoal}) and ${exam.specialistGoal} forms level 5 (${Math.min(exam.specialists,exam.specialistGoal)}/${exam.specialistGoal})`;
     }
     if (u.type === "any") return `${done}One of: ${(u.options || []).map((option) => describe(option).replace(/^✓ /, "")).join(" or ")}`;
     return "Unknown challenge";

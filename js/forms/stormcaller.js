@@ -31,10 +31,10 @@ registerForm({
   ] },
 
   quests: [
-    { text: "Zap 12 baddies with Storm Spark", event: "hit", match: { ability: "stormSpark" }, count: 12 },
-    { text: "Chain lightning through 15 baddies", event: "hit", match: { ability: "chainLightning" }, count: 15 },
-    { text: "Chain across 3 baddies, three times", event: "multiHit", match: { ability: "chainLightning", hits: { gte: 3 } }, count: 3 },
-    { text: "Thunderclap 10 nearby baddies", event: "hit", match: { ability: "thunderclap" }, count: 10 },
+    { text: "Land 6 Storm Spark hits", event: "hit", match: { ability: "stormSpark" }, count: 6 },
+    { text: "Land 8 Chain Lightning hits", event: "hit", match: { ability: "chainLightning" }, count: 8 },
+    { text: "Chain across 3 baddies, twice", event: "multiHit", match: { ability: "chainLightning", hits: { gte: 3 } }, count: 2 },
+    { text: "Land 6 Thunderclap hits", event: "hit", match: { ability: "thunderclap" }, count: 6 },
   ],
 
   sprite: {

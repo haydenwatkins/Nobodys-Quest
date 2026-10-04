@@ -142,10 +142,11 @@ G.finalExamMastery = function () {
   const levels = forms.map((id) => ({ id, level: G.formLevel(id) }));
   const missingBreadth = levels.filter((entry) => entry.level < 3).map((entry) => entry.id);
   const specialists = levels.filter((entry) => entry.level >= 5).length;
-  const specialistGoal = Math.min(6, forms.length);
+  const breadthGoal = Math.min(G.PACING.finalBreadth, forms.length);
+  const specialistGoal = Math.min(G.PACING.finalSpecialists, forms.length);
   return { total: forms.length, broad: forms.length - missingBreadth.length,
-    missingBreadth, specialists, specialistGoal,
-    ready: !missingBreadth.length && specialists >= specialistGoal };
+    missingBreadth, breadthGoal, specialists, specialistGoal,
+    ready: forms.length>0 && forms.length-missingBreadth.length>=breadthGoal && specialists >= specialistGoal };
 };
 
 // Choosing another form's lesson changes into that form. Borrowing an art

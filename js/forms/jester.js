@@ -31,10 +31,10 @@ registerForm({
   ] },
 
   quests: [
-    { text: "Deal 20 Wild Cards", event: "hit", match: { ability: "wildCard" }, count: 20 },
-    { text: "Land 8 ricochet follow-ups", event: "hit", match: { ability: "wildCard", combo: "ricochet" }, count: 8 },
-    { text: "Pie 12 baddies", event: "hit", match: { ability: "punchlinePie" }, count: 12 },
-    { text: "Hit 18 baddies with Encore", event: "hit", match: { ability: "encore" }, count: 18 },
+    { text: "Land 6 Wild Card hits", event: "hit", match: { ability: "wildCard" }, count: 6 },
+    { text: "Land 4 ricochet follow-ups", event: "hit", match: { ability: "wildCard", combo: "ricochet" }, count: 4 },
+    { text: "Land 6 Punchline Pie hits", event: "hit", match: { ability: "punchlinePie" }, count: 6 },
+    { text: "Land 8 Encore hits", event: "hit", match: { ability: "encore" }, count: 8 },
   ],
 
   sprite: {

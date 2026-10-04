@@ -17,7 +17,7 @@ test('the road to Worldwake keeps unfinished guardians actionable without making
   assert.equal(goal.mapId, 'sunkenMarsh');
   assert.equal(G.guidanceRouteTarget(goal).cell.portal.map, 'sunkenMarsh');
   assert.equal(G.bossPreparation().enemy, 'Mire Queen');
-  assert.match(goal.objective, /14 more stars/);
+  assert.match(goal.objective, /8 more stars/);
 
   G.state.items.push('trophy-mire-pearl');
   goal = G.storyGoal();
@@ -30,7 +30,7 @@ test('the road to Worldwake keeps unfinished guardians actionable without making
   assert.equal(goal.guide, 'mastery');
   assert.ok(goal.questId, 'the remaining stars have a concrete earned lesson');
 
-  G.state.stars = 24;
+  G.state.stars = G.PACING.worldwakeStars;
   G.state.items.pop(); // The last guardian remains optional once the road opens.
   goal = G.storyGoal();
   assert.equal(goal.guide, 'travel');
@@ -38,12 +38,12 @@ test('the road to Worldwake keeps unfinished guardians actionable without making
   assert.equal(G.guidanceRouteTarget(goal).cell.portal.map, 'sunstepPrairie');
 });
 
-test('a 24-star traveler crosses into Worldwake, meets the first guardian, and earns the next lead', () => {
+test('a 18-star traveler crosses into Worldwake, meets the first guardian, and earns the next lead', () => {
   const r = runtime(), {G} = r;
   r.load('overworld'); r.drain();
   G.state.opening.complete = true;
   G.state.delivery.complete = true;
-  G.state.stars = 24;
+  G.state.stars = G.PACING.worldwakeStars;
   G.state.items.push('trophy-heartwood-crown');
 
   function cross(to) {
@@ -100,7 +100,7 @@ test('after the third Mark, a missing Shattercoast star takes priority over the 
   r.load('rootdeepHollow'); r.drain();
   G.state.opening.complete = true;
   G.state.delivery.complete = true;
-  G.state.stars = 27;
+  G.state.stars = G.PACING.coastStars-1;
   G.state.worldwake.marks = ['sky', 'stone', 'thread'];
   G.state.worldwake.discovered = ['sunstepPrairie', 'windscarCanyon', 'hangingGardens', 'rootdeepHollow'];
 
@@ -119,7 +119,7 @@ test('after the third Mark, a missing Shattercoast star takes priority over the 
   const quest = G.questById(goal.questId).quest;
   assert.equal(quest.event, 'hit');
   for (let hit = 0; hit < quest.count; hit++) G.events.emit('hit', { ability: quest.match.ability });
-  assert.equal(G.state.stars, 28);
+  assert.equal(G.state.stars, G.PACING.coastStars);
   assert.ok(G.questsDone.includes(quest.id));
   goal = G.storyGoal();
   assert.equal(goal.guide, 'boss');

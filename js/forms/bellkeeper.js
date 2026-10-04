@@ -14,10 +14,10 @@ registerForm({
     { type: "formLevel", form: "weaver", level: 2 },
   ] },
   quests: [
-    { text: "Ring 20 baddies with Handbell", event: "hit", match: { ability: "handbell" }, count: 20 },
-    { text: "Bounce Echo Orb through 3 baddies, three times", event: "multiHit", match: { ability: "echoOrb", hits: { gte: 3 } }, count: 3 },
-    { text: "Silence 4 baddies at once, twice", event: "multiHit", match: { ability: "silenceRing", hits: { gte: 4 } }, count: 2 },
-    { text: "Break 8 Light wards", event: "wardBreak", match: { damageType: "light" }, lessonPractice: { mapId: "shattercoast", enemy: "Star Motes" }, count: 8 },
+    { text: "Land 6 Handbell hits", event: "hit", match: { ability: "handbell" }, count: 6 },
+    { text: "Bounce Echo Orb through 3 baddies, twice", event: "multiHit", match: { ability: "echoOrb", hits: { gte: 3 } }, count: 2 },
+    { text: "Silence 3 baddies at once, twice", event: "multiHit", match: { ability: "silenceRing", hits: { gte: 3 } }, count: 2 },
+    { text: "Break 3 Light wards", event: "wardBreak", match: { damageType: "light" }, lessonPractice: { mapId: "shattercoast", enemy: "Star Motes" }, count: 3 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", y: "#ffcd75", w: "#fff3c2", b: "#8a6538", c: "#73eff7", s: "#94b0c2", p: "#8153c1" },

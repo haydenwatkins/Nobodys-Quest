@@ -14,9 +14,9 @@ registerForm({
     { type: "formLevel", form: "knight", level: 4 },
   ] },
   quests: [
-    { text: "Land 24 Shell Jabs", event: "hit", match: { ability: "shellJab" }, count: 24 },
-    { text: "Brace through 2 baddies with a third Shell Jab, 4 times", event: "multiHit", match: { ability: "shellJab", combo: "brace" }, count: 4 },
-    { text: "Roll through 14 baddies", event: "hit", match: { ability: "shellRoll" }, count: 14 },
+    { text: "Land 6 Shell Jabs", event: "hit", match: { ability: "shellJab" }, count: 6 },
+    { text: "Brace through 2 baddies with a third Shell Jab, twice", event: "multiHit", match: { ability: "shellJab", combo: "brace" }, count: 2 },
+    { text: "Land 6 Shell Roll hits", event: "hit", match: { ability: "shellRoll" }, count: 6 },
     { text: "Counter 3 baddies at once, twice", event: "multiHit", match: { ability: "shellCounter", hits: { gte: 3 } }, count: 2 },
   ],
   sprite: {

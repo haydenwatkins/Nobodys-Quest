@@ -13,6 +13,8 @@ const G = {
   H: 180,
   TILE: 16,
   MANA_RESERVE: 6,
+  // Campaign gates assume mastery is earned in the worn body.
+  PACING: Object.freeze({ worldwakeStars: 18, coastStars: 22, finalBreadth: 8, finalSpecialists: 3 }),
   // Mana refills to the true maximum. Hits still add bonus mana, so fighting
   // aggressively beats waiting without making high-cost moves farm-only.
   MANA_REGEN_SECONDS: 0.7,

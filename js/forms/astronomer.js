@@ -14,10 +14,10 @@ registerForm({
     { type: "formLevel", form: "stormcaller", level: 4 },
   ] },
   quests: [
-    { text: "Land 24 Star Needles", event: "hit", match: { ability: "starNeedle" }, count: 24 },
-    { text: "Pierce 2 baddies with one aligned needle, 4 times", event: "multiHit", match: { ability: "starNeedle", hits: { gte: 2 } }, count: 4 },
-    { text: "Map 18 baddies with Constellation", event: "hit", match: { ability: "constellation" }, count: 18 },
-    { text: "Pull 4 baddies into one Gravity Well, twice", event: "multiHit", match: { ability: "gravityWell", hits: { gte: 4 } }, count: 2 },
+    { text: "Land 6 Star Needles", event: "hit", match: { ability: "starNeedle" }, count: 6 },
+    { text: "Pierce 2 baddies with one aligned needle, twice", event: "multiHit", match: { ability: "starNeedle", hits: { gte: 2 } }, count: 2 },
+    { text: "Land 6 Constellation hits", event: "hit", match: { ability: "constellation" }, count: 6 },
+    { text: "Pull 3 baddies into one Gravity Well, twice", event: "multiHit", match: { ability: "gravityWell", hits: { gte: 3 } }, count: 2 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", v: "#3b2f73", p: "#8153c1", b: "#41a6f6", c: "#73eff7", y: "#ffcd75", w: "#f4f4f4", s: "#94b0c2" },

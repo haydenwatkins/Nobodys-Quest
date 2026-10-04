@@ -8,6 +8,8 @@ function sixMarkTraveler() {
   G.state.delivery.complete = true;
   G.state.stars = 60;
   G.state.worldwake.marks = ['sky', 'stone', 'thread', 'echo', 'light', 'heart'];
+  // An edited eight-body roster exercises a truly necessary missing path.
+  G.formOrder=['nobody','rat','knight','wizard','ranger','frog','alchemist','turtle','god'];
   G.state.claimedForms = G.formOrder.filter(id => !['nobody', 'god', 'turtle'].includes(id));
   G.questsDone = G.formOrder.filter(id => !['god', 'turtle'].includes(id))
     .flatMap(id => G.forms[id].quests.slice(0, 2).map(quest => quest.id));
@@ -78,6 +80,7 @@ test('a missing Knight follows the Crest chest through the old dungeon to its Fo
   G.state.delivery.complete = true;
   G.state.stars = 60;
   G.state.worldwake.marks = ['sky', 'stone', 'thread', 'echo', 'light', 'heart'];
+  G.formOrder=['nobody','rat','knight','wizard','ranger','frog','alchemist','stormcaller','god'];
   G.state.claimedForms = G.formOrder.filter(id => !['nobody', 'god', 'knight'].includes(id));
   G.questsDone = G.formOrder.filter(id => !['god', 'knight'].includes(id))
     .flatMap(id => G.forms[id].quests.slice(0, 2).map(quest => quest.id));

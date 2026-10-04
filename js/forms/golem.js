@@ -14,10 +14,10 @@ registerForm({
     { type: "formLevel", form: "griffin", level: 2 },
   ] },
   quests: [
-    { text: "Hit 24 baddies with Stone Knuckle", event: "hit", match: { ability: "stoneKnuckle" }, count: 24 },
-    { text: "Hit 18 baddies with Rampart Pulse", event: "hit", match: { ability: "rampartPulse" }, count: 18 },
-    { text: "Roll Monolith through 3 baddies, three times", event: "multiHit", match: { ability: "rollingMonolith", hits: { gte: 3 } }, count: 3 },
-    { text: "Break 8 Blunt wards", event: "wardBreak", match: { damageType: "blunt" }, lessonPractice: { mapId: "shattercoast", enemy: "Tide Crabs" }, count: 8 },
+    { text: "Land 6 Stone Knuckle hits", event: "hit", match: { ability: "stoneKnuckle" }, count: 6 },
+    { text: "Land 6 Rampart Pulse hits", event: "hit", match: { ability: "rampartPulse" }, count: 6 },
+    { text: "Roll Monolith through 3 baddies, twice", event: "multiHit", match: { ability: "rollingMonolith", hits: { gte: 3 } }, count: 2 },
+    { text: "Break 3 Blunt wards", event: "wardBreak", match: { damageType: "blunt" }, lessonPractice: { mapId: "shattercoast", enemy: "Tide Crabs" }, count: 3 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", s: "#6b6f70", l: "#94b0c2", y: "#ffcd75", m: "#38b764", d: "#4b4f52", b: "#8a6538" },

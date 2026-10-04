@@ -32,10 +32,10 @@ registerForm({
   ] },
 
   quests: [
-    { text: "Land 18 flowing Rift Cuts", event: "hit", match: { ability: "riftCut" }, count: 18 },
+    { text: "Land 6 flowing Rift Cuts", event: "hit", match: { ability: "riftCut" }, count: 6 },
     { text: "Catch 3 baddies in one wide third cut, twice", event: "multiHit", match: { ability: "riftCut", combo: "finisher", hits: { gte: 3 } }, count: 2 },
-    { text: "Rush through 12 baddies", event: "hit", match: { ability: "riftRush" }, count: 12 },
-    { text: "Hit 16 baddies with the Returning Star", event: "hit", match: { ability: "returningStar" }, count: 16 },
+    { text: "Land 6 Rift Rush hits", event: "hit", match: { ability: "riftRush" }, count: 6 },
+    { text: "Land 8 Returning Star hits", event: "hit", match: { ability: "returningStar" }, count: 8 },
   ],
 
   sprite: {

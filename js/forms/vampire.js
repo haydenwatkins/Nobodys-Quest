@@ -28,9 +28,9 @@ registerForm({
   ] },
 
   quests: [
-    { text: "Bite 20 baddies", event: "hit", match: { ability: "bloodBite" }, count: 20 },
+    { text: "Land 6 Blood Bite hits", event: "hit", match: { ability: "bloodBite" }, count: 6 },
     { text: "Drain back 3 hearts", event: "selfHeal", match: { ability: "bloodBite" }, count: 3 },
-    { text: "Waltz through 12 baddies", event: "hit", match: { ability: "crimsonWaltz" }, count: 12 },
+    { text: "Land 6 Crimson Waltz hits", event: "hit", match: { ability: "crimsonWaltz" }, count: 6 },
     { text: "Catch 3 baddies under one Blood Moon, twice", event: "multiHit", match: { ability: "bloodMoon", hits: { gte: 3 } }, count: 2 },
   ],
 

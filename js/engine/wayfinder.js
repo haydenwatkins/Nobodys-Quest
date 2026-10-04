@@ -45,7 +45,7 @@ G.WAYFINDER_REGIONS = [
     spawn: { x: 2, y: 1 },
   },
   {
-    id: "shattercoast", name: "Shattercoast", icon: "🌊", stars: 28,
+    id: "shattercoast", name: "Shattercoast", icon: "🌊", stars: G.PACING.coastStars,
     clue: "A salt-wind passage waits along Greenfield's southwest edge.",
     spawn: { x: 2, y: 14 },
   },

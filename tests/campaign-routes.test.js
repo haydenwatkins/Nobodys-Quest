@@ -26,10 +26,10 @@ test('sealed destinations explain marks, stars, and mastery instead of promising
   G.state.worldwake.marks.push('echo');
   const route=G.guidanceRoute('glasswaterDesert','titanGrave');
   assert.equal(route.locks,0);assert.equal(route.steps.at(-1).from,'stormspinePeaks');
-  G.state.stars=23;r.load('overworld');r.drain();
+  G.state.stars=G.PACING.worldwakeStars-1;r.load('overworld');r.drain();
   target=G.guidanceRouteTarget({mapId:'sunstepPrairie',guide:'travel'});
   assert.equal(target.blocked,true);assert.match(target.text,/1 more star/);
-  G.state.stars=24;
+  G.state.stars=G.PACING.worldwakeStars;
   assert.ok(!G.guidanceRouteTarget({mapId:'sunstepPrairie',guide:'travel'}).blocked);
   target=G.guidanceRouteTarget({mapId:'godTrial',guide:'boss'});
   assert.equal(target.blocked,true);assert.match(target.text,/level 3/);assert.match(target.text,/level 5/);

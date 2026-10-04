@@ -14,10 +14,10 @@ registerForm({
     { type: "formLevel", form: "golem", level: 2 },
   ] },
   quests: [
-    { text: "Pin 24 baddies with Silk Needle", event: "hit", match: { ability: "silkNeedle" }, count: 24 },
-    { text: "Stitch 4 baddies in one line, three times", event: "multiHit", match: { ability: "stitchline", hits: { gte: 4 } }, count: 3 },
-    { text: "Cocoon 16 baddies", event: "status", match: { status: "stun" }, lessonArt: "cocoonField", count: 16 },
-    { text: "Defeat 10 baddies with Dark damage", event: "kill", match: { damageType: "dark" }, count: 10 },
+    { text: "Land 6 Silk Needle hits", event: "hit", match: { ability: "silkNeedle" }, count: 6 },
+    { text: "Stitch 3 baddies in one line, twice", event: "multiHit", match: { ability: "stitchline", hits: { gte: 3 } }, count: 2 },
+    { text: "Stun 6 targets with Cocoon Field", event: "status", match: { status: "stun" }, lessonArt: "cocoonField", count: 6 },
+    { text: "Defeat 6 baddies with Dark damage", event: "kill", match: { damageType: "dark" }, count: 6 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", p: "#8153c1", v: "#3b2f73", w: "#f4f4f4", s: "#d9a7ff", r: "#b13e53", c: "#73eff7" },

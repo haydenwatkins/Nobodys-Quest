@@ -12,20 +12,20 @@ G.STORY_CHAPTERS = [
   {
     id: "somebodysProblem", icon: "○", color: "#f4f4f4",
     title: "A Stitch in the Road",
-    thesis: "An old map becomes a traveller. A small kindness becomes a way home.",
-    summary: "Patchling follows a stranded courier's call and discovers that abandoned promises have begun growing teeth.",
+    thesis: "The road to Sunrise is blocked, and Parcel needs help with the waiting deliveries.",
+    summary: "Patchling, a coat stitched from an old road map, sets out to help Parcel reach the people beyond the orchard.",
     scene: [
-      ["THE STORY", "They stitched a torn road map into a travelling coat. One morning, the coat set off to find its missing roads."],
-      ["MAYOR MAYBE", "A walking map! Excellent. Our roads have been missing from themselves for weeks."],
-      ["ARCHIVIST ERRATA", "The Unfinished are abandoned duties, vows, and hopes. Left alone, they learned to bite."],
+      ["THE STORY", "Patchling was stitched from an old road map. When the roads began closing, the little coat set off to see who needed help."],
+      ["MAYOR MAYBE", "A walking map! I'm glad you're here. Some of our neighbours can't get home, and Parcel's deliveries are stuck in the orchard."],
+      ["ARCHIVIST ERRATA", "Those little creatures are called the Unfinished. They appeared where old promises were forgotten. I'm worried they've been left alone too long."],
       ["PEBBLE", "That courier needs a hand. We can worry about the rest of your map after breakfast."],
     ],
   },
   {
     id: "manyShapes", icon: "✦", color: "#73eff7",
     title: "Many Useful Shapes",
-    thesis: "A patch keeps the memory of the hands that made it.",
-    summary: "Every recovered form adds a living patch to the traveller's map: another talent, another way to help.",
+    thesis: "Each shape gives you a new way to help the people along the road.",
+    summary: "The orchard is open again. Patchling brings Parcel's deliveries to Sunrise and learns what the neighbours need next.",
     scene: [
       ["ARCHIVIST ERRATA", "That coat is made from our old road map! The shapes you’ve found belonged to people who used to look after these roads. I’m glad their skills can help again."],
       ["PEBBLE", "A pocket for every talent. Please leave one for lunch."],
@@ -36,8 +36,8 @@ G.STORY_CHAPTERS = [
   {
     id: "masters", icon: "⚔", color: "#ef7d57",
     title: "Masters of One Thing",
-    thesis: "A perfect answer becomes a prison when the question changes.",
-    summary: "Patchling challenges masters who mistook excellence for ownership and learns the weakness inside every perfect form.",
+    thesis: "The guardians have blocked the roads for their own reasons. Find out what happened and help reopen them.",
+    summary: "Patchling searches the marsh and nearby roads for people stranded by guardians, then prepares to reach the Worldbearers.",
     scene: [
       ["ARCHIVIST ERRATA", "The Treant closed the orchard because he was frightened. The Mire Queen flooded the marsh to keep her court to herself. Now people can’t get home. We need to talk some sense into the other guardians too."],
       ["PEBBLE", "They became perfect. It sounds exhausting."],
@@ -48,37 +48,37 @@ G.STORY_CHAPTERS = [
   {
     id: "wakingRoads", icon: "🧭", color: "#ffcd75",
     title: "The Waking Roads",
-    thesis: "The oldest roads were never ground. They were promises that carried people forward.",
-    summary: "Beyond Greenfield, the Worldwake roads stir and the forgotten giants beneath them begin to stand.",
+    thesis: "Six sleeping Worldbearers have left distant villages without safe roads.",
+    summary: "Parcel needs a way across the moving roads. Patchling follows Sunstep Road to find the first Worldbearer at Windscar Canyon.",
     scene: [
-      ["COURIER PARCEL", "A road moved under my feet. I complained until I realized it was taking me somewhere."],
-      ["ARCHIVIST ERRATA", "Worldbearers carried paths on their backs before maps learned to lie flat."],
-      ["PEBBLE", "People stopped traveling. The carriers decided nowhere must be sacred."],
-      ["THE STORY", "On the eastern horizon, an ancient road takes its first breath."],
+      ["COURIER PARCEL", "The road moved under my feet! I nearly dropped the post. There are still people waiting on the far side, but I can't get across."],
+      ["ARCHIVIST ERRATA", "Those roads rest on six enormous Worldbearers. They've been asleep for years. I'm worried the villages beyond them will be cut off for good."],
+      ["PEBBLE", "Let's find the first one at Windscar Canyon. Maybe we can help it wake up. Parcel, keep the letters safe!"],
+      ["THE STORY", "Beyond Sunstep Road, the path to Windscar Canyon begins to move."],
     ],
   },
   {
     id: "oldPromises", icon: "🗿", color: "#d9a7ff",
     title: "Six Old Promises",
-    thesis: "The Worldbearers do not need to be conquered. They need a reason to carry the future again.",
-    summary: "Six World Marks reconnect the horizon as Patchling reminds each ancient carrier why roads exist.",
+    thesis: "Every World Mark reopens a route people have been missing.",
+    summary: "Three Worldbearers are awake. Patchling travels west through Shattercoast to help the remaining three reopen their roads.",
     scene: [
-      ["PEBBLE", "Three marks answered. I think the horizon is starting to remember us."],
-      ["ARCHIVIST ERRATA", "The Worldbearers were promised that every road would matter. We broke that promise first."],
-      ["THE STORY", "Stone, thread, and sky pull against centuries of stillness."],
-      ["PEBBLE", "Let us finish the road. Someone is waiting at the other end."],
+      ["PEBBLE", "Three Worldbearers are awake! I love seeing people use those roads again. We've still got three sleepy giants to visit."],
+      ["ARCHIVIST ERRATA", "When the old routes closed, people stopped visiting. The Worldbearers thought nobody needed them anymore. I wish we'd checked on them sooner."],
+      ["THE STORY", "The western road opens toward Shattercoast. Three more Worldbearers wait beyond it."],
+      ["PEBBLE", "Let's go west. I want the people there to get their roads back too."],
     ],
   },
   {
     id: "together", icon: "☀", color: "#fff3c2",
     title: "Every Road Home",
-    thesis: "The world does not need one perfect answer. It needs every good answer willing to change.",
-    summary: "With the horizon restored, Patchling faces the impossible ideal that sealed the roads: Meridian, the Perfect Map.",
+    thesis: "Meridian closed roads that didn't fit his map. Help everyone find their way home.",
+    summary: "All six Worldbearers are awake. Patchling practices a varied set of favorite shapes before facing Meridian at the Final Firmament.",
     scene: [
-      ["THE LAST WORLDBEARER", "I carried every road here for you. I cannot carry the final step."],
-      ["ARCHIVIST ERRATA", "Meridian, the Perfect Map, was built from our demand for one answer to every problem."],
-      ["PEBBLE", "Fortunately, you have never been one thing for more than a few heartbeats."],
-      ["THE STORY", "At the northern edge of Greenfield, the Final Firmament opens."],
+      ["THE LAST WORLDBEARER", "Our roads are joined again. Thank you for coming back for us. But Meridian is still keeping the last crossing shut."],
+      ["ARCHIVIST ERRATA", "We asked Meridian to make a perfect map. He started closing any road that didn't fit his plan. People lost their way home. We have to stop him."],
+      ["PEBBLE", "You've helped so many people with your different shapes. Pick the ones you love, practice their moves, and we'll face him together."],
+      ["THE STORY", "The Final Firmament waits at the northern edge of Greenfield."],
     ],
   },
 ];
@@ -203,7 +203,7 @@ function formJourneyLead(formId, progress, seen = new Set(), horizon = false) {
   return { guide: "mastery", formId,
     title: `Find the path to ${form.name}`, short: `Awaken ${form.name}`,
     objective: `Awaken ${form.name}. ${G.unlockHint(formId)} Review its remaining steps in Form Lab.`,
-    reason: horizon ? "Another calling can turn the lessons ahead into new ways to travel and fight." : "The final portfolio needs every shape, including forms not yet awakened.", progress };
+    reason: horizon ? "Another calling can turn the lessons ahead into new ways to travel and fight." : "Choose different shapes to practice, then master the favorites you want to bring to Meridian.", progress };
 }
 
 G.storyComplete = function () {
@@ -302,17 +302,18 @@ G.storyGoal = function () {
   }
 
   if (chapter === 2) {
+    const wakeStars=G.PACING.worldwakeStars;
     const lesson = G.masteryLessons && G.masteryLessons(1)[0];
     const unfinishedMaster = masters.find((master) => !items.has(master.trophy) && stars >= master.stars);
-    if (stars < 24 && unfinishedMaster) return Object.assign(base, {
+    if (stars < wakeStars && unfinishedMaster) return Object.assign(base, {
       guide: "boss", mapId: unfinishedMaster.mapId, destination: unfinishedMaster.destination,
       title: `Answer the ${unfinishedMaster.name}'s challenge`,
       short: `Face ${unfinishedMaster.name} in ${unfinishedMaster.destination}`,
-      objective: `The ${unfinishedMaster.name} still holds an old road in ${unfinishedMaster.destination}. Face this guardian while gathering ${24 - stars} more stars for Sunstep Road.`,
+      objective: `The ${unfinishedMaster.name} still holds an old road in ${unfinishedMaster.destination}. Face this guardian while gathering ${wakeStars - stars} more stars for Sunstep Road.`,
       reason: "The waking horizon asks for lessons from the roads already traveled. An unfinished guardian is a stronger answer than another empty tally.",
-      progress: storyProgress(stars, 24, "STARS TO SUNSTEP"),
+      progress: storyProgress(stars, wakeStars, "STARS TO SUNSTEP"),
     });
-    if (stars < 24 && !G.masteryLessons(1, null, true).length) {
+    if (stars < wakeStars && !G.masteryLessons(1, null, true).length) {
       // Introduce the early roster during the long mastery stretch, rather
       // than reserving its missing paths for the final portfolio. This is a
       // lead, never an additional gate. A player's followed lesson wins.
@@ -321,20 +322,20 @@ G.storyGoal = function () {
         .filter(id => G.forms[id] && !G.forms[id].invalid && !G.formUnlocked(id));
       const next = callings.find(id => G.formReady(id)) || callings[0];
       if (next) {
-        const progress = storyProgress(stars, 24, "STARS TO SUNSTEP");
+        const progress = storyProgress(stars, wakeStars, "STARS TO SUNSTEP");
         const lead = formJourneyLead(next, progress, new Set(), true);
         if (lead) return Object.assign(base, lead, {
-          objective: `${lead.objective} Sunstep Road opens at 24 stars (${stars}/24).`,
+          objective: `${lead.objective} Sunstep Road opens at ${wakeStars} stars (${stars}/${wakeStars}).`,
         });
       }
     }
-    if (stars < 24) return Object.assign(base, {
+    if (stars < wakeStars) return Object.assign(base, {
       guide: "mastery",
       questId: lesson && lesson.quest.id,
-      title: "Prepare for the waking horizon", short: `Earn ${24 - stars} more ⭐ to wake Sunstep Road`,
-      objective: lesson ? `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. Complete lessons in your travels to reach 24 stars.` : "Challenge specialist masters, complete form mastery, and reach 24 stars.",
+      title: "Prepare for the waking horizon", short: `Earn ${wakeStars - stars} more ⭐ to wake Sunstep Road`,
+      objective: lesson ? `${lesson.quest.text} (${lesson.progress}/${lesson.quest.count}). ${lesson.reward}. Complete lessons in your travels to reach ${wakeStars} stars.` : `Challenge specialist masters, complete form mastery, and reach ${wakeStars} stars.`,
       reason: "Rumors describe an eastern road older than Greenfield. It will answer only a hero with many proven shapes.",
-      progress: storyProgress(stars, 24, "STARS"),
+      progress: storyProgress(stars, wakeStars, "STARS"),
     });
     return Object.assign(base, {
       guide: "travel", mapId: "sunstepPrairie", destination: "Sunstep Prairie",
@@ -359,7 +360,7 @@ G.storyGoal = function () {
     const next = range.find((guardian) => !marks.includes(guardian.mark)) || worldbearers.find((guardian) => !marks.includes(guardian.mark));
     // Only the western return road adds a late star gate; avoid searching the
     // whole map graph for a goal the HUD may request every frame.
-    const route = chapter === 4 && stars < 28 && next && G.state.mapId && G.guidanceRoute &&
+    const route = chapter === 4 && stars < G.PACING.coastStars && next && G.state.mapId && G.guidanceRoute &&
       G.guidanceRoute(G.state.mapId, next.mapId);
     const firstGate = route && route.steps.find((step) => step.reason);
     if (firstGate && firstGate.cell.stars > stars && !firstGate.cell.mark && !firstGate.cell.mastery && !firstGate.cell.masteryPortfolio) {
@@ -387,20 +388,20 @@ G.storyGoal = function () {
 
   const exam = G.finalExamMastery();
   if (!exam.ready) {
-    const focus = exam.missingBreadth.length ? exam.missingBreadth :
+    const focus = exam.broad < exam.breadthGoal ? exam.missingBreadth :
       G.formOrder.filter((id) => id !== "god" && G.forms[id] && !G.forms[id].invalid && G.formLevel(id) < 5);
     const lessons = G.masteryLessons ? G.masteryLessons(Infinity).filter(entry => focus.includes(entry.form.id)) : [];
     // During specialization, complete a nearly mastered form before sending
     // the traveler into another level-three path. An explicit followed lesson
     // remains the player's choice even when another form is closer to five.
     const lesson = lessons.find(entry => entry.quest.id === G.state.lessonQuestId) ||
-      (!exam.missingBreadth.length && lessons.find(entry => G.formLevel(entry.form.id) === 4)) || lessons[0];
-    const progress = storyProgress(exam.broad + Math.min(exam.specialists, exam.specialistGoal), exam.total + exam.specialistGoal, "FINAL PREPARATION");
+      (exam.broad >= exam.breadthGoal && lessons.find(entry => G.formLevel(entry.form.id) === 4)) || lessons[0];
+    const progress = storyProgress(Math.min(exam.broad,exam.breadthGoal) + Math.min(exam.specialists, exam.specialistGoal), exam.breadthGoal + exam.specialistGoal, "FINAL PREPARATION");
     const locked = focus.find(id => !G.formUnlocked(id));
     if (!lesson && locked) {
       const lead = formJourneyLead(locked, progress);
       return Object.assign(base, lead, {
-        objective: `${lead.objective} Bring every form to level 3 and six favorites to level 5.`,
+        objective: `${lead.objective} Bring ${exam.breadthGoal} chosen forms to level 3 and ${exam.specialistGoal} favorites to level 5.`,
       });
     }
     const form = lesson ? lesson.form : G.forms[focus[0]];
@@ -408,9 +409,9 @@ G.storyGoal = function () {
       G.formUnlocked && !G.formUnlocked(form.id) ? `Awaken ${form.name}. ${G.unlockHint(form.id)}` : `Practice ${form.name}'s remaining lessons.`;
     return Object.assign(base, {
       guide: "mastery", formId: form.id, questId: lesson && lesson.quest.id,
-      title: "Learn every path, master your favorites", short: `${exam.broad}/${exam.total} forms at level 3 · ${exam.specialists}/${exam.specialistGoal} mastered`,
-      objective: `${step} Bring every form to level 3 and six chosen forms to level 5. Wear each form to earn its mastery; borrowed arts still help in combat.`,
-      reason: "The final answer needs experience with every shape and a handful of lessons carried all the way through.",
+      title: "Practice different shapes, master your favorites", short: `${Math.min(exam.broad,exam.breadthGoal)}/${exam.breadthGoal} forms at level 3 · ${Math.min(exam.specialists,exam.specialistGoal)}/${exam.specialistGoal} mastered`,
+      objective: `${step} Bring ${exam.breadthGoal} chosen forms to level 3 and ${exam.specialistGoal} favorites to level 5. Wear each form to earn its mastery; borrowed arts still help in combat.`,
+      reason: "You have helped reopen the roads. A varied set of familiar shapes and three favorites will prepare you to face Meridian.",
       progress,
     });
   }
@@ -564,3 +565,16 @@ G.showStoryEnding = function () {
 G.events.on("saveSlotReady", (data) => G.beginStorySession(data.save));
 for (const event of ["questDone", "formUnlock", "pickup", "mapEnter"])
   G.events.on(event, () => G.storyCheck());
+
+
+// Meet a new calling through a concrete use, rather than a menu of chores.
+G.events.on("formUnlock", ({form}) => {
+  const lessons={
+    ranger:["SER PENDING","That bow suits you! Hold your basic attack to draw it, then release. Give yourself room and try a shot at a distant baddie. A steady shot is worth more than rushing."],
+    frog:["PEBBLE","A Frog! Try your tongue from just outside a baddie’s reach, then Hop Crash through it. I’ll stay back so you have room. Those ponds should feel much less scary now."],
+    alchemist:["ARCHIVIST ERRATA","You’ve learned to handle those flasks! Try Volatile Flask when two baddies come close together. I’d like to see the paths cleared, but please keep the bottles away from our picnic."],
+    stormcaller:["PEBBLE","Your coat’s crackling! Try Chain Lightning when baddies are close together. We can clear the road without running into the middle of them."],
+    dragon:["PEBBLE","Look at those wings! Try a Tail Sweep, then breathe a little fire while the baddies recover. The people at the next camp will be glad to have a warm friend."],
+  };
+  const line=lessons[form];if(line)G.ui.dialogue(line[0],line[1],{accent:"#ffcd75"});
+});

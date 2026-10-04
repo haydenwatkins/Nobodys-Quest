@@ -31,7 +31,7 @@ test('the horizon leads through the Crest, Knight practice, and a real Ranger ec
   assert.equal(goal.guide, 'item');
   assert.equal(goal.mapId, 'dungeon');
   assert.equal(goal.itemId, 'knights-crest');
-  assert.match(goal.objective, /10\/24/);
+  assert.match(goal.objective, /10\/18/);
   assert.equal(G.guidanceRoute('overworld', goal.mapId).locks, 0);
   assert.equal(G.guidanceTarget().cell.portal.map, 'dungeon');
   r.load('dungeon'); r.drain();
@@ -98,7 +98,7 @@ test('followed lessons, unfinished guardians, and the open road keep their prior
   goal = G.storyGoal();
   assert.equal(goal.guide, 'boss');
   assert.equal(goal.mapId, 'emberRidge');
-  G.state.stars = 24;
+  G.state.stars = G.PACING.worldwakeStars;
   goal = G.storyGoal();
   assert.equal(goal.guide, 'travel');
   assert.equal(goal.mapId, 'sunstepPrairie');
@@ -108,15 +108,15 @@ test('followed lessons, unfinished guardians, and the open road keep their prior
 test('Dragon preparation teaches earned parent arts without introducing another road gate', () => {
   const { G } = traveler();
   G.state.claimedForms = G.formOrder.slice(1, G.formOrder.indexOf('dragon'));
-  G.state.stars = 22;
-  G.questsDone = G.formOrder.slice(0, G.formOrder.indexOf('dragon'))
-    .filter(id => id !== 'frog').flatMap(id => G.forms[id].quests.slice(0, 2).map(q => q.id));
+  G.state.stars = G.PACING.worldwakeStars - 1;
+  G.questsDone = ['nobody','rat','knight'].flatMap(id => G.forms[id].quests.slice(0, 2).map(q => q.id));
+  G.questsDone.push(G.forms.alchemist.quests[0].id);
   const goal = G.storyGoal();
   assert.equal(goal.guide, 'mastery');
-  assert.equal(goal.formId, 'frog');
+  assert.equal(goal.formId, 'ranger');
   assert.match(goal.short, /Hearthdrake/);
   assert.ok(G.masteryLessons(Infinity).some(entry => entry.quest.id === goal.questId));
   assert.ok(!G.guidanceTarget().text.includes('Tail Sweep'));
-  G.state.stars = 24;
+  G.state.stars = G.PACING.worldwakeStars;
   assert.equal(G.storyGoal().guide, 'travel');
 });

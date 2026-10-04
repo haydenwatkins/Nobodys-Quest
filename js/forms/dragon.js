@@ -22,14 +22,18 @@ registerForm({
     { id: "meteor", level: 2 },
   ],
 
-  unlock: { type: "challenge", hint: "Master every form that came before it", requirements: [
-    { type: "previousFormsLevel", level: 3 },
+  unlock: { type: "challenge", hint: "Study four earlier shapes and practice an advanced calling", requirements: [
+    { type: "previousFormsLevel", level: 3, count: 4 },
+    { type: "any", options: [
+      { type: "formLevel", form: "alchemist", level: 2 },
+      { type: "formLevel", form: "stormcaller", level: 2 },
+    ] },
   ] },
 
   quests: [
-    { text: "Sweep 15 baddies with your tail", event: "hit", match: { ability: "tailSweep" }, count: 15 },
+    { text: "Land 6 Tail Sweep hits", event: "hit", match: { ability: "tailSweep" }, count: 6 },
     { text: "Tail-sweep 3 baddies at once, twice", event: "multiHit", match: { ability: "tailSweep", hits: { gte: 3 } }, count: 2 },
-    { text: "Scorch 15 baddies with Fire Breath", event: "hit", match: { ability: "fireBreath" }, count: 15 },
+    { text: "Land 6 Fire Breath hits", event: "hit", match: { ability: "fireBreath" }, count: 6 },
     { text: "Catch 3 baddies in a Meteor, twice", event: "multiHit", match: { ability: "meteor", hits: { gte: 3 } }, count: 2 },
   ],
 

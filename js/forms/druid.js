@@ -17,10 +17,10 @@ registerForm({
     ] },
   ] },
   quests: [
-    { text: "Lash 24 baddies with thorns", event: "hit", match: { ability: "thornLash" }, count: 24 },
-    { text: "Poison 14 baddies", event: "status", match: { status: "poison" }, lessonArt: "thornLash", count: 14 },
-    { text: "Burst seeds onto 16 baddies", event: "hit", match: { ability: "seedBurst" }, count: 16 },
-    { text: "Root 4 baddies in one Wild Growth, twice", event: "multiHit", match: { ability: "wildGrowth", hits: { gte: 4 } }, count: 2 },
+    { text: "Land 6 Thorn Lash hits", event: "hit", match: { ability: "thornLash" }, count: 6 },
+    { text: "Poison 6 targets", event: "status", match: { status: "poison" }, lessonArt: "thornLash", count: 6 },
+    { text: "Land 6 Seed Burst hits", event: "hit", match: { ability: "seedBurst" }, count: 6 },
+    { text: "Root 3 baddies in one Wild Growth", event: "multiHit", match: { ability: "wildGrowth", hits: { gte: 3 } }, count: 1 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", g: "#38b764", l: "#a7f070", b: "#6b4a2b", t: "#8a6538", w: "#f4f4f4", y: "#ffcd75" },

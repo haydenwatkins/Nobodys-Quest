@@ -41,7 +41,7 @@ test('final Journey guidance finishes an available level-four specialty before s
     assert.ok(!G.questsDone.includes(goal.questId));
     G.questsDone.push(goal.questId);
   }
-  assert.equal(G.finalExamMastery().specialists, 6);
+  assert.equal(G.finalExamMastery().specialists, 3);
   assert.equal(G.finalExamMastery().ready, true);
   assert.equal(G.storyGoal().mapId, 'godTrial');
 });

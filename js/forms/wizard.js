@@ -29,10 +29,10 @@ registerForm({
   ] },
 
   quests: [
-    { text: "Defeat 10 baddies as a magic user", event: "kill", count: 10 },
+    { text: "Defeat 4 baddies as Starwick Sage", event: "kill", count: 4 },
     { text: "Break 2 wards", event: "wardBreak", lessonArt: "curse", lessonPractice: { mapId: "sunkenMarsh", enemy: "Shades" }, count: 2 },
-    { text: "Hit 8 baddies with Shadow Bolt", event: "hit", match: { ability: "shadowBolt" }, count: 8 },
-    { text: "Hit 8 baddies with Dark Matter", event: "hit", match: { ability: "dark matter" }, count: 8 },
+    { text: "Land 6 Shadow Bolt hits", event: "hit", match: { ability: "shadowBolt" }, count: 6 },
+    { text: "Land 6 Dark Matter hits", event: "hit", match: { ability: "dark matter" }, count: 6 },
   ],
 
   sprite: {

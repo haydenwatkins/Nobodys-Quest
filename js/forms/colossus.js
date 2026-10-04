@@ -14,10 +14,10 @@ registerForm({
     { type: "formLevel", form: "lanternWisp", level: 3 },
   ] },
   quests: [
-    { text: "Hit 24 baddies with Pillar Fist", event: "hit", match: { ability: "pillarFist" }, count: 24 },
-    { text: "Shoulder through 3 baddies, four times", event: "multiHit", match: { ability: "earthShoulder", hits: { gte: 3 } }, count: 4 },
-    { text: "Break the world under 4 baddies, three times", event: "multiHit", match: { ability: "worldBreak", hits: { gte: 4 } }, count: 3 },
-    { text: "Defeat 16 baddies with Blunt damage", event: "kill", match: { damageType: "blunt" }, count: 16 },
+    { text: "Land 6 Pillar Fist hits", event: "hit", match: { ability: "pillarFist" }, count: 6 },
+    { text: "Shoulder through 3 baddies, twice", event: "multiHit", match: { ability: "earthShoulder", hits: { gte: 3 } }, count: 2 },
+    { text: "World Break under 3 baddies, twice", event: "multiHit", match: { ability: "worldBreak", hits: { gte: 3 } }, count: 2 },
+    { text: "Defeat 6 baddies with Blunt damage", event: "kill", match: { damageType: "blunt" }, count: 6 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", d: "#4b4541", s: "#6f665b", l: "#94836d", o: "#ef7d57", y: "#ffcd75", m: "#38b764" },

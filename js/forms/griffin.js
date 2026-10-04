@@ -14,10 +14,10 @@ registerForm({
     { type: "any", options: [{ type: "formLevel", form: "ranger", level: 3 }, { type: "formLevel", form: "samurai", level: 3 }] },
   ] },
   quests: [
-    { text: "Strike 20 baddies with Wingbeat", event: "hit", match: { ability: "wingbeat" }, count: 20 },
-    { text: "Cut 24 baddies with Feather Gale", event: "hit", match: { ability: "featherGale" }, count: 24 },
-    { text: "Land 10 Sky Dives", event: "hit", match: { ability: "skyDive" }, count: 10 },
-    { text: "Defeat 12 baddies with Sharp damage", event: "kill", match: { damageType: "sharp" }, count: 12 },
+    { text: "Land 6 Wingbeat hits", event: "hit", match: { ability: "wingbeat" }, count: 6 },
+    { text: "Land 6 Feather Gale hits", event: "hit", match: { ability: "featherGale" }, count: 6 },
+    { text: "Land 6 Sky Dives", event: "hit", match: { ability: "skyDive" }, count: 6 },
+    { text: "Defeat 6 baddies with Sharp damage", event: "kill", match: { damageType: "sharp" }, count: 6 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", g: "#d8b06a", y: "#ffcd75", w: "#f4f4f4", c: "#73eff7", b: "#8a6538", r: "#ef7d57" },

@@ -14,10 +14,10 @@ registerForm({
     { type: "formLevel", form: "bellkeeper", level: 2 },
   ] },
   quests: [
-    { text: "Lash 22 baddies with Wick Lash", event: "hit", match: { ability: "wickLash" }, count: 22 },
-    { text: "Light up 18 baddies with Ghostlight", event: "hit", match: { ability: "ghostlight" }, count: 18 },
-    { text: "Land Lantern Drift on 12 baddies", event: "hit", match: { ability: "lanternDrift" }, count: 12 },
-    { text: "Defeat 10 baddies with Light damage", event: "kill", match: { damageType: "light" }, count: 10 },
+    { text: "Land 6 Wick Lash hits", event: "hit", match: { ability: "wickLash" }, count: 6 },
+    { text: "Land 6 Ghostlight hits", event: "hit", match: { ability: "ghostlight" }, count: 6 },
+    { text: "Land 6 Lantern Drift hits", event: "hit", match: { ability: "lanternDrift" }, count: 6 },
+    { text: "Defeat 6 baddies with Light damage", event: "kill", match: { damageType: "light" }, count: 6 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", y: "#ffcd75", w: "#fff3c2", o: "#ef7d57", p: "#8153c1", v: "#3b2f73", c: "#73eff7" },

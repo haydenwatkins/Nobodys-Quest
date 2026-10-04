@@ -25,13 +25,14 @@ registerForm({
   unlock: { type: "challenge", hint: "Build a varied little roster", requirements: [
     { type: "stars", stars: 9 },
     { type: "claimedForms", count: 4 },
+    { type: "formLevel", form: "ranger", level: 2, openingOnly: true },
   ] },
 
   quests: [
-    { text: "Lash 12 baddies from tongue range", event: "hit", match: { ability: "tongueLash" }, count: 12 },
-    { text: "Hop Crash through 8 baddies", event: "hit", match: { ability: "hopCrash" }, count: 8 },
-    { text: "Rattle 12 baddies with Croak Burst", event: "hit", match: { ability: "croakBurst" }, count: 12 },
-    { text: "Defeat 10 baddies with Blunt damage", event: "kill", match: { damageType: "blunt" }, count: 10 },
+    { text: "Land 6 Tongue Lash hits", event: "hit", match: { ability: "tongueLash" }, count: 6 },
+    { text: "Land 4 Hop Crash hits", event: "hit", match: { ability: "hopCrash" }, count: 4 },
+    { text: "Land 6 Croak Burst hits", event: "hit", match: { ability: "croakBurst" }, count: 6 },
+    { text: "Defeat 4 baddies with Blunt damage", event: "kill", match: { damageType: "blunt" }, count: 4 },
   ],
 
   sprite: {

@@ -31,7 +31,7 @@ test('Atlas saves the unclaimed Worldheart, then collection opens the heart road
   assert.equal(G.state.items.filter(trophy=>trophy==='worldwake-crown').length,1);
   assert.equal(G.storyChapter(),5);assert.equal(G.activeKeepsake(),null);assert.equal(G.activeWorldMarkDiscipline(),null);
   assert.equal(G.world.portalBlockReason(G.state.grid[28][23]),null);
-  const reason=G.world.portalBlockReason(gate);assert.ok(reason);assert.match(reason.text,/Learn every form to level 3/);
+  const reason=G.world.portalBlockReason(gate);assert.ok(reason);assert.match(reason.text,/Learn 8 forms of your choice to level 3/);
   assert.doesNotMatch(reason.text,/Restore all 6 World Marks/,'awakening the last Mark does not bypass earned mastery');
   cross(r,'overworld');assert.equal(G.world.portalBlockReason(G.state.grid[0][114]),null);
   assert.ok(G.world.solid(110*16+8,8),'the final entrance still waits for the native portfolio');

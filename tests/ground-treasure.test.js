@@ -65,6 +65,8 @@ test('pending contents survive real saves, travel and cache relocation; legacy o
 
 test('the Crest story trail follows revealed contents and advances only on claim; drawing never grants progress', () => {
   const r = runtime(), { G } = r; G.state.opening.complete = true; G.state.delivery.complete = true;
+  // Seven learned forms make Knight the eighth needed portfolio entry.
+  G.formOrder=['nobody','rat','knight','wizard','ranger','frog','alchemist','stormcaller','god'];
   G.state.stars = 60; G.state.worldwake.marks = ['sky','stone','thread','echo','light','heart'];
   G.state.claimedForms = G.formOrder.filter(id => !['nobody', 'god', 'knight'].includes(id));
   G.questsDone = G.formOrder.filter(id => !['god','knight'].includes(id)).flatMap(id => G.forms[id].quests.slice(0,2).map(q => q.id));

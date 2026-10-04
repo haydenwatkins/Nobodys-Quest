@@ -14,10 +14,10 @@ registerForm({
     { type: "formLevel", form: "riftblade", level: 4 },
   ] },
   quests: [
-    { text: "Land 24 Quickdraw cuts", event: "hit", match: { ability: "quickdraw" }, count: 24 },
-    { text: "Catch 3 baddies in a third draw, 3 times", event: "multiHit", match: { ability: "quickdraw", combo: "draw-finish", hits: { gte: 3 } }, count: 3 },
-    { text: "Flash Step through 15 baddies", event: "hit", match: { ability: "flashStep" }, count: 15 },
-    { text: "Crescent Draw through 4 baddies at once", event: "multiHit", match: { ability: "crescentDraw", hits: { gte: 4 } }, count: 1 },
+    { text: "Land 6 Quickdraw cuts", event: "hit", match: { ability: "quickdraw" }, count: 6 },
+    { text: "Catch 3 baddies in a third draw, twice", event: "multiHit", match: { ability: "quickdraw", combo: "draw-finish", hits: { gte: 3 } }, count: 2 },
+    { text: "Land 6 Flash Step hits", event: "hit", match: { ability: "flashStep" }, count: 6 },
+    { text: "Crescent Draw through 3 baddies at once", event: "multiHit", match: { ability: "crescentDraw", hits: { gte: 3 } }, count: 1 },
   ],
   sprite: {
     palette: { k: "#1a1c2c", w: "#f4f4f4", s: "#94b0c2", r: "#b13e53", d: "#2d1b2e", y: "#ffcd75", c: "#73eff7" },
