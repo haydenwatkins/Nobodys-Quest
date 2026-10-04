@@ -106,8 +106,8 @@
           for(let i=0;i<3;i++){c.beginPath();c.arc(x,y-9-i*5,7+i*3,index?Math.PI*.15:Math.PI*1.15,index?Math.PI*1.15:Math.PI*2.15);c.stroke();}
           c.globalAlpha=1;
         }
-        c.font="6px monospace";c.textAlign="center";c.fillStyle=active?"#d8ffff":"#c0aea4";
-        c.fillText(active?endpoint.sign:"WIND STILL",x,y-34);
+        c.font=G.text.font(6, 700);c.textAlign="center";c.fillStyle=active?"#d8ffff":"#c0aea4";
+        G.drawWorldText(c,active?endpoint.sign:"WIND STILL",x,y-34);
         c.restore();
       }});
     });

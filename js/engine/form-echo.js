@@ -206,9 +206,9 @@
     G.drawSprite(ctx, form.sprite, Math.floor(t) % form.sprite.frames.length, echo.x, echo.y - 4 + bob, false, 1);
     ctx.globalAlpha = 0.75 + Math.sin(t * 2) * 0.15;
     ctx.fillStyle = "#fff3ff";
-    ctx.font = "7px monospace";
+    ctx.font = G.text.font(7, 700);
     ctx.textAlign = "center";
-    ctx.fillText(echo.needsLeave ? "✦" : "…", echo.x, echo.y - 25 + bob);
+    G.drawWorldText(ctx,echo.needsLeave ? "✦" : "…", echo.x, echo.y - 25 + bob);
     ctx.restore();
   };
 })();

@@ -55,6 +55,7 @@ const context = vm.createContext({
   },
 });
 
+vm.runInContext(fs.readFileSync(path.join(root, "js/engine/typography.js"), "utf8"), context, { filename: "typography.js" });
 vm.runInContext(fs.readFileSync(path.join(root, "js/engine/ui.js"), "utf8"), context, { filename: "ui.js" });
 const G = context.G;
 

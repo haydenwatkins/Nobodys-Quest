@@ -233,11 +233,11 @@
     const at=G.openingInteractionCandidate();if(!at)return;
     const prefix=G.input.isTouch?'A · ':G.input.hasGamepad?'A · ':'J / E · ';
     const label=prefix+at.label;
-    c.save();c.font="9px 'VT323', monospace";const w=c.measureText(label).width+16;
+    c.save();c.font=G.text.font(9, 700);const w=c.measureText(label).width+16;
     const x=(G.W-w)/2,p=G.state.player;let y=136;
     if(cam&&p){const px=p.x-cam.x,py=p.y-cam.y;if(px+12>x&&px-12<x+w&&py+4>y&&py-24<y+16)y=Math.max(45,Math.min(117,Math.floor(py-40)));}
     rect(c,x,y,w,16,'rgba(32,45,50,.94)');rect(c,x,y,2,16,C.gold);
-    c.fillStyle=C.paper;c.textBaseline='top';c.fillText(label,x+8,y+4);c.restore();return true;
+    c.fillStyle=C.paper;c.textBaseline='top';G.drawWorldText(c,label,x+8,y+4);c.restore();return true;
   };
 })();
 
@@ -245,7 +245,7 @@
 // The same drawing is used on keyboard, controller, and touch screens.
 (() => {
   const here=()=>G.state&&G.state.mapDef&&G.state.mapDef.openingLandscape;
-  function text(c,label,x,y,color='#f0dfb2',size=9){c.font=`${size}px 'VT323', monospace`;c.fillStyle=color;c.fillText(label,x,y);}
+  function text(c,label,x,y,color='#f0dfb2',size=9){c.font=G.text.font(size);c.fillStyle=color;G.drawWorldText(c,label,x,y);}
   function panel(c,x,y,w,h){c.fillStyle='rgba(30,44,44,.88)';c.fillRect(x,y,w,h);c.fillStyle='#ac9566';c.fillRect(x,y,1,h);}
   G.drawOpeningHud=(c,cam)=>{
     if(!here())return false;
@@ -253,7 +253,7 @@
     c.save();c.textBaseline='top';
     const hp=G.playerHp(),max=G.playerMaxHearts();
     const level=' · '+G.formLevel(form.id);let name=form.name;
-    c.font="7px 'VT323', monospace";
+    c.font=G.text.font(7, 700);
     const identityWidth=Math.max(64,max*7+10,Math.min(88,Math.ceil(c.measureText(name+level).width)+10));
     while(name.length>1&&c.measureText(name+level).width>identityWidth-10)name=name.slice(0,-1);
     if(name!==form.name)name=name.slice(0,-1)+'…';
@@ -272,11 +272,11 @@
     }else if(!G.ui.dialogueOpen&&!(G.nearGroundReward&&G.nearGroundReward())){
       const opening=G.openingGoal(),goal=opening||(s.delivery?.complete&&G.currentTask?G.currentTask():null);
       if(goal){
-        c.font="9px 'VT323', monospace";
+        c.font=G.text.font(9, 700);
         const w=Math.min(!opening&&G.input.isTouch?148:202,c.measureText(goal.short).width+10);
         if(opening||!G.ui.fieldPanelBlocked?.(cam,100,6,w,26)){
           text(c,goal.label||goal.progress.label,102,8,'#f4e5bc',7);
-          panel(c,100,18,w,14);c.font="9px 'VT323', monospace";
+          panel(c,100,18,w,14);c.font=G.text.font(9, 700);
           let short=goal.short;while(!opening&&short.length&&c.measureText(short).width>w-10)short=short.slice(0,-1);
           if(short!==goal.short)short=short.slice(0,-1)+'…';
           text(c,short,105,20,'#f3e4bd',9);
@@ -289,7 +289,7 @@
     if(!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
       const lesson=G.fieldMasteryReward();
       if(lesson&&!(G.nearGroundReward&&G.nearGroundReward())){
-        c.font="8px 'VT323', monospace";
+        c.font=G.text.font(8, 700);
         const count=lesson.progress+'/'+lesson.total,countWidth=c.measureText(count).width;
         const x=7,y=39,w=Math.min(199,Math.max(120,Math.ceil(c.measureText(lesson.quest.text).width+countWidth+19)));
         panel(c,x,y,w,23);
@@ -320,9 +320,9 @@
     if(!here())return false;
     c.save();c.textBaseline='top';
     const speaker=d.speaker.toUpperCase();
-    c.font="11px 'VT323', monospace";
+    c.font=G.text.font(11, 700);
     const lines=wrap(c,d.text,235),visible=wrap(c,d.text.slice(0,Math.floor(d.shown)),235);
-    const h=Math.max(55,30+lines.length*11)+(d.offerActive?28:0),y=174-h;
+    const h=Math.max(55,32+lines.length*13)+(d.offerActive?28:0),y=174-h;
     c.fillStyle='rgba(24,34,35,.24)';c.fillRect(0,0,320,180);
     // Offset paper edges, folded corners and a wax seal form a dialogue object.
     c.fillStyle='rgba(20,30,30,.5)';c.fillRect(10,y+4,303,h);
@@ -332,12 +332,12 @@
     c.save();c.beginPath();c.rect(10,y+3,46,h-7);c.clip();
     G.drawDialoguePortrait(c,d.speaker,13,y+9,39);c.restore();
     text(c,speaker.length>35?speaker.slice(0,34)+'…':speaker,65,y+7,'#65464a',8);
-    c.font="11px 'VT323', monospace";c.fillStyle='#354841';
-    visible.forEach((line,i)=>c.fillText(line,65,y+19+i*11));
+    c.font=G.text.font(11, 700);c.fillStyle='#354841';
+    visible.forEach((line,i)=>G.drawWorldText(c,line,65,y+20+i*13));
     if(d.offerActive)G.ui.drawDialogueChoices(c,d,65,y+h-29,235,true);
     else if(d.shown>=d.text.length){
       const prompt=G.input.isTouch?'TAP TO CONTINUE':G.input.hasGamepad?'A · CONTINUE':'SPACE · CONTINUE';
-      c.font="6px 'VT323', monospace";c.fillStyle='#7f7056';c.fillText(prompt,303-c.measureText(prompt).width,y+h-9);
+      c.font=G.text.font(6, 700);c.fillStyle='#7f7056';G.drawWorldText(c,prompt,303-c.measureText(prompt).width,y+h-9);
     }
     c.restore();return true;
   };

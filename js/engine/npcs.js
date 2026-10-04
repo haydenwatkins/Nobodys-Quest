@@ -520,10 +520,10 @@
     const width = selected ? Math.max(22, prompt.length * 4 + 4) : 10;
     ctx.fillRect(Math.round(npc.x - width / 2), y, width, 8);
     ctx.fillStyle = npc.def.sprite.palette.a;
-    ctx.font = "6px monospace";
+    ctx.font = G.text.font(6, 700);
     ctx.textBaseline = "top";
     ctx.textAlign = "center";
-    ctx.fillText(prompt, Math.round(npc.x), y);
+    G.drawWorldText(ctx,prompt, Math.round(npc.x), y);
     ctx.restore();
   };
 

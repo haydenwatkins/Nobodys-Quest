@@ -39,8 +39,8 @@ G.ui = (() => {
   let feedbackBounds = [];
   let bossHeaderBounds = null, wardHintBounds = null, starBounds = null;
 
-  const FONT_HEAD = '"Press Start 2P", "Courier New", monospace';
-  const FONT_BODY = '"VT323", "Courier New", monospace';
+  const FONT_HEAD = G.text.family;
+  const FONT_BODY = G.text.family;
 
   // Dialogue sits above the touch controls while it is open, making the
   // entire game view one large, comfortable "continue" target on iPad.
@@ -147,7 +147,7 @@ G.ui = (() => {
     const gap=5,buttonW=(w-gap)/2;
     dialogueChoiceBounds=[{x,y,w:buttonW,h:22},{x:x+buttonW+gap,y,w:buttonW,h:22}];
     const labels=["I'll help","Maybe later"];
-    c.font=`10px ${FONT_BODY}`;
+    c.font=`600 10px ${FONT_BODY}`;
     dialogueChoiceBounds.forEach((b,i)=>{
       c.fillStyle=paper?"#94734e":"#43536b";c.fillRect(b.x,b.y,b.w,b.h);
       c.fillStyle=paper?"#f8edcd":"#f4f4f4";
@@ -224,13 +224,13 @@ G.ui = (() => {
     const boxX = 7;
     const boxW = G.W - 14;
 
-    c.font = `11px ${FONT_BODY}`;
+    c.font = `600 11px ${FONT_BODY}`;
     const inset = G.drawDialoguePortrait ? 56 : 9;
     const textWidth = boxW - inset - 9;
     const allLines = wrapText(c, d.text, textWidth);
     const visibleLines = wrapText(c, visible, textWidth);
     const lineCount = Math.max(1, allLines.length);
-    const boxH = Math.max(G.drawDialoguePortrait ? 55 : 0, 27 + lineCount * 11) + (d.offerActive?28:0);
+    const boxH = Math.max(G.drawDialoguePortrait ? 55 : 0, 30 + lineCount * 13) + (d.offerActive?28:0);
     const boxY = G.H - boxH - 7;
 
     c.fillStyle = "rgba(12,14,25,0.48)";
@@ -245,23 +245,23 @@ G.ui = (() => {
     c.fillRect(boxX, boxY, 2, boxH);
     c.fillRect(boxX + boxW - 2, boxY, 2, boxH);
 
-    c.font = `6px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     c.fillStyle = d.accent;
     c.fillText(fitText(c, d.speaker.toUpperCase(), textWidth), boxX + inset, boxY + 7);
     if (G.drawDialoguePortrait) G.drawDialoguePortrait(c, d.speaker, boxX + 8, boxY + 9, 39);
 
-    c.font = `11px ${FONT_BODY}`;
+    c.font = `600 11px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
-    let y = boxY + 17;
+    let y = boxY + 20;
     for (const line of visibleLines) {
       c.fillText(line, boxX + inset, y);
-      y += 11;
+      y += 13;
     }
 
     if(d.offerActive)drawDialogueChoices(c,d,boxX+inset,boxY+boxH-29,textWidth,false);
     else if (d.shown >= d.text.length) {
       const prompt = G.input.isTouch ? "TAP TO CONTINUE" : G.input.hasGamepad ? "A  CONTINUE" : "SPACE / ENTER";
-      c.font = `5px ${FONT_HEAD}`;
+      c.font = `800 6.5px ${FONT_HEAD}`;
       const promptW = c.measureText(prompt).width;
       c.fillStyle = "#94b0c2";
       c.fillText(prompt, boxX + boxW - promptW - 11, boxY + boxH - 9);
@@ -278,7 +278,7 @@ G.ui = (() => {
     const s = G.state;
     const name = s.mapDef && s.mapDef.name ? s.mapDef.name : s.mapId;
     const touch = G.input.isTouch;
-    c.font = `${touch ? 5 : 6}px ${FONT_HEAD}`;
+    c.font = `800 ${touch ? 6.5 : 7}px ${FONT_HEAD}`;
     const enemies = s.enemies.filter((e) => !e.dead).length;
     const label = touch ? name.toUpperCase() : `${name}  enemies:${enemies}`;
     const w = c.measureText(label).width + 8;
@@ -294,7 +294,7 @@ G.ui = (() => {
     if (!G.nearWayfinderPost || !G.nearWayfinderPost()) return;
     const label = G.input.isTouch ? "🧭 TAP MAP TO TRAVEL" :
       G.input.hasGamepad ? "🧭 VIEW · WAYFINDER MAP" : "🧭 M · WAYFINDER MAP";
-    c.font = `5px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     const w = c.measureText(label).width + 10;
     const x = Math.round((G.W - w) / 2);
     const y = G.H - 16;
@@ -319,7 +319,7 @@ G.ui = (() => {
     for (const npc of active) {
       const bubble = npc.bubble;
       const speaker = npc.ambientOnly ? "RESIDENT" : String(npc.def.name || "NEARBY").toUpperCase();
-      c.font = `9px ${FONT_BODY}`;
+      c.font = `600 9px ${FONT_BODY}`;
       const lines = wrapText(c, bubble.text, 86);
       let width = Math.max(c.measureText(speaker).width + 12, 36);
       for (const line of lines) width = Math.max(width, c.measureText(line).width + 12);
@@ -368,10 +368,10 @@ G.ui = (() => {
       c.fillRect(tailX - 2, y + height, 5, 3);
       c.fillRect(tailX - 1, y + height + 3, 3, 2);
 
-      c.font = `4px ${FONT_HEAD}`;
+      c.font = `800 6.5px ${FONT_HEAD}`;
       c.fillStyle = "#566c86";
       c.fillText(speaker, x + 7, y + 4);
-      c.font = `9px ${FONT_BODY}`;
+      c.font = `600 9px ${FONT_BODY}`;
       c.fillStyle = "#1a1c2c";
       lines.forEach((line, index) => c.fillText(line, x + 7, y + 11 + index * 9));
       c.globalAlpha = 1;
@@ -382,7 +382,7 @@ G.ui = (() => {
     if (G.input.isTouch) return;
     const lo = G.getLoadout(G.state.formId);
     const labels = G.input.hasGamepad ? ["A", "X", "Y"] : ["A", "B", "C"];
-    c.font = `6px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     for (let i = 0; i < 3; i++) {
       const ab = G.abilities[lo[i]];
       const x = 6 + i * 34;
@@ -505,7 +505,7 @@ G.ui = (() => {
     const reward = G.nearGroundReward && G.nearGroundReward();
     if (!reward || G.ui.dialogueOpen || G.state.bossCutscene) return null;
     const info = G.groundRewardInfo(reward);
-    c.font = `8px ${FONT_BODY}`;
+    c.font = `600 8px ${FONT_BODY}`;
     const content = [info.name, info.purpose, "Walk over the treasure to collect"];
     const naturalWidth = Math.min(210, Math.ceil(Math.max(...content.map(line => c.measureText(line).width))) + 12);
     const right = G.input.isTouch ? G.W - 68 : G.W - 5;
@@ -531,7 +531,7 @@ G.ui = (() => {
     const { x, y, w, h, lines } = rewardCue;
     c.fillStyle = "rgba(26,28,44,.94)"; c.fillRect(x, y, w, h);
     c.fillStyle = "#f4d39c"; c.fillRect(x, y, 2, h);
-    c.font = `8px ${FONT_BODY}`;
+    c.font = `600 8px ${FONT_BODY}`;
     for (let i = 0; i < lines.length; i++) {
       c.fillStyle = i === 0 ? "#f4d39c" : "#f4f4f4";
       c.fillText(fitText(c, lines[i], w - 12), x + 6, y + 4 + i * 10);
@@ -546,9 +546,9 @@ G.ui = (() => {
     function place(notice, heading, text) {
       for (const w of [196, 160, 128]) {
         if (w > right - 5) continue;
-        c.font = `6px ${FONT_HEAD}`;
+        c.font = `800 6.5px ${FONT_HEAD}`;
         const titles = heading ? wrapText(c, heading, w - 12) : [];
-        c.font = `9px ${FONT_BODY}`;
+        c.font = `600 9px ${FONT_BODY}`;
         const lines = text ? wrapText(c, text, w - 12) : [];
         const h = 8 + titles.length * 10 + lines.length * 10;
         for (const y of [39, 68, 106, 5]) for (const x of [5, right - w]) {
@@ -583,9 +583,9 @@ G.ui = (() => {
       c.fillStyle = "rgba(26,28,44,.9)"; c.fillRect(x, y, w, h);
       c.fillStyle = titles.length ? "#ffcd75" : "#d9a7ff"; c.fillRect(x, y, 2, h);
       let by = y + 4;
-      c.font = `6px ${FONT_HEAD}`; c.fillStyle = "#ffcd75";
+      c.font = `800 6.5px ${FONT_HEAD}`; c.fillStyle = "#ffcd75";
       for (const line of titles) { c.fillText(line, x + 6, by); by += 10; }
-      c.font = `9px ${FONT_BODY}`; c.fillStyle = "#f4f4f4";
+      c.font = `600 9px ${FONT_BODY}`; c.fillStyle = "#f4f4f4";
       for (const line of lines) { c.fillText(line, x + 6, by); by += 10; }
       c.globalAlpha = 1;
     }
@@ -671,7 +671,7 @@ G.ui = (() => {
     c.fillRect(x, y, boxW, 27);
     c.fillStyle = pulse ? "#a7f070" : "#ffcd75";
     c.fillRect(x, y, boxW, 1);
-    c.font = `4px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     c.fillText(`${form.icon} ${form.name.toUpperCase()} · MASTERY`, x + 4, y + 3);
     if (lessons.length > 1) {
       const more = `+${lessons.length - 1}`;
@@ -679,7 +679,7 @@ G.ui = (() => {
       c.fillText(more, x + boxW - c.measureText(more).width - 4, y + 3);
     }
 
-    c.font = `7px ${FONT_BODY}`;
+    c.font = `600 8px ${FONT_BODY}`;
     const suffix = `${progress}/${quest.count}`;
     const suffixW = c.measureText(suffix).width;
     const slotLabel = slot > 0 ? `${["A", "B", "C"][slot]} · ` : "";
@@ -706,10 +706,10 @@ G.ui = (() => {
     c.fillRect(x, y, boxW, boxH);
     c.fillStyle = "#73eff7";
     c.fillRect(x, y, boxW, 1);
-    c.font = `${touch ? 5 : 6}px ${FONT_HEAD}`;
+    c.font = `800 ${touch ? 6.5 : 7}px ${FONT_HEAD}`;
     c.fillStyle = "#73eff7";
     c.fillText(prompt.title, x + 5, y + 4);
-    c.font = `${touch ? 8 : 9}px ${FONT_BODY}`;
+    c.font = `600 ${touch ? 8 : 9}px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
     c.fillText(fitText(c, prompt.text, boxW - 10), x + 5, y + (touch ? 10 : 12));
   }
@@ -726,10 +726,10 @@ G.ui = (() => {
     c.fillRect(x, y, boxW, 18);
     c.fillStyle = goal.color;
     c.fillRect(x, y, 2, 18);
-    c.font = `4px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     c.fillStyle = goal.complete ? "#a7f070" : goal.color;
     c.fillText(goal.label, x + 5, y + 3);
-    c.font = `7px ${FONT_BODY}`;
+    c.font = `600 8px ${FONT_BODY}`;
     c.fillStyle = "#f4f4f4";
     c.fillText(fitText(c, goal.short, boxW - 10), x + 5, y + 9);
   }
@@ -752,7 +752,7 @@ G.ui = (() => {
     const label = `${type.icon} ${type.name.toUpperCase()}`;
     const suggestion = G.guidanceWardSuggestion ? G.guidanceWardSuggestion(nearest) : null;
     const formLabel = suggestion && suggestion.form ? `⇄ ${suggestion.form.name.toUpperCase()}` : "";
-    c.font = `7px ${FONT_BODY}`;
+    c.font = `600 8px ${FONT_BODY}`;
     const w = Math.max(c.measureText(label).width, formLabel ? c.measureText(formLabel).width : 0) + 6;
     const x = Math.round(G.util.clamp(nearest.x - cam.x - w / 2, 2, G.W - w - 2));
     const h = formLabel ? 18 : 10;
@@ -788,7 +788,7 @@ G.ui = (() => {
     c.fillRect(x, y, w, 17);
     c.fillStyle = color;
     c.fillRect(x, y, w, 1);
-    c.font = `5px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     c.fillStyle = "#f4f4f4";
     const labelW = c.measureText(label).width;
     c.fillText(label, Math.round(G.W / 2 - labelW / 2), y + 3);
@@ -815,6 +815,7 @@ G.ui = (() => {
     // the transform blows it up to full screen resolution.
     c.setTransform(uiScale, 0, 0, uiScale, 0, 0);
     c.clearRect(0, 0, G.W, G.H);
+    G.text.paintWorldLabels(c, uiScale);
     statusBounds = null;
     rewardCue = null;
     feedbackBounds = [];
@@ -826,7 +827,7 @@ G.ui = (() => {
     const form = G.playerForm();
 
     /* floating damage numbers (world things, drawn sharp up here) */
-    c.font = `5px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     for (const f of G.fx) {
       if (f.kind !== "num") continue;
       c.globalAlpha = Math.max(0, 1 - f.t / f.dur);
@@ -847,7 +848,7 @@ G.ui = (() => {
     if (!openingHud) {
     const maxH = G.playerMaxHearts();
     const hp = G.playerHp();
-    c.font = `6px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     const label = `${form.icon} ${form.name} Lv${G.formLevel(form.id)}`;
     const chipW = c.measureText(label).width + 6;
     const pantryBuffs = [];
@@ -855,7 +856,7 @@ G.ui = (() => {
     if (p.pantryHasteT > 0) pantryBuffs.push({ text: "FAST", color: "#ef7d57" });
     if (p.pantryQuickT > 0) pantryBuffs.push({ text: "QUICK", color: "#73eff7" });
     if (p.pantryMagnetT > 0) pantryBuffs.push({ text: "MAG", color: "#d9a7ff" });
-    c.font = `5px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     const buffsW = pantryBuffs.reduce((w, buff) => w + c.measureText(buff.text).width + 7, 0);
     statusBounds = placeStatus(cam, Math.max(chipW + buffsW + 3, maxH * 9 + (p.passiveBarrier || 0) * 7 + 3, 43));
     c.save();
@@ -896,14 +897,14 @@ G.ui = (() => {
     }
 
     /* current form chip */
-    c.font = `6px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     c.fillStyle = "rgba(26,28,44,0.65)";
     c.fillRect(5, 24, chipW, 11);
     c.fillStyle = "#f4f4f4";
     c.fillText(label, 8, 27);
 
     let pantryX = 8 + chipW;
-    c.font = `5px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     for (const buff of pantryBuffs) {
       const w = c.measureText(buff.text).width + 5;
       c.fillStyle = "rgba(26,28,44,0.72)";
@@ -921,7 +922,7 @@ G.ui = (() => {
     if (!G.state.bossCutscene) drawWardHint(c, cam);
     const encounterFocus = bossBarShown || (G.state.mapId === "emberRidge" && G.ridgeSurvey && G.ridgeSurvey().active);
     /* Reserve and paint the earned-star counter before optional field cards. */
-    c.font = `6px ${FONT_HEAD}`;
+    c.font = `800 6.5px ${FONT_HEAD}`;
     const starTxt = `⭐${G.state.stars}`;
     const sw = c.measureText(starTxt).width + 6;
     c.fillStyle = "rgba(26,28,44,0.65)";
@@ -960,9 +961,9 @@ G.ui = (() => {
       const alpha = b.t < 0.2 ? b.t / 0.2 : b.t > 2.7 ? (3.2 - b.t) / 0.5 : 1;
       c.globalAlpha = Math.max(0, alpha);
 
-      c.font = `8px ${FONT_HEAD}`;
+      c.font = `800 8px ${FONT_HEAD}`;
       const titleLines = wrapText(c, b.title, G.W - 24);
-      c.font = `10px ${FONT_BODY}`;
+      c.font = `600 10px ${FONT_BODY}`;
       const subLines = b.sub ? wrapText(c, b.sub, G.W - 24) : [];
       const boxH = 10 + titleLines.length * 12 + subLines.length * 10;
       const boxY = Math.round((G.H - boxH) / 2 - 12);
@@ -974,13 +975,13 @@ G.ui = (() => {
       c.fillRect(0, boxY + boxH - 1, G.W, 1);
 
       let by = boxY + 6;
-      c.font = `8px ${FONT_HEAD}`;
+      c.font = `800 8px ${FONT_HEAD}`;
       c.fillStyle = "#ffcd75";
       for (const line of titleLines) {
         c.fillText(line, Math.round(G.W / 2 - c.measureText(line).width / 2), by);
         by += 12;
       }
-      c.font = `10px ${FONT_BODY}`;
+      c.font = `600 10px ${FONT_BODY}`;
       c.fillStyle = "#c8d8e0";
       for (const line of subLines) {
         c.fillText(line, Math.round(G.W / 2 - c.measureText(line).width / 2), by);
@@ -990,7 +991,7 @@ G.ui = (() => {
     }
     if (G.state.bossCutscene && !dialogueData) {
       const skip = "TAP AN ABILITY FOR NEXT";
-      c.font = `5px ${FONT_HEAD}`;
+      c.font = `800 6.5px ${FONT_HEAD}`;
       const skipW = c.measureText(skip).width;
       c.fillStyle = "rgba(26,28,44,0.8)";
       c.fillRect(Math.round(G.W / 2 - skipW / 2 - 4), G.H - 17, skipW + 8, 10);
@@ -2296,7 +2297,7 @@ G.ui = (() => {
     const current = id === G.state.formId;
     const selected = id === labFormId;
     const progress = G.formPathProgress(id);
-    const status = current ? "CURRENT" : ready ? "ECHO READY" : unlocked ? `LV ${G.formLevel(id)}` : `${progress.done}/${progress.total}`;
+    const status = current ? "Current" : ready ? "Echo ready" : unlocked ? `Lv ${G.formLevel(id)}` : `${progress.done}/${progress.total}`;
     return `<button class="form-portrait-tile ${selected ? "selected" : ""} ${current ? "current" : ""} ${ready ? "ready" : ""} ${unlocked ? "unlocked" : "locked"}"
       data-form-select="${id}" aria-label="${escapeHtml(`${form.name}, ${status}`)}">
       ${previewCanvas(id, unlocked ? G.selectedFormSkin(id)?.id : "classic", "tile-preview", form.name, !unlocked, unlocked && !G.selectedFormSkin(id))}
@@ -2486,7 +2487,7 @@ G.ui = (() => {
       if (canvas.dataset.previewLocked === "true") {
         c.globalCompositeOperation = "source-atop"; c.fillStyle = "#252a40"; c.fillRect(0, 0, w, h); c.globalCompositeOperation = "source-over";
         c.fillStyle = "rgba(17,21,34,0.56)"; c.fillRect(0, 0, w, h);
-        c.font = '28px "Press Start 2P", monospace'; c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#94b0c2"; c.fillText("?", w / 2, h / 2);
+        c.font = G.text.font(28, 700); c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#94b0c2"; c.fillText("?", w / 2, h / 2);
       }
     });
   }

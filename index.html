@@ -11,8 +11,10 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="icon" type="image/png" href="icons/icon-192.png">
   <title>Nobody's Quest</title>
-  <link rel="stylesheet" href="css/style.css?v=20261003a">
-  <link rel="stylesheet" href="css/journey.css?v=20260930c">
+  <link rel="preload" href="fonts/nunito-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css?v=20261004d">
+  <link rel="stylesheet" href="css/journey.css?v=20261004d">
+  <link rel="stylesheet" href="css/typography.css?v=20261004d">
 </head>
 <body>
   <div id="game-wrap">
@@ -52,6 +54,7 @@
 
   <!-- ENGINE (Ben: you don't need to touch these!) -->
   <script src="js/engine/core.js?v=20260914c"></script>
+  <script src="js/engine/typography.js?v=20261004d"></script>
   <script src="js/engine/comfort.js?v=20260820b"></script>
   <script src="js/engine/audio.js?v=20260817c"></script>
   <script src="js/engine/sprites.js?v=20260817b"></script>
@@ -59,13 +62,13 @@
   <script src="js/engine/menu-controller.js?v=20260822c"></script>
   <script src="js/engine/world.js?v=20261003b"></script>
   <script src="js/engine/combat.js?v=20261003c"></script>
-  <script src="js/engine/entities.js?v=20261003b"></script>
+  <script src="js/engine/entities.js?v=20261004d"></script>
   <script src="js/engine/forms.js?v=20260930a"></script>
   <script src="js/engine/ground-rewards.js?v=20261004c"></script>
   <script src="js/engine/keepsakes.js?v=20260930g"></script>
   <script src="js/engine/quests.js?v=20260930a"></script>
   <script src="js/engine/save.js?v=20261003a"></script>
-  <script src="js/engine/ui.js?v=20261004c"></script>
+  <script src="js/engine/ui.js?v=20261004d"></script>
   <script src="js/engine/tutorial.js?v=20260822c"></script>
   <script src="js/engine/town.js?v=20260930c"></script>
 
@@ -99,9 +102,9 @@
   <script src="js/forms/god.js?v=20261001a"></script>
   <script src="js/data/form-art-hd.js?v=20261003a"></script>
   <script src="js/engine/passives.js?v=20261003a"></script>
-  <script src="js/engine/form-echo.js?v=20260930c"></script>
+  <script src="js/engine/form-echo.js?v=20261004d"></script>
   <script src="js/engine/form-path.js?v=20260930c"></script>
-  <script src="js/engine/legends.js?v=20261001a"></script>
+  <script src="js/engine/legends.js?v=20261004d"></script>
 
   <!-- WORLD DATA (enemies and maps — also editable!) -->
   <script src="js/data/enemies.js?v=20261001j"></script>
@@ -114,9 +117,9 @@
   <script src="js/engine/wayfinder.js?v=20260913f"></script>
   <script src="js/engine/costumes.js?v=20261001c"></script>
   <script src="js/engine/worldwake.js?v=20260930a"></script>
-  <script src="js/engine/npcs.js?v=20261003a"></script>
+  <script src="js/engine/npcs.js?v=20261004d"></script>
   <script src="js/engine/story.js?v=20261003a"></script>
-  <script src="js/engine/guidance.js?v=20261003i"></script>
+  <script src="js/engine/guidance.js?v=20261004d"></script>
   <script src="js/data/wildlife-art.js?v=20261002a"></script>
   <script src="js/engine/living-world.js?v=20261002a"></script>
   <script src="js/engine/rival.js?v=20260817a"></script>
@@ -155,7 +158,7 @@
   <script src="js/data/orchard-environment-art.js?v=20261001a"></script>
   <script src="js/data/orchard-prop-art.js?v=20261001a"></script>
   <script src="js/engine/opening.js?v=20261003a"></script>
-  <script src="js/engine/opening-render.js?v=20261004a"></script>
+  <script src="js/engine/opening-render.js?v=20261004d"></script>
   <script src="js/data/lantern-road.js?v=20260913f"></script>
   <script src="js/data/delivery-art.js?v=20261001a"></script>
   <script src="js/data/quay-companion-art.js?v=20261003a"></script>
@@ -168,7 +171,7 @@
   <script src="js/data/greenfield-scenery-art.js?v=20261001c"></script>
   <script src="js/engine/greenfield-render.js?v=20261001d"></script>
   <script src="js/engine/delivery.js?v=20261004b"></script>
-  <script src="js/engine/delivery-render.js?v=20261001a"></script>
+  <script src="js/engine/delivery-render.js?v=20261004d"></script>
 
   <!-- BOOT (must be last) -->
   <script src="js/engine/journey.js?v=20261003a"></script>
@@ -189,8 +192,8 @@
   <script src="js/engine/titangrave.js?v=20261001b"></script>
   <script src="js/engine/rootdeep.js?v=20261001a"></script>
   <script src="js/engine/gardens.js?v=20261001a"></script>
-  <script src="js/engine/prairie.js?v=20261004c"></script>
-  <script src="js/engine/windscar.js?v=20261001a"></script>
+  <script src="js/engine/prairie.js?v=20261004d"></script>
+  <script src="js/engine/windscar.js?v=20261004d"></script>
   <script src="js/data/mistwood-environment-art.js?v=20261001a"></script>
   <script src="js/engine/mistwood-render.js?v=20261001a"></script>
   <script src="js/engine/mistwood.js?v=20261001a"></script>
@@ -198,7 +201,7 @@
   <script src="js/engine/grove-render.js?v=20261001a"></script>
   <script src="js/engine/grove.js?v=20261001a"></script>
   <script src="js/data/prairie-environment-art.js?v=20261001a"></script>
-  <script src="js/engine/prairie-render.js?v=20261001b"></script>
+  <script src="js/engine/prairie-render.js?v=20261004d"></script>
   <script src="js/data/windscar-environment-art.js?v=20261001a"></script>
   <script src="js/engine/windscar-render.js?v=20261001g"></script>
   <script src="js/data/gardens-environment-art.js?v=20261001a"></script>
@@ -214,9 +217,9 @@
   <script src="js/data/dungeon-environment-art.js?v=20261002a"></script>
   <script src="js/engine/dungeon-render.js?v=20261002a"></script>
   <script src="js/data/shifting-environment-art.js?v=20261001a"></script>
-  <script src="js/engine/shifting-render.js?v=20261001a"></script>
+  <script src="js/engine/shifting-render.js?v=20261004d"></script>
   <script src="js/data/coliseum-environment-art.js?v=20261001a"></script>
-  <script src="js/engine/coliseum-render.js?v=20261001b"></script>
+  <script src="js/engine/coliseum-render.js?v=20261004d"></script>
   <script src="js/data/hedgeway-environment-art.js?v=20261001b"></script>
   <script src="js/engine/hedgeway-render.js?v=20261001c"></script>
   <script src="js/data/starpath-environment-art.js?v=20261001a"></script>
@@ -246,6 +249,6 @@
   <script src="js/data/pickup-art.js?v=20261003a"></script>
   <script src="js/data/treasure-art.js?v=20261004c"></script>
   <script src="js/data/dialogue-portraits.js?v=20261003a"></script>
-  <script src="js/engine/main.js?v=20261004c"></script>
+  <script src="js/engine/main.js?v=20261004d"></script>
 </body>
 </html>

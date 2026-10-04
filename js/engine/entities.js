@@ -777,6 +777,7 @@ G.drawBossHazards = function (ctx) {
     if (!["mirePool","rootBloom","mireVolley","riftVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut"].includes(h.kind)) {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
+      G.text.setWorldClip(ctx,b);
     }
     ctx.fillStyle = h.color;
     ctx.strokeStyle = active ? "#f4f4f4" : h.color;
@@ -786,12 +787,12 @@ G.drawBossHazards = function (ctx) {
     if(h.kind === "riftVolley"){
       const e=h.owner,angle=Math.atan2(h.y-e.y,h.x-e.x);ctx.globalAlpha=.85;ctx.strokeStyle="#73eff7";ctx.setLineDash([4,3]);
       for(const spread of h.spreads){const a=angle+spread*Math.PI/180,x=e.x+Math.cos(a)*82,y=e.y-6+Math.sin(a)*82;ctx.beginPath();ctx.moveTo(e.x,e.y-6);ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.stroke();}
-      ctx.setLineDash([]);ctx.fillStyle="#263b4b";ctx.fillRect(e.x-28,e.y+16,56,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("THEY RETURN",e.x,e.y+24);
+      ctx.setLineDash([]);ctx.fillStyle="#263b4b";ctx.fillRect(e.x-28,e.y+16,56,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"THEY RETURN",e.x,e.y+24);
     }else if(h.kind === "foldCut"){
       ctx.translate(h.x,h.y);ctx.rotate(h.angle);ctx.globalAlpha=active?.65:.17;ctx.fillRect(-h.length/2,-h.width/2,h.length,h.width);
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#f4f4f4";ctx.setLineDash(active?[]:[4,3]);ctx.strokeRect(-h.length/2,-h.width/2,h.length,h.width);ctx.setLineDash([]);
       if(active){ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-h.length/2,0);ctx.lineTo(h.length/2,0);ctx.stroke();}
-      ctx.rotate(-h.angle);const nx=Math.cos(h.angle)*(h.length/2-10),ny=Math.sin(h.angle)*(h.length/2-10);ctx.fillStyle="#302638";ctx.fillRect(nx-5,ny-5,10,10);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText(String(h.note),nx,ny+3);
+      ctx.rotate(-h.angle);const nx=Math.cos(h.angle)*(h.length/2-10),ny=Math.sin(h.angle)*(h.length/2-10);ctx.fillStyle="#302638";ctx.fillRect(nx-5,ny-5,10,10);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,String(h.note),nx,ny+3);
     }else if(h.kind === "pieRain"){
       ctx.globalAlpha=.25;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.95;ctx.strokeStyle="#fff3c2";ctx.setLineDash(active?[]:[3,3]);ctx.stroke();ctx.setLineDash([]);
       if(active){if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,h.y,true)){ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-12,h.y-3,24,6);ctx.fillRect(h.x-5,h.y-8,10,16);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-6,h.y-4,12,8);}}
@@ -800,12 +801,12 @@ G.drawBossHazards = function (ctx) {
       const e=h.owner;ctx.globalAlpha=.7;ctx.strokeStyle="#e9a9ce";ctx.setLineDash([3,3]);
       for(const a of h.shots){ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*14,e.y-6+Math.sin(a)*14);ctx.lineTo(e.x+Math.cos(a)*95,e.y-6+Math.sin(a)*95);ctx.stroke();}
       ctx.setLineDash([]);ctx.strokeStyle="#fff3c2";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(e.x+Math.cos(h.angle-.55)*90,e.y-6+Math.sin(h.angle-.55)*90);ctx.lineTo(e.x,e.y-6);ctx.lineTo(e.x+Math.cos(h.angle+.55)*90,e.y-6+Math.sin(h.angle+.55)*90);ctx.stroke();
-      const x=e.x+Math.cos(h.angle)*64,y=e.y-6+Math.sin(h.angle)*64;ctx.globalAlpha=.95;ctx.fillStyle="#302638";ctx.fillRect(x-17,y+7,34,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("OPENING",x,y+15);
+      const x=e.x+Math.cos(h.angle)*64,y=e.y-6+Math.sin(h.angle)*64;ctx.globalAlpha=.95;ctx.fillStyle="#302638";ctx.fillRect(x-17,y+7,34,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"OPENING",x,y+15);
     }else if(h.kind === "royalStomp"){
       ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=.95;ctx.strokeStyle="#ffcd75";ctx.setLineDash(active?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
       for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(h.x+Math.cos(a)*12,h.y+Math.sin(a)*12);ctx.lineTo(h.x+Math.cos(a+.13)*h.radius*.6,h.y+Math.sin(a+.13)*h.radius*.6);ctx.lineTo(h.x+Math.cos(a)*h.radius*.9,h.y+Math.sin(a)*h.radius*.9);ctx.stroke();}
-      ctx.fillStyle="#302638";ctx.fillRect(h.x-22,h.y+h.radius+3,44,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("MOVE OUT",h.x,h.y+h.radius+11);
+      ctx.fillStyle="#302638";ctx.fillRect(h.x-22,h.y+h.radius+3,44,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"MOVE OUT",h.x,h.y+h.radius+11);
     }else if(h.kind === "orbitalBand"){
       ctx.beginPath();ctx.rect(b.left,b.top,b.right-b.left,b.bottom-b.top);
       ctx.moveTo(h.x+h.outer,h.y);ctx.arc(h.x,h.y,h.outer,0,Math.PI*2);
@@ -813,20 +814,20 @@ G.drawBossHazards = function (ctx) {
       ctx.globalAlpha=.95;ctx.strokeStyle="#73eff7";ctx.lineWidth=2;
       for(const radius of [h.inner,h.outer]){ctx.beginPath();ctx.arc(h.x,h.y,radius,0,Math.PI*2);ctx.stroke();}
       ctx.fillStyle="#263b4b";ctx.fillRect(h.x-25,h.y+(h.inner+h.outer)/2-5,50,11);
-      ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("SAFE ORBIT",h.x,h.y+(h.inner+h.outer)/2+3);
+      ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"SAFE ORBIT",h.x,h.y+(h.inner+h.outer)/2+3);
     }else if(h.kind === "eclipseSweep"){
       ctx.globalAlpha=active?.32:.18;ctx.beginPath();ctx.moveTo(h.x,h.y);
       ctx.arc(h.x,h.y,h.radius,h.angle-h.halfAngle,h.angle+h.halfAngle);ctx.closePath();ctx.fill();
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#d9a7ff";ctx.setLineDash(active?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
       if(active){ctx.lineWidth=3;ctx.beginPath();ctx.arc(h.x,h.y,h.radius*.78,h.angle-h.halfAngle,h.angle+h.halfAngle);ctx.stroke();}
-      ctx.fillStyle="#302638";ctx.fillRect(h.x-24,h.y+18,48,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("GET BEHIND",h.x,h.y+26);
+      ctx.fillStyle="#302638";ctx.fillRect(h.x-24,h.y+18,48,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"GET BEHIND",h.x,h.y+26);
     }else if(h.kind === "mireVolley"){
       const e=h.owner,a=Math.atan2(h.y-e.y,h.x-e.x),middle=(h.count-1)/2;
       ctx.globalAlpha=active?.9:.65;ctx.strokeStyle=active?"#fff3c2":"#b8d99b";ctx.setLineDash(active?[]:[4,3]);
       for(let i=0;i<h.count;i++){const angle=a+(i-middle)*14*Math.PI/180;
         ctx.beginPath();ctx.moveTo(e.x,e.y-5);ctx.lineTo(e.x+Math.cos(angle)*100,e.y-5+Math.sin(angle)*100);ctx.stroke();
       }ctx.setLineDash([]);
-      ctx.fillStyle="#302638";ctx.fillRect(e.x-26,e.y+15,52,11);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("STEP ASIDE",e.x,e.y+23);
+      ctx.fillStyle="#302638";ctx.fillRect(e.x-26,e.y+15,52,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"STEP ASIDE",e.x,e.y+23);
     } else if (h.kind === "rootBloom") {
       ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#a7f070";ctx.setLineDash(active?[]:[3,2]);ctx.stroke();ctx.setLineDash([]);
@@ -874,7 +875,7 @@ G.drawBossHazards = function (ctx) {
       if(h.owner.def.id === "bellTitan"){
         const label=h.note===2?"2 / ECHO":"1 / NOTE",x=h.owner.x,y=h.owner.y+25;
         ctx.globalAlpha=.95;ctx.fillStyle="#263b4b";ctx.fillRect(x-23,y-8,46,11);
-        ctx.fillStyle=h.color;ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText(label,x,y);
+        ctx.fillStyle=h.color;ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,label,x,y);
       }
     } else if (h.kind === "gust") {
       const lanes = h.lanes || 5;
@@ -910,7 +911,7 @@ G.drawBossHazards = function (ctx) {
         const w=horizontal?b.right-b.left:laneSize,height=horizontal?laneSize:b.bottom-b.top;
         ctx.globalAlpha=.9;ctx.strokeStyle="#fff3c2";ctx.lineWidth=1;ctx.setLineDash([3,3]);
         ctx.strokeRect(x+2,y+2,w-4,height-4);ctx.setLineDash([]);
-        if(h.safePoint){const p=h.safePoint;ctx.fillStyle="#263b3b";ctx.fillRect(p.x-12,p.y+6,24,10);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("SAFE",p.x,p.y+14);}
+        if(h.safePoint){const p=h.safePoint;ctx.fillStyle="#263b3b";ctx.fillRect(p.x-12,p.y+6,24,10);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"SAFE",p.x,p.y+14);}
       }
     } else if (h.kind === "ring") {
       // Shade precisely outside the safe circle. The even-odd cutout keeps the
@@ -928,12 +929,12 @@ G.drawBossHazards = function (ctx) {
         ctx.globalAlpha=.95;ctx.strokeStyle="#fff3c2";ctx.lineWidth=2;
         ctx.beginPath();ctx.arc(h.x,h.y,h.radius-2,0,Math.PI*2);ctx.stroke();
         ctx.fillStyle="#302638";ctx.fillRect(h.x-31,h.y+h.radius-17,62,11);
-        ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("STAY IN LIGHT",h.x,h.y+h.radius-9);
+        ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"STAY IN LIGHT",h.x,h.y+h.radius-9);
       }
     } else if (h.kind === "tether") {
       if(h.owner.def.id === "silkMatriarch"){
         ctx.globalAlpha=.85;ctx.strokeStyle="#fff3c2";ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(h.owner.x,h.owner.y,h.maxRange,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
-        ctx.fillStyle="#302638";ctx.fillRect(h.owner.x-24,h.owner.y+h.maxRange-14,48,10);ctx.fillStyle="#fff3c2";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("STAY CLOSE",h.owner.x,h.owner.y+h.maxRange-6);
+        ctx.fillStyle="#302638";ctx.fillRect(h.owner.x-24,h.owner.y+h.maxRange-14,48,10);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"STAY CLOSE",h.owner.x,h.owner.y+h.maxRange-6);
         ctx.strokeStyle=h.color;
       }
       ctx.globalAlpha = active ? 0.9 : 0.45;
@@ -956,6 +957,7 @@ G.drawBossHazards = function (ctx) {
       ctx.setLineDash([]);
     }
     ctx.restore();
+    G.text.setWorldClip(ctx,null);
   }
 };
 
@@ -1765,10 +1767,10 @@ G.drawEnemy = function (ctx, e) {
     ctx.fillRect(Math.round(e.x - w / 2), Math.round(e.y - e.def.size - 6), Math.round(w * frac), 2);
   }
   if (e.rival) {
-    ctx.font = "5px monospace";
+    ctx.font = G.text.font(6, 700);
     ctx.textAlign = "center";
     ctx.fillStyle = "#d9a7ff";
-    ctx.fillText(`★ ${e.def.name}`, Math.round(e.x), Math.round(e.y - e.def.size - 15));
+    G.drawWorldText(ctx,`★ ${e.def.name}`, Math.round(e.x), Math.round(e.y - e.def.size - 15));
     ctx.textAlign = "left";
   }
 };

@@ -760,7 +760,7 @@
     const active = runtime.activeUntil > now();
     if (target.spatial === false) {
       if (!active || runtime.toastUntil > now()) return;
-      ctx.font = "5px 'Press Start 2P', monospace";
+      ctx.font = G.text.font(6, 700);
       const label = `✦ ${String(target.destination).toUpperCase()}`;
       const width = ctx.measureText(label).width + 10;
       ctx.fillStyle = "rgba(26,28,44,0.88)";
@@ -768,7 +768,7 @@
       if (G.ui?.fieldPanelBlocked?.(cam, left, G.H - 45, width, 12)) return;
       ctx.fillRect(left, G.H - 45, width, 12);
       ctx.fillStyle = target.color;
-      ctx.fillText(label, Math.round((G.W - width) / 2) + 5, G.H - 41);
+      G.drawWorldText(ctx,label, Math.round((G.W - width) / 2) + 5, G.H - 41);
       return;
     }
     const sx = target.x - cam.x, sy = target.y - cam.y;
@@ -793,7 +793,7 @@
     ctx.beginPath(); ctx.moveTo(0, -6); ctx.lineTo(4, 4); ctx.lineTo(-4, 4); ctx.closePath(); ctx.fill();
     ctx.restore();
     if (active && !(onScreen && actor)) {
-      ctx.font = "5px 'Press Start 2P', monospace";
+      ctx.font = G.text.font(6, 700);
       const label = `${target.icon} ${String(target.destination).toUpperCase()}`;
       const width = Math.min(G.W - 30, ctx.measureText(label).width + 10);
       ctx.fillStyle = "rgba(26,28,44,0.86)";
@@ -801,7 +801,7 @@
       if (G.ui?.fieldPanelBlocked?.(cam, left, G.H - 45, width, 12)) return;
       ctx.fillRect(left, G.H - 45, width, 12);
       ctx.fillStyle = target.color;
-      ctx.fillText(label, Math.round((G.W - width) / 2) + 5, G.H - 41);
+      G.drawWorldText(ctx,label, Math.round((G.W - width) / 2) + 5, G.H - 41);
     }
   };
 

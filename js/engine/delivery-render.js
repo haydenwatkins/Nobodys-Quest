@@ -137,9 +137,9 @@
       }
       const label=h.safePoint||h;
       const text=active?'DRY GROUND':'SHELTER IN THE LIGHT',labelY=label.y+(h.safePoint?14:32);
-      c.font="8px 'VT323', monospace";c.textAlign='center';c.textBaseline='top';
+      c.font=G.text.font(8, 700);c.textAlign='center';c.textBaseline='top';
       const width=c.measureText(text).width;rect(c,label.x-width/2-3,labelY-1,width+6,10,C.ink);
-      c.fillStyle=C.paper;c.fillText(text,label.x,labelY);
+      c.fillStyle=C.paper;G.drawWorldText(c,text,label.x,labelY);
     }else{
       c.translate(h.x,h.y);c.rotate(Math.atan2(h.dy,h.dx));rect(c,0,-h.width,h.length,h.width*2,active?'rgba(229,188,114,.68)':'rgba(229,188,114,.16)');
       rect(c,0,-h.width,h.length,1,C.gold);rect(c,0,h.width,h.length,1,C.gold);for(let i=8;i<h.length;i+=16)rect(c,i,-1,6,2,active?C.paper:C.gold);

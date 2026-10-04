@@ -549,8 +549,8 @@
     if (echo.rank === 1) G.drawSprite(ctx, form.sprite, Math.floor(t) % form.sprite.frames.length, echo.x, echo.y - 3 + bob, false, 1);
     else if (echo.rank === 2) {
       const art = G.abilities[def.techniqueId];
-      ctx.fillStyle = "#fff3c2"; ctx.font = "18px serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(art.icon || "✦", echo.x, echo.y - 10 + bob);
+      ctx.fillStyle = "#fff3c2"; ctx.font = G.text.font(18, 700); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      G.drawWorldText(ctx,art.icon || "✦", echo.x, echo.y - 10 + bob);
     } else {
       ctx.translate(Math.round(echo.x), Math.round(echo.y - 8 + bob));
       drawRelicShape(ctx, def, echo.reward ? 2.4 : 1.8);
@@ -563,8 +563,8 @@
     ctx.globalAlpha = 1; ctx.fillStyle = "rgba(26,28,44,.9)";
     const width = selected ? 40 : 12;
     ctx.fillRect(Math.round(echo.x - width / 2), Math.round(echo.y - 31 + bob), width, 9);
-    ctx.fillStyle = selected ? "#fff3c2" : def.color; ctx.font = "6px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "top";
-    ctx.fillText(selected ? `${G.input.hasGamepad ? "A " : G.input.isTouch ? "" : "E "}${prompt}` : "✦", Math.round(echo.x), Math.round(echo.y - 30 + bob));
+    ctx.fillStyle = selected ? "#fff3c2" : def.color; ctx.font = G.text.font(6, 700); ctx.textAlign = "center"; ctx.textBaseline = "top";
+    G.drawWorldText(ctx,selected ? `${G.input.hasGamepad ? "A " : G.input.isTouch ? "" : "E "}${prompt}` : "✦", Math.round(echo.x), Math.round(echo.y - 30 + bob));
 
     if (active && active.kind === "waypoints") {
       active.runes.forEach((rune, index) => {
@@ -581,10 +581,10 @@
     if (active) {
       const progress = active.kind === "hold" ? Math.floor(active.progress) : active.progress;
       const text = `TRIAL ${Math.min(progress, active.goal)}/${active.goal}`;
-      ctx.globalAlpha = 1; ctx.font = "6px monospace"; ctx.textAlign = "center";
+      ctx.globalAlpha = 1; ctx.font = G.text.font(6, 700); ctx.textAlign = "center";
       const w = ctx.measureText(text).width + 8;
       ctx.fillStyle = "rgba(26,28,44,.92)"; ctx.fillRect(Math.round(echo.x - w / 2), Math.round(echo.y + 13), w, 10);
-      ctx.fillStyle = "#fff3c2"; ctx.fillText(text, Math.round(echo.x), Math.round(echo.y + 15));
+      ctx.fillStyle = "#fff3c2"; G.drawWorldText(ctx,text, Math.round(echo.x), Math.round(echo.y + 15));
     }
     ctx.restore();
   };

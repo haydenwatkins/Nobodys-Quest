@@ -1,14 +1,14 @@
 // Native input/save review shared by authored scenarios. No game grants here.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES||'node_modules']}));
-module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run}){
+module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,dpr=1,modes=['touch','controller'],viewports={}}){
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});fs.mkdirSync(out,{recursive:true});
- try{for(const mode of ['touch','controller'])for(const hd of [true,false]){
-  const viewport=mode==='touch'?{width:667,height:375}:{width:1280,height:720},context=await browser.newContext({viewport,hasTouch:mode==='touch',...(mode==='controller'?{userAgent:'NobodysQuestTV/1.0 Chromium review'}:{})}),page=await context.newPage(),errors=[];
+ try{for(const mode of modes)for(const hd of [true,false]){
+  const viewport=viewports[mode]||(mode==='touch'?{width:667,height:375}:{width:1280,height:720}),context=await browser.newContext({viewport,deviceScaleFactor:dpr,hasTouch:mode==='touch',...(mode==='controller'?{userAgent:'NobodysQuestTV/1.0 Chromium review'}:{})}),page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(()=>{
-   window.reviewClock=1000;window.requestAnimationFrame=cb=>(window.reviewFrame=cb,1);window.cancelAnimationFrame=()=>{};window.reviewPaint=[];window.reviewRects=[];
+   window.reviewClock=1000;window.requestAnimationFrame=cb=>(window.reviewFrame=cb,1);window.cancelAnimationFrame=()=>{};window.reviewPaint=[];window.reviewRects=[];window.reviewPixelText=[];
    const fill=CanvasRenderingContext2D.prototype.fillText,rect=CanvasRenderingContext2D.prototype.fillRect,clear=CanvasRenderingContext2D.prototype.clearRect;
-   CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...args){if(this.canvas.id==='ui')window.reviewPaint.push({text:String(text),x,y});return fill.call(this,text,x,y,...args);};
+   CanvasRenderingContext2D.prototype.fillText=function(text,x,y,...args){if(this.canvas.id==='ui')window.reviewPaint.push({text:String(text),x,y,font:this.font});if(this.canvas.id==='game')window.reviewPixelText.push(String(text));return fill.call(this,text,x,y,...args);};
    CanvasRenderingContext2D.prototype.fillRect=function(x,y,w,h){if(this.canvas.id==='ui')window.reviewRects.push({x,y,w,h,color:this.fillStyle});return rect.call(this,x,y,w,h);};
    CanvasRenderingContext2D.prototype.clearRect=function(...args){if(this.canvas.id==='ui'){window.reviewPaint=[];window.reviewRects=[];}return clear.apply(this,args);};
   });

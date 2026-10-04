@@ -467,6 +467,7 @@
   function draw() {
     const s = G.state;
     const p = s.player;
+    G.text.beginWorldFrame(ctx);
 
     // camera follows the player, clamped to the map edges
     const maxX = Math.max(0, s.mapW * G.TILE - G.W);
@@ -552,7 +553,7 @@
   }
 
   function drawFx() {
-    ctx.font = "7px 'Courier New', monospace";
+    ctx.font = G.text.font(7, 700);
     ctx.textBaseline = "top";
     for (const f of G.fx) {
       const prog = f.t / f.dur;

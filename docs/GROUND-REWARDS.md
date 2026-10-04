@@ -210,4 +210,4 @@ Mechanism/road flags already represent visible accomplishments. Any conversion m
 
 ## Next bounded implementation
 
-Ben requested clearer, less pixelated text throughout the game. Upgrade the shared fonts and rendering first, verify touch/TV and both art settings, then return to the Marsh award sources and the remaining regional inventory above.
+Ben’s shared font/rendering upgrade is complete; see `TYPOGRAPHY.md`. Return to Marsh’s two sluice currencies and Rat salvage while preserving immediate ward weakening, native safety/form requirements and legacy completion. Then continue the remaining regional inventory above.
