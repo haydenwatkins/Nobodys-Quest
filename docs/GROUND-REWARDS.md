@@ -1,6 +1,6 @@
 # Ground rewards: source audit and collection contract
 
-October 3, 2026. This is a working source audit, not a claim that all rewards have been converted. The user wants every dropped item to be visible and understandable without reading dialogue. Preserve earned progress and exactly-once rewards.
+October 4, 2026. This is a working source audit, not a claim that all rewards have been converted. The user wants every dropped item to be visible and understandable without reading dialogue. Preserve earned progress and exactly-once rewards.
 
 ## Current source families
 
@@ -177,6 +177,14 @@ Eight final touch/TV browser cases passed, and forty native thanks/ground/reload
 
 Review caught purpose cards covering the paper HUD’s hearts/mana/identity. The renderer now reports its actual status and boss/ward bounds to shared card placement, and its optional task headline yields near a ground gift. A native paint regression and the final browser cases check the actual drawn status rectangle. The browser assertion was corrected for Canvas’s normalized RGBA strings. The broader fixed/paper banner, relic and threat audit remains unfinished.
 
+## Brindle’s recipe promise complete (October 4)
+
+The recovered book has a blue cover, green spine, cream pages, cinnamon thumbprint and lilac bookmark. Rat entry records salvage and reveals the book; its three spirit waits for collection. An unclaimed book survives saves and permits Rat re-entry into the isolated pocket. Outside the pocket, the selected promise routes to the bank drain; inside, it routes to the actual book. Collection changes the task to returning to Brindle. Her separate five-spirit thanks, existing cinnamon-bun tray and generous-thumb revisit remain native. Legacy immediate salvage still qualifies, and an already-owned book cannot replay salvage spirit.
+
+Thirteen final recipe/delivery/request/current-task checks passed. The added native breadcrumb paint check caught a half-tile target error, which was corrected to use the gift’s actual position and tile. Four final browser cases passed in touch/TV and both art settings, with the same breadcrumb check, real save boot, native drain entry/exit/re-entry, movement collection, NPC acceptance, once-only thanks and revisit. Thirty-two views and all book atlas poses/settings were inspected. Touch movement uses keyboard steering; actions use touch buttons. TV uses the actual pad bridge. Controlled earned state and map/NPC positions isolate the request loop; this is not a complete inter-map walking campaign or physical-device test.
+
+The reusable `tools/lib/browser-review.cjs` keeps native input/save/painting checks shared without granting gameplay rewards. Reproduce this scenario with `node tools/review-recipe-promise.cjs [baseURL] [outputDirectory]`.
+
 ## Next bounded implementation
 
-Convert the rescued recipe book and its three spirit without stranding it in the isolated drain pocket. Preserve Rat access/re-entry, saved salvage, legacy readiness and Brindle’s distinct collection/return/thanks/revisit flow. Then continue regional gifts, town/request/currency rewards, challenge return rewards and relic/echo systems. NPC thanks and separate completion currencies remain explicitly unfinished.
+Convert Prairie’s courier keepsake and its six spirit while preserving the repeatable timed course and personal-best record. Inventory the Grove, Marsh, Ridge, Mistwood, Starfall and Glasswater accomplishment flags separately from their physical gifts and currencies; road restoration, lit mechanisms and recovery must remain available independently of an unclaimed gift. Continue town/request/currency rewards, challenge return rewards and relic/echo systems. NPC thanks and separate completion currencies remain explicitly unfinished.

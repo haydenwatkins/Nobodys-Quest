@@ -26,10 +26,17 @@
     G.saveGame();
   }
   const locations={bread:[12,12],letter:[30,13],present:[28,26]};
+  G.recipeGiftApproach=()=>{
+    const gift=G.groundRewardFor&&G.groundRewardFor('brindles-recipes');if(!gift)return null;
+    const s=G.state,inPocket=s.mapId===gift.mapId&&Math.abs(s.player.x-328)<32&&s.player.y>=33*16;
+    return {gift,inPocket,mapId:gift.mapId,point:inPocket?[gift.x/16-.5,gift.y/16-.5]:[18,30],
+      text:inPocket?'Walk over the recipe book to collect it, then return through the drain and bring Brindle the good news.':'Become Rat and enter the Lantern Reach drain again. The recipe book waits safely in the little pocket beneath the bank.'};
+  };
   G.deliveryGoal=()=>{
     const s=G.state;if(!s)return null;const d=state();
-    const gift=(s.groundRewards||[]).find(g=>['orchard-ribbon','sunrise-seal','keeper-lantern'].includes(g.item)&&!s.items.includes(g.item));
-    if(gift)return {chapter:1,act:G.STORY_CHAPTERS[1],title:'A gift for helping',short:`Collect the ${G.groundRewardInfo(gift).name}`,objective:`Walk over the gift on the ground. ${G.groundRewardInfo(gift).purpose}. The road and your unfinished promises remain open.`,reason:'Your help is remembered. Its gift waits even if you leave.',mapId:gift.mapId,point:[gift.x/16-.5,gift.y/16-.5],destination:G.maps[gift.mapId].name,guide:'opening',progress:{value:d.complete?8:d.keeper?4:0,total:8,label:'A THANK-YOU GIFT'},complete:false};
+    const gift=(s.groundRewards||[]).find(g=>['orchard-ribbon','sunrise-seal','keeper-lantern','brindles-recipes'].includes(g.item)&&!s.items.includes(g.item));
+    const approach=gift?.item==='brindles-recipes'?G.recipeGiftApproach():null;
+    if(gift)return {chapter:1,act:G.STORY_CHAPTERS[1],title:'A gift for helping',short:`Collect the ${G.groundRewardInfo(gift).name}`,objective:approach?approach.text:`Walk over the gift on the ground. ${G.groundRewardInfo(gift).purpose}. The road and your unfinished promises remain open.`,reason:'Your help is remembered. Its gift waits even if you leave.',mapId:gift.mapId,point:approach?approach.point:[gift.x/16-.5,gift.y/16-.5],destination:G.maps[gift.mapId].name,guide:'opening',progress:{value:d.complete?8:d.keeper?4:0,total:8,label:'A THANK-YOU GIFT'},complete:false};
     if(d.complete||(!d.started&&!(s.opening&&s.opening.complete)))return null;
     let mapId,point,short,objective,value;
     if(!d.started){mapId='orchardRoad';point=[26,37];short='Meet Parcel at the departure post';objective='Parcel can finally travel. Join the delivery beside the cart, a few steps east.';value=0;}
@@ -69,7 +76,7 @@
         const [x,y]=i?[38,12]:[14,24],at=option('lamp'+i,'Raise the '+(i?'second':'first')+' lantern',x,y);if(at)return at;
       }
       if(near(20,33,21))return {id:'drainBack',label:'Return through the drain',x:328,y:536};
-      if(!d.salvage)return option('drain',G.state.formId==='rat'?'Explore the storm drain':'A small drain · Rat can fit',18,30,25);
+      if(!d.salvage||G.groundRewardFor('brindles-recipes'))return option('drain',G.state.formId==='rat'?(d.salvage?'Return for the recipe book':'Explore the storm drain'):'A small drain · Rat can fit',18,30,25);
     }
     if(map==='sunriseQuay'&&d.started&&d.keeper){
       if(d.complete&&G.expeditionUnlocked()){
@@ -111,7 +118,7 @@
       say('lamp'+i,[['PARCEL',i?'They followed the light across. Clear the bank; I will keep the flame.':'The light woke something in the reeds. I have the cart. You have room to move.']]);
     }else if(at.id==='drain'){
       if(s.formId!=='rat')G.ui.dialogue('PEBBLE','Something pale is caught under that bank. A rat could follow the drain.',{accent:'#e7bd78'});
-      else{move(20,33);d.salvage=true;s.town.spirit+=3;G.sfx.play('pickup');say('salvage',[['PATCHLING','A recipe book. The pages smell of cinnamon.'],['PARCEL','Brindle lost that in the flood. Keep it dry. She will be pleased.']]);if(!s.items.includes('brindles-recipes'))s.items.push('brindles-recipes');}
+      else{move(20,33);if(!d.salvage){d.salvage=true;G.revealActivityReward('brindles-recipes',s.player.x,s.player.y);G.sfx.play('pickup');say('salvage',[['PATCHLING','A recipe book. The pages smell of cinnamon.'],['PARCEL','Brindle lost that in the flood. Walk over the book to collect it, then bring her the good news. Keep it dry.']]);}}
     }else if(at.id==='drainBack')move(18,30);
     else if(locations[at.id]){
       d.parcels.push(at.id);G.sfx.play('pickup');s.deliveryWarmT=3;

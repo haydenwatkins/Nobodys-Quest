@@ -29,7 +29,7 @@ clearWave(0);assert.equal(G.state.delivery.lamps[0],2);assert.ok(reachable(38,12
 assert.ok(!G.world.blocksProjectile(24*16+8,18*16+8));
 assert.ok(reachable(18,30));at(18,30);G.state.formId='nobody';talk();assert.equal(G.state.delivery.salvage,false);
 G.state.formId='rat';const spirit=G.state.town.spirit;talk();assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));
-assert.ok(G.state.items.includes('brindles-recipes'));assert.equal(G.state.town.spirit,spirit+3);
+assert.ok(!G.state.items.includes('brindles-recipes'));assert.equal(G.state.town.spirit,spirit);collect(r,'brindles-recipes');assert.ok(G.state.items.includes('brindles-recipes'));assert.equal(G.state.town.spirit,spirit+3);
 reload();at(20,33);assert.equal(G.deliveryCandidate().id,'drainBack');talk();assert.equal(G.state.player.x,18*16+8);
 assert.equal(G.state.town.spirit,spirit+3);at(38,12);talk();clearWave(1);assert.equal(G.state.delivery.lamps[1],2);assert.ok(reachable(59,18));
 reload();assert.equal(G.state.enemies.length,0);assert.ok(reachable(59,18));

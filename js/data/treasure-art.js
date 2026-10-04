@@ -24,6 +24,7 @@
     "keeper-lantern": { name: "Keeper's Lantern", purpose: "+1 star · a keepsake of the opened bridge", shape: "bridgeLamp" },
     "orchard-ribbon": { name: "Orchard Ribbon", purpose: "+5 town spirit · a keepsake of Parcel's open road", shape: "orchardBow" },
     "sunrise-seal": { name: "Sunrise Seal", purpose: "+8 town spirit · a keepsake of three deliveries", shape: "sunriseSeal" },
+    "brindles-recipes": { name: "Brindle's Recipes", purpose: "+3 town spirit · return to Brindle", shape: "recipeBook" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -39,7 +40,14 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "orchardBow") {
+      if (shape === "recipeBook") {
+        g.poly([[4,2],[24,2],[26,26],[23,31],[5,31],[2,28],[2,6]],"k");
+        g.rect(5,5,18,20,"e");g.rect(4,5,4,20,"g");g.line(6,6,6,22,"f",1);
+        g.rect(9,7,11,14,"a");g.ellipse(14,14,4,4,"b");g.ellipse(14,14,2,2,"j");g.put(13,13,"c");
+        g.line(11,9,17,9,"c",1);g.line(11,19,17,19,"b",1);
+        g.poly([[5,26],[23,26],[22,29],[5,29]],"c");g.line(6,28,21,28,"b",1);
+        g.rect(18,23,3,8,"h");g.line(18,24,20,24,"i",1);
+      } else if (shape === "orchardBow") {
         g.poly([[4,3],[11,4],[14,10],[17,4],[24,3],[25,14],[19,16],[22,29],[17,26],[14,30],[11,26],[6,29],[9,16],[3,14]],"k");
         g.poly([[6,5],[10,6],[12,11],[10,14],[5,12]],"j");g.poly([[18,6],[22,5],[23,12],[18,14],[16,11]],"a");
         g.poly([[11,15],[14,17],[12,25],[8,26]],"j");g.poly([[14,17],[17,15],[20,26],[16,25]],"b");

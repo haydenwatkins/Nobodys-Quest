@@ -29,3 +29,7 @@ This adds an optional transient `offer` to the existing dialogue queue, shared b
 Three final offer cases passed, plus four existing dialogue/portrait checks and ten current-task/request regression cases; some new cases were repeated after adding standard-layout callback coverage. They verify deferral with no save/reward, all four actual NPC acceptances with real saved selection, no repeat acceptance for an already followed task, ready/completed thanks once and ordinary queued dialogue callbacks. Four browser cases passed and twenty-four touch/TV views were inspected in both art settings, covering all four native NPC offers, accept/defer, outside-button tap protection and real save boot. Conversation positions and earned-form fixture state are controlled; this is not a full walking campaign or physical-device test.
 
 Reproduce with `node tools/review-promise-offers.cjs [baseURL] [outputDirectory]` and the existing review-sheet tool. The next source audit returns to unconverted specialist trial gifts and their native return roads, re-entry rules and relic/form consumers.
+
+## Brindle’s recovered book
+
+The recipe promise now follows the saved physical book: Rat entry, collection, return to Brindle, native thanks and later bakery visit. Leaving the isolated pocket before collection routes back to its bank drain and preserves Rat re-entry after save boot. Inside, breadcrumbs reach the actual book tile. Legacy salvage readiness remains. See `GROUND-REWARDS.md` and `tools/review-recipe-promise.cjs` for evidence and fixture limits.

@@ -6,6 +6,7 @@
     if (source === "activity") {
       if (item === "orchard-ribbon" && G.state.opening?.complete) return { name: "Orchard Ribbon", spirit: 5 };
       if (item === "sunrise-seal" && G.state.delivery?.complete) return { name: "Sunrise Seal", spirit: 8 };
+      if (item === "brindles-recipes" && G.state.delivery?.salvage) return { name: "Brindle's Recipes", spirit: 3 };
       return null;
     }
     if (source === "delivery") return item === "keeper-lantern" ? { name: "Keeper's Lantern", stars: 1 } : null;

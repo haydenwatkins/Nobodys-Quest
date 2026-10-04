@@ -9,8 +9,8 @@
       thanks:"A pearl! I’ll set it above the quay. You may keep calling it a trophy. I shall call it a lighthouse with a very small budget. The late boat has something to steer by again.",
       after:"Three boats found us last night. One brought turnips. We must accept the consequences of our heroism."},
     {id:"recipes", npc:"quayBaker", name:"Brindle", title:"The cinnamon pages", x:12, y:12, reward:5,
-      task:"Find Brindle’s recipe book in the Lantern Reach drain. Rat can fit beneath the bank.",
-      ready:()=>!!G.state.delivery.salvage || G.state.items.includes("brindles-recipes"),
+      task:"Enter the Lantern Reach drain as Rat, collect Brindle’s recipe book from the ground, then return to her on Sunrise Quay.",
+      ready:()=>G.state.items.includes("brindles-recipes") || (!!G.state.delivery.salvage && !G.groundRewardFor?.("brindles-recipes")),
       ask:"The flood took my cinnamon recipes. There’s a drain under the Lantern Reach bank. Small paws might manage where my bread paddle couldn’t.",
       thanks:"Cinnamon knots! My mother put a thumbprint in every one. Come back hungry. I have years of catching up to bake.",
       after:"That tray is for the road. The slightly enormous one is for you. I have a generous thumb."},
@@ -46,11 +46,12 @@
     const places={beacon:["sunkenMarsh",22,20],recipes:["lanternReach",18,30],dragon:["sunriseQuay",35,20],welcome:["sunriseQuay",30,13]};
     const steps={beacon:"Find the Mire Queen's pearl",recipes:"Find Brindle's recipes",dragon:"Win a Manyfold crossing",welcome:"Build the Welcome Lodge"};
     const reasons={beacon:"Help the late boat find the harbour.",recipes:"Help Brindle bake her family's cinnamon knots again.",dragon:"Bring Pip and Thimble a real adventure story.",welcome:"Make a warm place for Mara's sister and her friends."};
-    const gift=!selected.ready&&r.id==="beacon"&&G.groundRewardFor?.("trophy-mire-pearl");
-    const [mapId,tileX,tileY]=selected.ready?["sunriseQuay",r.x,r.y]:gift?[gift.mapId,Math.floor(gift.x/G.TILE),Math.floor(gift.y/G.TILE)]:places[r.id];
+    const gift=!selected.ready&&G.groundRewardFor?.(r.id==="beacon"?"trophy-mire-pearl":r.id==="recipes"?"brindles-recipes":"");
+    const recipe=gift&&r.id==="recipes"?G.recipeGiftApproach():null;
+    const [mapId,tileX,tileY]=selected.ready?["sunriseQuay",r.x,r.y]:recipe&&!recipe.inPocket?[recipe.mapId,...recipe.point]:gift?[gift.mapId,Math.floor(gift.x/G.TILE),Math.floor(gift.y/G.TILE)]:places[r.id];
     return {kind:"request",requestId:r.id,name:r.name,ready:selected.ready,title:r.title,
-      short:selected.ready?`Return to ${r.name}`:gift?"Collect the Mire Queen's pearl":steps[r.id],
-      objective:selected.ready?`Return to ${r.name} on Sunrise Quay and share the good news.`:gift?"The Mire Queen is defeated. Collect her pearl from the ground, then return to Pebble on Sunrise Quay.":r.task,
+      short:selected.ready?`Return to ${r.name}`:gift?(recipe?"Collect Brindle's recipe book":"Collect the Mire Queen's pearl"):steps[r.id],
+      objective:selected.ready?`Return to ${r.name} on Sunrise Quay and share the good news.`:recipe?recipe.text:gift?"The Mire Queen is defeated. Collect her pearl from the ground, then return to Pebble on Sunrise Quay.":r.task,
       reason:reasons[r.id],reward:`${r.reward} town spirit`,mapId,tileX,tileY,
       destination:G.maps[mapId].name,color:G.GUIDANCE_COLORS.home,icon:"☀",complete:false,
       label:`A PROMISE TO ${r.name.toUpperCase()}`,progress:{value:selected.ready?1:0,total:2,label:selected.ready?"GOOD NEWS · RETURN TO THE QUAY":"HELP, THEN RETURN"}};
@@ -74,7 +75,12 @@
         if(G.state.mapId===mapId && queen){x=Math.floor(queen.x/G.TILE);y=Math.floor(queen.y/G.TILE);text="The Mire Queen holds the pearl. Break her ward with dark magic, step clear of bubbles, then use her recovery to attack.";}
         else if(G.state.mapId===mapId)return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",spatial:false,destination:r.title,text:"Search the marsh for the Mire Queen’s pearl, then return to Pebble on Sunrise Quay."};
       }
-      if(r.id==="recipes"){mapId="lanternReach";x=18;y=30;text="Follow the bank to the drain, then become Rat to recover Brindle’s recipe book.";}
+      if(r.id==="recipes"){
+        const approach=G.recipeGiftApproach();
+        if(approach?.inPocket){const gift=approach.gift;return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,
+          x:gift.x,y:gift.y,tileX:Math.floor(gift.x/G.TILE),tileY:Math.floor(gift.y/G.TILE),reward:gift,text:approach.text};}
+        mapId="lanternReach";[x,y]=approach?approach.point:[18,30];text=approach?approach.text:"Follow the bank to the drain, then become Rat to recover Brindle’s recipe book.";
+      }
       if(r.id==="dragon"){x=35;y=20;text="Choose a Manyfold crossing at the trail stand. Finish it and bring Pip a story.";}
       if(r.id==="welcome")return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",spatial:false,destination:r.title,text:"Open Home → Sunrise and build the Welcome Lodge in Civic Works (12 spirit). Then visit Mara on the quay."};
     }
@@ -82,7 +88,7 @@
       const route=G.guidanceRouteTarget({mapId});
       return route?{...route,kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",text:`${route.text} ${r.name} is counting on you.`}:null;
     }
-    return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,tileX:x,tileY:y,x:x*G.TILE+8,y:y*G.TILE+8,text};
+    return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,tileX:Math.floor(x),tileY:Math.floor(y),x:x*G.TILE+8,y:y*G.TILE+8,text};
   };
   function candidate(){
     const s=G.state;
