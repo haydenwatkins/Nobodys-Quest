@@ -195,12 +195,21 @@ Four final touch/TV browser cases passed in both art settings. Actual steering f
 
 Reproduce with `node tools/review-prairie-courier.cjs [baseURL] [outputDirectory]`. Shared review now provides native waypoint steering as well as gift collection.
 
+## Marsh river gifts complete (October 4)
+
+The north and south sluices now reveal reed-wrapped river-stone bundles, each worth the original two town spirit. Rat's hatch reveals a worn brass Old Ferry Token carrying the original six spirit. Pending regional receipts record the completed work before collection: wheels stay open, wreck art stays salvaged and each sluice weakens the Queen's ward immediately. Travel/reload preserves the weakened ward, and neither collection nor map entry repairs a broken ward. The existing item IDs also preserve legacy paid completion without another gift. Journey explicitly names the waiting bundles/token.
+
+The ground contract now admits known `regional` receipts only on their authored map, with fixed reward amounts; arbitrary saved amounts, wrong maps and unknown regional items are rejected. Each receipt becomes its existing item ID on collection and pays once. No new save fields or form-mastery ceremonies were added.
+
+Nineteen Marsh/interaction/chest/Parcel/save checks passed, followed by fifteen guardian/courier/recipe integration cases (overlap). Coverage includes native ward weakening, safe collection, Rat and nearby-enemy requirements, no replay while pending, actual portal crossings, saved receipts, knockout, legacy ownership, once-only pickup/spirit and retained art. Four final touch/TV browser cases in both settings exercise native station actions, real save boot and movement collection. Forty-eight views and all new bundle/token atlas poses were inspected. The journal review scrolls to the actual regional card. Controlled positions and earned forms isolate stations; combat and roaming residents are removed for presentation. An earlier fixture let the Queen wander into the scene and crowd the card; ward behavior is covered by the native simulation cases, not by that presentation fixture. No physical-device or full-combat claim is made.
+
+Reproduce with `node tools/review-marsh-gifts.cjs [baseURL] [outputDirectory]`.
+
 ## Remaining regional source inventory
 
 | Region | Accomplishment and immediate world effect | Unconverted award |
 | --- | --- | --- |
 | Grove | Plant Whispering Seed; `grove-home-tree` restores the shelter/central path and recovery | Six spirit |
-| Marsh | Two sluice flags weaken the Queen’s ward; Rat opens the wreck hatch | Two spirit per sluice; Old Ferry Token and six spirit |
 | Ridge | Two watchfire flags light the fires after their guards; recover hearts/mana | Three spirit per fire |
 | Mistwood | Three bell flags; `mistwood-middle-road` opens the central path and recovery | Six spirit |
 | Starfall | Three lens flags enable the instrument | Fallen Star Thread/eight spirit; ownership also feeds Wayfinder and costume consumers |
@@ -210,4 +219,4 @@ Mechanism/road flags already represent visible accomplishments. Any conversion m
 
 ## Next bounded implementation
 
-Ben’s shared font/rendering upgrade is complete; see `TYPOGRAPHY.md`. Return to Marsh’s two sluice currencies and Rat salvage while preserving immediate ward weakening, native safety/form requirements and legacy completion. Then continue the remaining regional inventory above.
+Ben’s shared font/rendering upgrade and Marsh’s three rewards are complete; see `TYPOGRAPHY.md`. Continue with Grove’s six-spirit shelter gift while preserving immediate planting, central shortcut, recovery, seed ownership and legacy completion. Then continue the remaining regional inventory above.

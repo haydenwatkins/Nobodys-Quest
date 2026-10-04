@@ -6,7 +6,9 @@
     {id:"marsh-south-sluice",x:15,y:15,name:"South sluice"},
     {id:"marsh-ferry-token",x:3,y:3,name:"Wreck salvage hatch"}
   ];
-  const has=id=>G.state.items.includes(id);
+  // A pending receipt records the accomplished work; collection only pays
+  // its spirit/keepsake. Legacy owned flags already received their rewards.
+  const has=id=>G.state.items.includes(id)||!!G.groundRewardFor(id);
   const sluices=()=>stops.slice(0,2).filter(r=>has(r.id)).length;
   function weakenVeil(){
     if(G.state.mapId!=="sunkenMarsh")return;
@@ -17,7 +19,10 @@
       e.marshSluices=count;
     }
   }
-  G.marshSurvey=()=>({sluices:sluices(),salvage:has("marsh-ferry-token"),queen:has("trophy-mire-pearl")});
+  G.marshSurvey=()=>({sluices:sluices(),salvage:has("marsh-ferry-token"),
+    salvagePending:!!G.groundRewardFor("marsh-ferry-token"),
+    sluiceGifts:stops.slice(0,2).filter(r=>G.groundRewardFor(r.id)).length,
+    queen:G.state.items.includes("trophy-mire-pearl")});
   function candidate(){
     const s=G.state;
     if(s.mapId!=="sunkenMarsh"||s.expeditionRun||s.knockout||s.bossCutscene||G.ui.dialogueOpen)return null;
@@ -33,9 +38,9 @@
     if(salvage&&G.state.formId!=="rat"){
       G.ui.dialogue("THE WRECK","A brass token glints inside. The hatch is barely wider than a rat. Someone has scratched: ONE LAST CROSSING.",{accent:"#d5be83"});
     }else{
-      G.state.items.push(r.id);G.ensureTown().spirit+=salvage?6:2;weakenVeil();
-      G.ui.dialogue(salvage?"PATCHLING":"THE OLD SLUICE",salvage?"A ferry token, worn smooth by a hundred journeys. Somebody kept it for the way home. I think I will too.":"The wheel gives. Water runs toward the abandoned ferry channels, and a thread of the Queen’s purple veil unravels.",{accent:"#d5be83"});
-      G.ui.banner(salvage?"ONE LAST CROSSING":"THE MARSH BREATHES",salvage?"Old Ferry Token · 6 town spirit":`${sluices()}/2 sluices open · Queen’s ward weakened · 2 town spirit`);
+      G.revealRegionalReward(r.id,r.x,r.y);weakenVeil();
+      G.ui.dialogue(salvage?"PATCHLING":"THE OLD SLUICE",salvage?"A ferry token, worn smooth by a hundred journeys. Somebody kept it for the way home. It rests beside the wreck now, ready to carry along.":"The wheel gives. Water runs toward the abandoned ferry channels, and a thread of the Queen’s purple veil unravels. A little reed-wrapped bundle rests beside the open sluice.",{accent:"#d5be83"});
+      G.ui.banner(salvage?"ONE LAST CROSSING":"THE MARSH BREATHES",salvage?"Old Ferry Token revealed · walk over it for 6 town spirit":`${sluices()}/2 sluices open · Queen’s ward weakened · collect the bundle for 2 town spirit`);
       G.saveGame();
     }
     G.input.clearTaps();return true;

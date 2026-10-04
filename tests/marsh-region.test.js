@@ -1,4 +1,5 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');const runtime=require('../tools/lib/classic-runtime.cjs');
+const collect=require('./helpers/collect-treasure.cjs');
 function at(G,x,y){G.state.player.x=x*16+8;G.state.player.y=y*16+8;}
 function setup(){const r=runtime();r.load('sunkenMarsh');r.drain();return r;}
 test('arrival is outside the court and every regional landmark has a walkable approach',()=>{
@@ -9,14 +10,14 @@ test('arrival is outside the court and every regional landmark has a walkable ap
 test('sluices weaken the veil once, remain open after travel, and never restore a broken ward',()=>{
  const r=setup(),{G}=r;const e=G.state.enemies.find(e=>e.id==='mireQueen');G.state.enemies=[e];const before=G.state.town.spirit;
  at(G,15,3);G.tryOpeningInteraction();assert.equal(e.ward.hp,4);assert.equal(G.marshSurvey().sluices,1);
- G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+2);assert.equal(e.ward.hp,4);
+ G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before);assert.equal(e.ward.hp,4);r.drain();collect(r,'marsh-north-sluice');assert.equal(G.state.town.spirit,before+2);
  at(G,15,15);G.tryOpeningInteraction();assert.equal(e.ward.hp,3);assert.equal(G.marshSurvey().sluices,2);
  r.load('sunkenMarsh');r.drain();const reloaded=G.state.enemies.find(e=>e.id==='mireQueen');assert.equal(reloaded.ward.hp,3);
  reloaded.ward.hp=0;G.events.emit('mapEnter',{map:'sunkenMarsh'});assert.equal(reloaded.ward.hp,0);
 });
 test('wreck salvage requires Rat and is a one-time saved reward; nearby enemies prevent interactions',()=>{
- const {G}=setup();G.state.enemies=[];at(G,3,3);const before=G.state.town.spirit;
- G.tryOpeningInteraction();assert.equal(G.marshSurvey().salvage,false);G.state.formId='rat';G.tryOpeningInteraction();assert.equal(G.marshSurvey().salvage,true);assert.equal(G.state.town.spirit,before+6);
+ const r=setup(),{G}=r;G.state.enemies=[];at(G,3,3);const before=G.state.town.spirit;
+ G.tryOpeningInteraction();assert.equal(G.marshSurvey().salvage,false);G.state.formId='rat';G.tryOpeningInteraction();assert.equal(G.marshSurvey().salvage,true);assert.equal(G.state.town.spirit,before);r.drain();collect(r,'marsh-ferry-token');assert.equal(G.state.town.spirit,before+6);
  G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+6);
  at(G,15,3);G.state.enemies=[G.makeEnemy('slime',G.state.player.x,G.state.player.y)];assert.notEqual(G.openingInteractionCandidate()?.kind,'marsh');
  const ctx=new Proxy({},{get:()=>()=>{}});for(const d of G.openingDrawables(ctx))d.fn();

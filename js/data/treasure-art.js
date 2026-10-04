@@ -26,6 +26,9 @@
     "sunrise-seal": { name: "Sunrise Seal", purpose: "+8 town spirit · a keepsake of three deliveries", shape: "sunriseSeal" },
     "brindles-recipes": { name: "Brindle's Recipes", purpose: "+3 town spirit · return to Brindle", shape: "recipeBook" },
     "sunstep-courier": { name: "Courier Satchel", purpose: "+6 town spirit · a keepsake of your courier circuit", shape: "courierSatchel" },
+    "marsh-north-sluice": { name: "North Waterway Bundle", purpose: "+2 town spirit · the sluice is already open", shape: "reedBundle" },
+    "marsh-south-sluice": { name: "South Waterway Bundle", purpose: "+2 town spirit · the sluice is already open", shape: "reedBundle" },
+    "marsh-ferry-token": { name: "Old Ferry Token", purpose: "+6 town spirit · a keepsake of one last crossing", shape: "ferryToken" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -41,7 +44,24 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "courierSatchel") {
+      if (shape === "reedBundle") {
+        // River stones tucked into soft reeds, tied with the old ferry cord.
+        g.poly([[3,9],[10,11],[12,4],[16,3],[20,10],[25,7],[23,20],[20,29],[7,30],[3,22]],"k");
+        g.poly([[5,12],[10,16],[13,7],[16,6],[20,15],[22,12],[21,23],[18,27],[8,28],[5,22]],"g");
+        g.line(6,15,9,25,"f",2);g.line(13,9,12,25,"f",1);g.line(20,16,18,25,"f",1);
+        g.ellipse(10,19,5,6,"k");g.ellipse(10,18,3,4,"d");g.put(9,16,"c");
+        g.ellipse(18,20,5,6,"k");g.ellipse(18,19,3,4,"e");g.line(17,17,19,17,"d",1);
+        g.line(5,24,22,24,"b",3);g.line(6,23,21,23,"a",1);
+        g.ellipse(14,24,3,3,"k");g.line(12,24,16,24,"a",1);g.line(14,25,16,29,"b",2);
+      } else if (shape === "ferryToken") {
+        // A worn brass ferry fare with a little boat stamped into its face.
+        g.poly([[10,2],[18,2],[24,7],[26,14],[25,23],[19,29],[9,30],[3,25],[1,16],[3,8]],"k");
+        g.ellipse(14,16,11,13,"b");g.ellipse(14,15,9,10,"a");g.ellipse(14,15,7,8,"b");
+        g.line(8,8,16,6,"c",1);g.put(20,9,"c");g.line(6,24,11,28,"a",1);
+        g.poly([[7,17],[21,17],[18,21],[10,21]],"k");g.line(10,18,19,18,"a",1);
+        g.line(14,9,14,17,"k",1);g.poly([[15,9],[20,14],[15,14]],"a");
+        g.line(9,24,19,24,"e",1);g.put(8,23,"d");g.put(21,23,"d");
+      } else if (shape === "courierSatchel") {
         g.poly([[5,12],[5,6],[9,2],[19,2],[23,6],[23,12],[20,12],[20,7],[18,5],[10,5],[8,7],[8,12]],"k");
         g.line(7,10,7,7,"b",2);g.line(8,6,11,4,"a",2);g.line(12,4,18,4,"a",2);g.line(20,6,21,10,"b",2);
         g.poly([[10,7],[21,8],[20,16],[9,15]],"k");g.rect(11,9,8,6,"c");g.line(13,11,17,11,"b",1);

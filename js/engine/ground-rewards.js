@@ -2,7 +2,13 @@
 "use strict";
 (() => {
   const guardianSources = ["ancientTreant", "mireQueen", "eclipseKnight", "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer", "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar", "riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar"];
+  const regionalRewards = {
+    "marsh-north-sluice": { mapId: "sunkenMarsh", name: "North Waterway Bundle", spirit: 2 },
+    "marsh-south-sluice": { mapId: "sunkenMarsh", name: "South Waterway Bundle", spirit: 2 },
+    "marsh-ferry-token": { mapId: "sunkenMarsh", name: "Old Ferry Token", spirit: 6 },
+  };
   function definition(item, source = "chest") {
+    if (source === "regional") return regionalRewards[item] || null;
     if (source === "activity") {
       if (item === "orchard-ribbon" && G.state.opening?.complete) return { name: "Orchard Ribbon", spirit: 5 };
       if (item === "sunrise-seal" && G.state.delivery?.complete) return { name: "Sunrise Seal", spirit: 8 };
@@ -30,7 +36,8 @@
   G.normalizeGroundRewards = saved => {
     const seen = new Set(), owned = (G.state && G.state.items) || [];
     return (Array.isArray(saved) ? saved : []).flatMap(raw => {
-      if (!raw || !["chest", "guardian", "delivery", "activity"].includes(raw.source) || typeof raw.item !== "string" || !definition(raw.item, raw.source) ||
+      if (!raw || !["chest", "guardian", "delivery", "activity", "regional"].includes(raw.source) || typeof raw.item !== "string" || !definition(raw.item, raw.source) ||
+          (raw.source === "regional" && definition(raw.item, raw.source).mapId !== raw.mapId) ||
           owned.includes(raw.item) || seen.has(raw.item) || !G.maps[raw.mapId] ||
           !Number.isFinite(raw.x) || !Number.isFinite(raw.y)) return [];
       seen.add(raw.item);
@@ -91,6 +98,15 @@
     const existing = G.groundRewardFor(item);
     if (existing) return existing;
     const reward = Object.assign({ source: "activity", item, mapId: G.state.mapId,
+      revealUntil: (G.state.time || 0) + .45 }, revealPoint(x, y));
+    rewards().push(reward); G.saveGame(); return reward;
+  };
+  G.revealRegionalReward = (item, x, y) => {
+    const prize = definition(item, "regional");
+    if (!prize || prize.mapId !== G.state.mapId || G.state.items.includes(item)) return null;
+    const existing = G.groundRewardFor(item);
+    if (existing) return existing;
+    const reward = Object.assign({ source: "regional", item, mapId: G.state.mapId,
       revealUntil: (G.state.time || 0) + .45 }, revealPoint(x, y));
     rewards().push(reward); G.saveGame(); return reward;
   };
