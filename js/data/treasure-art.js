@@ -30,6 +30,11 @@
     "marsh-south-sluice": { name: "South Waterway Bundle", purpose: "+2 town spirit · the sluice is already open", shape: "reedBundle" },
     "marsh-ferry-token": { name: "Old Ferry Token", purpose: "+6 town spirit · a keepsake of one last crossing", shape: "ferryToken" },
     "grove-home-tree": { name: "Shelter Keepsake", purpose: "+6 town spirit · shelter and shortcut restored", shape: "homeSprig" },
+    "ridge-coal-watch": { name: "Coal Watch Lantern", purpose: "+3 town spirit · the watchfire is already lit", shape: "watchLantern" },
+    "ridge-ash-watch": { name: "Ash Watch Lantern", purpose: "+3 town spirit · the watchfire is already lit", shape: "watchLantern" },
+    "mistwood-middle-road": { name: "Trail Bell Keepsake", purpose: "+6 town spirit · the middle road is open", shape: "trailBell" },
+    "starfall-thread": { name: "Fallen Star Thread", purpose: "+8 town spirit · unlocks the Starstrider look", shape: "starThread" },
+    "glasswater-meridian": { name: "Meridian Keepsake", purpose: "+6 town spirit · the meridian road is open", shape: "sunDialToken" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -45,7 +50,35 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "homeSprig") {
+      if (shape === "watchLantern") {
+        g.ellipse(14,6,6,5,"k");g.ellipse(14,6,4,3,"b");g.ellipse(14,6,2,2,"k");
+        g.poly([[7,10],[21,10],[24,15],[23,29],[5,29],[4,15]],"k");
+        g.poly([[8,12],[20,12],[22,16],[6,16]],"b");g.line(8,12,19,12,"a",1);
+        g.rect(7,17,14,10,"e");g.rect(9,18,10,8,"a");
+        g.poly([[14,18],[17,23],[15,26],[11,25],[11,22]],"j");g.line(14,22,14,25,"c",2);
+        g.line(6,17,6,27,"b",2);g.line(21,17,21,27,"b",2);g.line(7,29,21,29,"b",2);
+      } else if (shape === "trailBell") {
+        g.line(14,5,14,11,"b",3);g.ellipse(14,5,4,3,"k");g.ellipse(14,5,2,1,"a");
+        g.poly([[9,10],[19,10],[22,21],[25,25],[24,28],[4,28],[3,25],[6,21]],"k");
+        g.poly([[10,12],[18,12],[20,22],[22,25],[6,25],[8,22]],"b");
+        g.line(11,13,9,23,"a",2);g.line(7,25,21,25,"a",1);g.ellipse(14,29,3,2,"a");
+        g.poly([[8,13],[3,11],[2,5],[6,6],[10,10]],"k");g.poly([[7,11],[4,9],[4,7],[7,9]],"f");
+        g.poly([[18,13],[25,10],[26,5],[21,6],[17,10]],"k");g.poly([[20,11],[23,9],[24,7],[21,9]],"g");
+        g.line(14,15,14,22,"c",1);g.put(13,18,"a");
+      } else if (shape === "starThread") {
+        g.ellipse(14,5,11,4,"k");g.ellipse(14,4,9,2,"a");g.rect(7,7,14,20,"k");
+        g.rect(8,8,12,16,"e");g.line(9,10,19,10,"d",2);g.line(9,14,19,14,"h",2);g.line(9,18,19,18,"a",2);g.line(9,22,18,22,"d",2);
+        g.line(9,9,9,22,"c",1);g.ellipse(14,27,11,4,"k");g.ellipse(14,26,9,2,"b");g.line(7,27,19,27,"a",1);
+        g.line(20,13,24,16,"d",1);g.line(24,16,23,23,"d",1);g.line(23,23,20,25,"d",1);
+        g.poly([[21,23],[22,26],[26,27],[23,29],[22,31],[20,28],[18,27]],"k");g.put(22,27,"c");g.put(22,28,"a");
+      } else if (shape === "sunDialToken") {
+        g.poly([[9,2],[19,2],[26,9],[26,22],[19,29],[9,29],[2,22],[2,9]],"k");
+        g.ellipse(14,15,11,12,"b");g.ellipse(14,14,9,9,"a");g.ellipse(14,14,7,7,"e");
+        for(const [x,y]of [[14,4],[24,14],[14,25],[4,14]])g.put(x,y,"c");
+        g.line(8,21,20,9,"k",2);g.line(9,20,19,10,"d",1);
+        g.poly([[14,7],[18,14],[14,21],[10,14]],"k");g.poly([[14,9],[16,14],[14,18],[12,14]],"d");g.line(14,10,14,15,"c",1);
+        g.line(7,25,11,27,"a",1);g.put(20,24,"c");
+      } else if (shape === "homeSprig") {
         // A roof carved into warm wood, with the shelter's first small leaves.
         g.poly([[4,14],[14,7],[24,14],[24,29],[4,29]],"k");g.rect(7,16,14,11,"b");
         g.poly([[6,14],[14,9],[22,14]],"a");g.line(8,15,20,15,"k",1);

@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
 function at(G,x,y){G.state.player.x=x*16+8;G.state.player.y=y*16+8;}
@@ -17,7 +18,7 @@ test('watchfire awards recovery only after both guards die and cannot pay twice'
  G.state.player.damageTaken=2;G.state.player.mana=0;G.state.enemies[0].dead=true;G.updateOpening(.05);
  assert.equal(G.ridgeSurvey().lit,0);assert.equal(G.ridgeSurvey().active.remaining,1);assert.equal(G.state.player.damageTaken,2);
  G.state.enemies[1].dead=true;G.updateOpening(.05);assert.equal(G.ridgeSurvey().lit,1);assert.equal(G.ridgeSurvey().active,null);
- assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,G.playerMaxMana());assert.equal(G.state.town.spirit,spirit+3);
+ assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,G.playerMaxMana());assert.equal(G.state.town.spirit,spirit);r.drain();collect(r,'ridge-coal-watch');assert.equal(G.state.town.spirit,spirit+3);
  G.updateOpening(.05);G.tryOpeningInteraction();assert.equal(G.state.town.spirit,spirit+3);
  r.load('emberRidge');r.drain();assert.equal(G.ridgeSurvey().lit,1);G.state.enemies=[];at(G,10,4);assert.notEqual(G.openingInteractionCandidate()?.kind,'ridge');
 });

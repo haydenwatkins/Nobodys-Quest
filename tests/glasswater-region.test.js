@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
 function setup(){const r=runtime();r.load('glasswaterDesert');r.drain();return r;}
 function dial(G){Object.assign(G.state.player,{x:376,y:104});}
@@ -29,7 +30,7 @@ test('Glasswater loop connects the prism, sundial, camp, exits and legend sites 
 test('alignment requires and preserves the prism, opens a saved shortcut, pays once, and retains the gate requirement',()=>{
  const r=setup(),{G}=r;G.state.enemies=[];dial(G);const before=G.ensureTown().spirit,gate=G.state.grid[28][23],reason=G.world.portalBlockReason(gate);assert.ok(reason);assert.equal(gate.mark,'light');
  G.tryOpeningInteraction();r.drain();assert.equal(G.glasswaterSurvey().aligned,false);G.state.items.push('glasswater-prism');G.tryOpeningInteraction();r.drain();
- assert.equal(G.glasswaterSurvey().aligned,true);assert.equal(G.glasswaterSurvey().prism,true);assert.equal(G.ensureTown().spirit,before+6);assert.equal(G.world.solid(376,312),false);assert.deepEqual(G.world.portalBlockReason(gate),reason);
+ assert.equal(G.glasswaterSurvey().aligned,true);assert.equal(G.glasswaterSurvey().prism,true);assert.equal(G.ensureTown().spirit,before);assert.equal(G.world.solid(376,312),false);collect(r,'glasswater-meridian');assert.equal(G.ensureTown().spirit,before+6);assert.deepEqual(G.world.portalBlockReason(gate),reason);
  G.tryOpeningInteraction();assert.equal(G.ensureTown().spirit,before+6);r.load('overworld');r.drain();r.load('glasswaterDesert');r.drain();assert.equal(G.world.solid(376,328),false);assert.equal(G.maps.glasswaterDesert.tiles[19][23],'r');assert.equal(G.state.grid[28][23].mark,'light');
 });
 test('combat prevents using the sundial',()=>{

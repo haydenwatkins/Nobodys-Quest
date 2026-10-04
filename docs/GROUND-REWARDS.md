@@ -215,17 +215,25 @@ Four touch/TV browser cases passed in both art settings. Forty seed/denial/plant
 
 Reproduce with `node tools/review-grove-gift.cjs [baseURL] [outputDirectory]`.
 
-## Remaining regional source inventory
+## Ridge, Mistwood, Starfall and Glasswater complete (October 4)
 
-| Region | Accomplishment and immediate world effect | Unconverted award |
+Five regional awards now use the shared saved-ground contract. Their accomplished world effects happen immediately, while inventory and spirit wait for actual collection. Legacy owners stay completed and cannot receive another gift or recovery.
+
+| Native accomplishment | Immediate effect | Collected gift |
 | --- | --- | --- |
-| Ridge | Two watchfire flags light the fires after their guards; recover hearts/mana | Three spirit per fire |
-| Mistwood | Three bell flags; `mistwood-middle-road` opens the central path and recovery | Six spirit |
-| Starfall | Three lens flags enable the instrument | Fallen Star Thread/eight spirit; ownership also feeds Wayfinder and costume consumers |
-| Glasswater | Fit the Prism; `glasswater-meridian` opens the shelf road; Lantern Mark still gates Titan | Six spirit |
+| Each Ridge watchfire's two guards defeated | Fire lit; hearts/mana restored; no repeat guards while pending | Coal/Ash Watch Lantern, three spirit each |
+| All three Mistwood bells rung, in any order | Middle shortcut open; hearts/mana restored | Trail Bell Keepsake at the actual last bell, six spirit |
+| All three Starfall lenses restored, then the instrument used | Instrument restored; hearts/mana restored | Fallen Star Thread, eight spirit; Starstrider appearance unlocks on collection |
+| Collected Glasswater Prism fitted to the sundial | Six shelf-road cells open; no added recovery; Prism retained | Meridian Keepsake, six spirit |
 
-Mechanism/road flags already represent visible accomplishments. Any conversion must preserve their effects independently of currency collection, trace their consumers and retain legacy completion. NPC thanks, regional favors, town rewards, challenge return rewards and relic/echo systems remain unfinished.
+Journey notes and near-gift cues name the waiting object and exact benefit. The authored lantern, fern bell, starlight spool and sundial token have four inspected poses in both art settings. Pending receipts restore the lit mechanisms/roads on map entry; they do not claim to be collected items. Glasswater's Titan gate still requires the Lantern Mark. Starfall's owned thread remains legacy Wayfinder discovery evidence; ordinary visit discovery is unchanged, and collection never equips a costume. Bell/lens/Prism prerequisites and map identity are checked when restoring receipts; saved arbitrary payout amounts are ignored.
 
-## Next bounded implementation
+Ridge's existing native combat rewards remain separate: the founded town still gives one spirit for each ward break, and its existing deed counter is unchanged. The six spirit in the two lanterns does not replace those bonuses. Town/currency presentation remains on the source-audit queue.
 
-Ben’s shared font/rendering upgrade, Marsh’s three rewards and Grove’s shelter gift are complete; see `TYPOGRAPHY.md`. Continue with Ridge’s two watchfire spirit awards while preserving their native guard encounters, immediate fire/recovery effects and legacy completion. Then continue Mistwood, Starfall and Glasswater above.
+Validation: 23 existing region/art checks and six new reward-contract checks passed. The latter use native ward/damage/kill events, authored portal exits and returns, saved pending receipts, actual collision collection, duplicate prevention, fixed payouts, legacy owners and Starfall consumers. Four browser cases per region passed (touch landscape and TV bridge, HD and BASE), with real save/reload, collection input, Journey cards and Mistwood/Glasswater shortcut crossings. There are 116 final controlled views: Ridge 36, Mistwood 24, Starfall 24 and Glasswater 32. The combat fixture isolates the spawned guards at one ward/heart; the Shade is staged on open floor because the ridge wall correctly blocks ranged shots beneath it. These checks cover the reward flow, not full encounter balance or a campaign walkthrough. Browser fixtures use earned prerequisites and clear other combat/NPCs for presentation. Physical-device behavior remains unverified.
+
+Nineteen shared ground-treasure, Journey-note, costume, Wayfinder, Marsh and Grove integration checks also passed after the regional browser review. No full-suite claim is made.
+
+## Remaining source inventory and next implementation
+
+Shattercoast's four-teacher cairn still directly grants its Chronicle, one star and eight spirit. Convert that next while retaining the four collected-keepsake requirement, immediate lit cairn, later reading, native trial/northern roads, saved collection and legacy completion. NPC thanks, regional favors, town rewards, challenge return rewards and relic/echo systems remain unfinished. Ben's shared font/rendering upgrade is covered in `TYPOGRAPHY.md`.

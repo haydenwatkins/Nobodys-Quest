@@ -7,13 +7,14 @@
   ];
   let active=null;
   const has=id=>G.state.items.includes(id);
-  G.ridgeSurvey=()=>({lit:fires.filter(f=>has(f.id)).length,knight:has("trophy-eclipse-sigil"),
+  const complete=id=>has(id)||!!G.groundRewardFor(id);
+  G.ridgeSurvey=()=>({lit:fires.filter(f=>complete(f.id)).length,pending:fires.filter(f=>G.groundRewardFor(f.id)).length,knight:has("trophy-eclipse-sigil"),
     active:active?{name:active.fire.name,remaining:active.guards.filter(e=>!e.dead).length}:null});
   function candidate(){
     const s=G.state;
     if(s.mapId!=="emberRidge"||active||s.expeditionRun||s.knockout||s.bossCutscene||G.ui.dialogueOpen)return null;
     if(s.enemies.some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<75))return null;
-    const f=fires.find(f=>!has(f.id)&&Math.hypot(f.x*16+8-s.player.x,f.y*16+8-s.player.y)<30);
+    const f=fires.find(f=>!complete(f.id)&&Math.hypot(f.x*16+8-s.player.x,f.y*16+8-s.player.y)<30);
     return f?{...f,kind:"ridge",label:`Awaken ${f.name} guards`,x:f.x*16+8,y:f.y*16+8}:null;
   }
   const oldCandidate=G.openingInteractionCandidate,oldInteract=G.tryOpeningInteraction;
@@ -33,17 +34,17 @@
     if(!active||G.state.mapId!=="emberRidge"||G.state.knockout)return;
     if(active.guards.some(e=>!e.dead))return;
     const fire=active.fire;active=null;
-    if(has(fire.id))return;
-    G.state.items.push(fire.id);G.ensureTown().spirit+=3;
+    if(complete(fire.id))return;
+    G.revealRegionalReward(fire.id,fire.x*16+8,fire.y*16+8);
     G.healPlayer(G.playerMaxHearts(),"watchfire");G.state.player.mana=G.playerMaxMana();
-    G.ui.banner("A LIGHT FOR THE ROAD",`${G.ridgeSurvey().lit}/2 watchfires lit · hearts and mana restored · 3 town spirit`);
+    G.ui.banner("A LIGHT FOR THE ROAD",`${G.ridgeSurvey().lit}/2 watchfires lit · hearts and mana restored · collect its lantern for 3 town spirit`);
     G.saveGame();
   };
   G.events.on("mapEnter",()=>{active=null;});
   const oldDraw=G.openingDrawables;
   G.openingDrawables=c=>{
     const list=oldDraw(c);if(G.state.mapId!=="emberRidge")return list;
-    for(const f of fires){const x=f.x*16+8,y=f.y*16+8,lit=has(f.id),fighting=active?.fire.id===f.id;
+    for(const f of fires){const x=f.x*16+8,y=f.y*16+8,lit=complete(f.id),fighting=active?.fire.id===f.id;
       list.push({y:y-4,fn:()=>{
         if(G.drawRidgeFire&&G.drawRidgeFire(c,f,lit,fighting))return;
         c.save();c.fillStyle="#292733";c.fillRect(x-14,y-5,28,12);

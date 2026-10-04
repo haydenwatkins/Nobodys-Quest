@@ -7,11 +7,18 @@
     "marsh-south-sluice": { mapId: "sunkenMarsh", name: "South Waterway Bundle", spirit: 2 },
     "marsh-ferry-token": { mapId: "sunkenMarsh", name: "Old Ferry Token", spirit: 6 },
     "grove-home-tree": { mapId: "whispering-grove", name: "Shelter Keepsake", spirit: 6, requires: "whispering-seed" },
+    "ridge-coal-watch": { mapId: "emberRidge", name: "Coal Watch Lantern", spirit: 3 },
+    "ridge-ash-watch": { mapId: "emberRidge", name: "Ash Watch Lantern", spirit: 3 },
+    "mistwood-middle-road": { mapId: "mistwood", name: "Trail Bell Keepsake", spirit: 6,
+      requires: ["mistwood-bell-west", "mistwood-bell-east", "mistwood-bell-south"] },
+    "starfall-thread": { mapId: "starfallRuins", name: "Fallen Star Thread", spirit: 8,
+      requires: ["starfall-dawn", "starfall-dusk", "starfall-midnight"] },
+    "glasswater-meridian": { mapId: "glasswaterDesert", name: "Meridian Keepsake", spirit: 6, requires: "glasswater-prism" },
   };
   function definition(item, source = "chest") {
     if (source === "regional") {
       const prize = regionalRewards[item];
-      return prize && (!prize.requires || G.state.items.includes(prize.requires)) ? prize : null;
+      return prize && [].concat(prize.requires || []).every(id => G.state.items.includes(id)) ? prize : null;
     }
     if (source === "activity") {
       if (item === "orchard-ribbon" && G.state.opening?.complete) return { name: "Orchard Ribbon", spirit: 5 };

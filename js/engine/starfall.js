@@ -8,13 +8,15 @@
   ];
   const instrument={id:"starfall-thread",name:"Star instrument",x:15,y:15,color:"#73eff7"};
   const has=id=>G.state.items.includes(id);
+  const restored=id=>has(id)||(id===instrument.id&&!!G.groundRewardFor(id));
   G.starfallSurvey=()=>({aligned:lenses.filter(l=>has(l.id)).length,thread:has(instrument.id),
+    instrument:restored(instrument.id),pending:!!G.groundRewardFor(instrument.id),
     remaining:lenses.filter(l=>!has(l.id)).map(l=>l.name)});
   function candidate(){
     const s=G.state;
     if(s.mapId!=="starfallRuins"||s.expeditionRun||s.knockout||s.bossCutscene||G.ui.dialogueOpen)return null;
     if(s.enemies.some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<75))return null;
-    const l=[...lenses,instrument].find(l=>!has(l.id)&&Math.hypot(l.x*16+8-s.player.x,l.y*16+8-s.player.y)<30);
+    const l=[...lenses,instrument].find(l=>!restored(l.id)&&Math.hypot(l.x*16+8-s.player.x,l.y*16+8-s.player.y)<30);
     return l?{...l,kind:"starfall",label:l.name,x:l.x*16+8,y:l.y*16+8}:null;
   }
   const oldCandidate=G.openingInteractionCandidate,oldInteract=G.tryOpeningInteraction;
@@ -25,13 +27,13 @@
     if(isInstrument&&G.starfallSurvey().aligned<3){
       G.ui.dialogue("THE STAR INSTRUMENT",`The spindle waits for ${G.starfallSurvey().remaining.join(", ")}. Restore the lenses in the side galleries; their light will lead back here.`,{accent:instrument.color});
     }else{
-      G.state.items.push(r.id);
       if(isInstrument){
+        G.revealRegionalReward(r.id,r.x,r.y);
         G.healPlayer(G.playerMaxHearts(),"starfall");G.state.player.mana=G.playerMaxMana();
-        G.ensureTown().spirit+=8;G.events.emit("pickup",{item:r.id});G.checkUnlocks();
-        G.ui.dialogue("PATCHLING","A thread of starlight winds around my hand. Not a prophecy. Just a road somebody left for whoever needed it.",{accent:instrument.color});
-        G.ui.banner("A ROAD THROUGH THE DARK","Fallen Star Thread · 8 town spirit · hearts and mana restored");
+        G.ui.dialogue("PATCHLING","A thread of starlight winds onto a little spindle. Not a prophecy. Just a road somebody left for whoever needed it. It waits beside the instrument, ready to carry home.",{accent:instrument.color});
+        G.ui.banner("A ROAD THROUGH THE DARK","Hearts and mana restored · collect the Fallen Star Thread for 8 town spirit");
       }else{
+        G.state.items.push(r.id);
         G.ui.dialogue(r.name.toUpperCase(),r.story,{accent:r.color});
         G.ui.toast(`${G.starfallSurvey().aligned}/3 lenses restored.`,3);
       }
@@ -43,7 +45,7 @@
   G.openingDrawables=c=>{
     const list=oldDraw(c);if(G.state.mapId!=="starfallRuins")return list;
     for(const l of [...lenses,instrument])list.push({y:l.y*16+4,fn:()=>{
-      const x=l.x*16+8,y=l.y*16+8,done=has(l.id),center=l===instrument;
+      const x=l.x*16+8,y=l.y*16+8,done=restored(l.id),center=l===instrument;
       if(G.drawStarfallMechanism&&G.drawStarfallMechanism(c,l,done,center,lenses))return;
       c.save();c.fillStyle="#292746";c.fillRect(x-13,y-4,26,12);c.fillStyle="#8389b3";c.fillRect(x-10,y+4,20,3);
       if(center){

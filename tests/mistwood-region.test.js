@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
 function setup(){const r=runtime();r.load('mistwood');r.drain();return r;}
 const bells=[[6,5],[23,5],[7,13]];
@@ -12,7 +13,7 @@ test('bells persist across travel, open the shortcut and pay the recovery reward
  const r=setup(),{G}=r;G.state.enemies=[];const spirit=G.ensureTown().spirit;visit(G,bells[0]);G.tryOpeningInteraction();assert.equal(G.mistwoodSurvey().bells,1);
  r.load('overworld');r.drain();r.load('mistwood');r.drain();G.state.enemies=[];assert.equal(G.mistwoodSurvey().bells,1);
  G.state.player.damageTaken=2;G.state.player.mana=0;for(const b of bells.slice(1)){visit(G,b);G.tryOpeningInteraction();r.drain();}
- assert.equal(G.mistwoodSurvey().open,true);assert.equal(G.ensureTown().spirit,spirit+6);assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,G.playerMaxMana());
+ assert.equal(G.mistwoodSurvey().open,true);assert.equal(G.ensureTown().spirit,spirit);collect(r,'mistwood-middle-road');assert.equal(G.ensureTown().spirit,spirit+6);assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,G.playerMaxMana());
  G.tryOpeningInteraction();assert.equal(G.ensureTown().spirit,spirit+6);r.load('mistwood');r.drain();assert.equal(G.world.solid(232,152),false);assert.equal(G.maps.mistwood.tiles[9][14],'t');
 });
 test('nearby combat blocks ringing a trail bell',()=>{

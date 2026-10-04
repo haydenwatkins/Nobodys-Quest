@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
 function capture(G){const draws=[],stack=[],ctx=new Proxy({globalAlpha:1,measureText:t=>({width:String(t).length*5}),save(){stack.push(this.globalAlpha);},restore(){this.globalAlpha=stack.pop();}},{get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)});G.drawSprite=(c,s,f,x,y)=>draws.push({s,f,x,y,alpha:c.globalAlpha});return {ctx,draws};}
 test('Mistwood bells render real restored states while the shortcut and spirit reward remain one-time native progression',()=>{
@@ -5,7 +6,7 @@ test('Mistwood bells render real restored states while the shortcut and spirit r
  const bells=[['fernBell',6,5],['mothBell',23,5],['rootBell',7,13]];
  for(const hd of [true,false]){G.hdPilot=hd;draws.length=0;for(const d of G.openingDrawables(ctx))d.fn();for(const [id]of bells)assert.ok(draws.some(d=>d.s===S[id]&&d.f===0));}
  for(const [id,x,y]of bells){Object.assign(G.state.player,{x:x*16+8,y:y*16+8});assert.equal(G.tryOpeningInteraction(),true);r.drain();draws.length=0;const items=JSON.stringify(G.state.items);for(const d of G.openingDrawables(ctx))d.fn();assert.ok(draws.some(d=>d.s===S[id]&&d.f===1));assert.equal(JSON.stringify(G.state.items),items);}
- assert.equal(G.mistwoodSurvey().open,true);assert.equal(G.ensureTown().spirit,spirit+6);assert.ok(!G.world.solid(232,152));assert.ok(!G.world.solid(232,168));G.tryOpeningInteraction();assert.equal(G.ensureTown().spirit,spirit+6);r.load('mistwood');r.drain();assert.equal(G.mistwoodSurvey().bells,3);assert.equal(G.maps.mistwood.tiles[9][14],'t');
+ assert.equal(G.mistwoodSurvey().open,true);assert.equal(G.ensureTown().spirit,spirit);collect(r,'mistwood-middle-road');assert.equal(G.ensureTown().spirit,spirit+6);assert.ok(!G.world.solid(232,152));assert.ok(!G.world.solid(232,168));G.tryOpeningInteraction();assert.equal(G.ensureTown().spirit,spirit+6);r.load('mistwood');r.drain();assert.equal(G.mistwoodSurvey().bells,3);assert.equal(G.maps.mistwood.tiles[9][14],'t');
 });
 test('authored woodland canopies yield around travellers and NPCs without touching collision, travel, pantry or post state',()=>{
  const r=runtime(),{G}=r;r.load('mistwood');r.drain();const {ctx,draws}=capture(G),S=G.mistwoodScenery,grid=JSON.stringify(G.state.grid),items=JSON.stringify(G.state.items);G.reducedMotion=true;

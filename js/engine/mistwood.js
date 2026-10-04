@@ -4,8 +4,9 @@
   const map="mistwood",reward="mistwood-middle-road";
   const bells=[{id:"mistwood-bell-west",name:"Fern Bell",x:6,y:5},{id:"mistwood-bell-east",name:"Moth Bell",x:23,y:5},{id:"mistwood-bell-south",name:"Root Bell",x:7,y:13}];
   const has=id=>G.state.items.includes(id);
-  G.mistwoodSurvey=()=>({bells:bells.filter(b=>has(b.id)).length,open:has(reward)});
-  function restore(){if(G.state.mapId===map&&has(reward))for(const y of [9,10])G.state.grid[y][14]={tile:"path"};}
+  const open=()=>has(reward)||!!G.groundRewardFor(reward);
+  G.mistwoodSurvey=()=>({bells:bells.filter(b=>has(b.id)).length,open:open(),pending:!!G.groundRewardFor(reward)});
+  function restore(){if(G.state.mapId===map&&open())for(const y of [9,10])G.state.grid[y][14]={tile:"path"};}
   G.events.on("mapEnter",restore);
   function candidate(){
     const s=G.state;
@@ -20,10 +21,10 @@
     const choice=candidate();if(!choice)return oldInteract();
     G.state.items.push(choice.bell.id);G.sfx.play("pickup");
     G.spawnFx({kind:"ring",x:choice.x,y:choice.y-14,color:"#ffcd75",radius:24,dur:.6});
-    if(G.mistwoodSurvey().bells===3&&!has(reward)){
-      G.state.items.push(reward);restore();G.ensureTown().spirit+=6;G.healPlayer(G.playerMaxHearts(),"mistwood");G.state.player.mana=G.playerMaxMana();
+    if(G.mistwoodSurvey().bells===3&&!open()){
+      G.revealRegionalReward(reward,choice.x,choice.y);restore();G.healPlayer(G.playerMaxHearts(),"mistwood");G.state.player.mana=G.playerMaxMana();
       G.ui.dialogue("THE MIDDLE ROAD","Three notes drift between the trees. Roots loosen across the middle of the wood, leaving a road wide enough for someone coming home.",{accent:"#a7f070"});
-      G.ui.banner("THE WOOD REMEMBERS","Central shortcut opened · hearts and mana restored · 6 town spirit");
+      G.ui.banner("THE WOOD REMEMBERS","Shortcut opened · hearts and mana restored · collect the bell keepsake for 6 town spirit");
     }else G.ui.toast(`${choice.bell.name} answers · ${G.mistwoodSurvey().bells}/3 trail bells`,3);
     G.saveGame();G.input.clearTaps();return true;
   };

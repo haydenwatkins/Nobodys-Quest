@@ -1,3 +1,4 @@
+const collect=require('./helpers/collect-treasure.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict');const runtime=require('../tools/lib/classic-runtime.cjs');
 function at(G,x,y){G.state.player.x=x*16+8;G.state.player.y=y*16+8;}
 function setup(){const r=runtime();r.load('starfallRuins');r.drain();return r;}
@@ -12,7 +13,7 @@ test('lenses persist in any order and the instrument awards the thread once',()=
  for(const [x,y]of [[24,14],[5,5],[24,5]]){at(G,x,y);G.tryOpeningInteraction();}
  assert.equal(G.starfallSurvey().aligned,3);r.load('starfallRuins');r.drain();assert.equal(G.starfallSurvey().aligned,3);G.state.enemies=[];
  at(G,15,15);let picked=0;G.events.on('pickup',e=>{if(e.item==='starfall-thread')picked++;});G.state.player.damageTaken=2;G.state.player.mana=0;G.tryOpeningInteraction();
- assert.equal(G.starfallSurvey().thread,true);assert.equal(G.state.town.spirit,before+8);assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,G.playerMaxMana());assert.equal(picked,1);
+ assert.equal(G.starfallSurvey().thread,false);assert.equal(G.starfallSurvey().pending,true);assert.equal(G.state.town.spirit,before);assert.equal(picked,0);r.drain();collect(r,'starfall-thread');assert.equal(G.starfallSurvey().thread,true);assert.equal(G.state.town.spirit,before+8);assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,G.playerMaxMana());assert.equal(picked,1);
  G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+8);assert.equal(picked,1);
 });
 test('legacy thread owners keep their reward and nearby enemies prevent lens interaction',()=>{
