@@ -102,9 +102,9 @@
       }
     }else if(at.id==='home'){
       o.complete=true;
-      if(!G.state.items.includes('orchard-ribbon')){G.state.items.push('orchard-ribbon');if(G.state.town)G.state.town.spirit=(G.state.town.spirit||0)+5;}
+      const gift=G.revealActivityReward('orchard-ribbon',at.x,at.y);
       say('home',[['PARCEL','Bread, letters, a birthday present. None of it looked important until it stopped arriving.'],['PEBBLE','Road open. Shall we take the help-wanted notice down?'],['PATCHLING','Leave it. There are more roads on my map. We could use more hands.']]);
-      G.ui.banner('THE FIRST PROMISE KEPT','Orchard Ribbon · 5 town spirit · the wider world awaits');G.saveGame();
+      G.ui.banner('THE FIRST PROMISE KEPT',gift?'Orchard Ribbon waits nearby · walk over it for 5 town spirit':'The road is open · the wider world awaits');G.saveGame();
     }
     G.input.clearTaps();return true;
   };

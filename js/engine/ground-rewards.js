@@ -3,6 +3,11 @@
 (() => {
   const guardianSources = ["ancientTreant", "mireQueen", "eclipseKnight", "skySovereign", "oldMason", "silkMatriarch", "bellTitan", "lanternKeeper", "lastWorldbearer", "admiralTortoise", "paperRonin", "professorPerihelion", "grandmotherBriar", "riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool", "godAvatar"];
   function definition(item, source = "chest") {
+    if (source === "activity") {
+      if (item === "orchard-ribbon" && G.state.opening?.complete) return { name: "Orchard Ribbon", spirit: 5 };
+      if (item === "sunrise-seal" && G.state.delivery?.complete) return { name: "Sunrise Seal", spirit: 8 };
+      return null;
+    }
     if (source === "delivery") return item === "keeper-lantern" ? { name: "Keeper's Lantern", stars: 1 } : null;
     if (source === "guardian") {
       // Proven sources; other trophy producers remain on the audit queue.
@@ -21,7 +26,7 @@
   G.normalizeGroundRewards = saved => {
     const seen = new Set(), owned = (G.state && G.state.items) || [];
     return (Array.isArray(saved) ? saved : []).flatMap(raw => {
-      if (!raw || !["chest", "guardian", "delivery"].includes(raw.source) || typeof raw.item !== "string" || !definition(raw.item, raw.source) ||
+      if (!raw || !["chest", "guardian", "delivery", "activity"].includes(raw.source) || typeof raw.item !== "string" || !definition(raw.item, raw.source) ||
           owned.includes(raw.item) || seen.has(raw.item) || !G.maps[raw.mapId] ||
           !Number.isFinite(raw.x) || !Number.isFinite(raw.y)) return [];
       seen.add(raw.item);
@@ -77,6 +82,14 @@
       revealUntil: (G.state.time || 0) + .45 }, revealPoint(enemy.x, enemy.y));
     rewards().push(reward); G.saveGame(); return reward;
   };
+  G.revealActivityReward = (item, x, y) => {
+    if (!definition(item, "activity") || G.state.items.includes(item)) return null;
+    const existing = G.groundRewardFor(item);
+    if (existing) return existing;
+    const reward = Object.assign({ source: "activity", item, mapId: G.state.mapId,
+      revealUntil: (G.state.time || 0) + .45 }, revealPoint(x, y));
+    rewards().push(reward); G.saveGame(); return reward;
+  };
   G.restoreGroundRewards = () => {
     G.state.groundRewards = G.normalizeGroundRewards(rewards());
     for (const reward of G.groundRewardsHere()) {
@@ -106,12 +119,14 @@
       s.items.push(reward.item);
       if (prize.heal) p.damageTaken = 0;
       s.stars += prize.stars || 0;
+      if (prize.spirit) G.ensureTown().spirit += prize.spirit;
       const info = G.groundRewardInfo(reward);
       G.sfx.play(reward.source === "chest" ? "pickup" : "quest");
       G.ui.toast(`${info.name} · ${info.purpose}${prize.heal ? " · Hearts restored" : ""}`, 4);
       G.events.emit("pickup", { item: reward.item });
       G.checkUnlocks();
-      if (G.leaveReadyFormEchoAt) G.leaveReadyFormEchoAt(reward.x, reward.y, reward.source === "guardian" ? "victory" : "treasure");
+      if (G.leaveReadyFormEchoAt && ["chest", "guardian"].includes(reward.source))
+        G.leaveReadyFormEchoAt(reward.x, reward.y, reward.source === "guardian" ? "victory" : "treasure");
       if (reward.source === "guardian") {
         const pathUpdate = G.formPathItemUpdate && G.formPathItemUpdate(reward.item);
         if (pathUpdate && G.ui.dialogue) G.ui.dialogue("✦ FORM PATH UPDATED", pathUpdate.text, { accent: "#d9a7ff" });

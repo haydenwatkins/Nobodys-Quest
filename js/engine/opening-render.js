@@ -269,7 +269,7 @@
       panel(c,100,6,146,23);text(c,boss.def.name,107,9,'#e9d39f',9);
       c.fillStyle='#40574a';c.fillRect(107,21,131,3);c.fillStyle='#bdc77d';c.fillRect(107,21,131*Math.max(0,boss.hp/boss.def.hp),3);
       if(boss.ward&&boss.ward.hp>0)text(c,boss.id==='ancientTreant'?'BARK WARD · BLUNT':'WARD · '+boss.ward.types.join(' / ').toUpperCase(),107,29,'#f0cf89',8);
-    }else if(!G.ui.dialogueOpen){
+    }else if(!G.ui.dialogueOpen&&!(G.nearGroundReward&&G.nearGroundReward())){
       const opening=G.openingGoal(),goal=opening||(s.delivery?.complete&&G.currentTask?G.currentTask():null);
       if(goal){
         c.font="9px 'VT323', monospace";
@@ -313,7 +313,8 @@
       text(c,G.input.hasGamepad?'B  FORMS   R3  MIX':'Q  FORMS   F  MIX',205,163,'#f0dfb2',8);
     }
     if(!G.ui.dialogueOpen)G.drawOpeningPrompt(c,cam);
-    c.restore();return true;
+    c.restore();return {status:{x:6,y:6,w:identityWidth,h:27},
+      boss:boss?{x:100,y:6,w:146,h:boss.ward&&boss.ward.hp>0?31:23}:null};
   };
   G.drawOpeningDialogue=(c,d,wrap)=>{
     if(!here())return false;

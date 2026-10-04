@@ -28,13 +28,14 @@
   const locations={bread:[12,12],letter:[30,13],present:[28,26]};
   G.deliveryGoal=()=>{
     const s=G.state;if(!s)return null;const d=state();
-    if((d.complete&&!(G.groundRewardFor&&G.groundRewardFor('keeper-lantern')))||(!d.started&&!(s.opening&&s.opening.complete)))return null;
+    const gift=(s.groundRewards||[]).find(g=>['orchard-ribbon','sunrise-seal','keeper-lantern'].includes(g.item)&&!s.items.includes(g.item));
+    if(gift)return {chapter:1,act:G.STORY_CHAPTERS[1],title:'A gift for helping',short:`Collect the ${G.groundRewardInfo(gift).name}`,objective:`Walk over the gift on the ground. ${G.groundRewardInfo(gift).purpose}. The road and your unfinished promises remain open.`,reason:'Your help is remembered. Its gift waits even if you leave.',mapId:gift.mapId,point:[gift.x/16-.5,gift.y/16-.5],destination:G.maps[gift.mapId].name,guide:'opening',progress:{value:d.complete?8:d.keeper?4:0,total:8,label:'A THANK-YOU GIFT'},complete:false};
+    if(d.complete||(!d.started&&!(s.opening&&s.opening.complete)))return null;
     let mapId,point,short,objective,value;
     if(!d.started){mapId='orchardRoad';point=[26,37];short='Meet Parcel at the departure post';objective='Parcel can finally travel. Join the delivery beside the cart, a few steps east.';value=0;}
     else if(d.lamps[0]<2){mapId='lanternReach';point=[14,24];short=d.lamps[0]?'Clear the first lantern':'Raise the first lantern';objective='Follow the west bank to the unlit lantern. Drive back the creatures its light draws.';value=1;}
     else if(d.lamps[1]<2){mapId='lanternReach';point=[38,12];short=d.lamps[1]?'Clear the second lantern':'Raise the second lantern';objective='The first light opened the causeway. Carry it to the lantern on the far bank.';value=2;}
     else if(!d.keeper){mapId='tollCourt';point=[18,17];short='Cross the old toll bridge';objective='Follow the lamps east. When the bridge floods, shelter inside the marked lantern circle.';value=3;}
-    else if(G.groundRewardFor&&G.groundRewardFor('keeper-lantern')){const gift=G.groundRewardFor('keeper-lantern');mapId=gift.mapId;point=[Math.floor(gift.x/16),Math.floor(gift.y/16)];short="Collect the Keeper's Lantern";objective='The bridge is open. Walk over the lantern left by the Tollkeeper to collect it and one star, then bring the parcels to the quay.';value=4;}
     else if(d.parcels.length<3){const id=['bread','letter','present'].find(x=>!d.parcels.includes(x));mapId='sunriseQuay';point=locations[id];short={bread:'Bring the flour to Baker Brindle',letter:'Give Mara her letter',present:'Bring Pip the birthday present'}[id];objective='The quay is just across the bridge. Deliver the three parcels in any order.';value=4+d.parcels.length;}
     else {mapId='sunriseQuay';point=[8,20];short='Tell Parcel everyone received it';objective='Return to the cart. Three ordinary things have arrived at last.';value=7;}
     return {chapter:1,act:G.STORY_CHAPTERS[1],title:'The Long Way Home',short,objective,reason:'Opening a road matters because someone is waiting at the other end.',mapId,point,destination:G.maps[mapId].name,guide:'opening',progress:{value,total:8,label:'THE LONG WAY HOME'},complete:false};
@@ -119,10 +120,10 @@
         present:[['PIP','A wooden dragon! It has wheels!'],['PATCHLING','The best dragons do.'],['PIP','Will you stay until I make it fly?']]};
       say(at.id,lines[at.id]);
     }else if(at.id==='finish'){
-      d.complete=true;if(!s.items.includes('sunrise-seal')){s.items.push('sunrise-seal');s.town.spirit+=8;}
+      d.complete=true;const gift=G.revealActivityReward('sunrise-seal',at.x,at.y);
       G.healPlayer(G.playerMaxHearts(),'delivery');
       say('home',[['PARCEL','Every name crossed off. That used to be an ordinary day.'],['PEBBLE','Patchling delivered everything. I am going to enjoy writing that down.'],['PATCHLING','Tomorrow there will be more.'],['PARCEL','Good. The road knows the way now.']]);
-      G.ui.banner('THE LONG WAY HOME','Sunrise Seal · 8 town spirit · a place to return to');
+      G.ui.banner('THE LONG WAY HOME',gift?'Sunrise Seal waits nearby · walk over it for 8 town spirit':'Every parcel delivered · a place to return to');
     }
     G.saveGame();G.input.clearTaps();return true;
   };

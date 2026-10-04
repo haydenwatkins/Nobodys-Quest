@@ -22,6 +22,8 @@
     "jester-bell": { name: "Curtain Bell", purpose: "+1 star · Pocket Trouper path", shape: "curtainBell" },
     "god-spark": { name: "Spark of Every Form", purpose: "+1 star · Roadlight path · story ending", shape: "livingSpark" },
     "keeper-lantern": { name: "Keeper's Lantern", purpose: "+1 star · a keepsake of the opened bridge", shape: "bridgeLamp" },
+    "orchard-ribbon": { name: "Orchard Ribbon", purpose: "+5 town spirit · a keepsake of Parcel's open road", shape: "orchardBow" },
+    "sunrise-seal": { name: "Sunrise Seal", purpose: "+8 town spirit · a keepsake of three deliveries", shape: "sunriseSeal" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -37,7 +39,18 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "bridgeLamp") {
+      if (shape === "orchardBow") {
+        g.poly([[4,3],[11,4],[14,10],[17,4],[24,3],[25,14],[19,16],[22,29],[17,26],[14,30],[11,26],[6,29],[9,16],[3,14]],"k");
+        g.poly([[6,5],[10,6],[12,11],[10,14],[5,12]],"j");g.poly([[18,6],[22,5],[23,12],[18,14],[16,11]],"a");
+        g.poly([[11,15],[14,17],[12,25],[8,26]],"j");g.poly([[14,17],[17,15],[20,26],[16,25]],"b");
+        g.ellipse(14,12,4,4,"k");g.ellipse(14,12,2,2,"f");g.put(13,11,"c");g.line(7,7,9,10,"c",1);
+      } else if (shape === "sunriseSeal") {
+        g.poly([[10,2],[18,2],[24,7],[26,14],[24,23],[18,28],[10,28],[4,23],[2,14],[4,7]],"k");
+        g.ellipse(14,15,10,11,"b");g.ellipse(14,14,8,8,"a");g.line(7,18,21,18,"k",2);
+        g.ellipse(14,15,4,4,"j");g.line(9,20,19,20,"c",1);g.line(14,5,14,8,"c",2);
+        g.line(7,9,9,11,"c",1);g.line(19,11,21,9,"c",1);g.put(7,15,"c");g.put(21,15,"c");
+        g.rect(11,27,6,3,"k");g.rect(12,28,4,1,"h");
+      } else if (shape === "bridgeLamp") {
         // A weathered road lantern with a tiny bridge arch in its warm pane.
         g.ellipse(14,6,7,5,"k");g.ellipse(14,6,5,3,"b");g.ellipse(14,6,3,2,"k");
         g.poly([[6,10],[22,10],[25,14],[24,28],[20,31],[8,31],[4,28],[3,14]],"k");

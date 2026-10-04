@@ -50,7 +50,7 @@ boss.hp=2;r.load('heartwood');boss=G.state.enemies.find(e=>e.id==='ancientTreant
 boss.bossIntroT=0;clear('ancientTreant');r.drain();require('./helpers/collect-treasure.cjs')(r,'trophy-heartwood-crown');G.updateOpening(.05);r.drain();
 assert.ok(G.state.items.includes('trophy-heartwood-crown'));assert.equal(G.openingGoal().mapId,'orchardRoad');
 r.load();at(22,37);const spirit=G.state.town.spirit;assert.ok(G.tryOpeningInteraction());r.drain();
-assert.ok(G.state.opening.complete);assert.ok(G.state.items.includes('orchard-ribbon'));assert.equal(G.state.town.spirit,spirit+5);
+assert.ok(G.state.opening.complete);assert.ok(!G.state.items.includes('orchard-ribbon'));assert.equal(G.state.town.spirit,spirit);require('./helpers/collect-treasure.cjs')(r,'orchard-ribbon');assert.ok(G.state.items.includes('orchard-ribbon'));assert.equal(G.state.town.spirit,spirit+5);
 assert.equal(G.tryOpeningInteraction(),false);assert.equal(G.state.town.spirit,spirit+5);
 // Old saves stay usable and retain unlocks; visiting does not overwrite them.
 const old={claimedForms:['rat','knight','dragon'],stars:35,items:['trophy-heartwood-crown']};

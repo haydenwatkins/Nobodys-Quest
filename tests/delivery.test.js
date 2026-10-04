@@ -51,7 +51,7 @@ for(const [id,x,y]of [['present',28,26],['bread',12,12],['letter',30,13]]){
   assert.ok(reachable(x,y),id+' has a walkable approach');at(x,y);talk();assert.ok(G.state.delivery.parcels.includes(id));reload();
 }
 assert.ok(reachable(43,19),'existing town remains linked');at(8,20);const before=G.state.town.spirit;talk();
-assert.ok(G.state.delivery.complete);assert.equal(G.state.town.spirit,before+8);assert.ok(G.state.items.includes('sunrise-seal'));
+assert.ok(G.state.delivery.complete);assert.equal(G.state.town.spirit,before);assert.ok(!G.state.items.includes('sunrise-seal'));collect(r,'sunrise-seal');assert.equal(G.state.town.spirit,before+8);assert.ok(G.state.items.includes('sunrise-seal'));
 reload();at(8,20);assert.equal(G.deliveryCandidate().id,'rideBack');assert.equal(G.state.town.spirit,before+8);assert.equal(G.deliveryGoal(),null);
 assert.match(G.npcDialogue('quayPip',0,0),/Thimble/);
 talk();assert.equal(G.state.mapId,'orchardRoad');talk();assert.equal(G.state.mapId,'sunriseQuay');assert.equal(G.state.town.spirit,before+8,'repeat cart trips cannot duplicate the delivery reward');

@@ -840,6 +840,10 @@ G.ui = (() => {
     }
 
     const openingHud = G.drawOpeningHud && G.drawOpeningHud(c, cam);
+    if (openingHud) {
+      statusBounds = openingHud.status || null;
+      bossHeaderBounds = openingHud.boss || null;
+    }
     if (!openingHud) {
     const maxH = G.playerMaxHearts();
     const hp = G.playerHp();
