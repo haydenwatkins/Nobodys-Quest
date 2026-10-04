@@ -205,11 +205,20 @@ Nineteen Marsh/interaction/chest/Parcel/save checks passed, followed by fifteen 
 
 Reproduce with `node tools/review-marsh-gifts.cjs [baseURL] [outputDirectory]`.
 
+## Grove shelter gift complete (October 4)
+
+Planting the collected Whispering Seed still grows the shelter/flowers, opens the two central crossing cells and restores hearts/mana immediately. A small wooden Shelter Keepsake with first leaves now waits beside the tree, carrying the original six spirit. Pending or owned completion keeps the shelter and shortcut restored across travel/save boot; collection and repeated interactions cannot replay recovery. The seed remains owned, and uncollected seed contents cannot plant or validate a pending shelter receipt. Legacy `grove-home-tree` ownership already received its spirit and never reveals another keepsake. Journey clearly names the waiting gift.
+
+Nine final Grove/Marsh cases passed; eight chest/prompt/save cases also passed in the preceding integration run. That run's new missing-seed fixture incorrectly entered the map with an owned seed, which had legitimately opened the chest; the final fixture starts without it. The existing Grove art fixture now collects actual ground seed contents before planting. Tests retain the old map template, blocked-combat behavior, immediate recovery, saved shortcut, safe movement collection, fixed six spirit and legacy completion.
+
+Four touch/TV browser cases passed in both art settings. Forty seed/denial/planting/ground/Journey/crossing/restored/collected/owned-boot views and all keepsake atlas poses were inspected. Actual input collects the seed, plants, crosses the rebuilt curtain and claims the keepsake; reload uses real save boot. Authored checkpoint positions, earned forms and cleared combat/residents isolate these actions, rather than establishing a complete campaign or physical-device behavior.
+
+Reproduce with `node tools/review-grove-gift.cjs [baseURL] [outputDirectory]`.
+
 ## Remaining regional source inventory
 
 | Region | Accomplishment and immediate world effect | Unconverted award |
 | --- | --- | --- |
-| Grove | Plant Whispering Seed; `grove-home-tree` restores the shelter/central path and recovery | Six spirit |
 | Ridge | Two watchfire flags light the fires after their guards; recover hearts/mana | Three spirit per fire |
 | Mistwood | Three bell flags; `mistwood-middle-road` opens the central path and recovery | Six spirit |
 | Starfall | Three lens flags enable the instrument | Fallen Star Thread/eight spirit; ownership also feeds Wayfinder and costume consumers |
@@ -219,4 +228,4 @@ Mechanism/road flags already represent visible accomplishments. Any conversion m
 
 ## Next bounded implementation
 
-Ben’s shared font/rendering upgrade and Marsh’s three rewards are complete; see `TYPOGRAPHY.md`. Continue with Grove’s six-spirit shelter gift while preserving immediate planting, central shortcut, recovery, seed ownership and legacy completion. Then continue the remaining regional inventory above.
+Ben’s shared font/rendering upgrade, Marsh’s three rewards and Grove’s shelter gift are complete; see `TYPOGRAPHY.md`. Continue with Ridge’s two watchfire spirit awards while preserving their native guard encounters, immediate fire/recovery effects and legacy completion. Then continue Mistwood, Starfall and Glasswater above.

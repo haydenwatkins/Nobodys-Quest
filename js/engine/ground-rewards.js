@@ -6,9 +6,13 @@
     "marsh-north-sluice": { mapId: "sunkenMarsh", name: "North Waterway Bundle", spirit: 2 },
     "marsh-south-sluice": { mapId: "sunkenMarsh", name: "South Waterway Bundle", spirit: 2 },
     "marsh-ferry-token": { mapId: "sunkenMarsh", name: "Old Ferry Token", spirit: 6 },
+    "grove-home-tree": { mapId: "whispering-grove", name: "Shelter Keepsake", spirit: 6, requires: "whispering-seed" },
   };
   function definition(item, source = "chest") {
-    if (source === "regional") return regionalRewards[item] || null;
+    if (source === "regional") {
+      const prize = regionalRewards[item];
+      return prize && (!prize.requires || G.state.items.includes(prize.requires)) ? prize : null;
+    }
     if (source === "activity") {
       if (item === "orchard-ribbon" && G.state.opening?.complete) return { name: "Orchard Ribbon", spirit: 5 };
       if (item === "sunrise-seal" && G.state.delivery?.complete) return { name: "Sunrise Seal", spirit: 8 };

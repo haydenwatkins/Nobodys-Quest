@@ -1,4 +1,5 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');const runtime=require('../tools/lib/classic-runtime.cjs');
+const collect=require('./helpers/collect-treasure.cjs');
 function setup(){const r=runtime();r.load('whispering-grove');r.drain();return r;}
 function stump(G){G.state.player.x=88;G.state.player.y=232;}
 test('the seed, shelter, pantry and exit are accessible before restoration',()=>{
@@ -11,10 +12,10 @@ test('planting requires the seed, preserves it, opens a saved shortcut and pays 
  const r=setup(),{G}=r;G.state.enemies=[];stump(G);const before=G.state.town.spirit;
  G.tryOpeningInteraction();assert.equal(G.groveSurvey().planted,false);
  G.state.items.push('whispering-seed');G.state.player.damageTaken=2;G.state.player.mana=0;G.tryOpeningInteraction();
- assert.equal(G.groveSurvey().planted,true);assert.equal(G.groveSurvey().seed,true);assert.equal(G.state.town.spirit,before+6);
+ assert.equal(G.groveSurvey().planted,true);assert.equal(G.groveSurvey().seed,true);assert.equal(G.state.town.spirit,before);
  assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,G.playerMaxMana());
  for(const y of [8,9])assert.equal(G.world.solid(232,y*16+8),false);
- G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before+6);
+ G.tryOpeningInteraction();assert.equal(G.state.town.spirit,before);r.drain();collect(r,'grove-home-tree');assert.equal(G.state.town.spirit,before+6);
  r.load('overworld');r.drain();r.load('whispering-grove');r.drain();assert.equal(G.world.solid(232,136),false);assert.equal(G.groveSurvey().planted,true);
  const c=new Proxy({},{get:()=>()=>{}});for(const d of G.openingDrawables(c))d.fn();
 });

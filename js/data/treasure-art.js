@@ -29,6 +29,7 @@
     "marsh-north-sluice": { name: "North Waterway Bundle", purpose: "+2 town spirit · the sluice is already open", shape: "reedBundle" },
     "marsh-south-sluice": { name: "South Waterway Bundle", purpose: "+2 town spirit · the sluice is already open", shape: "reedBundle" },
     "marsh-ferry-token": { name: "Old Ferry Token", purpose: "+6 town spirit · a keepsake of one last crossing", shape: "ferryToken" },
+    "grove-home-tree": { name: "Shelter Keepsake", purpose: "+6 town spirit · shelter and shortcut restored", shape: "homeSprig" },
     "knights-crest": { name: "Knight's Crest", purpose: "Discover the Knight", shape: "crest" },
     "whispering-seed": { name: "Whispering Seed", purpose: "Plant at the shelter stump", shape: "seed" },
     "sunstep-ribbon": { name: "Sunstep Ribbon", purpose: "A memento of Sunstep", shape: "ribbon" },
@@ -44,7 +45,17 @@
   const palette = { k: "#35413e", a: "#f4d39c", b: "#b58151", c: "#fff0dd", d: "#76bdbe", e: "#46758b", f: "#a0cb79", g: "#4c7955", h: "#d7aed2", i: "#96769c", j: "#ee947c" };
   for (const shape of [...new Set(Object.values(G.treasureInfo).map(info => info.shape)), "parcel"])
     G.treasureArt[shape] = A.compactSprite(A.authored(28, 32, shape === "plumbline" ? { ...palette, d: "#b5c8bd", e: "#718b82" } : palette, (g, frame) => {
-      if (shape === "reedBundle") {
+      if (shape === "homeSprig") {
+        // A roof carved into warm wood, with the shelter's first small leaves.
+        g.poly([[4,14],[14,7],[24,14],[24,29],[4,29]],"k");g.rect(7,16,14,11,"b");
+        g.poly([[6,14],[14,9],[22,14]],"a");g.line(8,15,20,15,"k",1);
+        g.rect(12,20,5,7,"k");g.rect(13,21,3,6,"a");g.put(14,22,"c");
+        g.line(8,18,8,24,"a",1);g.line(7,28,21,28,"a",1);
+        g.line(15,8,18,3,"k",3);g.line(15,7,18,3,"b",1);
+        g.poly([[17,5],[17,1],[22,1],[24,4],[21,7]],"k");g.poly([[19,3],[21,2],[22,4],[20,5]],"f");
+        g.poly([[15,7],[11,6],[9,2],[14,1],[17,4]],"k");g.poly([[13,3],[14,3],[15,5],[13,5]],"g");
+        g.line(6,13,10,10,"c",1);g.line(18,11,22,14,"b",1);
+      } else if (shape === "reedBundle") {
         // River stones tucked into soft reeds, tied with the old ferry cord.
         g.poly([[3,9],[10,11],[12,4],[16,3],[20,10],[25,7],[23,20],[20,29],[7,30],[3,22]],"k");
         g.poly([[5,12],[10,16],[13,7],[16,6],[20,15],[22,12],[21,23],[18,27],[8,28],[5,22]],"g");
