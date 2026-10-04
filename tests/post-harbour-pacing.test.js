@@ -5,7 +5,12 @@ test('a native bow lesson separates Ranger discovery from Frog, and the new move
  const p=G.state.player;Object.assign(p,{x:160,y:144,dir:{x:1,y:0}});G.state.enemies=[];G.state.projectiles=[];const e=G.makeEnemy('slime',280,144);e.hp=50;G.state.enemies.push(e);
  for(let i=0;i<4;i++){e.x=280;e.y=144;G.abilities.arrow.use(p);for(let frame=0;frame<20;frame++)G.combat.updateProjectiles(.05);r.drain();}
  assert.equal(G.formLevel('ranger'),2);assert.ok(G.getLoadout('ranger').includes('tripleShot'));assert.ok(e.hp<50);assert.ok(G.formReady('frog'));assert.equal(G.formReady('alchemist'),false);
- G.claimForm('frog');r.drain();G.setForm('frog');G.state.enemies=[];G.state.projectiles=[];const target=G.makeEnemy('slime',p.x+18,p.y);target.hp=50;G.state.enemies.push(target);
+ assert.equal(G.claimForm('frog'),false,'Frog waits while Ranger gets an outing, even though its old challenge stays earned');
+ require('./helpers/walk-road.cjs')(r,[[12,9]]);
+ for(let i=0;i<80&&!e.dead;i++){if(i%10===0)require('./helpers/walk-road.cjs')(r,[[12,9]]);e.x=280;e.y=144;G.abilities.arrow.use(p);for(let frame=0;frame<20;frame++)G.combat.updateProjectiles(.05);r.drain();}
+ assert.ok(e.dead,'finish the first real encounter before changing clearings');
+ const second=G.makeEnemy('slime',80,144);G.state.enemies=[second];p.dir={x:-1,y:0};for(let i=0;i<3&&!second.dead;i++){G.abilities.luckyArrow.use(p);for(let frame=0;frame<30;frame++)G.combat.updateProjectiles(.05);r.drain();}
+ assert.ok(second.dead);assert.equal(G.activeFormOuting(),null);assert.ok(G.claimForm('frog'));r.drain();G.setForm('frog');p.dir={x:1,y:0};G.state.enemies=[];G.state.projectiles=[];const target=G.makeEnemy('slime',p.x+18,p.y);target.hp=50;G.state.enemies.push(target);
  for(let i=0;i<6;i++){Object.assign(target,{x:p.x+18,y:p.y});G.abilities.tongueLash.use(p);r.drain();}
  assert.equal(G.formLevel('frog'),2);assert.ok(G.getLoadout('frog').includes('croakBurst'));assert.equal(G.formReady('alchemist'),false,'Frog still has a second lesson before the next calling');
  const progress=G.formLevel('ranger');G.saveGame();assert.ok(G.loadSaveData().questsDone.includes(G.forms.ranger.quests[0].id));assert.equal(G.formLevel('ranger'),progress);

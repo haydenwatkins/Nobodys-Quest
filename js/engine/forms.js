@@ -257,7 +257,7 @@ G.formReady = function (id) {
 };
 
 G.claimForm = function (id, options) {
-  if (!G.formReady(id)) return false;
+  if (G.state.quietFormVictory || !G.formReady(id) || (G.formDiscoveryAllowed && !G.formDiscoveryAllowed())) return false;
   const opts = options || {};
   G.state.claimedForms = G.state.claimedForms || [];
   G.state.known = G.state.known || [];
@@ -334,17 +334,23 @@ G.checkUnlocks = function () {
   G.state.known = G.state.known || [];
   G.state.unlockReadyNotified = G.state.unlockReadyNotified || [];
   let changed = false;
-  for (const id of G.formOrder) {
+  for (const id of G.formOrder.filter(id => G.forms[id].start)) {
+    if (!G.state.known.includes(id)) { G.state.known.push(id); changed = true; }
+  }
+  for (const id of G.formDiscoveryOrder ? G.formDiscoveryOrder() : G.formOrder) {
     const f = G.forms[id];
     if (f.start && !G.state.known.includes(id)) {
       G.state.known.push(id);
       changed = true;
     }
-    if (G.formReady(id) && !G.state.unlockReadyNotified.includes(id)) {
+    if ((!G.formDiscoveryAllowed || G.formDiscoveryAllowed()) && !G.state.quietFormVictory &&
+        !(G.state.formEchoes || []).length && G.formReady(id)) {
+      if (G.state.unlockReadyNotified.includes(id)) break;
       G.state.unlockReadyNotified.push(id);
       G.sfx.play("unlock");
       G.ui.toast(`${f.icon} ${f.name}'s path is complete. Win a battle and watch for its Form Echo.`, 4);
       changed = true;
+      break;
     }
   }
   if (changed) G.saveGame();

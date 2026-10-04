@@ -16,8 +16,8 @@
     { id: "crossed-lessons", number: "IV", title: "Crossed Lessons", note: "Combine what the early forms taught you.", forms: ["alchemist", "stormcaller", "dragon"] },
     { id: "hidden-crowns", number: "V", title: "Hidden Crowns", note: "Boss trophies reveal secret paths.", forms: ["mole", "vampire", "turtle", "druid"] },
     { id: "masters-beyond", number: "VI", title: "Masters Beyond", note: "Specialists awaken from deeper victories.", forms: ["riftblade", "jester", "samurai", "astronomer"] },
-    { id: "waking-road", number: "VII", title: "The Waking Road", note: "One guardian leads to the next.", forms: ["griffin", "golem", "weaver"] },
-    { id: "last-bells", number: "VIII", title: "The Last Bells", note: "Carry the guardian chain to its end.", forms: ["bellkeeper", "lanternWisp", "colossus"] },
+    { id: "waking-road", number: "VII", title: "The Waking Road", note: "A new shape opens a road worth exploring.", forms: ["griffin", "golem", "weaver"] },
+    { id: "last-bells", number: "VIII", title: "The Last Bells", note: "Enjoy each new shape before the next discovery.", forms: ["bellkeeper", "lanternWisp", "colossus"] },
     { id: "whole-roster", number: "IX", title: "The Final Answer", note: "Learn eight shapes to level 3; master three favorites to level 5.", forms: ["god"] },
   ];
 

@@ -228,6 +228,14 @@ G.storyGoal = function () {
     progress: storyProgress(0, 1, "GUARDIAN GIFT"),
   });
 
+  const outing = G.formOutingGoal && G.formOutingGoal();
+  if (outing) return Object.assign(base, outing);
+  const waitingEcho = (G.state.formEchoes || []).find(echo => G.formReady(echo.formId));
+  if (waitingEcho && G.state.opening?.started && G.state.opening.version >= 2) {
+    const lead = formJourneyLead(waitingEcho.formId, storyProgress(0, 1, "FORM ECHO"));
+    if (lead) return Object.assign(base, lead);
+  }
+
   if (G.storyComplete()) return Object.assign(base, {
     complete: true,
     title: "The map has room to grow",
@@ -356,6 +364,15 @@ G.storyGoal = function () {
     { mark: "light", name: "Lantern Keeper", mapId: "stormspinePeaks", destination: "Stormspine Peaks" },
     { mark: "heart", name: "Last Worldbearer", mapId: "titanGrave", destination: "Titan Grave" },
   ];
+
+  if (chapter >= 3 && G.state.opening?.started && G.state.opening.version >= 2) {
+    const bodies = ["griffin", "golem", "weaver", "bellkeeper", "lanternWisp", "colossus"];
+    const waiting = worldbearers.findIndex((guardian, i) => marks.includes(guardian.mark) && !G.formUnlocked(bodies[i]));
+    if (waiting >= 0) {
+      const lead = formJourneyLead(bodies[waiting], storyProgress(marks.length, 6, "WORLDBEARERS"), new Set(), true);
+      if (lead) return Object.assign(base, lead);
+    }
+  }
 
   if (chapter === 3 || chapter === 4) {
     const range = chapter === 3 ? worldbearers.slice(0, 3) : worldbearers.slice(3);

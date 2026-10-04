@@ -3,7 +3,7 @@
 (()=>{
  const here=()=>G.state&&G.state.mapId==='windscarCanyon',S=G.windscarScenery;
  const rect=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
- G.drawWindscarTile=(c,cell,x,y)=>{if(!here()||!['grass','path','rock'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x+173,y+113)*2,patch=G.util.hash2(Math.floor(x/5)+41,Math.floor(y/4)+71)*2;
+ G.drawWindscarTile=(c,cell,x,y)=>{if(!(here()||(G.state?.mapDef?.formTrail&&G.state.mapDef.biome==='windscar'))||!['grass','path','rock'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x+173,y+113)*2,patch=G.util.hash2(Math.floor(x/5)+41,Math.floor(y/4)+71)*2;
   rect(c,px,py,16,16,cell.tile==='path'?['#cfb28d','#d8c099','#c4a987'][Math.floor(patch*3)]:['#b69276','#bd9b7e','#aa886f'][Math.floor(patch*3)]);if(cell.tile==='rock'){G.drawSprite(c,S.cliff,Math.floor(r*4),px+8,py+16,false);const rock=(xx,yy)=>G.state.grid[yy]?.[xx]?.tile==='rock';if(!rock(x,y-1))rect(c,px,py,16,1,'#d8b18c');if(!rock(x,y+1))rect(c,px,py+15,16,1,'#654b45');if(!rock(x-1,y))rect(c,px,py,1,16,'#654b45');if(!rock(x+1,y))rect(c,px+15,py,1,16,'#654b45');}else if(cell.tile==='grass'&&r>.92)G.drawSprite(c,S.tuft,Math.floor(G.util.hash2(x+19,y+131)*8),px+8,py+16,false);else if(cell.tile==='path'&&r>.6){rect(c,px+3,py+8,5,1,'#e3caa5');rect(c,px+11,py+11,2,1,'#b4997e');}return true;
  };
  G.drawWindscarPortal=(c,cell,x,y)=>{if(!here()||!cell.portal)return false;c.save();if(x===0){c.translate(x*16+8,y*16+16);c.scale(-1,1);G.drawSprite(c,S.roadStep,0,0,0,false);}else G.drawSprite(c,S.roadStep,0,x*16+8,y*16+16,false);c.restore();return true;};

@@ -155,6 +155,7 @@ G.combat = (() => {
       if (p.mana < p.manaMax) { p.mana = Math.min(p.manaMax, p.mana + 1); }
     }
 
+    if (G.noteFormOutingHit) G.noteFormOutingHit(enemy, opts.ability);
     G.events.emit("hit", {
       enemy: enemy.id,
       ability: opts.ability,
@@ -204,6 +205,7 @@ G.combat = (() => {
     // A final run kill can synchronously return us to the campaign. Never
     // drop arena pickups, echoes, or passive effects into that new location.
     if(G.state.mapId!==defeatedMap || (run && (G.state.expeditionRun!==run || run.phase!=="battle")))return;
+    if (G.noteFormOutingVictory) G.noteFormOutingVictory(enemy);
     if (G.passives) G.passives.onKill(enemy, opts);
     if (enemy.def.miniboss) awardMinibossTrophy(enemy);
     // Quest and trophy listeners run synchronously above, so this exact

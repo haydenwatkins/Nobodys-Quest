@@ -232,7 +232,8 @@ G.passives = (() => {
     }
     if (passive.id === "slipstream" && user.moving) {
       user.slipstreamT = 0.7;
-      G.combat.forceEnemies(user.x - user.dir.x * 10, user.y - user.dir.y * 10, 24, 72, "#73eff7");
+      const moved = G.combat.forceEnemies(user.x - user.dir.x * 10, user.y - user.dir.y * 10, 24, 72, "#73eff7");
+      if (moved) G.events.emit("formFeature", { feature: "slipstream" });
       G.spawnFx({ kind: "bolt", x: user.x - user.dir.x * 4, y: user.y - user.dir.y * 4 - 5,
         x2: user.x - user.dir.x * 28, y2: user.y - user.dir.y * 28 - 5, color: "#73eff7", dur: 0.24 });
     }
@@ -248,7 +249,8 @@ G.passives = (() => {
       const now = G.state.time || 0;
       if (user.resonanceStyle && user.resonanceStyle !== style && now >= (user.resonanceReadyAt || 0)) {
         user.resonanceReadyAt = now + 0.55;
-        G.combat.forceEnemies(user.x, user.y, 39, 115, "#fff3c2", 0.16);
+        const moved = G.combat.forceEnemies(user.x, user.y, 39, 115, "#fff3c2", 0.16);
+        if (moved) G.events.emit("formFeature", { feature: "resonance" });
         G.damageNumber(user.x, user.y - 19, "RESONANCE!", "#ffcd75");
       }
       user.resonanceStyle = style;
@@ -260,6 +262,9 @@ G.passives = (() => {
     const p = G.state.player;
     const passive = current(p);
     if (!passive || enemy.dead) return;
+
+    if (passive.id === "worldweight" && enemy.def.heavy && (opts.knockback || 0) > 0)
+      G.events.emit("formFeature", { feature: "worldweight" });
 
     if (passive.id === "conductor") {
       const now = G.state.time || 0;
@@ -306,6 +311,7 @@ G.passives = (() => {
         }
         G.spawnFx({ kind: "bolt", x: ax, y: ay - 5, x2: bx, y2: by - 5, color: "#d9a7ff", dur: 0.28 });
         G.damageNumber(enemy.x, enemy.y - enemy.h(), "BOUND!", "#d9a7ff");
+        G.events.emit("formFeature", { feature: "lifeline" });
         p.lifelineTarget = null;
       } else {
         p.lifelineTarget = enemy;

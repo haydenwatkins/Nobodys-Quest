@@ -498,7 +498,7 @@
   });
   G.events.on("mapEnter", () => {
     if (state() && state().active && state().active.mapId !== G.state.mapId) G.abortLegendChallenge();
-    if (!state()) return;
+    if (!state() || G.activeFormOuting?.()) return;
     const id = G.state.formId, stage = G.legendStage(id);
     if (!G.legendAvailable(id) || !stage || state().revealed[id] >= stage.rank) return;
     state().revealed[id] = stage.rank;
@@ -509,7 +509,7 @@
     if (state() && state().active && state().active.formId !== data.form) G.abortLegendChallenge("The trial quiets when its form is set aside.");
   });
   G.events.on("questDone", (data) => {
-    if (!state() || !data || G.formLevel(data.form) < 5 || state().revealed[data.form] >= 1) return;
+    if (!state() || G.activeFormOuting?.() || !data || G.formLevel(data.form) < 5 || state().revealed[data.form] >= 1) return;
     state().revealed[data.form] = 1;
     const echo = G.legendEchoFor(data.form);
     if (echo) G.ui.dialogue(`${G.forms[data.form].icon} A LEGEND STIRS`, `${echo.clue} Seek ${echo.name} in ${G.maps[echo.mapId]?.name || echo.mapId}.`, { accent: G.LEGEND_DEFS[data.form].color });

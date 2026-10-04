@@ -402,6 +402,7 @@ G.makeEnemy = function (id, x, y) {
   return {
     id, def,
     x, y,
+    outingSpawnX: x, outingSpawnY: y,
     hp: def.hp,
     ward: def.ward ? { types: def.ward.types.slice(), hp: def.ward.hp, hpMax: def.ward.hp } : null,
     boxW: Math.min(12, def.size - 2), boxH: 6,

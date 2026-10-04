@@ -139,6 +139,7 @@ G.saveGame = function () {
       claimedForms: s.claimedForms,
       unlockReadyNotified: s.unlockReadyNotified,
       formEchoes: s.formEchoes,
+      formOutings: s.formOutings,
       loadouts: s.loadouts,
       mixRecipes: s.mixRecipes,
       lessonQuestId: s.lessonQuestId,

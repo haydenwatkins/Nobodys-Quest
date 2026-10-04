@@ -67,7 +67,7 @@
   };
 
   G.readyFormsWithoutEcho = function () {
-    return (G.formOrder || []).filter((id) => G.formReady(id) && !G.formEchoFor(id));
+    return (G.formDiscoveryOrder ? G.formDiscoveryOrder() : G.formOrder || []).filter((id) => G.formReady(id) && !G.formEchoFor(id));
   };
 
   function safePoint(x, y) {
@@ -85,6 +85,9 @@
 
   G.leaveReadyFormEchoAt = function (x, y, source) {
     if (!G.state || !G.state.player || !G.state.mapId) return false;
+    if (G.state.quietFormVictory) { G.state.quietFormVictory = false; return false; }
+    if (G.state.quietFormEchoTime === G.state.time) return false;
+    if ((G.formDiscoveryAllowed && !G.formDiscoveryAllowed()) || echoes().length) return false;
     const formId = G.readyFormsWithoutEcho()[0];
     if (!formId) return false;
     const point = safePoint(Number(x) || G.state.player.x, Number(y) || G.state.player.y);
@@ -136,8 +139,7 @@
 
   function completeEcho(echo) {
     if (!G.state || !echo) return;
-    G.state.formEchoes = echoes().filter((entry) => entry !== echo && entry.formId !== echo.formId);
-    G.claimForm(echo.formId, { worldEcho: true, x: echo.x, y: echo.y });
+    if (!G.claimForm(echo.formId, { worldEcho: true, x: echo.x, y: echo.y })) echo.interacting = false;
   }
 
   function beginEcho(echo) {
@@ -150,6 +152,14 @@
     }
     G.sfx.play("unlock");
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.12);
+    if (G.state.opening?.started && G.state.opening.version >= 2) {
+      G.ui.dialogue("✦ FORM ECHO", `${form.icon} You found ${form.name}!`, { accent: ECHO_COLOR });
+      const role = G.FORM_ROLES?.[form.id];
+      G.ui.dialogue("◇ PATCHLING", role ? `Ooh, let’s try this! ${role.role}.` : "Ooh, let’s try this new shape!", {
+        accent: "#f4f4f4", onClose: () => completeEcho(echo),
+      });
+      return;
+    }
     G.ui.dialogue("✦ FORM ECHO", discoveryLine(echo, form), { accent: ECHO_COLOR });
     G.ui.dialogue(`${form.icon} ${form.name.toUpperCase()}`, `${form.tagline} ${G.formEchoDescription(form)}`, { accent: ECHO_COLOR });
     G.ui.dialogue("◇ PATCHLING", `I don't have to become ${form.name} forever. I only have to carry what it knows.`, {
@@ -160,7 +170,7 @@
 
   G.updateFormEcho = function () {
     const echo = G.currentFormEcho();
-    if (!echo || echo.interacting || !G.state.player || (G.ui && (G.ui.dialogueOpen || G.ui.menuOpen))) return;
+    if (G.state.quietFormVictory || G.state.quietFormEchoTime === G.state.time || (G.formDiscoveryAllowed && !G.formDiscoveryAllowed()) || !echo || echo.interacting || !G.state.player || (G.ui && (G.ui.dialogueOpen || G.ui.menuOpen))) return;
     const distance = G.util.dist(G.state.player.x, G.state.player.y, echo.x, echo.y);
     if (echo.needsLeave) {
       if (distance >= ARM_DISTANCE) {

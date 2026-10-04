@@ -134,6 +134,7 @@
     claimedForms: [],
     unlockReadyNotified: [],
     formEchoes: [],
+    formOutings: G.makeFormOutings(),
     loadouts: {},
     mixRecipes: {},
     lessonQuestId: null,
@@ -191,6 +192,7 @@
     s.claimedForms = s.claimedForms.filter((id) => G.forms[id] && !G.forms[id].start && !G.forms[id].invalid);
     s.unlockReadyNotified = Array.isArray(save.unlockReadyNotified) ? save.unlockReadyNotified : [];
     s.formEchoes = G.normalizeFormEchoes(save.formEchoes);
+    s.formOutings = G.normalizeFormOutings(save.formOutings);
     s.loadouts = save.loadouts || {};
     s.mixRecipes = G.normalizeMixRecipes(save.mixRecipes);
     s.lessonQuestId = typeof save.lessonQuestId === "string" ? save.lessonQuestId : null;

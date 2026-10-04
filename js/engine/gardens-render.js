@@ -4,7 +4,7 @@
  const here=()=>G.state&&G.state.mapId==='hangingGardens',S=G.gardensScenery,water=['#4b7879','#7da19a','#bad0bd'];
  const rect=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
  G.gardensWaterColors=()=>here()?water:null;
- G.drawGardensTile=(c,cell,x,y,time)=>{if(!here()||!['grass','path','rock','tree','water'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x+201,y+163)*2,patch=G.util.hash2(Math.floor(x/5)+71,Math.floor(y/4)+97)*2;
+ G.drawGardensTile=(c,cell,x,y,time)=>{if(!(here()||(G.state?.mapDef?.formTrail&&G.state.mapDef.biome==='gardens'))||!['grass','path','rock','tree','water'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x+201,y+163)*2,patch=G.util.hash2(Math.floor(x/5)+71,Math.floor(y/4)+97)*2;
   if(cell.tile==='water'){rect(c,px,py,16,16,patch>.65?'#527f7e':water[0]);if(r>.6){rect(c,px+3,py+7,7,1,water[1]);if(!G.reducedMotion)rect(c,px+9,py+12+Math.floor(Math.sin(time*.7+x)*1.1),4,1,water[1]);}return true;}
   rect(c,px,py,16,16,cell.tile==='path'?['#adb9a3','#b7c0ad','#a6b49e'][Math.floor(patch*3)]:['#789274','#819a7a','#728b70'][Math.floor(patch*3)]);
   if(cell.tile==='rock')G.drawSprite(c,S.wall,Math.floor(r*4),px+8,py+16,false);else if(cell.tile==='tree')G.drawSprite(c,S.hedge,Math.floor(r*4),px+8,py+16,false);else if(cell.tile==='grass'&&r>.93)G.drawSprite(c,S.tuft,Math.floor(r*4),px+8,py+16,false);else if(cell.tile==='path'&&r>.6){rect(c,px+4,py+8,7,1,'#c8cfb7');rect(c,px+11,py+11,2,1,'#819185');}return true;

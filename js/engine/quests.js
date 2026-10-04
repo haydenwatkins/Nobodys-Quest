@@ -221,7 +221,7 @@ G.fieldMasteryReward = function () {
   const level=G.formLevel(entry.form.id),next=level+1;
   const move=(entry.form.abilities||[]).find(a=>a.level===next&&G.abilities[a.id]);
   let reward=move?'Next: '+G.abilities[move.id].name:entry.form.name+' Lv '+next+' + 1 star';
-  if(!move&&G.formUnlockSteps){
+  if(!move&&G.formUnlockSteps&&!G.activeFormOuting?.()){
     const child=G.formOrder.find(id=>!G.formUnlocked(id)&&G.formUnlockSteps(id).some(step=>(step.options||[]).some(o=>o.formId===entry.form.id&&!o.met&&o.target===next)));
     if(child)reward='Toward '+G.forms[child].name+' + 1 star';
   }

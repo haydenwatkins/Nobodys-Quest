@@ -423,6 +423,7 @@
       label:goal.complete?"MAIN STORY · COMPLETE":`ACT ${goal.chapter + 1} · MAIN STORY`};
   };
 
+  let outingAnchor = null;
   G.guidanceTarget = function () {
     const s = G.state;
     if (!s || !s.player) return null;
@@ -468,6 +469,23 @@
       }
     }
     if (goal.mapId && goal.mapId !== s.mapId) return routeTarget(goal);
+
+    if (goal.guide === "outing") {
+      const outing = G.activeFormOuting();
+      if (s.formId !== outing.formId) return { kind: "form", color: G.GUIDANCE_COLORS.form, icon: G.forms[outing.formId].icon, spatial: false, destination: goal.title, text: goal.objective };
+      const foes = s.enemies.filter(e => !e.dead && !e.def.miniboss && !e.def.practice &&
+        (G.formLevel(outing.formId) < 3 || outing.arts.length < 2 || outing.scenes.every(scene => scene.mapId !== s.mapId || Math.hypot(scene.x - e.outingSpawnX, scene.y - e.outingSpawnY) >= 160)));
+      const key = s.mapId + ":" + outing.formId;
+      if (outingAnchor?.key !== key || !foes.some(e => Math.hypot(e.outingSpawnX - outingAnchor.x, e.outingSpawnY - outingAnchor.y) < 80)) {
+        const point = nearest(foes.map(e => ({ x: e.outingSpawnX, y: e.outingSpawnY })), s.player.x, s.player.y);
+        outingAnchor = point ? { ...point, key } : null;
+      }
+      // Guide the clearing, not a chasing creature. Keep this anchor while
+      // any member of the encounter remains, even when the camera moves.
+      return outingAnchor ? { kind: "form", color: G.GUIDANCE_COLORS.form, icon: G.forms[outing.formId].icon, destination: goal.title,
+        x: outingAnchor.x, y: outingAnchor.y, tileX: Math.floor(outingAnchor.x / G.TILE), tileY: Math.floor(outingAnchor.y / G.TILE), text: goal.objective }
+        : { kind: "form", color: G.GUIDANCE_COLORS.form, icon: G.forms[outing.formId].icon, spatial: false, destination: goal.title, text: "Try another clearing or a neighbouring road with this new shape." };
+    }
 
     if (goal.guide === "item") {
       const chests = (s.chests || []).filter(chest => !chest.opened && chest.chest?.item === goal.itemId)
