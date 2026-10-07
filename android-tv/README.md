@@ -1,4 +1,4 @@
-# Nobody's Quest — Android TV / Google TV wrapper
+# Patchling and the Waking Roads — Android TV / Google TV wrapper
 
 A thin native shell that makes the existing web game feel like an installed
 Google TV game. **The web game stays the single canonical game** — this app

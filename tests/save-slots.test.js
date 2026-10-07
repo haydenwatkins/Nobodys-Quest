@@ -70,7 +70,7 @@ context.document = { activeElement: null, addEventListener() {}, removeEventList
   getElementById: (id) => id === "save-slots" ? overlay : null };
 assert.equal(G.showSaveSlotScreen(true), true);
 assert.match(overlay.html, /class="title-world-hero"/, "the selector should open inside the unified game world");
-assert.match(overlay.html, /Every road begins with a stitch/);
+assert.match(overlay.html, /A little coat\. A world to mend\./);
 assert.match(overlay.html, /class="title-transform-stage"/, "Nobody's form changing should be part of the title composition");
 assert.match(overlay.html, /data-title-form="nobody"/, "Nobody should be the source of the title transformation");
 assert.match(overlay.html, /class="title-chapter-panel"/);

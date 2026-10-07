@@ -7,7 +7,7 @@
  S.herbs=A.compactSprite(A.authored(32,32,pal,(g,v)=>{const x=7+v*4,y=14+(v%2)*6;g.line(x,y,x,y+5,'a',1);g.ellipse(x-2,y+1,2,1,'c');g.ellipse(x+2,y-1,2,1,'b');g.put(x-2,y,'d');g.line(x+9,y+6,x+9,y+2,'b',1);g.put(x+10,y+2,'c');if(v===3){g.ellipse(x+1,y-3,2,2,'j');g.put(x+1,y-3,'i');}}));
  S.notice=A.compactSprite(A.authored(32,38,pal,g=>{g.rect(14,15,5,22,'e');g.line(15,17,15,35,'g',1);g.rect(1,2,30,24,'e');g.rect(3,4,26,20,'f');g.rect(5,6,22,16,'h');for(const [y,w]of [[10,16],[14,12],[18,14]])g.line(8,y,8+w,y,'f',1);g.put(3,4,'g');g.put(28,23,'g');}));
  G.drawMeadowNotice=(c,cell,x,y)=>{if(!here()||!cell.message)return false;G.drawSprite(c,S.notice,0,x*16+8,y*16+16,false);return true;};
- const here=()=>G.state&&(G.state.mapId==='town'||G.state.mapId==='overworld');
+ const here=()=>G.state&&(G.state.mapId==='town'||G.state.mapId==='overworld'||['ranger','alchemist'].includes(G.state.mapDef?.earlyFormRoad));
  G.meadowGroundColor=(kind,x,y)=>{if(!here()||!['grass','path'].includes(kind))return null;const r=G.util.hash2(Math.floor((x+(Math.floor(y/4)%2)*2)/5)+71,Math.floor(y/4)+43)*2;return (kind==='path'?['#b29c73','#b9a77f','#b5a079']:['#71835c','#7a8b64','#758660'])[r<.3?0:r>.76?1:2];};
  G.drawMeadowTile=(c,cell,x,y)=>{if(!here()||!['grass','path','tree'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x,y)*2;c.fillStyle=G.meadowGroundColor(cell.tile==='path'?'path':'grass',x,y);c.fillRect(px,py,16,16);
   if(cell.tile==='tree')G.drawSprite(c,S.hedge,Math.floor(r*4),px+8,py+16,false);

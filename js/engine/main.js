@@ -135,6 +135,7 @@
     unlockReadyNotified: [],
     formEchoes: [],
     formOutings: G.makeFormOutings(),
+    roadworks: G.makeRoadworks(),
     loadouts: {},
     mixRecipes: {},
     lessonQuestId: null,
@@ -193,6 +194,7 @@
     s.unlockReadyNotified = Array.isArray(save.unlockReadyNotified) ? save.unlockReadyNotified : [];
     s.formEchoes = G.normalizeFormEchoes(save.formEchoes);
     s.formOutings = G.normalizeFormOutings(save.formOutings);
+    s.roadworks = G.normalizeRoadworks(save.roadworks);
     s.loadouts = save.loadouts || {};
     s.mixRecipes = G.normalizeMixRecipes(save.mixRecipes);
     s.lessonQuestId = typeof save.lessonQuestId === "string" ? save.lessonQuestId : null;

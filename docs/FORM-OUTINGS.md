@@ -1,6 +1,6 @@
 # Form discoveries need room to matter
 
-October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. It does not finish bespoke environmental consequences for all thirteen earlier specialist callings.
+October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; ten earlier specialists remain. See `EARLY-FORM-ROADS.md`.
 
 ## Player experience
 
@@ -46,10 +46,10 @@ Every future form change must preserve a distinct useful action, an immediately 
 | Patchling | Combine borrowed answers with forgiving handling | Existing mixing specialist; expand meaningful combinations in later road encounters |
 | Rat | Reach narrow places and leave poison working while moving | Existing walked drains, mill briars and saved sluice crossing |
 | Knight | Guard a charge, then answer it | Existing native guard practice and close-road fights |
-| Bramble Scout | Reach distant foes across a clearing | Existing native distant-shot lesson; add a clearer environmental consequence |
+| Bramble Scout | Reach distant foes across a clearing | New Bramblebank winches, distant encounters and Parcel return |
 | Starwick Sage | Break a Dark ward from a safe distance | Existing delivery/bridge introduction |
-| Frog | Pull a foe into tongue reach, then reposition | Existing native reach and marsh fights; strengthen a local helping opportunity |
-| Copperwick Brewer | Combine status and a burst against a group | Existing flask/reaction mechanics; author a road encounter that rewards this combination |
+| Frog | Pull a foe into tongue reach, then reposition | New ferry towing loops, pull/hop encounters and Moss return |
+| Copperwick Brewer | Combine status and a burst against a group | New lampyard clumps, permanent paths and Provisional return |
 | Cloudcap Conductor | Carry a spark through separated neighbours | Existing chains and conductive shove; make a distinct field encounter |
 | Hearthdrake | Sweep a broad crowd away from a close approach | Existing wider sweep and shove; add a purposeful crowded road |
 | Wayglass Duelist | Rush through a crowded approach and control the landing | Existing dash/afterimage; add a useful route variation |

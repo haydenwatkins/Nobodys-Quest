@@ -35,7 +35,7 @@
     G.dialoguePortraits[id] = portrait;
   }
 
-  const aliases = { ERRATA: "errata", PARCEL: "parcel", "SER PENDING": "pending", BRINDLE: "quayBaker", "PEBBLE NOTICES": "pebble" };
+  const aliases = { ERRATA: "errata", PARCEL: "parcel", "SER PENDING": "pending", BRINDLE: "quayBaker", MOSS: "moss", PROVISIONAL: "provisional", "PEBBLE NOTICES": "pebble" };
   function clean(speaker) { return String(speaker || "").toUpperCase().replace(/^[^A-Z0-9]+/, "").replace(/[^A-Z0-9]+$/, "").trim(); }
   function matches(name, alias) { return name === alias || name.startsWith(alias + " ·") || (alias === "PARCEL" && name.startsWith(alias + ",")); }
   G.resolveDialogueSpeaker = speaker => {

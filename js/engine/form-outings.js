@@ -9,9 +9,9 @@
     rat: { role: "Reach the places bigger friends cannot", mapId: "orchardRoad", opening: true },
     knight: { role: "Stand your ground and answer a charge", mapId: "orchardRoad", opening: true },
     wizard: { role: "Open a Dark ward from a safe distance", mapId: "lanternReach", opening: true },
-    ranger: { role: "Catch a distant foe across a clearing", mapId: "overworld" },
-    frog: { role: "Pull a foe into tongue reach", mapId: "sunkenMarsh" },
-    alchemist: { role: "Catch a group in one flask burst", mapId: "sunkenMarsh" },
+    ranger: { role: "Reach across the creek with your bow", mapId: "bramblebank" },
+    frog: { role: "Pull the ferry pontoons into place", mapId: "reedbedFerry" },
+    alchemist: { role: "Clear a crowded lamp stand with one flask", mapId: "copperwickYard" },
     stormcaller: { role: "Carry a spark through a group", mapId: "starfallRuins" },
     dragon: { role: "Make room with a broad sweep", mapId: "emberRidge" },
     riftblade: { role: "Rush through a crowded approach", mapId: "overworld" },
@@ -82,6 +82,8 @@
   G.formOutingGoal = () => {
     const outing = G.activeFormOuting();
     if (!outing) return null;
+    const roadGoal=G.roadworkOutingGoal?.(outing);
+    if(roadGoal)return roadGoal;
     const form = G.forms[outing.formId], role = G.FORM_ROLES[outing.formId];
     const trail = G.FORM_TRAILS?.find(t => t.formId === outing.formId);
     // A trophy may have been earned on an earlier visit. Suggest its trail

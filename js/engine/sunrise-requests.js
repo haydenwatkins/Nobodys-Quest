@@ -45,6 +45,12 @@
       thanks:"Look at that starlight! The lenses are shining all the way down the galleries. Thank you for finding the thread. Now I can read the old eastern road toward Sunstep. Practice a shape you enjoy, then we'll see who's waiting beyond it.",
       after:"I can see the road clearly again. Parcel has already asked for a copy of the map. He's very excited about having a route instead of a guess."}
   ];
+  G.registerSunriseRequest=request=>{
+    if(requests.some(r=>r.id===request.id))return false;
+    requests.push(request);
+    if(!G.SUNRISE_REQUEST_IDS.includes(request.id))G.SUNRISE_REQUEST_IDS.push(request.id);
+    return true;
+  };
   const unlocked=()=>!!(G.state && G.state.delivery?.complete);
   const claimed=()=>{const town=G.ensureTown();if(!Array.isArray(town.requests))town.requests=[];return town.requests;};
   const home=r=>r.mapId||"sunriseQuay";
@@ -56,6 +62,7 @@
   const giftName=r=>G.treasureInfo?.[`sunrise-thanks-${r.id}`]?.name||`${r.name}'s thank-you gift`;
   const reminder=r=>giftFor(r)?` Your ${giftName(r)} waits beside me. Walk over it to collect your thanks.`:"";
   function introduced(r) {
+    if(r.formId)return G.formUnlocked(r.formId);
     if(r.mapId){
       if(claimed().includes(r.id)||G.ensureTown().followedRequest===r.id||r.ready())return true;
       const visited=G.state.mapId===home(r)||G.ensureWayfinder().discovered.includes(home(r));
@@ -81,7 +88,7 @@
     if(!selected||G.state.expeditionRun)return null;
     const r=requests.find(r=>r.id===selected.id);
     if(r.mapId){
-      const step=r.id==='starfall-lights'?G.starfallPromiseStep():ridgeStep();
+      const step=r.step?r.step():r.id==='starfall-lights'?G.starfallPromiseStep():ridgeStep();
       const at=position(r),mapId=selected.ready?home(r):step.mapId;
       return {kind:"request",requestId:r.id,name:r.name,title:r.title,ready:selected.ready,
         short:selected.ready?`Return to ${r.name}`:step.short,
@@ -110,7 +117,8 @@
     let mapId=selected.mapId,x=selected.tileX,y=selected.tileY,text=selected.objective;
     if(r.mapId){
       if(G.state.mapId!==mapId){const route=G.guidanceRouteTarget({mapId});return route?{...route,kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",text:`${route.text} ${text}`}:null;}
-      const gift=!selected.ready&&G.groundRewardFor(r.id==='ridge-watch'?'trophy-eclipse-sigil':'starfall-thread');
+      const rewardItem=r.id==='ridge-watch'?'trophy-eclipse-sigil':r.id==='starfall-lights'?'starfall-thread':r.rewardItem;
+      const gift=!selected.ready&&rewardItem&&G.groundRewardFor(rewardItem);
       const at=selected.ready?position(r):gift?{x:gift.x,y:gift.y}:{x:x*G.TILE+8,y:y*G.TILE+8};
       return {kind:"home",color:G.GUIDANCE_COLORS.home,icon:"☀",destination:r.title,x:at.x,y:at.y,tileX:Math.floor(at.x/G.TILE),tileY:Math.floor(at.y/G.TILE),text,...(gift?{reward:gift}:{})};
     }
@@ -208,7 +216,7 @@
         }else if(r.id==="dragon"){
           c.fillStyle="#9666b7";c.fillRect(x+15,y+3,12,5);c.fillRect(x+24,y-2,5,6);c.fillRect(x+17,y-3,3,7);
           c.fillStyle="#e6bc67";c.fillRect(x+16,y+8,3,3);c.fillRect(x+24,y+8,3,3);c.fillRect(x+27,y-1,1,1);
-        }else{
+        }else if(r.id==='welcome'){
           c.fillStyle="#97623e";c.fillRect(x+18,y-10,12,12);c.fillRect(x+17,y+2,14,4);c.fillRect(x+18,y+6,3,5);c.fillRect(x+27,y+6,3,5);
           c.fillStyle="#d9bd84";c.fillRect(x+20,y-8,8,8);
         }
@@ -227,7 +235,7 @@
   }
   G.neighbourPromiseLead=()=>{
     if(!unlocked()||!G.state.opening?.started||G.state.opening.version<2||!G.systemIntroduced('sideAdventures')||G.storyChapter()>=3||G.state.stars>=G.PACING.worldwakeStars||G.masteryLessons(1,null,true).length)return null;
-    const r=requests.find(r=>r.mapId&&!claimed().includes(r.id));
+    const r=requests.find(r=>r.mapId&&!r.formId&&!claimed().includes(r.id));
     if(!r||G.state.stars<(r.id==='ridge-watch'?7:10))return null;
     const at=position(r);
     return {guide:'person',mapId:home(r),personId:r.npc,point:[Math.floor(at.x/G.TILE),Math.floor(at.y/G.TILE)],destination:G.maps[home(r)].name,

@@ -1,14 +1,20 @@
-# Nobody's Quest
+# Patchling and the Waking Roads
 
 A family-built browser adventure about restoring living roads through
 form switching, mastery and borrowed talents. Originally inspired by
 *Nobody Saves the World*, it is developing its own cast and world; see
 [the original identity direction](docs/ORIGINAL-IDENTITY.md).
-the engine is finished infrastructure; the **forms, abilities, enemies,
+The engine is finished infrastructure; the **forms, abilities, enemies,
 and maps are data files designed to be extended by a kid** (see
 [FOR-BEN.md](FOR-BEN.md)).
 
 Plain JavaScript + Canvas. **No build tools, no npm, no installs.**
+
+Bramble Scout, Frog and Copperwick Brewer can now help neighbours repair
+bridges, ferry pontoons and lampyard paths on three connected roads. Repairs
+stay open for every shape, and optional promises lead back to grateful friends.
+See [the early-form adventures](docs/EARLY-FORM-ROADS.md) and
+[the game's new identity](docs/GAME-IDENTITY.md). Existing saves still work.
 
 ## The road to Sunrise
 
@@ -63,7 +69,7 @@ a functional Crown with extra mana and one Second Wind per future run.
 Sunrise Town now enters the story after the first claimed form, starts with an
 affordable house, and grows from ordinary good deeds as well as late-game wins.
 The Living Atlas maintains three untimed situations in discovered regions, and
-an ordinary creature that knocks Nobody out can become a named Rival that
+an ordinary creature that knocks Patchling out can become a named Rival that
 returns with new readable traits. Manyfold Expeditions unlock with two forms and
 provide short roguelite-inspired runs: varied branching routes, combat and rest
 rooms, temporary boon/move/form drafts, safe failure, and persistent town
@@ -126,7 +132,7 @@ One-time setup:
    ```
    git init
    git add -A
-   git commit -m "Nobody's Quest v1"
+   git commit -m "Patchling and the Waking Roads"
    git branch -M main
    git remote add origin https://github.com/YOUR-USERNAME/nobodys-quest.git
    git push -u origin main

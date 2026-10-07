@@ -46,6 +46,8 @@ Write spoken English that a child can follow on first hearing. Every story/reque
 | Brindle | Warm baker attached to family recipes; affection, loss and delight expressed through real kitchen details. |
 | Mara | Quiet affection and anticipation for her sister; ordinary domestic details. |
 | Pip | Excitable child; direct questions and imaginative play with Thimble. |
+| Moss | Gentle groundskeeper; cares about neighbours visiting and sharing baskets/soup. |
+| Provisional | Curious, careful road-lamp researcher; worries about night travellers, offers a warm supper. |
 | Treant | Frightened protector who shut the road; admits his mistake and lifts the branches. |
 | Mire Queen | Proud, possessive of her court’s light; reluctantly recognizes the boats need it. |
 | Eclipse Knight | Anxious night guard; fears losing the last watchfire, admits he frightened travellers, offers a friendly practice rematch. |

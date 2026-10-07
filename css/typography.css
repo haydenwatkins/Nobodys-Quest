@@ -19,6 +19,13 @@ small, .eyebrow { font-weight:700; }
 #menu .journey-crossing strong { font-size:25px; line-height:1.3; }
 #menu .journey-crossing span, #menu .journey-crossing small { font-size:16px; line-height:1.45; }
 .title-lockup h1 { font-weight:800; letter-spacing:-1px; text-shadow:0 3px 0 #5d275d,0 0 25px #ffcd7538; }
+.title-lockup > span { margin:0; font-size:clamp(18px,2.5vw,28px); line-height:1.25; font-weight:800; letter-spacing:0; text-transform:none; }
+.title-lockup h1 { line-height:1.15; text-transform:none; }
+.title-lockup p { text-transform:none; }
+#save-slots.title-short-landscape .title-lockup > span { font-size:19px; line-height:1.25; margin:0; letter-spacing:0; }
+#save-slots.title-short-landscape .title-lockup h1 { font-size:clamp(37px,7vw,54px); line-height:1.1; letter-spacing:-1px; }
+#save-slots.title-short-landscape .title-world-hero { flex-basis:clamp(150px,calc(var(--title-vh,100dvh) - 216px),214px); min-height:clamp(150px,calc(var(--title-vh,100dvh) - 216px),214px); }
+#save-slots.title-short-landscape .title-transform-stage { transform:translateX(-50%) scale(.62); }
 .title-lockup p, .save-slot-number, .save-slot-card strong, .save-screen-foot button, .title-return,
 .title-settings button, .ending-panel button { font-size:14px; line-height:1.4; letter-spacing:0; }
 .ending-stats strong { font-size:20px; }

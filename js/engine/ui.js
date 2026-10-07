@@ -286,8 +286,7 @@ G.ui = (() => {
     const name = s.mapDef && s.mapDef.name ? s.mapDef.name : s.mapId;
     const touch = G.input.isTouch;
     c.font = `800 ${touch ? 6.5 : 7}px ${FONT_HEAD}`;
-    const enemies = s.enemies.filter((e) => !e.dead).length;
-    const label = touch ? name.toUpperCase() : `${name}  enemies:${enemies}`;
+    const label = touch ? name.toUpperCase() : name;
     const w = c.measureText(label).width + 8;
     const x = Math.round(G.W / 2 - w / 2);
     if (fieldPanelBlocked(cam, x, 5, w, 11)) return;
@@ -1712,7 +1711,7 @@ G.ui = (() => {
     const sections = menuSections();
     const section = activeMenuSection(sections);
     const routeTabs = section.routes;
-    let html = `<header class="menu-console-header"><div class="menu-title"><h1>${escapeHtml(G.state.mapDef.name || "Nobody's Quest")}</h1><span>⭐ ${G.state.stars}</span></div>
+    let html = `<header class="menu-console-header"><div class="menu-title"><h1>${escapeHtml(G.state.mapDef.name || "Patchling and the Waking Roads")}</h1><span>⭐ ${G.state.stars}</span></div>
       <div class="menu-tabs" aria-label="Pause menu sections">${sections.map((item) =>
         `<button data-menu-section="${item.id}" data-menu-route="${item.routes[0][0]}" data-nav-zone="sections" class="${section.id === item.id && !settingsOpen ? "active" : ""}"><span>${item.icon}</span>${item.label}</button>`).join("")}
       </div>${!settingsOpen && section.id === "challenges" && routeTabs.length > 1 ? `<div class="menu-route-tabs" aria-label="${escapeHtml(section.label)} pages">${routeTabs.map(([route, label]) =>

@@ -1,7 +1,7 @@
 {
-  "name": "Nobody's Quest",
-  "short_name": "Nobody",
-  "description": "A shapeshifting adventure by Ben (and family)",
+  "name": "Patchling and the Waking Roads",
+  "short_name": "Patchling",
+  "description": "Become a new shape. Help a neighbour. Wake the roads. An adventure by Ben and family.",
   "start_url": ".",
   "display": "fullscreen",
   "orientation": "landscape",

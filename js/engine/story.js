@@ -230,11 +230,6 @@ G.storyGoal = function () {
 
   const outing = G.formOutingGoal && G.formOutingGoal();
   if (outing) return Object.assign(base, outing);
-  const waitingEcho = (G.state.formEchoes || []).find(echo => G.formReady(echo.formId));
-  if (waitingEcho && G.state.opening?.started && G.state.opening.version >= 2) {
-    const lead = formJourneyLead(waitingEcho.formId, storyProgress(0, 1, "FORM ECHO"));
-    if (lead) return Object.assign(base, lead);
-  }
 
   if (G.storyComplete()) return Object.assign(base, {
     complete: true,
@@ -289,6 +284,11 @@ G.storyGoal = function () {
   }
   const neighbourLead=G.neighbourPromiseLead?.();
   if(neighbourLead)return Object.assign(base,neighbourLead);
+  const waitingEcho = (G.state.formEchoes || []).find(echo => G.formReady(echo.formId));
+  if (waitingEcho && G.state.opening?.started && G.state.opening.version >= 2) {
+    const lead = formJourneyLead(waitingEcho.formId, storyProgress(0, 1, "FORM ECHO"));
+    if (lead) return Object.assign(base, lead);
+  }
   if (chapter === 1) {
     const defeated = masters.filter((master) => items.has(master.trophy)).length;
     const next = masters.find((master) => !items.has(master.trophy) && stars >= master.stars) ||

@@ -76,6 +76,7 @@ G.combat = (() => {
   function damageEnemy(enemy, opts) {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
+    if(enemy.roadMechanism&&G.hitRoadMechanism)return G.hitRoadMechanism(enemy,opts);
     if (enemy.def.practice) {
       enemy.flash = .12;
       // The opening post stays available if a player clears the road in
@@ -854,6 +855,7 @@ G.combat = (() => {
   function explodeProjectile(pr) {
     const damage = pr.explodeDamage === undefined ? pr.damage : pr.explodeDamage;
     let hits = 0;
+    const targets = [];
     for (const e of G.state.enemies) {
       if (e.dead || G.util.dist(pr.x, pr.y, e.x, e.y - 4) > pr.explodeRadius + e.def.size / 2) continue;
       if (pr.hitSet && pr.hitSet.has(e)) continue;
@@ -865,6 +867,7 @@ G.combat = (() => {
         knockback: 120,
       })) {
         hits++;
+        targets.push(e);
         if (pr.passivePull) {
           const d = G.util.dist(e.x, e.y, pr.x, pr.y);
           const a = G.util.angleTo(e.x, e.y, pr.x, pr.y);
@@ -874,6 +877,7 @@ G.combat = (() => {
       }
     }
     pr.hitCount = (pr.hitCount || 0) + hits;
+    if(G.noteRoadworkBlast)G.noteRoadworkBlast(pr,targets);
     G.state.shake = Math.max(G.state.shake, 0.22);
     G.state.hitStop = Math.max(G.state.hitStop, 0.055);
     G.sfx.play("explosion");

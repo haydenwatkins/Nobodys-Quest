@@ -1,4 +1,4 @@
-# 👤 NOBODY'S QUEST — Builder's Guide
+# 🧵 PATCHLING AND THE WAKING ROADS — Builder's Guide
 
 Hey Ben! This game is **yours to grow**. The engine is built —
 your job is to invent new **forms** (classes), new **abilities**,
@@ -270,7 +270,7 @@ at school or asleep. Each one asks for normal play—victories, distinct moves,
 different forms, ward breaks, or finding a Rival—and resolving it replaces it
 with a new situation.
 
-`js/engine/rival.js` turns an ordinary creature that knocks Nobody out into one
+`js/engine/rival.js` turns an ordinary creature that knocks Patchling out into one
 named recurring opponent. Its extra health, speed, ward, and ranged behavior
 are applied to that individual instance, never to the base enemy definition.
 Three victories complete its story and award a keepsake.
@@ -315,7 +315,7 @@ NPCs talk when the player walks close, then reset after the player steps away.
 That keeps the same interaction working on keyboard, Xbox controllers, iPad,
 and phones without another screen button. Keep lines short, funny, and useful.
 The game's story is about abandoned promises becoming the Unfinished, and about
-Nobody succeeding through many imperfect roles instead of becoming one perfect
+Patchling succeeding through many imperfect roles instead of becoming one perfect
 hero. New jokes should reveal character or world rules, not imitate dialogue
 from another game.
 

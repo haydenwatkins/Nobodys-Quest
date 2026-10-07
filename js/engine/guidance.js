@@ -473,6 +473,8 @@
     if (goal.guide === "outing") {
       const outing = G.activeFormOuting();
       if (s.formId !== outing.formId) return { kind: "form", color: G.GUIDANCE_COLORS.form, icon: G.forms[outing.formId].icon, spatial: false, destination: goal.title, text: goal.objective };
+      const roadTarget=G.roadworkOutingTarget?.(goal);
+      if(roadTarget)return roadTarget;
       const foes = s.enemies.filter(e => !e.dead && !e.def.miniboss && !e.def.practice &&
         (G.formLevel(outing.formId) < 3 || outing.arts.length < 2 || outing.scenes.every(scene => scene.mapId !== s.mapId || Math.hypot(scene.x - e.outingSpawnX, scene.y - e.outingSpawnY) >= 160)));
       const key = s.mapId + ":" + outing.formId;

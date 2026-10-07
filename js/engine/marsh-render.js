@@ -1,7 +1,7 @@
 /* The optional ferry mechanisms select art from actual saved items. */
 "use strict";
 (()=>{
- const here=()=>G.state&&G.state.mapId==='sunkenMarsh',S=G.marshScenery,colors=['#426773','#658c91','#a0bcb6'];
+ const here=()=>G.state&&(G.state.mapId==='sunkenMarsh'||G.state.mapDef?.earlyFormRoad==='frog'),S=G.marshScenery,colors=['#426773','#658c91','#a0bcb6'];
  const rect=(c,x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y,w,h);};
  G.marshWaterColors=()=>here()?colors:null;
  G.drawMarshTile=(c,cell,x,y,time)=>{

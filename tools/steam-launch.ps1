@@ -100,7 +100,8 @@ try {
 
     if (-not (Test-Path -LiteralPath $chromeProxy)) { throw "Google Chrome is not installed." }
 
-    $window = [NobodyQuestWindow]::Find("Nobody's Quest")
+    $window = [NobodyQuestWindow]::Find("Patchling and the Waking Roads")
+    if ($window -eq [IntPtr]::Zero) { $window = [NobodyQuestWindow]::Find("Nobody's Quest") }
     if ($window -eq [IntPtr]::Zero) {
         Start-Process -FilePath $chromeProxy -ArgumentList @(
             "--profile-directory=Default",
@@ -112,7 +113,8 @@ try {
     $deadline = (Get-Date).AddSeconds(6)
     do {
         Start-Sleep -Milliseconds 200
-        $window = [NobodyQuestWindow]::Find("Nobody's Quest")
+        $window = [NobodyQuestWindow]::Find("Patchling and the Waking Roads")
+        if ($window -eq [IntPtr]::Zero) { $window = [NobodyQuestWindow]::Find("Nobody's Quest") }
     } while ($window -eq [IntPtr]::Zero -and (Get-Date) -lt $deadline)
 
     # If the installed-app registration ever disappears, the direct app URL
@@ -126,11 +128,12 @@ try {
         $deadline = (Get-Date).AddSeconds(10)
         do {
             Start-Sleep -Milliseconds 200
-            $window = [NobodyQuestWindow]::Find("Nobody's Quest")
+            $window = [NobodyQuestWindow]::Find("Patchling and the Waking Roads")
+            if ($window -eq [IntPtr]::Zero) { $window = [NobodyQuestWindow]::Find("Nobody's Quest") }
         } while ($window -eq [IntPtr]::Zero -and (Get-Date) -lt $deadline)
     }
 
-    if ($window -eq [IntPtr]::Zero) { throw "Nobody's Quest did not open in Chrome." }
+    if ($window -eq [IntPtr]::Zero) { throw "Patchling and the Waking Roads did not open in Chrome." }
 
     [NobodyQuestWindow]::Raise($window)
     Start-Sleep -Milliseconds 700

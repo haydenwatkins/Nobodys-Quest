@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || enemy.def.practice) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -68,7 +68,7 @@ G.autoAimTarget = function (user, maxRange) {
     let visible = true;
     for (let i = 1; i < steps; i++) {
       const t = i / steps;
-      if (G.world.solid(
+      if (G.world.blocksProjectile(
         user.x + (enemy.x - user.x) * t,
         user.y - 5 + (enemy.y - user.y) * t,
       )) { visible = false; break; }
@@ -350,7 +350,10 @@ G.updatePlayer = function (dt) {
       }
       if (!touchAimHelpShown && G.tutorial && G.tutorial.coaching()) {
         touchAimHelpShown = true;
-        G.tutorial.hint("touch-aim", "🎯 Tap ranged attacks to auto-aim · drag to aim yourself", 3.5);
+        const aimHelp = G.input.hasGamepad
+          ? "🎯 Ranged attacks aim for you · use the right stick to aim yourself"
+          : "🎯 Tap ranged attacks to auto-aim · drag to aim yourself";
+        G.tutorial.hint("touch-aim", aimHelp, 3.5);
       }
     }
     const manaCost = G.abilityManaCost ? G.abilityManaCost(ab) : ab.mana;
