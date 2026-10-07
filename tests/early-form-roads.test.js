@@ -2,10 +2,10 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=r
 const walkGrid=require('../tools/lib/walk-grid.cjs'),cross=require('./helpers/cross-road.cjs');
 function modern(r,id){const {G}=r;G.state.opening.started=G.state.opening.complete=true;G.state.delivery.complete=true;
  G.state.items=['trophy-heartwood-crown','trophy-mire-pearl'];G.ensureTown().requests=['recipes','beacon'];G.state.stars=14;
- G.state.claimedForms=['rat','knight','wizard','ranger','frog','alchemist'];G.state.formOutings={active:{formId:id,arts:[],scenes:[]},features:[]};G.setForm(id);}
+ G.state.claimedForms=['rat','knight','wizard','ranger','frog','alchemist',id];G.state.formOutings={active:{formId:id,arts:[],scenes:[]},features:[]};G.setForm(id);}
 function cast(r,button,frames=35){r.taps.add(button);for(let i=0;i<frames;i++){r.G.state.time+=.05;r.G.updatePlayer(.05);r.G.combat.updateProjectiles(.05);r.G.updateFx(.05);}r.drain();}
 function aim(G,x,y){const p=G.state.player,dx=x*16+8-p.x,dy=y*16+8-p.y,d=Math.hypot(dx,dy)||1;p.dir={x:dx/d,y:dy/d};}
-test('three different roads connect both ways, have an open long path and preserve original neighbouring entrances',()=>{
+test('five different roads connect both ways, have an open long path and preserve original neighbouring entrances',()=>{
  const r=runtime(),{G}=r;
  for(const road of G.EARLY_FORM_ROADS){modern(r,road.formId);r.load(road.region);r.drain();cross(r,road.id);
   assert.equal(G.state.mapId,road.id);walkGrid(r,31,4);walkGrid(r,...road.start);
@@ -13,11 +13,11 @@ test('three different roads connect both ways, have an open long path and preser
   cross(r,road.region);assert.equal(G.state.mapId,road.region);
  }
  assert.equal(G.maps.overworld.legend.S.portal.map,'sunkenMarsh');assert.equal(G.maps.sunkenMarsh.legend.x.portal.map,'overworld');
- for(const road of G.EARLY_FORM_ROADS){modern(r,road.formId);r.load('overworld');r.drain();assert.equal(G.guidanceRouteTarget(G.storyGoal()).cell.portal.map,road.region==='overworld'?road.id:'sunkenMarsh');}
+ for(const road of G.EARLY_FORM_ROADS){modern(r,road.formId);r.load('overworld');r.drain();assert.equal(G.guidanceRouteTarget(G.storyGoal()).cell.portal.map,road.region==='overworld'?road.id:road.region);}
 });
 test('native bow shots across water and Frog tongue contacts create actual saved crossings without free mastery',()=>{
  const r=runtime(),{G}=r;
- for(const road of G.EARLY_FORM_ROADS.filter(r=>r.formId!=='alchemist')){
+ for(const road of G.EARLY_FORM_ROADS.filter(r=>['ranger','frog'].includes(r.formId))){
   modern(r,road.formId);r.load(road.id);r.drain();G.state.enemies=G.state.enemies.filter(e=>e.roadMechanism);
   const original=JSON.stringify(G.questCounts);
   for(const repair of road.repairs){walkGrid(r,...repair.approach);aim(G,repair.x,repair.y);
@@ -85,5 +85,5 @@ test('authored repair scenery keeps both densities and cannot change progress or
   }
   assert.equal(snap(),before);assert.equal(G.greenfieldWaterColors()[0],'#42646f');
  }
- for(const id of ['winch','pontoon','lamp','boards'])assert.ok(G.roadworkScenery[id].hd&&G.roadworkScenery[id].frames.length===4);
+ for(const id of ['winch','pontoon','lamp','boards','relay','brush','breadCart','kettle'])assert.ok(G.roadworkScenery[id].hd&&G.roadworkScenery[id].frames.length===4);
 });

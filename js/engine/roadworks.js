@@ -19,7 +19,8 @@
     for(const enemy of G.state.enemies)if(enemy.roadMechanism?.id===repair.id)enemy.dead=true;
     const [x0,y0,x1,y1]=repair.bridge;
     G.spawnFx({kind:'ring',x:(x0+x1+1)*8,y:(y0+y1+1)*8,color:'#a7f070',radius:26,dur:.65});
-    G.sfx.play('pickup');G.ui.toast(repair.kind==='lamp'?'The lamp is clear. A warm path opens!':'The boards settle into place. A new crossing!',3);
+    const message=repair.kind==='lamp'?'The lamp is clear. A warm path opens!':repair.kind==='relay'?'The relays light up. The bridge lowers!':repair.kind==='brush'?'The branches roll aside. Room for the cart!':'The boards settle into place. A new crossing!';
+    G.sfx.play('pickup');G.ui.toast(message,3);
     G.saveGame();return true;
   }
   G.hitRoadMechanism=(enemy,opts)=>{
@@ -32,6 +33,17 @@
     return false;
   };
   G.roadMechanismAim=enemy=>enemy.roadMechanism?.kind==='winch'&&G.state.formId==='ranger'&&!G.roadRepairOpen(enemy.roadMechanism.id);
+  function linkedContact(kind,ability,expected,contacts){
+    if(ability!==expected)return;
+    for(const repair of repairs().filter(r=>r.kind===kind)){
+      const nodes=new Set([...contacts].filter(e=>e.roadMechanism?.id===repair.id).map(e=>e.roadMechanism.node));
+      if(nodes.size===repair.nodes.length)open(repair);
+    }
+  }
+  // Use the targets of one real arc or swing. Separate casts, distant
+  // casts and a single Storm Spark cannot impersonate a connected action.
+  G.noteRoadworkChain=(ability,contacts)=>linkedContact('relay',ability,'chainLightning',contacts);
+  G.noteRoadworkSweep=(ability,contacts)=>linkedContact('brush',ability,'tailSweep',contacts);
   G.noteRoadworkBlast=(projectile,targets)=>{
     if(projectile.ability!=='volatileFlask'||targets.length<3)return;
     const road=roads().find(r=>r.id===G.state.mapId&&r.formId==='alchemist');if(!road)return;
@@ -55,8 +67,10 @@
       if(repair.kind==='lamp'||G.roadRepairOpen(repair.id))continue;
       // Existing inert practice actors supply native hit geometry; the
       // road renderer owns their physical appearance and saved open pose.
-      const e=G.makeEnemy('slime',repair.x*16+8,repair.y*16+8);
-      e.roadMechanism=repair;e.def={...e.def,name:'Road mechanism',practice:true,hp:999,damage:0,speed:0,size:16};e.hp=999;G.state.enemies.push(e);
+      for(const [node,[x,y]]of (repair.nodes||[[repair.x,repair.y]]).entries()){
+        const e=G.makeEnemy('slime',x*16+8,y*16+8);
+        e.roadMechanism={...repair,node};e.def={...e.def,name:'Road mechanism',practice:true,hp:999,damage:0,speed:0,size:16};e.hp=999;G.state.enemies.push(e);
+      }
     }
   });
   const enemyUpdate=G.updateOpeningEnemy;
@@ -67,7 +81,7 @@
     const repair=road.repairs.find(r=>!G.roadRepairOpen(r.id));
     if(!repair)return {mapId:road.id,short:`Bring ${road.person} the good news`,objective:`Both routes are repaired. Return to ${road.person}.`,tileX:road.at[0],tileY:road.at[1],value:2};
     const remaining=G.state.mapId===road.id?G.state.enemies.filter(e=>!e.dead&&!e.def.practice&&Math.hypot(e.outingSpawnX-repair.x*16-8,e.outingSpawnY-repair.y*16-8)<56).length:3;
-    const verb=repair.kind==='winch'?'Shoot the copper winch across the creek':repair.kind==='pontoon'?'Pull the copper loop with Tongue Lash':remaining<3?'Clear the remaining creatures around this lamp':'Catch the three lamp creatures in one Volatile Flask burst';
+    const verb=repair.kind==='winch'?'Shoot the copper winch across the creek':repair.kind==='pontoon'?'Pull the copper loop with Tongue Lash':repair.kind==='relay'?'Send Chain Lightning through all three copper relays':repair.kind==='brush'?'Stand beside the branches and move all three with Tail Sweep':remaining<3?'Clear the remaining creatures around this lamp':'Catch the three lamp creatures in one Volatile Flask burst';
     return {mapId:road.id,short:road.role,objective:verb+'. The long path is open if you need to approach from another side.',tileX:repair.approach[0],tileY:repair.approach[1],value:road.repairs.filter(r=>G.roadRepairOpen(r.id)).length};
   };
   G.roadworkOutingGoal=outing=>{

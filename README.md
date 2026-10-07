@@ -1,4 +1,4 @@
-# Patchling and the Waking Roads
+# Patchling’s Quest
 
 A family-built browser adventure about restoring living roads through
 form switching, mastery and borrowed talents. Originally inspired by
@@ -10,8 +10,8 @@ and maps are data files designed to be extended by a kid** (see
 
 Plain JavaScript + Canvas. **No build tools, no npm, no installs.**
 
-Bramble Scout, Frog and Copperwick Brewer can now help neighbours repair
-bridges, ferry pontoons and lampyard paths on three connected roads. Repairs
+Five specialist forms now help neighbours restore connected roads: bow
+winches, ferry pontoons, lampyards, lightning relays and a broad cart route. Repairs
 stay open for every shape, and optional promises lead back to grateful friends.
 See [the early-form adventures](docs/EARLY-FORM-ROADS.md) and
 [the game's new identity](docs/GAME-IDENTITY.md). Existing saves still work.
@@ -132,7 +132,7 @@ One-time setup:
    ```
    git init
    git add -A
-   git commit -m "Patchling and the Waking Roads"
+   git commit -m "Patchling’s Quest"
    git branch -M main
    git remote add origin https://github.com/YOUR-USERNAME/nobodys-quest.git
    git push -u origin main

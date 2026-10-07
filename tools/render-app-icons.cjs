@@ -22,8 +22,8 @@ c.fillStyle='#254d4c';c.fillRect(0,0,320,180);c.fillStyle='#efdca8';c.fillRect(8
 c.strokeStyle='#ab8158';c.lineWidth=1;c.setLineDash([3,3]);c.strokeRect(14,14,292,152);c.setLineDash([]);
 c.strokeStyle='#c0aa79';c.lineWidth=8;c.beginPath();c.moveTo(17,153);c.bezierCurveTo(79,104,145,170,302,146);c.stroke();
 G.drawSprite(c,G.forms.nobody.sprite,0,57,143,false,4);
-c.fillStyle='#254d4c';c.font='800 40px Nunito';c.fillText('Patchling',98,76);
-c.font='800 17px Nunito';c.fillText('and the Waking Roads',99,101);
+c.fillStyle='#254d4c';c.font='800 37px Nunito';c.fillText('Patchling’s',98,76);
+c.font='800 17px Nunito';c.fillText('Quest',99,101);
 c.fillStyle='#6d5947';c.font='600 15px Nunito';c.fillText('A world to mend.',100,125);
 fs.writeFileSync(path.join(r.root,'android-tv/app/src/main/res/drawable-xhdpi/tv_banner.png'),banner.toBuffer('image/png'));
 console.log('Rendered TV banner from native Patchling art and Nunito');

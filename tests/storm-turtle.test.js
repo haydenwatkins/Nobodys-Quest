@@ -6,9 +6,9 @@ test('stunned chain anchors reach farther without hitting an enemy twice',()=>{
  G.combat.applyStatus(a,'stun',{dur:1});G.abilities.chainLightning.use(G.state.player);assert.equal(a.hp,48);assert.equal(b.hp,49);
 });
 test('solid cover blocks initial lightning targets and later links',()=>{
- const {G}=setup(),a=foe(G,220),b=foe(G,250);const solid=G.world.solid;
- G.world.solid=(x,y)=>x>230&&x<240;G.abilities.chainLightning.use(G.state.player);assert.equal(a.hp,49);assert.equal(b.hp,50);
- G.world.solid=(x,y)=>x>205&&x<215;G.abilities.chainLightning.use(G.state.player);assert.equal(a.hp,49);assert.equal(b.hp,50);G.world.solid=solid;
+ const {G}=setup(),a=foe(G,220),b=foe(G,250);const blocks=G.world.blocksProjectile;
+ G.world.blocksProjectile=(x,y)=>x>230&&x<240;G.abilities.chainLightning.use(G.state.player);assert.equal(a.hp,49);assert.equal(b.hp,50);
+ G.world.blocksProjectile=(x,y)=>x>205&&x<215;G.abilities.chainLightning.use(G.state.player);assert.equal(a.hp,49);assert.equal(b.hp,50);G.world.blocksProjectile=blocks;
 });
 test('Shell Counter blocks one hit and responds once, even when another hit arrives immediately',()=>{
  const {G}=setup(),p=G.state.player,e=foe(G,220);G.abilities.shellCounter.use(p);assert.equal(e.hp,48);

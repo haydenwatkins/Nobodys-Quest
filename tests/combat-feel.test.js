@@ -31,6 +31,7 @@ G.ui = { toast() {}, banner() {}, update() {} };
 G.playerForm = () => ({ breaksAnyWard: false, speed: 80, hearts: 3 });
 G.world = {
   solid: () => false,
+  blocksProjectile: () => false,
   moveBox(entity, dx, dy) { entity.x += dx; entity.y += dy; },
   checkTriggers() {},
 };

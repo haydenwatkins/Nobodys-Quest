@@ -12,8 +12,8 @@ test('Blood Moon gathers a crowd and heals once without granting melee guard',()
  assert.equal(p.damageTaken,1);assert.equal(p.meleeGuard,0);foes.forEach((e,i)=>{assert.equal(e.hp,48);assert.ok(Math.hypot(e.x-p.x,e.y-p.y)<before[i]);});
 });
 test('a card skips a nearer blocked ricochet target for a clear target',()=>{
- const {G}=setup('jester'),a=foe(G,264),hidden=foe(G,282),clear=foe(G,264,188);const solid=G.world.solid;
- G.world.solid=(x,y)=>x>=272&&x<=277&&y<170;
- G.abilities.wildCard.use(G.state.player);for(let i=0;i<60;i++)G.combat.updateProjectiles(.02);G.world.solid=solid;
+ const {G}=setup('jester'),a=foe(G,264),hidden=foe(G,282),clear=foe(G,264,188);const blocks=G.world.blocksProjectile;
+ G.world.blocksProjectile=(x,y)=>x>=272&&x<=277&&y<170;
+ G.abilities.wildCard.use(G.state.player);for(let i=0;i<60;i++)G.combat.updateProjectiles(.02);G.world.blocksProjectile=blocks;
  assert.equal(a.hp,49);assert.equal(hidden.hp,50);assert.equal(clear.hp,49);
 });

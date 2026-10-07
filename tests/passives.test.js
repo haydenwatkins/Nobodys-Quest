@@ -20,6 +20,7 @@ G.checkUnlocks = () => {};
 G.input = { vec: { x: 0, y: 0 }, tapped: () => false, takeAim: () => null };
 G.world = {
   solid: () => false,
+  blocksProjectile: () => false,
   moveBox(entity, dx, dy) { entity.x += dx; entity.y += dy; },
   checkTriggers() {},
 };

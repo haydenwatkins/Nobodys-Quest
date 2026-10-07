@@ -1,4 +1,4 @@
-# 🧵 PATCHLING AND THE WAKING ROADS — Builder's Guide
+# 🧵 PATCHLING’S QUEST — Builder's Guide
 
 Hey Ben! This game is **yours to grow**. The engine is built —
 your job is to invent new **forms** (classes), new **abilities**,

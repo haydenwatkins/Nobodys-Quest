@@ -21,7 +21,7 @@ test('the extra thread respects solid walls, wrong wards, and guardian introduct
  const first=foes[1];first.ward={types:['sharp'],hp:8};G.abilities.chainLightning.use(p);
  assert.equal(first.hp,50);assert.equal(first.ward.hp,8);assert.equal(foes.filter(e=>e.hp===49).length,4);
  G.state.enemies=[first,foes[4]];first.ward=null;first.x=264;first.y=152;foes[4].x=295;foes[4].y=152;
- const hp=foes[4].hp;G.world.solid=(x,y)=>x>275&&x<283;G.abilities.chainLightning.use(p);assert.equal(foes[4].hp,hp);
+ const hp=foes[4].hp;G.world.blocksProjectile=(x,y)=>x>275&&x<283;G.abilities.chainLightning.use(p);assert.equal(foes[4].hp,hp);
  const boss=G.makeEnemy('silkMatriarch',264,152);boss.bossIntroT=1;G.state.enemies=[boss];const before=boss.hp;
  G.abilities.chainLightning.use(p);assert.equal(boss.hp,before);
 });

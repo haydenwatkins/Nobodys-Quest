@@ -3,7 +3,7 @@
 // Earned checkpoints isolate native controls, authored routes, offers,
 // repairs and saves. Original health/wards; AI held still for this review.
 const assert=require('node:assert/strict'),review=require('./lib/browser-review.cjs');
-review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',name:'Patchling identity and three neighbour roads',publishedHost:true,
+review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',name:'Patchling’s Quest and five neighbour roads',publishedHost:true,
  async run({page,mode,hd,frames,next,drain,offer,answer,walkTo,shot,reload}){
   async function pad(index){const b=Array(16).fill(0);b[index]=1;await page.evaluate(b=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b})),b);await frames(1);await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:Array(16).fill(0)})));await frames(5);}
   async function art(slot){if(mode==='controller')await pad([0,2,3][slot]);else{await page.locator(['#btn-a','#btn-b','#btn-c'][slot]).tap();await frames(6);}await frames(35);await drain();}
@@ -15,17 +15,18 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
    },{x,y});
    for(const [px,py]of points)await walkTo(px*16+8,py*16+8);
   }
-  assert.equal(await page.title(),'Patchling and the Waking Roads');
+  assert.equal(await page.title(),'Patchling’s Quest');
   await page.evaluate(()=>G.showSaveSlotScreen(true));await page.evaluate(()=>document.fonts.ready);await frames(3);
-  assert.equal((await page.locator('.title-lockup').innerText()).replace(/\n+/g,'\n'),'Patchling\nand the Waking Roads\nA little coat. A world to mend.');
+  assert.equal((await page.locator('.title-lockup').innerText()).replace(/\n+/g,'\n'),'Patchling’s\nQuest\nA little coat. A world to mend.');
   assert.equal(await page.locator('.title-lockup').evaluate(el=>el.scrollWidth>el.clientWidth),false);await shot('new-title');
   assert.equal(await page.locator('.title-lockup').evaluate(el=>{const r=el.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight;}),true,'the complete title stays on screen after slot focus');
   if(mode==='controller')await pad(1);else await page.locator('[data-title-return]').tap();await frames(3);
-  const roads=await page.evaluate(()=>G.EARLY_FORM_ROADS);
+  const selected=process.argv[4]?.split(',');
+  const roads=(await page.evaluate(()=>G.EARLY_FORM_ROADS)).filter(r=>!selected||selected.includes(r.formId));
   for(const road of roads){
    await page.evaluate(r=>{
     Object.assign(G.state.opening,{started:true,complete:true,bell:true,version:2});G.state.delivery.complete=true;G.state.stars=14;
-    G.state.items=['trophy-heartwood-crown','trophy-mire-pearl'];G.state.claimedForms=['rat','knight','wizard','ranger','frog','alchemist'];
+    G.state.items=['trophy-heartwood-crown','trophy-mire-pearl'];G.state.claimedForms=['rat','knight','wizard','ranger','frog','alchemist','stormcaller','dragon'];
     Object.assign(G.ensureTown(),{founded:true,introduced:true,requests:['recipes','beacon'],followedRequest:null});
     G.questsDone=[];G.questCounts={};G.state.loadouts={};G.state.roadworks=G.makeRoadworks();G.state.formEchoes=[];
     G.state.formOutings={active:{formId:r.formId,arts:[],scenes:[]},features:[]};G.setForm(r.formId);G.world.load(r.id);
@@ -40,8 +41,8 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
    assert.equal(await page.evaluate(()=>G.currentTask().requestId),'road-'+road.formId);
    for(const repair of road.repairs){
     await walk(...repair.approach);await frames(8);await shot(repair.id+'-before');
-    await page.evaluate(({x,y})=>{const p=G.state.player,dx=x*16+8-p.x,dy=y*16+8-p.y,d=Math.hypot(dx,dy)||1;p.dir={x:dx/d,y:dy/d};},repair);
-    for(let i=0;i<3&&!await page.evaluate(id=>G.roadRepairOpen(id),repair.id);i++)await art(road.formId==='alchemist'?1:0);
+    await page.evaluate(({x,y})=>{const p=G.state.player,dx=x*16+8-p.x,dy=y*16+8-p.y,d=Math.hypot(dx,dy)||1;p.dir={x:dx/d,y:dy/d};},{x:repair.nodes?.[0]?.[0]??repair.x,y:repair.nodes?.[0]?.[1]??repair.y});
+    for(let i=0;i<3&&!await page.evaluate(id=>G.roadRepairOpen(id),repair.id);i++)await art(['alchemist','stormcaller'].includes(road.formId)?1:0);
     assert.equal(await page.evaluate(id=>G.roadRepairOpen(id),repair.id),true,'native input completes '+repair.id);await frames(8);await shot(repair.id+'-after');
     const [x0,y0,x1,y1]=repair.bridge;await walk(x0,Math.round((y0+y1)/2));await walk(x1,Math.round((y0+y1)/2));await frames(100);await shot(repair.id+'-crossed');
    }

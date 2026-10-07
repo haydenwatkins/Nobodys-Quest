@@ -503,7 +503,7 @@ registerAbility({
 registerAbility({
   id: "chainLightning",
   name: "Chain Lightning",
-  description: "Arcs through up to four foes. Stunned targets conduct the next jump 50% farther; solid terrain blocks the arc.",
+  description: "Arcs through up to four foes, even across water. Stunned targets conduct the next jump 50% farther; walls and trees block the arc.",
   icon: "🌩️",
   type: "light",
   style: "chain",

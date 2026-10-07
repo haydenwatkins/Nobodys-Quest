@@ -1,6 +1,6 @@
 # Form discoveries need room to matter
 
-October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; ten earlier specialists remain. See `EARLY-FORM-ROADS.md`.
+October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; Cloudcap Conductor and Hearthdrake subsequently gain relay and cart roads; eight earlier specialists remain. See `EARLY-FORM-ROADS.md` and `CONDUCTOR-HEARTHDRAKE.md`.
 
 ## Player experience
 
@@ -50,8 +50,8 @@ Every future form change must preserve a distinct useful action, an immediately 
 | Starwick Sage | Break a Dark ward from a safe distance | Existing delivery/bridge introduction |
 | Frog | Pull a foe into tongue reach, then reposition | New ferry towing loops, pull/hop encounters and Moss return |
 | Copperwick Brewer | Combine status and a burst against a group | New lampyard clumps, permanent paths and Provisional return |
-| Cloudcap Conductor | Carry a spark through separated neighbours | Existing chains and conductive shove; make a distinct field encounter |
-| Hearthdrake | Sweep a broad crowd away from a close approach | Existing wider sweep and shove; add a purposeful crowded road |
+| Cloudcap Conductor | Carry a spark through separated neighbours | New Rainbell relays, separated real crowds and Probably return |
+| Hearthdrake | Sweep a broad crowd away from a close approach | New Hearthside branch piles, wide crowds and Brindle return |
 | Wayglass Duelist | Rush through a crowded approach and control the landing | Existing dash/afterimage; add a useful route variation |
 | Tunneltuft | Scatter a group with a delayed tremor | Existing aftershocks; add a visible local consequence |
 | Velvetwing | Recover while staying close, turning overflow into protection | Existing healing/Bloodskin; provide a forgiving sustain encounter |

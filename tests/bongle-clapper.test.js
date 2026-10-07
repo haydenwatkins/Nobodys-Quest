@@ -23,7 +23,7 @@ test('blocked wards and practice props cannot earn a returning note; valid ward 
   G.abilities.chainLightning.use(G.state.player);assert.equal(G.state.player.mana,kind==='matching'?1:0);
   assert.equal(feedback.filter(x=>x==='+1 MANA').length,kind==='matching'?1:0);assert.ok(foes.every(e=>e.hp===50));
  }
- const {G,crowd}=fixture();G.carryKeepsake('clapper');crowd(3);G.world.solid=(x,y)=>x>250&&x<257;
+ const {G,crowd}=fixture();G.carryKeepsake('clapper');crowd(3);G.world.blocksProjectile=(x,y)=>x>250&&x<257;
  G.abilities.chainLightning.use(G.state.player);assert.equal(G.state.player.mana,0);
 });
 test('full wells do not emit a false refund and other art styles receive no chain bonus',()=>{

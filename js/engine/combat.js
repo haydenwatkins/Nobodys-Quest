@@ -23,7 +23,7 @@ G.combat = (() => {
   let staggerHelpShown = false;
   function clearArc(x,y,ex,ey){
     const steps=Math.max(1,Math.ceil(Math.hypot(ex-x,ey-y)/6));
-    for(let i=1;i<steps;i++)if(G.world.solid(x+(ex-x)*i/steps,y+(ey-y)*i/steps))return false;
+    for(let i=1;i<steps;i++)if(G.world.blocksProjectile(x+(ex-x)*i/steps,y+(ey-y)*i/steps))return false;
     return true;
   }
 
@@ -444,12 +444,14 @@ G.combat = (() => {
     attackPose(user, facing, o.lunge === undefined ? 2 : o.lunge, 0.09);
     G.sfx.attack("melee", type, o.damage || 1);
     let hits = 0;
+    const roadContacts = [];
     for (const e of G.state.enemies) {
       if (e.dead) continue;
       const d = G.util.dist(user.x, user.y, e.x, e.y);
       if (d > range + e.def.size / 2) continue;
       const a = G.util.angleTo(user.x, user.y, e.x, e.y);
       if (Math.abs(G.util.angleDiff(facing, a)) > arc / 2 && d > 10) continue;
+      if (e.roadMechanism) roadContacts.push(e);
       if (damageEnemy(e, {
         damage: o.damage, type, ability: o.ability,
         knockback: o.knockback, status: o.status,
@@ -490,6 +492,7 @@ G.combat = (() => {
         G.spawnFx({ kind: "puff", x: user.x, y: user.y - 3, color: "#f4f4f4", dur: 0.12 });
       }
     }
+    if (G.noteRoadworkSweep) G.noteRoadworkSweep(o.ability, roadContacts);
     if (hits >= 2 && !o.suppressMultiHit) G.events.emit("multiHit", { ability: o.ability, hits, combo: o.combo });
     return hits;
   }
@@ -604,6 +607,7 @@ G.combat = (() => {
       G.damageNumber(user.x, user.y - 18, '+1 MANA', '#ffcd75');
       G.spawnFx({ kind: 'ring', x: user.x, y: user.y - 6, color: '#ffcd75', radius: 13, dur: .35 });
     }
+    if (G.noteRoadworkChain) G.noteRoadworkChain(o.ability, used);
     if (hits >= 2) G.events.emit("multiHit", { ability: o.ability, hits });
     if (!used.size) G.spawnFx({ kind: "ring", x: user.x, y: user.y - 6, color, radius: 8, dur: 0.2 });
     return hits;

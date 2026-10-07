@@ -11,7 +11,7 @@ test('borrowed Stitchline preserves zero knockback and gains Hexcraft duration',
 });
 test('Seedbed skips wards and blocked targets, preserving borrowed burn kill credit',()=>{
  const {G}=setup(),source=foe(G,250),warded=foe(G,258),blocked=foe(G,266),clear=foe(G,250,182);warded.ward={types:['dark'],hp:4};
- G.world.solid=(x,y)=>x>=260&&x<=263&&y<170;
+ G.world.blocksProjectile=(x,y)=>x>=260&&x<=263&&y<170;
  G.combat.applyStatus(source,'burn',{dur:.2,dps:2,ability:'meteor'});source.hp=1;let killed;G.events.on('kill',e=>killed=e);
  G.combat.damageEnemy(source,{damage:1,type:'dark',ability:'thornLash',knockback:0});
  assert.equal(warded.status?.burn,undefined);assert.equal(blocked.status?.burn,undefined);assert.equal(clear.status.burn.ability,'meteor');assert.equal(clear.status.burn.dur,1);

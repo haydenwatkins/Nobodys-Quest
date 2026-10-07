@@ -28,6 +28,6 @@ test('the ricochet lead explains an empty, warded, distant, or wall-separated ro
   b.ward=null;b.def={...b.def,practice:true};assert.equal(G.guidanceTarget().spatial,false);
   b.def.practice=false;b.dead=true;assert.equal(G.guidanceTarget().spatial,false);b.dead=false;
   b.y=260;assert.match(G.guidanceTarget().text,/close together/);b.y=188;
-  G.world.solid=(x,y)=>y>=165&&y<=175;assert.equal(G.guidanceTarget().spatial,false);assert.match(G.guidanceTarget().text,/across a wall/);
+  G.world.blocksProjectile=(x,y)=>y>=165&&y<=175;assert.equal(G.guidanceTarget().spatial,false);assert.match(G.guidanceTarget().text,/across a wall/);
   a.dead=true;assert.match(G.guidanceTarget().text,/needs two baddies/);
 });

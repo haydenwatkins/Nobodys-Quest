@@ -1,6 +1,6 @@
 # Three shapes that mend the road
 
-October 7, 2026. Bramble Scout, Frog and Copperwick Brewer now have connected local adventures with real repairs, optional neighbour promises and remembered returns. The roster stays at 24 forms and 96 lessons. Ten other earlier specialist callings still await this level of authored opportunity.
+October 7, 2026. Bramble Scout, Frog and Copperwick Brewer now have connected local adventures with real repairs, optional neighbour promises and remembered returns. The roster stays at 24 forms and 96 lessons. This first checkpoint left ten earlier specialists. Cloudcap Conductor/Hearthdrake subsequently receive two roads; eight remain. See `CONDUCTOR-HEARTHDRAKE.md`.
 
 | Shape and road | First useful action | Variation and lessons | Lasting benefit |
 | --- | --- | --- | --- |
@@ -40,4 +40,4 @@ Broad integration checkpoint: 614 tests passed, zero failed/skipped. Subsequent 
 
 The existing Ridge/Starfall regression also exposed an earlier unselected-echo handoff issue. The recommendation to visit Errata now precedes an unselected waiting form echo after Pending's return; deliberately followed echoes still keep their current-task priority. Guardian/gift/outing priorities and the Worldwake form queue remain intact.
 
-Physical iPad/Android/TV performance and a continuous live-AI Worldwake session remain separate work. Next: strengthen Cloudcap Conductor/Hearthdrake and the remaining eight earlier specialists, then measure Worldwake's complete combat/travel rhythm.
+Physical iPad/Android/TV performance and a continuous live-AI Worldwake session remain separate work. Cloudcap Conductor/Hearthdrake are subsequently complete. Next: measure Worldwake’s complete combat/travel rhythm, then strengthen the remaining eight earlier specialists.
