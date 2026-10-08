@@ -39,3 +39,43 @@ test('an interrupted opening invitation resumes, while a completed choice and la
  G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),false);
  G.state.opening.seen=['arrival'];G.state.player.x=40*16+8;G.state.player.y=24*16+8;G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),false);
 });
+
+test('dungeon and guardian approaches offer help before entry, including the closed orchard arch and all coastal trials',()=>{
+ const r=runtime(),{G}=r;let approaches=0;
+ for(const id of Object.keys(G.maps)){
+  r.load(id);
+  for(let y=0;y<G.state.mapH;y++)for(let x=0;x<G.state.mapW;x++){
+   const dest=G.maps[G.state.grid[y][x].portal?.map];
+   if(!dest||dest.worldwake||dest.worldbearer)continue;
+   if(!dest.bossTrial&&!Object.values(dest.legend||{}).some(c=>G.enemies[c.enemy]?.miniboss)&&!['dungeon','starfallRuins'].includes(dest.id))continue;
+   approaches++;
+   for(const kind of ['easyMode','bossAssistance']){
+    const lamp=G.helpStations().find(s=>s.approach===dest.id&&s.kind===kind&&Math.hypot(s.x-(x*16+8),s.y-(y*16+8))<=128);
+    assert.ok(lamp,`${id} -> ${dest.id}: ${kind} outside the door`);
+    assert.ok(G.world.isSafeSpawn(lamp.x,lamp.y));
+    assert.ok(G.state.enemies.every(e=>e.dead||e.def.practice||Math.hypot(e.x-lamp.x,e.y-lamp.y)>=72),'preparation is outside enemy attention');
+   }
+  }
+ }
+ assert.equal(approaches,22,'all current entrances, not just the first boss');
+ r.load('orchardRoad');assert.equal(G.state.opening.bell,false);
+ const lamps=G.helpStations().filter(s=>s.approach==='heartwood');assert.equal(lamps.length,2);
+ for(const lamp of lamps){assert.ok(lamp.y>=5*16+8,'help stays below the locked roots');Object.assign(G.state.player,{x:lamp.x,y:lamp.y});assert.equal(G.helpStationCandidate()?.kind,lamp.kind);}
+ r.load('shattercoast');assert.equal(G.helpStations().filter(s=>s.approach).length,10,'return points on portals still produce coastal lamps');
+});
+
+test('lamp prompts show complete effects and stay in one bounded dock across movement and switching',()=>{
+ const r=runtime(),{G}=r;r.load();G.state.enemies=[];
+ const at=G.helpStations().find(s=>s.kind==='easyMode'),p=G.state.player;Object.assign(p,{x:at.x,y:at.y});
+ const paint=[],boxes=[],c=new Proxy({measureText:t=>({width:t.length*5}),fillRect:(x,y,w,h)=>boxes.push({x,y,w,h}),fillText:(text,x,y)=>paint.push({text,x,y})},{get:(o,k)=>o[k]||(()=>{})});
+ for(const mode of ['keyboard','touch','controller']){
+  G.input.isTouch=mode==='touch';G.input.hasGamepad=mode==='controller';paint.length=boxes.length=0;
+  const cam={x:p.x-160,y:p.y-148};assert.equal(G.drawOpeningPrompt(c,cam),true);
+  assert.match(paint.map(p=>p.text).join(' '),/Hearts grow back, even in fights\./);
+  assert.match(paint.map(p=>p.text).join(' '),/Heart Lantern · Light/);
+  const panel=boxes[0];assert.ok(panel.x>=0&&panel.x+panel.w<=G.W&&panel.y>=0&&panel.y+panel.h<=G.H);
+  assert.ok(paint.every(p=>p.x+c.measureText(p.text).width<=panel.x+panel.w-8),'no clipped effect or action');
+  paint.length=boxes.length=0;G.drawOpeningPrompt(c,{x:cam.x,y:cam.y+35});assert.equal(boxes[0].y,panel.y,'moving camera cannot reshuffle the dock');
+  G.setComfortSetting('easyMode',true);paint.length=boxes.length=0;G.drawOpeningPrompt(c,cam);assert.equal(boxes[0].y,panel.y);assert.match(paint.map(p=>p.text).join(' '),/Put out/);G.setComfortSetting('easyMode',false);
+ }
+});

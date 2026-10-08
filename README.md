@@ -173,4 +173,4 @@ Game design pillars borrowed with admiration from Drinkbox Studios'
 *Nobody Saves the World*. This began as a family learning project; the
 original cast, art, story and eventual public branding are under active review.
 
-Common play now has **Heart Lantern / Guardian Lantern** switches at rest spots and **Patchling’s Pockets** through camp bags or Quick Mix. Help has a short visual opening invitation; carrying a collected guardian gift returns straight to play. See [the menu-optional contract](docs/MENU-OPTIONAL.md) for what is implemented and what remains.
+Common play now has **Heart Lantern / Guardian Lantern** switches at rest spots and outside dungeon/guardian approaches, plus **Patchling’s Pockets** through camp bags or Quick Mix. Help has a short visual opening invitation; carrying a collected guardian gift returns straight to play. See [the menu-optional contract](docs/MENU-OPTIONAL.md) for what is implemented and what remains. [The guardian challenge design](docs/GUARDIAN-CHALLENGES.md) specifies future harder fights built around active counters and equal progression rewards; hard mode is not enabled yet.

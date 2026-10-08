@@ -27,6 +27,12 @@ These are document benchmarks, not timed playtests of other games.
 
 11. Make common play menu-optional. Use physical help switches and introduced field selectors; pictures and a short benefit/price precede exact values. Looking never equips. Default help stays off, choices persist, and rewards stay equal. Reuse Forms/Quick Mix rather than a permanent HUD button per system. See `MENU-OPTIONAL.md` for the shipped lantern/pocket foundation and the remaining conversion.
 
+## Difficulty and skill growth
+
+Difficulty must add an interesting action, an active counter and a satisfying payoff. Preserve ordinary walking speed, responsive controls, clear warnings and nearby retries. Any temporary restriction must be short, local and breakable, with an accessible fallback when a form lacks the preferred counter. Standard fights also need these moments; children's play must be as joyful as adult play.
+
+Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. The harder patterns are specified, not yet enabled.
+
 ## Prose rules
 
 Use American spelling. UI footnotes must offer useful, actionable help. Empty/carried equipment belongs in visible object state; omit generic reassurance about browsing and other self-evident interactions.

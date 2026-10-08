@@ -7,7 +7,7 @@
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const lamps=[
     {key:'easyMode',name:'Heart Lantern',icon:'♥',color:'#efa2ae',effect:'Hearts grow back.',detail:'One heart every 6 seconds, after a short breather. Works in fights too.'},
-    {key:'bossAssistance',name:'Guardian Lantern',icon:'☀',color:'#ffce7b',effect:'Gentler guardian fights.',detail:'More time to dodge, softer hits, and extra hearts after a retry.'},
+    {key:'bossAssistance',name:'Guardian Lantern',icon:'☀',color:'#ffce7b',effect:'Help with guardian fights.',detail:'Extra hearts and slower boss shots after retries. Longer warnings on the opening road.'},
   ];
   G.HELP_LANTERNS=lamps;
   // Keep compact benefits explicit for a child; the full bench remains optional.
@@ -91,11 +91,41 @@
   G.events.on('mapEnter',()=>{
     stations=[];const s=G.state,used=new Set();
     const free=(x,y)=>{const c=s.grid[y]?.[x];return c&&['grass','path','floor'].includes(c.tile)&&!c.rest&&!c.portal&&!c.message&&!c.chest&&!c.smallPassage&&!c.enemy&&!c.townPlot&&G.world.isSafeSpawn(x*16+8,y*16+8)&&!used.has(`${x},${y}`)&&!(s.npcs||[]).some(n=>Math.hypot(n.x-(x*16+8),n.y-(y*16+8))<12);};
-    const add=(x,y,kind)=>{if(!free(x,y))return false;used.add(`${x},${y}`);stations.push({kind,x:x*16+8,y:y*16+8});return true;};
+    const add=(x,y,kind,approach)=>{if(!free(x,y))return false;used.add(`${x},${y}`);stations.push({kind,x:x*16+8,y:y*16+8,...(approach?{approach}: {})});return true;};
     if(s.mapId==='orchardRoad'){add(6,38,'easyMode');add(8,38,'bossAssistance');}
     for(let y=0;y<s.mapH;y++)for(let x=0;x<s.mapW;x++)if(s.grid[y][x].rest){
       const spots=[[-1,0],[1,0],[0,1],[-1,1],[1,1],[0,-1],[-1,-1],[1,-1]];
       for(const kind of ['easyMode','bossAssistance','pockets'])for(const [dx,dy]of spots)if(add(x+dx,y+dy,kind))break;
+    }
+    // Prepare on the approach, not after entering danger. Open Worldwake
+    // guardians already have caravan fires; houses and migration arenas do not
+    // need another cluster of lamps. Use the actual registered destination.
+    for(let y=0;y<s.mapH;y++)for(let x=0;x<s.mapW;x++){
+      const door=s.grid[y][x].portal,dest=door&&G.maps[door.map];
+      if(!dest||dest.worldwake||dest.worldbearer)continue;
+      const guardian=Object.values(dest.legend||{}).some(c=>c.enemy&&G.enemies[c.enemy]?.miniboss);
+      if(!dest.bossTrial&&!guardian&&!['dungeon','starfallRuins'].includes(dest.id))continue;
+      // A trial's return point describes its walkable outside approach. In the
+      // orchard it also keeps the lights below the closed root arch.
+      const exit=dest.bossTrial?.exit;
+      const seeds=exit?.map===s.mapId&&Math.hypot(exit.x-x,exit.y-y)<=8&&G.world.isSafeSpawn(exit.x*16+8,exit.y*16+8)?[[exit.x,exit.y]]:[[x-1,y],[x+1,y],[x,y-1],[x,y+1]];
+      const queue=[],seen=new Set();
+      const visit=(tx,ty,depth)=>{
+        const key=`${tx},${ty}`,c=s.grid[ty]?.[tx];
+        if(seen.has(key)||!c||c.portal||!G.world.isSafeSpawn(tx*16+8,ty*16+8))return;
+        seen.add(key);queue.push({x:tx,y:ty,depth});
+      };
+      seeds.forEach(([tx,ty])=>visit(tx,ty,0));
+      for(let i=0;i<queue.length;i++){
+        const at=queue[i];if(at.depth>=6)continue;
+        for(const [dx,dy]of [[-1,0],[1,0],[0,1],[0,-1]])visit(at.x+dx,at.y+dy,at.depth+1);
+      }
+      for(const kind of ['easyMode','bossAssistance']){
+        for(const at of queue){
+          if((s.enemies||[]).some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-(at.x*16+8),e.y-(at.y*16+8))<72))continue;
+          if(add(at.x,at.y,kind,dest.id))break;
+        }
+      }
     }
   });
   const safe=()=>G.state&&!G.ui.dialogueOpen&&!G.ui.menuOpen&&!view&&!G.state.knockout&&!G.state.bossCutscene&&!G.state.zoneTransition&&!G.activeWorldbearer?.()&&!(G.state.enemies||[]).some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-G.state.player.x,e.y-G.state.player.y)<68)&&!(G.state.projectiles||[]).some(p=>!p.fromPlayer&&Math.hypot(p.x-G.state.player.x,p.y-G.state.player.y)<68);
@@ -106,7 +136,7 @@
     const npc=G.npcTalkCandidate?.();
     if(npc&&Math.hypot(npc.x-p.x,npc.y-p.y)<near.d+6)return null;
     const lamp=lamps.find(l=>l.key===near.kind);
-    return {...near,id:'field-kit',label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
+    return {...near,id:'field-kit',hint:lamp?(lamp.key==='easyMode'?'Hearts grow back, even in fights.':'After retries: extra hearts, slower shots.'):null,label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
   };
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>candidate()||G.helpStationCandidate();

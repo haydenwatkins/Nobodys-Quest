@@ -238,12 +238,31 @@
       if(e.openingMode==='windup'&&!e.dead){const a=e.openingAim;c.save();c.translate(e.x,e.y-4);c.rotate(Math.atan2(a.y,a.x));rect(c,5,-7,38,14,'rgba(242,207,139,.17)');rect(c,5,-7,38,1,C.gold);rect(c,5,7,38,1,C.gold);c.restore();}
     }
   };
+  let lampPrompt=null;
   G.drawOpeningPrompt=(c,cam)=>{
     if(G.ui.dialogueOpen||G.ui.menuOpen||G.state.bossCutscene)return false;
-    const at=G.openingInteractionCandidate();if(!at)return;
+    const at=G.openingInteractionCandidate();if(!at){lampPrompt=null;return;}
     const prefix=G.input.isTouch?'A · ':G.input.hasGamepad?'A · ':'J / E · ';
     const label=prefix+at.label;
-    c.save();c.font=G.text.font(9, 700);const w=c.measureText(label).width+16;
+    c.save();c.font=G.text.font(9, 700);
+    if(at.hint){
+      // A lamp explains itself before the player switches it. Keep all words
+      // and hold one dock position while walking around this particular lamp.
+      const max=G.input.isTouch?144:224,lines=[];
+      for(const part of [label,at.hint]){
+        let line='';for(const word of part.split(/\s+/)){const next=line?line+' '+word:word;if(line&&c.measureText(next).width>max-16){lines.push(line);line=word;}else line=next;}if(line)lines.push(line);
+      }
+      const w=Math.min(max,Math.max(...lines.map(line=>c.measureText(line).width))+16),h=8+lines.length*11,x=(G.W-w)/2;
+      const key=`${G.state.mapId}:${at.kind}:${at.x},${at.y}:${G.input.isTouch}:${G.input.hasGamepad}`;
+      if(lampPrompt?.key!==key){
+        let y=152-h;const p=G.state.player;
+        if(cam&&p){const px=p.x-cam.x,py=p.y-cam.y;if(px+12>x&&px-12<x+w&&py+4>y&&py-24<y+h)y=Math.max(45,Math.min(117,Math.floor(py-h-24)));}
+        lampPrompt={key,y};
+      }
+      rect(c,x,lampPrompt.y,w,h,'rgba(32,45,50,.94)');rect(c,x,lampPrompt.y,2,h,C.gold);
+      c.fillStyle=C.paper;c.textBaseline='top';lines.forEach((line,i)=>G.drawWorldText(c,line,x+8,lampPrompt.y+4+i*11));c.restore();return true;
+    }
+    lampPrompt=null;const w=c.measureText(label).width+16;
     const x=(G.W-w)/2,p=G.state.player;let y=136;
     if(cam&&p){const px=p.x-cam.x,py=p.y-cam.y;if(px+12>x&&px-12<x+w&&py+4>y&&py-24<y+16)y=Math.max(45,Math.min(117,Math.floor(py-40)));}
     rect(c,x,y,w,16,'rgba(32,45,50,.94)');rect(c,x,y,2,16,C.gold);
