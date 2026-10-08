@@ -41,10 +41,12 @@
     put(4, 24, "x"); put(5, 22, "m"); put(6, 20, "C"); put(38, 19, "H");
     // Close pairs support binds/resonance; separated shooters ask the player
     // to create cover or safe light while approaching rather than mash a hit.
+    // The entry notice and fire are a genuine pause. The first encounter
+    // begins farther along the road, beyond every foe's attention radius.
     const pairSites = ["golem", "lanternWisp"].includes(trail.formId)
-      ? [[10, 16], [14, 18], [10, 20], [27, 7], [31, 5], [33, 8]]
-      : trail.formId === "griffin" ? [[10, 18], [12, 19], [14, 18], [29, 7], [31, 8], [33, 7]]
-        : [[10, 18], [12, 18], [11, 16], [29, 7], [31, 7], [30, 5]];
+      ? [[15, 16], [19, 18], [15, 20], [27, 7], [31, 5], [33, 8]]
+      : trail.formId === "griffin" ? [[14, 18], [16, 19], [18, 18], [29, 7], [31, 8], [33, 7]]
+        : [[14, 18], [16, 18], [15, 16], [29, 7], [31, 7], [30, 5]];
     for (const [x, y] of pairSites) put(x, y, "1");
     for (const [x, y] of [[9, 8], [11, 8], [10, 10], [33, 18], [35, 18], [34, 16]]) put(x, y, "2");
     registerMap({ id: trail.id, name: trail.name, biome: trail.biome, formTrail: trail.formId,
@@ -54,7 +56,7 @@
         "#": { tile: trail.edge }, "R": { tile: trail.obstacle },
         "S": { tile: trail.obstacle, formTrailShortcut: trail.formId },
         "x": { tile: "path", portal: { map: trail.region, x: 7, y: 2 }, portalStyle: "gap", seamless: true },
-        "1": { tile: "path", enemy: trail.pair }, "2": { tile: "path", enemy: trail.crowd },
+        "1": { tile: "path", enemy: trail.pair, guardPost: true }, "2": { tile: "path", enemy: trail.crowd, guardPost: true },
         "m": { tile: "path", message: trail.sign },
         "C": { tile: "path", rest: true, restText: "A quiet camp restores every heart and all mana." },
         "H": { tile: "path", chest: { heal: true, name: trail.picnic } },

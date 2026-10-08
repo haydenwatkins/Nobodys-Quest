@@ -52,6 +52,9 @@ The current campaign includes 24 mixable forms, the late-game Shattercoast and
 Worldwake regions, personality-driven three-phase guardian trials, and two
 different run systems: a configurable boss gauntlet and branching Manyfold
 Expeditions.
+The six Worldwake form roads also have optional neighbour promises: use a new
+body to reopen a short crossing, bring back the good news, and find a saved
+picnic detail on later visits. See [the design ledger](docs/WORLDWAKE-NEIGHBOURS.md).
 
 Every form carries an exclusive passive identity in addition to its basic
 attack and stats. All 53 abilities declare a combat style, and form passives

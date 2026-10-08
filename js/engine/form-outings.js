@@ -44,7 +44,12 @@
   };
   const state = () => G.state.formOutings || (G.state.formOutings = G.makeFormOutings());
   G.activeFormOuting = () => G.state && state().active;
-  G.formDiscoveryAllowed = () => !G.activeFormOuting();
+  G.formReturnPromise = () => {
+    if(!G.state?.opening?.started || G.state.opening.version<2)return null;
+    const promise=G.followedSunriseRequest?.();
+    return promise?.ready && /^(road-|trail-)/.test(promise.id) ? promise : null;
+  };
+  G.formDiscoveryAllowed = () => !G.activeFormOuting() && !G.formReturnPromise();
   G.formDiscoveryOrder = () => {
     const guardian = (G.FORM_TRAILS || []).find(t => G.hasWorldMark?.(t.mark) && G.formReady(t.formId));
     return guardian ? [guardian.formId, ...G.formOrder.filter(id => id !== guardian.formId)] : G.formOrder;
@@ -84,6 +89,8 @@
     if (!outing) return null;
     const roadGoal=G.roadworkOutingGoal?.(outing);
     if(roadGoal)return roadGoal;
+    const firstUse=G.formTrailFirstUseGoal?.(outing);
+    if(firstUse)return firstUse;
     const form = G.forms[outing.formId], role = G.FORM_ROLES[outing.formId];
     const trail = G.FORM_TRAILS?.find(t => t.formId === outing.formId);
     // A trophy may have been earned on an earlier visit. Suggest its trail
@@ -112,7 +119,7 @@
     const id = G.state?.formId;
     if (!id || G.FORM_ROLES[id]?.feature !== feature || state().features.includes(id)) return;
     state().features.push(id);
-    if (G.applyFormTrailShortcut) G.applyFormTrailShortcut();
+    if (G.applyFormTrailShortcut?.()) G.ui.toast("A short way home opens!",3);
     G.saveGame();
   });
   G.events.on("projectileBlock", ({ kind }) => G.events.emit("formFeature", { feature: kind }));

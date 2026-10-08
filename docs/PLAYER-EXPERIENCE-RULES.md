@@ -23,6 +23,8 @@ These are document benchmarks, not timed playtests of other games.
 
 9. Make ordinary chapter travel physical. Friends explain the route while the player stays in place; authored roads join neighbouring maps. A small-form passage needs visible terrain and actual walking, with its useful action on the far side. Guidance must continue forward once inside, and the same path must provide a safe return. Preserve saved accomplishments and once-only gifts. See `CONNECTED-OPENING.md`.
 
+10. Give a chosen promise's good-news return its own moment. A ready specialist-road or Worldwake-trail request can hold the next discovery until the player returns; Journey's Set aside releases it deliberately. Do not turn unaccepted requests into gates, erase waiting echoes or add counters for this pause. Signature-action guidance should demonstrate a body's practical use, then yield to its existing lessons. See `WORLDWAKE-NEIGHBOURS.md`.
+
 ## Prose rules
 
 Write spoken English that a child can follow on first hearing. Every story/request exchange should answer: who is speaking, what they want, how they feel, and what the player can do now.

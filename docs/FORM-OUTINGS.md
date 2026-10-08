@@ -1,6 +1,6 @@
 # Form discoveries need room to matter
 
-October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; Cloudcap Conductor and Hearthdrake subsequently gain relay and cart roads; eight earlier specialists remain. See `EARLY-FORM-ROADS.md` and `CONDUCTOR-HEARTHDRAKE.md`.
+October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; Cloudcap Conductor and Hearthdrake subsequently gain relay and cart roads; eight earlier specialists remain. See `EARLY-FORM-ROADS.md` and `CONDUCTOR-HEARTHDRAKE.md`. The October 8 follow-up adds six optional Worldwake neighbour promises, safe entry pauses, signature-action guidance and deliberate good-news return space (`WORLDWAKE-NEIGHBOURS.md`).
 
 ## Player experience
 
@@ -35,7 +35,7 @@ Each trail is a northward spur from its restored guardian region. Entry uses the
 
 The feature belongs to the worn body; borrowed arts can still express that body's passive. An empty cast is not proof. Learned crossings persist per save slot. Grid cells are replaced instead of mutating shared map legends, so another slot cannot inherit a repaired road.
 
-Each trail uses its neighbouring region's authored terrain and scenery, with yielding landmarks, a familiar hearth, a picnic desk and a readable notice about the people returning to that road. They reuse existing foes and the renewable pantry system. They add no new roster entries, tracked quests or reward currency.
+Each trail uses its neighbouring region's authored terrain and scenery, with yielding landmarks, a familiar hearth, a picnic desk and a readable notice about the people returning to that road. They reuse existing foes and the renewable pantry system. They add no new roster entries or reward currency. Six optional neighbour promises now reuse the shared request engine and saved crossing features; return thanks leave bunting, a planter, lamps or a bench by the picnic. A selected, ready road/trail promise gives the return conversation room before discovery; Journey can set it aside. Existing outing quotas remain unchanged.
 
 ## Roster design contract
 
@@ -78,5 +78,7 @@ The shared breathing-room rule applies to future discoveries in opening version 
 - `node tools/audit-progression.cjs --json`: 24 valid forms, 96 lessons, no dependency cycles or Workshop errors; the eight-form/three-specialist final portfolio is unchanged.
 - Native published-host browser route review passed touch and the Android TV controller bridge in both HD/base settings. It walks all six spurs and return crossings, demonstrates the six actual passive effects using input, visits the picnic and restores saved crossings. Controlled earned checkpoints and isolated foes establish route/effect contracts; this is not a fresh continuous campaign playthrough.
 - Final browser scenery/readability review covers the same four device/art combinations, full neighbour notices, complete outing task text and the waiting-path Form Lab. Captures are in `/tmp/nq-outings-review` and `/tmp/nq-outings-shipping-review`; the scripts regenerate them.
+
+The October 8 native review completes all six consecutive discoveries, passive effects and NPC returns with original enemy AI from an earned late checkpoint, in two seeded runs with two gentle knockouts each and zero respawns. The six guardian Marks are checkpoint inputs, so this does not establish fresh guardian-to-guardian pacing. See `WORLDWAKE-NEIGHBOURS.md` for reproducible tools, browser evidence and remaining limits.
 
 Physical iPad/Android/TV performance, audio feel and full live-AI campaign pacing remain unmeasured by these cloud checks. The next design pass should strengthen earlier forms' world opportunities and test a continuous Worldwake session, rather than adding more unlocks or increasing quotas.

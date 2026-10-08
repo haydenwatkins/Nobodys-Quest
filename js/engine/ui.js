@@ -2266,15 +2266,16 @@ G.ui = (() => {
     const unlocked = G.formUnlocked(id);
     const ready = !unlocked && G.formReady(id);
     const waiting = ready && G.formDiscoveryAllowed && !G.formDiscoveryAllowed();
+    const returning = G.formReturnPromise?.();
     const current = id === G.state.formId;
     const selected = labFormId === id;
     const progress = G.formPathProgress(id);
     const steps = G.formUnlockSteps(id);
     const next = steps.find((step) => !step.met);
-    const status = current ? "CURRENT" : waiting ? "AFTER YOUR OUTING" : ready ? "ECHO READY" : unlocked ? `LEVEL ${G.formLevel(id)}` : `${progress.done}/${progress.total} STEPS`;
+    const status = current ? "CURRENT" : waiting ? returning ? "AFTER GOOD NEWS" : "AFTER YOUR OUTING" : ready ? "ECHO READY" : unlocked ? `LEVEL ${G.formLevel(id)}` : `${progress.done}/${progress.total} STEPS`;
     const percent = progress.total ? Math.round(progress.done / progress.total * 100) : 0;
     const action = current ? "This is the shape you wear now."
-      : waiting ? "Enjoy your newest shape first. This path stays earned."
+      : waiting ? returning ? `Bring ${returning.name} the good news. This path stays earned.` : "Enjoy your newest shape first. This path stays earned."
       : ready ? "The path is complete. Find its echo."
       : unlocked ? `Awakened · mastery level ${G.formLevel(id)}`
       : next ? `${next.label} · ${next.detail}` : "Its path has not yet been revealed.";
@@ -2345,6 +2346,7 @@ G.ui = (() => {
     const unlocked = G.formUnlocked(selected.id);
     const ready = !unlocked && G.formReady(selected.id);
     const waiting = ready && G.formDiscoveryAllowed && !G.formDiscoveryAllowed();
+    const returning = G.formReturnPromise?.();
     const echo = ready && G.formEchoFor ? G.formEchoFor(selected.id) : null;
     const echoMap = echo && G.maps[echo.mapId];
     const current = selected.id === G.state.formId;
@@ -2353,7 +2355,7 @@ G.ui = (() => {
     const inspector = `<section class="form-stage ${unlocked ? "" : "locked"}">
         <div class="form-stage-art">${previewCanvas(selected.id, skin ? skin.id : "classic", "hero-preview", selected.name, !unlocked, !skin)}</div>
         <div class="form-stage-copy">
-          <div class="eyebrow">${current ? "CURRENT FORM" : waiting ? "PATH COMPLETE · AFTER YOUR OUTING" : echo ? "FORM ECHO WAITING" : ready ? "CHALLENGE COMPLETE" : unlocked ? `FORM LEVEL ${G.formLevel(selected.id)}` : "UNDISCOVERED FORM"}</div>
+          <div class="eyebrow">${current ? "CURRENT FORM" : waiting ? returning ? "PATH COMPLETE · AFTER THE GOOD NEWS" : "PATH COMPLETE · AFTER YOUR OUTING" : echo ? "FORM ECHO WAITING" : ready ? "CHALLENGE COMPLETE" : unlocked ? `FORM LEVEL ${G.formLevel(selected.id)}` : "UNDISCOVERED FORM"}</div>
           <h2>${selected.icon} ${escapeHtml(selected.name)}</h2>
           <p class="lab-tagline">${escapeHtml(selected.tagline)}</p>
           ${unlocked ? `<div class="lab-stat-row"><span>❤️ ${selected.hearts}</span><span>👟 ${selected.speed}</span>${dmgChip(G.abilities[selected.basic]?.type || "blunt")}</div>
@@ -2362,7 +2364,7 @@ G.ui = (() => {
             <div class="mastery-track"><span>MASTERY</span><span class="mastery-pips">${selected.quests.map((quest) => `<i class="${G.questsDone.includes(quest.id) ? "done" : ""}"></i>`).join("")}</span><span>${completed}/${selected.quests.length}</span></div>
             <div class="lab-actions"><button data-become="${selected.id}" ${current ? "disabled" : ""}>${current ? "Current form" : `Become ${escapeHtml(selected.name)}`}</button>
             <button data-formlab-view="loadout">Mix arts</button><button data-formlab-view="skins">Choose a look</button></div>`
-          : `${buildUnlockRoute(selected)}${waiting ? `<div class="unlock-panel">Enjoy ${escapeHtml(G.forms[G.activeFormOuting().formId].name)} on the road first. Learn two lessons in that body, try two of its own arts, and explore two separate clearings. This completed path will wait for you.</div>` : ready ? echo
+          : `${buildUnlockRoute(selected)}${waiting ? G.activeFormOuting() ? `<div class="unlock-panel">Enjoy ${escapeHtml(G.forms[G.activeFormOuting().formId].name)} on the road first. Learn two lessons in that body, try two of its own arts, and explore two separate clearings. This completed path will wait for you.</div>` : `<div class="unlock-panel">You've helped ${escapeHtml(returning.name)}! Bring back the good news before your next discovery. This completed path will wait for you. You can also set the promise aside in Journey.</div>` : ready ? echo
             ? `<div class="unlock-panel">✦ ${escapeHtml(selected.name)} is waiting ${echo.mapId === G.state.mapId ? "nearby" : "in " + escapeHtml(echoMap ? echoMap.name : echo.mapId)}. Meet it in the world to unlock it.</div>
               <button data-form-echo-guide="${selected.id}">Guide me to the echo</button>`
             : `<div class="unlock-panel">The lesson is complete. Win a battle and watch what remains.</div>` : ""}`}

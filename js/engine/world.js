@@ -564,7 +564,14 @@ G.world = (() => {
       s.lastBlockedPortal = null;
     }
 
-    if (cell.portal) {
+    const tx=Math.floor(p.x/G.TILE),ty=Math.floor(p.y/G.TILE);
+    const outward={x:tx===0?-1:tx===s.mapW-1?1:0,y:ty===0?-1:ty===s.mapH-1?1:0};
+    // A hit can knock the player onto a trail's border while they are
+    // standing still or moving along it. Cross when they head outwards.
+    const trailExit=!s.mapDef.formTrail || (!outward.x&&!outward.y) ||
+      outward.x*move.x+outward.y*move.y>0.08 ||
+      (p.dashing && outward.x*p.dashing.dirX+outward.y*p.dashing.dirY>0.08);
+    if (cell.portal && trailExit) {
       const need = cell.stars || 0;
       const masteryReady = portalMasteryMet(cell);
       const markReady = portalMarkMet(cell);
