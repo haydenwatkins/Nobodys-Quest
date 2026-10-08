@@ -11,7 +11,7 @@
   ];
   G.HELP_LANTERNS=lamps;
   // Keep compact benefits explicit for a child; the full bench remains optional.
-  const benefits={heartwood:['Wider swings','Walk a little slower'],mire:['Poison lasts longer','Paid arts cost more mana'],eclipse:['Hold more mana','Mana grows back slower'],plume:['Dash sooner','Area arts recover slower'],plumbline:['Longer guard after a swing','Dashes cost more mana'],spindle:['Chains reach one more foe','Shots recover slower'],clapper:['Chain 3 foes: gain mana','Area arts cost more mana'],ember:['Area arts snuff a shot','Chains cost more mana'],lodestone:['Matching hits crack more ward','Dashes recover slower']};
+  const benefits={heartwood:['Wider swings','Swings push foes less'],mire:['Poison lasts longer','Paid arts cost more mana'],eclipse:['Hold more mana','Mana grows back slower'],plume:['Dash sooner','Area arts recover slower'],plumbline:['Longer guard after a swing','Dashes cost more mana'],spindle:['Chains reach one more foe','Shots recover slower'],clapper:['Chain 3 foes: gain mana','Area arts cost more mana'],ember:['Area arts snuff a shot','Chains cost more mana'],lodestone:['Matching hits crack more ward','Dashes recover slower']};
   G.pocketTreasures=()=>{
     if(!G.state)return [];
     const owned=new Set(G.state.items);
@@ -53,6 +53,11 @@
       const id=G.activeKeepsake()?.id===k.id?null:k.id;
       if(G.carryKeepsake(id)){G.ui.toast(id?`${k.name} tucked in your pocket`:`${k.name} set aside`,2);G.sfx.play('pickup');close();}
     });
+    // Bring the newly revealed explanation into view on short touch screens
+    // and TV. Opening a disclosure must not leave its contents below the fold.
+    el.querySelectorAll('details').forEach(detail=>detail.addEventListener('toggle',()=>{
+      if(detail.open)detail.scrollIntoView({block:'nearest',inline:'nearest'});
+    }));
     // Real authored treasure art, without writing to owned items or equipment.
     el.querySelectorAll('[data-pocket-art]').forEach(canvas=>{
       const shape=G.treasureInfo[canvas.dataset.pocketArt]?.shape;

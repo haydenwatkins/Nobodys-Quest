@@ -35,7 +35,7 @@ test('guardian keepsakes are optional, owned by trophies, and saved without sile
   assert.equal(G.activeKeepsake(), null);
 });
 
-test('Heartwood actually reaches an extra foe while paying for it in walking speed', () => {
+test('Heartwood reaches an extra foe without taxing walking, dash distance or free attacks', () => {
   const { G } = fixture(), p = G.state.player;
   const angle = Math.PI / 3, e = foe(G, Math.cos(angle) * 20, Math.sin(angle) * 20);
   const swing = { ability: 'slap', type: 'blunt', damage: 1, range: 25, arcDeg: 110, knockback: 0, contactAssist: false, lunge: 0 };
@@ -48,14 +48,47 @@ test('Heartwood actually reaches an extra foe while paying for it in walking spe
   G.input.vec = { x: 1, y: 0 };
   const x = p.x;
   G.updatePlayer(.05);
-  const weighted = p.x - x;
+  const carried = p.x - x;
   p.x = x; G.carryKeepsake(null); G.updatePlayer(.05);
-  assert.ok(Math.abs(weighted / (p.x - x) - .9) < .0001);
+  assert.ok(Math.abs(carried - (p.x - x)) < .0001);
   const normalDash = G.passives.prepare('dash', p, { ability: 'cartwheel', dist: 55 }).dist;
   G.carryKeepsake('heartwood');
   assert.equal(G.passives.prepare('dash', p, { ability: 'cartwheel', dist: 55 }).dist, normalDash);
   G.state.worldwake.marks.push('stone'); G.attuneWorldMark('stone');
-  assert.equal(G.passives.prepare('melee', p, swing).arcDeg, 155, 'Mark and keepsake combine, with the walking price intact');
+  assert.equal(G.passives.prepare('melee', p, swing).arcDeg, 155, 'Mark and keepsake retain their wider swing');
+});
+
+test('Heartwood trades shove for keeping foes close, with unchanged damage and a real guarded hit', () => {
+  const { G } = fixture(), p = G.state.player;
+  const plain = foe(G); G.abilities.slap.use(p);
+  const shove = plain.kbx, damage = 50 - plain.hp;
+  G.state.enemies = []; const carried = foe(G); G.carryKeepsake('heartwood');
+  p.meleeGuard = 0; G.abilities.slap.use(p);
+  assert.ok(Math.abs(carried.kbx - shove * .6) < .0001);
+  assert.equal(50 - carried.hp, damage);
+  assert.ok(p.meleeGuard > 0, 'a successful wide swing retains the normal protection');
+  const x = carried.x; G.updateEnemies(.05);
+  assert.ok(carried.x > x && carried.x - x < shove * .05, 'the foe really moves a shorter distance');
+  const warded = foe(G); warded.ward = { types: ['sharp'], hp: 3 };
+  p.meleeGuard = 0; G.state.enemies = [warded]; G.abilities.slap.use(p);
+  assert.equal(warded.ward.hp, 3); assert.equal(warded.hp, 50);
+  assert.equal(p.meleeGuard, 0, 'a wrong ward still gives no hit-confirm guard');
+});
+
+test('every gift retains a castable zero-mana basic for every form', () => {
+  const r = fixture(), { G } = r, p = G.state.player;
+  G.state.claimedForms = Object.keys(G.forms).filter(id => id !== 'nobody');
+  G.state.delivery.complete = true;
+  for (const gift of G.KEEPSAKES) {
+    G.carryKeepsake(gift.id);
+    for (const form of Object.values(G.forms)) {
+      G.state.formId = form.id;
+      Object.assign(p, { mana: 0, cooldowns: {}, cooldownDurations: {}, abilityBuffer: {}, dashing: null, performance: null });
+      assert.equal(G.abilityManaCost(G.abilities[form.basic]), 0, `${gift.id}/${form.id}`);
+      r.taps.add('a'); G.updatePlayer(.01);
+      assert.ok(p.cooldowns[form.basic] > 0, `${gift.id}/${form.id} actually starts its free basic`);
+    }
+  }
 });
 
 test('Mire extends real poison, preserves ward protection, and charges its price at the input boundary', () => {

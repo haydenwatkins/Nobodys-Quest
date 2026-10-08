@@ -5,6 +5,7 @@
      id, name, hp, speed, damage
      behavior: "wander" | "chase" | "shooter"
      aggro:    how close (in pixels) before it notices you
+     shotWarning: OPTIONAL ranged commitment time (default 0.6 seconds)
      ward:     OPTIONAL shield — { types: ["blunt"], hp: 2 }
                means only BLUNT damage can break its shield!
      sprite:   pixel art, same format as forms

@@ -211,8 +211,10 @@ G.passives = (() => {
     }
 
     const keepsake = G.activeKeepsake && G.activeKeepsake();
-    if (keepsake?.id === "heartwood" && kind === "melee" && style === "melee")
+    if (keepsake?.id === "heartwood" && kind === "melee" && style === "melee") {
       o.arcDeg = Math.min(360, (o.arcDeg || 100) + 25);
+      o.knockback = (o.knockback === undefined ? 90 : o.knockback) * .6;
+    }
     if (keepsake?.id === "mire" && o.status?.name === "poison")
       o.status = { ...o.status, dur: (o.status.dur || 3) * 1.4 };
     if (keepsake?.id === 'spindle' && kind === 'chain' && style === 'chain')

@@ -4,7 +4,7 @@
 G.KEEPSAKES = [
   { id: "heartwood", name: "Heartwood Crown", item: "trophy-heartwood-crown", icon: "♛", color: "#a6d66e",
     region: "Mistwood", guardian: "Ancient Treant", gain: "Melee sweeps gain 25° of arc.",
-    price: "Walking speed falls by 10%.", note: "A stubborn answer for crowded roads. Dash arts keep their usual distance." },
+    price: "Melee hits push foes 40% less.", note: "Keep a crowd within your next swing. Walking, dash distance, damage, and mana stay the same." },
   { id: "mire", name: "Mire Pearl", item: "trophy-mire-pearl", icon: "●", color: "#73eff7",
     region: "Sunken Marsh", guardian: "Mire Queen", gain: "Poison from your arts lasts 40% longer.",
     price: "Arts that cost mana cost 1 more.", note: "Leave a little trouble behind. Free basic arts stay free; wards still block poison." },
@@ -56,7 +56,7 @@ G.cooldownDuration = function (ability) {
 };
 G.keepsakeManaBonus = function () { return G.activeKeepsake()?.id === "eclipse" ? 4 : 0; };
 G.manaRegenSeconds = function () { return G.MANA_REGEN_SECONDS * (G.activeKeepsake()?.id === "eclipse" ? 1.25 : 1); };
-G.keepsakeSpeedScale = function () { return G.activeKeepsake()?.id === "heartwood" ? .9 : 1; };
+G.keepsakeSpeedScale = function () { return 1; };
 
 G.carryKeepsake = function (id) {
   if (!G.state || id !== null && G.normalizeKeepsake(id, G.state.items) !== id) return false;

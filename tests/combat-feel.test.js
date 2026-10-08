@@ -472,7 +472,7 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
 }
 
 // Boss projectiles are visible briefly before they can hurt a nearby player;
-// regular shooters retain immediate projectile collision.
+// Regular shooters warn before casting; the released shot uses normal collision.
 {
   const queen = G.makeEnemy("mireQueen", 15, 0);
   queen.bossEngaged = true;
@@ -503,6 +503,8 @@ for (const id of ["riftbladeAdept", "moleMonarch", "countessCarmine", "royalFool
     entryPoint: { x: 0, y: 0 }, hitStop: 0, shake: 0, cameraKickX: 0, cameraKickY: 0, time: 1,
   };
   G.updateEnemies(0.016);
+  assert.equal(G.state.projectiles.length, 0, "ordinary casters commit before release");
+  G.updateEnemies(0.61);
   assert.equal(G.state.projectiles[0].armT, 0, "ordinary enemy projectile timing should stay unchanged");
 }
 

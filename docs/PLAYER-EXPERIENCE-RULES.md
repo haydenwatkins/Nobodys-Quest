@@ -31,6 +31,8 @@ For every substantial design observation:
 
 `DESIGN-APPLICATION.md` is the current coverage ledger; `CLOUD-ROADMAP.md` orders implementation. Feature specifications explain how they satisfy this contract and cannot limit it to their illustrative mechanic.
 
+Combat/build application: attach an equipment price to a meaningful choice about its tool, rather than making every journey or basic control worse. Preserve a zero-mana basic answer and verify it at the real input boundary. Threats commit to a readable place; successful interruptions buy an observable opening. Incapacitation must actually suppress the affected actor's body attack, while already-released danger retains its visible rules. Audit these contracts in ordinary creatures and optional runs as well as guardians. `COMBAT-AGENCY.md` records the first equipment/ordinary-enemy backfill and its remaining gaps.
+
 ## Benchmarks consulted
 
 These are document benchmarks, not timed playtests of other games.
