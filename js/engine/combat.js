@@ -547,6 +547,7 @@ G.combat = (() => {
       startX: user.x, startY: user.y,
       range: o.range || 130,
       fromPlayer: true,
+      sourceForm: user === G.state.player ? G.state.formId : null,
     });
     G.spawnFx({
       kind: "puff",
@@ -794,6 +795,7 @@ G.combat = (() => {
             }
             if (pr.hitGroup) e.lastProjectileGroup = pr.hitGroup;
             if (pr.hitSet) pr.hitSet.add(e);
+            G.noteRoadworkRicochet?.(pr, e);
             const hit = damageEnemy(e, {
                 damage: pr.damage, type: pr.type, ability: pr.ability,
                 status: pr.status, breaksAnyWard: pr.breaksAnyWard, consumePoison: pr.consumePoison,

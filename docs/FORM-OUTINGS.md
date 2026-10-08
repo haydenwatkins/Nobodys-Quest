@@ -1,6 +1,6 @@
 # Form discoveries need room to matter
 
-October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; Cloudcap Conductor and Hearthdrake subsequently gain relay and cart roads; eight earlier specialists remained at that checkpoint. See `EARLY-FORM-ROADS.md` and `CONDUCTOR-HEARTHDRAKE.md`. The October 8 follow-up adds six optional Worldwake neighbour promises, safe entry pauses, signature-action guidance and deliberate good-news return space (`WORLDWAKE-NEIGHBOURS.md`). Duelist/Tunneltuft subsequently gain arcade gates and dry library paths; six earlier specialists remain (`DUELIST-TUNNELTUFT.md`).
+October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; Cloudcap Conductor and Hearthdrake subsequently gain relay and cart roads; eight earlier specialists remained at that checkpoint. See `EARLY-FORM-ROADS.md` and `CONDUCTOR-HEARTHDRAKE.md`. The October 8 follow-up adds six optional Worldwake neighbour promises, safe entry pauses, signature-action guidance and deliberate good-news return space (`WORLDWAKE-NEIGHBOURS.md`). Duelist/Tunneltuft subsequently gain arcade gates and dry library paths; six earlier specialists remained (`DUELIST-TUNNELTUFT.md`). Velvetwing/Pocket Trouper subsequently gain healing flowers and ricochet stage bells; four earlier specialists remain (`VELVETWING-TROUPER.md`).
 
 ## Player experience
 
@@ -54,8 +54,8 @@ Every future form change must preserve a distinct useful action, an immediately 
 | Hearthdrake | Sweep a broad crowd away from a close approach | New Hearthside branch piles, wide crowds and Brindle return |
 | Wayglass Duelist | Rush through a crowded approach and control the landing | New Ribbonwind gate landings, rhythm crowds and saved parade bunting |
 | Tunneltuft | Scatter a group with a delayed tremor | New Rootbell delayed repairs, aimed burrowing and a saved lending basket |
-| Velvetwing | Recover while staying close, turning overflow into protection | Existing healing/Bloodskin; provide a forgiving sustain encounter |
-| Pocket Trouper | Bounce a shot through a pair | Existing ricochet; author a geometry-led first use |
+| Velvetwing | Recover while staying close, turning overflow into protection | New Duskmallow healing/overflow flowers, recoverable garden paths and Mara’s cushions |
+| Pocket Trouper | Bounce a shot through a pair | New Applause bell pairs, actual card-bounce geometry and Pip’s puppet stage |
 | Harborback | Hold an exposed road behind the shell | Existing rear protection and coast fights; demonstrate it more deliberately |
 | Foldstep Fox | Cut past a foe while moving | Existing moving draw-step; add a distinct mobile encounter |
 | Skylens Mapper | Gather spread-out foes into an orbit | Existing pulls and chains; author a clear grouping opportunity |

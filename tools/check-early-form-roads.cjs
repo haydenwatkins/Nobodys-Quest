@@ -14,7 +14,10 @@ for(const road of G.EARLY_FORM_ROADS){
  G.state.opening.started=G.state.opening.complete=true;G.state.delivery.complete=true;G.ensureTown().requests=['recipes','beacon'];G.state.stars=14;
  G.state.items=['trophy-heartwood-crown','trophy-mire-pearl'];G.state.roadworks=G.makeRoadworks();G.state.formEchoes=[];
  G.state.formOutings={active:{formId:road.formId,arts:[],scenes:[]},features:[]};r.load(road.id);r.drain();let casts=0;
- for(const repair of road.repairs){walk(r,...repair.approach);const target=repair.nodes?.[0]||[repair.x,repair.y];aim(target[0]*16+8,target[1]*16+8);cast(road.formId==='alchemist'?'volatileFlask':road.formId==='stormcaller'?'chainLightning':road.formId==='riftblade'?'riftRush':road.formId==='mole'?'burrowBlitz':G.forms[road.formId].basic);casts++;
+ for(const repair of road.repairs){walk(r,...repair.approach);const target=repair.nodes?.[0]||[repair.x,repair.y];aim(target[0]*16+8,target[1]*16+8);
+  if(road.formId==='vampire')for(let i=0;i<20&&!G.roadRepairOpen(repair.id);i++){
+   const e=G.state.enemies.find(e=>!e.dead&&!e.def.practice&&Math.hypot(e.outingSpawnX-repair.x*16-8,e.outingSpawnY-repair.y*16-8)<56);assert.ok(e);walk(r,Math.floor(e.x/16)-1,Math.floor(e.y/16));aim(e.x,e.y);cast('bloodBite',8);casts++;
+  }else{cast(road.formId==='alchemist'?'volatileFlask':road.formId==='stormcaller'?'chainLightning':road.formId==='riftblade'?'riftRush':road.formId==='mole'?'burrowBlitz':G.forms[road.formId].basic);casts++;}
   assert.ok(G.roadRepairOpen(repair.id),repair.id+' opens through its action');}
  const form=G.forms[road.formId],p=G.state.player;
  // These two bodies teach a three-beat rhythm. Approach an untouched
@@ -33,7 +36,7 @@ for(const road of G.EARLY_FORM_ROADS){
   const tx=Math.floor(e.x/16),ty=Math.floor(e.y/16);
   // Bramble Scout's first lesson needs the actual distant contact. Choose
   // a safe bow perch, not melee distance, until it has been learned.
-  const offset=road.formId==='ranger'&&!G.questsDone.includes(form.quests[0].id)?7:art==='burrowBlitz'?4:1;
+  const offset=road.formId==='ranger'&&!G.questsDone.includes(form.quests[0].id)?7:['burrowBlitz','crimsonWaltz'].includes(art)?4:1;
   const spots=[[tx-offset,ty],[tx+offset,ty],[tx,ty-offset],[tx,ty+offset]].filter(([x,y])=>G.world.isSafeSpawn(x*16+8,y*16+8)&&!G.world.blocksProjectile(x*16+8,y*16+8));
   spots.sort((a,b)=>Math.hypot(a[0]*16+8-p.x,a[1]*16+8-p.y)-Math.hypot(b[0]*16+8-p.x,b[1]*16+8-p.y));
   assert.ok(spots.length);

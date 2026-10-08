@@ -59,6 +59,22 @@
       after:"The children returned the books with little leaf bookmarks. Someone asked for the tunnel-scout story again. I've left it at the front of the basket. I think I know why.",
       repairs:[{id:"rootbell-lower",x:16,y:18,kind:"soil",bridge:[18,17,20,19],approach:[11,18]},
         {id:"rootbell-upper",x:22,y:7,kind:"soil",bridge:[18,6,20,8],approach:[27,7]}]},
+    {id:"duskmallowWalk",name:"Duskmallow Walk",formId:"vampire",region:"sunkenMarsh",exit:[27,0],arrival:[27,2],key:"b",start:[5,22],door:[5,24],npc:"quayMara",person:"Mara",at:[6,22],
+      title:"A warm place to stop",role:"Carry healing warmth to the dusk flowers",
+      ask:"The families coming off the ferry need somewhere warm to sit. These dusk flowers used to light the little paths, but they've closed up. I miss seeing everyone stop for a chat. Could you help me wake them?",
+      tips:["Stay near a closed flower and try Blood Bite on the creatures. Every five bites bring back a heart; that warmth wakes the flower too. Full hearts are fine: Velvetwing saves the extra warmth as armor.","The other flower is across the garden. Crimson Waltz carries you through a crowd; then you can settle into close bites. If you've already cleared a flower's creatures, its path will open anyway. No need to get hurt."],
+      thanks:"Both flowers are glowing! Thank you. I've brought cushions for the picnic. The ferry families stayed so long that Moss had to call them twice. It feels like our little garden again.",
+      after:"Someone left a tiny cushion for you today. Pip says it's just the right size for a very important bat. I've put it on top so nobody sits on it by mistake.",
+      repairs:[{id:"duskmallow-lower",x:16,y:18,kind:"flower",bridge:[18,17,20,19],approach:[13,17]},
+        {id:"duskmallow-upper",x:25,y:14,kind:"flower",bridge:[24,10,26,12],approach:[23,15]}]},
+    {id:"applauseBend",name:"Applause Bend",formId:"jester",region:"overworld",exit:[0,45],arrival:[1,45],key:"e",start:[35,21],door:[37,21],npc:"quayPip",person:"Pip",at:[34,20],
+      title:"Bells for the puppet show",role:"Bounce one card through a pair of stage bells",
+      ask:"I've made a puppet show! But the stage gates won't open unless both bells ring together. They're round the corner from each other. I'm worried everyone will go home before my dragon gets a turn. Can you help?",
+      tips:["Throw a Wild Card at the first bell. Pocket Trouper's card bounces to the other bell, even when you can't see it from where you're standing. Both bells need the same card.","The upper pair bends the other way. The long path is open if you want to look. Cards bounce through the creatures too; Punchline Pie makes a big splat. My dragon thinks that's very funny."],
+      thanks:"You rang them! Both gates are open! Thank you. Mum helped me put up the puppet stage by the picnic. My dragon took three bows. I only told him to take one.",
+      after:"Moss came to see the show again. She laughed before the funny bit! I think my dragon's getting famous. You can have the best seat whenever you like.",
+      repairs:[{id:"applause-lower",x:23,y:18,kind:"bell",bridge:[18,17,20,19],approach:[28,18],nodes:[[23,18],[25,15]]},
+        {id:"applause-upper",x:11,y:7,kind:"bell",bridge:[10,10,12,12],approach:[11,4],nodes:[[11,7],[14,8]]}]},
   ];
   const rows = () => Array.from({length:25},(_,y)=>Array.from({length:38},(_,x)=>x===0||x===37||y===0||y===24?"t":"."));
   for(const road of G.EARLY_FORM_ROADS){
@@ -109,16 +125,34 @@
       box(4,3,5,23,'p');box(31,3,32,21,'p');box(5,3,32,4,'p');box(5,20,32,21,'p');
       box(10,17,17,19,'p');box(21,6,29,8,'p');
       for(const [x,y]of [[13,16],[14,16],[13,17],[25,6],[26,6],[25,7],[10,5],[11,5],[10,6],[29,17],[30,17],[29,18]])put(x,y,'1');
+    }else if(road.formId==='vampire'){
+      // A near-bank flower, then a sideways crossing. Long garden paths
+      // stay open; close native bites let warmth travel with the player.
+      box(18,11,20,23,'w');box(18,10,36,12,'w');box(32,10,34,12,'p');
+      box(4,4,5,23,'p');box(4,4,34,5,'p');box(32,4,34,22,'p');box(5,20,34,21,'p');
+      box(11,17,17,19,'p');box(23,13,27,19,'p');
+      for(const [x,y]of [[14,17],[15,17],[14,18],[24,15],[25,15],[26,15],[9,5],[10,5],[9,6],[29,6],[30,6],[29,7]])put(x,y,'1');
+    }else if(road.formId==='jester'){
+      // Two right-angle bell pairs use actual card travel. Small hedges
+      // block a direct second-bell shot without blocking its ricochet.
+      box(18,12,20,23,'t');box(3,10,20,12,'t');box(3,10,5,12,'p');
+      box(4,4,33,5,'p');box(32,4,33,22,'p');box(4,20,33,21,'p');box(4,4,5,21,'p');
+      box(21,17,30,19,'p');box(10,4,12,9,'p');put(26,16,'t');put(12,5,'t');
+      for(const [x,y]of [[29,6],[31,6],[30,8],[6,16],[8,16],[7,18],[23,22],[25,22],[24,23],[4,5],[6,5],[5,7]])put(x,y,'1');
     }
     road.repairs.forEach((repair,i)=>{const [x0,y0,x1,y1]=repair.bridge;box(x0,y0,x1,y1,String(i+4));});
-    const [dx,dy]=road.door;put(dx,dy,'x');put(road.start[0],road.start[1]-1,'m');put(31,4,'H');put(road.start[0]-2,road.start[1]-2,'C');
+    const [dx,dy]=road.door;
+    // A feet-box reaches above its anchor. Broad physical openings let a
+    // slightly off-center stick approach cross without perfect alignment.
+    if(dx===37){put(dx,dy-1,'p');put(dx,dy+1,'p');}else{put(dx-1,dy,'p');put(dx+1,dy,'p');}
+    put(dx,dy,'x');put(road.start[0],road.start[1]-1,'m');put(31,4,'H');put(road.start[0]-2,road.start[1]-2,'C');
     const legend={
       'x':{tile:'path',portal:{map:road.region,x:road.arrival[0],y:road.arrival[1]},portalStyle:'gap',seamless:true},
       '1':{tile:'grass',enemy:'slime',guardPost:true},'2':{tile:'grass',enemy:'wisp',guardPost:true},'3':{tile:'grass',enemy:'bones',guardPost:true},
       'm':{tile:'path',message:`${road.person.toUpperCase()}'S NOTE · ${road.ask}`},
       'H':{tile:'path',chest:{heal:true,name:`${road.person}'s road picnic`}},'C':{tile:'path',rest:true,restText:'A quiet camp restores every heart and all mana.'},
     };
-    road.repairs.forEach((repair,i)=>legend[String(i+4)]={tile:['alchemist','dragon','riftblade','mole'].includes(road.formId)?'tree':'water',roadRepair:repair.id});
+    road.repairs.forEach((repair,i)=>legend[String(i+4)]={tile:['alchemist','dragon','riftblade','mole','jester'].includes(road.formId)?'tree':'water',roadRepair:repair.id});
     registerMap({id:road.id,name:road.name,earlyFormRoad:road.formId,playerStart:{x:road.start[0],y:road.start[1]},legend,tiles:grid.map(row=>row.join(''))});
     G.NPC_PLACEMENTS[road.id]=[[road.npc,...road.at,{stationary:true}]];
     const parent=G.maps[road.region],[px,py]=road.exit;
@@ -126,8 +160,13 @@
     if(parent.legend[parent.tiles[py]?.[px]]?.portal||parent.legend[key]?.portal)throw new Error(`${road.name} would replace an existing entrance in ${parent.name}. Choose a free tile and letter.`);
     parent.legend={...parent.legend,[key]:{tile:'path',portal:{map:road.id,x:road.start[0],y:road.start[1]},portalStyle:'gap',seamless:true}};
     parent.tiles=parent.tiles.map((row,y)=>y===py?row.slice(0,px)+key+row.slice(px+1):row);
-    // Clear the physical approach without changing neighbouring entrances.
-    if(px===0)for(let y=py-1;y<=py+1;y++)parent.tiles[y]=parent.tiles[y].slice(0,1)+'pp'+parent.tiles[y].slice(3);
-    else for(let y=1;y<=2;y++)parent.tiles[y]=parent.tiles[y].slice(0,px)+'p'+parent.tiles[y].slice(px+1);
+    // Clear both the opening and its approach. Keep the portal at the
+    // center and preserve any independently authored neighbouring exit.
+    const sideways=px===0||px===parent.tiles[0].length-1,into=sideways?(px===0?1:-1):(py===0?1:-1);
+    for(let across=-1;across<=1;across++)for(let depth=0;depth<=2;depth++){
+      const x=px+(sideways?depth*into:across),y=py+(sideways?across:depth*into);
+      if((x===px&&y===py)||!parent.tiles[y]?.[x]||parent.legend[parent.tiles[y][x]]?.portal)continue;
+      parent.tiles[y]=parent.tiles[y].slice(0,x)+'p'+parent.tiles[y].slice(x+1);
+    }
   }
 })();

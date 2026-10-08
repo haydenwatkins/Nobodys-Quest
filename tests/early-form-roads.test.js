@@ -17,6 +17,21 @@ test('specialist roads connect both ways, have an open long path and preserve or
  assert.equal(G.maps.overworld.legend.Z.portal.map,'shattercoast');assert.equal(G.maps.overworld.legend.Z.stars,G.PACING.coastStars);
  for(const road of G.EARLY_FORM_ROADS){modern(r,road.formId);r.load('overworld');r.drain();assert.equal(G.guidanceRouteTarget(G.storyGoal()).cell.portal.map,road.region==='overworld'?road.id:road.region);}
 });
+test('specialist road openings accept off-center feet boxes through native collisions in both directions',()=>{
+ const r=runtime(),{G}=r;
+ for(const road of G.EARLY_FORM_ROADS){modern(r,road.formId);r.load(road.id);r.drain();
+  const [x,y]=road.door,sideways=x===37,p=G.state.player;
+  Object.assign(p,{x:(sideways?x-1:x)*16+8+(sideways?0:2),y:(sideways?y:y-1)*16+8+(sideways?-2:0)});
+  G.input.vec={x:0,y:0};G.world.checkTriggers(.5);r.drain();
+  G.input.vec={x:sideways?1:0,y:sideways?0:1};for(let i=0;i<40&&G.state.mapId===road.id;i++){G.world.moveBox(p,sideways?1.5:0,sideways?0:1.5);G.world.checkTriggers(.02);r.drain();}
+  assert.equal(G.state.mapId,road.region,road.name+' has a forgiving return');
+  const [px,py]=road.exit,horizontal=px===0,fromTop=py===0;
+  Object.assign(p,{x:(horizontal?px+1:px)*16+8+(horizontal?0:2),y:(horizontal?py:fromTop?py+1:py-1)*16+8+(horizontal?-2:0)});
+  G.input.vec={x:0,y:0};G.world.checkTriggers(.5);r.drain();
+  const vx=horizontal?-1:0,vy=horizontal?0:fromTop?-1:1;G.input.vec={x:vx,y:vy};
+  for(let i=0;i<40&&G.state.mapId===road.region;i++){G.world.moveBox(p,vx*1.5,vy*1.5);G.world.checkTriggers(.02);r.drain();}assert.equal(G.state.mapId,road.id,road.name+' has a forgiving entrance');
+ }
+});
 test('native bow shots across water and Frog tongue contacts create actual saved crossings without free mastery',()=>{
  const r=runtime(),{G}=r;
  for(const road of G.EARLY_FORM_ROADS.filter(r=>['ranger','frog'].includes(r.formId))){

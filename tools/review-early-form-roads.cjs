@@ -42,7 +42,13 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
    for(const repair of road.repairs){
     await walk(...repair.approach);await frames(8);await shot(repair.id+'-before');
     await page.evaluate(({x,y})=>{const p=G.state.player,dx=x*16+8-p.x,dy=y*16+8-p.y,d=Math.hypot(dx,dy)||1;p.dir={x:dx/d,y:dy/d};},{x:repair.nodes?.[0]?.[0]??repair.x,y:repair.nodes?.[0]?.[1]??repair.y});
-    for(let i=0;i<3&&!await page.evaluate(id=>G.roadRepairOpen(id),repair.id);i++)await art(['alchemist','stormcaller','riftblade','mole'].includes(road.formId)?1:0);
+    for(let i=0;i<(road.formId==='vampire'?20:3)&&!await page.evaluate(id=>G.roadRepairOpen(id),repair.id);i++){
+     if(road.formId==='vampire'){
+      const target=await page.evaluate(part=>{const p=G.state.player;return G.state.enemies.filter(e=>!e.dead&&!e.def.practice&&Math.hypot(e.outingSpawnX-part.x*16-8,e.outingSpawnY-part.y*16-8)<56).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y)).map(e=>({x:Math.floor(e.x/16),y:Math.floor(e.y/16)}))[0];},repair);
+      assert.ok(target);await walk(target.x-1,target.y);await page.evaluate(({x,y})=>{const p=G.state.player,dx=x*16+8-p.x,dy=y*16+4-p.y,d=Math.hypot(dx,dy)||1;p.dir={x:dx/d,y:dy/d};},target);
+     }
+     await art(['alchemist','stormcaller','riftblade','mole'].includes(road.formId)?1:0);
+    }
     assert.equal(await page.evaluate(id=>G.roadRepairOpen(id),repair.id),true,'native input completes '+repair.id);await frames(8);await shot(repair.id+'-after');
     const [x0,y0,x1,y1]=repair.bridge;await walk(x0,Math.round((y0+y1)/2));await walk(x1,Math.round((y0+y1)/2));await frames(100);await shot(repair.id+'-crossed');
    }
@@ -55,7 +61,7 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
    assert.ok(await page.evaluate(text=>window.reviewPaint.map(p=>p.text).join(' ').includes(text),road.thanks));await shot(road.id+'-good-news');await drain();
    assert.equal(await page.evaluate(id=>G.ensureTown().requests.includes(id),'road-'+road.formId),true);
    await next();await next();await frames(5);assert.ok(await page.evaluate(text=>window.reviewPaint.map(p=>p.text).join(' ').includes(text),road.after));await shot(road.id+'-revisit');await drain();
-   await walk(27,6);await frames(80);await shot(road.id+'-picnic-consequence');
+   await walk(road.formId==='jester'?24:27,6);await frames(80);await shot(road.id+'-picnic-consequence');
    // Both sides are ordinary walked exits. Approach inside the road, then
    // use native movement through its border and back through the parent.
    const [dx,dy]=road.door,inside=[Math.max(1,Math.min(36,dx)),Math.max(1,Math.min(23,dy))];await walk(...inside);

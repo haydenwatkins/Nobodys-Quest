@@ -496,9 +496,11 @@ G.passives = (() => {
     return result;
   }
 
-  function onHeal(user, amount, healed) {
+  function onHeal(user, amount, healed, source) {
     const passive = current(user);
     if (!passive || passive.id !== "bloodskin") return;
+    if (amount > 0 && ["bloodBite", "bloodMoon"].includes(source))
+      G.noteRoadworkPulse?.("flower", user.x, user.y, 56, G.state.formId);
     const overflow = Math.max(0, amount - healed);
     if (overflow <= 0) return;
     user.passiveBarrier = Math.min(2, (user.passiveBarrier || 0) + overflow);

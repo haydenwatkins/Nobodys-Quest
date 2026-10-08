@@ -8,12 +8,13 @@
   const tile=G.drawGreenfieldTile;
   G.drawGreenfieldTile=(c,cell,x,y,time)=>{
     if(!road())return tile(c,cell,x,y,time);
-    if(cell.roadRepair&&G.roadRepairOpen(cell.roadRepair)){const floor=road().formId==='riftblade'?'pavers':road().formId==='mole'?'dryPath':'boards';G.drawSprite(c,G.roadworkScenery[floor],0,x*16+8,y*16+16,false);return true;}
+    if(cell.roadRepair&&G.roadRepairOpen(cell.roadRepair)){const floor=road().formId==='riftblade'?'pavers':road().formId==='mole'?'dryPath':road().formId==='vampire'?'petalPath':'boards';G.drawSprite(c,G.roadworkScenery[floor],0,x*16+8,y*16+16,false);return true;}
     const calling=road().formId;
-    if(['stormcaller','dragon','riftblade','mole'].includes(calling)&&['grass','path','tree'].includes(cell.tile)){
+    if(['stormcaller','dragon','riftblade','mole','vampire','jester'].includes(calling)&&['grass','path','tree'].includes(cell.tile)){
       const terrace=calling==='stormcaller',r=G.util.hash2(Math.floor(x/4)+31,Math.floor(y/3)+73)*2;
       const colors=calling==='riftblade'?(cell.tile==='path'?['#aaa0b6','#b4aabe','#a398b0']:['#798b7d','#829382','#728677']):calling==='mole'?(cell.tile==='path'?['#ba9b79','#c2a581','#b29574']:['#907b60','#9a8265','#89745c']):terrace?(cell.tile==='path'?['#8a91a0','#939aa8','#868d9c']:['#656f83','#6b7589','#626c7f']):(cell.tile==='path'?['#af8d74','#b7957a','#a98972']:['#81705f','#887663','#7c6b5c']);
-      c.fillStyle=colors[Math.floor(r*3)];c.fillRect(x*16,y*16,16,16);
+      const palette=calling==='vampire'?(cell.tile==='path'?['#958aab','#a095b4','#8f83a6']:['#687e81','#71868a','#62777c']):calling==='jester'?(cell.tile==='path'?['#bb9c7d','#c4a685','#b29677']:['#7c8b75','#85947d','#75856e']):colors;
+      c.fillStyle=palette[Math.floor(r*3)];c.fillRect(x*16,y*16,16,16);
       if(cell.tile==='tree')G.drawSprite(c,terrace?G.starfallScenery.wall:calling==='mole'?G.rootdeepScenery.rootWall:G.meadowScenery.hedge,Math.floor(G.util.hash2(x,y)*8),x*16+8,y*16+16,false);
       else if(G.util.hash2(x+73,y+43)>.32){c.fillStyle=terrace?'#a9b3bd':'#d0b192';c.fillRect(x*16+3,y*16+7,4,1);}
       return true;
@@ -57,6 +58,8 @@
     if(r.formId==='stormcaller')list.push({y:21*16+15,fn:()=>prop(c,G.roadworkScenery.kettle,7*16+8,21*16+16,complete?1:0)});
     if(r.formId==='riftblade'&&G.ensureTown().requests.includes('road-riftblade'))list.push({y:5*16+15,fn:()=>prop(c,G.deliveryScenery.bunting,27*16+8,5*16+16)});
     if(r.formId==='mole')list.push({y:6*16+15,fn:()=>prop(c,G.roadworkScenery.bookBasket,29*16+8,6*16+16,G.ensureTown().requests.includes('road-mole')?1:0)});
+    if(r.formId==='vampire')list.push({y:6*16+15,fn:()=>prop(c,G.roadworkScenery.cushions,29*16+8,6*16+16,G.ensureTown().requests.includes('road-vampire')?1:0)});
+    if(r.formId==='jester')list.push({y:7*16+15,fn:()=>prop(c,G.roadworkScenery.puppetStage,27*16+8,7*16+16,G.ensureTown().requests.includes('road-jester')?1:0)});
     list.push({y:(sy-2)*16+15,fn:()=>prop(c,G.prairieScenery.hearth,(sx-2)*16+8,(sy-2)*16+16,G.reducedMotion?0:Math.floor(G.state.time*2)%4)});
     list.push({y:5*16+15,fn:()=>prop(c,G.prairieScenery.desk,31*16+8,5*16+16)});
     if(r.formId==='stormcaller'){
