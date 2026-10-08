@@ -198,13 +198,13 @@
   G.updateOrchardBoss=(e,p,dt)=>{
     if(e.id!=='tollkeeper')return oldBoss(e,p,dt);
     e.openingTimer=Math.max(0,(e.openingTimer||0)-dt);if(e.openingTimer)return true;
-    const phase=e.bossPhase||1,assist=G.comfortSetting&&G.comfortSetting('bossAssistance');
-    const warn=1.15+(assist?.35:0),hazards=G.state.openingHazards||(G.state.openingHazards=[]);
+    const phase=e.bossPhase||1;
+    const warn=G.guardianWarningSeconds?.(1.15,.35)??1.15,hazards=G.state.openingHazards||(G.state.openingHazards=[]);
     e.openingBeat=(e.openingBeat||0)+1;
     if(e.openingBeat%2){
       const flood={kind:'flood',owner:e,x:e.x,y:e.y+12,radius:phase===3?57:70,t:0,warn:1.65,active:.65,hit:false};
       floodRefuge(flood,p);
-      if(assist)flood.warn+=.4;
+      flood.warn=G.guardianWarningSeconds?.(flood.warn,.4)??flood.warn;
       hazards.push(flood);e.openingTimer=flood.warn+flood.active+1.3;
     }else{
       const a=Math.atan2(p.y-e.y,p.x-e.x),count=phase===1?1:3;

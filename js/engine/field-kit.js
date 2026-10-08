@@ -7,7 +7,7 @@
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const lamps=[
     {key:'easyMode',name:'Heart Lantern',icon:'♥',color:'#efa2ae',effect:'Hearts grow back.',detail:'One heart every 6 seconds, after a short breather. Works in fights too.'},
-    {key:'bossAssistance',name:'Guardian Lantern',icon:'☀',color:'#ffce7b',effect:'Help with guardian fights.',detail:'Extra hearts and slower boss shots after retries. Longer warnings on the opening road.'},
+    {key:'bossAssistance',name:'Guardian Lantern',icon:'☀',color:'#ffce7b',effect:'More time to react.',detail:'Longer guardian warnings. Extra hearts and slower boss shots after retries.'},
   ];
   G.HELP_LANTERNS=lamps;
   // Keep compact benefits explicit for a child; the full bench remains optional.
@@ -136,7 +136,7 @@
     const npc=G.npcTalkCandidate?.();
     if(npc&&Math.hypot(npc.x-p.x,npc.y-p.y)<near.d+6)return null;
     const lamp=lamps.find(l=>l.key===near.kind);
-    return {...near,id:'field-kit',hint:lamp?(lamp.key==='easyMode'?'Hearts grow back, even in fights.':'After retries: extra hearts, slower shots.'):null,label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
+    return {...near,id:'field-kit',hint:lamp?(lamp.key==='easyMode'?'Hearts grow back, even in fights.':'Longer warnings; help after retries.'):null,label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
   };
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>candidate()||G.helpStationCandidate();

@@ -28,7 +28,7 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/nq-guardian-lanterns',nam
      return {box,text:lines.map(p=>p.text).join(' '),fits:box.x>=0&&box.x+box.w<=G.W&&box.y>=0&&box.y+box.h<=G.H&&lines.every(p=>{c.font=p.font;return p.x+c.measureText(p.text).width<=box.x+box.w-7;})};
     });
     assert.equal(painted.fits,true,'all lamp words fit inside the real painted dock');
-    assert.match(painted.text,kind==='easyMode'?/Hearts grow back, even in fights\./:/After retries: extra hearts, slower shots\./);
+    assert.match(painted.text,kind==='easyMode'?/Hearts grow back, even in fights\./:/Longer warnings; help after retries\./);
     assert.ok(!painted.text.includes('…'));
     await shot(`${mapId}-${approach||'camp'}-${kind}-unlit`);
     const before=await page.evaluate(()=>JSON.stringify({items:G.state.items,stars:G.state.stars}));

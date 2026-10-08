@@ -37,6 +37,12 @@
     return !!(G.comfortSettings && G.comfortSettings[name] === true);
   };
 
+  // Help preserves the decision and adds time to read it, in every region.
+  // Custom opening encounters can retain their already-authored extra beat.
+  G.guardianWarningSeconds = function (seconds, extra = 0.3) {
+    return seconds + (G.comfortSetting("bossAssistance") ? extra : 0);
+  };
+
   G.setComfortSetting = function (name, enabled) {
     if (!(name in DEFAULTS)) return false;
     const next = !!enabled;

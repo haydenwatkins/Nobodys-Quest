@@ -7,7 +7,7 @@ October 8, 2026. Family direction: Lily needs generous help, Ben wants something
 | World object | What it changes | Why choose it |
 | --- | --- | --- |
 | Heart Lantern, already shipped | Hearts recover after a short breather, including during battle. | Keep exploring and experimenting after mistakes. |
-| Guardian Lantern, already shipped | Extra hearts and slower boss shots after repeated retries; longer warnings in the opening encounters. | More room to recognize and practice the guardian's actions. |
+| Guardian Lantern, already shipped | Longer warnings throughout guardian fights; extra hearts and slower boss shots after repeated retries. | More room to recognize and practice the guardian's actions. |
 | Challenge Lantern, proposed | A guardian adds an authored twist with an active counter and a generous opening when countered. Ordinary travel and progression stay the same. | Enjoy turning a dangerous move into your advantage. |
 
 Keep these independent. A player may learn the challenge with both help lights on, then put one out voluntarily. Do not silently extinguish help, increase difficulty after good play, or weaken help to protect a challenge score. The challenge is off by default. Do not show an actionable Challenge Lantern for a guardian whose alternate encounter is unfinished. Introduce the first optional challenge only after its basic counter has been demonstrated on the road; first contact must not be a three-way difficulty quiz.
@@ -39,7 +39,7 @@ Implement Treant first, then Queen, then Knight. Keep their existing connected r
 
 ## Whole-campaign encounter direction
 
-This is an authoring queue. Each idea must pass the rules above; alternatives are welcome when native combat makes an idea awkward.
+These are illustrative authoring directions, not fixed requirements. The intent is agency, a useful response and a satisfying payoff across the whole game. Each idea must pass the shared player-experience principles; choose a different mechanic whenever it better serves that intent. See `DESIGN-APPLICATION.md` for old and new systems beyond this guardian list.
 
 | Guardian | Counter opportunity to develop |
 | --- | --- |
@@ -80,8 +80,10 @@ Future Challenge Lanterns use a distinct crossed-branch emblem and flame shape, 
 
 ## Current limits and next deliverable
 
-This batch changes preparation placement and truthful, bounded lamp explanations. It does not enable hard mode, add challenge trophies, rebalance every guardian or implement the counter proposals above. Existing assistance is uneven: extra warning time is authored in opening/delivery encounters, while retry hearts and slower guardian projectiles use shared guidance. Before the new challenge toggle, make its warning/recovery contract explicit and consistent without changing normal fights into damage sponges.
+The preparation foundation added outside/camp lamps and bounded explanations. The shared follow-through now lengthens guardian commitments, floor-pattern warnings and shot arming with Guardian help throughout the roster, preserving the opening's authored extra beats. Standard pattern guardians retain a clear opening after actual lingering threats, including slowed/returning shots and delayed echoes. Every registered guardian clears its previous commitment and hostile shots before introducing a new phase; friendly and unrelated shots remain. This does not enable hard mode, add challenge trophies or implement the proposed counters. Shared timing verification does not establish whole-campaign human balance.
 
 Next deliverable: Treant's breakable-branch counter in standard play, a nearby safe demonstration, its optional branching pattern, native victory/retry evidence with both help lights and without them, and its menu-optional invitation/recognition. Then repeat for Queen; build every later alternate through the same acceptance criteria. Preserve the open continuous Worldwake pacing review and menu-optional treasure pursuit after this foundation.
 
 The same enjoyment rule applies to gear. Review the Heartwood Crown's existing always-on walking penalty during the treasure pursuit pass; prefer a tactical price attached to its wider swing over making every trip slower. Do not quietly rebalance owned gifts in this preparation batch or replace a small movement tax with a worse recovery penalty without native combat evidence.
+
+The generalized contract and retroactive coverage are in `PLAYER-EXPERIENCE-RULES.md` and `DESIGN-APPLICATION.md`. This warning/recovery follow-through passes 647 complete 2D tests and eight touch/TV × HD/base browser workflows; see the application ledger for controlled-fixture and physical-device limits.

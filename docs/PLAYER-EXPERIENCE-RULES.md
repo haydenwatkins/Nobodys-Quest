@@ -1,6 +1,35 @@
-# Teaching, pacing and dialogue
+# Player experience principles
 
 October 4, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
+
+## How design feedback becomes game-wide work
+
+October 8 direction: interpret the intent behind the parent's advice, generalize it into this shared contract, and apply it to existing content as well as future work. Examples illustrate a problem or opportunity; they are not the boundaries of the request or compulsory literal mechanics. A tar-pit example implies interactive, recoverable restrictions and interesting decisions across combat, equipment and traversal. It does not require tar in every fight.
+
+For every substantial design observation:
+
+1. Record the desired player experience and the underlying principle here. Preserve earlier requirements; reconcile actual conflicts explicitly. Do not create a fresh competing rulebook for each feature.
+2. Scan the affected old and new systems: early campaign, later regions, optional content, rewards/builds, world interactions, feedback, saves and all supported inputs. Identify shared code and authored exceptions. An illustrative prototype is not whole-game application.
+3. Implement safe shared improvements and backfill authored content in reviewable batches. Add uncovered work to the existing roadmap with a concrete next action. Keep one active priority and preserve the remaining obligations.
+4. Track each area as **verified**, **partial** or **queued**, with evidence and the next gap in `DESIGN-APPLICATION.md`. A documented rule, a registry check and a human campaign playtest establish different things. Do not mark an area complete because one example works.
+5. Revisit the ledger whenever a shared change or new system lands. Later work must obey the accumulated principles, and older content remains part of the improvement queue. Report what changed in play and what still needs implementation.
+
+## General experience contract
+
+| Principle | Intent and application |
+| --- | --- |
+| Preserve the pleasure of playing | Responsive movement, useful abilities, exploration and short retries are the baseline. Put difficulty and tradeoffs in interesting choices and recoverable situations. Audit permanent movement taxes, resource starvation, compulsory menu work and long repeated walks. Apply this to ordinary enemies, bosses, gear, roads and optional runs. |
+| Turn danger into agency | A threat should offer a readable response with a satisfying consequence: interrupt, reposition, rescue, create useful ground, protect an ally or open a strike. Use multiple viable answers. Added complexity must give the player more to do with their tools, rather than merely more punishment to endure. |
+| Teach through useful play | Introduce a system through a meaningful world action, let the player enjoy it, then develop and combine it. Availability follows introduction. Every form and upgrade needs an immediate use and space to discover its value; mastery records actual use. Apply this beyond the opening to Marks, Legends, recipes, items and optional challenges. |
+| Keep a coherent purpose | Give the player one clear chosen next action, understandable causes and consequences, and a physical route. Optional requests require acceptance. Avoid quest floods, disconnected chores, abrupt travel and unlock cascades throughout the campaign. |
+| Make people feel like people | Dialogue conveys an identifiable person's feelings, concrete stakes and a useful next action. Warm reactions acknowledge the player's help. Apply the prose rules below to later guardians, signs, menus and return conversations, not just opening NPCs. |
+| Make the world the main interface | Common configuration and collection actions belong in legible world objects and existing quick controls. Menus remain an accessible fallback. Show the state and effect where the player acts; minimize reading, screen clutter, sorting and repeated setup. Themed controls must remain discoverable. |
+| Preserve a complete adventure for every skill level | Help supports learning and experimentation without withholding story, power, forms or treasure opportunities. Encourage improvement through demonstrated success, interesting optional variations and personal expression. Players choose scaffolding; never silently promote them or shame a helped clear. |
+| Make presentation trustworthy | Text fits, warnings match collision, targets stop moving when committed, and helpers hold a readable position. Effects and scenery yield to actors and hazards. Sharp text and cute art serve comprehension on touch devices and TV, not only screenshots or a PC viewport. |
+| Make progress feel earned and lasting | Reward purposeful actions, give their consequences room to register, and preserve them across saves and revisits. Collection pays once. Avoid meaningless grind, random inventory churn, slot clutter and back-to-back priorities that bury an achievement. |
+| Say only what helps | Use plain, friendly American English. UI copy tells the player what an action changes or how to proceed. Show self-evident state visually; remove filler assurances and unexplained thematic claims. The same standard applies to future interfaces. |
+
+`DESIGN-APPLICATION.md` is the current coverage ledger; `CLOUD-ROADMAP.md` orders implementation. Feature specifications explain how they satisfy this contract and cannot limit it to their illustrative mechanic.
 
 ## Benchmarks consulted
 

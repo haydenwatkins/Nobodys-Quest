@@ -1053,7 +1053,7 @@ function spawnArenaPattern(e, action) {
   }
 }
 
-function resolveBossAction(e, p, action) {
+function resolveBossActionPattern(e, p, action) {
   if(action === "blades"&&e.def.id === "riftbladeAdept"){
     spawnBossHazard(e,"riftVolley",{x:p.x,y:p.y,spreads:e.bossPhase>=3?[-28,-14,0,14,28]:e.bossPhase===2?[-22,0,22]:[-13,13],warning:.8,active:.15,color:"#73eff7"});
     e.bossRecoverT=.8+2*82/120+.85;return;
@@ -1193,6 +1193,18 @@ function resolveBossAction(e, p, action) {
   }
 }
 
+function resolveBossAction(e, p, action) {
+  const before = new Set(G.state.bossHazards || []);
+  resolveBossActionPattern(e, p, action);
+  // Apply help after each encounter's authored reachability adjustments and
+  // early-return patterns. Recovery must cover the actual warning and echo.
+  for (const h of G.state.bossHazards || []) {
+    if (h.owner !== e || before.has(h)) continue;
+    h.warning = G.guardianWarningSeconds?.(h.warning) ?? h.warning;
+    e.bossRecoverT = Math.max(e.bossRecoverT, (h.delay || 0) + h.warning + h.active + 0.65);
+  }
+}
+
 function updateBossState(e, p, dist, dt) {
   const boss = e.def.boss;
   const aggro = e.def.aggro || 120;
@@ -1221,6 +1233,13 @@ function updateBossState(e, p, dist, dt) {
     e.bossRecoverT = 0.55;
     e.bossSpecialT = Math.min(e.bossSpecialT, 0.8);
     G.cancelBossHazards(e);
+    e.bossPendingAction = null;
+    e.bossTelegraphT = e.bossChargeT = 0;
+    e.bossAfterCharge = null;
+    e.bossContactActive = false;
+    // The next phase introduces its own phrase. Old hostile shots cannot
+    // resume under it; player and other creatures' shots retain their rules.
+    for (const shot of G.state.projectiles) if (shot.owner === e && !shot.fromPlayer) shot.dispelled = true;
     G.state.hitStop = Math.max(G.state.hitStop || 0, 0.055);
     G.state.shake = Math.max(G.state.shake, 0.3);
     G.sfx.play("bossPhase");
@@ -1278,6 +1297,15 @@ function updateBossState(e, p, dist, dt) {
     return true;
   }
 
+  // A fixed timer cannot predict slower assistance shots, return volleys or
+  // delayed echoes. Standard pattern bosses wait for their actual phrase to
+  // finish, then leave a short clear opening. Opening bosses already sequence
+  // their complete ground phrases through openingTimer; do not freeze it.
+  if (!boss.orchard && (
+    (G.state.bossHazards || []).some(h => h.owner === e && h.t < (h.delay || 0) + h.warning + h.active)
+    || G.state.projectiles.some(shot => shot.owner === e && !shot.fromPlayer && !shot.dispelled)
+  )) e.bossRecoverT = Math.max(e.bossRecoverT, 0.65);
+
   if (e.bossRecoverT > 0) {
     e.bossRecoverT = Math.max(0, e.bossRecoverT - dt);
     return true;
@@ -1291,10 +1319,10 @@ function updateBossState(e, p, dist, dt) {
       const a = G.util.angleTo(e.x, e.y, p.x, p.y);
       e.bossChargeX = Math.cos(a);
       e.bossChargeY = Math.sin(a);
-      e.bossTelegraphT = boss.telegraph;
+      e.bossTelegraphT = G.guardianWarningSeconds?.(boss.telegraph) ?? boss.telegraph;
       e.bossSpecialT = boss.specialEvery * Math.max(0.78, 1 - (e.bossPhase - 1) * 0.11);
       G.sfx.play("bossPhase");
-      G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: boss.color, radius: 18, dur: boss.telegraph });
+      G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: boss.color, radius: 18, dur: e.bossTelegraphT });
       const fallback = boss.style === "riftblade" ? ["charge", "blades"] : ["charge"];
       const patterns = boss.patterns || fallback;
       e.bossPendingAction = patterns[e.bossPattern % patterns.length];
@@ -1306,7 +1334,7 @@ function updateBossState(e, p, dist, dt) {
         G.spawnFx({
           kind: "tell", x: e.x, y: e.y - 5,
           x2: e.x + e.bossChargeX * 44, y2: e.y - 5 + e.bossChargeY * 44,
-          color: boss.color, dur: boss.telegraph,
+          color: boss.color, dur: e.bossTelegraphT,
         });
       }
       return true;
@@ -1363,7 +1391,7 @@ function enemyShot(state, enemy, angle, opts) {
     fromPlayer: false,
     // Give melee-range players a readable instant before a boss shot becomes
     // dangerous. Ordinary enemy shots retain their existing timing.
-    armT: enemy.def.miniboss ? G.BOSS_PROJECTILE_ARM_SECONDS : 0,
+    armT: enemy.def.miniboss ? (G.guardianWarningSeconds?.(G.BOSS_PROJECTILE_ARM_SECONDS) ?? G.BOSS_PROJECTILE_ARM_SECONDS) : 0,
   });
 }
 

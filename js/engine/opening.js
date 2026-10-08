@@ -230,8 +230,8 @@
     if(e.openingTimer>0)return true;
     e.openingBeat=(e.openingBeat||0)+1;
     const hazards=G.state.openingHazards||(G.state.openingHazards=[]);
-    const assist=G.comfortSetting&&G.comfortSetting('bossAssistance');
-    const warn=(e.bossPhase===1?.95:.8)+(assist?.3:0);
+    const base=e.bossPhase===1?.95:.8;
+    const warn=G.guardianWarningSeconds?.(base)??base;
     if(e.openingBeat%2){
       const a=Math.atan2(p.y-e.y,p.x-e.x),count=e.bossPhase===1?1:3;
       for(let i=0;i<count;i++){
