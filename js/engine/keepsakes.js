@@ -73,7 +73,7 @@ G.carryKeepsake = function (id) {
 
 G.events.on("pickup", data => {
   const keepsake = G.KEEPSAKES.find(k => k.item === data.item);
-  if (keepsake) G.ui.toast(`${keepsake.name} can shape your build. Visit Build / Keepsakes to choose its gift and price.`, 5);
+  if (keepsake) G.ui.toast(`${keepsake.name} can shape your build. Open Quick Mix → Pockets, or visit a camp bag, to try its gift and price.`, 5);
 });
 
 G.onKeepsakeAbilityUse = function (user, ability) {

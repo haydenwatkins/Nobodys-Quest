@@ -55,8 +55,8 @@
     }
     G.events.emit("comfortSettingChanged", { name, enabled: next });
     if (G.state && G.ui && G.ui.toast) {
-      const label = name === "easyMode" ? "Easy Mode" : "Boss Assistance";
-      G.ui.toast(`${label}: ${next ? "ON" : "OFF"}`, 2.2);
+      const label = name === "easyMode" ? "Heart Lantern" : "Guardian Lantern";
+      G.ui.toast(`${label}: ${next ? "lit" : "unlit"}`, 2.2);
     }
     return true;
   };

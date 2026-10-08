@@ -139,7 +139,7 @@ test('a crowded Heartwood touch view keeps the Crown purpose visible beneath the
   const before=JSON.stringify(G.state);
   for(const hd of [true,false]){
     G.hdPilot=hd;labels.length=rects.length=0;G.ui.drawHUD(cam);
-    assert.ok(labels.includes('Heartwood Crown'));assert.ok(labels.includes('+1 star · choose a Keepsake in Build'));
+    assert.ok(labels.includes('Heartwood Crown'));assert.ok(labels.includes('+1 star · try its gift in Pockets'));
     assert.ok(labels.some(text=>/Walk over.*collect/.test(text)));
     const cue=rects.find(rect=>rect.color==='rgba(26,28,44,.94)');assert.ok(cue);
     assert.ok(cue.x>=84&&cue.x+cue.w<=G.W-68,'the centred cue clears both touch control corners');

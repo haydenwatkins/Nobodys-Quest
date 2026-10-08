@@ -230,7 +230,7 @@ G.updatePlayer = function (dt) {
     const awakened = (G.tryOpeningInteraction && G.tryOpeningInteraction()) || (G.tryLegendEcho && G.tryLegendEcho());
     if (!awakened && G.tryNpcTalk) G.tryNpcTalk();
   }
-  if (G.ui.dialogueOpen) return;
+  if (G.ui.dialogueOpen || G.fieldKit?.isOpen()) return;
   if (G.updateFormPerformance) G.updateFormPerformance(dt);
   if (G.input.tapped("ultimate") && G.useLegendUltimate) G.useLegendUltimate();
 

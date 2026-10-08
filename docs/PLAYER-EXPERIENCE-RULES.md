@@ -25,7 +25,11 @@ These are document benchmarks, not timed playtests of other games.
 
 10. Give a chosen promise's good-news return its own moment. A ready specialist-road or Worldwake-trail request can hold the next discovery until the player returns; Journey's Set aside releases it deliberately. Do not turn unaccepted requests into gates, erase waiting echoes or add counters for this pause. Signature-action guidance should demonstrate a body's practical use, then yield to its existing lessons. See `WORLDWAKE-NEIGHBOURS.md`.
 
+11. Make common play menu-optional. Use physical help switches and introduced field selectors; pictures and a short benefit/price precede exact values. Looking never equips. Default help stays off, choices persist, and rewards stay equal. Reuse Forms/Quick Mix rather than a permanent HUD button per system. See `MENU-OPTIONAL.md` for the shipped lantern/pocket foundation and the remaining conversion.
+
 ## Prose rules
+
+Use American spelling. UI footnotes must offer useful, actionable help. Empty/carried equipment belongs in visible object state; omit generic reassurance about browsing and other self-evident interactions.
 
 Write spoken English that a child can follow on first hearing. Every story/request exchange should answer: who is speaking, what they want, how they feel, and what the player can do now.
 

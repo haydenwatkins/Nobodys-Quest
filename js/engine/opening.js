@@ -29,10 +29,13 @@
     progress().started=true;
     const st=G.ensureStory();st.prologueSeen=true;
     if(!st.seenChapters.includes(0))st.seenChapters.push(0);
-    say('arrival',[
+    const arriving=say('arrival',[
       ['PEBBLE','Oh, hello! I’m Pebble. Those roots have blocked the road to Sunrise, and Parcel’s cart is stuck up ahead.'],
       ['PATCHLING','I’m Patchling. I’ll help! Is everyone all right?'],
-    ]);
+    ],()=>G.introduceHelpLanterns?.());
+    // A reload between Pebble's greeting and the lantern choice must not
+    // lose the invitation. Late saves continue their own adventure quietly.
+    if(!arriving&&s.mapId===road&&s.player.x<16*16&&s.player.y>32*16)G.introduceHelpLanterns?.();
     return true;
   };
   G.openingActive=()=>!!(G.state&&(here()||progress().started)&&!progress().complete);

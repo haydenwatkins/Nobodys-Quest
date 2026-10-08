@@ -357,12 +357,15 @@
 
     // Dialogue owns every action button while it is open. In particular,
     // Enter/Escape must advance the conversation instead of opening a menu.
-    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("guide") && G.requestGuidance) G.requestGuidance(false);
-    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("map")) G.ui.openMap();
-    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("mix")) G.ui.openArtMixer(1);
-    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && G.input.tapped("pause")) G.ui.toggleMenu();
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && !G.fieldKit?.isOpen() && G.input.tapped("guide") && G.requestGuidance) G.requestGuidance(false);
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && !G.fieldKit?.isOpen() && G.input.tapped("map")) G.ui.openMap();
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && !G.fieldKit?.isOpen() && G.input.tapped("mix")) G.ui.openArtMixer(1);
+    if (!G.ui.dialogueOpen && !G.ui.formWheelOpen && !G.ui.artMixerOpen && !G.fieldKit?.isOpen() && G.input.tapped("pause")) G.ui.toggleMenu();
 
-    if (G.ui.artMixerOpen) {
+    if (G.fieldKit?.isOpen()) {
+      G.fieldKit.update(dt);
+      G.input.clearTaps();
+    } else if (G.ui.artMixerOpen) {
       G.ui.updateArtMixer(dt);
       G.input.clearTaps();
     } else if (G.ui.formWheelOpen) {
@@ -449,7 +452,7 @@
     s.time += dt;
 
     G.updatePlayer(dt);
-    if (G.ui.dialogueOpen || s.zoneTransition) { G.input.clearTaps(); return; }
+    if (G.ui.dialogueOpen || G.fieldKit?.isOpen() || s.zoneTransition) { G.input.clearTaps(); return; }
     if(G.updateExpeditionEffects)G.updateExpeditionEffects(dt);
     if(G.ui.menuOpen) {G.input.clearTaps();return;}
     if (G.updateOpening) G.updateOpening(dt);

@@ -3,9 +3,9 @@
 (() => {
   const A = G.authoredPixelArt;
   G.treasureInfo = {
-    "trophy-heartwood-crown": { name: "Heartwood Crown", purpose: "+1 star · choose a Keepsake in Build", shape: "crown" },
+    "trophy-heartwood-crown": { name: "Heartwood Crown", purpose: "+1 star · try its gift in Pockets", shape: "crown" },
     "trophy-mire-pearl": { name: "Mire Pearl", purpose: "+1 star · light Pebble's beacon", shape: "pearl" },
-    "trophy-eclipse-sigil": { name: "Eclipse Sigil", purpose: "+1 star · choose a Keepsake in Build", shape: "sigil" },
+    "trophy-eclipse-sigil": { name: "Eclipse Sigil", purpose: "+1 star · try its gift in Pockets", shape: "sigil" },
     "trophy-sky-sovereign": { name: "Sky Mark", purpose: "+1 star · awakens the wind lifts", shape: "plume" },
     "trophy-old-mason": { name: "Stone Mark", purpose: "+1 star · raises garden crossings", shape: "plumbline" },
     "trophy-silk-matriarch": { name: "Thread Mark", purpose: "+1 star · opens woven passages", shape: "spindle" },

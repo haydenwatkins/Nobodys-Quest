@@ -39,6 +39,15 @@ G.input = (() => {
   let mapTouchLongTriggered = false;
   const MAP_HELP_HOLD_MS = 520;
   let abilityHold = null;
+  // A touch hold opens the mixer underneath the finger. Chromium can send
+  // its release click to a newly exposed art; only a fresh press may choose.
+  let suppressMixerOpeningClick = false;
+  document.addEventListener("pointerdown", () => { suppressMixerOpeningClick = false; }, true);
+  document.addEventListener("click", event => {
+    if (!suppressMixerOpeningClick || !event.detail || !event.target.closest?.("#art-mixer")) return;
+    suppressMixerOpeningClick = false;
+    event.preventDefault(); event.stopImmediatePropagation();
+  }, true);
   const ART_MIX_HOLD_MS = 520;
 
   function inputNow() {
@@ -281,7 +290,7 @@ G.input = (() => {
     // highlight. The DOM screens matter most on TV, where there is no
     // keyboard or pointer to fall back on.
     const quickMix = !!(G.ui && G.ui.artMixerOpen);
-    const menuOpen = !!(G.ui && (G.ui.menuOpen || G.ui.workshopOpen || quickMix)) ||
+    const menuOpen = !!(G.ui && (G.ui.menuOpen || G.ui.workshopOpen || quickMix || G.fieldKit?.isOpen())) ||
       !!G.saveSlotScreenOpen || !!G.storyEndingOpen;
     const wheelOpen = !!(G.ui && G.ui.formWheelOpen);
     const axes = pad.axes || [];
@@ -328,7 +337,7 @@ G.input = (() => {
     syncGamepadControl("rt", rightTrigger && !suppressChordTriggers, menuOpen ? "pageRight" : wheelOpen ? "confirm" : "a", false);
     if (!leftTrigger && !rightTrigger) ultimateChordLatched = false;
     syncGamepadControl("view", gamepadButton(pad, 8), menuOpen || wheelOpen ? "back" : "map");
-    syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen || quickMix ? "back" : "pause");
+    syncGamepadControl("menu", gamepadButton(pad, 9), wheelOpen || quickMix || G.fieldKit?.isOpen() ? "back" : "pause");
     syncGamepadControl("leftStick", gamepadButton(pad, 10), menuOpen || wheelOpen ? null : "guide");
     syncGamepadControl("rightStick", gamepadButton(pad, 11), menuOpen || wheelOpen ? null : "mix");
 
@@ -616,7 +625,7 @@ G.input = (() => {
   // Stop Safari from moving the game page, but leave scrollable overlays alone.
   // Blocking every touchmove also blocks the pause menu on iPhone.
   document.addEventListener("touchmove", (e) => {
-    if (e.target.closest("#menu, #workshop-errors, #art-mixer")) return;
+    if (e.target.closest("#menu, #workshop-errors, #art-mixer, #field-kit")) return;
     e.preventDefault();
   }, { passive: false });
 
@@ -626,6 +635,7 @@ G.input = (() => {
       inputNow() - abilityHold.started >= ART_MIX_HOLD_MS && G.ui && G.ui.openArtMixer) {
       abilityHold.triggered = !!G.ui.openArtMixer(abilityHold.slot);
       if (abilityHold.triggered) {
+        suppressMixerOpeningClick = true;
         liveAim = null;
         abilityHold.el.classList.add("mixing");
       }

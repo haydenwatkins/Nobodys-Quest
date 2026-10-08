@@ -1,7 +1,7 @@
 // Native input/save review shared by authored scenarios. No game grants here.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES||'node_modules']}));
-module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,publishedHost=false,dpr=1,modes=['touch','controller'],viewports={}}){
+module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,publishedHost=false,dpr=1,modes=['touch','controller'],viewports={},onLanternIntro}){
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});fs.mkdirSync(out,{recursive:true});
  try{for(const mode of modes)for(const hd of [true,false]){
   const viewport=viewports[mode]||(mode==='touch'?{width:667,height:375}:{width:1280,height:720}),context=await browser.newContext({viewport,deviceScaleFactor:dpr,hasTouch:mode==='touch',...(mode==='controller'?{userAgent:'NobodysQuestTV/1.0 Chromium review'}:{})}),page=await context.newPage(),errors=[];
@@ -47,10 +47,17 @@ module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,
    await release();await frames(1);await drain();assert.ok(await page.evaluate(({x,y})=>Math.hypot(G.state.player.x-x,G.state.player.y-y)<4,{x,y}),'native movement reaches the authored waypoint');
   }
   let titleCaptureDone=false;
-  async function boot(){await page.waitForFunction(()=>typeof G!=='undefined'&&G.state?.player);await connect();await page.evaluate(hd=>G.setHdPilot(hd),hd);if(await page.evaluate(()=>G.saveSlotScreenOpen)){if(mode==='controller')await pad(0);else await page.locator('[data-save-slot="1"]').tap();await frames(90);await page.evaluate(()=>window.reviewOpeningPaint=window.reviewPaint.map(p=>p.text).join(' '));if(publishedHost&&!titleCaptureDone){await page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-published-arrival.png`)});titleCaptureDone=true;}}await drain();await frames(100);await drain();}
+  async function boot(){await page.waitForFunction(()=>typeof G!=='undefined'&&G.state?.player);await connect();await page.evaluate(hd=>G.setHdPilot(hd),hd);if(await page.evaluate(()=>G.saveSlotScreenOpen)){if(mode==='controller')await pad(0);else await page.locator('[data-save-slot="1"]').tap();await frames(90);await page.evaluate(()=>window.reviewOpeningPaint=window.reviewPaint.map(p=>p.text).join(' '));if(publishedHost&&!titleCaptureDone){await page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-published-arrival.png`)});titleCaptureDone=true;}}await drain();
+   if(await page.evaluate(()=>G.fieldKit?.isOpen())){
+    assert.equal(await page.locator('#field-kit [data-lamp]').count(),2,'the opening pauses at the lantern demonstration');
+    if(onLanternIntro)await onLanternIntro({page,mode,hd,frames,pad,shot});
+    if(mode==='controller')await pad(1);else await page.locator('[data-kit-close]').tap();
+    await frames(5);assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);
+   }
+   await frames(100);await drain();}
   const shot=stage=>page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-${stage}.png`)});
   async function reload(){await page.evaluate(()=>G.saveGame());await page.reload();await boot();}
-  await page.goto(publishedHost?new URL(new URL(url).pathname+new URL(url).search,'https://quest-review.example').href:url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,walkTo,visibleGift,shot,reload});
+  await page.goto(publishedHost?new URL(new URL(url).pathname+new URL(url).search,'https://quest-review.example').href:url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,walkTo,visibleGift,shot,reload,pad});
   assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);console.log(`PASS ${name} ${mode} ${hd?'HD':'BASE'}`);await context.close();
  }}finally{await browser.close();}
 };
