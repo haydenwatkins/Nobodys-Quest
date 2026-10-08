@@ -43,6 +43,22 @@
       after:"Parcel helped me push the cart today. We didn't spill a single roll. He only asked for one as payment. Well, two. I'm pretending not to have counted.",
       repairs:[{id:"hearthside-lower",x:21,y:17,kind:"brush",bridge:[18,16,20,18],approach:[23,17],nodes:[[21,16],[21,17],[21,18]]},
         {id:"hearthside-upper",x:21,y:7,kind:"brush",bridge:[18,6,20,8],approach:[23,7],nodes:[[21,6],[21,7],[21,8]]}]},
+    {id:"ribbonwindArcade",name:"Ribbonwind Arcade",formId:"riftblade",region:"overworld",exit:[0,60],arrival:[1,60],key:"c",start:[35,21],door:[37,21],npc:"pending",person:"Ser Pending",at:[34,20],
+      title:"Room for the little parade",role:"Land beside a glass vane to open its gate",
+      ask:"The children made paper banners for our little parade. But the arcade gates are stuck! I'm worried we'll tear the banners squeezing round the hedges. Could you help us make room?",
+      tips:["Try Rift Rush towards a glass vane. The gust when Wayglass Duelist lands turns it and opens the gate. You can walk the long path to choose your approach.","The second vane is beside the upper hedge. Your third flowing Rift Cut reaches a wider crowd; a dash landing gives you room to finish. I'll look after the banners."],
+      thanks:"Both gates are open! Thank you. We got every banner through without a tear. I've hung them along the arcade. You should have heard the cheering. My helmet is still ringing.",
+      after:"We took the parade through both gates again today. Moss waved from the picnic. One child carried a banner bigger than me. Very carefully, I'm pleased to report.",
+      repairs:[{id:"ribbonwind-lower",x:22,y:18,kind:"vane",bridge:[18,17,20,19],approach:[27,18]},
+        {id:"ribbonwind-upper",x:11,y:13,kind:"vane",bridge:[10,10,12,12],approach:[11,18]}]},
+    {id:"rootbellCutting",name:"Rootbell Cutting",formId:"mole",region:"overworld",exit:[0,70],arrival:[1,70],key:"d",start:[5,22],door:[5,24],npc:"errata",person:"Errata",at:[6,22],
+      title:"A dry road for the books",role:"Let a delayed tremor loosen the packed soil",
+      ask:"I've promised the burrow children a basket of books. The rain packed these paths shut, and I don't want the books getting muddy on the long walk. Could you loosen a dry way through?",
+      tips:["Try Burrow Blitz towards the packed soil. Tunneltuft's landing leaves a little tremor. Wait for it to rumble: the soil loosens after you come up.","The upper path needs a different approach, from the far side. Your third Drill Tap reaches a wider group. Burrow Blitz keeps you safe while moving; its little aftershock makes room to breathe."],
+      thanks:"Two dry paths! Thank you. Every book arrived with clean pages. I've put the lending basket beside the picnic. There's a story about a very brave tunnel scout. I thought you might like it.",
+      after:"The children returned the books with little leaf bookmarks. Someone asked for the tunnel-scout story again. I've left it at the front of the basket. I think I know why.",
+      repairs:[{id:"rootbell-lower",x:16,y:18,kind:"soil",bridge:[18,17,20,19],approach:[11,18]},
+        {id:"rootbell-upper",x:22,y:7,kind:"soil",bridge:[18,6,20,8],approach:[27,7]}]},
   ];
   const rows = () => Array.from({length:25},(_,y)=>Array.from({length:38},(_,x)=>x===0||x===37||y===0||y===24?"t":"."));
   for(const road of G.EARLY_FORM_ROADS){
@@ -79,6 +95,20 @@
       // Wide unwarded clumps give the actual three-target Tail Sweep
       // lesson twice; the upper west pocket changes to ranged fire.
       for(const [x,y]of [[27,16],[27,17],[27,18],[12,6],[12,7],[12,8],[28,5],[30,5],[28,7],[30,7],[7,17],[9,17]])put(x,y,'1');
+    }else if(road.formId==='riftblade'){
+      // Two courtyard gates face different directions. The long arcade
+      // stays open; dash landings make the direct parade route possible.
+      box(18,12,20,23,'t');box(3,10,20,12,'t');box(3,10,5,12,'p');
+      box(4,4,33,5,'p');box(32,4,33,22,'p');box(4,20,33,21,'p');box(4,4,5,21,'p');
+      box(10,13,12,19,'p');box(21,17,30,19,'p');
+      for(const [x,y]of [[25,17],[25,18],[25,19],[11,15],[12,15],[11,16],[10,5],[11,5],[10,6],[29,6],[30,6],[29,7]])put(x,y,'1');
+    }else if(road.formId==='mole'){
+      // Root shelves make an earthy loop. Lower soil is reached from
+      // the near bank; the upper patch invites a far-bank landing.
+      box(18,1,20,23,'t');box(18,11,20,13,'p');
+      box(4,3,5,23,'p');box(31,3,32,21,'p');box(5,3,32,4,'p');box(5,20,32,21,'p');
+      box(10,17,17,19,'p');box(21,6,29,8,'p');
+      for(const [x,y]of [[13,16],[14,16],[13,17],[25,6],[26,6],[25,7],[10,5],[11,5],[10,6],[29,17],[30,17],[29,18]])put(x,y,'1');
     }
     road.repairs.forEach((repair,i)=>{const [x0,y0,x1,y1]=repair.bridge;box(x0,y0,x1,y1,String(i+4));});
     const [dx,dy]=road.door;put(dx,dy,'x');put(road.start[0],road.start[1]-1,'m');put(31,4,'H');put(road.start[0]-2,road.start[1]-2,'C');
@@ -88,11 +118,12 @@
       'm':{tile:'path',message:`${road.person.toUpperCase()}'S NOTE · ${road.ask}`},
       'H':{tile:'path',chest:{heal:true,name:`${road.person}'s road picnic`}},'C':{tile:'path',rest:true,restText:'A quiet camp restores every heart and all mana.'},
     };
-    road.repairs.forEach((repair,i)=>legend[String(i+4)]={tile:['alchemist','dragon'].includes(road.formId)?'tree':'water',roadRepair:repair.id});
+    road.repairs.forEach((repair,i)=>legend[String(i+4)]={tile:['alchemist','dragon','riftblade','mole'].includes(road.formId)?'tree':'water',roadRepair:repair.id});
     registerMap({id:road.id,name:road.name,earlyFormRoad:road.formId,playerStart:{x:road.start[0],y:road.start[1]},legend,tiles:grid.map(row=>row.join(''))});
     G.NPC_PLACEMENTS[road.id]=[[road.npc,...road.at,{stationary:true}]];
     const parent=G.maps[road.region],[px,py]=road.exit;
-    const key=road.formId==='alchemist'?'b':road.formId==='stormcaller'?'q':road.formId==='dragon'?'q':'a';
+    const key=road.key||(road.formId==='alchemist'?'b':road.formId==='stormcaller'?'q':road.formId==='dragon'?'q':'a');
+    if(parent.legend[parent.tiles[py]?.[px]]?.portal||parent.legend[key]?.portal)throw new Error(`${road.name} would replace an existing entrance in ${parent.name}. Choose a free tile and letter.`);
     parent.legend={...parent.legend,[key]:{tile:'path',portal:{map:road.id,x:road.start[0],y:road.start[1]},portalStyle:'gap',seamless:true}};
     parent.tiles=parent.tiles.map((row,y)=>y===py?row.slice(0,px)+key+row.slice(px+1):row);
     // Clear the physical approach without changing neighbouring entrances.

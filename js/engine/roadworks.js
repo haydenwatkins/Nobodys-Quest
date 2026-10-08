@@ -19,7 +19,7 @@
     for(const enemy of G.state.enemies)if(enemy.roadMechanism?.id===repair.id)enemy.dead=true;
     const [x0,y0,x1,y1]=repair.bridge;
     G.spawnFx({kind:'ring',x:(x0+x1+1)*8,y:(y0+y1+1)*8,color:'#a7f070',radius:26,dur:.65});
-    const message=repair.kind==='lamp'?'The lamp is clear. A warm path opens!':repair.kind==='relay'?'The relays light up. The bridge lowers!':repair.kind==='brush'?'The branches roll aside. Room for the cart!':'The boards settle into place. A new crossing!';
+    const message=repair.kind==='vane'?'The glass vane turns. Room for the parade!':repair.kind==='soil'?'A little rumble. The dry path opens!':repair.kind==='lamp'?'The lamp is clear. A warm path opens!':repair.kind==='relay'?'The relays light up. The bridge lowers!':repair.kind==='brush'?'The branches roll aside. Room for the cart!':'The boards settle into place. A new crossing!';
     G.sfx.play('pickup');G.ui.toast(message,3);
     G.saveGame();return true;
   }
@@ -44,6 +44,15 @@
   // casts and a single Storm Spark cannot impersonate a connected action.
   G.noteRoadworkChain=(ability,contacts)=>linkedContact('relay',ability,'chainLightning',contacts);
   G.noteRoadworkSweep=(ability,contacts)=>linkedContact('brush',ability,'tailSweep',contacts);
+  // Real passive landings/echoes reach world props without pretending
+  // they are living enemies or awarding hits, kills, mastery or mana.
+  G.noteRoadworkPulse=(kind,x,y,radius,formId)=>{
+    const road=roads().find(r=>r.id===G.state.mapId&&r.formId===formId);if(!road)return;
+    for(const repair of road.repairs){
+      const rx=repair.x*16+8,ry=repair.y*16+8;
+      if(repair.kind===kind&&Math.hypot(rx-x,ry-y)<=radius&&G.combat.clearArc(x,y,rx,ry))open(repair);
+    }
+  };
   G.noteRoadworkBlast=(projectile,targets)=>{
     if(projectile.ability!=='volatileFlask'||targets.length<3)return;
     const road=roads().find(r=>r.id===G.state.mapId&&r.formId==='alchemist');if(!road)return;
@@ -64,7 +73,7 @@
     G.applyRoadRepairs();
     const road=roads().find(r=>r.id===G.state.mapId);if(!road)return;
     for(const repair of road.repairs){
-      if(repair.kind==='lamp'||G.roadRepairOpen(repair.id))continue;
+      if(['lamp','vane','soil'].includes(repair.kind)||G.roadRepairOpen(repair.id))continue;
       // Existing inert practice actors supply native hit geometry; the
       // road renderer owns their physical appearance and saved open pose.
       for(const [node,[x,y]]of (repair.nodes||[[repair.x,repair.y]]).entries()){
@@ -81,7 +90,7 @@
     const repair=road.repairs.find(r=>!G.roadRepairOpen(r.id));
     if(!repair)return {mapId:road.id,short:`Bring ${road.person} the good news`,objective:`Both routes are repaired. Return to ${road.person}.`,tileX:road.at[0],tileY:road.at[1],value:2};
     const remaining=G.state.mapId===road.id?G.state.enemies.filter(e=>!e.dead&&!e.def.practice&&Math.hypot(e.outingSpawnX-repair.x*16-8,e.outingSpawnY-repair.y*16-8)<56).length:3;
-    const verb=repair.kind==='winch'?'Shoot the copper winch across the creek':repair.kind==='pontoon'?'Pull the copper loop with Tongue Lash':repair.kind==='relay'?'Send Chain Lightning through all three copper relays':repair.kind==='brush'?'Stand beside the branches and move all three with Tail Sweep':remaining<3?'Clear the remaining creatures around this lamp':'Catch the three lamp creatures in one Volatile Flask burst';
+    const verb=repair.kind==='vane'?'Use Rift Rush towards the glass vane; its landing gust opens the gate':repair.kind==='soil'?'Use Burrow Blitz towards the packed soil, then wait for the little tremor':repair.kind==='winch'?'Shoot the copper winch across the creek':repair.kind==='pontoon'?'Pull the copper loop with Tongue Lash':repair.kind==='relay'?'Send Chain Lightning through all three copper relays':repair.kind==='brush'?'Stand beside the branches and move all three with Tail Sweep':remaining<3?'Clear the remaining creatures around this lamp':'Catch the three lamp creatures in one Volatile Flask burst';
     return {mapId:road.id,short:road.role,objective:verb+'. The long path is open if you need to approach from another side.',tileX:repair.approach[0],tileY:repair.approach[1],value:road.repairs.filter(r=>G.roadRepairOpen(r.id)).length};
   };
   G.roadworkOutingGoal=outing=>{

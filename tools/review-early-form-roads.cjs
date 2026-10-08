@@ -3,7 +3,7 @@
 // Earned checkpoints isolate native controls, authored routes, offers,
 // repairs and saves. Original health/wards; AI held still for this review.
 const assert=require('node:assert/strict'),review=require('./lib/browser-review.cjs');
-review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',name:'Patchling’s Quest and five neighbour roads',publishedHost:true,
+review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',name:'Patchling’s Quest neighbour roads',publishedHost:true,
  async run({page,mode,hd,frames,next,drain,offer,answer,walkTo,shot,reload}){
   async function pad(index){const b=Array(16).fill(0);b[index]=1;await page.evaluate(b=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b})),b);await frames(1);await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:Array(16).fill(0)})));await frames(5);}
   async function art(slot){if(mode==='controller')await pad([0,2,3][slot]);else{await page.locator(['#btn-a','#btn-b','#btn-c'][slot]).tap();await frames(6);}await frames(35);await drain();}
@@ -26,7 +26,7 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
   for(const road of roads){
    await page.evaluate(r=>{
     Object.assign(G.state.opening,{started:true,complete:true,bell:true,version:2});G.state.delivery.complete=true;G.state.stars=14;
-    G.state.items=['trophy-heartwood-crown','trophy-mire-pearl'];G.state.claimedForms=['rat','knight','wizard','ranger','frog','alchemist','stormcaller','dragon'];
+    G.state.items=['trophy-heartwood-crown','trophy-mire-pearl'];G.state.claimedForms=['rat','knight','wizard','ranger','frog','alchemist','stormcaller','dragon',r.formId];
     Object.assign(G.ensureTown(),{founded:true,introduced:true,requests:['recipes','beacon'],followedRequest:null});
     G.questsDone=[];G.questCounts={};G.state.loadouts={};G.state.roadworks=G.makeRoadworks();G.state.formEchoes=[];
     G.state.formOutings={active:{formId:r.formId,arts:[],scenes:[]},features:[]};G.setForm(r.formId);G.world.load(r.id);
@@ -35,14 +35,14 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
    },road);await drain();await frames(10);
    assert.equal(await page.evaluate(()=>G.deliveryCandidate()?.kind),'sunriseRequest','the entrance offers a safe neighbour conversation');
    assert.equal(await page.evaluate(person=>G.resolveDialogueSpeaker(person.toUpperCase()).id,road.person),road.npc,'the actual neighbour portrait belongs to the speaker');
-   await next();await frames(180);
+   await next();await next();await frames(5);
    assert.ok(await page.evaluate(text=>window.reviewPaint.map(p=>p.text).join(' ').includes(text),road.ask),'complete emotional request is painted');await shot(road.id+'-concern');
    await offer();await shot(road.id+'-choice');await answer(true);
    assert.equal(await page.evaluate(()=>G.currentTask().requestId),'road-'+road.formId);
    for(const repair of road.repairs){
     await walk(...repair.approach);await frames(8);await shot(repair.id+'-before');
     await page.evaluate(({x,y})=>{const p=G.state.player,dx=x*16+8-p.x,dy=y*16+8-p.y,d=Math.hypot(dx,dy)||1;p.dir={x:dx/d,y:dy/d};},{x:repair.nodes?.[0]?.[0]??repair.x,y:repair.nodes?.[0]?.[1]??repair.y});
-    for(let i=0;i<3&&!await page.evaluate(id=>G.roadRepairOpen(id),repair.id);i++)await art(['alchemist','stormcaller'].includes(road.formId)?1:0);
+    for(let i=0;i<3&&!await page.evaluate(id=>G.roadRepairOpen(id),repair.id);i++)await art(['alchemist','stormcaller','riftblade','mole'].includes(road.formId)?1:0);
     assert.equal(await page.evaluate(id=>G.roadRepairOpen(id),repair.id),true,'native input completes '+repair.id);await frames(8);await shot(repair.id+'-after');
     const [x0,y0,x1,y1]=repair.bridge;await walk(x0,Math.round((y0+y1)/2));await walk(x1,Math.round((y0+y1)/2));await frames(100);await shot(repair.id+'-crossed');
    }
@@ -51,9 +51,11 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
    await reload();await page.evaluate(()=>{for(const e of G.state.enemies){e.def={...e.def,speed:0,aggro:0};e.guardPost=true;}G.state.player.invuln=999;});await frames(3);
    assert.equal(await page.evaluate(()=>G.state.roadworks.opened.length),2,'both repairs survive actual save reboot');
    assert.equal(await page.evaluate(()=>G.currentTask().short),'Return to '+road.person,'the selected promise also survives reboot');
-   await walk(road.at[0],road.at[1]+1);await next();await frames(180);await shot(road.id+'-good-news');await drain();
+   await walk(road.at[0],road.at[1]+1);await next();await next();await frames(5);
+   assert.ok(await page.evaluate(text=>window.reviewPaint.map(p=>p.text).join(' ').includes(text),road.thanks));await shot(road.id+'-good-news');await drain();
    assert.equal(await page.evaluate(id=>G.ensureTown().requests.includes(id),'road-'+road.formId),true);
-   await next();await frames(180);assert.ok(await page.evaluate(text=>window.reviewPaint.map(p=>p.text).join(' ').includes(text),road.after));await shot(road.id+'-revisit');await drain();
+   await next();await next();await frames(5);assert.ok(await page.evaluate(text=>window.reviewPaint.map(p=>p.text).join(' ').includes(text),road.after));await shot(road.id+'-revisit');await drain();
+   await walk(27,6);await frames(80);await shot(road.id+'-picnic-consequence');
    // Both sides are ordinary walked exits. Approach inside the road, then
    // use native movement through its border and back through the parent.
    const [dx,dy]=road.door,inside=[Math.max(1,Math.min(36,dx)),Math.max(1,Math.min(23,dy))];await walk(...inside);

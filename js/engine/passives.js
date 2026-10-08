@@ -345,6 +345,7 @@ G.passives = (() => {
     if (!passive) return;
     if (passive.id === "afterimage") {
       G.combat.forceEnemies(user.x, user.y, 28, 115, "#73eff7");
+      G.noteRoadworkPulse?.("vane", user.x, user.y, 28, "riftblade");
       G.spawnFx({ kind: "slash", x: user.x, y: user.y - 6, angle: Math.atan2(user.dir.y, user.dir.x) + Math.PI,
         range: 25, arc: Math.PI * 1.4, color: "#73eff7", weight: 4, dur: 0.2 });
     }
@@ -371,7 +372,7 @@ G.passives = (() => {
     // Multi-projectile area casts can explode together. One echo at nearly
     // the same place is enough and prevents accidental crowd-control spam.
     if (s.passiveEchoes.some((echo) => G.util.dist(x, y, echo.x, echo.y) < 10 && Math.abs(echo.t - delay) < 0.08)) return;
-    s.passiveEchoes.push({ x, y, radius, color, t: delay });
+    s.passiveEchoes.push({ x, y, radius, color, t: delay, formId: s.formId });
     G.spawnFx({ kind: "tell", x, y, radius, color, dur: delay + 0.08 });
   }
 
@@ -393,6 +394,7 @@ G.passives = (() => {
       echo.t -= dt;
       if (echo.t > 0) continue;
       G.combat.forceEnemies(echo.x, echo.y, echo.radius, 95, echo.color, 0.22);
+      G.noteRoadworkPulse?.("soil", echo.x, echo.y, echo.radius, echo.formId);
       G.spawnFx({ kind: "ring", x: echo.x, y: echo.y, color: echo.color, radius: echo.radius, dur: 0.28 });
       G.sfx.play("stagger");
       echoes.splice(i, 1);

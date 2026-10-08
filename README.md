@@ -55,6 +55,9 @@ Expeditions.
 The six Worldwake form roads also have optional neighbour promises: use a new
 body to reopen a short crossing, bring back the good news, and find a saved
 picnic detail on later visits. See [the design ledger](docs/WORLDWAKE-NEIGHBOURS.md).
+Seven earlier specialist roads also make forms useful in the world; the latest
+[Duelist and Tunneltuft adventures](docs/DUELIST-TUNNELTUFT.md) open parade gates
+and dry paths for a basket of books.
 
 Every form carries an exclusive passive identity in addition to its basic
 attack and stats. All 53 abilities declare a combat style, and form passives

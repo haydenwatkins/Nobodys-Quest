@@ -2,7 +2,7 @@
    has two physical poses: waiting for help and restored by a real action. */
 "use strict";
 (() => {
-  const A=G.authoredPixelArt,S=G.roadworkScenery={},pal={k:'#303f3d',a:'#544536',b:'#826348',c:'#b48a60',d:'#dfc38c',e:'#597769',f:'#89a982',g:'#bdd1a1',h:'#994f3e',i:'#cb8057',j:'#f1b976',l:'#6a8b95',m:'#b3d5cf',n:'#fff0bd'};
+  const A=G.authoredPixelArt,S=G.roadworkScenery={},pal={k:'#303f3d',a:'#544536',b:'#826348',c:'#b48a60',d:'#dfc38c',e:'#597769',f:'#89a982',g:'#bdd1a1',h:'#994f3e',i:'#cb8057',j:'#f1b976',l:'#6a8b95',m:'#b3d5cf',n:'#fff0bd',o:'#79749b',p:'#afa5cf',q:'#ded2ee'};
   const build=(id,w,h,fn)=>S[id]=A.compactSprite(A.authored(w,h,pal,fn));
   build('winch',48,52,(g,v)=>{
     const done=v%2;g.rect(7,40,34,9,'a');g.line(8,41,39,41,'c',1);g.rect(11,27,5,17,'a');g.rect(33,27,5,17,'a');
@@ -63,5 +63,32 @@
     g.ellipse(19,13,8,8,'k');g.ellipse(19,13,5,5,'e');g.rect(9,17,20,4,'k');g.line(11,18,26,18,'d',1);g.rect(17,14,5,3,'b');
     g.ellipse(32,34,5,4,'b');g.ellipse(32,32,4,2,warm?'j':'l');
     if(warm){g.line(17,9,14,6,'m',1);g.line(14,6,16,2,'m',1);g.line(23,9,25,5,'m',1);g.put(24,2,'m');}
+  });
+  build('vane',56,72,(g,v)=>{
+    const turned=v%2;
+    g.ellipse(28,67,24,4,'o');g.poly([[6,65],[12,55],[43,55],[50,65]],'k');g.rect(12,56,31,8,'o');g.line(14,57,40,57,'q',1);
+    g.rect(25,17,6,41,'a');g.line(27,18,27,56,'d',2);g.ellipse(28,33,5,5,'a');g.ellipse(28,33,2,2,'j');
+    if(turned){g.poly([[28,6],[41,12],[35,29],[28,32]],'k');g.poly([[29,9],[38,13],[33,26],[29,29]],'l');g.line(31,12,34,16,'m',2);
+      g.poly([[27,34],[15,40],[20,51],[27,55]],'k');g.poly([[26,37],[18,42],[22,49],[26,51]],'l');g.line(22,42,24,47,'m',2);
+    }else{g.poly([[4,20],[23,23],[27,32],[16,39],[3,34]],'k');g.poly([[7,23],[21,25],[24,31],[16,36],[6,32]],'l');g.line(10,25,16,28,'m',2);
+      g.poly([[29,33],[41,26],[52,30],[49,43],[32,42]],'k');g.poly([[32,35],[41,29],[49,32],[47,40],[34,39]],'l');g.line(40,32,45,34,'m',2);}
+    g.ellipse(28,13,4,4,'a');g.ellipse(28,12,2,2,'d');g.line(13,62,40,62,'p',1);
+  });
+  build('soil',64,42,(g,v)=>{
+    const loose=v%2;g.ellipse(32,35,29,5,'a');
+    if(loose){g.ellipse(32,32,25,5,'c');g.line(8,29,19,30,'b',3);g.line(46,29,58,30,'b',3);g.line(20,33,42,33,'d',1);g.line(25,36,36,36,'j',1);}
+    else{g.poly([[5,33],[12,21],[24,12],[40,12],[51,22],[59,33]],'b');g.poly([[10,30],[16,22],[26,16],[39,15],[49,25],[53,31]],'c');
+      g.line(17,25,27,23,'a',2);g.line(32,19,35,26,'b',2);g.line(35,26,45,28,'a',2);g.line(26,29,30,32,'b',2);
+      g.ellipse(16,29,5,3,'l');g.ellipse(43,18,4,3,'l');g.line(13,29,17,28,'m',1);g.line(39,18,43,17,'m',1);}
+    g.line(6,34,10,26,'e',2);g.ellipse(9,25,4,2,'f');g.ellipse(55,33,4,2,'g');
+  });
+  build('pavers',32,32,g=>{g.rect(0,0,32,32,'o');for(const [x,y,w,h]of [[1,1,19,13],[21,1,10,13],[1,16,10,15],[12,16,19,15]]){g.rect(x,y,w,h,'p');g.line(x+1,y+1,x+w-2,y+1,'q',1);}g.put(6,8,'o');g.put(23,25,'o');});
+  build('dryPath',32,32,g=>{g.rect(0,0,32,32,'c');g.line(2,0,2,31,'b',2);g.line(29,0,29,31,'b',2);for(const [x,y]of [[9,5],[20,13],[11,22],[21,28]])g.line(x,y,x+3,y,'d',1);g.line(4,2,4,28,'j',1);});
+  build('bookBasket',64,48,(g,v)=>{
+    const full=v%2;g.ellipse(32,43,29,4,'a');g.poly([[4,22],[59,22],[54,42],[9,42]],'a');g.rect(9,26,46,13,'b');
+    for(const y of [28,33,37])g.line(10,y,53,y,'c',1);for(const x of [15,26,38,49])g.line(x,26,x,38,'d',1);
+    g.ellipse(31,17,17,15,'a');g.ellipse(31,17,13,11,'c');g.rect(14,19,35,8,'a');
+    if(full){for(const [x,y,color]of [[11,18,'l'],[25,13,'o'],[38,16,'h']]){g.rect(x,y,12,15,'a');g.rect(x+1,y+1,10,12,color);g.line(x+3,y+3,x+9,y+3,'n',1);g.rect(x+3,y+6,6,6,'d');g.line(x+4,y+7,x+8,y+7,'n',1);}g.line(46,15,46,8,'e',1);g.ellipse(46,7,4,2,'g');}
+    g.rect(5,25,54,4,'a');g.line(7,26,56,26,'d',1);
   });
 })();

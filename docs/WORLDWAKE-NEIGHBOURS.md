@@ -38,4 +38,4 @@ Live combat exposed a border problem: native knockback could put a traveller on 
 - `tools/review-form-return.cjs` passes the same four combinations, checking the waiting inspector, readable return explanation, actual Journey **Set aside** button and restored discovery access. Menu scrolling exposes the complete explanation.
 - Progression audit retains 24 forms, 96 valid lessons, no dependency cycles or Workshop errors, and the eight-learned-body / three-favorite finale contract.
 
-Physical iPad/Android/TV behavior remains unmeasured. Eight earlier specialists still need bespoke opportunities, starting with Wayglass Duelist and Tunneltuft. A fresh continuous Worldwake guardian session, Legend/Mark/Manyfold introductions and the seven caravan ground gifts remain on the roadmap.
+Physical iPad/Android/TV behavior remains unmeasured. After the Duelist/Tunneltuft follow-up (`DUELIST-TUNNELTUFT.md`), six earlier specialists still need bespoke opportunities, starting with Velvetwing and Pocket Trouper. A fresh continuous Worldwake guardian session, Legend/Mark/Manyfold introductions and the seven caravan ground gifts remain on the roadmap.

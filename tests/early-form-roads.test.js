@@ -5,7 +5,7 @@ function modern(r,id){const {G}=r;G.state.opening.started=G.state.opening.comple
  G.state.claimedForms=['rat','knight','wizard','ranger','frog','alchemist',id];G.state.formOutings={active:{formId:id,arts:[],scenes:[]},features:[]};G.setForm(id);}
 function cast(r,button,frames=35){r.taps.add(button);for(let i=0;i<frames;i++){r.G.state.time+=.05;r.G.updatePlayer(.05);r.G.combat.updateProjectiles(.05);r.G.updateFx(.05);}r.drain();}
 function aim(G,x,y){const p=G.state.player,dx=x*16+8-p.x,dy=y*16+8-p.y,d=Math.hypot(dx,dy)||1;p.dir={x:dx/d,y:dy/d};}
-test('five different roads connect both ways, have an open long path and preserve original neighbouring entrances',()=>{
+test('specialist roads connect both ways, have an open long path and preserve original neighbouring entrances',()=>{
  const r=runtime(),{G}=r;
  for(const road of G.EARLY_FORM_ROADS){modern(r,road.formId);r.load(road.region);r.drain();cross(r,road.id);
   assert.equal(G.state.mapId,road.id);walkGrid(r,31,4);walkGrid(r,...road.start);
@@ -13,6 +13,8 @@ test('five different roads connect both ways, have an open long path and preserv
   cross(r,road.region);assert.equal(G.state.mapId,road.region);
  }
  assert.equal(G.maps.overworld.legend.S.portal.map,'sunkenMarsh');assert.equal(G.maps.sunkenMarsh.legend.x.portal.map,'overworld');
+ assert.equal(G.maps.overworld.tiles[65][0],'Z','the coast entrance remains on its original western stretch');
+ assert.equal(G.maps.overworld.legend.Z.portal.map,'shattercoast');assert.equal(G.maps.overworld.legend.Z.stars,G.PACING.coastStars);
  for(const road of G.EARLY_FORM_ROADS){modern(r,road.formId);r.load('overworld');r.drain();assert.equal(G.guidanceRouteTarget(G.storyGoal()).cell.portal.map,road.region==='overworld'?road.id:road.region);}
 });
 test('native bow shots across water and Frog tongue contacts create actual saved crossings without free mastery',()=>{

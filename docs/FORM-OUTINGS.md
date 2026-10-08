@@ -1,6 +1,6 @@
 # Form discoveries need room to matter
 
-October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; Cloudcap Conductor and Hearthdrake subsequently gain relay and cart roads; eight earlier specialists remain. See `EARLY-FORM-ROADS.md` and `CONDUCTOR-HEARTHDRAKE.md`. The October 8 follow-up adds six optional Worldwake neighbour promises, safe entry pauses, signature-action guidance and deliberate good-news return space (`WORLDWAKE-NEIGHBOURS.md`).
+October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guardian rush in the introduced 2D campaign. It adds six connected Worldwake outings and establishes a role for every current form. The October 7 follow-up gives Scout, Frog and Brewer bespoke road repairs and neighbour promises; Cloudcap Conductor and Hearthdrake subsequently gain relay and cart roads; eight earlier specialists remained at that checkpoint. See `EARLY-FORM-ROADS.md` and `CONDUCTOR-HEARTHDRAKE.md`. The October 8 follow-up adds six optional Worldwake neighbour promises, safe entry pauses, signature-action guidance and deliberate good-news return space (`WORLDWAKE-NEIGHBOURS.md`). Duelist/Tunneltuft subsequently gain arcade gates and dry library paths; six earlier specialists remain (`DUELIST-TUNNELTUFT.md`).
 
 ## Player experience
 
@@ -52,8 +52,8 @@ Every future form change must preserve a distinct useful action, an immediately 
 | Copperwick Brewer | Combine status and a burst against a group | New lampyard clumps, permanent paths and Provisional return |
 | Cloudcap Conductor | Carry a spark through separated neighbours | New Rainbell relays, separated real crowds and Probably return |
 | Hearthdrake | Sweep a broad crowd away from a close approach | New Hearthside branch piles, wide crowds and Brindle return |
-| Wayglass Duelist | Rush through a crowded approach and control the landing | Existing dash/afterimage; add a useful route variation |
-| Tunneltuft | Scatter a group with a delayed tremor | Existing aftershocks; add a visible local consequence |
+| Wayglass Duelist | Rush through a crowded approach and control the landing | New Ribbonwind gate landings, rhythm crowds and saved parade bunting |
+| Tunneltuft | Scatter a group with a delayed tremor | New Rootbell delayed repairs, aimed burrowing and a saved lending basket |
 | Velvetwing | Recover while staying close, turning overflow into protection | Existing healing/Bloodskin; provide a forgiving sustain encounter |
 | Pocket Trouper | Bounce a shot through a pair | Existing ricochet; author a geometry-led first use |
 | Harborback | Hold an exposed road behind the shell | Existing rear protection and coast fights; demonstrate it more deliberately |
