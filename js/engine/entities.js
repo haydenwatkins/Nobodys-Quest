@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice)) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -1141,6 +1141,7 @@ function resolveBossActionPattern(e, p, action) {
   if (["charge", "burrow", "vampireDash"].includes(action)) {
     e.bossChargeT = e.def.boss.chargeDur;
     e.bossAfterCharge = action === "burrow" ? "quake" : action === "vampireDash" ? "bloodBurst" : null;
+    if(action === "charge"&&e.def.id === "eclipseKnight"&&e.knightCrescent)e.bossAfterCharge="eclipseSweep";
     if(action === "burrow"&&e.def.id === "moleMonarch")e.bossAfterCharge="royalStomp";
     if(action === "vampireDash"&&e.def.id === "countessCarmine")e.bossAfterCharge="crimsonWaltz";
     return;
@@ -1337,6 +1338,7 @@ function updateBossState(e, p, dist, dt) {
       const fallback = boss.style === "riftblade" ? ["charge", "blades"] : ["charge"];
       const patterns = boss.patterns || fallback;
       e.bossPendingAction = patterns[e.bossPattern % patterns.length];
+      if(e.bossPendingAction==='charge'&&boss.chargeTelegraph)e.bossTelegraphT=G.guardianWarningSeconds?.(boss.chargeTelegraph)??boss.chargeTelegraph;
       e.bossPattern++;
       if (BOSS_ARENA_ACTIONS[e.bossPendingAction]) {
         G.damageNumber(e.x, e.y - e.h() - 11, BOSS_ARENA_ACTIONS[e.bossPendingAction], boss.color);

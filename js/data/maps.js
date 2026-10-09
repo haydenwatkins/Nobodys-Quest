@@ -578,16 +578,18 @@ registerMap({
 
 registerMap({
   id: "emberRidge",
+  bossTrial: {worldBoss:true,onlyEngaged:true,exit:{map:"emberRidge",x:3,y:11},delay:1.2},
   name: "Ember Ridge",
   visualTheme: "ember",
   playerStart: { x: 2, y: 9 },
 
   legend: {
-    "2": { tile: "floor", enemy: "bat" },
-    "3": { tile: "floor", enemy: "bones" },
+    "2": { tile: "floor", enemy: "bat", guardPost:true },
+    "3": { tile: "floor", enemy: "bones", guardPost:true },
     "5": { tile: "floor", enemy: "brute", guardPost: true },
     "8": { tile: "floor", enemy: "shade", guardPost: true },
-    "N": { tile: "floor", enemy: "eclipseKnight" },
+    "N": { tile: "floor", enemy: "eclipseKnight", guardPost:true },
+    "F": { tile: "floor", rest:true },
     "m": { tile: "floor", message: "The Eclipse Knight waits in the eastern court. DARK breaks his ward. North and south, two watchfires remember their guards: awaken them for a fight, recovery, and town spirit. The direct road is yours too." },
     "c": { tile: "floor", message: "COAL WATCH: Wake the fire, defeat its guards, and carry its warmth onward. One brute, one rattling assistant. Neither has taken a break in years." },
     "a": { tile: "floor", message: "ASH WATCH: A shade and a skeleton kept the last watch. Light their fire when you are ready to fight. Every road deserves someone waiting with a lantern." },
@@ -606,9 +608,9 @@ registerMap({
     "#ffffRRRffRRRRffRRRffffffffff#",
     "#ffffffffffffffffffffffffffff#",
     "#ffffffffffffffffffffffffffff#",
-    "xfffmfffff5ff8ffffHfffffNffff#",
+    "xfffmfffffff5ff8ffHfffffNffff#",
     "#ffffffffffffffffffffffffffff#",
-    "#ffffffffffffffffffffffffffff#",
+    "#ffFfffffffffffffffffffffffff#",
     "#ffffRRRffRRRRffRRRffffffffff#",
     "#ffffffffffffffffffffffffffff#",
     "#ffffffffffafffffff5fffffffff#",

@@ -196,7 +196,7 @@
       const px=x*16+8,py=y*16+8;
       list.push({y:py,fn:()=>{c.save();if(Math.abs(s.player.x-px)<24&&s.player.y<py&&s.player.y>py-43)c.globalAlpha=.32;tree(c,px,py,x+y,false);c.restore();}});
     }
-    const dummy=s.enemies.find(e=>!e.dead&&e.def.practice&&!e.treantRoot&&!e.mireCrust);
+    const dummy=s.enemies.find(e=>!e.dead&&e.def.practice&&!e.treantRoot&&!e.mireCrust&&!e.eclipsePractice);
     if(dummy)list.push({y:dummy.y,fn:()=>{const x=dummy.x,y=dummy.y;if(freshOrchard()&&G.openingScenery?.props){G.drawSprite(c,G.openingScenery.props.practice,0,x,y+3,false);return;}rect(c,x-2,y-23,4,24,C.wood);rect(c,x-13,y-18,26,3,C.woodDark);ellipse(c,x,y-20,7,8,C.woodDark);ellipse(c,x,y-21,6,6,C.gold);rect(c,x-4,y-23,2,2,C.woodDark);rect(c,x+2,y-23,2,2,C.woodDark);rect(c,x-2,y-19,5,1,C.woodDark);}});
     return list;
   };

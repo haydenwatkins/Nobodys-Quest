@@ -135,21 +135,23 @@
     addChallengeLamps();
   });
   function addChallengeLamps(){
-    for(const at of [G.treantChallengeStation?.(),G.mireChallengeStation?.()])
+    for(const at of [G.treantChallengeStation?.(),G.mireChallengeStation?.(),G.eclipseChallengeStation?.()])
       if(at&&!stations.some(s=>s.kind===at.kind))stations.push(at);
   }
-  G.events.on('kill',data=>{if(['ancientTreant','mireQueen'].includes(data.enemy))addChallengeLamps();});
+  G.events.on('kill',data=>{if(['ancientTreant','mireQueen','eclipseKnight'].includes(data.enemy))addChallengeLamps();});
   const safe=()=>G.state&&!G.ui.dialogueOpen&&!G.ui.menuOpen&&!view&&!G.state.knockout&&!G.state.bossCutscene&&!G.state.zoneTransition&&!G.activeWorldbearer?.()&&!(G.state.enemies||[]).some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-G.state.player.x,e.y-G.state.player.y)<68)&&!(G.state.projectiles||[]).some(p=>!p.fromPlayer&&Math.hypot(p.x-G.state.player.x,p.y-G.state.player.y)<68);
   G.helpStationCandidate=()=>{
+    addChallengeLamps();
     if(!safe())return null;
     const p=G.state.player,near=stations.map(s=>({...s,d:Math.hypot(s.x-p.x,s.y-p.y)})).filter(s=>s.d<=20).sort((a,b)=>a.d-b.d)[0];
     if(!near)return null;
-    if((near.kind==='treantChallenge'&&G.treantRematchActive())||(near.kind==='mireChallenge'&&G.mireRematchActive()))return null;
+    if((near.kind==='treantChallenge'&&G.treantRematchActive())||(near.kind==='mireChallenge'&&G.mireRematchActive())||(near.kind==='eclipseChallenge'&&G.eclipseRematchActive()))return null;
     const npc=G.npcTalkCandidate?.();
     if(npc&&Math.hypot(npc.x-p.x,npc.y-p.y)<near.d+6)return null;
     const lamp=lamps.find(l=>l.key===near.kind);
     if(near.kind==='treantChallenge')return {...near,id:'field-kit',label:`Branching Roots · ${G.treantBranchingLit()?'Put out':'Light'}`,hint:'Adds a following root. Snap the first root to stop it.'};
     if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Adds a following volley. Crack the mire near the Queen to stop it.'};
+    if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Adds a crescent after his charge. Strike his raised shield to stop the pair.'};
     return {...near,id:'field-kit',hint:lamp?(lamp.key==='easyMode'?'Hearts grow back, even in fights.':'Longer warnings; help after retries.'):null,label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
   };
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
@@ -160,12 +162,13 @@
     if(at.kind==='pockets')return G.fieldKit.openPockets();
     if(at.kind==='treantChallenge'){G.toggleTreantBranching();G.sfx.play('pickup');G.input.clearTaps();return true;}
     if(at.kind==='mireChallenge'){G.toggleMireRippling();G.sfx.play('pickup');G.input.clearTaps();return true;}
+    if(at.kind==='eclipseChallenge'){G.toggleEclipseCrescent();G.sfx.play('pickup');G.input.clearTaps();return true;}
     G.setComfortSetting(at.kind,!G.comfortSetting(at.kind));G.sfx.play('pickup');G.input.clearTaps();return true;
   };
   const drawables=G.openingDrawables;
-  G.openingDrawables=c=>{const list=drawables(c);for(const s of stations)list.push({y:s.y,fn:()=>drawStation(c,s)});return list;};
+  G.openingDrawables=c=>{const list=drawables(c);addChallengeLamps();for(const s of stations)list.push({y:s.y,fn:()=>drawStation(c,s)});return list;};
   function drawStation(c,s){
-    const lamp=lamps.find(l=>l.key===s.kind)||(['treantChallenge','mireChallenge'].includes(s.kind)?{key:s.kind,color:s.kind==='mireChallenge'?'#b7d9d4':'#e9ac75'}:null),lit=lamp&&(s.kind==='treantChallenge'?G.treantBranchingLit():s.kind==='mireChallenge'?G.mireRipplingLit():G.comfortSetting(lamp.key)),x=s.x,y=s.y;
+    const lamp=lamps.find(l=>l.key===s.kind)||(['treantChallenge','mireChallenge','eclipseChallenge'].includes(s.kind)?{key:s.kind,color:s.kind==='mireChallenge'?'#b7d9d4':s.kind==='eclipseChallenge'?'#b58ee6':'#e9ac75'}:null),lit=lamp&&(s.kind==='treantChallenge'?G.treantBranchingLit():s.kind==='mireChallenge'?G.mireRipplingLit():s.kind==='eclipseChallenge'?G.eclipseCrescentLit():G.comfortSetting(lamp.key)),x=s.x,y=s.y;
     c.save();c.fillStyle='rgba(25,38,35,.25)';c.beginPath();c.ellipse(x,y+3,9,3,0,0,Math.PI*2);c.fill();
     if(!lamp){c.fillStyle='#48382f';c.fillRect(x-7,y-11,14,14);c.fillStyle='#af8462';c.fillRect(x-6,y-10,12,11);c.fillStyle='#e9c890';c.fillRect(x-7,y-12,14,4);c.fillRect(x-1,y-9,2,5);c.strokeStyle='#e9c890';c.strokeRect(x-4,y-15,8,5);c.restore();return;}
     if(lit){c.fillStyle=lamp.color+'33';c.beginPath();c.ellipse(x,y-8,13,15,0,0,Math.PI*2);c.fill();}
@@ -177,6 +180,9 @@
     }else if(s.kind==='mireChallenge'){
       c.strokeStyle=lit?'#fff3c2':'#c4baa0';c.lineWidth=1;for(const dy of [-10,-6]){c.beginPath();c.ellipse(x,y+dy,3,1.5,0,0,Math.PI*2);c.stroke();}
       if(lit){c.fillStyle='#fff3c2';c.beginPath();c.arc(x,y-14,1.5,0,Math.PI*2);c.fill();}
+    }else if(s.kind==='eclipseChallenge'){
+      c.strokeStyle=lit?'#fff3c2':'#c4baa0';c.lineWidth=2;c.beginPath();c.arc(x+1,y-9,3.5,Math.PI*.4,Math.PI*1.6);c.stroke();
+      if(lit){c.fillStyle='#fff3c2';c.beginPath();c.arc(x,y-15,1.5,0,Math.PI*2);c.fill();}
     }else if(s.kind==='easyMode'){c.fillRect(x-3,y-11,2,3);c.fillRect(x+1,y-11,2,3);c.fillRect(x-2,y-8,4,2);c.fillRect(x-1,y-6,2,1);}
     else{c.fillRect(x-2,y-12,4,6);c.fillRect(x-3,y-11,6,4);c.fillRect(x-1,y-14,2,1);c.fillRect(x-1,y-4,2,1);}
     c.restore();

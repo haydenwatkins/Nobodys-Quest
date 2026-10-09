@@ -14,13 +14,13 @@ function defeatKnight(r){const {G}=r;r.load('emberRidge');r.drain();const e=G.st
 function realDialogue(r){r.run('js/engine/ui.js');const paint=[];r.nodes.get('ui').getContext('2d').fillText=t=>paint.push(String(t));return {paint,listen(){for(let i=0;i<35;i++){paint.length=0;r.G.ui.drawHUD({x:0,y:0});if(paint.some(t=>t.endsWith('Maybe later')))return;r.taps.add('interact');r.G.ui.update(.3);}assert.fail('the three-page conversation must end with an explicit choice');},reply(action){r.taps.add(action);r.G.ui.update(.3);}};}
 test('the unmodified Ridge entrance introduces Pending before its aggressive guard or optional watchfire encounters',()=>{
  const r=fixture(),{G}=r;r.load('emberRidge');r.drain();assert.equal(G.deliveryCandidate().id,'ridge-watch');
- const pending=G.state.npcs.find(n=>n.id==='pending'),guard=G.state.enemies.find(e=>e.id==='brute');assert.equal(pending.anchors.length,1);
+ const pending=G.state.npcs.find(n=>n.id==='pending'),guard=G.state.enemies.find(e=>e.id==='brute'),guardX=guard.x;assert.equal(pending.anchors.length,1);
  assert.ok(Math.hypot(guard.x-G.state.player.x,guard.y-G.state.player.y)>guard.def.aggro);
  // Force every idle foe to wander toward the entrance: the authored guards must still
  // leave time to read at the entrance rather than randomly crossing it.
  for(const e of G.state.enemies){e.wanderT=999;const dx=G.state.player.x-e.x,dy=G.state.player.y-e.y,d=Math.hypot(dx,dy);e.wanderDir={x:dx/d,y:dy/d};}
  for(let i=0;i<120;i++)r.step(.05);assert.equal(G.deliveryCandidate()?.id,'ridge-watch');assert.equal(G.state.player.damageTaken,0);
- assert.equal(guard.guardPost,true);assert.equal(guard.x,168);
+ assert.equal(guard.guardPost,true);assert.equal(guard.x,guardX);
  G.tryOpeningInteraction();assert.ok(r.messages.some(m=>m.text.includes("I'm worried about the night watch")));assert.ok(r.messages.some(m=>m.text.includes('Dark ward')));assert.equal(G.ensureTown().followedRequest,null);r.drain();
  G.state.enemies=[guard];Object.assign(G.state.player,{x:guard.x-50,y:guard.y,invuln:999});const oldX=guard.x;r.step(.1);assert.ok(guard.x<oldX,'approaching the posted guard still triggers native pursuit');
 });
@@ -35,7 +35,7 @@ test('native Eclipse victory requires collecting the Sigil before a moving Ser P
  G.saveGame();const save=G.loadSaveData();G.state.town=G.normalizeTown(save.town);G.state.groundRewards=G.normalizeGroundRewards(save.groundRewards);r.load('emberRidge');r.drain();assert.ok(!G.state.enemies.some(e=>e.id==='eclipseKnight'));
  collectNearby(r,'trophy-eclipse-sigil');const spirit=G.ensureTown().spirit;assert.equal(G.currentTask().short,'Return to Ser Pending');G.state.enemies=[];
  const pending=G.state.npcs.find(n=>n.id==='pending');pending.x+=16;assert.equal(G.guidanceTarget().x,pending.x);visit(G,'pending');G.tryOpeningInteraction();r.drain();
- assert.ok(G.ensureTown().requests.includes('ridge-watch'));assert.equal(G.ensureTown().spirit,spirit);assert.equal(G.followedSunriseRequest(),null);assert.equal(G.storyGoal().guide,'person');assert.equal(G.storyGoal().mapId,'starfallRuins');assert.match(G.npcDialogue('pending',2,0),/Two travellers/);
+ assert.ok(G.ensureTown().requests.includes('ridge-watch'));assert.equal(G.ensureTown().spirit,spirit);assert.equal(G.followedSunriseRequest(),null);assert.equal(G.storyGoal().guide,'person');assert.equal(G.storyGoal().mapId,'starfallRuins');assert.match(G.npcDialogue('pending',2,0),/Two travelers/);
  G.tryOpeningInteraction();r.drain();assert.equal(G.ensureTown().requests.filter(id=>id==='ridge-watch').length,1);assert.equal(G.ensureTown().spirit,spirit);assert.ok(G.loadSaveData().town.requests.includes('ridge-watch'));
 });
 test('Starfall follows remaining lenses in any order, then the native thread gift, then Errata without a second payout',()=>{

@@ -494,12 +494,12 @@ registerEnemy({
   boss: {
     style: "duelist", intro: "THE LAST LIGHT FADES",
     color: "#b58ee6", specialEvery: 3.0,
-    telegraph: 0.48, chargeSpeed: 145, chargeDur: 0.3,
+    telegraph: 0.48, chargeTelegraph: 1.1, chargeSpeed: 145, chargeDur: 0.3,
     phases: 3, phaseThresholds: [0.67, 0.34], patterns: ["charge", "eclipseSweep"],
     introLines: [
       "Stop! If I let everyone through, who will look after the last watchfire? I can't let it go out.",
       "Ser Pending says I'm frightening the travelers. I'm trying to keep them safe! Perhaps I've been guarding this court too long.",
-      "Dark magic can break my ward. When I mark a crescent, step behind it. I won't swing again until I've caught my breath.",
+      "My shield rings when it's raised. Strike it before I charge and you'll knock me off balance! Dark magic breaks my ward. Step behind my marked crescent.",
     ],
     phaseLine: "You can handle yourself. But I'm still worried about that fire!",
     phaseThreeLine: "All right. One last swing, and then I'll listen.",

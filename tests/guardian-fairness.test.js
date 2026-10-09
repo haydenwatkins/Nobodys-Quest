@@ -23,7 +23,7 @@ test('Guardian help lengthens every standard guardian commitment and every autho
  for(const d of Object.values(G.enemies).filter(d=>d.miniboss&&!d.boss.orchard)){
   for(const help of [false,true]){
    G.setComfortSetting('bossAssistance',help);const e=prepare(G,d.id);G.updateEnemies(.01);
-   assert.ok(Math.abs(e.bossTelegraphT-d.boss.telegraph-(help?.3:0))<1e-8,d.id);
+   assert.ok(Math.abs(e.bossTelegraphT-(e.bossPendingAction==='charge'?(d.boss.chargeTelegraph??d.boss.telegraph):d.boss.telegraph)-(help?.3:0))<1e-8,d.id);
   }
   for(const action of new Set(d.boss.patterns||(d.boss.style==='riftblade'?['charge','blades']:['charge']))){
    const samples=[];

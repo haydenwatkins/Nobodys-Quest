@@ -5,7 +5,7 @@
     {id:"beacon", npc:"pebble", name:"Pebble", title:"A light for the late boat", x:22, y:20, reward:8,
       task:"Defeat the Mire Queen in Sunken Marsh, collect her pearl from the ground, then bring it to Pebble at the centre of Sunrise Quay. Dark magic breaks her ward.",
       ready:()=>G.state.items.includes("trophy-mire-pearl"),
-      ask:"I’m worried about the late boat. Our harbour lamp can’t shine through this fog. The Mire Queen took its pearl when she flooded the marsh. Could you bring it back? Wizard’s dark magic will crack her ward. Try it on the little marsh creatures first. Parcel can take you back to Orchard Road; Greenfield and the marsh are west from there.",
+      ask:"I’m worried about the late boat. Our harbor lamp can’t shine through this fog. The Mire Queen took its pearl when she flooded the marsh. Could you bring it back? Wizard’s dark magic will crack her ward. Try it on the little marsh creatures first. Parcel can take you back to Orchard Road; Greenfield and the marsh are west from there.",
       thanks:"A pearl! I’ll set it above the quay. You may keep calling it a trophy. I shall call it a lighthouse with a very small budget. The late boat has something to steer by again. Pip’s been asking about the strange trail east of the quay. He’d love to hear about your next adventure.",
       after:"Three boats found us last night. One brought turnips. We must accept the consequences of our heroism."},
     {id:"recipes", npc:"quayBaker", name:"Brindle", title:"The cinnamon pages", x:12, y:12, reward:5,
@@ -27,19 +27,19 @@
       thanks:"A roof for every friend she’s collected. I’ve put a second chair outside. She always liked to sit where she could see the boats.",
       after:"I moved her chair three times this morning. Waiting is easier when you can pretend it’s decorating."},
     {id:"ridge-watch", npc:"pending", name:"Ser Pending", mapId:"emberRidge", title:"Bring back the night watch", x:2, y:7, reward:0,
-      rewardText:"A safe guardian court", consequence:"Ser Pending can watch the road without the Eclipse Knight chasing travellers.",
+      rewardText:"A safe guardian court", consequence:"Ser Pending can watch the road without the Eclipse Knight chasing travelers.",
       task:"Talk to the Eclipse Knight in Ember Ridge's eastern court. Break his ward with Dark attacks, defeat him, collect his Sigil, then return to Ser Pending at the western entrance.",
       ready:()=>G.state.items.includes("trophy-eclipse-sigil"),
       ask:"I'm worried about the night watch. The Eclipse Knight won't let anyone past his court. He thinks the last light will go out if he leaves. Could you help me talk him into letting people through?",
       tips:["He won't listen while that Dark ward is up. Wizard's Curse and Shadow Bolt can break it. The Ash watchfire is a good place to try your magic first, if you'd like.",
-        "When he marks a crescent, step behind it. Wait until his swing is over to attack. Bring his Sigil back so I know you've made it safely."],
+        "There's a spare shield by our fire. Give it a tap! His shield rings the same way when he raises it to charge. Strike it, or step aside. Bring his Sigil back so I know you've made it safely."],
       thanks:"You're back! I was watching the court and worrying. The Knight has lowered his sword. Thank you. Errata is at Starfall's observatory, south of Greenfield. She needs help getting its lights working again.",
-      after:"Two travellers passed the court this morning! I waved so much my glove fell off. If you're going farther, check on Errata at Starfall's observatory."},
+      after:"Two travelers passed the court this morning! I waved so much my glove fell off. If you're going farther, check on Errata at Starfall's observatory."},
     {id:"starfall-lights", npc:"errata", name:"Errata", mapId:"starfallRuins", title:"Lights for the lost road", x:14, y:1, reward:0,
       rewardText:"Restored lenses and the Fallen Star Thread", consequence:"The observatory's lenses shine again, and Errata can read the eastern road.",
       task:"Align Starfall's three lenses in the side galleries, use the instrument on the southern platform, collect its Fallen Star Thread, then return to Errata at the northern entrance.",
       ready:()=>G.state.items.includes("starfall-thread"),
-      ask:"The observatory used to guide people home after dark. Its three lenses have slipped out of place. I'm worried about travellers missing the road. Would you help me get the lights working again?",
+      ask:"The observatory used to guide people home after dark. Its three lenses have slipped out of place. I'm worried about travelers missing the road. Would you help me get the lights working again?",
       tips:["Visit the northwest, northeast and southeast galleries. Use each lens when the nearby creatures are cleared. Their light points toward the instrument on the southern platform.",
         "Once all three are shining, use the instrument and collect the thread it leaves. Come back and tell me how it went. I'll keep your place in the map!"],
       thanks:"Look at that starlight! The lenses are shining all the way down the galleries. Thank you for finding the thread. Now I can read the old eastern road toward Sunstep. Practice a shape you enjoy, then we'll see who's waiting beyond it.",
@@ -99,7 +99,7 @@
     }
     const places={beacon:["sunkenMarsh",22,20],recipes:["lanternReach",20,30],dragon:["sunriseQuay",35,20],welcome:["sunriseQuay",30,13]};
     const steps={beacon:"Find the Mire Queen's pearl",recipes:"Find Brindle's recipes",dragon:"Win a Manyfold crossing",welcome:"Build the Welcome Lodge"};
-    const reasons={beacon:"Help the late boat find the harbour.",recipes:"Help Brindle bake her family's cinnamon knots again.",dragon:"Bring Pip and Thimble a real adventure story.",welcome:"Make a warm place for Mara's sister and her friends."};
+    const reasons={beacon:"Help the late boat find the harbor.",recipes:"Help Brindle bake her family's cinnamon knots again.",dragon:"Bring Pip and Thimble a real adventure story.",welcome:"Make a warm place for Mara's sister and her friends."};
     const gift=!selected.ready&&G.groundRewardFor?.(r.id==="beacon"?"trophy-mire-pearl":r.id==="recipes"?"brindles-recipes":"");
     const recipe=gift&&r.id==="recipes"?G.recipeGiftApproach():null;
     const [mapId,tileX,tileY]=selected.ready?["sunriseQuay",r.x,r.y]:recipe&&!recipe.inPocket?[recipe.mapId,...recipe.point]:gift?[gift.mapId,Math.floor(gift.x/G.TILE),Math.floor(gift.y/G.TILE)]:places[r.id];
@@ -240,7 +240,7 @@
     const at=position(r);
     return {guide:'person',mapId:home(r),personId:r.npc,point:[Math.floor(at.x/G.TILE),Math.floor(at.y/G.TILE)],destination:G.maps[home(r)].name,
       title:r.title,short:r.ready()?`Bring ${r.name} the good news`:`Talk to ${r.name} in ${G.maps[home(r)].name}`,
-      objective:r.ready()?`Visit ${r.name} in ${G.maps[home(r)].name}. Your help is ready to share.`:`Visit ${r.name} in ${G.maps[home(r)].name} and hear what is troubling the travellers. You can choose to help.`,
-      reason:r.id==='ridge-watch'?"The harbour is shining again. Ser Pending is worried about the night watch on the next road.":"Ser Pending's road is calmer. Errata needs a hand at the old observatory.",progress:{value:claimed().includes('ridge-watch')?1:0,total:2,label:'FRIENDS ON THE ROAD'}};
+      objective:r.ready()?`Visit ${r.name} in ${G.maps[home(r)].name}. Your help is ready to share.`:`Visit ${r.name} in ${G.maps[home(r)].name} and hear what is troubling the travelers. You can choose to help.`,
+      reason:r.id==='ridge-watch'?"The harbor is shining again. Ser Pending is worried about the night watch on the next road.":"Ser Pending's road is calmer. Errata needs a hand at the old observatory.",progress:{value:claimed().includes('ridge-watch')?1:0,total:2,label:'FRIENDS ON THE ROAD'}};
   };
 })();
