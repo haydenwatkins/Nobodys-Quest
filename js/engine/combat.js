@@ -79,6 +79,7 @@ G.combat = (() => {
     if(enemy.roadMechanism&&G.hitRoadMechanism)return G.hitRoadMechanism(enemy,opts);
     if(enemy.treantRoot&&G.hitTreantRoot)return G.hitTreantRoot(enemy,opts);
     if(enemy.mireCrust&&G.hitMireCrust)return G.hitMireCrust(enemy,opts);
+    if(enemy.burrowPlug&&G.hitBurrowPlug)return G.hitBurrowPlug(enemy,opts);
     if(enemy.wayglassReflector&&G.hitWayglassReflector)return G.hitWayglassReflector(enemy,opts);
     if(enemy.eclipsePractice&&G.hitEclipsePractice)return G.hitEclipsePractice(enemy,opts);
     if(G.hitEclipseShield?.(enemy,opts))return false;
@@ -197,6 +198,8 @@ G.combat = (() => {
     if (G.noteMireQueenDefeat) G.noteMireQueenDefeat(enemy);
     if (G.noteEclipseDefeat) G.noteEclipseDefeat(enemy);
     G.noteWayglassDefeat?.(enemy);
+    G.noteBurrowDefeat?.(enemy);
+    if(enemy.def.id==='moleMonarch')G.cancelBurrowPlugs?.(enemy);
     if(enemy.wayglassCounters!==undefined||enemy.def.id==='riftbladeAdept')G.cancelWayglassReflectors?.(enemy);
     if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
     G.sfx.play("defeat");
@@ -255,6 +258,8 @@ G.combat = (() => {
             ? enemy.knightCrescent ? enemy.eclipseCounters>0 ? "You rang my shield before the crescent! Come sit by the fire. I've put the kettle on." : "You found your way around my crescent! Come sit by the fire. I've put the kettle on." : "A fine duel! Come sit by the fire. I've put the kettle on."
             : enemy.miraLocalRematch
               ? enemy.miraDoubleReturn ? enemy.wayglassCounters>0 ? "You stopped both throws with one ring! Come have a star-cookie by the fire." : "You stepped around both throws! Come have a star-cookie by the fire." : "That was fun! Come have a star-cookie by the fire."
+            : enemy.bramLocalRematch
+              ? enemy.bramRootRumble ? enemy.burrowStompCounters>0 ? "You stopped my stomp with a root pop! Come warm up by the fire. The shortbread's ready." : enemy.burrowTripCounters>0 ? "You tripped my burrow! Come warm up by the fire. The shortbread's ready." : "You found a clear step through both stomps! Come warm up by the fire. The shortbread's ready." : "Good practice! Come warm up by the fire. The shortbread's ready."
             : `${enemy.def.name} is defeated again.`;
       if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
         accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",

@@ -65,7 +65,7 @@ These are document benchmarks, not timed playtests of other games.
 
 Difficulty must add an interesting action, an active counter and a satisfying payoff. Preserve ordinary walking speed, responsive controls, clear warnings and nearby retries. Any temporary restriction must be short, local and breakable, with an accessible fallback when a form lacks the preferred counter. Standard fights also need these moments; children's play must be as joyful as adult play.
 
-Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. Treant’s Branching Roots, Queen’s Rippling Mire, Knight’s Following Crescent and Mira’s Double Return are implemented local rematches; the remaining authored patterns are queued.
+Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. Treant’s Branching Roots, Queen’s Rippling Mire, Knight’s Following Crescent, Mira’s Double Return and Bram’s Root Rumble are implemented local rematches; the remaining authored patterns are queued.
 
 An accessible counter can clear pressure and open an attack window while preserving the encounter’s distinct tool requirement. Do not make every response bypass every ward. Keep a free answer to temporary restrictions, and teach the guardian’s own ward through previously introduced arts. Derive any local movement restriction from the active prop and the player’s actual feet; leaving, breaking, expiration, phase changes, defeat and travel must clear it without a lingering or stacking penalty. Dash movement and its real resource price stay intact.
 
@@ -76,6 +76,8 @@ A counter’s visual motif should survive from safe practice into the real commi
 A projectile counter must be earned by the real flight: honor outbound versus returning state, ownership, terrain, expiry and swept contact. Raising a prop prepares an answer; it must not grant the payoff before the threat reaches it. Derive following warnings from actual slowed travel, with a breather between phrases. Keep the guardian’s original ward purpose distinct from the counter opening.
 
 A newly gained body’s discovery, useful outing and chosen good-news return take precedence over rematch invitations. Practice can remain harmless and available, but do not compete for attention with the new body’s first purpose. Invitations create neither a task nor an automatic duel. `WAYGLASS-RETURN.md` records this application.
+
+A leftover hazard prop should retain an honest use after its warning: a real attack may prepare it, and actual committed movement may supply a different counter. Honor the moving actor’s ownership, state and swept feet; do not award an opening for merely entering a warning or preparing a trap. Keep props walkable and retire them cleanly when the encounter changes. Recognition names the action actually performed. Chosen practice retries may use their own quiet camp, while first encounters retain their connected return and ordinary mishaps keep their attribution. `BURROW-ROOTS.md` records this application.
 
 ## Prose rules
 
@@ -109,6 +111,7 @@ Write spoken English that a child can follow on first hearing. Every story/reque
 | Mire Queen | Proud, possessive of her court’s light; reluctantly recognizes the boats need it. |
 | Eclipse Knight | Anxious night guard; fears losing the last watchfire, admits he frightened travelers, offers a friendly practice rematch. |
 | Mira | Careful road keeper; cares about travelers crossing safely, enjoys a good practice duel and welcomes the player back with star-cookies. |
+| Bram | Caring tunnel keeper; worries about packed roots beneath the road, gives concrete digging advice and shares shortbread after practice or a breather. |
 
 ## Guidance rules
 

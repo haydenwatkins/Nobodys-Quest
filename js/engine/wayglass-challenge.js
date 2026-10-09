@@ -76,7 +76,7 @@
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
     const e=G.makeEnemy('riftbladeAdept',21*16+8,8*16+8);
     e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().doubleReturn?'Two throws this time! Raise a reflector to stop the pair when a blade comes back.':'Glad you came back! Raise the reflector, then step away from the blades.'}};
-    e.guardPost=true;e.miraLocalRematch=true;e.miraDoubleReturn=progress().doubleReturn&&progress().counterLearned;G.state.enemies.push(e);return true;
+    e.guardianPracticeExit={map:'riftbladeTrial',x:3,y:11};e.guardPost=true;e.miraLocalRematch=true;e.miraDoubleReturn=progress().doubleReturn&&progress().counterLearned;G.state.enemies.push(e);return true;
   };
   G.events.on('mapEnter',()=>{
     if(G.state.mapId!=='riftbladeTrial')return;

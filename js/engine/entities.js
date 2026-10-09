@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -164,10 +164,10 @@ G.damagePlayer = function (dmg, fromX, fromY) {
       G.state.bossCutscene = null;
       G.state.knockout = {
         t: trial.delay || 1.5,
-        exit: bossEnemy?.miraLocalRematch ? {map:G.state.mapId,x:3,y:11} : trial.exit,
+        exit: bossEnemy?.guardianPracticeExit || trial.exit,
         bossName,
       };
-      const heading = bossEnemy?.miraLocalRematch ? "💫 PRACTICE PAUSED" : trial.worldBoss ? "💫 THE WORLD BEARS YOU BACK" : "💫 TRIAL LOST";
+      const heading = bossEnemy?.guardianPracticeExit ? "💫 PRACTICE PAUSED" : trial.worldBoss ? "💫 THE WORLD BEARS YOU BACK" : "💫 TRIAL LOST";
       const fallback = trial.worldBoss
         ? `${bossName} reclaims the region. The caravan carries you to its fire.`
         : `${bossName} sends you back outside. Breathe, then try again.`;
@@ -650,6 +650,7 @@ G.cancelBossHazards = function (owner) {
   if (G.cancelTreantRoots) G.cancelTreantRoots(owner);
   if (G.cancelMireCrusts) G.cancelMireCrusts(owner);
   G.cancelWayglassReflectors?.(owner);
+  G.cancelBurrowPlugs?.(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -1090,7 +1091,8 @@ function resolveBossActionPattern(e, p, action) {
     e.bossRecoverT=.9+155/92+.8;return;
   }
   if(action === "royalStomp"){
-    spawnBossHazard(e,"royalStomp",{x:e.x,y:e.y,radius:40+e.bossPhase*6,warning:.85,active:.25,color:"#d8b06a"});
+    const h=spawnBossHazard(e,"royalStomp",{x:e.x,y:e.y,radius:40+e.bossPhase*6,warning:.85,active:.25,color:"#d8b06a"});
+    G.prepareBurrowCounter?.(e,h,p);
     e.bossRecoverT=.85+.25+.9;return;
   }
   if(action === "gardenBeds"){
@@ -1291,9 +1293,10 @@ function updateBossState(e, p, dist, dt) {
     // This flag is reset every frame so recovery and ordinary movement remain
     // safe for close-range forms.
     e.bossContactActive = true;
-    const step = boss.chargeSpeed * dt;
+    const step = boss.chargeSpeed * dt,beforeX=e.x,beforeY=e.y;
     G.world.moveBox(e, e.bossChargeX * step, e.bossChargeY * step);
     e.dir = { x: e.bossChargeX, y: e.bossChargeY };
+    if(G.catchBurrowPlug?.(e,beforeX,beforeY))return true;
     e.bossChargeT -= dt;
     G.spawnFx({ kind: "puff", x: e.x, y: e.y - 5, color: boss.color, dur: 0.16 });
     if (e.bossChargeT <= 0) {
