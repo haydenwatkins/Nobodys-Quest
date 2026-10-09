@@ -19,8 +19,10 @@ module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,
   });
   const frames=n=>page.evaluate(n=>{for(let i=0;i<n;i++){const queue=window.reviewFrameQueue;window.reviewFrameQueue=[];window.reviewClock+=50;for(const {cb} of queue)cb(window.reviewClock);}},n);
   async function connect(){if(mode==='controller'){await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'c',id:'Review TV controller'})));await frames(1);assert.equal(await page.evaluate(()=>G.input.hasGamepad),true);}}
-  async function pad(index){const b=Array(16).fill(0);b[index]=1;await page.evaluate(b=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b})),b);await frames(1);await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:Array(16).fill(0)})));await frames(5);}
-  async function next(){if(mode==='controller')await pad(0);else{if(await page.evaluate(()=>G.ui.dialogueOpen))await page.touchscreen.tap(viewport.width/2,viewport.height/2);else{const b=await page.locator('#btn-a').boundingBox();assert.ok(b);await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);}await frames(6);}}
+  async function pad(index,heldFrames=1){const b=Array(16).fill(0);b[index]=1;await page.evaluate(b=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b})),b);await frames(heldFrames);await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:Array(16).fill(0)})));await frames(5);}
+  // Hold dialogue A across the screen handoff; a one-frame pulse conceals
+  // remapping bugs that can immediately confirm the newly opened chooser.
+  async function next(){if(mode==='controller')await pad(0,4);else{if(await page.evaluate(()=>G.ui.dialogueOpen))await page.touchscreen.tap(viewport.width/2,viewport.height/2);else{const b=await page.locator('#btn-a').boundingBox();assert.ok(b);await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);}await frames(6);}}
   const offered=()=>page.evaluate(()=>window.reviewPaint.some(p=>p.text.endsWith('Maybe later')));
   async function drain(){for(let i=0;i<60&&await page.evaluate(()=>G.ui.dialogueOpen);i++){assert.equal(await offered(),false,'an NPC choice requires an explicit scenario answer');await frames(5);await next();}assert.equal(await page.evaluate(()=>G.ui.dialogueOpen),false);}
   async function offer(){await next();for(let i=0;i<40&&!await offered();i++)await next();assert.equal(await offered(),true);}

@@ -219,16 +219,21 @@ G.input = (() => {
 
   function syncGamepadControl(id, down, action, repeat) {
     const previous = gamepadControls[id] || { down: false, action: null, repeatAt: 0 };
-    const changed = !previous.down || previous.action !== action;
+    // A screen change can remap a still-held physical button. Release its
+    // old action, but require a fresh physical press for the new owner.
+    // Otherwise the A that finishes dialogue also accepts the next chooser,
+    // or a menu confirmation leaks into an attack after the menu closes.
+    const changed = !previous.down;
+    const remapped = previous.down && previous.action !== action;
     if (previous.down && (!down || previous.action !== action) && previous.action) {
-      release(previous.action);
+      release(previous.action, remapped);
     }
     if (down && changed && action) {
       if (action === "a" || action === "b" || action === "c") prepareControllerAim(action);
       press(action);
     }
     let repeatAt = previous.repeatAt || 0;
-    if (!down || !action) repeatAt = 0;
+    if (!down || !action || remapped) repeatAt = 0;
     else if (changed) repeatAt = inputNow() + MENU_REPEAT_DELAY_MS;
     else if (repeat && repeatAt && inputNow() >= repeatAt) {
       // Gamepads do not emit keyboard-style repeat events. Synthesize a

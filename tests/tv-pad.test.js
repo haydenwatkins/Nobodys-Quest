@@ -217,6 +217,35 @@ G.input.update();
 assert.equal(G.input.tapped("back"), true, "Xbox B should back out on the title screen");
 G.saveSlotScreenOpen = false;
 
+/* ---------- one physical press belongs to one screen ---------- */
+let lanternOpen = false;
+G.fieldKit = { isOpen: () => lanternOpen };
+state([0, 0, 0, 0], { 0: 1 });
+G.input.update();
+assert.equal(G.input.tapped("a"), true, "A first belongs to the dialogue/world");
+lanternOpen = true;
+G.input.update();
+assert.equal(G.input.tapped("confirm"), false, "held dialogue A must not accept the new lantern chooser");
+assert.equal(G.input.held("a"), false, "the previous action is released at the handoff");
+inputClock += 800;
+G.input.update();
+assert.equal(G.input.tapped("confirm"), false, "a longer hold still cannot accept the chooser");
+state([0, 0, 0, 0]);
+G.input.update();
+state([0, 0, 0, 0], { 0: 1 });
+G.input.update();
+assert.equal(G.input.tapped("confirm"), true, "a fresh A deliberately accepts the chooser");
+lanternOpen = false;
+G.input.update();
+assert.equal(G.input.tapped("a"), false, "held menu A must not become an attack on closing");
+state([0, 0, 0, 0]);
+G.input.update();
+state([0, 0, 0, 0], { 0: 1 });
+G.input.update();
+assert.equal(G.input.tapped("a"), true, "a fresh A still attacks normally");
+state([0, 0, 0, 0]);
+G.input.update();
+
 /* ---------- app switch safety: no stuck buttons ---------- */
 state([0.9, 0, 0, 0], { 0: 1 });
 G.input.update();
