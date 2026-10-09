@@ -20,10 +20,14 @@ test('every named speaker, form and guardian resolves by identity, while narrati
   for (const [id, foe] of Object.entries(G.enemies).filter(([, foe]) => foe.miniboss)) {
     const speaker = G.resolveDialogueSpeaker(`🏆 ${foe.name}`);
     assert.equal(speaker.kind, 'guardian'); assert.equal(speaker.id, id);
+    if (foe.name.includes(',')) {
+      const personal = G.resolveDialogueSpeaker(foe.name.split(',')[0]);
+      assert.equal(personal.id, id); assert.equal(personal.sprite, foe.sprite);
+    }
     for (const title of [`⚔ ${foe.name} ⚔`, `${foe.name} — PHASE II`, `${foe.name} — PHASE III`, ...(foe.boss?.domain ? [`⚔ WORLDBEARER OF ${foe.boss.domain.toUpperCase()} ⚔`] : [])])
       assert.equal(G.resolveDialogueSpeaker(title).id, id, title);
   }
-  for (const name of ['THE STORY', '🪧 SIGN', '🎁 TREASURE CHEST', 'BRINDLEBERRY', 'PARCELMAN', 'RATTLE', 'MARA’S LETTER', 'ARCHIVIST ERRATA’S DESK', 'ERRATA’S DESK', 'ERRATUM', 'THE BLIND SUNDIAL']) {
+  for (const name of ['THE STORY', '🪧 SIGN', '🎁 TREASURE CHEST', 'BRINDLEBERRY', 'PARCELMAN', 'MIRABELLE', 'MIRA’S REFLECTOR', 'RATTLE', 'MARA’S LETTER', 'ARCHIVIST ERRATA’S DESK', 'ERRATA’S DESK', 'ERRATUM', 'THE BLIND SUNDIAL']) {
     assert.equal(G.resolveDialogueSpeaker(name).sprite, null, name);
   }
 });

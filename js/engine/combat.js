@@ -79,6 +79,7 @@ G.combat = (() => {
     if(enemy.roadMechanism&&G.hitRoadMechanism)return G.hitRoadMechanism(enemy,opts);
     if(enemy.treantRoot&&G.hitTreantRoot)return G.hitTreantRoot(enemy,opts);
     if(enemy.mireCrust&&G.hitMireCrust)return G.hitMireCrust(enemy,opts);
+    if(enemy.wayglassReflector&&G.hitWayglassReflector)return G.hitWayglassReflector(enemy,opts);
     if(enemy.eclipsePractice&&G.hitEclipsePractice)return G.hitEclipsePractice(enemy,opts);
     if(G.hitEclipseShield?.(enemy,opts))return false;
     if (enemy.def.practice) {
@@ -195,6 +196,8 @@ G.combat = (() => {
     if (G.noteTreantDefeat) G.noteTreantDefeat(enemy);
     if (G.noteMireQueenDefeat) G.noteMireQueenDefeat(enemy);
     if (G.noteEclipseDefeat) G.noteEclipseDefeat(enemy);
+    G.noteWayglassDefeat?.(enemy);
+    if(enemy.wayglassCounters!==undefined||enemy.def.id==='riftbladeAdept')G.cancelWayglassReflectors?.(enemy);
     if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
     G.sfx.play("defeat");
     G.state.shake = Math.max(G.state.shake, enemy.def.heavy ? 0.3 : 0.14);
@@ -250,6 +253,8 @@ G.combat = (() => {
           ? enemy.queenRippling ? "You caught my ripple! Come warm up at the fire. I’ll bring the towel." : "What a splash! Come warm up at the fire. We can practice again whenever you like."
           : enemy.knightLocalRematch
             ? enemy.knightCrescent ? enemy.eclipseCounters>0 ? "You rang my shield before the crescent! Come sit by the fire. I've put the kettle on." : "You found your way around my crescent! Come sit by the fire. I've put the kettle on." : "A fine duel! Come sit by the fire. I've put the kettle on."
+            : enemy.miraLocalRematch
+              ? enemy.miraDoubleReturn ? enemy.wayglassCounters>0 ? "You stopped both throws with one ring! Come have a star-cookie by the fire." : "You stepped around both throws! Come have a star-cookie by the fire." : "That was fun! Come have a star-cookie by the fire."
             : `${enemy.def.name} is defeated again.`;
       if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
         accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",
@@ -771,7 +776,7 @@ G.combat = (() => {
       } else {
         pr.trail.length = 0;
       }
-      const beforeX = pr.x, beforeY = pr.y;
+      const beforeX = pr.x, beforeY = pr.y, wasReturning=!!pr.returning;
       const guidanceScale = G.guidanceProjectileScale ? G.guidanceProjectileScale(pr) : 1;
       pr.x += pr.vx * dt * guidanceScale;
       pr.y += pr.vy * dt * guidanceScale;
@@ -795,6 +800,8 @@ G.combat = (() => {
       if (!gone && hitsTerrain) {
         gone = true;
         G.spawnFx({ kind: "puff", x: pr.x, y: pr.y, color: pr.color, dur: 0.2 });
+      } else if (!gone && G.catchWayglassReturn?.(pr,beforeX,beforeY,wasReturning)) {
+        gone = true;
       } else if (!gone && pr.fromPlayer) {
         for (const e of s.enemies) {
           if (e.dead) continue;
@@ -847,7 +854,7 @@ G.combat = (() => {
             }
           }
         }
-      } else if (!gone && pr.armT <= 0) {
+      } else if (!gone && !pr.wayglassPractice && pr.armT <= 0) {
         // enemy projectile hitting the player
         const shelter = (s.passiveShelters || []).find((field) =>
           G.util.dist(pr.x, pr.y, field.x, field.y) <= field.radius + pr.size);

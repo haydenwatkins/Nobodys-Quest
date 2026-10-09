@@ -17,6 +17,11 @@ for(const [id,map,item,form,type,entryStars]of sources)test(`${id} preserves its
  assert.equal(G.state.stars,stars+1);assert.ok(G.formReady(form));assert.ok(G.formEchoFor(form));assert.ok(!G.state.claimedForms.includes(form),'collection preserves the native Echo ceremony');
  G.saveGame();assert.ok(G.loadSaveData().items.includes(item));assert.ok(!G.loadSaveData().groundRewards.some(g=>g.item===item));
  const rematch=G.makeEnemy(id,e.x,e.y);rematch.ward.hp=0;G.combat.damageEnemy(rematch,{damage:100,type,knockback:0});r.drain();assert.equal(G.state.stars,stars+1);assert.equal(G.groundRewardFor(item),null);
- cross(r,'overworld');cross(r,map);assert.ok(G.state.enemies.some(e=>e.id===id),'the original optional rematch returns after claim');
+ cross(r,'overworld');cross(r,map);
+ if(id==='riftbladeAdept'){
+  assert.ok(!G.state.enemies.some(e=>!e.dead&&e.id===id),'Mira waits for a chosen rematch after collection');
+  assert.ok(G.beginWayglassRematch(),'legacy ownership retains deliberate practice access');
+  assert.ok(G.state.enemies.some(e=>!e.dead&&e.miraLocalRematch));
+ }else assert.ok(G.state.enemies.some(e=>!e.dead&&e.id===id),'the original optional rematch returns after claim');
  assert.equal(G.normalizeGroundRewards(saved.groundRewards).length,0,'legacy ownership cannot restore duplicate pending credit');
 });

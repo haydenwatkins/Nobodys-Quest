@@ -17,9 +17,32 @@ function fixture() {
   c.translate = (x, y) => { dx += x; dy += y; };
   c.fillRect = (x, y, w, h) => rects.push({ x: x + dx, y: y + dy, w, h, color: c.fillStyle });
   c.fillText = text => labels.push(String(text));
-  const draw = () => { rects.length = labels.length = 0; G.ui.drawHUD({ x: 0, y: 0 }); assert.equal(stack.length, 0); };
+  const draw = (cam = { x: 0, y: 0 }) => { rects.length = labels.length = 0; G.ui.drawHUD(cam); assert.equal(stack.length, 0); };
   return { r, G, rects, labels, draw };
 }
+
+test('world interactions reserve their stable full-text dock before promises and map notices', () => {
+  const { r, G, rects, labels, draw } = fixture();
+  G.state.items.push('riftblade-sigil'); G.state.guardianChallenges.mira.counterLearned = true;
+  r.load('riftbladeTrial'); r.drain();
+  Object.assign(G.state.player, { x: 72, y: 200 });
+  assert.equal(G.helpStationCandidate()?.kind, 'wayglassChallenge');
+  G.ui.banner('WAYGLASS COURT', 'Mira has a new trick to share.');
+  const before = JSON.stringify(G.currentTask()), cam = { x: 0, y: 52 };
+  for (const hd of [true, false]) for (const mode of ['touch', 'controller', 'keyboard']) {
+    G.hdPilot = hd; G.input.isTouch = mode === 'touch'; G.input.hasGamepad = mode === 'controller';
+    draw(cam); const prompt = G.openingPromptBounds; assert.ok(prompt);
+    assert.match(labels.join(' '), /Double Return/);
+    assert.match(labels.join(' '), /Adds a second throw\. Raise a reflector to stop the pair when a blade returns\./);
+    assert.ok(prompt.x >= 0 && prompt.x + prompt.w <= G.W && prompt.y >= 0 && prompt.y + prompt.h <= G.H);
+    const cards = rects.filter(rect => ['rgba(26,28,44,.9)', 'rgba(26,28,44,0.82)', 'rgba(26,28,44,0.78)'].includes(rect.color));
+    for (const card of cards) assert.ok(!overlaps(card, prompt), 'a story, mastery, map or notice card cannot cover the real world prompt');
+    draw({ x: 0, y: 62 }); assert.equal(G.openingPromptBounds.y, prompt.y, 'walking cannot reshuffle the dock');
+  }
+  assert.equal(JSON.stringify(G.currentTask()), before, 'temporary painting priority preserves the chosen task');
+  Object.assign(G.state.player, { x: 280, y: 200 }); draw(cam);
+  assert.equal(G.openingPromptBounds, null, 'leaving the lamp releases its reserved space');
+});
 
 test('compact full-text feedback clears the traveller, essential status and fixed controls in each input mode', () => {
   const { G, rects, labels, draw } = fixture();

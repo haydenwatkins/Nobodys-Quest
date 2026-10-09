@@ -127,14 +127,15 @@ registerMap({
   name: "Wayglass Court",
   visualTheme: "riftblade",
   playerStart: { x: 2, y: 8 },
-  bossTrial: { exit: { map: "overworld", x: 118, y: 18 }, delay: 1.5 },
+  bossTrial: { onlyEngaged: true, exit: { map: "overworld", x: 118, y: 18 }, delay: 1.5 },
 
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 18 } },
     "B": { tile: "floor", enemy: "riftbladeAdept" },
-    "m": { tile: "floor", message: "Sharp attacks break Mira's ward. Step off the marked throws and wait for the blades to return, then close in during the pause." },
+    "m": { tile: "floor", message: "Sharp attacks break Mira's ward. Strike a reflector to raise it, then step off the marked throws. A returning blade rings it and gives you an opening." },
     "H": { tile: "floor", chest: { heal: true, name: "a perfectly folded star-cookie" } },
     "R": { tile: "rock", on: "floor" },
+    "F": { tile: "floor", rest: true, restText: "Mira's fire restores every heart and all mana." },
   },
 
   tiles: [
@@ -149,7 +150,7 @@ registerMap({
     "xffmfffffffffffffffffBfffff#",
     "#ffffffffffffffffffffffffff#",
     "#ffffffffffffffffffffffffff#",
-    "#ffffffffffffRfffffffffffff#",
+    "#ffFfffffffffRfffffffffffff#",
     "#ffffffffffffffffffffffffff#",
     "#ffffffffffffffffffffffffff#",
     "#fffRffffffffffffffffffRfff#",

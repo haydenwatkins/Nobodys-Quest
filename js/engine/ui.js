@@ -471,7 +471,7 @@ G.ui = (() => {
     if (rewardCue && x < rewardCue.x + rewardCue.w && x + w > rewardCue.x &&
         y < rewardCue.y + rewardCue.h && y + h > rewardCue.y) return true;
     if (feedbackOverlaps(x, y, w, h)) return true;
-    if ([bossHeaderBounds, wardHintBounds, starBounds].some(box => box && x < box.x + box.w + 2 && x + w + 2 > box.x &&
+    if ([bossHeaderBounds, wardHintBounds, starBounds, G.openingPromptBounds].some(box => box && x < box.x + box.w + 2 && x + w + 2 > box.x &&
         y < box.y + box.h + 2 && y + h + 2 > box.y)) return true;
     if ((G.groundRewardsHere ? G.groundRewardsHere() : []).some(reward =>
       x < reward.x - cam.x + 10 && x + w > reward.x - cam.x - 10 &&
@@ -843,6 +843,7 @@ G.ui = (() => {
     rewardCue = null;
     feedbackBounds = [];
     bossHeaderBounds = wardHintBounds = starBounds = null;
+    G.openingPromptBounds = null;
     let fieldFeedback = [];
     c.textBaseline = "top";
 
@@ -954,6 +955,9 @@ G.ui = (() => {
     c.fillStyle = "#ffcd75";
     c.fillText(starTxt, G.W - sw - 1, 8);
 
+    // Reserve the stable world prompt before optional cards and notices choose
+    // their docks. An actor-aware prompt can sit well above the bottom edge.
+    const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c, cam);
     rewardCue = placeRewardCue(c, cam);
     fieldFeedback = planFieldFeedback(c, cam);
     if (!encounterFocus && !entranceFocus) drawLocationChip(c, cam);
@@ -965,7 +969,6 @@ G.ui = (() => {
         drawStoryTracker(c, cam);
         drawQuestTracker(c, cam);
       }
-      const interactionShown = G.drawOpeningPrompt && G.drawOpeningPrompt(c, cam);
       if (!rewardCue && !interactionShown && !entranceFocus && !encounterFocus && G.drawGuidanceHud) G.drawGuidanceHud(c, cam);
       if (!rewardCue) drawWayfinderHint(c);
       drawTutorial(c, cam);

@@ -1,6 +1,6 @@
 # Guardian challenges
 
-October 9, 2026. Family direction: Lily needs generous help, Ben wants something worth mastering, and Brayden and the parent want engaging fights. Difficulty should create more interesting play while keeping Patchling fast, responsive, cute and approachable. The local alternates **Treant’s Branching Roots**, **Queen’s Rippling Mire** and **Knight’s Following Crescent** are now implemented. Later bespoke alternates remain queued; this is not a global hard-mode switch.
+October 9, 2026. Family direction: Lily needs generous help, Ben wants something worth mastering, and Brayden and the parent want engaging fights. Difficulty should create more interesting play while keeping Patchling fast, responsive, cute and approachable. The local alternates **Treant’s Branching Roots**, **Queen’s Rippling Mire**, **Knight’s Following Crescent** and **Mira’s Double Return** are now implemented. Later bespoke alternates remain queued; this is not a global hard-mode switch.
 
 ## Three choices, rather than three separate adventures
 
@@ -8,7 +8,7 @@ October 9, 2026. Family direction: Lily needs generous help, Ben wants something
 | --- | --- | --- |
 | Heart Lantern, already shipped | Hearts recover after a short breather, including during battle. | Keep exploring and experimenting after mistakes. |
 | Guardian Lantern, already shipped | Longer warnings throughout guardian fights; extra hearts and slower boss shots after repeated retries. | More room to recognize and practice the guardian's actions. |
-| Branching Roots, Rippling Mire and Following Crescent at their fires, shipped; later local challenge lanterns queued | A guardian adds an authored twist with an active counter and a generous opening when countered. Ordinary travel and progression stay the same. | Enjoy turning a dangerous move into your advantage. |
+| Branching Roots, Rippling Mire, Following Crescent and Double Return at their fires, shipped; later local challenge lanterns queued | A guardian adds an authored twist with an active counter and a generous opening when countered. Ordinary travel and progression stay the same. | Enjoy turning a dangerous move into your advantage. |
 
 Keep these independent. A player may learn the challenge with both help lights on, then put one out voluntarily. Do not silently extinguish help, increase difficulty after good play, or weaken help to protect a challenge score. The challenge is off by default. Do not show an actionable Challenge Lantern for a guardian whose alternate encounter is unfinished. Introduce the first optional challenge only after its basic counter has been demonstrated on the road; first contact must not be a three-way difficulty quiz.
 
@@ -27,15 +27,16 @@ The Heart Lantern is not a lesser adventure. Everyone gets the story, forms, sta
 
 ## First encounters to build
 
-Treant, Queen and Knight are shipped as described below. Later guardians remain proposals subject to the shared contract.
+Treant, Queen, Knight and Mira are shipped as described below. Later guardians remain proposals subject to the shared contract.
 
 | Guardian | Familiar idea → challenge twist | Active answer and payoff |
 | --- | --- | --- |
 | Ancient Treant, shipped | Root warning → cracked root; optional local rematch adds a following circle. | Any damaging art snaps the first root, chips the real blunt ward and staggers the Treant; this cancels the follower. Walking clear remains safe. Free basics work without mana. |
 | Mire Queen, shipped | Marked bubbles → one short-lived breakable crust; optional local rematch adds a following committed volley. | Any damaging art or dash clears the crust. A nearby splash cancels her pressure and opens an attack window; dark magic still breaks her veil. Harmless ferry practice opens a saved lily light. |
 | Eclipse Knight, shipped | Raised shield → committed charge; an optional local duel adds a following crescent. | Any damaging art rings his raised shield and cancels the commitment for a 1.6-second opening. Free basics and native Shield Advance work at zero mana. Dark still opens his ward; walking clear remains viable. Safe spare-shield practice lights a saved watchpost. |
+| Mira, shipped | Marked returning blades → strike a reflector to raise it; an optional local duel adds a second committed throw. | A real returning blade rings the raised reflector, stops the pair and opens 1.6 seconds. Free basics work in all 24 bodies. Sharp still opens her ward; walking clear remains viable. Harmless practice leaves a saved reflected light. |
 
-Treant, Queen and Knight are implemented; continue with Mira’s reflector response and local returning-blade variation. Keep their existing connected roads, earned form intervals, promises, ground gifts and return moments. Do not insert a hard challenge quest into the compulsory opening. Each needs its own native victory and counter evidence before enabling its lamp. The three shipped encounters share their proven opening/cleanup lifecycle and conservative saved profiles; individual counters still keep their own ward and pattern rules.
+Treant, Queen, Knight and Mira are implemented; continue with Bram’s burrow response and local variation. Keep their existing connected roads, earned form intervals, promises, ground gifts and return moments. Do not insert a hard challenge quest into the compulsory opening. Each needs its own native victory and counter evidence before enabling its lamp. The four shipped encounters share their proven opening/cleanup lifecycle and conservative saved profiles; individual counters still keep their own ward and pattern rules.
 
 ## Whole-campaign encounter direction
 
@@ -43,7 +44,6 @@ These are illustrative authoring directions, not fixed requirements. The intent 
 
 | Guardian | Counter opportunity to develop |
 | --- | --- |
-| Mira / Wayglass | Returning blades strike a visible reflector when positioned correctly, opening her sharp ward. Ordinary repositioning remains valid; no mandatory precision aim. |
 | Bram / Tunnelwarden | Lure the burrow strike toward a cracked mound; its collapse leaves him exposed. Breaking the mound in advance gives another route. |
 | Vesper / Dusk Host | Break one prepared lantern cover to light a refuge and interrupt the next committed dash. Preserve a clear escape through the waltz. |
 | Tansy / Caravan Star | Strike a landed pie before it bursts; its comic splash interrupts the card encore. A missed pie expires quickly. |
@@ -76,13 +76,13 @@ Two help lights now stand outside every current dungeon/guardian-zone/trial entr
 
 The world prompt names the lamp, the action and its effect before A/tap changes it. The dock wraps completely and holds its position during approach and switching. The Heart symbol, sun symbol and steady lit/unlit glass support low reading. Each lamp reflects the same existing saved preference across the adventure; lighting one affects later regions too. No new HUD button, compulsory configuration quest or extra confirmation screen.
 
-Challenge Lanterns use distinct emblems and flame shapes, not color alone: crossed branches for Treant, ripple rings for Queen and a crescent for Knight. Add one only at completed supported approaches/camps. Its nearby placard and guardian demonstration name the actual local twist, e.g. “Branching roots · break a branch,” rather than an abstract adjective. The world shows the extra pattern when it is lit. Choosing a challenge snapshots that encounter's pattern; changing help remains available through the accessibility fallback, but world switches never steal an attack during danger. No collectible requires all help extinguished.
+Challenge Lanterns use distinct emblems and flame shapes, not color alone: crossed branches for Treant, ripple rings for Queen, a crescent for Knight and twin blades for Mira. Add one only at completed supported approaches/camps. Its nearby placard and guardian demonstration name the actual local twist, e.g. “Branching roots · break a branch,” rather than an abstract adjective. The world shows the extra pattern when it is lit. Choosing a challenge snapshots that encounter's pattern; changing help remains available through the accessibility fallback, but world switches never steal an attack during danger. No collectible requires all help extinguished.
 
 ## Current limits and next deliverable
 
 The preparation foundation added outside/camp lamps and bounded explanations. The shared follow-through now lengthens guardian commitments, floor-pattern warnings and shot arming with Guardian help throughout the roster, preserving the opening's authored extra beats. Standard pattern guardians retain a clear opening after actual lingering threats, including slowed/returning shots and delayed echoes. Every registered guardian clears its previous commitment and hostile shots before introducing a new phase; friendly and unrelated shots remain. This shared timing foundation does not alone implement bespoke counters or establish a global hard mode. Shared timing verification does not establish whole-campaign human balance.
 
-Treant now has the shared standard counter, saved safe picnic practice, optional Branching Roots rematch, local lantern, equal rewards and personal camp recognition (`TREANT-ROOTS.md`). Native full-strength victories cover all help combinations and a slow body. Queen now adds breakable mire, a saved harmless lily demonstration, a voluntary following-volley rematch and a ferry retry (`MIRE-CRUST.md`). Knight adds a raised-shield counter, harmless watchpost practice, a camp retry and the voluntary Following Crescent duel (`ECLIPSE-SHIELD.md`). All three local patterns retain independent help and once-only rewards. Next deliverable: Mira’s useful reflector response and voluntary returning-blade variation, with safe practice and full input/retry/reward evidence. Build every later alternate through the same acceptance criteria. Preserve the open continuous Worldwake pacing review and menu-optional treasure pursuit after this foundation.
+Treant now has the shared standard counter, saved safe picnic practice, optional Branching Roots rematch, local lantern, equal rewards and personal camp recognition (`TREANT-ROOTS.md`). Native full-strength victories cover all help combinations and a slow body. Queen now adds breakable mire, a saved harmless lily demonstration, a voluntary following-volley rematch and a ferry retry (`MIRE-CRUST.md`). Knight adds a raised-shield counter, harmless watchpost practice, a camp retry and the voluntary Following Crescent duel (`ECLIPSE-SHIELD.md`). Mira adds an actual returning-blade reflector counter, quiet practice/fire and voluntary Double Return duel after the Sigil discovery and useful outing (`WAYGLASS-RETURN.md`). All four local patterns retain independent help and once-only rewards. Next deliverable: Bram’s burrow response and local variation, with safe practice and full input/retry/reward evidence. Build every later alternate through the same acceptance criteria. Preserve the open continuous Worldwake pacing review and menu-optional treasure pursuit after this foundation.
 
 The same enjoyment rule applies to gear and ordinary fights. The subsequent `COMBAT-AGENCY.md` pass replaces the Heartwood Crown's walking tax with gentler melee knockback, verifies free basics with all nine gifts/all 24 forms, gives all ordinary caster families visible interruptible commitments, and makes actual stuns safe against body contact. Existing Mark/form tradeoffs and individual encounter combinations remain open. Future prices need native combat evidence; do not replace a movement tax with resource starvation or a worse recovery penalty by assumption.
 

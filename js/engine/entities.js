@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice)) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -164,10 +164,10 @@ G.damagePlayer = function (dmg, fromX, fromY) {
       G.state.bossCutscene = null;
       G.state.knockout = {
         t: trial.delay || 1.5,
-        exit: trial.exit,
+        exit: bossEnemy?.miraLocalRematch ? {map:G.state.mapId,x:3,y:11} : trial.exit,
         bossName,
       };
-      const heading = trial.worldBoss ? "💫 THE WORLD BEARS YOU BACK" : "💫 TRIAL LOST";
+      const heading = bossEnemy?.miraLocalRematch ? "💫 PRACTICE PAUSED" : trial.worldBoss ? "💫 THE WORLD BEARS YOU BACK" : "💫 TRIAL LOST";
       const fallback = trial.worldBoss
         ? `${bossName} reclaims the region. The caravan carries you to its fire.`
         : `${bossName} sends you back outside. Breathe, then try again.`;
@@ -649,6 +649,7 @@ function spawnBossHazard(e, kind, options) {
 G.cancelBossHazards = function (owner) {
   if (G.cancelTreantRoots) G.cancelTreantRoots(owner);
   if (G.cancelMireCrusts) G.cancelMireCrusts(owner);
+  G.cancelWayglassReflectors?.(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -1064,7 +1065,8 @@ function spawnArenaPattern(e, action) {
 
 function resolveBossActionPattern(e, p, action) {
   if(action === "blades"&&e.def.id === "riftbladeAdept"){
-    spawnBossHazard(e,"riftVolley",{x:p.x,y:p.y,spreads:e.bossPhase>=3?[-28,-14,0,14,28]:e.bossPhase===2?[-22,0,22]:[-13,13],warning:.8,active:.15,color:"#73eff7"});
+    const h=spawnBossHazard(e,"riftVolley",{x:p.x,y:p.y,spreads:e.bossPhase>=3?[-28,-14,0,14,28]:e.bossPhase===2?[-22,0,22]:[-13,13],warning:.8,active:.15,color:"#73eff7"});
+    G.prepareWayglassCounter?.(e,h);
     e.bossRecoverT=.8+2*82/120+.85;return;
   }
   if(action === "foldCuts"){

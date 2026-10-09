@@ -196,7 +196,7 @@
       const px=x*16+8,py=y*16+8;
       list.push({y:py,fn:()=>{c.save();if(Math.abs(s.player.x-px)<24&&s.player.y<py&&s.player.y>py-43)c.globalAlpha=.32;tree(c,px,py,x+y,false);c.restore();}});
     }
-    const dummy=s.enemies.find(e=>!e.dead&&e.def.practice&&!e.treantRoot&&!e.mireCrust&&!e.eclipsePractice);
+    const dummy=s.enemies.find(e=>!e.dead&&e.def.practice&&!e.treantRoot&&!e.mireCrust&&!e.eclipsePractice&&!e.wayglassReflector);
     if(dummy)list.push({y:dummy.y,fn:()=>{const x=dummy.x,y=dummy.y;if(freshOrchard()&&G.openingScenery?.props){G.drawSprite(c,G.openingScenery.props.practice,0,x,y+3,false);return;}rect(c,x-2,y-23,4,24,C.wood);rect(c,x-13,y-18,26,3,C.woodDark);ellipse(c,x,y-20,7,8,C.woodDark);ellipse(c,x,y-21,6,6,C.gold);rect(c,x-4,y-23,2,2,C.woodDark);rect(c,x+2,y-23,2,2,C.woodDark);rect(c,x-2,y-19,5,1,C.woodDark);}});
     return list;
   };
@@ -241,6 +241,7 @@
   };
   let lampPrompt=null;
   G.drawOpeningPrompt=(c,cam)=>{
+    G.openingPromptBounds=null;
     if(G.ui.dialogueOpen||G.ui.menuOpen||G.state.bossCutscene)return false;
     const at=G.openingInteractionCandidate();if(!at){lampPrompt=null;return;}
     const prefix=G.input.isTouch?'A · ':G.input.hasGamepad?'A · ':'J / E · ';
@@ -260,12 +261,14 @@
         if(cam&&p){const px=p.x-cam.x,py=p.y-cam.y;if(px+12>x&&px-12<x+w&&py+4>y&&py-24<y+h)y=Math.max(45,Math.min(117,Math.floor(py-h-24)));}
         lampPrompt={key,y};
       }
+      G.openingPromptBounds={x,y:lampPrompt.y,w,h};
       rect(c,x,lampPrompt.y,w,h,'rgba(32,45,50,.94)');rect(c,x,lampPrompt.y,2,h,C.gold);
       c.fillStyle=C.paper;c.textBaseline='top';lines.forEach((line,i)=>G.drawWorldText(c,line,x+8,lampPrompt.y+4+i*11));c.restore();return true;
     }
     lampPrompt=null;const w=c.measureText(label).width+16;
     const x=(G.W-w)/2,p=G.state.player;let y=136;
     if(cam&&p){const px=p.x-cam.x,py=p.y-cam.y;if(px+12>x&&px-12<x+w&&py+4>y&&py-24<y+16)y=Math.max(45,Math.min(117,Math.floor(py-40)));}
+    G.openingPromptBounds={x,y,w,h:16};
     rect(c,x,y,w,16,'rgba(32,45,50,.94)');rect(c,x,y,2,16,C.gold);
     c.fillStyle=C.paper;c.textBaseline='top';G.drawWorldText(c,label,x+8,y+4);c.restore();return true;
   };
@@ -295,11 +298,12 @@
     c.fillStyle='#344b54';c.fillRect(11,20,51,2);c.fillStyle='#85c0bb';c.fillRect(11,20,51*p.mana/p.manaMax,2);
     text(c,name+level,11,25,'#e4dbbc',7);
     const boss=s.enemies.find(e=>!e.dead&&e.def.miniboss&&e.bossEngaged);
+    const interactionShown=G.drawOpeningPrompt(c,cam);
     if(boss){
       panel(c,100,6,146,23);text(c,boss.def.name,107,9,'#e9d39f',9);
       c.fillStyle='#40574a';c.fillRect(107,21,131,3);c.fillStyle='#bdc77d';c.fillRect(107,21,131*Math.max(0,boss.hp/boss.def.hp),3);
       if(boss.ward&&boss.ward.hp>0)text(c,boss.id==='ancientTreant'?'BARK WARD · BLUNT':'WARD · '+boss.ward.types.join(' / ').toUpperCase(),107,29,'#f0cf89',8);
-    }else if(!G.ui.dialogueOpen&&!(G.nearGroundReward&&G.nearGroundReward())){
+    }else if(!interactionShown&&!G.ui.dialogueOpen&&!(G.nearGroundReward&&G.nearGroundReward())){
       const opening=G.openingGoal(),goal=opening||(s.delivery?.complete&&G.currentTask?G.currentTask():null);
       if(goal){
         const x=100,y=6,w=G.W-x-(G.input.isTouch?68:6);
@@ -314,7 +318,7 @@
         text(c,s.mapDef.deliveryLandscape?'A place to return to':'The road is open',102,20,'#d2dda8',9);
       }
     }
-    if(!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
+    if(!interactionShown&&!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
       const lesson=G.fieldMasteryReward();
       if(lesson&&G.ui.fieldQuiet?.()&&G.systemIntroduced('forms')&&!(G.nearGroundReward&&G.nearGroundReward())){
         c.font=G.text.font(8,700);
@@ -342,7 +346,6 @@
       }
       if(G.systemIntroduced('forms'))text(c,(G.input.hasGamepad?'B  FORMS':'Q  FORMS')+(G.systemIntroduced('mix')?(G.input.hasGamepad?'   R3 MIX':'   F MIX'):''),205,163,'#f0dfb2',8);
     }
-    if(!G.ui.dialogueOpen)G.drawOpeningPrompt(c,cam);
     c.restore();return {status:{x:6,y:6,w:identityWidth,h:27},
       boss:boss?{x:100,y:6,w:146,h:boss.ward&&boss.ward.hp>0?31:23}:null};
   };

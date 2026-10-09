@@ -48,7 +48,8 @@
     for (const [id, form] of Object.entries(G.forms)) if (matches(name, form.name.toUpperCase()))
       return { kind: "form", id, name: form.name, sprite: form.sprite };
     for (const [id, foe] of Object.entries(G.enemies)) if (foe.miniboss &&
-      [foe.name.toUpperCase(), "THE " + foe.name.toUpperCase().replace(/^THE /, ""),
+      [foe.name.toUpperCase(), foe.name.includes(',') ? foe.name.split(',')[0].toUpperCase() : "",
+       "THE " + foe.name.toUpperCase().replace(/^THE /, ""),
        foe.boss?.domain ? "WORLDBEARER OF " + foe.boss.domain.toUpperCase() : ""].filter(Boolean)
        .some(alias => matches(name, alias) || name === alias + " — PHASE II" || name === alias + " — PHASE III"))
       return { kind: "guardian", id, name: foe.name, sprite: foe.sprite };

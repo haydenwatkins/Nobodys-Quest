@@ -65,13 +65,17 @@ These are document benchmarks, not timed playtests of other games.
 
 Difficulty must add an interesting action, an active counter and a satisfying payoff. Preserve ordinary walking speed, responsive controls, clear warnings and nearby retries. Any temporary restriction must be short, local and breakable, with an accessible fallback when a form lacks the preferred counter. Standard fights also need these moments; children's play must be as joyful as adult play.
 
-Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. Treant’s Branching Roots, Queen’s Rippling Mire and Knight’s Following Crescent are implemented local rematches; the remaining authored patterns are queued.
+Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. Treant’s Branching Roots, Queen’s Rippling Mire, Knight’s Following Crescent and Mira’s Double Return are implemented local rematches; the remaining authored patterns are queued.
 
 An accessible counter can clear pressure and open an attack window while preserving the encounter’s distinct tool requirement. Do not make every response bypass every ward. Keep a free answer to temporary restrictions, and teach the guardian’s own ward through previously introduced arts. Derive any local movement restriction from the active prop and the player’s actual feet; leaving, breaking, expiration, phase changes, defeat and travel must clear it without a lingering or stacking penalty. Dash movement and its real resource price stay intact.
 
 Preparation and practice need quiet geography. Place neighbouring creatures on purposeful routes and hold their posts outside attention range; do not let random wandering overwhelm a camp or the next guardian’s teaching beat. An ordinary mishap before engagement must not count as a failed guardian attempt. A chosen rematch waits in its own court and starts through walking and interaction, with independent help and a clean nearby retry.
 
 A counter’s visual motif should survive from safe practice into the real commitment: the same raised shield, ringing center and response are recognizable before prose is read. Author warning lengths for the actual action, then apply help on top; a charge and a ground swing need not share one timer. Validate every earned body’s free basic through native input, with scarce resources. Praise an action only when it happened in that attempt; a successful walking alternative deserves its own warm recognition. Refresh newly earned world interactions during the same visit, so a return never needs a reload or menu to expose its useful consequence. `ECLIPSE-SHIELD.md` records this backfill; carry it into later guardians and collection interactions.
+
+A projectile counter must be earned by the real flight: honor outbound versus returning state, ownership, terrain, expiry and swept contact. Raising a prop prepares an answer; it must not grant the payoff before the threat reaches it. Derive following warnings from actual slowed travel, with a breather between phrases. Keep the guardian’s original ward purpose distinct from the counter opening.
+
+A newly gained body’s discovery, useful outing and chosen good-news return take precedence over rematch invitations. Practice can remain harmless and available, but do not compete for attention with the new body’s first purpose. Invitations create neither a task nor an automatic duel. `WAYGLASS-RETURN.md` records this application.
 
 ## Prose rules
 
@@ -104,10 +108,13 @@ Write spoken English that a child can follow on first hearing. Every story/reque
 | Treant | Frightened protector who shut the road; admits his mistake and lifts the branches. |
 | Mire Queen | Proud, possessive of her court’s light; reluctantly recognizes the boats need it. |
 | Eclipse Knight | Anxious night guard; fears losing the last watchfire, admits he frightened travelers, offers a friendly practice rematch. |
+| Mira | Careful road keeper; cares about travelers crossing safely, enjoys a good practice duel and welcomes the player back with star-cookies. |
 
 ## Guidance rules
 
 Essential task text wraps completely in a fixed, bounded dock. Full purpose, route and controls remain available in Journey. Never silently truncate an essential instruction. Show one current mastery lesson; future lessons belong in the journal.
+
+Reserve the complete, anchored world-interaction prompt before optional story, mastery, map and notice cards choose their space. Cards yield when they would cover its action or effect; do not relocate the prompt every frame or change the chosen task to solve a painting conflict. Friendly guardians retain their own portrait when addressed by their personal name.
 
 Incidental NPC speech waits for the player to stop, fades in, and uses stable authored selection. A moving camera must not reshuffle speakers or flicker speech over the player. Quest attention markers can remain in the world; the actual conversation is available through the normal interaction.
 
