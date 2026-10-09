@@ -4,14 +4,6 @@
 (() => {
   const trophy='trophy-heartwood-crown',point=(x,y)=>({x:x*16+8,y:y*16+8});
   const fire=point(12,20),lamp=point(12,19),friend=point(16,19),seat=point(20,20);
-  G.makeGuardianChallenges=()=>({treant:{practiceCleared:false,counterLearned:false,invited:false,branching:false,branchingCleared:false,bestCounters:0}});
-  G.normalizeGuardianChallenges=raw=>{
-    const out=G.makeGuardianChallenges(),a=raw?.treant;
-    for(const k of ['practiceCleared','counterLearned','invited','branchingCleared'])out.treant[k]=a?.[k]===true;
-    out.treant.branching=a?.branching===true&&out.treant.counterLearned;
-    out.treant.bestCounters=Number.isFinite(a?.bestCounters)?Math.max(0,Math.min(99,Math.floor(a.bestCounters))):0;
-    return out;
-  };
   const progress=()=> (G.state.guardianChallenges||(G.state.guardianChallenges=G.makeGuardianChallenges())).treant;
   const treant=e=>e?.def?.id==='ancientTreant';
   G.treantVisitReady=()=>G.state.items.includes(trophy)&&
@@ -68,16 +60,10 @@
     if(!r.owner){progress().practiceCleared=true;G.saveGame();return false;}
     const owner=r.owner;
     owner.treantCounters=(owner.treantCounters||0)+1;
-    G.cancelBossHazards(owner);
-    owner.bossPendingAction=owner.bossAfterCharge=null;
-    owner.bossTelegraphT=owner.bossChargeT=0;owner.bossContactActive=false;
-    owner.openingTimer=0;
-    owner.bossStaggerT=Math.max(owner.bossStaggerT||0,1.6);
-    owner.bossRecoverT=Math.max(owner.bossRecoverT||0,.4);
+    G.guardianCounterOpening(owner);
     // The root's tug is blunt, regardless of the art that snapped it. Use
     // the existing ward rule; never turn scenery into hit/mana/mastery credit.
     if(owner.ward?.hp>0)G.combat.damageEnemy(owner,{damage:1,type:'blunt',ability:null,knockback:0,noMana:true});
-    for(const shot of G.state.projectiles)if(!shot.fromPlayer&&shot.owner===owner)shot.dispelled=true;
     G.spawnFx({kind:'bolt',x:e.x,y:e.y-6,x2:owner.x,y2:owner.y-8,color:'#a7f070',dur:.3});
     G.damageNumber(owner.x,owner.y-owner.h()-5,'TUG!','#fff3c2');
     progress().counterLearned=true;G.saveGame();

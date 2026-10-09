@@ -1,6 +1,6 @@
 # Player experience principles
 
-October 4, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
+October 9, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
 
 ## How design feedback becomes game-wide work
 
@@ -65,7 +65,11 @@ These are document benchmarks, not timed playtests of other games.
 
 Difficulty must add an interesting action, an active counter and a satisfying payoff. Preserve ordinary walking speed, responsive controls, clear warnings and nearby retries. Any temporary restriction must be short, local and breakable, with an accessible fallback when a form lacks the preferred counter. Standard fights also need these moments; children's play must be as joyful as adult play.
 
-Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. The harder patterns are specified, not yet enabled.
+Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. Treant’s Branching Roots and Queen’s Rippling Mire are implemented local rematches; the remaining authored patterns are queued.
+
+An accessible counter can clear pressure and open an attack window while preserving the encounter’s distinct tool requirement. Do not make every response bypass every ward. Keep a free answer to temporary restrictions, and teach the guardian’s own ward through previously introduced arts. Derive any local movement restriction from the active prop and the player’s actual feet; leaving, breaking, expiration, phase changes, defeat and travel must clear it without a lingering or stacking penalty. Dash movement and its real resource price stay intact.
+
+Preparation and practice need quiet geography. Place neighbouring creatures on purposeful routes and hold their posts outside attention range; do not let random wandering overwhelm a camp or the next guardian’s teaching beat. An ordinary mishap before engagement must not count as a failed guardian attempt. A chosen rematch waits in its own court and starts through walking and interaction, with independent help and a clean nearby retry.
 
 ## Prose rules
 

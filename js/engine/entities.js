@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -151,7 +151,8 @@ G.damagePlayer = function (dmg, fromX, fromY) {
     // A purified open-world region is no longer a live boss attempt. Ordinary
     // enemies can still knock Nobody out normally without resurrecting or
     // attributing the defeat to a Worldbearer who is already gone.
-    const trial = configuredTrial && (!configuredTrial.worldBoss || livingBoss) ? configuredTrial : null;
+    const trial = configuredTrial && (!configuredTrial.worldBoss || livingBoss) &&
+      (!configuredTrial.onlyEngaged || livingBoss?.bossEngaged) ? configuredTrial : null;
     if (trial) {
       const bossEnemy = livingBoss;
       const bossName = bossEnemy ? bossEnemy.def.name : "The guardian";
@@ -277,6 +278,7 @@ G.updatePlayer = function (dt) {
     const step = Math.min(d.left, d.speed * dt);
     const beforeX = p.x, beforeY = p.y;
     G.world.moveBox(p, d.dirX * step, d.dirY * step);
+    if(G.breakMireAlongDash)G.breakMireAlongDash(beforeX,beforeY,p.x,p.y);
     d.left -= step;
     G.spawnFx({ kind: "puff", x: p.x, y: p.y - 4, color: d.color, dur: 0.2 });
     // hurt things we zoom through
@@ -310,7 +312,7 @@ G.updatePlayer = function (dt) {
       p.dir = { x: v.x, y: v.y };
       const pantrySpeed = p.pantryHasteT > 0 ? 1.18 : 1;
       const expeditionSpeed = G.expeditionSpeedScale ? G.expeditionSpeedScale() : 1;
-      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1) * pantrySpeed * expeditionSpeed * (G.keepsakeSpeedScale ? G.keepsakeSpeedScale() : 1);
+      const spd = form.speed * (G.passives ? G.passives.movementScale(p) : 1) * pantrySpeed * expeditionSpeed * (G.keepsakeSpeedScale ? G.keepsakeSpeedScale() : 1) * (G.mireWalkingScale ? G.mireWalkingScale(p) : 1);
       G.world.moveBox(p, v.x * spd * dt, v.y * spd * dt);
       p.anim += dt * (spd / 14);
     }
@@ -646,6 +648,7 @@ function spawnBossHazard(e, kind, options) {
 
 G.cancelBossHazards = function (owner) {
   if (G.cancelTreantRoots) G.cancelTreantRoots(owner);
+  if (G.cancelMireCrusts) G.cancelMireCrusts(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -687,6 +690,7 @@ G.updateBossHazards = function (dt) {
       || h.t >= (h.delay || 0) + h.warning + h.active) {
       if (h.mapId === G.state.mapId && h.owner && !h.owner.dead
           && h.t >= (h.delay || 0) + h.warning + h.active && G.leaveTreantRoot) G.leaveTreantRoot(h);
+      if(h.mapId===G.state.mapId&&h.owner&&!h.owner.dead&&h.t>=(h.delay||0)+h.warning+h.active&&G.leaveMireCrust)G.leaveMireCrust(h);
       hazards.splice(i, 1);
       continue;
     }
@@ -1130,6 +1134,7 @@ function resolveBossActionPattern(e, p, action) {
       if(i && G.world.solid(x,y))continue;
       spawnBossHazard(e,"mirePool",{x,y,radius:16,warning:0.9+i*0.22,active:0.35,color:"#b29bdf"});
     }
+    if(G.prepareMireCounter)G.prepareMireCounter(e,(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.t===0&&h.kind==='mirePool'),p);
     e.bossRecoverT=0.9+(count-1)*0.22+0.35+0.8;
     return;
   }

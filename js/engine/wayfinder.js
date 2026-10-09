@@ -110,7 +110,7 @@ G.makeWayfinder = function () {
 
 G.wayfinderLandmarkIds = function () {
   return Object.values(G.maps)
-    .filter((map) => map.bossTrial || map.id === "gauntletArena")
+    .filter((map) => (map.bossTrial && !WAYFINDER_REGION_IDS.has(map.id)) || map.id === "gauntletArena")
     .map((map) => map.id);
 };
 

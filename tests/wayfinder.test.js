@@ -34,6 +34,8 @@ for (const region of G.WAYFINDER_REGIONS) {
   }
 }
 assert.equal(G.wayfinderLandmarkIds().length, 16, "all fifteen guardian trials and the coliseum are landmarks");
+assert.ok(!G.wayfinderLandmarkIds().includes("sunkenMarsh"), "an open-world region with a guardian retry remains a region, not a duplicate trial landmark");
+assert.equal(new Set(G.wayfinderAllIds()).size, G.wayfinderAllIds().length, "retry metadata must not duplicate atlas destinations");
 
 // Starfall's western vault and lore room used to be sealed on all four sides.
 // Verify the permanent reward and both signs are reachable without a wall-skip.

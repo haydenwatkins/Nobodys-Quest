@@ -537,9 +537,11 @@ function makeSunkenMarshTiles() {
   // The court occupies the far bank. Arrival has space to read the routes.
   for(let y=6;y<=12;y++)for(let x=2;x<=12;x++)put(x,y,".");
   for(let x=2;x<=28;x++)put(x,9,"p");
-  [[24,3,"4"],[20,5,"1"],[17,3,"2"],[24,15,"8"],
-   [20,13,"1"],[17,16,"2"],[11,3,"4"],[10,15,"1"]].forEach(([x,y,ch])=>put(x,y,ch));
-  put(w-1,9,"x");put(26,9,"m");put(12,15,"H");put(6,9,"Q");
+  // Hold the banks outside attention range. The ferry is a quiet rest spot,
+  // and the side-route creatures give the court room for its own phrase.
+  [[20,2,"4"],[20,5,"1"],[17,3,"2"],[19,16,"8"],
+   [20,13,"1"],[17,16,"2"],[12,2,"4"],[11,16,"1"]].forEach(([x,y,ch])=>put(x,y,ch));
+  put(w-1,9,"x");put(26,9,"m");put(28,9,"F");put(12,15,"H");put(6,9,"Q");
   put(15,3,"n");put(15,15,"s");put(3,3,"r");
   return rows.map((row) => row.join(""));
 }
@@ -547,6 +549,7 @@ function makeSunkenMarshTiles() {
 registerMap({
   id: "sunkenMarsh",
   name: "Sunken Marsh",
+  bossTrial: {worldBoss:true,onlyEngaged:true,exit:{map:"sunkenMarsh",x:27,y:9},delay:1.2},
   playerStart: { x: 27, y: 9 },
   fences: [
     { x: 2, y: 7, length: 10, dir: "h", style: "marsh" },
@@ -556,12 +559,13 @@ registerMap({
   ],
 
   legend: {
-    "1": { tile: "grass", enemy: "slime" },
-    "2": { tile: "grass", enemy: "bat" },
-    "4": { tile: "grass", enemy: "wisp" },
-    "8": { tile: "grass", enemy: "shade" },
-    "Q": { tile: "grass", enemy: "mireQueen" },
-    "m": { tile: "path", message: "FERRY NOTICE: The Queen holds court on the west bank. North and south sluices feed her veil; open them to weaken it. A tiny salvage hatch survives in the northwest wreck. DARK magic breaks her remaining ward." },
+    "1": { tile: "grass", enemy: "slime", guardPost: true },
+    "2": { tile: "grass", enemy: "bat", guardPost: true },
+    "4": { tile: "grass", enemy: "wisp", guardPost: true },
+    "8": { tile: "grass", enemy: "shade", guardPost: true },
+    "Q": { tile: "grass", enemy: "mireQueen", guardPost: true },
+    "F": { tile: "path", rest: true },
+    "m": { tile: "path", message: "FERRY NOTICE: The Queen is on the west bank. Open the north and south sluices to weaken her veil. Dark magic breaks what remains. A Rat can reach the little salvage hatch in the northwest wreck." },
     "n": { tile: "path" }, "s": { tile: "path" }, "r": { tile: "grass" },
     "x": { tile: "path", portal: { map: "overworld", x: 1, y: 30 }, portalStyle: "gap", seamless: true },
     "H": { tile: "grass", chest: { heal: true, name: "a soggy-but-magical cookie" } },
