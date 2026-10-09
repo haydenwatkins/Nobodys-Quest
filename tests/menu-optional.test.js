@@ -16,6 +16,19 @@ test('world A switches lanterns without a menu or attack; threats and shots keep
  G.fieldKit.close();const e=G.makeEnemy('slime',at.x+12,at.y);G.state.enemies=[e];assert.equal(G.helpStationCandidate(),null);r.taps.add('a');G.updatePlayer(.05);assert.equal(G.fieldKit.isOpen(),false);assert.ok(G.state.player.cooldowns.slap>0);
  G.state.enemies=[];G.state.projectiles=[{x:at.x+10,y:at.y,fromPlayer:false}];assert.equal(G.helpStationCandidate(),null);
 });
+test('choosing standard extinguishes both saved help lights without refilling or rewarding the player',()=>{
+ const r=runtime(),{G}=r;r.load();G.setComfortSetting('easyMode',true);G.setComfortSetting('bossAssistance',true);
+ G.beginStorySession(null);r.drain();assert.ok(G.fieldKit.isOpen());assert.ok(G.comfortSetting('easyMode'));assert.ok(G.comfortSetting('bossAssistance'),'opening respects existing choices until an actual selection');
+ Object.assign(G.state.player,{mana:3,damageTaken:1});const before=JSON.stringify({items:G.state.items,stars:G.state.stars,quests:G.questsDone});
+ assert.ok(G.fieldKit.chooseStandard());assert.equal(G.comfortSetting('easyMode'),false);assert.equal(G.comfortSetting('bossAssistance'),false);assert.equal(G.state.player.mana,3);assert.equal(G.state.player.damageTaken,1);
+ assert.equal(JSON.stringify({items:G.state.items,stars:G.state.stars,quests:G.questsDone}),before);
+ assert.deepEqual(JSON.parse(r.storage.get('nobodys-quest-comfort-v1')),{easyMode:false,bossAssistance:false});
+ G.fieldKit.close();G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),false);
+});
+test('standard selection is unavailable outside the lantern chooser and never substitutes for a pocket action',()=>{
+ const r=runtime(),{G}=r;r.load('town');G.setComfortSetting('easyMode',true);G.setComfortSetting('bossAssistance',true);
+ assert.equal(G.fieldKit.chooseStandard(),false);assert.ok(G.fieldKit.openPockets());assert.equal(G.fieldKit.chooseStandard(),false);assert.ok(G.comfortSetting('easyMode'));assert.ok(G.comfortSetting('bossAssistance'));G.fieldKit.close();
+});
 test('every rest fire offers both lights and a bag on a safe neighbouring tile across the campaign',()=>{
  const r=runtime(),{G}=r;let fires=0;
  for(const id of Object.keys(G.maps)){

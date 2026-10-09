@@ -350,6 +350,38 @@
 @media (max-height:460px) { .pocket-pages { margin-bottom:8px; }.pocket-treasure h2 { margin:3px 0 6px; }.pocket-treasure p { margin:4px 0; }.pocket-actions { margin-top:6px; }.pocket-treasure summary { padding:10px 0; }.pocket-treasure canvas { align-self:center; } }
 
 .carried-pocket { display:flex; align-items:center; gap:8px; min-height:36px; color:#f5e8cc; font-size:18px; }.carried-pocket canvas { width:36px; height:36px; image-rendering:pixelated; }.carried-pocket svg { flex-shrink:0; }
+/* Three equally visible setups, with standard play explicitly represented. */
+.help-lamps.lantern-choices { grid-template-columns:1fr; gap:10px; }
+#field-kit .lantern-choices .help-lamp { display:grid; grid-template-columns:70px minmax(0,1fr) 110px; align-items:center; gap:14px; padding:12px; text-align:left; }
+.lantern-choices .lantern-picture { width:44px; height:54px; margin:0; }
+.lantern-choices .lantern-picture i { font-size:30px; }
+.lantern-copy { display:flex; flex-direction:column; gap:3px; }
+.lantern-copy b { font-weight:normal; }
+.lantern-copy small { max-width:none; }
+.lantern-action { display:flex; flex-direction:column; gap:5px; text-align:center; }
+.lantern-action .lamp-state { font-size:14px; }
+#field-kit .standard-adventure.lit { background:#49554a; }
+@media (max-height:460px) {
+  .field-kit-panel:has(.lantern-choices) { padding:10px; }
+  .help-lamps.lantern-choices { gap:6px; }
+  #field-kit .lantern-choices .help-lamp { grid-template-columns:56px minmax(0,1fr) 94px; gap:10px; padding:6px 10px; }
+  .lantern-choices .lantern-picture { grid-row:auto; width:36px; height:44px; }
+  .lantern-choices .standard-picture svg { width:42px; height:42px; }
+  .lantern-choices .lantern-copy b { font-size:16px; }.lantern-choices .lantern-copy small { font-size:14px; }
+  .lantern-choices .lantern-copy { gap:2px; }
+  .lantern-choices .lamp-state { font-size:13px; }.lantern-choices .lantern-action em { font-size:16px; }
+  .field-kit-panel:has(.lantern-choices) header { gap:12px; margin-bottom:6px; }
+  .field-kit-panel:has(.lantern-choices) header p { font-size:16px; }
+  .field-kit-panel:has(.lantern-choices) [data-kit-close] { max-width:210px; font-size:17px; }
+}
+@media (min-width:600px) and (max-height:460px) {
+  .field-kit-panel:has(.lantern-choices) [data-kit-close] { max-width:none; flex-shrink:0; white-space:nowrap; }
+}
+@media (max-width:480px) and (min-height:461px) {
+  #field-kit .lantern-choices .help-lamp { grid-template-columns:52px minmax(0,1fr); gap:10px; }
+  .lantern-choices .lantern-action { grid-column:1/-1; flex-direction:row; justify-content:space-between; }
+  .field-kit-panel:has(.lantern-choices) header { flex-wrap:wrap; }
+}
 @media (min-width:1000px) {
   #field-kit.controller-active { font-size:24px; }
   #field-kit.controller-active .field-kit-panel { width:min(900px,100%); }
@@ -357,6 +389,7 @@
   #field-kit.controller-active .carried-pocket { font-size:24px; }
   #field-kit.controller-active .help-lamp strong { font-size:28px; }
   #field-kit.controller-active .help-lamp small { font-size:22px; max-width:360px; }
+  #field-kit.controller-active .lantern-action .lamp-state { font-size:18px; }
   #field-kit.controller-active .pocket-treasure h2 { font-size:30px; }
   #field-kit.controller-active .pocket-treasure small { font-size:22px; }
   #field-kit.controller-active .pocket-treasure details { font-size:22px; }

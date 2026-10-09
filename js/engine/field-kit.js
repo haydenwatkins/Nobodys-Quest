@@ -6,8 +6,8 @@
   const el=document.getElementById('field-kit');
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const lamps=[
-    {key:'easyMode',name:'Heart Lantern',icon:'♥',color:'#efa2ae',effect:'Hearts grow back.',detail:'One heart every 6 seconds, after a short breather. Works in fights too.'},
-    {key:'bossAssistance',name:'Guardian Lantern',icon:'☀',color:'#ffce7b',effect:'More time to react.',detail:'Longer guardian warnings. Extra hearts and slower boss shots after retries.'},
+    {key:'easyMode',name:'Heart Lantern',icon:'♥',color:'#efa2ae',effect:'Hearts grow back.',choiceDetail:'Recover between hits, even in fights.',detail:'One heart every 6 seconds, after a short breather. Works in fights too.'},
+    {key:'bossAssistance',name:'Guardian Lantern',icon:'☀',color:'#ffce7b',effect:'More time to react.',choiceDetail:'Longer warnings. Extra hearts after retries.',detail:'Longer guardian warnings. Extra hearts and slower boss shots after retries.'},
   ];
   G.HELP_LANTERNS=lamps;
   // Keep compact benefits explicit for a child; the full bench remains optional.
@@ -33,17 +33,32 @@
     view=kind;el.classList.remove('hidden');el.setAttribute('aria-hidden','false');render(preferred);G.input.clearTaps();G.sfx.play('menu');return true;
   }
   function page(delta){const list=G.pocketTreasures();if(!list.length)return;index=(index+delta+list.length)%list.length;render('pocket-next');}
+  function chooseStandard(){
+    if(view!=='lanterns')return false;
+    for(const l of lamps)G.setComfortSetting(l.key,false);
+    render('lantern-standard');return true;
+  }
+  function lanternChoices(){
+    const standard=!lamps.some(l=>G.comfortSetting(l.key));
+    return `<button class="help-lamp standard-adventure ${standard?'lit':''}" data-standard-adventure data-nav-id="lantern-standard" aria-pressed="${standard}" style="--lamp:#d9bd7e">
+      <span class="standard-picture" aria-hidden="true"><svg width="60" height="60" viewBox="0 0 60 60"><g fill="#28403c" stroke="#b49c71" stroke-width="3"><path d="M10 15v-4h12v4M38 15v-4h12v4" fill="none"/><rect x="6" y="16" width="20" height="31" rx="4"/><rect x="34" y="16" width="20" height="31" rx="4"/></g><g fill="#8daba0"><path d="M16 36l-6-7c-3-5 3-8 6-3 3-5 9-2 6 3z"/><circle cx="44" cy="31" r="5"/></g></svg></span>
+      <span class="lantern-copy"><strong>Standard adventure</strong><b>Both lanterns unlit.</b></span><span class="lantern-action"><span class="lamp-state">${standard?'SELECTED':''}</span><em>Choose</em></span></button>`+
+      lamps.map(l=>{
+        const lit=G.comfortSetting(l.key);
+        return `<button class="help-lamp ${lit?'lit':''}" data-lamp="${l.key}" data-nav-id="lamp-${l.key}" aria-pressed="${lit}" style="--lamp:${l.color}">
+          <span class="lantern-picture" aria-hidden="true"><i>${l.icon}</i></span><span class="lantern-copy"><strong>${l.name}</strong><b>${l.effect}</b><small>${l.choiceDetail}</small></span><span class="lantern-action"><span class="lamp-state">${lit?'LIT':'UNLIT'}</span><em>${lit?'Put out':'Light'}</em></span></button>`;
+      }).join('');
+  }
   function render(preferred){
-    const body=view==='lanterns'?lamps.map(l=>{
-      const lit=G.comfortSetting(l.key);
-      return `<button class="help-lamp ${lit?'lit':''}" data-lamp="${l.key}" data-nav-id="lamp-${l.key}" aria-pressed="${lit}" style="--lamp:${l.color}">
-        <span class="lantern-picture" aria-hidden="true"><i>${l.icon}</i></span><strong>${l.name}</strong><span class="lamp-state">${lit?'LIT':'UNLIT'}</span><b>${l.effect}</b><small>${l.detail}</small><em>${lit?'Put out':'Light'}</em></button>`;
-    }).join(''):pocketCard();
+    const body=view==='lanterns'?lanternChoices():pocketCard();
+    const lit=lamps.filter(l=>G.comfortSetting(l.key));
+    const start=lit.length===2?'Start with both lanterns':lit.length?`Start with ${lit[0].name}`:'Start standard adventure';
     el.innerHTML=`<section class="field-kit-panel" role="dialog" aria-modal="true" aria-label="${view==='lanterns'?'Help lanterns':'Pockets'}">
-      <header><div><h1>${view==='lanterns'?'A little light for your road':'Patchling’s Pockets'}</h1>${view==='lanterns'?'<p>Light either. Change them at any camp.</p>':carriedPocket()}</div><button data-kit-close data-nav-id="kit-close" aria-label="${view==='lanterns'?'Done with lanterns':'Close pockets'}">Done ✓</button></header>
-      <div class="${view==='lanterns'?'help-lamps':'pocket-layout'}">${body}</div>
+      <header><div><h1>${view==='lanterns'?'Your adventure':'Patchling’s Pockets'}</h1>${view==='lanterns'?'<p>Change lanterns at any camp.</p>':carriedPocket()}</div><button data-kit-close data-nav-id="kit-close" aria-label="${view==='lanterns'?start:'Close pockets'}">${view==='lanterns'?start:'Done ✓'}</button></header>
+      <div class="${view==='lanterns'?'help-lamps lantern-choices':'pocket-layout'}">${body}</div>
     </section>`;
     el.querySelector('[data-kit-close]')?.addEventListener('click',close);
+    el.querySelector('[data-standard-adventure]')?.addEventListener('click',chooseStandard);
     el.querySelectorAll('[data-lamp]').forEach(b=>b.addEventListener('click',()=>{
       const key=b.dataset.lamp;G.setComfortSetting(key,!G.comfortSetting(key));G.sfx.play('pickup');render(`lamp-${key}`);
     }));
@@ -80,14 +95,14 @@
       <article class="pocket-treasure"><canvas width="128" height="112" data-pocket-art="${k.item}" aria-label="${esc(k.name)}"></canvas><div><small>${k.kind==='carry'?(carried?'IN YOUR POCKET':'GUARDIAN GIFT'):'SOUVENIR · COLLECTED'}</small><h2>${esc(k.name)}</h2>
       ${k.kind==='carry'?`<p class="pocket-gift">＋ ${esc(k.benefit)}</p><p class="pocket-price">↔ ${esc(k.cost)}</p><div class="pocket-actions"><button data-pocket-carry data-nav-id="pocket-carry">${carried?'Set it aside':'Carry this gift'}</button><details><summary tabindex="0" data-nav-id="pocket-detail">Look closer</summary><p>${esc(k.gain)} ${esc(k.price)}</p></details></div>`:`<p>${esc(k.purpose)}</p>`}</div></article>`;
   }
-  G.fieldKit={isOpen:()=>!!view,close,openLanterns:preferred=>show('lanterns',preferred),openPockets:()=>{index=Math.max(0,G.pocketTreasures().findIndex(k=>k.id===G.activeKeepsake()?.id));return show('pockets','pocket-carry');},update:dt=>{
+  G.fieldKit={isOpen:()=>!!view,close,chooseStandard,openLanterns:preferred=>show('lanterns',preferred),openPockets:()=>{index=Math.max(0,G.pocketTreasures().findIndex(k=>k.id===G.activeKeepsake()?.id));return show('pockets','pocket-carry');},update:dt=>{
     G.menuController.update(el,{preferred:el.querySelector('[data-kit-close]'),onBack:close,onPageLeft:()=>view==='pockets'?page(-1):undefined,onPageRight:()=>view==='pockets'?page(1):undefined},dt);
     if(G.input.tapped('pause'))close();
   }};
   G.introduceHelpLanterns=()=>{
     const o=G.state?.opening;if(!o||o.seen.includes('help-lanterns')||invitePending||intro||view)return false;
     invitePending=true;
-    G.ui.dialogue('PEBBLE','Psst, Patchling! Want a little help? Try my lanterns!',{accent:'#efa2ae',onClose:()=>{invitePending=false;intro=G.fieldKit.openLanterns();}});return true;
+    G.ui.dialogue('PEBBLE','Leave both lanterns unlit for the standard adventure. Light one if you’d like help. You can change them at any camp.',{accent:'#efa2ae',onClose:()=>{invitePending=false;intro=G.fieldKit.openLanterns();}});return true;
   };
   // Rest locations already exist across the campaign. Place light props on
   // ordinary, walkable tiles, never on a door, message, reward, or camp fire.

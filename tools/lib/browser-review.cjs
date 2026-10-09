@@ -50,8 +50,9 @@ module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,
   async function boot(){await page.waitForFunction(()=>typeof G!=='undefined'&&G.state?.player);await connect();await page.evaluate(hd=>G.setHdPilot(hd),hd);if(await page.evaluate(()=>G.saveSlotScreenOpen)){if(mode==='controller')await pad(0);else await page.locator('[data-save-slot="1"]').tap();await frames(90);await page.evaluate(()=>window.reviewOpeningPaint=window.reviewPaint.map(p=>p.text).join(' '));if(publishedHost&&!titleCaptureDone){await page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-published-arrival.png`)});titleCaptureDone=true;}}await drain();
    if(await page.evaluate(()=>G.fieldKit?.isOpen())){
     assert.equal(await page.locator('#field-kit [data-lamp]').count(),2,'the opening pauses at the lantern demonstration');
+    assert.equal(await page.locator('#field-kit [data-standard-adventure]').count(),1,'standard play is an explicit third choice');
     if(onLanternIntro)await onLanternIntro({page,mode,hd,frames,pad,shot});
-    if(mode==='controller')await pad(1);else await page.locator('[data-kit-close]').tap();
+    if(await page.evaluate(()=>G.fieldKit.isOpen())){if(mode==='controller')await pad(1);else await page.locator('[data-kit-close]').tap();}
     await frames(5);assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);
    }
    await frames(100);await drain();}

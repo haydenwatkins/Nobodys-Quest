@@ -1,6 +1,6 @@
 # Menu-optional play
 
-October 8, 2026. Family direction: Lily needs short, visual choices; Ben enjoys collecting, comparing and working toward treasured things. Common play should stay on the road, as Forms and Quick Mix already do.
+October 9, 2026. Family direction: Lily needs short, visual choices; Ben enjoys collecting, comparing and working toward treasured things. Common play should stay on the road, as Forms and Quick Mix already do.
 
 ## Play contract
 
@@ -15,7 +15,7 @@ October 8, 2026. Family direction: Lily needs short, visual choices; Ben enjoys 
 
 ## Shipped foundation
 
-Pebble says, “Psst, Patchling! Want a little help? Try my lanterns!” after the opening greeting. A once-only visual invitation presents two large lanterns. It can be closed with Done or controller B without enabling anything. An interrupted arrival can resume the invitation; late saves are left to their existing adventure.
+After the opening greeting, Pebble explains that both lanterns unlit is the standard adventure and that help can be changed at any camp. The once-only chooser gives **Standard adventure — both lanterns unlit** its own visible card, alongside Heart and Guardian. Standard is selected on a fresh installation; the primary action explicitly says **Start standard adventure**. Lighting a lantern changes that action to name Heart, Guardian or both. Choosing Standard deliberately extinguishes both lights; merely opening the chooser respects existing preferences. The two help choices remain independent, and controller B remains an accessible exit. An interrupted arrival resumes the introduction; completed/late saves remain quiet.
 
 **Heart Lantern** grows back one heart every six seconds after the existing short breather, including during battle. **Guardian Lantern** retains extra retry hearts and slower boss shots after repeated tries, plus longer warnings throughout guardian fights. Its description does not promise a universal damage reduction. These names also appear in the optional title/pause settings and feedback; internal preference names stay compatible. Lighting help does not award progress or change rewards.
 
@@ -29,7 +29,7 @@ Native touch review also found a real Quick Mix input defect: the release click 
 
 This is a foundation, not a completed conversion of every system.
 
-First follow the latest voluntary-difficulty priority in `GUARDIAN-CHALLENGES.md`: develop the Treant counter and its optional branching fight before showing an actionable challenge lamp. Keep help independent and rewards equal. Hard patterns remain unimplemented in the preparation batch.
+First follow the active checkpoint in `CLOUD-ROADMAP.md`. The opening now makes the standard adventure explicit; Treant, Queen, Knight, Mira and Bram have authored local challenge lanterns. Continue Vesper and the remaining roster under `GUARDIAN-CHALLENGES.md`, keeping help independent and rewards equal. These local patterns do not create a global hard-mode setting.
 
 1. Give Ben a deliberate treasure pursuit using the existing single-current-task system. Let him compare meaningful future gifts at a physical collection display, choose one aspiration, and see one practical next action. Avoid spoilers, compulsory shopping, universal best-stat tiers or a new quest counter. Existing guardian gifts offer different strengths and prices; cosmetic memories should never pretend to be upgrades.
 2. Put saved mix recipes, Mark attunement and form natures within the existing field selectors or clearly introduced camp objects. Changes must preserve ownership, paid recovery and the appropriate Manyfold build rules. Do not turn advanced systems into early-game chores.
@@ -62,3 +62,13 @@ The final complete 2D follow-up run passes **643 tests**, zero failed/cancelled/
 ## General-principle follow-through
 
 Guardian help now adds warning time across the campaign, including commitments, authored floor patterns and boss shot arming. Opening/delivery extra beats remain. The field card says “More time to react,” describes the real warning/retry effects, and the world prompt names both. Shared recovery respects actual lingering attacks, and phase changes clear the previous guardian commitment. Existing player experience principles now explicitly govern all old and new systems; coverage and remaining work live in `DESIGN-APPLICATION.md`.
+
+## Explicit standard-adventure follow-up
+
+The parent’s first-20-second playtest found a biased introduction: “Light either” and two help cards encouraged opting in, while ordinary play was hidden behind Done. Both stored defaults were already false, so this correction changes the choice and its explanation rather than combat difficulty. Standard now has a matching visual card with two unlit lanterns and selected state. The start action names the actual setup. Help cards use short concrete effects; world lamps and the accessibility fallback retain their original independent switches and mechanics. No new difficulty flag, reward tier, HUD button or quest is added.
+
+All three cards and the named start action fit together at 667×375 and 640×360 touch layouts, 1280×720 TV and 768×1024 portrait tablet, in both art settings. The first visual review caught a below-fold third option; the final layout reduces spacing and uses concise descriptions while keeping readable type. Selecting Standard saves both preferences off without refilling, rewarding or changing a chosen task. Existing preferences remain until an actual selection, and early-completed/late adventures keep their introduction state.
+
+The final complete 2D regression passes **711 tests**, zero failed/cancelled/skipped (668,737.801106 ms). Fourteen overlapping focused opening, comfort, kit, menu/controller and title checks pass. Two new native cases prove deliberate Standard selection preserves resources/rewards and saves both lights off, and cannot act outside the lantern chooser.
+
+`tools/review-lantern-choice.cjs` passes 24 fresh-opening workflows: Standard, Heart and Guardian on touch/TV × HD/base, plus 640×360 touch and 768×1024 portrait tablet × both art settings. Actual tap/controller choices, named start actions, default TV focus, both-to-standard switching and save/reload use the real new-game slot and introduction without ownership/position grants. All three options and the start action fit without scrolling. Four retained kit workflows also pass, covering world-lamp walking, Pockets, carrying, native hold/R3 Quick Mix and save/reload; their late treasure-ownership checkpoint remains a controlled fixture. All **206 captures** were inspected on six sheets with native-size short-phone, portrait-tablet and TV choices. Chromium automation does not replace iPad Safari, physical TV viewing or family playtesting.
