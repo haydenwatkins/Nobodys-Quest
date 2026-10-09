@@ -77,6 +77,7 @@ G.combat = (() => {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
     if(enemy.roadMechanism&&G.hitRoadMechanism)return G.hitRoadMechanism(enemy,opts);
+    if(enemy.treantRoot&&G.hitTreantRoot)return G.hitTreantRoot(enemy,opts);
     if (enemy.def.practice) {
       enemy.flash = .12;
       // The opening post stays available if a player clears the road in
@@ -188,6 +189,7 @@ G.combat = (() => {
   function killEnemy(enemy, opts) {
     const defeatedMap=G.state.mapId,run=G.state.expeditionRun;
     enemy.dead = true;
+    if (G.noteTreantDefeat) G.noteTreantDefeat(enemy);
     if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
     G.sfx.play("defeat");
     G.state.shake = Math.max(G.state.shake, enemy.def.heavy ? 0.3 : 0.14);
@@ -235,7 +237,11 @@ G.combat = (() => {
     if (!trophy) return;
     G.state.items = G.state.items || [];
     if (G.state.items.includes(trophy)) {
-      const repeatVictory = `${enemy.def.name} is defeated again.`;
+      const repeatVictory = enemy.treantLocalRematch
+        ? enemy.treantBranching
+          ? "You caught my branching trick! Come sit by the fire. We can try it again whenever you like."
+          : "Good practice! Come sit by the fire. We can try my roots again whenever you like."
+        : `${enemy.def.name} is defeated again.`;
       if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
         accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",
       });

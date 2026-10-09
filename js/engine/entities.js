@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -645,6 +645,7 @@ function spawnBossHazard(e, kind, options) {
 }
 
 G.cancelBossHazards = function (owner) {
+  if (G.cancelTreantRoots) G.cancelTreantRoots(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -684,6 +685,8 @@ G.updateBossHazards = function (dt) {
     h.t += dt;
     if (h.mapId !== G.state.mapId || !h.owner || h.owner.dead
       || h.t >= (h.delay || 0) + h.warning + h.active) {
+      if (h.mapId === G.state.mapId && h.owner && !h.owner.dead
+          && h.t >= (h.delay || 0) + h.warning + h.active && G.leaveTreantRoot) G.leaveTreantRoot(h);
       hazards.splice(i, 1);
       continue;
     }
@@ -1113,6 +1116,7 @@ function resolveBossActionPattern(e, p, action) {
       if(i&&!G.world.isSafeSpawn(x,y))continue;
       spawnBossHazard(e,"rootBloom",{x,y,radius:18,warning:.95+i*.2,active:.38,color:"#a7f070"});
     }
+    if (G.prepareTreantCounter) G.prepareTreantCounter(e, (G.state.bossHazards || []).filter(h=>h.owner===e&&h.t===0&&h.kind==='rootBloom'), p);
     e.bossRecoverT=.95+(e.bossPhase-1)*.2+.38+.85;
     return;
   }

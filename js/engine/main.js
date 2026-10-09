@@ -156,6 +156,7 @@
     playSeconds: 0,
     story: G.makeStory(),
     opening: G.makeOpening ? G.makeOpening() : null,
+    guardianChallenges: G.makeGuardianChallenges(),
     delivery: G.makeDelivery ? G.makeDelivery() : null,
     guidance: G.makeGuidance(),
     shake: 0,
@@ -179,6 +180,7 @@
     s.guidance = G.normalizeGuidance(save.guidance);
     s.stars = save.stars || 0;
     s.items = save.items || [];
+    s.guardianChallenges = G.normalizeGuardianChallenges(save.guardianChallenges);
     s.keepsakeId = G.normalizeKeepsake(save.keepsakeId, s.items);
     s.opened = save.opened || [];
     // Activity rewards validate against saved accomplishments such as the

@@ -196,7 +196,7 @@
       const px=x*16+8,py=y*16+8;
       list.push({y:py,fn:()=>{c.save();if(Math.abs(s.player.x-px)<24&&s.player.y<py&&s.player.y>py-43)c.globalAlpha=.32;tree(c,px,py,x+y,false);c.restore();}});
     }
-    const dummy=s.enemies.find(e=>e.def.practice);
+    const dummy=s.enemies.find(e=>!e.dead&&e.def.practice&&!e.treantRoot);
     if(dummy)list.push({y:dummy.y,fn:()=>{const x=dummy.x,y=dummy.y;if(freshOrchard()&&G.openingScenery?.props){G.drawSprite(c,G.openingScenery.props.practice,0,x,y+3,false);return;}rect(c,x-2,y-23,4,24,C.wood);rect(c,x-13,y-18,26,3,C.woodDark);ellipse(c,x,y-20,7,8,C.woodDark);ellipse(c,x,y-21,6,6,C.gold);rect(c,x-4,y-23,2,2,C.woodDark);rect(c,x+2,y-23,2,2,C.woodDark);rect(c,x-2,y-19,5,1,C.woodDark);}});
     return list;
   };
@@ -217,6 +217,7 @@
   G.drawOpeningHazards=c=>{
     if(!here())return;
     for(const h of G.state.openingHazards||[]){
+      if(h.delay&&h.t<h.delay)continue;
       if(G.drawDeliveryHazard&&G.drawDeliveryHazard(c,h))continue;
       const active=h.t>=h.warn;
       c.save();c.strokeStyle=active?'#f5dba0':'#eec780';c.fillStyle=active?'rgba(111, 60, 40, .8)':'rgba(224,174,101,.16)';c.lineWidth=active?3:1;
@@ -224,7 +225,7 @@
         ellipse(c,h.x,h.y,h.radius,h.radius,active?'#745749':'rgba(222,183,112,.2)');
         c.beginPath();c.arc(h.x,h.y,h.radius,0,Math.PI*2);c.stroke();
         if(active)for(let i=0;i<5;i++)poly(c,[[h.x-13+i*6,h.y+4],[h.x-10+i*6,h.y-14-(i%2)*7],[h.x-6+i*6,h.y+4]],i%2?C.wood:C.gold);
-        else{c.beginPath();c.arc(h.x,h.y,h.radius*Math.min(1,h.t/h.warn),0,Math.PI*2);c.stroke();}
+        else{c.beginPath();c.arc(h.x,h.y,h.radius*Math.min(1,(h.t-(h.delay||0))/(h.warn-(h.delay||0))),0,Math.PI*2);c.stroke();}
       }else{
         c.translate(h.x,h.y);c.rotate(Math.atan2(h.dy,h.dx));
         rect(c,0,-h.width,h.length,h.width*2,active?'#866347':'rgba(222,183,112,.18)');

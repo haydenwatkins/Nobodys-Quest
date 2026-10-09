@@ -33,6 +33,9 @@ For every substantial design observation:
 
 Combat/build application: attach an equipment price to a meaningful choice about its tool, rather than making every journey or basic control worse. Preserve a zero-mana basic answer and verify it at the real input boundary. Threats commit to a readable place; successful interruptions buy an observable opening. Incapacitation must actually suppress the affected actor's body attack, while already-released danger retains its visible rules. Audit these contracts in ordinary creatures and optional runs as well as guardians. `COMBAT-AGENCY.md` records the first equipment/ordinary-enemy backfill and its remaining gaps.
 
+
+Guardian counter application: separate **personal learning**, **chosen encounter rules** and **reward ownership**. Recognize an actual action even with help; record a clear only after victory; pay a durable gift once. Preserve the player's useful free answer across forms and resources. A richer rematch should develop a response already enjoyed in the standard fight, with an explicit local choice rather than a global difficulty preference silently changing optional runs. Give practice a small lasting world consequence, not a second progression currency or mandatory quota. `TREANT-ROOTS.md` records the first implementation; later encounters must be authored and verified individually.
+
 ## Benchmarks consulted
 
 These are document benchmarks, not timed playtests of other games.

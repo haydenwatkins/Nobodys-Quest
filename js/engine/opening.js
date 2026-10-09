@@ -146,8 +146,8 @@
       if(o.defeated.includes(e.openingKey))e.dead=true;
       if(s.mapId===glade&&e.id==='ancientTreant'){
         e.def=Object.assign({},e.def,{aggro:170,size:34,sprite:G.openingTreantSprite||e.def.sprite,boss:Object.assign({},e.def.boss,{orchard:true,
-          introLines:['I closed the orchard when the root creatures came. I couldn’t bear to see anyone get hurt!','You want to bring the cart through? You’ll have to get past me first!'],
-          phaseLine:'You’re quick! Let’s see you dodge these roots!',phaseThreeLine:'Still standing? You’re tougher than you look!',
+          introLines:['I closed the orchard when the root creatures came. I couldn’t bear to see anyone get hurt!','Dodge my strike, then snap a cracked root. It gives me a good tug! Show me you can keep the cart safe.'],
+          phaseLine:'You’re keeping up! I’m going to spread my roots wider. Keep a clear step!',phaseThreeLine:'One more try! I’ll leave you room between the roots.',
           defeatLine:'All right. I was wrong to keep everyone out. I’ll lift the branches. Bring your friends through safely.',
         })});
       }
@@ -192,6 +192,7 @@
       h.t+=dt;
       if(!h.hit&&h.t>=h.warn&&h.t<h.warn+h.active&&!h.owner.dead&&G.openingHazardHits(h,s.player.x,s.player.y))
         h.hit=!!G.damagePlayer(1,h.owner.x,h.owner.y);
+      if(!h.owner.dead&&h.t>=h.warn+h.active&&G.leaveTreantRoot)G.leaveTreantRoot(h);
     }
     s.openingHazards=(s.openingHazards||[]).filter(h=>!h.owner.dead&&h.t<h.warn+h.active);
   };
@@ -242,7 +243,8 @@
       const offsets=e.bossPhase===1?[[0,0]]:e.bossPhase===2?[[0,0],[42,0],[-42,0]]:[[0,0],[42,0],[-42,0],[0,42],[0,-42]];
       for(const [dx,dy]of offsets)hazards.push({kind:'roots',owner:e,t:0,warn,active:.55,x:p.x+dx,y:p.y+dy,radius:17,hit:false});
     }
-    e.openingTimer=warn+1.45;e.bossRecoverT=.15;
+    if(G.prepareTreantCounter)G.prepareTreantCounter(e,hazards.filter(h=>h.owner===e&&h.t===0),p);
+    e.openingTimer=Math.max(warn+1.45,Math.max(...hazards.filter(h=>h.owner===e&&h.t===0).map(h=>h.warn+h.active))+.9);e.bossRecoverT=.15;
     G.sfx.play('bossPhase');return true;
   };
 })();

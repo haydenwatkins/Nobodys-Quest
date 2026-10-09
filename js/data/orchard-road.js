@@ -65,12 +65,12 @@
   });
   const h=landscape(34,27);
   h.oval(16,13,14,11); h.road([[16,25],[16,19],[13,16],[16,11]],1);
-  h.put(16,26,'O');h.put(16,6,'T');h.put(7,15,'r');h.put(25,15,'r');
+  h.put(16,26,'O');h.put(16,6,'T');h.put(12,20,'F');h.put(7,15,'r');h.put(25,15,'r');
   h.put(8,8,'r');h.put(24,8,'r');
   registerMap({id:'heartwood',name:'Mistwood · The Heartwood',biome:'mistwood',openingLandscape:true,
     playerStart:{x:16,y:22},tiles:h.finish(),bossTrial:{exit:{map:'orchardRoad',x:54,y:5},delay:1.2},
-    legend:{O:{tile:'path',portal:{map:'orchardRoad',x:54,y:5},portalStyle:'gap'},T:{tile:'grass',enemy:'ancientTreant'}},
-    openingProps:[['arch',16,22],['stone',5,13],['stone',27,13],['stump',10,5],['stump',23,6]],
+    legend:{O:{tile:'path',portal:{map:'orchardRoad',x:54,y:5},portalStyle:'gap'},T:{tile:'grass',enemy:'ancientTreant'},F:{tile:'grass',rest:true}},
+    openingProps:[['arch',16,22],['camp',12,20],['stone',5,13],['stone',27,13],['stump',10,5],['stump',23,6]],
   });
   // Original Greenfield remains reachable; add a clearly signed side road at
   // the starting crossroads without moving any existing portal or treasure.
