@@ -1,12 +1,13 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
-test('the opening invites lantern play once; returning and reloading do not impose another choice or change rewards',()=>{
- const r=runtime(),{G}=r;r.load();G.beginStorySession(null);r.drain();
- assert.equal(G.fieldKit.isOpen(),true);assert.equal(G.comfortSetting('easyMode'),false);assert.equal(G.comfortSetting('bossAssistance'),false);
- const before=JSON.stringify({items:G.state.items,stars:G.state.stars,quests:G.questsDone});
- G.fieldKit.close();assert.ok(G.state.opening.seen.includes('help-lanterns'));
- const saved=G.loadSaveData();G.state.opening=G.normalizeOpening(saved.opening);assert.equal(G.introduceHelpLanterns(),false);
- assert.equal(JSON.stringify({items:G.state.items,stars:G.state.stars,quests:G.questsDone}),before);
+test('the opening continues directly into the world with optional help off and no forced configuration',()=>{
+ const r=runtime(),{G}=r;r.load();G.beginStorySession(null);
+ assert.ok(r.messages.some(m=>m.text.includes('Parcel')));
+ assert.equal(r.messages.some(m=>/lantern/i.test(m.text)),false);
+ r.drain();assert.equal(G.fieldKit.isOpen(),false);assert.equal(G.comfortSetting('easyMode'),false);assert.equal(G.comfortSetting('bossAssistance'),false);
+ const p=G.state.player;assert.equal(G.helpStationCandidate(),null,'arrival does not present a lamp action under the player');
+ assert.equal(G.helpStations().filter(s=>['easyMode','bossAssistance'].includes(s.kind)&&Math.hypot(s.x-p.x,s.y-p.y)<60).length,2,'help stays discoverable beside the path');
+ const saved=G.loadSaveData();G.state.opening=G.normalizeOpening(saved.opening);G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),false);
 });
 test('world A switches lanterns without a menu or attack; threats and shots keep A available for combat',()=>{
  const r=runtime(),{G}=r;r.load();G.state.enemies=[];
@@ -18,7 +19,7 @@ test('world A switches lanterns without a menu or attack; threats and shots keep
 });
 test('choosing standard extinguishes both saved help lights without refilling or rewarding the player',()=>{
  const r=runtime(),{G}=r;r.load();G.setComfortSetting('easyMode',true);G.setComfortSetting('bossAssistance',true);
- G.beginStorySession(null);r.drain();assert.ok(G.fieldKit.isOpen());assert.ok(G.comfortSetting('easyMode'));assert.ok(G.comfortSetting('bossAssistance'),'opening respects existing choices until an actual selection');
+ G.beginStorySession(null);r.drain();assert.equal(G.fieldKit.isOpen(),false);assert.ok(G.fieldKit.openLanterns());assert.ok(G.comfortSetting('easyMode'));assert.ok(G.comfortSetting('bossAssistance'),'opening respects existing choices until an actual selection');
  Object.assign(G.state.player,{mana:3,damageTaken:1});const before=JSON.stringify({items:G.state.items,stars:G.state.stars,quests:G.questsDone});
  assert.ok(G.fieldKit.chooseStandard());assert.equal(G.comfortSetting('easyMode'),false);assert.equal(G.comfortSetting('bossAssistance'),false);assert.equal(G.state.player.mana,3);assert.equal(G.state.player.damageTaken,1);
  assert.equal(JSON.stringify({items:G.state.items,stars:G.state.stars,quests:G.questsDone}),before);
@@ -47,10 +48,11 @@ test('pocket browsing uses actual collected treasures; preview and rendering can
  const c=r.context.document.getElementById('game').getContext('2d');for(const d of G.openingDrawables(c))d.fn();assert.equal(JSON.stringify({items:G.state.items,player:G.state.player,keepsake:G.state.keepsakeId}),before);
 });
 
-test('an interrupted opening invitation resumes, while a completed choice and late saves stay quiet',()=>{
- const r=runtime(),{G}=r;r.load();G.state.opening.seen=['arrival'];G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),true);G.fieldKit.close();
- G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),false);
- G.state.opening.seen=['arrival'];G.state.player.x=40*16+8;G.state.player.y=24*16+8;G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),false);
+test('old arrival and lantern-introduction flags never reopen configuration or overwrite saved help',()=>{
+ const r=runtime(),{G}=r;r.load();G.setComfortSetting('easyMode',true);
+ for(const seen of [['arrival'],['arrival','help-lanterns'],[]]){
+  G.state.opening.seen=seen.slice();G.beginOpening();r.drain();assert.equal(G.fieldKit.isOpen(),false);assert.ok(G.comfortSetting('easyMode'));
+ }
 });
 
 test('dungeon and guardian approaches offer help before entry, including the closed orchard arch and all coastal trials',()=>{
@@ -84,7 +86,7 @@ test('lamp prompts show complete effects and stay in one bounded dock across mov
  for(const mode of ['keyboard','touch','controller']){
   G.input.isTouch=mode==='touch';G.input.hasGamepad=mode==='controller';paint.length=boxes.length=0;
   const cam={x:p.x-160,y:p.y-148};assert.equal(G.drawOpeningPrompt(c,cam),true);
-  assert.match(paint.map(p=>p.text).join(' '),/Hearts grow back, even in fights\./);
+  assert.match(paint.map(p=>p.text).join(' '),/Optional help: hearts grow back, even in fights\./);
   assert.match(paint.map(p=>p.text).join(' '),/Heart Lantern · Light/);
   const panel=boxes[0];assert.ok(panel.x>=0&&panel.x+panel.w<=G.W&&panel.y>=0&&panel.y+panel.h<=G.H);
   assert.ok(paint.every(p=>p.x+c.measureText(p.text).width<=panel.x+panel.w-8),'no clipped effect or action');

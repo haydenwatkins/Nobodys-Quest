@@ -85,6 +85,6 @@
     registerEnemy(Object.assign({},src,{id,ward:null,trophy:null,miniboss:false},extra));
   }
   copyEnemy('orchardTangle','slime',{name:'Unfinished Tangle',hp:3,speed:23,damage:1,aggro:65});
-  copyEnemy('orchardSpitter','slime',{name:'Briar Spitter',hp:4,speed:18,damage:1,aggro:110,behavior:'shooter',shootEvery:2.5,shotWarning:.8,projectileSpeed:62});
+  copyEnemy('orchardSpitter','slime',{name:'Briar Spitter',hp:4,speed:18,damage:1,aggro:110,behavior:'shooter',shootEvery:2.5,projectileSpeed:62});
   copyEnemy('orchardGuard','bones',{name:'Hollow Watchman',hp:5,speed:30,damage:1,aggro:75});
 })();

@@ -129,7 +129,6 @@ G.combat = (() => {
         G.spawnFx({ kind: "ring", x: enemy.x, y: enemy.y - 6, color: wardHitColor, dur: 0.45 });
         burst(enemy.x, enemy.y - 6, wardHitColor, 8);
         openBossWard(enemy);
-        if (G.interruptEnemyShot) G.interruptEnemyShot(enemy);
         G.events.emit("wardBreak", { damageType: type, ability: opts.ability, enemy: enemy.id });
       }
       return true;
@@ -151,7 +150,6 @@ G.combat = (() => {
     }
     // Normal damage
     enemy.hp -= opts.damage;
-    if (opts.damage > 0 && G.interruptEnemyShot) G.interruptEnemyShot(enemy);
     enemy.flash = 0.12;
     G.damageNumber(enemy.x, enemy.y - enemy.h(), opts.damage, G.DAMAGE_TYPES[type].color);
     knockback(enemy, opts, 1);
@@ -323,7 +321,6 @@ G.combat = (() => {
     const isNew = !enemy.status[name];
     const previous=enemy.status[name];
     enemy.status[name] = { dur: opts.dur || 3, dps: opts.dps || 1, tick: 0, ability:opts.ability };
-    if (name === "stun" && G.interruptEnemyShot) G.interruptEnemyShot(enemy);
     if((name==="poison"||name==="burn")&&previous?.dur>0){
       // Refresh the infection without postponing its next tick or replacing a
       // stronger/longer poison with a weaker bite. Poison never stacks damage.

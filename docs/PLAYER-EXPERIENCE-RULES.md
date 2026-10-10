@@ -1,6 +1,6 @@
 # Player experience principles
 
-October 9, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
+October 10, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
 
 ## How design feedback becomes game-wide work
 
@@ -31,7 +31,7 @@ For every substantial design observation:
 
 `DESIGN-APPLICATION.md` is the current coverage ledger; `CLOUD-ROADMAP.md` orders implementation. Feature specifications explain how they satisfy this contract and cannot limit it to their illustrative mechanic.
 
-Combat/build application: attach an equipment price to a meaningful choice about its tool, rather than making every journey or basic control worse. Preserve a zero-mana basic answer and verify it at the real input boundary. Threats commit to a readable place; successful interruptions buy an observable opening. Incapacitation must actually suppress the affected actor's body attack, while already-released danger retains its visible rules. Audit these contracts in ordinary creatures and optional runs as well as guardians. `COMBAT-AGENCY.md` records the first equipment/ordinary-enemy backfill and its remaining gaps.
+Combat/build application: attach an equipment price to a meaningful choice about its tool, rather than making every journey or basic control worse. Preserve a zero-mana basic answer and verify it at the real input boundary. Authored committed attacks identify their real target; successful counters buy an observable opening. Ordinary ranged creatures retain simple firing cycles with visible projectiles. Incapacitation must actually suppress the affected actor's body attack, while already-released danger retains its visible rules. Audit these contracts in ordinary creatures and optional runs as well as guardians. `COMBAT-AGENCY.md` records the first equipment/ordinary-enemy backfill and its remaining gaps.
 
 
 Guardian counter application: separate **personal learning**, **chosen encounter rules** and **reward ownership**. Recognize an actual action even with help; record a clear only after victory; pay a durable gift once. Preserve the player's useful free answer across forms and resources. A richer rematch should develop a response already enjoyed in the standard fight, with an explicit local choice rather than a global difficulty preference silently changing optional runs. Give practice a small lasting world consequence, not a second progression currency or mandatory quota. `TREANT-ROOTS.md` records the first implementation; later encounters must be authored and verified individually.
@@ -65,7 +65,9 @@ These are document benchmarks, not timed playtests of other games.
 
 Difficulty must add an interesting action, an active counter and a satisfying payoff. Preserve ordinary walking speed, responsive controls, clear warnings and nearby retries. Any temporary restriction must be short, local and breakable, with an accessible fallback when a form lacks the preferred counter. Standard fights also need these moments; children's play must be as joyful as adult play.
 
-Make a meaningful baseline an explicit, first-class choice alongside optional aids or modifiers. Name its actual state in the continuation control, and show the relevant choices together without scrolling on supported opening layouts. Neutral introductions explain effects without nudging players toward an opt-in. New installations begin with help off; existing choices remain player-owned, and selecting standard deliberately extinguishes both help lanterns. An unchanged baseline is the standard adventure, not an invented global hard mode. Carry this principle into future build, recipe and configuration choices, rather than hiding “keep current” behind a generic dismissal.
+Keep optional help available without making it the opening's main event. Begin ordinary play with both help lanterns off, preserve established choices, and explain effects at their physical switches. A player who walks past them has already chosen to continue normally; do not require a difficulty dialog or extra confirmation. Place switches beside routes and at quiet camps/approaches, with no unsolicited modal or recurring attention call. When players deliberately open configuration, make its baseline explicit and name its actual state; this does not justify interrupting the adventure to ask for setup.
+
+Improve visibility before adding warning machinery. Give a moving threat enough contrast and a recognizable silhouette on the actual play backgrounds. A readability upgrade should not automatically add aiming lanes, cast pauses, rings, text or another action stage to ordinary encounters. Keep authored guardian commitments useful, but restore simpler behavior when playtesting shows that extra signaling distracts or makes the game less fun.
 
 A physical confirmation belongs to the action that received the press. When a screen remaps a held controller button, release its old action and wait for a fresh press before activating the new one. Finishing a conversation must leave a newly presented choice visible; confirming a menu must not become an attack as it closes. Verify handoffs with a realistic held press as well as a one-frame pulse.
 

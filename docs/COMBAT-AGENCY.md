@@ -24,20 +24,11 @@ Short Pockets copy now says “Swings push foes less”; optional exact details 
 
 ## Ordinary encounter backfill
 
-All seven registered ordinary caster types now use a shared commitment: Wisp, Thornling, Shade, Star Mote, Loomling, Bell Moth and Briar Spitter. The original enemy speed, health, ward, shot speed, damage and range are retained. The opening Spitter has a generous 0.8-second warning; later casters use 0.6 seconds. Initial cooldown variety remains, so a crowd does not start by firing in perfect synchrony.
+October 10 family playtesting rejected the ordinary enemy aiming change. All seven ordinary ranged types again fire on their native cooldown at the player's position on release and keep their ordinary movement. The stop-and-aim phase, fixed-place commitment, targeting lanes, wind-up ring, cast interruption and added recovery are removed. Actual stun still suppresses movement, firing and body-contact damage; released projectiles retain their danger. Guardian-specific counters and warnings retain their authored rules.
 
-The caster stops to aim at the player's current **place**, then keeps that target while the player moves. An outlined dashed trajectory and growing ring show the commitment without flashing text or another HUD marker. The trajectory stops at terrain, and all warnings draw below actors. When the shot releases it uses the committed target; after release the caster holds for 0.45 seconds. Warning and recovery occupy its attack cycle rather than becoming an extra menu or tutorial.
+Hostile projectiles now carry a dark edge, pale rim and bright center through the shared renderer. Generic shots stay compact; cards, blades, stars, seeds, shells, waves and fault shots retain their silhouettes and specialized regional art. Collision size, speed, damage, range, lifetime, player shot art and rewards are unchanged. Readability belongs to the traveling shot rather than a line painted across the map.
 
-There are several answers:
-
-- Walk sideways, use a dash, or use the existing shield/shelter/light tools against the shot.
-- Land a real health-damaging hit during the warning to cancel the cast and leave a 0.45-second opening. A free basic can do this and recover mana.
-- Break the correct ward to cancel a warded caster. A wrong type or partial chip cannot pretend to break it.
-- Apply an actual stun to cancel the warning immediately. The existing stun stars identify the safe pause.
-
-A stun now suppresses body-contact damage for **all 18 registered ordinary types**, including the opening guard; it previously stopped movement while contact could still hurt the player. The native tests verify that danger returns after expiry. Poison and burn are not universal interrupts: their existing continuing damage/status rules remain, and they do not erase a commitment every tick. Already-released projectiles keep flying after an ordinary interruption; the player still has to answer visible danger.
-
-The ordinary caster behavior also follows reused definitions into rivals and optional runs. This is a shared readability/response change, not a new run modifier, reward restriction or guardian timing change. Campaign enemy groupings and every optional run have not all received a human balance review.
+Verification: five focused ordinary-enemy cases verify native cooldown/retargeting/retreat, health hits without invented cast interruption, ward behavior, actual stun across the roster and paint-only rendering of eight hostile silhouettes plus a friendly arrow. They are included in the 17-case focused batch. Four native touch/TV × art-setting browser workflows use a controlled Spitter placement and supplied Crown ownership checkpoint to verify native sidestepping, real released-shot travel, free Slap damage, retained movement and exact equipment disclosure. The eight-shot gallery is a stationary visual fixture, not a combat playthrough. All 28 final captures were inspected on two sheets and selected native-size views; the final gallery exposes all eight silhouettes outside the HUD. These checks do not establish uninterrupted campaign balance, every guardian fight or physical-device visibility. The final complete 2D regression passes **711 tests**, zero failed/cancelled/skipped/todo (576,169.723729 ms); the 17 focused cases overlap that run.
 
 The remaining close-range registry inspection identifies these authored gaps:
 
@@ -52,7 +43,7 @@ The remaining close-range registry inspection identifies these authored gaps:
 
 These observations are a code/registry audit, not newly authored chase patterns or completed human encounter tuning.
 
-## Verification and remaining coverage
+## Earlier verification (superseded ordinary aiming behavior) and remaining coverage
 
 Focused native verification passes 13 cases covering the new ordinary behavior, Crown, zero-mana basics and existing ownership/save/recipe contracts. Full regression and browser evidence are recorded below after the integration checkpoint.
 

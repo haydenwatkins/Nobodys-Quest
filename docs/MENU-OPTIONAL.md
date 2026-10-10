@@ -1,6 +1,6 @@
 # Menu-optional play
 
-October 9, 2026. Family direction: Lily needs short, visual choices; Ben enjoys collecting, comparing and working toward treasured things. Common play should stay on the road, as Forms and Quick Mix already do.
+October 10, 2026. Family direction: Lily needs short, visual choices; Ben enjoys collecting, comparing and working toward treasured things. Common play should stay on the road, as Forms and Quick Mix already do.
 
 ## Play contract
 
@@ -15,7 +15,7 @@ October 9, 2026. Family direction: Lily needs short, visual choices; Ben enjoys 
 
 ## Shipped foundation
 
-After the opening greeting, Pebble explains that both lanterns unlit is the standard adventure and that help can be changed at any camp. The once-only chooser gives **Standard adventure — both lanterns unlit** its own visible card, alongside Heart and Guardian. Standard is selected on a fresh installation; the primary action explicitly says **Start standard adventure**. Lighting a lantern changes that action to name Heart, Guardian or both. Choosing Standard deliberately extinguishes both lights; merely opening the chooser respects existing preferences. The two help choices remain independent, and controller B remains an accessible exit. An interrupted arrival resumes the introduction; completed/late saves remain quiet.
+The opening greeting now returns straight to the world. There is no automatic lantern dialogue, help chooser, standard-adventure confirmation or repeated invitation after reload. Both help settings still default off and existing saved choices remain intact. Two unlit lamps sit beside the Orchard arrival path, outside immediate interaction range; their nearby world prompts name their optional effects. Walking past them continues the usual adventure. Camps and guardian approaches retain the physical switches and accessible settings fallback. The former chooser remains an internal explicit API rather than part of the startup flow.
 
 **Heart Lantern** grows back one heart every six seconds after the existing short breather, including during battle. **Guardian Lantern** retains extra retry hearts and slower boss shots after repeated tries, plus longer warnings throughout guardian fights. Its description does not promise a universal damage reduction. These names also appear in the optional title/pause settings and feedback; internal preference names stay compatible. Lighting help does not award progress or change rewards.
 
@@ -74,3 +74,10 @@ The real-time published TV check caught a second defect: held A changed from dia
 The final complete 2D regression passes **711 tests**, zero failed/cancelled/skipped (710,963.131038 ms). Fifteen overlapping focused opening, comfort, kit, menu/controller, title and TV bridge checks pass. Two new native cases prove deliberate Standard selection preserves resources/rewards and saves both lights off, and cannot act outside the lantern chooser.
 
 `tools/review-lantern-choice.cjs` passes 24 fresh-opening workflows: Standard, Heart and Guardian on touch/TV × HD/base, plus 640×360 touch and 768×1024 portrait tablet × both art settings. Actual tap/controller choices, named start actions, default TV focus, both-to-standard switching and save/reload use the real new-game slot and introduction without ownership/position grants. All three options and the start action fit without scrolling. Four retained kit workflows also pass, covering world-lamp walking, Pockets, carrying, native hold/R3 Quick Mix and save/reload; their late treasure-ownership checkpoint remains a controlled fixture. All **206 captures** were inspected on six sheets with native-size short-phone, portrait-tablet and TV choices. Chromium automation does not replace iPad Safari, physical TV viewing or family playtesting.
+
+
+## Quieter help after family playtesting
+
+The family found that even a balanced three-card chooser made help too prominent. October 10 removes its automatic opening dialogue and panel instead of redesigning another compulsory setup screen. Arrival/reload never opens configuration, unlit lamps sit beside the path, and the effect appears only on approach. Normal continuation needs no extra selection or dismissal. Former `help-lanterns` seen flags remain harmless saved history; established preferences, rewards, camps, challenge lamps and Pockets remain independent. Earlier chooser evidence above is historical and superseded for startup.
+
+Verification: `menu-optional`, opening, comfort, combat-feel and ordinary-enemy checks pass together in 17 focused cases. Twenty-four quiet-opening browser scenarios cover touch at 667×375 and 640×360, portrait tablet at 768×1024, and TV at 1280×720, in both art settings and with standard/Heart/Guardian outcomes. These start from native title selection, finish the real arrival conversation, walk to the actual side switches where needed, toggle them and save/reload; there are no ownership or placement grants in these scenarios. Four kit workflows retain the supplied late treasure checkpoint and verify native Pockets, Carry, Quick Mix and save controls; four preparation workflows retain controlled late-map placement and verify camp/approach switches and prompts. All 274 help/kit/preparation captures were inspected on eight sheets with selected native-size views. No physical iPad/Android/TV, living-room reading distance or family preference check is claimed. The final complete 2D regression passes **711 tests**, zero failed/cancelled/skipped/todo (576,169.723729 ms); the 17 focused cases overlap that run.

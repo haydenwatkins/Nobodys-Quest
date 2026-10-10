@@ -38,43 +38,28 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/nq-enemy-agency',name:'en
   await page.evaluate(()=>{
    const e=G.state.enemies.find(e=>e.id==='orchardSpitter');window.reviewCaster=e;
    G.state.enemies=[e];G.state.projectiles=[];G.state.bossCutscene=null;
-   Object.assign(e,{shootT:0,shotTell:null,shotRecoverT:0});
+   e.shootT=0;
    Object.assign(G.state.player,{x:e.x-70,y:e.y,dir:{x:1,y:0},damageTaken:0,invuln:0,cooldowns:{},mana:0,manaRegenDelay:100});
   });await frames(3);await drain();
-  // Position can naturally introduce a first-use lesson. Finish it before
-  // measuring the cast; dialogue is a real simulation pause.
-  await page.evaluate(()=>{window.reviewCaster.shotTell=null;window.reviewCaster.shootT=0;window.reviewCaster.shotRecoverT=0;});
-  await frames(3);assert.ok(await page.evaluate(()=>window.reviewCaster.shotTell));
-  await shot('briar-committed-lane');
-  const target=await page.evaluate(()=>({x:window.reviewCaster.shotTell.x,y:window.reviewCaster.shotTell.y}));
+  await page.evaluate(()=>{G.state.projectiles=[];window.reviewCaster.shootT=0;});await frames(1);
+  assert.equal(await page.evaluate(()=>typeof G.drawEnemyShotWarnings),'undefined');
+  assert.ok(await page.evaluate(()=>G.state.projectiles.some(pr=>pr.owner===window.reviewCaster)),'native firing beat releases immediately');
+  assert.equal(await page.evaluate(()=>window.reviewCaster.shotTell),undefined);
+  await shot('visible-shot-without-aim-lane');
+  const target=await page.evaluate(()=>({x:G.state.player.x,y:G.state.player.y}));
   let cdp;
   if(mode==='controller')await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,1,0,0],b:Array(16).fill(0)})));
-  else{
-   const zone=await page.locator('#joy-zone').boundingBox(),x=zone.x+zone.width/2,y=zone.y+zone.height/2;
-   cdp=await page.context().newCDPSession(page);
-   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
-   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+42}]});
-  }
+  else{const zone=await page.locator('#joy-zone').boundingBox(),x=zone.x+zone.width/2,y=zone.y+zone.height/2;cdp=await page.context().newCDPSession(page);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+42}]});}
   await frames(8);
   if(mode==='controller')await page.evaluate(()=>window.__nqTvPad(JSON.stringify({t:'s',a:[0,0,0,0],b:Array(16).fill(0)})));
   else{await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();}
-  assert.ok(await page.evaluate(()=>G.state.player.y-window.reviewCaster.shotTell.y>=25),'native movement exits the lane');
-  assert.deepEqual(await page.evaluate(()=>({x:window.reviewCaster.shotTell.x,y:window.reviewCaster.shotTell.y})),target);
-  await shot('briar-native-sidestep');let crossed=false;
-  for(let i=0;i<30;i++){
-   await frames(1);
-   crossed ||= await page.evaluate(target=>G.state.projectiles.some(pr=>pr.owner===window.reviewCaster&&Math.hypot(pr.x-target.x,pr.y-target.y)<8),target);
-  }
-  assert.ok(crossed,'the actual shot crosses the old position, rather than disappearing behind terrain');
-  assert.equal(await page.evaluate(()=>G.state.player.damageTaken),0,'the released shot misses the actual sidestep');
-  await page.evaluate(()=>{
-   const e=window.reviewCaster;G.state.projectiles=[];e.shootT=0;e.shotRecoverT=0;
-   Object.assign(G.state.player,{x:e.x-19,y:e.y,dir:{x:1,y:0},cooldowns:{},mana:0,manaRegenDelay:100});
-  });await frames(1);assert.ok(await page.evaluate(()=>window.reviewCaster.shotTell));
-  await next();assert.equal(await page.evaluate(()=>window.reviewCaster.shotTell),null);
-  assert.equal(await page.evaluate(()=>window.reviewCaster.hp),3);
-  assert.ok(await page.evaluate(()=>window.reviewCaster.shotRecoverT>0));
-  assert.equal(await page.evaluate(()=>G.state.projectiles.some(p=>p.owner===window.reviewCaster)),false);
-  await shot('briar-native-interrupt');
+  assert.ok(await page.evaluate(target=>G.state.player.y-target.y>=25,target),'native movement avoids the visible released shot');
+  await shot('visible-shot-native-sidestep');let crossed=false;
+  for(let i=0;i<28;i++){await frames(1);crossed ||= await page.evaluate(target=>G.state.projectiles.some(pr=>pr.owner===window.reviewCaster&&Math.hypot(pr.x-target.x,pr.y-target.y)<9),target);}
+  assert.ok(crossed,'the actual shot reaches the old position');assert.equal(await page.evaluate(()=>G.state.player.damageTaken),0);
+  await page.evaluate(()=>{const e=window.reviewCaster;e.shootT=1;Object.assign(G.state.player,{x:e.x-19,y:e.y,dir:{x:1,y:0},cooldowns:{},mana:0,manaRegenDelay:100});});await next();
+  assert.equal(await page.evaluate(()=>window.reviewCaster.hp),3);assert.ok(await page.evaluate(()=>G.state.player.mana>0));await shot('ordinary-native-free-hit');
+  // Authored shot silhouettes keep their identity under the shared contrast.
+  await page.evaluate(()=>{const e=window.reviewCaster;G.state.projectiles=['riftBlade','card','pie','fault','shell','star','seed','wave'].map((shape,i)=>({x:G.state.player.x+16+(i%4)*14,y:G.state.player.y-25-Math.floor(i/4)*18,vx:0,vy:0,size:3,color:'#8153c1',shape,fromPlayer:false,owner:e,range:140,startX:G.state.player.x,startY:G.state.player.y,damage:1}));});await frames(1);await shot('hostile-shot-silhouettes');
  }
 }).catch(e=>{console.error(e);process.exitCode=1;});

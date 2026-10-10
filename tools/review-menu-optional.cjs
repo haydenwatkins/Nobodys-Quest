@@ -22,19 +22,12 @@ async function fit(page){
 review({url:process.argv[2],out,name:'menu-optional lanterns and treasures',publishedHost:true,
  modes:process.argv.includes('--tv')?['controller']:process.argv.includes('--tablet')?['touch']:undefined,
  viewports:process.argv.includes('--tablet')?{touch:process.argv.includes('--portrait')?{width:768,height:1024}:{width:1024,height:768}}:{},
- async onLanternIntro(ctx){const {page,shot}=ctx;
-  assert.equal(await page.evaluate(()=>G.ui.menuOpen),false);assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')||G.comfortSetting('bossAssistance')),false);
-  await fit(page);await shot('first-lantern-invitation');const before=await page.evaluate(()=>JSON.stringify({items:G.state.items,quests:G.questsDone,stars:G.state.stars}));
-  await choose(ctx,'[data-lamp="easyMode"]');assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')),true);await shot('heart-lantern-lit');
-  await choose(ctx,'[data-lamp="bossAssistance"]');assert.equal(await page.evaluate(()=>G.comfortSetting('bossAssistance')),true);await shot('both-lanterns-lit');
-  assert.equal(await page.evaluate(()=>JSON.stringify({items:G.state.items,quests:G.questsDone,stars:G.state.stars})),before);
- },
  async run(ctx){const {page,mode,frames,pad,next,drain,walkTo,shot,reload}=ctx;
-  assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);assert.equal(await page.evaluate(()=>G.state.opening.seen.includes('help-lanterns')),true);
+  assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')||G.comfortSetting('bossAssistance')),false);await shot('quiet-opening');
   // Walk from the genuine new-game arrival to Pebble's physical lamps.
-  await walkTo(6*16+8,38*16+8);assert.equal(await page.evaluate(()=>G.helpStationCandidate()?.kind),'easyMode');await shot('opening-world-lights');
-  await next();assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')),false);
-  await walkTo(8*16+8,38*16+8);await next();assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);
+  await walkTo(4*16+8,38*16+8);assert.equal(await page.evaluate(()=>G.helpStationCandidate()?.kind),'easyMode');await shot('opening-world-lights');
+  await next();assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')),true);await shot('heart-lantern-lit');await next();assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')),false);
+  await walkTo(5*16+8,38*16+8);await next();assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);assert.equal(await page.evaluate(()=>G.comfortSetting('bossAssistance')),true);await shot('guardian-lantern-lit');await next();
   assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')||G.comfortSetting('bossAssistance')),false);await shot('opening-world-unlit');await reload();
   assert.equal(await page.evaluate(()=>G.fieldKit.isOpen()),false);assert.equal(await page.evaluate(()=>G.comfortSetting('easyMode')||G.comfortSetting('bossAssistance')),false);
   // Controlled collected-treasure checkpoint. Ownership is supplied; carrying,

@@ -503,7 +503,6 @@
     if (G.passives && G.passives.drawFields) G.passives.drawFields(ctx);
     if (G.drawBossHazards) G.drawBossHazards(ctx);
     if (G.drawOpeningHazards) G.drawOpeningHazards(ctx);
-    if (G.drawEnemyShotWarnings) G.drawEnemyShotWarnings(ctx);
     G.drawPickups(ctx);
 
     // draw everyone in y-order so closer things overlap farther things

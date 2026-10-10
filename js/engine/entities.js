@@ -415,8 +415,6 @@ G.makeEnemy = function (id, x, y) {
     anim: Math.random() * 10,
     wanderT: 0, wanderDir: { x: 0, y: 0 },
     shootT: 1 + Math.random(),
-    shotTell: null,
-    shotRecoverT: 0,
     bossEngaged: false,
     bossIntroT: 0,
     bossPhase: 1,
@@ -1413,47 +1411,6 @@ function enemyShot(state, enemy, angle, opts) {
   });
 }
 
-// A normal caster commits to a place, not a moving player. Landing a real
-// hit, breaking its ward or stunning it drops the cast and leaves an opening.
-G.interruptEnemyShot = function (e) {
-  if (e.def.miniboss || !e.shotTell) return false;
-  e.shotTell = null;
-  e.shotRecoverT = Math.max(e.shotRecoverT || 0, .45);
-  e.shootT = Math.max(e.shootT, e.def.shootEvery || 1.6);
-  G.sfx.play("stagger");
-  G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: "#fff3c2", radius: 12, dur: .25 });
-  G.events.emit("enemyInterrupt", { enemy: e.id });
-  return true;
-};
-
-function updateOrdinaryShooter(e, p, dt) {
-  e.shootT = Math.max(0, e.shootT - dt);
-  if (e.shotTell) {
-    const tell = e.shotTell;
-    tell.left -= dt;
-    if (tell.left <= 0) {
-      enemyShot(G.state, e, G.util.angleTo(e.x, e.y - 6, tell.x, tell.y), {
-        damage: e.def.damage || 1, speed: e.def.projectileSpeed || 90, range: 140,
-      });
-      e.shotTell = null;
-      e.shotRecoverT = .45;
-    }
-    return true;
-  }
-  if (e.shotRecoverT > 0) {
-    e.shotRecoverT = Math.max(0, e.shotRecoverT - dt);
-    return true;
-  }
-  if (e.shootT > 0 || G.util.dist(e.x, e.y, p.x, p.y) >= (e.def.aggro || 110)
-      || !G.combat.clearArc(e.x, e.y - 10, p.x, p.y - 9)) return false;
-  const duration = e.def.shotWarning || .6;
-  e.shotTell = { x: p.x, y: p.y - 5, left: duration, duration };
-  e.shootT = Math.max(e.def.shootEvery || 1.6, duration + .45);
-  const a = G.util.angleTo(e.x, e.y - 6, p.x, p.y - 5);
-  e.dir = { x: Math.cos(a), y: Math.sin(a) };
-  return true;
-}
-
 G.updateEnemies = function (dt) {
   const s = G.state;
   const p = s.player;
@@ -1483,15 +1440,12 @@ G.updateEnemies = function (dt) {
     }
 
     const stunned = e.status && e.status.stun;
-    if (stunned) G.interruptEnemyShot(e);
     if (!stunned && G.updateOpeningEnemy && G.updateOpeningEnemy(e, p, dt)) continue;
     const d = G.util.dist(e.x, e.y, p.x, p.y);
     e.bossContactActive = false;
     const bossLocked = e.def.miniboss ? updateBossState(e, p, d, dt) : false;
-    const shotLocked = !stunned && !e.def.miniboss && e.def.behavior === "shooter"
-      && updateOrdinaryShooter(e, p, dt);
 
-    if (!stunned && !bossLocked && !shotLocked) {
+    if (!stunned && !bossLocked) {
       const beh = e.def.behavior || "wander";
       let mx = 0, my = 0;
       let moveScale = 1;
@@ -1521,7 +1475,7 @@ G.updateEnemies = function (dt) {
         mx = e.wanderDir.x * 0.5; my = e.wanderDir.y * 0.5;
       }
 
-      if (e.def.miniboss && beh === "shooter" && d < (e.def.aggro || 110)) {
+      if (beh === "shooter" && d < (e.def.aggro || 110)) {
         const a = G.util.angleTo(e.x, e.y, p.x, p.y);
         e.shootT -= dt;
         if (e.shootT <= 0) {
@@ -1741,30 +1695,6 @@ G.drawAimGuide = function (ctx) {
   ctx.restore();
 };
 
-G.drawEnemyShotWarnings = function (ctx) {
-  for (const e of G.state.enemies) {
-    if (e.dead || !e.shotTell) continue;
-    // The lane and growing ring use shape as well as color; no flashing HUD
-    // marker or text to read. Clip the lane where the actual shot meets terrain.
-    const tell = e.shotTell, a = G.util.angleTo(e.x, e.y - 6, tell.x, tell.y);
-    const dx = Math.cos(a), dy = Math.sin(a);
-    let reach = 140;
-    for (let d = 2; d <= reach; d += 2) {
-      if (G.world.blocksProjectile(e.x + dx * d, e.y - 10 + dy * d)) { reach = d; break; }
-    }
-    const x2 = e.x + dx * reach, y2 = e.y - 6 + dy * reach;
-    ctx.save();
-    ctx.strokeStyle = "#1a1c2c"; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(e.x, e.y - 6); ctx.lineTo(x2, y2); ctx.stroke();
-    ctx.strokeStyle = "#ffcd75"; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
-    ctx.beginPath(); ctx.moveTo(e.x, e.y - 6); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
-    ctx.beginPath(); ctx.arc(e.x, e.y - 6, e.def.size / 2 + 3, -Math.PI / 2,
-      -Math.PI / 2 + Math.PI * 2 * (1 - tell.left / tell.duration)); ctx.stroke();
-    ctx.fillStyle = "#ffcd75"; ctx.fillRect(Math.round(x2 - 2), Math.round(y2 - 2), 4, 4);
-    ctx.restore();
-  }
-};
-
 G.drawEnemy = function (ctx, e) {
   const spriteScale = (e.def.boss && e.def.boss.spriteScale) || 1;
   if (e.rival || e.expeditionElite) {
@@ -1936,6 +1866,35 @@ G.drawProjectiles = function (ctx) {
       ctx.fillRect(Math.round(point.x - trailSize / 2), Math.round(point.y - 4 - trailSize / 2), trailSize, trailSize);
     }
     ctx.restore();
+    if (!pr.fromPlayer) {
+      // Contrast travels with the actual shot. This rim is paint only:
+      // damage, collision, speed, aim and lifetime retain their native rules.
+      const x = Math.round(pr.x), y = Math.round(pr.y - 4);
+      const radius = Math.max(1.5, (pr.size || 3) / 2);
+      ctx.save(); ctx.translate(x, y); ctx.beginPath();
+      if (pr.shape === "card") ctx.rect(-2, -3, 5, 7);
+      else if (pr.shape === "pie") ctx.ellipse(0, 0, 4, 2.5, 0, 0, Math.PI * 2);
+      else if (pr.shape === "shell") ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
+      else if (pr.shape === "seed") ctx.ellipse(0, 0, 2.5, 3.5, Math.PI / 4, 0, Math.PI * 2);
+      else if (pr.shape) {
+        const points = pr.shape === "riftBlade"
+          ? [[-4,-1],[-1,-1],[-1,-3],[1,-3],[1,-1],[4,0],[1,1],[1,3],[-1,3],[-1,1],[-4,1]]
+          : pr.shape === "star"
+            ? [[0,-4],[1,-1],[4,0],[1,1],[0,4],[-1,1],[-4,0],[-1,-1]]
+            : pr.shape === "fault"
+              ? [[-5,-1],[-2,-1],[-2,-3],[1,-3],[1,-1],[4,-1],[4,1],[-5,1]]
+              : pr.shape === "wave"
+                ? [[-4,-3],[-2,-3],[-2,-2],[0,-2],[0,-1],[4,-1],[4,2],[0,2],[0,3],[-2,3],[-2,4],[-4,4]]
+                : [[-radius,-radius],[radius,-radius],[radius,radius],[-radius,radius]];
+        ctx.moveTo(...points[0]); for (let i = 1; i < points.length; i++) ctx.lineTo(...points[i]); ctx.closePath();
+      } else ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.lineJoin = "round"; ctx.strokeStyle = "#19252d"; ctx.lineWidth = 3; ctx.stroke();
+      ctx.strokeStyle = "#fff3c2"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = pr.color; ctx.fill();
+      ctx.fillStyle = "#fff9e8"; ctx.fillRect(0, -1, 1, 2);
+      ctx.restore();
+      if (!pr.shape) continue;
+    }
     if(pr.fromPlayer&&['arrow','luckyArrow','tripleShot'].includes(pr.ability)){
       ctx.save();ctx.translate(Math.round(pr.x),Math.round(pr.y-4));ctx.rotate(Math.atan2(pr.vy,pr.vx));
       ctx.fillStyle='#483f3d';ctx.fillRect(-8,-1,14,3);

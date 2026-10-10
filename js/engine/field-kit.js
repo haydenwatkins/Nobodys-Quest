@@ -20,12 +20,11 @@
     const found=Object.entries(G.treasureInfo||{}).filter(([id])=>owned.has(id)&&!giftItems.has(id)).map(([id,info])=>({id,item:id,...info,kind:'memory'}));
     return [...gifts,...found];
   };
-  let view=null,index=0,intro=false,invitePending=false;
+  let view=null,index=0;
   function close(){
     if(!view)return;
     view=null;el.classList.add('hidden');el.setAttribute('aria-hidden','true');el.innerHTML='';
     G.menuController.reset(el);G.input.clearTaps();
-    if(intro){intro=false;const o=G.state.opening;if(!o.seen.includes('help-lanterns'))o.seen.push('help-lanterns');G.saveGame();}
   }
   function allowed(){return !!G.state&&!G.saveSlotScreenOpen&&!G.state.knockout&&!G.state.bossCutscene&&!G.ui.menuOpen&&!G.ui.dialogueOpen&&!G.ui.formWheelOpen&&!G.ui.artMixerOpen&&!view;}
   function show(kind,preferred){
@@ -99,11 +98,6 @@
     G.menuController.update(el,{preferred:el.querySelector('[data-kit-close]'),onBack:close,onPageLeft:()=>view==='pockets'?page(-1):undefined,onPageRight:()=>view==='pockets'?page(1):undefined},dt);
     if(G.input.tapped('pause'))close();
   }};
-  G.introduceHelpLanterns=()=>{
-    const o=G.state?.opening;if(!o||o.seen.includes('help-lanterns')||invitePending||intro||view)return false;
-    invitePending=true;
-    G.ui.dialogue('PEBBLE','Leave both lanterns unlit for the standard adventure. Light one if you’d like help. You can change them at any camp.',{accent:'#efa2ae',onClose:()=>{invitePending=false;intro=G.fieldKit.openLanterns();}});return true;
-  };
   // Rest locations already exist across the campaign. Place light props on
   // ordinary, walkable tiles, never on a door, message, reward, or camp fire.
   let stations=[];
@@ -112,7 +106,7 @@
     stations=[];const s=G.state,used=new Set();
     const free=(x,y)=>{const c=s.grid[y]?.[x];return c&&['grass','path','floor'].includes(c.tile)&&!c.rest&&!c.portal&&!c.message&&!c.chest&&!c.smallPassage&&!c.enemy&&!c.townPlot&&G.world.isSafeSpawn(x*16+8,y*16+8)&&!used.has(`${x},${y}`)&&!(s.npcs||[]).some(n=>Math.hypot(n.x-(x*16+8),n.y-(y*16+8))<12);};
     const add=(x,y,kind,approach)=>{if(!free(x,y))return false;used.add(`${x},${y}`);stations.push({kind,x:x*16+8,y:y*16+8,...(approach?{approach}: {})});return true;};
-    if(s.mapId==='orchardRoad'){add(6,38,'easyMode');add(8,38,'bossAssistance');}
+    if(s.mapId==='orchardRoad'){add(4,38,'easyMode');add(5,38,'bossAssistance');}
     for(let y=0;y<s.mapH;y++)for(let x=0;x<s.mapW;x++)if(s.grid[y][x].rest){
       const spots=[[-1,0],[1,0],[0,1],[-1,1],[1,1],[0,-1],[-1,-1],[1,-1]];
       for(const kind of ['easyMode','bossAssistance','pockets'])for(const [dx,dy]of spots)if(add(x+dx,y+dy,kind))break;
@@ -171,7 +165,7 @@
     if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Adds a crescent after his charge. Strike his raised shield to stop the pair.'};
     if(near.kind==='wayglassChallenge')return {...near,id:'field-kit',label:`Double Return · ${G.wayglassDoubleLit()?'Put out':'Light'}`,hint:'Adds a second throw. Raise a reflector to stop the pair when a blade returns.'};
     if(near.kind==='burrowChallenge')return {...near,id:'field-kit',label:`Root Rumble · ${G.burrowRumbleLit()?'Put out':'Light'}`,hint:'Adds a second marked stomp. Break the root plug to stop both.'};
-    return {...near,id:'field-kit',hint:lamp?(lamp.key==='easyMode'?'Hearts grow back, even in fights.':'Longer warnings; help after retries.'):null,label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
+    return {...near,id:'field-kit',hint:lamp?(lamp.key==='easyMode'?'Optional help: hearts grow back, even in fights.':'Optional help: longer warnings; help after retries.'):null,label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
   };
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>candidate()||G.helpStationCandidate();
