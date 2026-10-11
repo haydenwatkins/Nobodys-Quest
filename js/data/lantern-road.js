@@ -46,6 +46,15 @@
   });
   const town=G.maps.town,row=town.tiles[8].split('');row[0]='Q';town.tiles[8]=row.join('');
   town.legend.Q={tile:'path',portal:{map:'sunriseQuay',x:40,y:19},portalStyle:'gap'};
+  // Branch off Greenfield's through-road. The entrance is north of the
+  // branch, so held travel carries players into town and away on returning.
+  // Keep the old Greenfield arrival unchanged for existing saves.
+  town.legend.x={...town.legend.x,tile:'path',portalStyle:'gap'};
+  const field=G.maps.overworld;
+  for(const [x,y,id]of [[61,45,'p'],[62,45,'p'],[62,44,'p'],[62,43,'h']]){
+    const row=field.tiles[y].split('');row[x]=id;field.tiles[y]=row.join('');
+  }
+  field.legend.h={tile:'path',portal:{map:'town',x:14,y:14},portalStyle:'gap',homeRoad:true};
   G.NPC_PLACEMENTS.lanternReach=[['parcel',8,29]];G.NPC_PLACEMENTS.tollCourt=[];
   G.NPC_PLACEMENTS.sunriseQuay=[['parcel',8,20],['quayBaker',12,12],['quayMara',30,13],['quayPip',28,26],['pebble',22,20]];
   for(const [id,name,base,line]of [

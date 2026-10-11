@@ -3,11 +3,13 @@
 (() => {
   const requests = [
     {id:"beacon", npc:"pebble", name:"Pebble", title:"A light for the late boat", x:22, y:20, reward:8,
-      task:"Defeat the Mire Queen in Sunken Marsh, collect her pearl from the ground, then bring it to Pebble at the centre of Sunrise Quay. Dark magic breaks her ward.",
+      task:"Defeat the Mire Queen in Sunken Marsh, collect her pearl from the ground, then bring it to Pebble at the center of Sunrise Quay. Dark magic breaks her ward.",
       ready:()=>G.state.items.includes("trophy-mire-pearl"),
-      ask:"I’m worried about the late boat. Our harbor lamp can’t shine through this fog. The Mire Queen took its pearl when she flooded the marsh. Could you bring it back? Wizard’s dark magic will crack her ward. Try it on the little marsh creatures first. Parcel can take you back to Orchard Road; Greenfield and the marsh are west from there.",
-      thanks:"A pearl! I’ll set it above the quay. You may keep calling it a trophy. I shall call it a lighthouse with a very small budget. The late boat has something to steer by again. Pip’s been asking about the strange trail east of the quay. He’d love to hear about your next adventure.",
-      after:"Three boats found us last night. One brought turnips. We must accept the consequences of our heroism."},
+      ask:"I’m worried about the late boat. The Queen took our harbor pearl, and the fog hides the lamp. Could you bring it home?",
+      tips:["Starwick Sage’s Curse breaks her ward. Try it on the marsh creatures before you meet her.",
+        "Follow Sunrise’s east road through town to Greenfield, then head west to Sunken Marsh. You can rest at the ferry fire."],
+      thanks:"You brought it back! I was scared the boat would miss us again. I’ll put the pearl in our harbor lamp. Pip’s been asking about the trail east of the quay. He’d love a story when you get home.",
+      after:"The late boat found us! Brindle brought warm bread to the quay, and the crew brought turnips. I was hoping for apples. Still, I’m glad everyone got home."},
     {id:"recipes", npc:"quayBaker", name:"Brindle", title:"The cinnamon pages", x:12, y:12, reward:5,
       task:"Enter the Lantern Reach drain as Rat, collect Brindle’s recipe book from the ground, then return to her on Sunrise Quay.",
       ready:()=>G.state.items.includes("brindles-recipes") || (!!G.state.delivery.salvage && !G.groundRewardFor?.("brindles-recipes")),
@@ -54,6 +56,19 @@
   const unlocked=()=>!!(G.state && G.state.delivery?.complete);
   const claimed=()=>{const town=G.ensureTown();if(!Array.isArray(town.requests))town.requests=[];return town.requests;};
   const home=r=>r.mapId||"sunriseQuay";
+  function prepareHarborMagic() {
+    const s=G.state;
+    if(s.mapId!=="sunriseQuay" || !s.opening?.started || s.opening.version<2 ||
+      G.followedSunriseRequest()?.id!=="beacon" || !G.formReady("wizard"))return;
+    let echo=G.formEchoFor("wizard");
+    // Reveal only this already-earned preparation. Preserve any waiting
+    // discovery and the normal outing/return gates; never grant mastery.
+    if(!echo && G.readyFormsWithoutEcho()[0]==="wizard") {
+      const at=position(requests.find(r=>r.id==="beacon"));
+      echo=G.leaveReadyFormEchoAt(at.x+40,at.y,"promise");
+    }
+    if(echo?.formId==="wizard")G.guideToFormEcho("wizard");
+  }
   const position=r=>{
     const actor=r.mapId&&G.state.mapId===home(r)&&G.state.npcs?.find(n=>n.id===r.npc);
     return actor?{x:actor.x,y:actor.y}:{x:r.x*G.TILE+8,y:r.y*G.TILE+8};
@@ -174,12 +189,13 @@
       prompt:`Follow “${r.title}” for ${r.name}? You can set it aside in Journey.`,
       onAccept:()=>{
         if(!G.followSunriseRequest(r.id))return;
+        if(r.id==="beacon")prepareHarborMagic();
         G.ui.banner(`A PROMISE TO ${r.name.toUpperCase()}`,G.sunriseRequestTask().short);
         G.requestGuidance?.(true);
       }
     }:null;
     const pages=done?[r.after]:ready?[r.thanks]:[r.ask,...(r.tips||[])];
-    pages.forEach((text,i)=>G.ui.dialogue(r.name.toUpperCase(),text+reminder(r),{accent:"#e7bd78",...(i===pages.length-1?{offer}:{})}));
+    pages.forEach((text,i)=>G.ui.dialogue(r.name.toUpperCase(),text+reminder(r),{accent:"#e7bd78",...(i===pages.length-1?{offer,...(!offer&&!done&&!ready&&r.id==="beacon"?{onClose:prepareHarborMagic}:{})}:{})}));
     G.input.clearTaps();return true;
   };
   G.npcDialogue=(id,chapter,index)=>{

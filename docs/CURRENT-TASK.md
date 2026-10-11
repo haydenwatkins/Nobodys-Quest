@@ -51,3 +51,7 @@ New adventures recommend these people after the harbour, before the open Worldwa
 ## Connected opening traversal
 
 The early task now points through real roads. Parcel's route conversation leaves the player at the cart; Orchard Road's east exit leads to Lantern Reach and its west exit brings the player back. Rat walks beneath the roots to the far-bank lever and walks through the recipe drain to its saved book. Pending recipe guidance points to the actual mouth at tile 20,30, then the book inside; leaving and returning requires walking. See `CONNECTED-OPENING.md` for native/browser evidence and unchanged legacy credit.
+
+## Quiet promise work and earned harbor preparation (October 11)
+
+Both HUDs now use `G.showFieldMastery()` to quiet automatic lesson cards during selected promises/Mark field notes. Usable deliberate practice remains while work is unfinished; discoveries, guardian collection and ready returns take precedence. Learning and journal availability stay automatic. Pebble’s deliberately chosen harbor promise can reveal already-earned Sage preparation before departure, and Greenfield’s missing town entrance now makes the return physical in both directions. `CAMPAIGN-SESSION-REVIEW.md` records the carried fresh journey, earned browser snapshots and verification limits.

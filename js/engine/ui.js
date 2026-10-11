@@ -676,6 +676,7 @@ G.ui = (() => {
   }
 
   function drawQuestTracker(c, cam) {
+    if(G.showFieldMastery?.()===false)return;
     const field = G.fieldMasteryQuest && G.fieldMasteryQuest();
     if(fieldQuiet.t<.6 || !(G.systemIntroduced?.("forms")!==false))return;
     const automatic = G.relevantMasteryQuests ? G.relevantMasteryQuests(1) : [];

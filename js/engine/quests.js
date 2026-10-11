@@ -133,6 +133,18 @@ G.fieldMasteryQuest = function () {
   return G.relevantMasteryQuests(1)[0] || null;
 };
 
+// Automatic learning continues quietly beside a chosen promise. The field
+// card is for intentional practice; a discovery or good-news return gets
+// its own moment even if an older lesson is still selected in the journal.
+G.showFieldMastery = function () {
+  const task=G.currentTask?.();
+  if(!task)return true;
+  if(task.ready || ["echo", "legend"].includes(task.kind) || task.guide==="item")return false;
+  if(!["request", "mark"].includes(task.kind))return true;
+  const chosen=G.masteryLessons(1,null,true)[0],field=G.fieldMasteryQuest();
+  return !!chosen && chosen.quest.id===field?.quest.id;
+};
+
 // The finale asks for breadth and a chosen set of deep specializations. The
 // same snapshot drives the gate, story guidance, and God's unlock condition.
 G.finalExamMastery = function () {

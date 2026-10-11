@@ -156,3 +156,11 @@ Reproduce logic with `node --test --test-concurrency=6 tests/*.test.js`. Browser
 Ridge and Starfall now apply the same contract to existing activities: a concerned person, useful advice, an explicit promise, actual victory/lens work, ground collection, return and a changed later conversation. Pending recommends Errata; Errata explains the eastern road. These are recommendations, not new mandatory gates. Dark attacks, the crescent recovery window, any-order lenses and once-only gift payouts keep their native rules. See `REGIONAL-PROMISES.md` for the authored entry check and controlled chapter evidence.
 
 Keep incidental report counts and map-entry lists on the Atlas. Optional background activities must not repeatedly announce extra errands over an accepted promise. Their existing completion feedback remains after deliberate introduction.
+
+## Earned preparation and quiet returns (October 11)
+
+When a known destination needs a newly earned tool, reveal it through the existing purposeful world beat before departure. Keep its real eligibility and discovery action; an unrelated extra kill should not be the only way to make ready preparation visible. Preserve a waiting discovery and existing useful-form/return spacing. Do not hand out unearned abilities to bypass preparation.
+
+A connected road needs a usable entrance and exit. Review the complete trip home as well as departure: guidance must not impose an empty lap because an existing connection is one-way. Keep introduction gates and safe saved arrival positions. Put entrances on their own approaches rather than unexpectedly taking over a through-road. Align arrivals with the walking direction so held input carries the player inward rather than immediately back through the reverse crossing.
+
+Automatic learning can continue without becoming another visible assignment. Both field layouts yield its optional card to a deliberately chosen promise or field note; retain intentional usable practice while working, then give discoveries, collection and good-news returns their own attention. Hide presentation rather than changing learned credit or the chosen task. See `CAMPAIGN-SESSION-REVIEW.md` for the fresh-session evidence and browser/human limits.

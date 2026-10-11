@@ -60,7 +60,7 @@ module.exports=async function review({url='http://127.0.0.1:8000/',out,name,run,
    await frames(100);await drain();}
   const shot=stage=>page.screenshot({path:path.join(out,`${mode}-${hd?'hd':'base'}-${stage}.png`)});
   async function reload(){await page.evaluate(()=>G.saveGame());await page.reload();await boot();}
-  await page.goto(publishedHost?new URL(new URL(url).pathname+new URL(url).search,'https://quest-review.example').href:url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,walkTo,visibleGift,shot,reload,pad});
+  await page.goto(publishedHost?new URL(new URL(url).pathname+new URL(url).search,'https://quest-review.example').href:url);await boot();await run({page,mode,hd,frames,next,drain,offer,answer,walkGift,walkTo,visibleGift,shot,reload,pad,boot});
   assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);console.log(`PASS ${name} ${mode} ${hd?'HD':'BASE'}`);await context.close();
  }}finally{await browser.close();}
 };

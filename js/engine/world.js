@@ -119,7 +119,7 @@ G.world = (() => {
   }
 
   function portalOpen(cell) {
-    return (!cell.stars || G.state.stars >= cell.stars) && portalMasteryMet(cell) && portalMarkMet(cell);
+    return (!cell.homeRoad || G.townUnlocked?.()) && (!cell.stars || G.state.stars >= cell.stars) && portalMasteryMet(cell) && portalMarkMet(cell);
   }
 
   function portalDestinationName(cell) {
@@ -153,6 +153,7 @@ G.world = (() => {
   function portalBlockReason(cell) {
     if (!cell || !cell.portal || portalOpen(cell)) return null;
     const requirements = [];
+    if(cell.homeRoad && !G.townUnlocked?.())requirements.push("Finish Parcel’s deliveries to make Sunrise your home.");
     const need = cell.stars || 0;
     const held = G.state.stars || 0;
     if (held < need) {
@@ -572,10 +573,7 @@ G.world = (() => {
       outward.x*move.x+outward.y*move.y>0.08 ||
       (p.dashing && outward.x*p.dashing.dirX+outward.y*p.dashing.dirY>0.08);
     if (cell.portal && trailExit) {
-      const need = cell.stars || 0;
-      const masteryReady = portalMasteryMet(cell);
-      const markReady = portalMarkMet(cell);
-      if (s.stars >= need && masteryReady && markReady && !s.portalNeedsRelease && s.portalGrace <= 0) {
+      if (portalOpen(cell) && !s.portalNeedsRelease && s.portalGrace <= 0) {
         G.sfx.play("door");
         const target = { x: cell.portal.x, y: cell.portal.y };
         if ((cell.seamless || cell.portalStyle === "gap") && G.beginWorldTransition)

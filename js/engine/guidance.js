@@ -97,6 +97,9 @@
       visited.add(mapId);
       if (mapId === destination) return current;
       for (const portal of mapPortalCells(mapId)) {
+        // An unintroduced home shortcut must not replace the delivery road
+        // with advice to finish deliveries from its other end.
+        if(portal.cell.homeRoad && !G.townUnlocked?.())continue;
         const next = portal.cell.portal.map;
         if (!next || visited.has(next) || !G.maps[next]) continue;
         const reason = (G.world.portalBlockReason && G.world.portalBlockReason(portal.cell)?.text) ||

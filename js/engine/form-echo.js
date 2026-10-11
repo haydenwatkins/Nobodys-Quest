@@ -25,7 +25,7 @@
       mapId,
       x,
       y,
-      source: ["battle", "victory", "treasure", "legacy"].includes(raw.source) ? raw.source : "battle",
+      source: ["battle", "victory", "treasure", "legacy", "promise"].includes(raw.source) ? raw.source : "battle",
       needsLeave: raw.needsLeave !== false,
       interacting: false,
     };
@@ -131,6 +131,7 @@
   };
 
   function discoveryLine(echo, form) {
+    if (echo.source === "promise") return `Your help opened a new road. ${form.name} is ready to travel with you.`;
     if (echo.source === "treasure") return `The treasure is open, but ${form.name} was hidden deeper than the prize. Its shape is waiting for you.`;
     if (echo.source === "victory") return `${form.name} stands in the silence after the guardian. The victory left an answer behind.`;
     if (echo.source === "legacy") return `A lesson you finished long ago has finally taken shape. ${form.name} has been waiting to meet you.`;

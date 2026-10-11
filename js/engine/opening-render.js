@@ -320,7 +320,7 @@
     }
     if(!interactionShown&&!boss&&!G.ui.dialogueOpen&&!s.bossCutscene&&G.fieldMasteryReward){
       const lesson=G.fieldMasteryReward();
-      if(lesson&&G.ui.fieldQuiet?.()&&G.systemIntroduced('forms')&&!(G.nearGroundReward&&G.nearGroundReward())){
+      if(lesson&&G.showFieldMastery?.()!==false&&G.ui.fieldQuiet?.()&&G.systemIntroduced('forms')&&!(G.nearGroundReward&&G.nearGroundReward())){
         c.font=G.text.font(8,700);
         const x=7,y=72,w=128,lines=[];let line='';
         for(const word of lesson.quest.text.split(/\s+/)){const next=line?line+' '+word:word;if(line&&c.measureText(next).width>w-10){lines.push(line);line=word;}else line=next;}if(line)lines.push(line);
