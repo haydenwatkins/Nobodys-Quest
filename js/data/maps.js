@@ -195,15 +195,16 @@ registerMap({
 registerMap({
   id: "vampireTrial", name: "The Dusk Court", playerStart: { x: 3, y: 8 },
   visualTheme: "vampire",
-  bossTrial: { exit: { map: "overworld", x: 50, y: 78 }, delay: 1.5 },
+  bossTrial: { onlyEngaged: true, exit: { map: "overworld", x: 50, y: 78 }, delay: 1.5 },
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 50, y: 78 } },
     "B": { tile: "floor", enemy: "countessCarmine" },
-    "m": { tile: "floor", message: "The invitation says FORMAL COMBAT. Capes optional. Dramatic entrances mandatory." },
+    "m": { tile: "floor", message: "Strike a moon lamp cover before Vesper dashes. Its light stops her dash. Dark attacks break her ward." },
     "H": { tile: "floor", chest: { heal: true, name: "a suspiciously red velvet cookie" } },
+    "F": { tile: "floor", rest: true, restText: "Vesper’s fire restores every heart and all mana." },
     "R": { tile: "rock", on: "floor" },
   },
-  tiles: makeFormTrialArena(1),
+  tiles: makeFormTrialArena(1).map((row,y)=>y===11?row.slice(0,3)+'F'+row.slice(4):row),
 });
 
 registerMap({

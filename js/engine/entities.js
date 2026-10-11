@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -650,6 +650,7 @@ G.cancelBossHazards = function (owner) {
   if (G.cancelMireCrusts) G.cancelMireCrusts(owner);
   G.cancelWayglassReflectors?.(owner);
   G.cancelBurrowPlugs?.(owner);
+  G.cancelMoonCovers?.(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -1086,7 +1087,8 @@ function resolveBossActionPattern(e, p, action) {
   if(action === "crimsonWaltz"){
     const angle=Math.atan2(p.y-(e.y-6),p.x-e.x),count=8+(e.bossPhase-1)*4,shots=[];
     for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)shots.push(a);}
-    spawnBossHazard(e,"crimsonWaltz",{angle,shots,warning:.9,active:.15,color:"#b13e53"});
+    const h=spawnBossHazard(e,"crimsonWaltz",{angle,shots,warning:.9,active:.15,color:"#b13e53"});
+    G.prepareDuskWaltz?.(e,h);
     e.bossRecoverT=.9+155/92+.8;return;
   }
   if(action === "royalStomp"){
@@ -1296,6 +1298,7 @@ function updateBossState(e, p, dist, dt) {
     G.world.moveBox(e, e.bossChargeX * step, e.bossChargeY * step);
     e.dir = { x: e.bossChargeX, y: e.bossChargeY };
     if(G.catchBurrowPlug?.(e,beforeX,beforeY))return true;
+    if(G.catchMoonLight?.(e,beforeX,beforeY))return true;
     e.bossChargeT -= dt;
     G.spawnFx({ kind: "puff", x: e.x, y: e.y - 5, color: boss.color, dur: 0.16 });
     if (e.bossChargeT <= 0) {
@@ -1343,6 +1346,7 @@ function updateBossState(e, p, dist, dt) {
       const patterns = boss.patterns || fallback;
       e.bossPendingAction = patterns[e.bossPattern % patterns.length];
       if(e.bossPendingAction==='charge'&&boss.chargeTelegraph)e.bossTelegraphT=G.guardianWarningSeconds?.(boss.chargeTelegraph)??boss.chargeTelegraph;
+      if(e.bossPendingAction==='vampireDash')G.prepareDuskCounter?.(e);
       e.bossPattern++;
       if (BOSS_ARENA_ACTIONS[e.bossPendingAction]) {
         G.damageNumber(e.x, e.y - e.h() - 11, BOSS_ARENA_ACTIONS[e.bossPendingAction], boss.color);

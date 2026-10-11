@@ -3,10 +3,10 @@
 "use strict";
 (() => {
   const profile=mode=>({practiceCleared:false,counterLearned:false,invited:false,[mode]:false,[mode+'Cleared']:false,bestCounters:0});
-  G.makeGuardianChallenges=()=>({treant:profile('branching'),queen:profile('rippling'),knight:profile('crescent'),mira:profile('doubleReturn'),bram:profile('rootRumble')});
+  G.makeGuardianChallenges=()=>({treant:profile('branching'),queen:profile('rippling'),knight:profile('crescent'),mira:profile('doubleReturn'),bram:profile('rootRumble'),vesper:profile('secondWaltz')});
   G.normalizeGuardianChallenges=raw=>{
     const out=G.makeGuardianChallenges();
-    for(const [id,mode] of [['treant','branching'],['queen','rippling'],['knight','crescent'],['mira','doubleReturn'],['bram','rootRumble']]){
+    for(const [id,mode] of [['treant','branching'],['queen','rippling'],['knight','crescent'],['mira','doubleReturn'],['bram','rootRumble'],['vesper','secondWaltz']]){
       const a=raw?.[id],b=out[id];
       for(const k of ['practiceCleared','counterLearned','invited',mode+'Cleared'])b[k]=a?.[k]===true;
       b[mode]=a?.[mode]===true&&b.counterLearned;
