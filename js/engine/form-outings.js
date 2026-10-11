@@ -57,7 +57,15 @@
 
   function finishIfReady() {
     const outing = G.activeFormOuting();
-    if (!outing || outing.scenes.length < 2 || outing.arts.length < 2 || G.formLevel(outing.formId) < 3) return;
+    if (!outing) return;
+    const road = G.EARLY_FORM_ROADS?.find(r => r.formId === outing.formId);
+    // A repaired road is a complete useful outing in its own right.
+    // The existing exploration route stays available elsewhere; optional
+    // neighbour roads must not become compulsory errands.
+    const repaired = road && G.state.mapId === road.id && G.state.formId === outing.formId &&
+      road.repairs.every(r => G.roadRepairOpen(r.id));
+    const learned = outing.scenes.length >= 2 && outing.arts.length >= 2 && G.formLevel(outing.formId) >= 3;
+    if (!repaired && !learned) return;
     state().active = null;
     G.state.quietFormVictory = true;
     G.state.quietFormEchoTime = G.state.time;
@@ -65,6 +73,7 @@
     // the hit that finished this outing, or announce a whole ready roster.
     G.saveGame();
   }
+  G.updateFormOuting = finishIfReady;
 
   G.noteFormOutingHit = (enemy, abilityId) => {
     const outing = G.activeFormOuting(), ability = G.abilities[abilityId];
@@ -115,6 +124,7 @@
     state().active = { formId: form, scenes: [], arts: [] };
   });
   G.events.on("questDone", finishIfReady);
+  G.events.on("roadRepair", finishIfReady);
   G.events.on("formFeature", ({ feature }) => {
     const id = G.state?.formId;
     if (!id || G.FORM_ROLES[id]?.feature !== feature || state().features.includes(id)) return;

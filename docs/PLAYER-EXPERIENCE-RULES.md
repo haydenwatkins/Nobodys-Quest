@@ -1,6 +1,6 @@
 # Player experience principles
 
-October 10, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
+October 11, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
 
 ## How design feedback becomes game-wide work
 
@@ -35,6 +35,16 @@ Combat/build application: attach an equipment price to a meaningful choice about
 
 
 Guardian counter application: separate **personal learning**, **chosen encounter rules** and **reward ownership**. Recognize an actual action even with help; record a clear only after victory; pay a durable gift once. Preserve the player's useful free answer across forms and resources. A richer rematch should develop a response already enjoyed in the standard fight, with an explicit local choice rather than a global difficulty preference silently changing optional runs. Give practice a small lasting world consequence, not a second progression currency or mandatory quota. `TREANT-ROOTS.md` records the first implementation; later encounters must be authored and verified individually.
+
+## Consolidation and session quality
+
+The October 11 design assessment changes the quality priority: strengthen a continuous adventure before expanding the feature inventory. A passing feature test establishes correctness, not an enjoyable session. Prefer subtraction, clearer sequencing and useful world consequences over another menu, reward tier, named mechanic or mandatory counter.
+
+- Every authored body retains at least Patchling's normal walking pace. Express weight through its attacks, cover, push, timing and tactical choices; do not charge the player a permanent travel penalty for choosing a favorite. Fast bodies retain their movement advantages. Short, visible, actively breakable encounter restrictions are a separate contract.
+- A demonstrated world purpose can finish a new-body outing without additional unrelated kills, lessons or a timer. Give the action a meaningful variation and a lasting consequence. Repairs do not manufacture mastery, stars or hit credit; earning another ability remains actual worn-body learning.
+- Optional roads and promises remain optional. Keep the existing exploration alternative until it has a better authored replacement. Preserve the chosen good-news return and the quiet completion moment so removing paperwork does not cause rapid-fire discoveries.
+- Audit a whole stretch of play for walking, reading, repeated actions, interruptions and competing goals. A collection of individually successful fixtures is not a continuous-session or family-fun verdict.
+- Reused implementation is useful, but a different name must not stand in for a different experience. Consolidate redundant late systems and rewards when their practical choices cannot be explained or demonstrated.
 
 ## Benchmarks consulted
 

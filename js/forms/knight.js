@@ -4,7 +4,7 @@
 registerForm({
   id: "knight", name: "Knight", icon: "🛡️",
   tagline: "Meets danger shield-first, then answers with the one cut it earned.",
-  speed: 60, hearts: 7, slots: 2,
+  speed: 80, hearts: 7, slots: 2,
   passive: { id: "oathguard", name: "Oathguard",
     description: "Starting a melee art raises a brief frontal guard. Turn aside one blow to ready an Oathblade riposte. Perfect timing restores 1 mana and readies Oathblade immediately." },
   basic: "slash",

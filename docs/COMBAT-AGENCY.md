@@ -35,7 +35,7 @@ The remaining close-range registry inspection identifies these authored gaps:
 | Existing creatures | Current useful answer and next review |
 | --- | --- |
 | Slime / Orchard Tangle | Slow pursuit, ordinary knockback and short free-basic encounters; the Tangle also supports the poison lesson. Keep these approachable rather than adding a compulsory counter to every creature. |
-| Bat / Sun Hopper / Mirage Skater | Fast pursuit, low health and ordinary knockback. Stun now buys a safe pause. Review distinct readable approach beats and slow-form escape answers; these are the next close-range pressure cases. |
+| Bat / Sun Hopper / Mirage Skater | Fast pursuit, low health and ordinary knockback. Stun now buys a safe pause. Review distinct readable approach beats and short-range escape answers; these are the next close-range pressure cases. |
 | Bones | A small blunt ward gives a clear type choice, then ordinary knockback. Review how its matching-ward lesson combines with faster neighbours. |
 | Brute | Slow heavy pursuit with a larger sharp ward. Review a purposeful close-range commitment/recovery and low-mana matching answers; stronger ward health alone does not establish an interesting encounter. |
 | Pebblebeast / Tide Crab / Cairn Walker | Heavy creatures with smaller blunt wards and different regional settings. Existing shoves have reduced effect. Review their different space-making answers and group combinations rather than treating them as three copies of the same pressure. |

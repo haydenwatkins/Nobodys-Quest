@@ -4,7 +4,7 @@
 registerForm({
   id: "golem", name: "Cobblekin", icon: "🗿",
   tagline: "A patient roadmender whose mossy hands turn loose stones into a way home.",
-  speed: 58, hearts: 8, slots: 2,
+  speed: 80, hearts: 8, slots: 2,
   passive: { id: "masonry", name: "Masonry",
     description: "Area abilities raise a brief shot-filter field. Enemy shots stop; you, your friends and your shots pass through." },
   basic: "stoneKnuckle",

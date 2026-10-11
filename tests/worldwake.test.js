@@ -255,7 +255,7 @@ assert.equal(G.formOrder.at(-1), "god");
 assert.equal(G.formOrder.length, 24);
 assert.equal(G.abilities.worldBreak.damage, undefined, "ability metadata must not smuggle a passive damage bonus");
 assert.equal(G.forms.colossus.hearts, 8);
-assert.equal(G.forms.colossus.speed, 48);
+assert.equal(G.forms.colossus.speed, 80);
 
 // Worldbearers own arena-control moves instead of merely borrowing the same
 // projectile rotation as older bosses. The tighter pursuit only starts at

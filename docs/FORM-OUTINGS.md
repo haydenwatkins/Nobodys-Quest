@@ -6,7 +6,9 @@ October 4, 2026. This batch addresses clustered unlocks and the guardian-to-guar
 
 An earned form appears as one persistent echo in the world. The modern ceremony has two short pages, with an excited Patchling rather than a lecture about stats. The player becomes that body immediately.
 
-For the nineteen callings beyond the opening, another discovery waits until the player has:
+October 11 consolidates the nine authored specialist roads: repairing both crossings while using that road's body completes its useful outing. The action and its variation already demonstrate a purpose; no extra mastery lesson or encounter quota follows the repairs. A chosen ready neighbour promise still reserves the good-news return. New mastery, stars and abilities remain earned only by their existing real-action rules. A completed repair never fabricates hit/kill credit.
+
+The roads are optional. Another discovery can also follow the existing exploration alternative, in which the player has:
 
 - Learned two lessons while wearing the new body, reaching at least level 3.
 - Landed two different arts belonging to that body.
@@ -14,7 +16,7 @@ For the nineteen callings beyond the opening, another discovery waits until the 
 
 There is no elapsed-time requirement or extra star quota. Existing short lessons still supply mastery and new moves. The opening's Rat, Knight and Wizard retain their authored culvert/mill, guard practice and delivery/bridge introductions. Wayheart is the final form, with no competing successor to hold back.
 
-A clearing is credited at an enemy's original spawn site. Another site must be at least ten tiles away, or on a different map. Respawning one pocket or dragging the same foe across a room cannot impersonate exploration. Borrowing an art on another body cannot finish the outing. The ending victory and its same-frame companions do not reveal the next echo.
+A clearing is credited at an enemy's original spawn site. Another site must be at least ten tiles away, or on a different map. Respawning one pocket or dragging the same foe across a room cannot impersonate exploration. Borrowing an art on another body cannot finish the outing. Neither outing-ending repairs nor the ending victory and its same-frame companions reveal a competing echo. Saved completed roads can resolve a retained outing on a visit with that body; partial roads remain partial.
 
 Readiness remains earned while discovery waits. The Form Lab explains the current outing; the HUD points toward useful native play rather than advertising another body. Existing selected promises, deliberately followed lessons, echoes and Mark practices keep their priority.
 
@@ -35,7 +37,7 @@ Each trail is a northward spur from its restored guardian region. Entry uses the
 
 The feature belongs to the worn body; borrowed arts can still express that body's passive. An empty cast is not proof. Learned crossings persist per save slot. Grid cells are replaced instead of mutating shared map legends, so another slot cannot inherit a repaired road.
 
-Each trail uses its neighbouring region's authored terrain and scenery, with yielding landmarks, a familiar hearth, a picnic desk and a readable notice about the people returning to that road. They reuse existing foes and the renewable pantry system. They add no new roster entries or reward currency. Six optional neighbour promises now reuse the shared request engine and saved crossing features; return thanks leave bunting, a planter, lamps or a bench by the picnic. A selected, ready road/trail promise gives the return conversation room before discovery; Journey can set it aside. Existing outing quotas remain unchanged.
+Each trail uses its neighbouring region's authored terrain and scenery, with yielding landmarks, a familiar hearth, a picnic desk and a readable notice about the people returning to that road. They reuse existing foes and the renewable pantry system. They add no new roster entries or reward currency. Six optional neighbour promises now reuse the shared request engine and saved crossing features; return thanks leave bunting, a planter, lamps or a bench by the picnic. A selected, ready road/trail promise gives the return conversation room before discovery; Journey can set it aside. The six Worldwake trails retain their current exploration spacing while continuous guardian acquisition is reviewed. The nine specialist-road repair alternative above does not speed through Worldwake.
 
 ## Roster design contract
 
@@ -82,3 +84,15 @@ The shared breathing-room rule applies to future discoveries in opening version 
 The October 8 native review completes all six consecutive discoveries, passive effects and NPC returns with original enemy AI from an earned late checkpoint, in two seeded runs with two gentle knockouts each and zero respawns. The six guardian Marks are checkpoint inputs, so this does not establish fresh guardian-to-guardian pacing. See `WORLDWAKE-NEIGHBOURS.md` for reproducible tools, browser evidence and remaining limits.
 
 Physical iPad/Android/TV performance, audio feel and full live-AI campaign pacing remain unmeasured by these cloud checks. The next design pass should strengthen earlier forms' world opportunities and test a continuous Worldwake session, rather than adding more unlocks or increasing quotas.
+
+## October 11 consolidation verification
+
+Nine slower bodies now walk at 80, Patchling's baseline, throughout ordinary play and encounters; fast forms keep their original speeds. The 24-body native movement check wears genuinely eligible bodies (including the supplied earned final portfolio), walks a safe stretch of the real collision map, and verifies no movement-earned mastery or resource price. Both road repairs can finish an outing at level 1 or 2, without manufacturing lessons. Off-road exploration remains covered by the original separate-clearing/borrowed-body/quiet-discovery test. Partial/save restoration and chosen-return coverage span all nine roads.
+
+Verification: 37 focused movement/outing/road/return cases pass; five Bellkeeper-art/Worldwake checks also pass after updating the two intended old-speed expectations. These overlap the complete suite. Nine controlled road-availability runs demonstrate native repairs without respawns. Four original-AI Duelist/Tunneltuft/Velvetwing/Trouper checkpoints complete actual repairs and chosen returns without respawns; the first two finish at level 2. Seventeen original-AI Treant and seventeen Queen fight checkpoints retain all phases, counters, wards, mana, independent help combinations, real power collection and native enemy pressure. These are earned checkpoints, not fresh campaign sessions or human difficulty evidence. The Queen pilot now replans nearby terrain over 0.3 seconds while retaining its full shot/hazard forecast; its previous long wall forecast trapped the faster body. No encounter assertion or live enemy rule was relaxed.
+
+Eight final touch/TV × art-setting browser workflows pass: four use the actual joystick/TV axes on nine revised bodies plus two fast bodies; four walk Scout and Tunneltuft's repairs, chosen returns, real save reboot and remembered consequence with native attack/dialogue controls. Road walking uses native keyboard movement in the touch viewport; the dedicated pace workflow separately exercises the touch joystick. Supplied ownership/placement and stationary road AI isolate input/state/layout, rather than earning the campaign or proving fight balance. All **124 captures** were inspected on six sheets with selected native-size dialogue, return-journal and moving-body views. The complete 2D regression passes **713 tests**, zero failed/cancelled/skipped/todo (607,095.907534 ms); the 42 focused checks overlap that run.
+
+Physical iPad/Safari, Android/TV hardware behavior, viewing-distance comfort and family enjoyment remain unmeasured.
+
+Next, review the fresh opening through the Queen as a continuous session: interruptions, travel, first-use demonstrations, preparation and good-news returns. Preserve Worldwake's useful time; review its acquisition and remaining quota burden as a separate continuous session before changing the six trails. Physical device performance and human enjoyment remain separate evidence.

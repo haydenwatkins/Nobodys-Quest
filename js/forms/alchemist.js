@@ -10,7 +10,7 @@ registerForm({
   icon: "⚗️",
   tagline: "A cheerful field brewer who bottles wild herbs and lights the copper road lamps.",
 
-  speed: 75,
+  speed: 80,
   hearts: 4,
   slots: 2,
   passive: { id: "catalyst", name: "Catalyst",

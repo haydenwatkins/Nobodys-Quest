@@ -1,5 +1,5 @@
 /* ============================================================
-   DRAGON — a slow, sturdy master form with wide arcs and costly fire.
+   DRAGON — a sturdy master form with wide arcs and costly fire.
    ============================================================ */
 
 "use strict";
@@ -10,7 +10,7 @@ registerForm({
   icon: "🐉",
   tagline: "A sturdy hearth dragon who warms waystations and keeps a little fire for the road.",
 
-  speed: 65,
+  speed: 80,
   hearts: 7,
   slots: 2,
   passive: { id: "unstoppable", name: "Unstoppable",

@@ -52,10 +52,13 @@ review({url:process.argv[2],out:process.argv[3]||'/tmp/patchling-roads-review',n
     assert.equal(await page.evaluate(id=>G.roadRepairOpen(id),repair.id),true,'native input completes '+repair.id);await frames(8);await shot(repair.id+'-after');
     const [x0,y0,x1,y1]=repair.bridge;await walk(x0,Math.round((y0+y1)/2));await walk(x1,Math.round((y0+y1)/2));await frames(100);await shot(repair.id+'-crossed');
    }
+   assert.equal(await page.evaluate(()=>G.activeFormOuting()),null,'native repairs finish the outing without extra quota work');
    assert.equal(await page.evaluate(()=>G.currentTask().short),'Return to '+road.person);
    await page.evaluate(()=>G.ui.openMenu());assert.match(await page.locator('.journey-hero').innerText(),new RegExp('Return to '+road.person));await shot(road.id+'-return-journal');await page.evaluate(()=>G.ui.closeMenu());
    await reload();await page.evaluate(()=>{for(const e of G.state.enemies){e.def={...e.def,speed:0,aggro:0};e.guardPost=true;}G.state.player.invuln=999;});await frames(3);
    assert.equal(await page.evaluate(()=>G.state.roadworks.opened.length),2,'both repairs survive actual save reboot');
+   assert.equal(await page.evaluate(()=>G.activeFormOuting()),null,'completed outing survives actual save reboot');
+   assert.equal(await page.evaluate(()=>G.formDiscoveryAllowed()),false,'the chosen good-news return still has room');
    assert.equal(await page.evaluate(()=>G.currentTask().short),'Return to '+road.person,'the selected promise also survives reboot');
    await walk(road.at[0],road.at[1]+1);await next();await next();await frames(5);
    assert.ok(await page.evaluate(text=>window.reviewPaint.map(p=>p.text).join(' ').includes(text),road.thanks));await shot(road.id+'-good-news');await drain();

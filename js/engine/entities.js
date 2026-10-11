@@ -391,6 +391,7 @@ G.updatePlayer = function (dt) {
   }
 
   G.world.checkTriggers(dt);
+  if (G.updateFormOuting) G.updateFormOuting();
 };
 
 /* ================= ENEMIES ================= */

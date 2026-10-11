@@ -10,7 +10,7 @@ registerForm({
   icon: "🐹",
   tagline: "A soft-furred tunnel scout who listens for lost roads beneath the roots.",
 
-  speed: 75,
+  speed: 80,
   hearts: 6,
   slots: 2,
   passive: { id: "aftershock", name: "Aftershock",

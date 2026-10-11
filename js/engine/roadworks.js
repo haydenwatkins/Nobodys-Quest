@@ -21,7 +21,7 @@
     G.spawnFx({kind:'ring',x:(x0+x1+1)*8,y:(y0+y1+1)*8,color:'#a7f070',radius:26,dur:.65});
     const message=repair.kind==='flower'?'The dusk flower wakes. A warm path opens!':repair.kind==='bell'?'Both bells ring! Room for the show!':repair.kind==='vane'?'The glass vane turns. Room for the parade!':repair.kind==='soil'?'A little rumble. The dry path opens!':repair.kind==='lamp'?'The lamp is clear. A warm path opens!':repair.kind==='relay'?'The relays light up. The bridge lowers!':repair.kind==='brush'?'The branches roll aside. Room for the cart!':'The boards settle into place. A new crossing!';
     G.sfx.play('pickup');G.ui.toast(message,3);
-    G.saveGame();return true;
+    G.events.emit('roadRepair',{id:repair.id});G.saveGame();return true;
   }
   G.hitRoadMechanism=(enemy,opts)=>{
     const repair=enemy.roadMechanism;

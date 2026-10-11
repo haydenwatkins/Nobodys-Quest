@@ -42,7 +42,7 @@ test('the third Handbell peal displays its own ringing sequence without delaying
     for(const [phase,index]of [[1,0],[.5,1],[.01,2]]){p.attackPose.t=p.attackPose.dur*phase;assert.equal(G.performanceFrame(sprite,p,0),set.peal[index]);}
   }
   p.attackPose.t=.01;G.updatePlayer(.02);assert.equal(p.attackPose,null);assert.equal(e.hp,49);
-  assert.equal(G.forms.bellkeeper.speed,78);assert.equal(G.forms.bellkeeper.hearts,6);
+  assert.equal(G.forms.bellkeeper.speed,80);assert.equal(G.forms.bellkeeper.hearts,6);
 });
 
 test('Silence Ring poses remain visual and borrowed bells keep the borrower animation',()=>{

@@ -4,7 +4,7 @@
 registerForm({
   id: "turtle", name: "Harborback", icon: "🐢",
   tagline: "A patient shorekeeper with sea-worn shell plates and a heart for stranded travellers.",
-  speed: 62, hearts: 8, slots: 2,
+  speed: 80, hearts: 8, slots: 2,
   passive: { id: "shellback", name: "Shellback",
     description: "Your shell removes one damage and all knockback from attacks behind you." },
   basic: "shellJab",

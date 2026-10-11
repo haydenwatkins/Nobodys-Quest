@@ -4,7 +4,7 @@
 registerForm({
   id: "colossus", name: "Cragback", icon: "⛰️",
   tagline: "A gentle cliff-bear whose broad shoulders remember every homeward path.",
-  speed: 48, hearts: 8, slots: 2,
+  speed: 80, hearts: 8, slots: 2,
   passive: { id: "worldweight", name: "Worldweight",
     description: "While attacking, Cragback cannot be shoved or interrupted; melee and area arts hurl foes farther." },
   basic: "pillarFist",

@@ -30,7 +30,7 @@ test('both roads preserve a chosen promise, saved help, zero extra payouts and d
  for(const id of ['riftblade','mole']){const {r,G,road}=setup(id);G.state.enemies=[];G.ensureTown().followedRequest='beacon';
   G.tryOpeningInteraction();const offer=r.messages.find(m=>m.options?.offer)?.options.offer;assert.ok(offer);r.drain();assert.equal(G.ensureTown().followedRequest,'beacon');offer.onAccept();
   G.state.formOutings={active:{formId:id,arts:[],scenes:[]},features:[]};for(const repair of road.repairs){launch(r,repair);tick(r,35);assert.ok(G.roadRepairOpen(repair.id));}
-  assert.ok(G.activeFormOuting(),'world repairs do not manufacture lessons or encounter wins');G.state.formOutings.active=null;
+  assert.equal(G.activeFormOuting(),null,'two real repairs finish the useful outing without extra lessons or kills');
   assert.equal(G.formDiscoveryAllowed(),false,'a chosen ready promise reserves the return');G.saveGame();const saved=G.loadSaveData();G.state.roadworks=G.normalizeRoadworks(saved.roadworks);G.state.town=G.normalizeTown(saved.town);r.load(road.id);r.drain();G.state.enemies=[];
   assert.equal(G.currentTask().short,'Return to '+road.person);walk(r,road.at[0],road.at[1]+1);const before=[G.state.stars,G.ensureTown().spirit];G.tryOpeningInteraction();r.drain();
   assert.ok(G.ensureTown().requests.includes('road-'+id));assert.equal(G.formDiscoveryAllowed(),true);assert.deepEqual([G.state.stars,G.ensureTown().spirit],before);assert.equal(G.npcDialogue(road.npc,2,0),road.after);

@@ -39,8 +39,10 @@ for(const {form,rippling,heart,guardian,first=false} of (process.argv.includes('
   const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy),desired=d>1.5?{x:dx/d,y:dy/d}:{x:0,y:0};
   const shots=G.state.projectiles.filter(s=>!s.fromPlayer&&!s.dispelled),speed=G.forms[form].speed*G.mireWalkingScale(p);
   const choices=[desired,{x:0,y:0},...Array.from({length:16},(_,j)=>({x:Math.cos(j*Math.PI/8),y:Math.sin(j*Math.PI/8)}))];
+  // Replan feet steering every frame; do not treat a wall almost a
+  // second away as a collision now. Keep the full danger forecast.
   const score=v=>{let cost=Math.hypot(p.x+v.x*speed*.3-target.x,p.y+v.y*speed*.3-target.y);
-   for(let j=1;j<=8;j++){const t=j*.1,x=p.x+v.x*speed*t,y=p.y+v.y*speed*t;if(!G.world.isSafeSpawn(x,y))cost+=1000;
+   for(let j=1;j<=8;j++){const t=j*.1,x=p.x+v.x*speed*t,y=p.y+v.y*speed*t;if(t<=.3&&!G.world.isSafeSpawn(x,y))cost+=1000;
     for(const s of shots){if(t<s.armT)continue;const scale=G.guidanceProjectileScale?.(s)??1,sx=s.x+s.vx*t*scale,sy=s.y+s.vy*t*scale,dist=Math.hypot(x-sx,y-5-sy);cost+=Math.max(0,(s.size||3)+11-dist)**2*15;}
     for(const h of primary){const age=h.t+t;if(age>=h.delay+h.warning&&age<h.delay+h.warning+h.active)cost+=Math.max(0,h.radius+6-Math.hypot(x-h.x,y-h.y))**2*20;}
    }return cost;};choices.sort((a,b)=>score(a)-score(b));G.input.vec=choices[0];r.step(dt);r.drain();maxPhase=Math.max(maxPhase,e.bossPhase||0);

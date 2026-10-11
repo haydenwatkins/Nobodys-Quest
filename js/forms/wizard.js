@@ -9,7 +9,7 @@ registerForm({
   tagline: "A kindly roadside sage who keeps lost starlight in a walnut staff.",
 
 
-  speed: 70,                  // zoomy! (limit is 140)
+  speed: 80,                  // every shape keeps at least Patchling’s walking pace
   hearts: 4,                   // long-range power trades away staying power
   slots: 2,
   passive: { id: "hexcraft", name: "Hexcraft",
