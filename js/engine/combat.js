@@ -81,6 +81,7 @@ G.combat = (() => {
     if(enemy.mireCrust&&G.hitMireCrust)return G.hitMireCrust(enemy,opts);
     if(enemy.custardPie&&G.hitStagePie)return G.hitStagePie(enemy,opts);
     if(enemy.breakwaterSluice&&G.hitBreakwaterSluice)return G.hitBreakwaterSluice(enemy,opts);
+    if(enemy.foldroadPaper&&G.hitFoldroadPaper)return G.hitFoldroadPaper(enemy,opts);
     if(enemy.moonCover&&G.hitMoonCover)return G.hitMoonCover(enemy,opts);
     if(enemy.burrowPlug&&G.hitBurrowPlug)return G.hitBurrowPlug(enemy,opts);
     if(enemy.wayglassReflector&&G.hitWayglassReflector)return G.hitWayglassReflector(enemy,opts);
@@ -203,6 +204,7 @@ G.combat = (() => {
     G.noteDuskDefeat?.(enemy);
     G.noteStageDefeat?.(enemy);
     G.noteBreakwaterDefeat?.(enemy);
+    G.noteFoldroadDefeat?.(enemy);
     if(enemy.def.id==='moleMonarch')G.cancelBurrowPlugs?.(enemy);
     if(enemy.wayglassCounters!==undefined||enemy.def.id==='riftbladeAdept')G.cancelWayglassReflectors?.(enemy);
     if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
@@ -270,6 +272,8 @@ G.combat = (() => {
               ? enemy.stageCounters>0 ? "Custard everywhere! Come have a cookie by the fire." : "That was a lovely show! Come have a cookie by the fire."
             : enemy.marloLocalRematch
               ? enemy.breakwaterCounters>0 ? "The tide caught my shell! Come have a warm biscuit by the fire." : "You found your way through the tide! Come have a warm biscuit by the fire."
+            : enemy.sumiLocalRematch
+              ? enemy.foldroadCounters>0 ? "You opened my folds! Come have a rice cake by the fire." : "You found a clear step through my cuts! Come have a rice cake by the fire."
             : `${enemy.def.name} is defeated again.`;
       if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
         accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",

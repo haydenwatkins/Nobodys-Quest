@@ -27,6 +27,6 @@ for(const [id,map,item,form,type]of sources)test(`${id} saves a ground gift, pre
  const spirit=G.state.town.spirit,before=G.state.stars;G.tryOpeningInteraction();r.drain();assert.equal(G.state.stars,before);assert.equal(G.state.town.spirit,spirit);assert.ok(G.shattercoastChronicle().pending);collect(r,'shattercoast-tideglass-chronicle');
  assert.equal(G.state.stars,before+1);assert.equal(G.state.town.spirit,spirit+8);assert.equal(G.shattercoastChronicle().complete,true);
  G.tryOpeningInteraction();r.drain();assert.equal(G.state.stars,before+1);assert.equal(G.state.town.spirit,spirit+8);
- cross(r,map);if(id==='admiralTortoise'){assert.ok(!G.state.enemies.some(e=>!e.dead&&e.id===id),'Marlo waits for chosen practice after collection');assert.ok(G.beginBreakwaterRematch());assert.ok(G.state.enemies.some(e=>!e.dead&&e.marloLocalRematch));}else assert.ok(G.state.enemies.some(e=>e.id===id),'claimed trial keeps its original optional rematch');
+ cross(r,map);if(['admiralTortoise','paperRonin'].includes(id)){assert.ok(!G.state.enemies.some(e=>!e.dead&&e.id===id),'the keeper waits for chosen practice after collection');assert.ok(id==='admiralTortoise'?G.beginBreakwaterRematch():G.beginFoldroadRematch());assert.ok(G.state.enemies.some(e=>!e.dead&&(e.marloLocalRematch||e.sumiLocalRematch)));}else assert.ok(G.state.enemies.some(e=>e.id===id),'claimed trial keeps its original optional rematch');
  assert.equal(G.normalizeGroundRewards(saved.groundRewards).length,0,'legacy ownership discards stale pending credit');
 });

@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy) && !G.breakwaterSluiceAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy) && !G.breakwaterSluiceAim?.(enemy) && !G.foldroadPaperAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -653,6 +653,7 @@ G.cancelBossHazards = function (owner) {
   G.cancelMoonCovers?.(owner);
   G.cancelStagePies?.(owner);
   G.cancelBreakwaterSluices?.(owner);
+  G.cancelFoldroadPapers?.(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -1087,6 +1088,7 @@ function resolveBossActionPattern(e, p, action) {
   if(action === "foldCuts"){
     const angle=Math.atan2(p.y-e.y,p.x-e.x),turns=[0,Math.PI/3,-Math.PI/3];
     for(let i=0;i<e.bossPhase;i++)spawnBossHazard(e,"foldCut",{x:p.x,y:p.y,angle:angle+turns[i],length:140,width:14,note:i+1,warning:.95+i*.3,active:.18,color:"#f4f4f4"});
+    G.prepareFoldroadCounter?.(e,G.state.bossHazards.filter(h=>h.owner===e&&h.kind==='foldCut'&&h.t===0));
     e.bossRecoverT=.95+(e.bossPhase-1)*.3+.18+.9;return;
   }
   if(action === "pieRain"){
