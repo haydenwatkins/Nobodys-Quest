@@ -306,7 +306,7 @@ function makeExpansionTrialArena(variant) {
 
 [
   { id: "turtleTrial", name: "The Breakwater Bastion", theme: "turtle", boss: "admiralTortoise", variant: 0,
-    exit: { x: 11, y: 5 }, sign: "Blunt attacks break Marlo's ward. Use the marked channel through his tide, sidestep the charge, and counterattack during his pause." },
+    exit: { x: 11, y: 5 }, sign: "Blunt attacks break Marlo's ward. Strike a driftwood gate, then let the tide catch his shell. The marked channel is safe." },
   { id: "samuraiTrial", name: "The Foldroad Hall", theme: "samurai", boss: "paperRonin", variant: 1,
     exit: { x: 36, y: 5 }, sign: "Three deliberate cuts beat one frantic swing. Watch the pause before the draw." },
   { id: "astronomerTrial", name: "The Starpath Observatory", theme: "astronomer", boss: "professorPerihelion", variant: 2,
@@ -315,14 +315,15 @@ function makeExpansionTrialArena(variant) {
     exit: { x: 36, y: 24 }, sign: "Dark attacks break Briar's ward. Her marked flowerbeds leave gaps and a clear center. Step between them, then prune while she rests." },
 ].forEach((trial) => registerMap({
   id: trial.id, name: trial.name, visualTheme: trial.theme, playerStart: { x: 3, y: 8 },
-  bossTrial: { exit: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y }, delay: 1.7 },
+  bossTrial: { ...(trial.id==='turtleTrial'?{onlyEngaged:true}:{}), exit: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y }, delay: 1.7 },
   legend: {
     "x": { tile: "floor", portal: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y } },
     "B": { tile: "floor", enemy: trial.boss }, "m": { tile: "floor", message: trial.sign },
     "H": { tile: "floor", chest: { heal: true, name: "a guardian's travel biscuit" } },
     "R": { tile: "rock", on: "floor" },
+    ...(trial.id==='turtleTrial'?{"F":{tile:"floor",rest:true,restText:"Marlo’s fire restores every heart and all mana."}}:{}),
   },
-  tiles: makeExpansionTrialArena(trial.variant),
+  tiles: makeExpansionTrialArena(trial.variant).map((row,y)=>trial.id==='turtleTrial'&&y===11?row.slice(0,3)+'F'+row.slice(4):row),
 }));
 
 registerMap({

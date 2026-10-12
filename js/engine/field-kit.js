@@ -144,21 +144,22 @@
     addChallengeLamps();
   });
   function addChallengeLamps(){
+    if(!G.breakwaterVisitReady?.())stations=stations.filter(s=>s.kind!=='breakwaterChallenge');
     if(!G.stageVisitReady?.())stations=stations.filter(s=>s.kind!=='stageChallenge');
     if(!G.duskVisitReady?.())stations=stations.filter(s=>s.kind!=='duskChallenge');
     if(!G.burrowVisitReady?.())stations=stations.filter(s=>s.kind!=='burrowChallenge');
     if(!G.wayglassVisitReady?.())stations=stations.filter(s=>s.kind!=='wayglassChallenge');
-    for(const at of [G.treantChallengeStation?.(),G.mireChallengeStation?.(),G.eclipseChallengeStation?.(),G.wayglassChallengeStation?.(),G.burrowChallengeStation?.(),G.duskChallengeStation?.(),G.stageChallengeStation?.()])
+    for(const at of [G.treantChallengeStation?.(),G.mireChallengeStation?.(),G.eclipseChallengeStation?.(),G.wayglassChallengeStation?.(),G.burrowChallengeStation?.(),G.duskChallengeStation?.(),G.stageChallengeStation?.(),G.breakwaterChallengeStation?.()])
       if(at&&!stations.some(s=>s.kind===at.kind))stations.push(at);
   }
-  G.events.on('kill',data=>{if(['ancientTreant','mireQueen','eclipseKnight','riftbladeAdept','moleMonarch','countessCarmine','royalFool'].includes(data.enemy))addChallengeLamps();});
+  G.events.on('kill',data=>{if(['ancientTreant','mireQueen','eclipseKnight','riftbladeAdept','moleMonarch','countessCarmine','royalFool','admiralTortoise'].includes(data.enemy))addChallengeLamps();});
   const safe=()=>G.state&&!G.ui.dialogueOpen&&!G.ui.menuOpen&&!view&&!G.state.knockout&&!G.state.bossCutscene&&!G.state.zoneTransition&&!G.activeWorldbearer?.()&&!(G.state.enemies||[]).some(e=>!e.dead&&!e.def.practice&&(e.bossEngaged||Math.hypot(e.x-G.state.player.x,e.y-G.state.player.y)<68))&&!(G.state.projectiles||[]).some(p=>!p.fromPlayer&&Math.hypot(p.x-G.state.player.x,p.y-G.state.player.y)<68);
   G.helpStationCandidate=()=>{
     addChallengeLamps();
     if(!safe())return null;
     const p=G.state.player,near=stations.map(s=>({...s,d:Math.hypot(s.x-p.x,s.y-p.y)})).filter(s=>s.d<=20).sort((a,b)=>a.d-b.d)[0];
     if(!near)return null;
-    if((near.kind==='treantChallenge'&&G.treantRematchActive())||(near.kind==='mireChallenge'&&G.mireRematchActive())||(near.kind==='eclipseChallenge'&&G.eclipseRematchActive())||(near.kind==='wayglassChallenge'&&G.wayglassRematchActive())||(near.kind==='burrowChallenge'&&G.burrowRematchActive())||(near.kind==='duskChallenge'&&G.duskRematchActive())||(near.kind==='stageChallenge'&&G.stageRematchActive()))return null;
+    if((near.kind==='treantChallenge'&&G.treantRematchActive())||(near.kind==='mireChallenge'&&G.mireRematchActive())||(near.kind==='eclipseChallenge'&&G.eclipseRematchActive())||(near.kind==='wayglassChallenge'&&G.wayglassRematchActive())||(near.kind==='burrowChallenge'&&G.burrowRematchActive())||(near.kind==='duskChallenge'&&G.duskRematchActive())||(near.kind==='stageChallenge'&&G.stageRematchActive())||(near.kind==='breakwaterChallenge'&&G.breakwaterRematchActive()))return null;
     const npc=G.npcTalkCandidate?.();
     if(npc&&Math.hypot(npc.x-p.x,npc.y-p.y)<near.d+6)return null;
     const lamp=lamps.find(l=>l.key===near.kind);
@@ -166,6 +167,7 @@
     if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Adds a following volley. Crack the mire near the Queen to stop it.'};
     if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Adds a crescent after his charge. Strike his raised shield to stop the pair.'};
     if(near.kind==='wayglassChallenge')return {...near,id:'field-kit',label:`Double Return · ${G.wayglassDoubleLit()?'Put out':'Light'}`,hint:'Adds a second throw. Raise a reflector to stop the pair when a blade returns.'};
+    if(near.kind==='breakwaterChallenge')return {...near,id:'field-kit',label:`Returning Tide · ${G.breakwaterReturningLit()?'Put out':'Light'}`,hint:'Adds a tide across the first. Open a driftwood gate; the arriving water stops the pair.'};
     if(near.kind==='stageChallenge')return {...near,id:'field-kit',label:`Card Encore · ${G.stageEncoreLit()?'Put out':'Light'}`,hint:'Adds a card fan after the pies. Splash a landed pie to stop the act.'};
     if(near.kind==='duskChallenge')return {...near,id:'field-kit',label:`Second Waltz · ${G.duskSecondLit()?'Put out':'Light'}`,hint:'Adds a following waltz. Uncover a moon lamp to stop her dash before both.'};
     if(near.kind==='burrowChallenge')return {...near,id:'field-kit',label:`Root Rumble · ${G.burrowRumbleLit()?'Put out':'Light'}`,hint:'Adds a second marked stomp. Break the root plug to stop both.'};
@@ -180,6 +182,7 @@
     if(at.kind==='treantChallenge'){G.toggleTreantBranching();G.sfx.play('pickup');G.input.clearTaps();return true;}
     if(at.kind==='mireChallenge'){G.toggleMireRippling();G.sfx.play('pickup');G.input.clearTaps();return true;}
     if(at.kind==='eclipseChallenge'){G.toggleEclipseCrescent();G.sfx.play('pickup');G.input.clearTaps();return true;}
+    if(at.kind==='breakwaterChallenge'){G.toggleBreakwaterReturning();G.sfx.play('pickup');G.input.clearTaps();return true;}
     if(at.kind==='stageChallenge'){G.toggleStageEncore();G.sfx.play('pickup');G.input.clearTaps();return true;}
     if(at.kind==='duskChallenge'){G.toggleDuskSecond();G.sfx.play('pickup');G.input.clearTaps();return true;}
     if(at.kind==='burrowChallenge'){G.toggleBurrowRumble();G.sfx.play('pickup');G.input.clearTaps();return true;}
@@ -189,7 +192,7 @@
   const drawables=G.openingDrawables;
   G.openingDrawables=c=>{const list=drawables(c);addChallengeLamps();for(const s of stations)list.push({y:s.y,fn:()=>drawStation(c,s)});return list;};
   function drawStation(c,s){
-    const lamp=lamps.find(l=>l.key===s.kind)||(['treantChallenge','mireChallenge','eclipseChallenge','wayglassChallenge','burrowChallenge','duskChallenge','stageChallenge'].includes(s.kind)?{key:s.kind,color:s.kind==='stageChallenge'?'#ffcd75':s.kind==='duskChallenge'?'#e2c9d6':s.kind==='burrowChallenge'?'#d8b06a':s.kind==='wayglassChallenge'?'#73eff7':s.kind==='mireChallenge'?'#b7d9d4':s.kind==='eclipseChallenge'?'#b58ee6':'#e9ac75'}:null),lit=lamp&&(s.kind==='treantChallenge'?G.treantBranchingLit():s.kind==='mireChallenge'?G.mireRipplingLit():s.kind==='eclipseChallenge'?G.eclipseCrescentLit():s.kind==='wayglassChallenge'?G.wayglassDoubleLit():s.kind==='burrowChallenge'?G.burrowRumbleLit():s.kind==='duskChallenge'?G.duskSecondLit():s.kind==='stageChallenge'?G.stageEncoreLit():G.comfortSetting(lamp.key)),x=s.x,y=s.y;
+    const lamp=lamps.find(l=>l.key===s.kind)||(['treantChallenge','mireChallenge','eclipseChallenge','wayglassChallenge','burrowChallenge','duskChallenge','stageChallenge','breakwaterChallenge'].includes(s.kind)?{key:s.kind,color:s.kind==='breakwaterChallenge'?'#73eff7':s.kind==='stageChallenge'?'#ffcd75':s.kind==='duskChallenge'?'#e2c9d6':s.kind==='burrowChallenge'?'#d8b06a':s.kind==='wayglassChallenge'?'#73eff7':s.kind==='mireChallenge'?'#b7d9d4':s.kind==='eclipseChallenge'?'#b58ee6':'#e9ac75'}:null),lit=lamp&&(s.kind==='treantChallenge'?G.treantBranchingLit():s.kind==='mireChallenge'?G.mireRipplingLit():s.kind==='eclipseChallenge'?G.eclipseCrescentLit():s.kind==='wayglassChallenge'?G.wayglassDoubleLit():s.kind==='burrowChallenge'?G.burrowRumbleLit():s.kind==='duskChallenge'?G.duskSecondLit():s.kind==='stageChallenge'?G.stageEncoreLit():s.kind==='breakwaterChallenge'?G.breakwaterReturningLit():G.comfortSetting(lamp.key)),x=s.x,y=s.y;
     c.save();c.fillStyle='rgba(25,38,35,.25)';c.beginPath();c.ellipse(x,y+3,9,3,0,0,Math.PI*2);c.fill();
     if(!lamp){c.fillStyle='#48382f';c.fillRect(x-7,y-11,14,14);c.fillStyle='#af8462';c.fillRect(x-6,y-10,12,11);c.fillStyle='#e9c890';c.fillRect(x-7,y-12,14,4);c.fillRect(x-1,y-9,2,5);c.strokeStyle='#e9c890';c.strokeRect(x-4,y-15,8,5);c.restore();return;}
     if(lit){c.fillStyle=lamp.color+'33';c.beginPath();c.ellipse(x,y-8,13,15,0,0,Math.PI*2);c.fill();}
@@ -204,6 +207,8 @@
     }else if(s.kind==='eclipseChallenge'){
       c.strokeStyle=lit?'#fff3c2':'#c4baa0';c.lineWidth=2;c.beginPath();c.arc(x+1,y-9,3.5,Math.PI*.4,Math.PI*1.6);c.stroke();
       if(lit){c.fillStyle='#fff3c2';c.beginPath();c.arc(x,y-15,1.5,0,Math.PI*2);c.fill();}
+    }else if(s.kind==='breakwaterChallenge'){
+      c.strokeStyle=lit?'#fff3c2':'#c4baa0';c.lineWidth=1.2;for(const dy of [-11,-7]){c.beginPath();c.moveTo(x-4,y+dy);c.quadraticCurveTo(x,y+dy-3,x+4,y+dy);c.stroke();}
     }else if(s.kind==='stageChallenge'){
       c.strokeStyle=lit?'#fff3c2':'#c4baa0';c.lineWidth=1;c.strokeRect(x-3,y-13,4,7);c.strokeRect(x,y-11,4,7);
     }else if(s.kind==='duskChallenge'){

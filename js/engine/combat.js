@@ -80,6 +80,7 @@ G.combat = (() => {
     if(enemy.treantRoot&&G.hitTreantRoot)return G.hitTreantRoot(enemy,opts);
     if(enemy.mireCrust&&G.hitMireCrust)return G.hitMireCrust(enemy,opts);
     if(enemy.custardPie&&G.hitStagePie)return G.hitStagePie(enemy,opts);
+    if(enemy.breakwaterSluice&&G.hitBreakwaterSluice)return G.hitBreakwaterSluice(enemy,opts);
     if(enemy.moonCover&&G.hitMoonCover)return G.hitMoonCover(enemy,opts);
     if(enemy.burrowPlug&&G.hitBurrowPlug)return G.hitBurrowPlug(enemy,opts);
     if(enemy.wayglassReflector&&G.hitWayglassReflector)return G.hitWayglassReflector(enemy,opts);
@@ -201,6 +202,7 @@ G.combat = (() => {
     G.noteBurrowDefeat?.(enemy);
     G.noteDuskDefeat?.(enemy);
     G.noteStageDefeat?.(enemy);
+    G.noteBreakwaterDefeat?.(enemy);
     if(enemy.def.id==='moleMonarch')G.cancelBurrowPlugs?.(enemy);
     if(enemy.wayglassCounters!==undefined||enemy.def.id==='riftbladeAdept')G.cancelWayglassReflectors?.(enemy);
     if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
@@ -266,6 +268,8 @@ G.combat = (() => {
               ? enemy.vesperSecondWaltz ? enemy.duskCounters>0 ? "You caught my dash before both waltzes! Come have tea by the fire." : "You found the clear opening in both waltzes! Come have tea by the fire." : "A lovely dance! Come have tea by the fire."
             : enemy.tansyLocalRematch
               ? enemy.stageCounters>0 ? "Custard everywhere! Come have a cookie by the fire." : "That was a lovely show! Come have a cookie by the fire."
+            : enemy.marloLocalRematch
+              ? enemy.breakwaterCounters>0 ? "The tide caught my shell! Come have a warm biscuit by the fire." : "You found your way through the tide! Come have a warm biscuit by the fire."
             : `${enemy.def.name} is defeated again.`;
       if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
         accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",

@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy) && !G.breakwaterSluiceAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -652,6 +652,7 @@ G.cancelBossHazards = function (owner) {
   G.cancelBurrowPlugs?.(owner);
   G.cancelMoonCovers?.(owner);
   G.cancelStagePies?.(owner);
+  G.cancelBreakwaterSluices?.(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -695,10 +696,12 @@ G.updateBossHazards = function (dt) {
           && h.t >= (h.delay || 0) + h.warning + h.active && G.leaveTreantRoot) G.leaveTreantRoot(h);
       if(h.mapId===G.state.mapId&&h.owner&&!h.owner.dead&&h.t>=(h.delay||0)+h.warning+h.active&&G.leaveMireCrust)G.leaveMireCrust(h);
       G.retireStagePie?.(h);
+      G.retireBreakwaterSluice?.(h);
       hazards.splice(i, 1);
       continue;
     }
     if(h.kind==="pieRain")G.landStagePie?.(h);
+    if(h.breakwater)G.syncBreakwaterSluice?.(h);
     if (!hazardIsActive(h) || G.state.knockout) continue;
 
     if(h.kind === "mireVolley"){
@@ -719,6 +722,7 @@ G.updateBossHazards = function (dt) {
     }
 
     if (h.kind === "gust") {
+      if(G.catchBreakwaterTide?.(h))continue;
       if (!p.dashing && gustLaneDanger(h, p.x, p.y)) {
         const a = G.util.angleTo(p.x, p.y, h.owner.x, h.owner.y);
         const speed = h.push || 58;
@@ -1027,6 +1031,7 @@ function spawnArenaPattern(e, action) {
         gust.warning=Math.max(gust.warning,(gust.safeRoute.length-1)*8/G.bossWalkingSpeed()+.35);
       }
     }
+    if(action === "tideWall")G.prepareBreakwaterCounter?.(e,gust);
   }
   if (action === "faultGrid" || action === "webGrid" || action === "worldGrid") {
     const colors = { faultGrid: "#ffcd75", webGrid: "#d9a7ff", worldGrid: "#ef7d57" };
