@@ -79,6 +79,7 @@ G.combat = (() => {
     if(enemy.roadMechanism&&G.hitRoadMechanism)return G.hitRoadMechanism(enemy,opts);
     if(enemy.treantRoot&&G.hitTreantRoot)return G.hitTreantRoot(enemy,opts);
     if(enemy.mireCrust&&G.hitMireCrust)return G.hitMireCrust(enemy,opts);
+    if(enemy.custardPie&&G.hitStagePie)return G.hitStagePie(enemy,opts);
     if(enemy.moonCover&&G.hitMoonCover)return G.hitMoonCover(enemy,opts);
     if(enemy.burrowPlug&&G.hitBurrowPlug)return G.hitBurrowPlug(enemy,opts);
     if(enemy.wayglassReflector&&G.hitWayglassReflector)return G.hitWayglassReflector(enemy,opts);
@@ -199,6 +200,7 @@ G.combat = (() => {
     G.noteWayglassDefeat?.(enemy);
     G.noteBurrowDefeat?.(enemy);
     G.noteDuskDefeat?.(enemy);
+    G.noteStageDefeat?.(enemy);
     if(enemy.def.id==='moleMonarch')G.cancelBurrowPlugs?.(enemy);
     if(enemy.wayglassCounters!==undefined||enemy.def.id==='riftbladeAdept')G.cancelWayglassReflectors?.(enemy);
     if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
@@ -262,6 +264,8 @@ G.combat = (() => {
               ? enemy.bramRootRumble ? enemy.burrowStompCounters>0 ? "You stopped my stomp with a root pop! Come warm up by the fire. The shortbread's ready." : enemy.burrowTripCounters>0 ? "You tripped my burrow! Come warm up by the fire. The shortbread's ready." : "You found a clear step through both stomps! Come warm up by the fire. The shortbread's ready." : "Good practice! Come warm up by the fire. The shortbread's ready."
             : enemy.vesperLocalRematch
               ? enemy.vesperSecondWaltz ? enemy.duskCounters>0 ? "You caught my dash before both waltzes! Come have tea by the fire." : "You found the clear opening in both waltzes! Come have tea by the fire." : "A lovely dance! Come have tea by the fire."
+            : enemy.tansyLocalRematch
+              ? enemy.stageCounters>0 ? "Custard everywhere! Come have a cookie by the fire." : "That was a lovely show! Come have a cookie by the fire."
             : `${enemy.def.name} is defeated again.`;
       if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
         accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",

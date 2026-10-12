@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -651,6 +651,7 @@ G.cancelBossHazards = function (owner) {
   G.cancelWayglassReflectors?.(owner);
   G.cancelBurrowPlugs?.(owner);
   G.cancelMoonCovers?.(owner);
+  G.cancelStagePies?.(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
@@ -693,9 +694,11 @@ G.updateBossHazards = function (dt) {
       if (h.mapId === G.state.mapId && h.owner && !h.owner.dead
           && h.t >= (h.delay || 0) + h.warning + h.active && G.leaveTreantRoot) G.leaveTreantRoot(h);
       if(h.mapId===G.state.mapId&&h.owner&&!h.owner.dead&&h.t>=(h.delay||0)+h.warning+h.active&&G.leaveMireCrust)G.leaveMireCrust(h);
+      G.retireStagePie?.(h);
       hazards.splice(i, 1);
       continue;
     }
+    if(h.kind==="pieRain")G.landStagePie?.(h);
     if (!hazardIsActive(h) || G.state.knockout) continue;
 
     if(h.kind === "mireVolley"){
@@ -704,6 +707,10 @@ G.updateBossHazards = function (dt) {
     }
     if(h.kind === "riftVolley"){
       if(!h.fired){h.fired=true;fireRiftbladeVolley(h.owner,{x:h.x,y:h.y});}
+      continue;
+    }
+    if(h.kind === "stageEncore"){
+      if(!h.fired){h.fired=true;for(const angle of h.shots){enemyShot(G.state,h.owner,angle,{damage:1,speed:105,range:175,size:5,shape:"card"});const s=G.state.projectiles[G.state.projectiles.length-1];s.x=s.startX=h.x;s.y=s.startY=h.y;}}
       continue;
     }
     if(h.kind === "crimsonWaltz"){
@@ -789,7 +796,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (!["mirePool","rootBloom","mireVolley","riftVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut"].includes(h.kind)) {
+    if (!["mirePool","rootBloom","mireVolley","riftVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut","stageEncore"].includes(h.kind)) {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
       G.text.setWorldClip(ctx,b);
@@ -799,7 +806,9 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if(h.kind === "riftVolley"){
+    if(h.kind === "stageEncore"){
+      ctx.globalAlpha=.9;ctx.strokeStyle="#fff3c2";ctx.lineWidth=1;for(const angle of h.shots){const x=h.x+Math.cos(angle)*42,y=h.y+Math.sin(angle)*42;ctx.save();ctx.translate(x,y);ctx.rotate(angle+Math.PI/2);ctx.fillStyle="#e2c9d6";ctx.fillRect(-3,-5,6,10);ctx.strokeRect(-3,-5,6,10);ctx.fillStyle="#bb8c55";ctx.fillRect(-1,-2,2,4);ctx.restore();}
+    }else if(h.kind === "riftVolley"){
       const e=h.owner,angle=Math.atan2(h.y-e.y,h.x-e.x);ctx.globalAlpha=.85;ctx.strokeStyle="#73eff7";ctx.setLineDash([4,3]);
       for(const spread of h.spreads){const a=angle+spread*Math.PI/180,x=e.x+Math.cos(a)*82,y=e.y-6+Math.sin(a)*82;ctx.beginPath();ctx.moveTo(e.x,e.y-6);ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.stroke();}
       ctx.setLineDash([]);ctx.fillStyle="#263b4b";ctx.fillRect(e.x-28,e.y+16,56,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"THEY RETURN",e.x,e.y+24);
@@ -811,7 +820,7 @@ G.drawBossHazards = function (ctx) {
     }else if(h.kind === "pieRain"){
       ctx.globalAlpha=.25;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.95;ctx.strokeStyle="#fff3c2";ctx.setLineDash(active?[]:[3,3]);ctx.stroke();ctx.setLineDash([]);
       if(active){if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,h.y,true)){ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-12,h.y-3,24,6);ctx.fillRect(h.x-5,h.y-8,10,16);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-6,h.y-4,12,8);}}
-      else{const py=h.y-30*(1-Math.min(1,local/h.warning));if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,py)){ctx.fillStyle="#bb8c55";ctx.fillRect(h.x-8,py-3,16,6);ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-7,py-6,14,4);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-3,py-8,6,3);}}
+      else{const py=h.y-30*(1-Math.min(1,local/(h.landing||h.warning)));if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,py)){ctx.fillStyle="#bb8c55";ctx.fillRect(h.x-8,py-3,16,6);ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-7,py-6,14,4);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-3,py-8,6,3);}}
     }else if(h.kind === "crimsonWaltz"){
       const e=h.owner;ctx.globalAlpha=.7;ctx.strokeStyle="#e9a9ce";ctx.setLineDash([3,3]);
       for(const a of h.shots){ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*14,e.y-6+Math.sin(a)*14);ctx.lineTo(e.x+Math.cos(a)*95,e.y-6+Math.sin(a)*95);ctx.stroke();}
@@ -1082,6 +1091,7 @@ function resolveBossActionPattern(e, p, action) {
       if(i&&!G.world.isSafeSpawn(x,y))continue;
       spawnBossHazard(e,"pieRain",{x,y,radius:17,warning:1+i*.25,active:.3,color:"#ffcd75"});
     }
+    G.prepareStageCounter?.(e,(G.state.bossHazards||[]).filter(h=>h.owner===e&&h.kind==="pieRain"&&h.t===0),p);
     e.bossRecoverT=1+(e.bossPhase-1)*.25+.3+.9;return;
   }
   if(action === "crimsonWaltz"){

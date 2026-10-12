@@ -1,6 +1,6 @@
 # Player experience principles
 
-October 11, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
+October 12, 2026. Apply this contract when changing the 2D game. The parent's playtest through Mire Queen takes priority over the previous reward-audit queue. Ben wants readable text and NPC quests; the game should feel friendly, purposeful and playful.
 
 ## How design feedback becomes game-wide work
 
@@ -81,7 +81,7 @@ Improve visibility before adding warning machinery. Give a moving threat enough 
 
 A physical confirmation belongs to the action that received the press. When a screen remaps a held controller button, release its old action and wait for a fresh press before activating the new one. Finishing a conversation must leave a newly presented choice visible; confirming a menu must not become an attack as it closes. Verify handoffs with a realistic held press as well as a one-frame pulse.
 
-Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. Treant’s Branching Roots, Queen’s Rippling Mire, Knight’s Following Crescent, Mira’s Double Return, Bram’s Root Rumble and Vesper’s Second Waltz are implemented local rematches; the remaining authored patterns are queued.
+Heart recovery, guardian help and future authored challenge patterns are independent voluntary choices. Never promote a player automatically or extinguish help. Keep all power, forms, stars, story and treasure pursuits available with help. Encourage a rematch after a demonstrated success, with a friendly invitation and visible personal accomplishment; no difficulty shame, automatically accepted challenge quests or repeated nudges. Harder patterns must earn their appeal through richer play. See `GUARDIAN-CHALLENGES.md` for the family ladder, each guardian's proposed counter, reward contract and implementation gates. Treant’s Branching Roots, Queen’s Rippling Mire, Knight’s Following Crescent, Mira’s Double Return, Bram’s Root Rumble, Vesper’s Second Waltz and Tansy’s Card Encore are implemented local rematches; the remaining authored patterns are queued.
 
 An accessible counter can clear pressure and open an attack window while preserving the encounter’s distinct tool requirement. Do not make every response bypass every ward. Keep a free answer to temporary restrictions, and teach the guardian’s own ward through previously introduced arts. Derive any local movement restriction from the active prop and the player’s actual feet; leaving, breaking, expiration, phase changes, defeat and travel must clear it without a lingering or stacking penalty. Dash movement and its real resource price stay intact.
 
@@ -96,6 +96,8 @@ An active guardian encounter owns attack input even when its body is farther awa
 A newly gained body’s discovery, useful outing and chosen good-news return take precedence over rematch invitations. Practice can remain harmless and available, but do not compete for attention with the new body’s first purpose. Invitations create neither a task nor an automatic duel. `WAYGLASS-RETURN.md` records this application.
 
 A leftover hazard prop should retain an honest use after its warning: a real attack may prepare it, and actual committed movement may supply a different counter. Honor the moving actor’s ownership, state and swept feet; do not award an opening for merely entering a warning or preparing a trap. Keep props walkable and retire them cleanly when the encounter changes. Recognition names the action actually performed. Chosen practice retries may use their own quiet camp, while first encounters retain their connected return and ordinary mishaps keep their attribution. `BURROW-ROOTS.md` records this application.
+
+A falling object and a landed target are different states. Create a hittable ground proxy only after the visible landing; retire it at the actual burst, even if the surrounding animation remains. A following ranged phrase commits its origin as well as direction, so knockback cannot separate the warning from its released shots. Companion presence can remain quiet while a new body’s discovery/outing/return protects action availability; do not equate avoiding attention with removing the person. `STAGE-CUSTARD.md` records this application and the earlier companion backfill still queued.
 
 ## Prose rules
 
@@ -129,6 +131,8 @@ Write spoken English that a child can follow on first hearing. Every story/reque
 | Mire Queen | Proud, possessive of her court’s light; reluctantly recognizes the boats need it. |
 | Eclipse Knight | Anxious night guard; fears losing the last watchfire, admits he frightened travelers, offers a friendly practice rematch. |
 | Mira | Careful road keeper; cares about travelers crossing safely, enjoys a good practice duel and welcomes the player back with star-cookies. |
+| Tansy | Caring caravan performer; wants travelers to laugh after difficult roads, gives practical pie advice, shares cookies and welcomes another try without shame. |
+| Vesper | Warm night shelter keeper; cares about travelers after dark, gives practical light advice and offers tea after a dance or breather. |
 | Bram | Caring tunnel keeper; worries about packed roots beneath the road, gives concrete digging advice and shares shortbread after practice or a breather. |
 
 ## Guidance rules

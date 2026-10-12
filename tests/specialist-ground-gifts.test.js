@@ -18,10 +18,10 @@ for(const [id,map,item,form,type,entryStars]of sources)test(`${id} preserves its
  G.saveGame();assert.ok(G.loadSaveData().items.includes(item));assert.ok(!G.loadSaveData().groundRewards.some(g=>g.item===item));
  const rematch=G.makeEnemy(id,e.x,e.y);rematch.ward.hp=0;G.combat.damageEnemy(rematch,{damage:100,type,knockback:0});r.drain();assert.equal(G.state.stars,stars+1);assert.equal(G.groundRewardFor(item),null);
  cross(r,'overworld');cross(r,map);
- if(['riftbladeAdept','moleMonarch','countessCarmine'].includes(id)){
+ if(['riftbladeAdept','moleMonarch','countessCarmine','royalFool'].includes(id)){
   assert.ok(!G.state.enemies.some(e=>!e.dead&&e.id===id),'the friendly specialist waits for a chosen rematch after collection');
-  assert.ok(id==='moleMonarch'?G.beginBurrowRematch():id==='countessCarmine'?G.beginDuskRematch():G.beginWayglassRematch(),'legacy ownership retains deliberate practice access');
-  assert.ok(G.state.enemies.some(e=>!e.dead&&(e.miraLocalRematch||e.bramLocalRematch||e.vesperLocalRematch)));
+  assert.ok(id==='moleMonarch'?G.beginBurrowRematch():id==='countessCarmine'?G.beginDuskRematch():id==='royalFool'?G.beginStageRematch():G.beginWayglassRematch(),'legacy ownership retains deliberate practice access');
+  assert.ok(G.state.enemies.some(e=>!e.dead&&(e.miraLocalRematch||e.bramLocalRematch||e.vesperLocalRematch||e.tansyLocalRematch)));
  }else assert.ok(G.state.enemies.some(e=>!e.dead&&e.id===id),'the original optional rematch returns after claim');
  assert.equal(G.normalizeGroundRewards(saved.groundRewards).length,0,'legacy ownership cannot restore duplicate pending credit');
 });
