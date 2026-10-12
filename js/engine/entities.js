@@ -594,6 +594,7 @@ const BOSS_ARENA_ACTIONS = {
   mireVolley: "REED VOLLEY",
   eclipseSweep: "ECLIPSE SWEEP",
   orbitalBand: "SAFE ORBIT",
+  starpathComet: "COMET",
   gardenBeds: "BRIAR GARDEN",
   royalStomp: "ROYAL STOMP",
   crimsonWaltz: "CRIMSON WALTZ",
@@ -691,6 +692,7 @@ G.updateBossHazards = function (dt) {
   for (let i = hazards.length - 1; i >= 0; i--) {
     const h = hazards[i];
     h.t += dt;
+    G.trackStarpathOrbit?.(h);
     if (h.mapId !== G.state.mapId || !h.owner || h.owner.dead
       || h.t >= (h.delay || 0) + h.warning + h.active) {
       if (h.mapId === G.state.mapId && h.owner && !h.owner.dead
@@ -715,6 +717,10 @@ G.updateBossHazards = function (dt) {
     }
     if(h.kind === "stageEncore"){
       if(!h.fired){h.fired=true;for(const angle of h.shots){enemyShot(G.state,h.owner,angle,{damage:1,speed:105,range:175,size:5,shape:"card"});const s=G.state.projectiles[G.state.projectiles.length-1];s.x=s.startX=h.x;s.y=s.startY=h.y;}}
+      continue;
+    }
+    if(h.kind === "starpathComet"){
+      if(!h.fired){h.fired=true;enemyShot(G.state,h.owner,h.angle,{damage:1,speed:125,range:240,size:8,shape:"star"});const s=G.state.projectiles[G.state.projectiles.length-1];s.x=s.startX=h.x;s.y=s.startY=h.y;s.color="#ffcd75";}
       continue;
     }
     if(h.kind === "crimsonWaltz"){
@@ -836,6 +842,12 @@ G.drawBossHazards = function (ctx) {
       ctx.globalAlpha=.95;ctx.strokeStyle="#ffcd75";ctx.setLineDash(active?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
       for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(h.x+Math.cos(a)*12,h.y+Math.sin(a)*12);ctx.lineTo(h.x+Math.cos(a+.13)*h.radius*.6,h.y+Math.sin(a+.13)*h.radius*.6);ctx.lineTo(h.x+Math.cos(a)*h.radius*.9,h.y+Math.sin(a)*h.radius*.9);ctx.stroke();}
       ctx.fillStyle="#302638";ctx.fillRect(h.x-22,h.y+h.radius+3,44,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"MOVE OUT",h.x,h.y+h.radius+11);
+    }else if(h.kind === "starpathComet"){
+      ctx.globalAlpha=.22;ctx.strokeStyle="#ffcd75";ctx.lineWidth=16;
+      ctx.beginPath();ctx.moveTo(h.x,h.y);ctx.lineTo(h.x+Math.cos(h.angle)*240,h.y+Math.sin(h.angle)*240);ctx.stroke();
+      ctx.globalAlpha=.8;ctx.strokeStyle="#ffcd75";ctx.lineWidth=2;ctx.setLineDash([5,4]);
+      ctx.beginPath();ctx.moveTo(h.x,h.y);ctx.lineTo(h.x+Math.cos(h.angle)*240,h.y+Math.sin(h.angle)*240);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle="#fff3c2";ctx.beginPath();ctx.arc(h.x,h.y,8,0,Math.PI*2);ctx.fill();
     }else if(h.kind === "orbitalBand"){
       ctx.beginPath();ctx.rect(b.left,b.top,b.right-b.left,b.bottom-b.top);
       ctx.moveTo(h.x+h.outer,h.y);ctx.arc(h.x,h.y,h.outer,0,Math.PI*2);
@@ -1123,8 +1135,13 @@ function resolveBossActionPattern(e, p, action) {
     e.bossRecoverT=1.1+.8+.9;return;
   }
   if(action === "orbitalBand"){
-    spawnBossHazard(e,"orbitalBand",{x:e.x,y:e.y,inner:32+e.bossPhase*4,outer:108-e.bossPhase*8,warning:1.6,active:.65,color:"#73eff7"});
+    const h=spawnBossHazard(e,"orbitalBand",{x:e.x,y:e.y,inner:32+e.bossPhase*4,outer:108-e.bossPhase*8,warning:1.6,active:.65,color:"#73eff7"});
+    G.prepareStarpathOrbit?.(h);
     e.bossRecoverT=1.6+.65+.9;return;
+  }
+  if(action === "starpathComet"){
+    spawnBossHazard(e,"starpathComet",{x:e.x,y:e.y-6,angle:Math.atan2(p.y-5-(e.y-6),p.x-e.x),warning:.8,active:.08,color:"#ffcd75"});
+    e.bossRecoverT=.8+.08+240/125+.75;return;
   }
   if(action === "eclipseSweep"){
     spawnBossHazard(e,"eclipseSweep",{x:e.x,y:e.y,angle:Math.atan2(p.y-e.y,p.x-e.x),radius:56+e.bossPhase*8,halfAngle:(45+e.bossPhase*10)*Math.PI/180,warning:.85,active:.24,color:"#b58ee6"});

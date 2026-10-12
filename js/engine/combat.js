@@ -205,6 +205,7 @@ G.combat = (() => {
     G.noteStageDefeat?.(enemy);
     G.noteBreakwaterDefeat?.(enemy);
     G.noteFoldroadDefeat?.(enemy);
+    G.noteStarpathDefeat?.(enemy);
     if(enemy.def.id==='moleMonarch')G.cancelBurrowPlugs?.(enemy);
     if(enemy.wayglassCounters!==undefined||enemy.def.id==='riftbladeAdept')G.cancelWayglassReflectors?.(enemy);
     if(G.expeditionPoisonRelay)G.expeditionPoisonRelay(enemy);
@@ -819,6 +820,8 @@ G.combat = (() => {
         gone = true;
         G.spawnFx({ kind: "puff", x: pr.x, y: pr.y, color: pr.color, dur: 0.2 });
       } else if (!gone && G.catchWayglassReturn?.(pr,beforeX,beforeY,wasReturning)) {
+        gone = true;
+      } else if (!gone && G.catchStarpathShot?.(pr,beforeX,beforeY)) {
         gone = true;
       } else if (!gone && pr.fromPlayer) {
         for (const e of s.enemies) {

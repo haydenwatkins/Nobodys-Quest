@@ -41,7 +41,7 @@ Treant, Queen, Knight, Mira, Bram, Vesper, Tansy, Marlo and Sumi are shipped as 
 | Sumi, shipped | Strike a loose paper fold, then move away to open it. Crossfold adds a perpendicular cut after a breather. | All 24 free basics prepare the fold; actual controlled outward feet earn a 1.6-second opening. Sharp keeps its ward purpose, walking clear remains valid, and safe practice leaves a saved paper crane. |
 | Bram, shipped | Marked stomp → pop its cracked root plug; or lead a later burrow through an old plug. Root Rumble adds a second committed circle. | A live stomp pop or actual burrow trip clears pressure and opens 1.6 seconds. Free basics work in all 24 bodies; Blunt keeps its ward purpose. Safe practice leaves a saved mushroom. |
 
-Treant, Queen, Knight, Mira, Bram, Vesper, Tansy, Marlo and Sumi are implemented; continue with Nell’s Starpath response and local variation. Keep their existing connected roads, earned form intervals, promises, ground gifts and return moments. Do not insert a hard challenge quest into the compulsory opening. Each needs its own native victory and counter evidence before enabling its lamp. The nine shipped encounters share their proven opening/cleanup lifecycle and conservative saved profiles; individual counters still keep their own ward and pattern rules.
+Treant, Queen, Knight, Mira, Bram, Vesper, Tansy, Marlo and Sumi’s local alternates are implemented. Nell’s standard carried-cover response and deliberate standard practice are implemented; no following-comet mode is added. Apply the stronger identity gate in `BOSS-IDENTITY.md` before authoring any further variation. Backfill Tansy/Queen and continue Grandmother Briar. Keep their existing connected roads, earned form intervals, promises, ground gifts and return moments. Do not insert a hard challenge quest into the compulsory opening. Each needs its own native victory and counter evidence before enabling its lamp. The nine earlier responses share their proven opening/cleanup lifecycle and conservative saved profiles; Nell deliberately has a separate carried-defense payoff and only learning/catch records. Individual counters still keep their own ward and pattern rules.
 
 ## Whole-campaign encounter direction
 
@@ -49,15 +49,15 @@ These are illustrative authoring directions, not fixed requirements. The intent 
 
 | Guardian | Counter opportunity to develop |
 | --- | --- |
-| Nell / Starpath | Strike the orbit's tether from its safe band to send a star back and expose her center. No need to chase an orbiting target. |
-| Grandmother Briar | Prune a planted bud before bloom; it creates a lasting safe gap for that pattern and interrupts the seed follow-up. |
-| Aurelia / Sky Sovereign | Open a wind vane; her committed gust propels the player toward a counter opening. Walking the marked refuge remains viable. |
-| Pillar / Old Mason | Break a marked fault peg to interrupt its grid and turn a slab into useful cover. Keep honest safe ground around the slab. |
-| Tess / Silk Matriarch | Cut a visible tether anchor with normal attacks; the snapped thread pulls her off balance. Staying close remains safe. |
-| Bongle / Bell Titan | Hit a reachable bell between the first note and echo; its answer cancels one dangerous beat. Sound reinforces visual timing, never replaces it. |
-| Mallow / Lantern Keeper | Feed a loose spark into a nearby lantern; the safe light grows and opens a strike window. Use ordinary movement/attacks, not an inventory prompt. |
-| Atlas / Last Worldbearer | Break one accessible fault anchor during each established pattern; that region of the pattern goes quiet. Remixes two learned answers, rather than stacking everything. |
-| Meridian / Final Firmament | Mix already demonstrated counters in short readable phrases. A successful response breaks the phrase and earns a recovery. Introduce no final-exam control trick. |
+| Nell / Starpath, implemented | Stay in the safe orbit to collect three carried planets. They catch actual individual shots during her continuing attack; walk clear of a single committed comet. No global counter stun or tether prop. |
+| Grandmother Briar | Prune a planted bud before bloom to choose a lasting path through the remaining garden; keep the other beds meaningful. |
+| Aurelia / Sky Sovereign | Use her committed wind to choose a landing and approach. Preserve control and a walking refuge; subtract unrelated fans. |
+| Pillar / Old Mason | Release or move a slab to choose cover and a route through the remaining masonry. Its visible solid geometry must match its protection. |
+| Tess / Silk Matriarch | Cut a connection to free movement or a bound route, while the remaining web and Tess stay active. Staying close remains a viable answer. |
+| Bongle / Bell Titan | Answer readable beats and choose which echo to silence. Preserve the other beats; visuals teach the timing even on mute. |
+| Mallow / Lantern Keeper | Relocate or grow shelter with world actions to choose the next safe route. Keep it distinct from Nell’s carried consumable defense. |
+| Atlas / Last Worldbearer | Rebuild useful ground through regional changes, combining a small number of learned spatial choices. Remove attacks that do not serve that identity. |
+| Meridian / Final Firmament | Pair already demonstrated decisions in short phrases, retaining their actual learned payoffs. A rotation of familiar attack art is insufficient; introduce no new control trick. |
 
 The Tollkeeper remains a short delivery-road encounter; improve its teaching and help consistency before deciding whether an optional alternate adds value. Manyfold already remixes earned fights; do not let a new global preference silently alter a run's rules or paid recovery. A future challenge-enabled run snapshots its settings explicitly at entry.
 

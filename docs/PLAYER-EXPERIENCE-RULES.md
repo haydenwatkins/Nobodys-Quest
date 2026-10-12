@@ -46,6 +46,10 @@ The October 11 design assessment changes the quality priority: strengthen a cont
 - Audit a whole stretch of play for walking, reading, repeated actions, interruptions and competing goals. A collection of individually successful fixtures is not a continuous-session or family-fun verdict.
 - Reused implementation is useful, but a different name must not stand in for a different experience. Consolidate redundant late systems and rewards when their practical choices cannot be explained or demonstrated.
 
+## Boss identity and meaningful variation
+
+October 12 family direction: every boss must feel unique. Different names, art, wards and props do not establish different play. Describe the player’s decisions and the result without those labels, and compare with nearby encounters. Shared input/help/retry/reward scaffolding is useful; repeating “hit a prop, cancel the phrase, hit the stunned boss” is an authored gap. A different count or following attack alone is not a richer fight. Give success an encounter-specific consequence: carried defense, useful ground, placement, a redirected threat or a changed route, as suits the character. These examples do not prescribe every fight. Teach the signature through standard play before variations; subtract redundant attacks and modes. Preserve familiar free controls, favorite bodies, readable commitments, independent help and equal rewards. Deliberate final remixes retain the learned responses and payoffs. `BOSS-IDENTITY.md` audits all 19 definitions and records the backfill; Nell’s carried cover is implemented, not proof of whole-roster completion.
+
 ## Benchmarks consulted
 
 These are document benchmarks, not timed playtests of other games.
@@ -139,6 +143,7 @@ Write spoken English that a child can follow on first hearing. Every story/reque
 | Vesper | Warm night shelter keeper; cares about travelers after dark, gives practical light advice and offers tea after a dance or breather. |
 | Sumi | Worried map courier; wants travelers to find clear roads, demonstrates opening folded paper and shares rice cakes after practice or a breather. |
 | Marlo | Worried shorekeeper; cares about little boats finding home, shows a clear way through rough water, offers warm biscuits and welcomes practice. |
+| Nell | Eager star-map maker; worries about people losing the coast road, delights in her little planets catching stars, and thanks the player for helping finish reliable maps. |
 | Bram | Caring tunnel keeper; worries about packed roots beneath the road, gives concrete digging advice and shares shortbread after practice or a breather. |
 
 ## Guidance rules

@@ -774,7 +774,7 @@ for (const [id, patternIndex, action, projectileCount] of [
   ["royalFool", 0, "cards", 3],
   ["admiralTortoise", 0, "shells", 8],
   ["paperRonin", 1, "crescent", 5],
-  ["professorPerihelion", 0, "stars", 6],
+  ["professorPerihelion", 1, "stars", 6],
   ["grandmotherBriar", 0, "seeds", 3],
   ["godAvatar", 7, "nova", 12],
 ]) {

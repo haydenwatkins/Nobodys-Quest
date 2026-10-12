@@ -310,20 +310,20 @@ function makeExpansionTrialArena(variant) {
   { id: "samuraiTrial", name: "The Foldroad Hall", theme: "samurai", boss: "paperRonin", variant: 1,
     exit: { x: 36, y: 5 }, sign: "Sharp attacks break Sumi’s ward. Strike the loose paper fold, then step away to open it and stop her cuts." },
   { id: "astronomerTrial", name: "The Starpath Observatory", theme: "astronomer", boss: "professorPerihelion", variant: 2,
-    exit: { x: 11, y: 24 }, sign: "Light attacks break Nell's ward. Stand between her two bright circles during the orbit, then close in after they fade." },
+    exit: { x: 11, y: 24 }, sign: "Light breaks Nell’s ward. Stay between her circles to collect little planets. Carry them close; each catches one of her stars." },
   { id: "druidTrial", name: "The Walking Garden", theme: "druid", boss: "grandmotherBriar", variant: 3,
     exit: { x: 36, y: 24 }, sign: "Dark attacks break Briar's ward. Her marked flowerbeds leave gaps and a clear center. Step between them, then prune while she rests." },
 ].forEach((trial) => registerMap({
   id: trial.id, name: trial.name, visualTheme: trial.theme, playerStart: { x: 3, y: 8 },
-  bossTrial: { ...(['turtleTrial','samuraiTrial'].includes(trial.id)?{onlyEngaged:true}:{}), exit: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y }, delay: 1.7 },
+  bossTrial: { ...(['turtleTrial','samuraiTrial','astronomerTrial'].includes(trial.id)?{onlyEngaged:true}:{}), exit: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y }, delay: 1.7 },
   legend: {
     "x": { tile: "floor", portal: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y } },
     "B": { tile: "floor", enemy: trial.boss }, "m": { tile: "floor", message: trial.sign },
     "H": { tile: "floor", chest: { heal: true, name: "a guardian's travel biscuit" } },
     "R": { tile: "rock", on: "floor" },
-    ...(['turtleTrial','samuraiTrial'].includes(trial.id)?{"F":{tile:"floor",rest:true,restText:(trial.id==='turtleTrial'?'Marlo’s':'Sumi’s')+' fire restores every heart and all mana.'}}:{}),
+    ...(['turtleTrial','samuraiTrial','astronomerTrial'].includes(trial.id)?{"F":{tile:"floor",rest:true,restText:(trial.id==='turtleTrial'?'Marlo’s':trial.id==='samuraiTrial'?'Sumi’s':'Nell’s')+' fire restores every heart and all mana.'}}:{}),
   },
-  tiles: makeExpansionTrialArena(trial.variant).map((row,y)=>['turtleTrial','samuraiTrial'].includes(trial.id)&&y===11?row.slice(0,3)+'F'+row.slice(4):row),
+  tiles: makeExpansionTrialArena(trial.variant).map((row,y)=>['turtleTrial','samuraiTrial','astronomerTrial'].includes(trial.id)&&y===11?row.slice(0,3)+'F'+row.slice(4):row),
 }));
 
 registerMap({
