@@ -261,7 +261,7 @@ assert.equal(G.forms.colossus.speed, 80);
 // projectile rotation as older bosses. The tighter pursuit only starts at
 // genuine kiting distance, while every floor attack remains one damage.
 const arenaPatterns = {
-  skySovereign: ["gustLanes", "windWall"],
+  skySovereign: ["skyFlight"],
   oldMason: ["faultGrid", "collapseRing"],
   silkMatriarch: ["silkTether", "webGrid"],
   bellTitan: ["stormGrid", "echoCross"],
@@ -279,11 +279,14 @@ for (const [id, patterns] of Object.entries(arenaPatterns)) {
     `${id} should look and target physically larger without widening its damaging charge body`);
 }
 
-// Aurelia announces a stable safe wind lane and warns before it activates.
+// The shared legacy wind kernel remains available to learned remixes.
+// Aurelia’s standard flight is verified through the actual index/native input;
+// this explicit kernel fixture preserves the earlier gust collision checks.
 // Ignoring it costs one heart and mends the boss, so tanking the mechanic makes
 // the fight longer without increasing its burst damage.
 G.world.load("windscarCanyon");
 let arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "skySovereign");
+arenaBoss.def={...arenaBoss.def,boss:{...arenaBoss.def.boss,patterns:["gustLanes"]}};
 const ordinaryEnemies = G.state.enemies.filter((enemy) => !enemy.def.miniboss).length;
 G.state.player.x = arenaBoss.x - 105;
 G.state.player.y = arenaBoss.y;
@@ -317,7 +320,7 @@ const hazardCtx = {
   fill(rule) { if (rule === "evenodd") hazardDrawCalls.evenodd++; },
 };
 G.drawBossHazards(hazardCtx);
-assert.ok(hazardDrawCalls.labels.includes("SAFE"), "Aurelia should label usable refuge");
+assert.ok(hazardDrawCalls.labels.includes("SAFE"), "the shared wind kernel should label usable refuge");
 assert.ok(hazardDrawCalls.lines >= 3, "gust warnings should draw directional arrows toward the boss");
 
 // Bongle's grid alternates full readable floor bands. It can hurt once after
