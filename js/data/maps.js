@@ -912,7 +912,7 @@ function caravanFenceLayout() {
   },
   {
     id: "windscarCanyon", name: "Windscar Canyon", biome: "windscar", variant: 1,
-    message: "The Sky Sovereign circles the northeast shelf. The upper traverse approaches its perch; the south road skirts the cliffs to a feather cache. The caravan fire waits southwest.",
+    message: "Aurelia circles the northeast shelf. Choose a feather with a free attack, then step out of the marked flight. Its wind helps you approach; Sharp opens her ward. The south road reaches a feather cache; the caravan fire waits southwest.",
     portals: {
       x: { map: "sunstepPrairie", x: 43, y: 14 }, y: { map: "hangingGardens", x: 2, y: 14 },
     },
