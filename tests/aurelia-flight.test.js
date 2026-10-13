@@ -11,3 +11,7 @@ test('the wind makes a real controlled approach; phase, ward, travel and knockou
   if(exit==='phase'){e.hp=50;G.updateEnemies(.01);q.drain();}if(exit==='ward')G.combat.damageEnemy(e,{damage:7,type:'sharp',ability:'slash',noMana:true});if(exit==='travel')q.load('sunstepPrairie');if(exit==='knockout'){G.state.player.invuln=0;G.damagePlayer(100,e.x,e.y);}G.updateOpening(.01);assert.ok(posts.every(a=>a.dead||!G.guardianPropLive(a)),exit);
  }
 });
+test('a native incapacitating art suppresses the actor flight, while phase-two wind approaches across its flight',()=>{
+ const r=setup(),{G,e}=r,h=G.state.bossHazards.find(h=>h.owner===e);e.ward.hp=0;Object.assign(G.state.player,{x:e.x-18,y:e.y});G.state.claimedForms.push('stormcaller');G.questsDone.push(G.forms.stormcaller.quests[0].id);G.state.loadouts.wizard=['curse','thunderclap'];G.state.player.mana=G.abilityManaCost(G.abilities.thunderclap);r.taps.add('b');r.step(.025);r.drain();assert.ok(e.status.stun.dur>0);const at={x:e.x,y:e.y},damage=G.state.player.damageTaken;G.updateBossHazards(h.warning+.1);assert.deepEqual({x:e.x,y:e.y},at);assert.equal(G.state.player.damageTaken,damage);
+ const q=setup(2),b=q.G.state.bossHazards.find(h=>h.owner===q.e),f=b.flight;assert.ok(f.windStart,'crosswind has its own reachable approach');const flight={x:f.selected.x-f.start.x,y:f.selected.y-f.start.y},wind={x:f.selected.x-f.windStart.x,y:f.selected.y-f.windStart.y};assert.ok(Math.abs(flight.x*wind.x+flight.y*wind.y)<1,'the second-phase wind crosses the committed flight');
+});

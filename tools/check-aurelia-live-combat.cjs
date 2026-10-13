@@ -18,15 +18,21 @@ for(const c of (process.argv.includes('--first-only')?cases.slice(0,1):cases)){
   if(!walking&&!counters[phase]&&posts.length){posts.sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));const at=posts[0],dx=at.x-e.x,dy=at.y-e.y,d=Math.hypot(dx,dy)||1;target={x:at.x-dx/d*18,y:at.y-dy/d*18};aim=at;attack=Math.hypot(at.x-p.x,at.y-p.y)<30;}
   else if(h){const f=h.flight,at=f.selected,dx=at.x-f.start.x,dy=at.y-f.start.y,d=Math.hypot(dx,dy)||1;
    if(h.t<h.warning+.32)target={x:f.start.x-dy/d*38,y:f.start.y+dx/d*38};
-   else if(!walking&&!wind[phase])target={x:f.start.x+dx*.35,y:f.start.y+dy*.35};
+   else if(!walking&&!wind[phase])target={x:f.windStart.x+(at.x-f.windStart.x)*.35,y:f.windStart.y+(at.y-f.windStart.y)*.35};
    else attack=(walking||counters[phase])&&Math.hypot(e.x-p.x,e.y-p.y)<45;
   }else attack=(walking||(counters[phase]&&wind[phase]))&&Math.hypot(e.x-p.x,e.y-p.y)<50;
   if(!G.world.isSafeSpawn(target.x,target.y))target=G.world.safeArrival(target.x,target.y);
   const ax=aim.x-p.x,ay=aim.y-p.y,ad=Math.hypot(ax,ay)||1;G.input.aim={x:ax/ad,y:ay/ad};if(attack)r.taps.add(form==='knight'?'a':'b');
-  const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy);G.input.vec=d>2?{x:dx/d,y:dy/d}:{x:0,y:0};const before=e.skyWindSteps||0;r.step(dt);r.drain();if((e.skyWindSteps||0)>before)wind[phase]=true;seconds+=dt;
+  const nearby=G.state.enemies.filter(a=>!a.dead&&!a.def.miniboss&&!a.def.practice&&Math.hypot(a.x-p.x,a.y-p.y)<34).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));if(nearby.length){const at=nearby[0],dx=at.x-p.x,dy=at.y-p.y,d=Math.hypot(dx,dy)||1;G.input.aim={x:dx/d,y:dy/d};r.taps.add(form==='knight'?'a':'b');}
+  const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy),desired=d>2?{x:dx/d,y:dy/d}:{x:0,y:0},speed=G.forms[form].speed,choices=[desired,{x:0,y:0},...Array.from({length:16},(_,j)=>({x:Math.cos(j*Math.PI/8),y:Math.sin(j*Math.PI/8)}))];
+  const score=v=>{let cost=Math.hypot(p.x+v.x*speed*.2-target.x,p.y+v.y*speed*.2-target.y);for(let j=1;j<=16;j++){const t=j*.025,x=p.x+v.x*speed*t,y=p.y+v.y*speed*t;if(t<=.15&&!G.world.isSafeSpawn(x,y))cost+=1000;
+   for(const s of G.state.projectiles)if(!s.fromPlayer&&!s.dispelled&&t>=(s.armT||0)){const scale=G.guidanceProjectileScale?.(s)??1;cost+=Math.max(0,(s.size||3)+11-Math.hypot(x-s.x-s.vx*t*scale,y-5-s.y-s.vy*t*scale))**2*25;}
+   for(const a of G.state.enemies)if(!a.dead&&!a.def.miniboss&&!a.def.practice)cost+=Math.max(0,17-Math.hypot(x-a.x,y-a.y))**2*15;
+   if(h){const age=h.t+t-h.warning;if(age>=0&&age<.32){const f=h.flight,m=Math.min(1,age/.3),bx=f.start.x+(f.selected.x-f.start.x)*m,by=f.start.y+(f.selected.y-f.start.y)*m;cost+=Math.max(0,22-Math.hypot(x-bx,y-by))**2*30;}}
+  }return cost;};choices.sort((a,b)=>score(a)-score(b));G.input.vec=choices[0];const before=e.skyWindSteps||0;r.step(dt);r.drain();if((e.skyWindSteps||0)>before)wind[phase]=true;seconds+=dt;
   assert.ok(!G.state.knockout,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,damage:p.damageTaken,counters,wind,x:p.x,y:p.y}));
  }
  assert.ok(e.dead,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,counters,wind}));assert.equal(e.bossPhase,3);if(!walking)for(const phase of [1,2,3]){assert.ok(counters[phase]>=1,JSON.stringify({c,counters}));assert.ok(wind[phase],JSON.stringify({c,wind}));}assert.equal(paid,0);
- if(form!=='colossus'){assert.ok(G.groundRewardFor('trophy-sky-sovereign'));assert.equal(G.hasWorldMark('sky'),false);assert.equal(G.state.stars,stars+lessons);collect(r,'trophy-sky-sovereign');assert.ok(G.hasWorldMark('sky'));assert.ok(G.formReady('griffin'));assert.ok(G.formEchoFor('griffin'));const claimed=G.state.stars;r.load('windscarCanyon');r.drain();assert.ok(!G.state.enemies.some(e=>e.id==='skySovereign'));assert.equal(G.state.stars,claimed);}else{assert.deepEqual([...G.state.items],items);assert.equal(G.state.stars,stars+lessons);assert.equal(G.state.gauntletRun.wins,1);}
+ if(form!=='colossus'){assert.ok(G.groundRewardFor('trophy-sky-sovereign'));assert.equal(G.hasWorldMark('sky'),false);assert.equal(G.state.stars,stars+lessons);collect(r,'trophy-sky-sovereign');assert.ok(G.hasWorldMark('sky'));assert.ok(G.formReady('griffin'),JSON.stringify({claimed:G.state.claimedForms,level:G.formLevel('ranger'),quests:G.questsDone,items:G.state.items,echoes:G.state.formEchoes,outing:G.activeFormOuting()}));assert.ok(G.formEchoFor('griffin'));const claimed=G.state.stars;r.load('windscarCanyon');r.drain();assert.ok(!G.state.enemies.some(e=>e.id==='skySovereign'));assert.equal(G.state.stars,claimed);}else{assert.deepEqual([...G.state.items],items);assert.equal(G.state.stars,stars+lessons);assert.equal(G.state.gauntletRun.wins,1);}
  console.log(JSON.stringify({...c,seconds:+seconds.toFixed(2),counters,wind,damage:p.damageTaken,paidCasts:paid,ai:'original',context:form==='colossus'?'native Manyfold first round':'native Windscar region'}));
 }
