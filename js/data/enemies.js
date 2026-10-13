@@ -747,11 +747,11 @@ registerEnemy({
     style: "jester", color: "#ffcd75", specialEvery: 2.2,
     phases: 3, phaseThresholds: [0.66, 0.33],
     telegraph: 0.5, chargeSpeed: 0, chargeDur: 0,
-    patterns: ["cards", "pieRain", "cards", "nova"],
+    patterns: ["pieRain"],
     intro: "TANSY’S ROADSIDE SHOW",
     introLines: [
       "Hi! I’m Tansy. Travelers have had a rough time on these closed roads. I want to give them something to laugh about.",
-      "Come try the show! Sharp attacks break my ward. Strike a landed pie before it pops, and the custard will splash me.",
+      "Come try the show! Sharp attacks break my ward. Splash a landed pie before it pops to open a path through my cards.",
       "Or step clear of the pie shadows and cards. There’s a warm fire if you need a breather.",
     ],
     phaseLine: "Nice work! Now watch for the next pie beside the first.",

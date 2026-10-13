@@ -692,6 +692,7 @@ G.updateBossHazards = function (dt) {
   for (let i = hazards.length - 1; i >= 0; i--) {
     const h = hazards[i];
     h.t += dt;
+    if(h.kind==="stageEncore")G.waitStageEncore?.(h);
     G.trackStarpathOrbit?.(h);
     if (h.mapId !== G.state.mapId || !h.owner || h.owner.dead
       || h.t >= (h.delay || 0) + h.warning + h.active) {
@@ -715,8 +716,8 @@ G.updateBossHazards = function (dt) {
       if(!h.fired){h.fired=true;fireRiftbladeVolley(h.owner,{x:h.x,y:h.y});}
       continue;
     }
-    if(h.kind === "stageEncore"){
-      if(!h.fired){h.fired=true;for(const angle of h.shots){enemyShot(G.state,h.owner,angle,{damage:1,speed:105,range:175,size:5,shape:"card"});const s=G.state.projectiles[G.state.projectiles.length-1];s.x=s.startX=h.x;s.y=s.startY=h.y;}}
+    if(h.kind === "stageCards"||h.kind === "stageEncore"){
+      if(!h.fired){h.fired=true;for(const angle of h.shots){enemyShot(G.state,h.owner,angle,{damage:1,speed:105,range:175,size:5,shape:"card"});const s=G.state.projectiles[G.state.projectiles.length-1];s.x=s.startX=h.x;s.y=s.startY=h.y;s.stagePassage=h;}}
       continue;
     }
     if(h.kind === "starpathComet"){
@@ -807,7 +808,7 @@ G.drawBossHazards = function (ctx) {
     const pulse = 0.5 + Math.sin((G.state.time || 0) * 12) * 0.5;
     ctx.save();
     ctx.beginPath();
-    if (!["mirePool","rootBloom","mireVolley","riftVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut","stageEncore"].includes(h.kind)) {
+    if (!["mirePool","rootBloom","mireVolley","riftVolley","eclipseSweep","royalStomp","crimsonWaltz","pieRain","foldCut","stageCards","stageEncore"].includes(h.kind)) {
       ctx.rect(b.left, b.top, b.right - b.left, b.bottom - b.top);
       ctx.clip();
       G.text.setWorldClip(ctx,b);
@@ -817,7 +818,7 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
-    if(h.kind === "stageEncore"){
+    if(h.kind === "stageCards"||h.kind === "stageEncore"){
       ctx.globalAlpha=.9;ctx.strokeStyle="#fff3c2";ctx.lineWidth=1;for(const angle of h.shots){const x=h.x+Math.cos(angle)*42,y=h.y+Math.sin(angle)*42;ctx.save();ctx.translate(x,y);ctx.rotate(angle+Math.PI/2);ctx.fillStyle="#e2c9d6";ctx.fillRect(-3,-5,6,10);ctx.strokeRect(-3,-5,6,10);ctx.fillStyle="#bb8c55";ctx.fillRect(-1,-2,2,4);ctx.restore();}
     }else if(h.kind === "riftVolley"){
       const e=h.owner,angle=Math.atan2(h.y-e.y,h.x-e.x);ctx.globalAlpha=.85;ctx.strokeStyle="#73eff7";ctx.setLineDash([4,3]);
@@ -1000,6 +1001,7 @@ G.drawBossHazards = function (ctx) {
     ctx.restore();
     G.text.setWorldClip(ctx,null);
   }
+  G.drawStagePassages?.(ctx);
 };
 
 function spawnArenaPattern(e, action) {

@@ -214,7 +214,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 60 } },
     "B": { tile: "floor", enemy: "royalFool" },
-    "m": { tile: "floor", message: "Strike a landed custard pie before it pops to splash Tansy. Sharp attacks break her ward." },
+    "m": { tile: "floor", message: "Splash a landed custard pie before it pops, then follow the crumbs through Tansy’s cards. Sharp attacks break her ward." },
     "H": { tile: "floor", chest: { heal: true, name: "a custard-proof cookie" } },
     "R": { tile: "rock", on: "floor" },
     "F": { tile: "floor", rest: true, restText: "Tansy’s fire restores every heart and all mana." },

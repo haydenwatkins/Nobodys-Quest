@@ -1,4 +1,4 @@
-/* Landed pies turn Tansy's dangerous punchline into a custard opening. */
+/* Splash a landed pie to choose a walking passage through Tansy's cards. */
 "use strict";
 (() => {
  const point=(x,y)=>({x:x*16+8,y:y*16+8}),fire=point(3,11),lamp=point(4,12),friend=point(5,10),practice=point(6,13);
@@ -20,11 +20,19 @@
  G.cancelStagePies=owner=>{for(const e of G.state.enemies||[])if(e.custardPie?.owner&&(!owner||e.custardPie.owner===owner))e.dead=true;};
  G.prepareStageCounter=(owner,fields,p)=>{
   if(!tansy(owner))return;G.cancelStagePies(owner);
-  for(const h of fields){h.stageCounter=true;h.landing=.18;}
-  if(!owner.tansyEncore||!fields.length)return;
-  const count=owner.bossPhase>=3?7:owner.bossPhase===2?5:3,angle=Math.atan2(p.y-owner.y,p.x-owner.x);
-  const h={kind:'stageEncore',owner,mapId:G.state.mapId,t:0,delay:Math.max(...fields.map(h=>(G.guardianWarningSeconds?.(h.warning)??h.warning)+h.active))+.45,warning:.85,active:.15,color:'#ffcd75',phase:owner.bossPhase,angle,shots:Array.from({length:count},(_,i)=>angle+(i-(count-1)/2)*14*Math.PI/180),x:owner.x,y:owner.y-6,fired:false};
+  if(!fields.length)return;
+  const count=owner.bossPhase*2+3,angle=Math.atan2(p.y-5-(owner.y-6),p.x-owner.x);
+  const h={kind:'stageCards',owner,mapId:G.state.mapId,t:0,delay:Math.max(...fields.map(h=>(G.guardianWarningSeconds?.(h.warning)??h.warning)+h.active))+.45,warning:.85,active:.15,color:'#ffcd75',phase:owner.bossPhase,angle,shots:Array.from({length:count},(_,i)=>angle+(i-(count-1)/2)*18*Math.PI/180),x:owner.x,y:owner.y-6,fired:false,passages:[]};
+  h.fullShots=[...h.shots];
+  for(const pie of fields){pie.stageCounter=true;pie.landing=.18;pie.cardPassage=h;}
   G.state.bossHazards.push(h);
+  if(owner.tansyEncore){const encore={...h,kind:'stageEncore',shots:[...h.shots],following:h,followingDone:false,delay:h.delay+(G.guardianWarningSeconds?.(h.warning)??h.warning)+175/105+.45};G.state.bossHazards.push(encore);}
+ };
+ G.waitStageEncore=h=>{
+  if(!h.following||h.followingDone)return;
+  // Never start the next warning over still-live, possibly helped cards.
+  h.delay=h.t+.45;
+  if(h.following.fired&&!G.state.projectiles.some(s=>s.stagePassage===h.following&&!s.dispelled))h.followingDone=true;
  };
  G.landStagePie=h=>{
   if(!h.stageCounter||h.mapId!==G.state.mapId||h.owner.dead||G.state.knockout)return;
@@ -35,8 +43,14 @@
   const r=e.custardPie;if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||!G.abilities[opts.ability])return false;
   if(r.owner){const h=r.h,t=h.t-(h.delay||0);
    if(r.owner.dead||!tansy(r.owner)||h.owner!==r.owner||!G.state.bossHazards.includes(h)||t<h.landing||t>=h.warning)return false;
-   e.dead=true;r.owner.stageCounters=(r.owner.stageCounters||0)+1;progress().counterLearned=true;G.guardianCounterOpening(r.owner);
-   G.damageNumber(r.owner.x,r.owner.y-12,'SPLAT!','#fff3c2');G.spawnFx({kind:'ring',x:r.owner.x,y:r.owner.y-8,color:'#fff3c2',radius:23,dur:.5});
+   const cards=h.cardPassage;if(!cards||cards.fired||!G.state.bossHazards.includes(cards))return false;
+   const toward=Math.atan2(h.y-5-cards.y,h.x-cards.x),distance=a=>Math.abs(Math.atan2(Math.sin(a-toward),Math.cos(a-toward)));
+   // Near Tansy, a side pie can lie beyond the fan. Open its nearest actual
+   // lane instead of drawing an unused path that changes no cards.
+   const angle=cards.fullShots.reduce((best,a)=>distance(a)<distance(best)?a:best),delta=a=>Math.abs(Math.atan2(Math.sin(a-angle),Math.cos(a-angle)));
+   cards.passages.push(angle);for(const fan of G.state.bossHazards.filter(f=>f===cards||f.following===cards))fan.shots=fan.shots.filter(a=>delta(a)>.4);
+   e.dead=true;G.state.bossHazards=G.state.bossHazards.filter(other=>other!==h);r.owner.stageCounters=(r.owner.stageCounters||0)+1;progress().counterLearned=true;
+   G.damageNumber(e.x,e.y-18,'SPLAT!','#fff3c2');G.spawnFx({kind:'ring',x:e.x,y:e.y-5,color:'#fff3c2',radius:23,dur:.5});
    G.events.emit('guardianCounter',{guardian:'royalFool',kind:'custardSplash'});
   }else{e.dead=true;progress().practiceCleared=true;G.damageNumber(e.x,e.y-18,'SPLAT!','#fff3c2');}
   G.sfx.play('wardBreak');for(let i=0;i<6;i++)G.spawnFx({kind:'puff',x:e.x+(i-2.5)*3,y:e.y-8-(i%2)*5,color:i%2?'#e9a9ce':'#fff3c2',dur:.4});G.saveGame();
@@ -48,7 +62,7 @@
  };
  G.beginStageRematch=()=>{
   if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
-  const e=G.makeEnemy('royalFool',22*16+8,8*16+8);e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().encore?'One more card fan after the pies! Its aim stays put. Splash a landed pie to stop the whole act.':'Ready for another show? Splash a landed pie before it pops. The cookie tin is by the fire.'}};
+  const e=G.makeEnemy('royalFool',22*16+8,8*16+8);e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().encore?'The cards come twice! Splash a landed pie, then follow the crumbs through both fans. Or walk around them.':'Ready for another show? Splash a landed pie to open a path through my cards. The cookie tin is by the fire.'}};
   e.guardPost=true;e.tansyLocalRematch=true;e.tansyEncore=progress().encore&&progress().counterLearned;e.guardianPracticeExit={map:'jesterTrial',x:3,y:11};G.state.enemies.push(e);return true;
  };
  G.events.on('mapEnter',()=>{if(G.state.mapId!=='jesterTrial')return;for(const e of G.state.enemies)if(tansy(e)){e.guardPost=true;if(G.state.items.includes('jester-bell'))e.dead=true;}if(!progress().practiceCleared)pie(practice.x,practice.y);});
@@ -62,6 +76,15 @@
  };
  G.tryOpeningInteraction=()=>{const at=G.openingInteractionCandidate();if(at?.id!=='tansy-rematch')return interact();const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('TANSY',"You got me with custard! Want to try my card encore? Light its lantern by the fire. Keep your help lights if you like. I'll fetch the cookies.",{accent:'#ffcd75'});}else G.beginStageRematch();G.input.clearTaps();return true;};
  function drawPie(c,x,y){if(G.drawStagePie?.(c,x,y))return;c.save();c.fillStyle='#bb8c55';c.fillRect(x-8,y-3,16,6);c.fillStyle='#fff3c2';c.fillRect(x-7,y-6,14,4);c.fillStyle='#e9a9ce';c.fillRect(x-3,y-8,6,3);c.restore();}
+ G.drawStagePassages=c=>{
+  const fans=new Set((G.state.bossHazards||[]).filter(h=>h.kind==='stageCards'||h.kind==='stageEncore').map(h=>h.following||h));
+  for(const s of G.state.projectiles)if(s.stagePassage&&!s.dispelled)fans.add(s.stagePassage.following||s.stagePassage);
+  c.save();c.strokeStyle='#fff3c2';c.fillStyle='#fff3c2';c.lineWidth=1;
+  for(const h of fans){if(h.mapId!==G.state.mapId||h.owner.dead)continue;for(const a of h.passages){
+   c.globalAlpha=.5;c.setLineDash([3,5]);for(const edge of [a-.22,a+.22]){c.beginPath();c.moveTo(h.x+Math.cos(edge)*30,h.y+Math.sin(edge)*30);c.lineTo(h.x+Math.cos(edge)*140,h.y+Math.sin(edge)*140);c.stroke();}
+   c.setLineDash([]);c.globalAlpha=.85;for(let d=38;d<=134;d+=16)c.fillRect(Math.round(h.x+Math.cos(a)*d)-1,Math.round(h.y+Math.sin(a)*d)-1,3,3);
+  }}c.restore();
+ };
  const draw=G.openingDrawables;
  G.openingDrawables=c=>{const list=draw(c);for(const e of G.state.enemies||[])if(!e.dead&&e.custardPie&&!e.custardPie.owner)list.push({y:e.y,fn:()=>drawPie(c,e.x,e.y)});
   if(G.state.mapId!=='jesterTrial')return list;list.push({y:fire.y,fn:()=>G.drawOpeningProp(c,'camp',fire.x,fire.y,G.state.time)});
