@@ -9,3 +9,19 @@ Interpret family design feedback by intent. Generalize it into reusable principl
 Keep the game charming, responsive, readable and as menu-optional as possible. Teach through meaningful world actions, protect useful time after unlocks, maintain one clear chosen task, and give different skill levels a complete rewarding adventure. Apply the detailed shared contract to old content as well as additions.
 
 After each relevant batch, update the application ledger and active roadmap with actual coverage, evidence and the next gap. Distinguish documented design, implemented behavior, native/automated verification and human playtesting. A working example does not establish whole-game completion. Run focused checks first and full regression for shared integration changes; inspect changed visual/input behavior on supported layouts.
+
+## Agent skills
+
+Project-local Matt Pocock skills live in `.agents/skills/`. Read a skill's actual `SKILL.md` before using it. Installation evidence and the game workflow: `docs/agents/skills-workflow.md`.
+
+### Issue tracker
+
+Explicit specs and tickets use GitHub Issues in `haydenwatkins/Nobodys-Quest`; `docs/CLOUD-ROADMAP.md` remains the ordered game roadmap. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five default library labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context glossary and optional ADRs. See `docs/agents/domain.md`.
