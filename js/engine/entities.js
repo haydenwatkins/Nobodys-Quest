@@ -58,7 +58,7 @@ G.playerMaxMana = function () {
 G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
-    if (enemy.dead || (enemy.def.practice && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy) && !G.breakwaterSluiceAim?.(enemy) && !G.foldroadPaperAim?.(enemy))) continue;
+    if (enemy.dead || (enemy.def.practice && !G.guardianPropLive?.(enemy) && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy) && !G.breakwaterSluiceAim?.(enemy) && !G.foldroadPaperAim?.(enemy))) continue;
     const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
     if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
 
@@ -647,6 +647,7 @@ function spawnBossHazard(e, kind, options) {
 }
 
 G.cancelBossHazards = function (owner) {
+  G.retireGuardianProps?.(owner);
   if (G.cancelTreantRoots) G.cancelTreantRoots(owner);
   if (G.cancelMireCrusts) G.cancelMireCrusts(owner);
   G.cancelWayglassReflectors?.(owner);
@@ -692,6 +693,7 @@ G.updateBossHazards = function (dt) {
   for (let i = hazards.length - 1; i >= 0; i--) {
     const h = hazards[i];
     h.t += dt;
+    if(h.cancelled){hazards.splice(i,1);continue;}
     if(h.kind==="stageEncore")G.waitStageEncore?.(h);
     G.trackStarpathOrbit?.(h);
     if (h.mapId !== G.state.mapId || !h.owner || h.owner.dead
@@ -708,6 +710,7 @@ G.updateBossHazards = function (dt) {
     if(h.breakwater)G.syncBreakwaterSluice?.(h);
     if (!hazardIsActive(h) || G.state.knockout) continue;
 
+    if(h.guardianActive){h.guardianActive(h,p,dt);continue;}
     if(h.kind === "mireVolley"){
       if(!h.fired){h.fired=true;fireBossFan(h.owner,{x:h.x,y:h.y},h.count,"seed",6,1);}
       continue;
@@ -803,6 +806,7 @@ G.drawBossHazards = function (ctx) {
   G.drawMireChannels?.(ctx);
   const hazards = G.state.bossHazards || [];
   for (const h of hazards) {
+    if(h.cancelled)continue;
     const b = arenaBounds(h);
     const local = hazardLocalTime(h);
     if (local < 0) continue;
@@ -820,6 +824,7 @@ G.drawBossHazards = function (ctx) {
     ctx.lineWidth = active ? 2 : 1;
     ctx.globalAlpha = active ? 0.24 + pulse * 0.1 : 0.08 + pulse * 0.08;
 
+    if(h.guardianPaint){h.guardianPaint(ctx,h,active,local);ctx.restore();continue;}
     if(h.kind === "stageCards"||h.kind === "stageEncore"){
       ctx.globalAlpha=.9;ctx.strokeStyle="#fff3c2";ctx.lineWidth=1;for(const angle of h.shots){const x=h.x+Math.cos(angle)*42,y=h.y+Math.sin(angle)*42;ctx.save();ctx.translate(x,y);ctx.rotate(angle+Math.PI/2);ctx.fillStyle="#e2c9d6";ctx.fillRect(-3,-5,6,10);ctx.strokeRect(-3,-5,6,10);ctx.fillStyle="#bb8c55";ctx.fillRect(-1,-2,2,4);ctx.restore();}
     }else if(h.kind === "riftVolley"){
@@ -1096,6 +1101,7 @@ function spawnArenaPattern(e, action) {
 }
 
 function resolveBossActionPattern(e, p, action) {
+  if(G.runGuardianAction?.(e,p,action,spawnBossHazard))return;
   if(action === "blades"&&e.def.id === "riftbladeAdept"){
     const h=spawnBossHazard(e,"riftVolley",{x:p.x,y:p.y,spreads:e.bossPhase>=3?[-28,-14,0,14,28]:e.bossPhase===2?[-22,0,22]:[-13,13],warning:.8,active:.15,color:"#73eff7"});
     G.prepareWayglassCounter?.(e,h);

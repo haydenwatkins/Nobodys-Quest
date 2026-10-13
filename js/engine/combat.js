@@ -76,6 +76,7 @@ G.combat = (() => {
   function damageEnemy(enemy, opts) {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
+    if(enemy.guardianProp&&G.hitGuardianProp)return G.hitGuardianProp(enemy,opts);
     if(enemy.roadMechanism&&G.hitRoadMechanism)return G.hitRoadMechanism(enemy,opts);
     if(enemy.treantRoot&&G.hitTreantRoot)return G.hitTreantRoot(enemy,opts);
     if(enemy.mireCrust&&G.hitMireCrust)return G.hitMireCrust(enemy,opts);
@@ -196,6 +197,7 @@ G.combat = (() => {
   function killEnemy(enemy, opts) {
     const defeatedMap=G.state.mapId,run=G.state.expeditionRun;
     enemy.dead = true;
+    G.noteGuardianAuthorDefeat?.(enemy);
     if (G.noteTreantDefeat) G.noteTreantDefeat(enemy);
     if (G.noteMireQueenDefeat) G.noteMireQueenDefeat(enemy);
     if (G.noteEclipseDefeat) G.noteEclipseDefeat(enemy);
