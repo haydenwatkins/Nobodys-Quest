@@ -1,6 +1,6 @@
 # Queen’s usable mire channel
 
-October 13, 2026. Implementation specification for the next boss-identity backfill. This supersedes the global counter opening in `MIRE-CRUST.md`; its saved practice, help, retry, Pearl and ferry-return contracts remain.
+October 13, 2026. Implementation and verification record for the Queen boss-identity backfill. [GitHub issue #48](https://github.com/haydenwatkins/Nobodys-Quest/issues/48) tracks the delivery. This supersedes the global counter opening in `MIRE-CRUST.md`; its saved practice, help, retry, Pearl and ferry-return contracts remain.
 
 A nearby landed crust broken with an actual damaging art or travelled dash leaves a lily-lined strip from that crust toward Queen’s position at the moment of breaking. Queen keeps fighting. Her bubbles and armed reeds cannot hurt feet within the strip; other enemies, Queen’s body contact and danger outside it retain their native rules. Only a reed actually contacting the sheltered player is snuffed. The channel does not cancel commitments, clear shots elsewhere, stun, damage the veil or grant combat/mastery credit.
 
@@ -14,4 +14,10 @@ Verification uses native input/attack/walking/damage and actual saves rather tha
 
 ## Delivery evidence
 
-Pending implementation and verification. Do not infer success from this specification.
+Implemented. Six new native channel cases cover real free input/remaining reeds, inside/outside damage, bubble shelter, other-owner pressure, preserved ward recovery, fixed/replaced ground, phase/death/knockout/travel/reload and blocked-ground paint. A real wall fixture caught the rounded end overlapping solid ground; endpoint clearance and scenery clipping now agree with walking. Review narrowed a zero-motion traversal edge to non-damaging dashes: that native regression passes, while Cartwheel’s legitimate damaging contact and actual two-mana input remain unchanged. Both review axes have zero remaining findings.
+
+The affected integration run passes 46 cases; the final channel/challenge focus passes 18 cases. These focused cases overlap full regression. Nineteen full-strength original-AI victories pass with all nine regional enemies: sixteen standard/ripple × Starwick Sage/Cragback × independent help rematches, a first Pearl/star pickup and two walking strategies. Seventeen deliberately exercise an actual sheltered reed contact in every phase. The Wizard walking victory uses no counter; Cragback’s broad native art incidentally cracks one crust, so its walking strategy is not labelled counter-free. Simulated fights take 9.75–67.02 seconds with zero knockouts and zero to one damage. Wizard spends naturally earned mana; borrowed Curse keeps Cragback’s answer free. Actual lesson stars retain their payout; owned Pearl/star never pays again. Supplied ownership/chapter/initial poses and predictive feet steering are encounter evidence, not uninterrupted acquisition or a human speed/difficulty verdict.
+
+Six phone/TV/portrait-tablet × HD/base browser workflows exercise real touch/TV arts and channel walking, saved lily practice, full invitation/lantern text, reload and explicit rematch. Their chapter/positions and render clocks are controlled. Portrait review observes Queen-owned damage separately: a native bank caster legitimately hurts feet on the strip, as it should. The new real-time helper retains original RAF, AI, physics and scarce mana, with only an earned chapter and initial court pose supplied. Local touch/TV runs pass with help off, zero damage/mana, Queen health36/veil5 and no bespoke counter stagger. These checks do not establish physical hardware, continuous acquisition or family enjoyment.
+
+All 90 final deterministic captures and eight local real-time views were inspected on 17 aspect-preserving sheets and selected native-size views. Complete regression and exact Pages/public release gates remain pending in this checkpoint.

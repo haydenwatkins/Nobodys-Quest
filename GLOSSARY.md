@@ -23,3 +23,5 @@ _Avoid_: Automatically assigned chore
 **Card passage**: Tansy's moving card fan, with an approach opened by splashing a landed pie while the rest of her act continues.
 
 **Card Encore**: Tansy's deliberately chosen local practice variation with a following card passage; help and rewards remain independent.
+
+**Mire channel**: Queen’s fixed lily-lined ground, made by breaking nearby landed crust. It shelters feet from her bubbles and reeds while her court continues fighting; other enemies keep their danger.

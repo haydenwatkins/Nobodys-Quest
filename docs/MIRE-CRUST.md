@@ -1,5 +1,7 @@
 # Mire crust and the ferry fire
 
+Historical October 9 foundation. The October 13 backfill in `MIRE-CHANNEL.md` supersedes its global splash opening and following-volley cancellation; current success leaves useful ground while Queen keeps fighting. The evidence below describes the earlier version.
+
 October 9, 2026. The second authored guardian response follows `GUARDIAN-CHALLENGES.md` and `PLAYER-EXPERIENCE-RULES.md`. Queen and Treant now share saved profile normalization and opening cleanup; their concrete mechanics remain different. This does not complete the later guardian roster.
 
 ## What changes in play
