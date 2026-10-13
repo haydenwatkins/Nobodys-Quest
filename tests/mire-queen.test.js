@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const runtime=require('../tools/lib/classic-runtime.cjs');
-function fight(phase=1){const r=runtime(),{G}=r;r.load('sunkenMarsh');r.drain();const e=G.state.enemies.find(e=>e.id==='mireQueen');G.state.enemies=[e];G.state.player.x=e.x+70;G.state.player.y=e.y;G.state.player.invuln=0;e.bossEngaged=true;e.bossIntroT=0;e.bossPhase=phase;e.bossPattern=1;e.bossSpecialT=0;G.state.bossCutscene=null;G.updateEnemies(.016);assert.equal(e.bossPendingAction,'mireBubbles');G.updateEnemies(.6);return {...r,e};}
+function fight(phase=1){const r=runtime(),{G}=r;r.load('sunkenMarsh');r.drain();const e=G.state.enemies.find(e=>e.id==='mireQueen');G.state.enemies=[e];G.state.player.x=e.x+70;G.state.player.y=e.y;G.state.player.invuln=0;e.bossEngaged=true;e.bossIntroT=0;e.bossPhase=phase;e.bossPattern=0;e.bossSpecialT=0;G.state.bossCutscene=null;G.updateEnemies(.016);assert.equal(e.bossPendingAction,'mireBubbles');G.updateEnemies(.6);return {...r,e};}
 test('Mire Queen marks a fixed target, warns before harm, and leaves a recovery opening',()=>{
  const {G,e}=fight();const h=G.state.bossHazards[0];assert.equal(h.kind,'mirePool');assert.equal(h.radius,16);
  const x=h.x,y=h.y;const health=G.state.player.damageTaken;G.updateBossHazards(.89);assert.equal(G.state.player.damageTaken,health);

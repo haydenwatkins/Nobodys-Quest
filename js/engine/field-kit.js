@@ -165,7 +165,7 @@
     if(npc&&Math.hypot(npc.x-p.x,npc.y-p.y)<near.d+6)return null;
     const lamp=lamps.find(l=>l.key===near.kind);
     if(near.kind==='treantChallenge')return {...near,id:'field-kit',label:`Branching Roots · ${G.treantBranchingLit()?'Put out':'Light'}`,hint:'Adds a following root. Snap the first root to stop it.'};
-    if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Adds a following volley. Crack the mire near the Queen to stop it.'};
+    if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Adds following reeds. Crack nearby mire, then walk your lily path.'};
     if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Adds a crescent after his charge. Strike his raised shield to stop the pair.'};
     if(near.kind==='wayglassChallenge')return {...near,id:'field-kit',label:`Double Return · ${G.wayglassDoubleLit()?'Put out':'Light'}`,hint:'Adds a second throw. Raise a reflector to stop the pair when a blade returns.'};
     if(near.kind==='foldroadChallenge')return {...near,id:'field-kit',label:`Crossfold · ${G.foldroadCrossfoldLit()?'Put out':'Light'}`,hint:'Adds a crossing cut after a pause. Strike the loose fold, then step away to stop the sequence.'};

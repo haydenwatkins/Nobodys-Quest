@@ -31,7 +31,7 @@ test('ranged, sharp and slow native free basics splash at zero mana without eras
  for(const form of ['wizard','knight','colossus']){
   const r=setup({form}),{G,e}=r,root=finish(r),hp=e.hp,ward=e.ward.hp;let credit=0;G.events.on('hit',()=>credit++);G.events.on('wardBreak',()=>credit++);
   Object.assign(G.state.player,{x:root.x+18,y:root.y,dir:{x:-1,y:0}});r.taps.add('a');for(let i=0;i<28;i++){r.step(.025);r.drain();}
-  assert.equal(root.dead,true,form);assert.equal(e.mireCounters,1,form);assert.equal(e.hp,hp,form);assert.equal(e.ward.hp,ward,form);assert.equal(credit,0,form);assert.equal(G.state.player.mana,0,form);assert.ok(e.bossStaggerT>0,form);
+  assert.equal(root.dead,true,form);assert.equal(e.mireCounters,1,form);assert.equal(e.hp,hp,form);assert.equal(e.ward.hp,ward,form);assert.equal(credit,0,form);assert.equal(G.state.player.mana,0,form);assert.equal(e.bossStaggerT||0,0,form);assert.ok(G.mireShelters({x:root.x,y:root.y},e),form);
  }
 });
 test('sticky feet are local, unstacked, short-lived and immediately freed by a basic or expiration',()=>{
@@ -46,11 +46,11 @@ test('a distant crust still frees the player but cannot splash the Queen or unlo
  const r=setup(),{G,e}=r;G.state.bossHazards=[];const h={owner:e,mireAftermath:{x:e.x+130,y:e.y}};G.leaveMireCrust(h);const root=G.state.enemies.find(e=>e.mireCrust);
  G.combat.damageEnemy(root,{damage:1,type:'dark',ability:'curse'});assert.equal(root.dead,true);assert.equal(e.mireCounters,undefined);assert.equal(G.state.guardianChallenges.queen.counterLearned,false);
 });
-test('the following volley waits for helped bubbles and can be cancelled; fallback shots follow the old target',()=>{
+test('the following volley waits for helped bubbles and continues through the chosen channel; fallback shots follow the old target',()=>{
  for(const phase of [1,2,3])for(const help of [false,true]){
   const r=setup({phase,help,rippling:true}),{G,e}=r,echo=G.state.bossHazards.find(h=>h.mireRipple),primary=G.state.bossHazards.filter(h=>!h.mireRipple);
   assert.ok(Math.abs(echo.delay-Math.max(...primary.map(h=>h.warning+h.active)))<1e-8);assert.equal(echo.warning,help?1.25:.95);
-  const root=finish(r);assert.ok(root);assert.equal(echo.fired,false);G.combat.damageEnemy(root,{damage:1,type:'blunt',ability:'slap'});assert.equal(G.state.bossHazards.length,0);assert.equal(e.bossPendingAction,null);
+  const root=finish(r);assert.ok(root);assert.equal(echo.fired,false);G.combat.damageEnemy(root,{damage:1,type:'blunt',ability:'slap'});assert.ok(G.state.bossHazards.includes(echo));assert.equal(e.bossStaggerT||0,0);assert.ok(G.mireShelters({x:root.x,y:root.y},e));
  }
  const r=setup({rippling:true}),{G,e}=r;finish(r);const echo=G.state.bossHazards[0],at={x:echo.x,y:echo.y};G.state.player.y+=35;G.updateBossHazards(echo.delay+echo.warning-echo.t+.01);assert.equal(echo.fired,true);assert.equal(echo.x,at.x);assert.equal(echo.y,at.y);assert.ok(G.state.projectiles.some(p=>p.owner===e));assert.equal(G.state.player.damageTaken,0);
 });

@@ -766,6 +766,7 @@ G.updateBossHazards = function (dt) {
       if(!h.hit&&(d<h.inner||d>h.outer)&&G.damagePlayer(1,h.x,h.y))h.hit=true;
       continue;
     }
+    if (h.kind === "mirePool" && G.mireShelters?.(p,h.owner)) continue;
     if (["mirePool","rootBloom","royalStomp","pieRain"].includes(h.kind)) {
       if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
       continue;
@@ -799,6 +800,7 @@ function punishBossHazard(h) {
 }
 
 G.drawBossHazards = function (ctx) {
+  G.drawMireChannels?.(ctx);
   const hazards = G.state.bossHazards || [];
   for (const h of hazards) {
     const b = arenaBounds(h);

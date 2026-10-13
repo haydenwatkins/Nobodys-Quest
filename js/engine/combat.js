@@ -890,7 +890,9 @@ G.combat = (() => {
         }
         const p = s.player;
         if (!gone && G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {
-          G.damagePlayer(pr.damage, pr.owner ? pr.owner.x : pr.x, pr.owner ? pr.owner.y : pr.y);
+          if (G.mireShelters?.(p,pr.owner)) {
+            G.spawnFx({kind:"puff",x:pr.x,y:pr.y,color:"#c5e5dd",dur:.2});
+          } else G.damagePlayer(pr.damage, pr.owner ? pr.owner.x : pr.x, pr.owner ? pr.owner.y : pr.y);
           // Trial knockouts intentionally clear every shot and start an eject
           // sequence. The old loop indices are invalid after that reset.
           if (s.knockout) return;

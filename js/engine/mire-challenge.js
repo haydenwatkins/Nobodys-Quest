@@ -1,5 +1,4 @@
-/* A short-lived mire crust offers an attack or dash counter. The local
-   ripple rematch develops the same action without changing run rules. */
+/* Break a landed crust to keep useful ground while the Queen fights on. */
 "use strict";
 (() => {
   const trophy='trophy-mire-pearl',point=(x,y)=>({x:x*16+8,y:y*16+8});
@@ -46,6 +45,40 @@
   };
   G.mireWalkingScale=p=>G.state.enemies.some(e=>!e.dead&&e.mireCrust?.owner&&!e.mireCrust.owner.dead&&
     e.mireCrust.map===G.state.mapId&&Math.hypot(e.x-p.x,e.y-p.y)<=14)?.8:1;
+  function channel(owner,x,y){
+    const dx=owner.x-x,dy=owner.y-y,length=Math.hypot(dx,dy),ux=length?dx/length:1,uy=length?dy/length:0;
+    let reach=0;
+    // A lily strip never advertises a walking route through solid ground.
+    for(let d=4;d<=length;d+=4){
+      if([-14,0,14].some(side=>!G.world.isSafeSpawn(x+ux*d-uy*side,y+uy*d+ux*side))||!G.world.isSafeSpawn(x+ux*(d+14),y+uy*(d+14)))break;
+      reach=d;
+    }
+    owner.mireChannel={x,y,x2:x+ux*reach,y2:y+uy*reach,map:G.state.mapId,phase:owner.bossPhase};
+  }
+  function liveChannel(owner){
+    const c=owner?.mireChannel;
+    return c&&!owner.dead&&!G.state.knockout&&c.map===G.state.mapId&&c.phase===owner.bossPhase?c:null;
+  }
+  G.mireShelters=(p,owner)=>{
+    const c=liveChannel(owner);if(!c||!G.world.isSafeSpawn(p.x,p.y))return false;
+    const dx=c.x2-c.x,dy=c.y2-c.y,sq=dx*dx+dy*dy,at=sq?G.util.clamp(((p.x-c.x)*dx+(p.y-c.y)*dy)/sq,0,1):0;
+    return Math.hypot(p.x-c.x-dx*at,p.y-c.y-dy*at)<=14;
+  };
+  G.drawMireChannels=c=>{
+    for(const owner of G.state.enemies||[]){const path=liveChannel(owner);if(!path)continue;
+      c.save();c.beginPath();
+      // Keep a near-wall crust's rounded edge off solid scenery too.
+      for(let y=Math.floor((Math.min(path.y,path.y2)-18)/16);y<=Math.floor((Math.max(path.y,path.y2)+18)/16);y++)
+        for(let x=Math.floor((Math.min(path.x,path.x2)-18)/16);x<=Math.floor((Math.max(path.x,path.x2)+18)/16);x++)
+          if(!G.world.solid(x*16+8,y*16+8))c.rect(x*16,y*16,16,16);
+      c.clip();c.strokeStyle='#b7d9d4';c.lineWidth=28;c.lineCap='round';c.globalAlpha=.38;
+      c.beginPath();c.moveTo(path.x,path.y);c.lineTo(path.x2,path.y2);c.stroke();c.globalAlpha=1;
+      const dx=path.x2-path.x,dy=path.y2-path.y,length=Math.hypot(dx,dy),ux=length?dx/length:1,uy=length?dy/length:0;
+      for(let d=0;d<=length;d+=16){for(const side of [-14,14]){
+        c.fillStyle='#c5e5dd';c.beginPath();c.ellipse(path.x+ux*d-uy*side,path.y+uy*d+ux*side,3,2,0,0,Math.PI*2);c.fill();
+      }}c.restore();
+    }
+  };
   G.hitMireCrust=(e,opts)=>{
     const r=e.mireCrust;if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||r.owner?.dead)return false;
     e.dead=true;G.sfx.play('wardBreak');G.state.hitStop=Math.max(G.state.hitStop||0,.04);
@@ -53,12 +86,11 @@
     for(let i=0;i<8;i++)G.spawnFx({kind:'spark',x:e.x,y:e.y-3,color:i%2?'#b7d9d4':'#d6b5e6',vx:(i-3.5)*10,vy:-26-i,dur:.4});
     if(!r.owner){progress().practiceCleared=true;G.saveGame();return false;}
     const owner=r.owner;
-    // Clearing the crust always frees the feet. Only a nearby splash opens
-    // the Queen; her dark ward still needs dark magic.
+    // Nearby splashes leave ground, not a global opening. Dark still answers the veil.
     if(Math.hypot(owner.x-e.x,owner.y-e.y)>110)return false;
-    owner.mireCounters=(owner.mireCounters||0)+1;G.guardianCounterOpening(owner);
+    owner.mireCounters=(owner.mireCounters||0)+1;channel(owner,e.x,e.y);
     G.spawnFx({kind:'bolt',x:e.x,y:e.y-2,x2:owner.x,y2:owner.y-8,color:'#b7d9d4',dur:.3});
-    G.damageNumber(owner.x,owner.y-owner.h()-5,'SPLASH!','#d6e9e1');
+    G.damageNumber(owner.x,owner.y-owner.h()-5,'LILY PATH!','#d6e9e1');
     progress().counterLearned=true;G.saveGame();G.events.emit('guardianCounter',{guardian:'mireQueen',kind:'mire'});return false;
   };
   G.breakMireAlongDash=(x,y,x2,y2)=>{
@@ -78,7 +110,7 @@
   G.beginMireRematch=()=>{
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen||G.state.gauntletRun||G.state.expeditionRun)return false;
     const owner=G.makeEnemy('mireQueen',6*16+8,9*16+8);
-    owner.def={...owner.def,boss:{...owner.def.boss,rematchLine:progress().rippling?'Let’s try my ripple! Crack the mire before my following volley.':'Ready for another splash? My veil still needs dark magic.'}};
+    owner.def={...owner.def,boss:{...owner.def.boss,rematchLine:progress().rippling?'Let’s try my ripple! Crack the mire, then use your lily path through my following reeds.':'Ready for another splash? My veil still needs dark magic.'}};
     owner.guardPost=true;owner.queenLocalRematch=true;owner.queenRippling=progress().rippling&&progress().counterLearned;
     G.state.enemies.push(owner);G.applyMarshSluices();return true;
   };
@@ -90,6 +122,7 @@
   const update=G.updateOpening;
   G.updateOpening=dt=>{
     update(dt);
+    for(const owner of G.state.enemies||[])if(owner.mireChannel&&!liveChannel(owner))delete owner.mireChannel;
     for(const e of G.state.enemies||[]){const r=e.mireCrust;if(!r||e.dead)continue;
       if(r.map!==G.state.mapId||r.owner?.dead){e.dead=true;continue;}
       if(r.owner){r.left-=dt;if(r.left<=0)e.dead=true;}
@@ -108,7 +141,7 @@
   G.tryOpeningInteraction=()=>{
     const at=G.openingInteractionCandidate();if(at?.id!=='queen-rematch')return interact();
     const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();
-      G.ui.dialogue('MIRE QUEEN','You splashed my crown! Want to try my ripple? Light the ripple lantern by my fire. Bring your help lights, too. I’ve got a towel ready.',{accent:'#b29bdf'});
+      G.ui.dialogue('MIRE QUEEN','You grew a lily path! Want to walk it through my ripple? Light the ripple lantern by my fire. Bring your help lights, too. I’ve got a towel ready.',{accent:'#b29bdf'});
     }else G.beginMireRematch();G.input.clearTaps();return true;
   };
   function drawCrust(c,e){const x=e.x,y=e.y;c.save();

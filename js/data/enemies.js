@@ -428,11 +428,11 @@ registerEnemy({
     style: "caster", intro: "HER COURT HAS RISEN",
     color: "#8153c1", specialEvery: 3.8,
     phases: 3, phaseThresholds: [0.67, 0.34], telegraph: 0.58,
-    chargeSpeed: 0, chargeDur: 0, patterns: ["mireVolley", "mireBubbles", "nova"],
+    chargeSpeed: 0, chargeDur: 0, patterns: ["mireBubbles", "mireVolley"],
     introLines: [
       "You’ve come for my pearl? I took it to light my court. I won’t sit in the dark again!",
       "Those boats have their whole harbor. This little marsh is mine!",
-      "Dark magic opens my veil. After a bubble bursts, crack its crust—or dash through it—to splash my crown!",
+      "Dark magic opens my veil. After a bubble bursts, crack its crust—or dash through it—to open a lily path. My bubbles and reeds can’t hurt you there!",
     ],
     phaseLine: "You’ve made quite a splash! I’ll try two bubbles. Watch the purple circles.",
     phaseThreeLine: "You’re still with me! Three bubbles, then a breather. Ready?",
