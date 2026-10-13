@@ -77,10 +77,12 @@
  G.tryOpeningInteraction=()=>{const at=G.openingInteractionCandidate();if(at?.id!=='tansy-rematch')return interact();const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('TANSY',"You got me with custard! Want to try my card encore? Light its lantern by the fire. Keep your help lights if you like. I'll fetch the cookies.",{accent:'#ffcd75'});}else G.beginStageRematch();G.input.clearTaps();return true;};
  function drawPie(c,x,y){if(G.drawStagePie?.(c,x,y))return;c.save();c.fillStyle='#bb8c55';c.fillRect(x-8,y-3,16,6);c.fillStyle='#fff3c2';c.fillRect(x-7,y-6,14,4);c.fillStyle='#e9a9ce';c.fillRect(x-3,y-8,6,3);c.restore();}
  G.drawStagePassages=c=>{
-  const fans=new Set((G.state.bossHazards||[]).filter(h=>h.kind==='stageCards'||h.kind==='stageEncore').map(h=>h.following||h));
+  const fans=new Set((G.state.bossHazards||[]).filter(h=>!h.owner.dead&&(h.kind==='stageCards'||h.kind==='stageEncore')).map(h=>h.following||h));
   for(const s of G.state.projectiles)if(s.stagePassage&&!s.dispelled)fans.add(s.stagePassage.following||s.stagePassage);
   c.save();c.strokeStyle='#fff3c2';c.fillStyle='#fff3c2';c.lineWidth=1;
-  for(const h of fans){if(h.mapId!==G.state.mapId||h.owner.dead)continue;for(const a of h.passages){
+  // Released cards keep their native danger after victory, so their route
+  // remains useful until those actual shots leave, even with a dead owner.
+  for(const h of fans){if(h.mapId!==G.state.mapId)continue;for(const a of h.passages){
    c.globalAlpha=.5;c.setLineDash([3,5]);for(const edge of [a-.22,a+.22]){c.beginPath();c.moveTo(h.x+Math.cos(edge)*30,h.y+Math.sin(edge)*30);c.lineTo(h.x+Math.cos(edge)*140,h.y+Math.sin(edge)*140);c.stroke();}
    c.setLineDash([]);c.globalAlpha=.85;for(let d=38;d<=134;d+=16)c.fillRect(Math.round(h.x+Math.cos(a)*d)-1,Math.round(h.y+Math.sin(a)*d)-1,3,3);
   }}c.restore();

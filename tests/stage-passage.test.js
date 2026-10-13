@@ -41,3 +41,12 @@ test('a close-range side pie still changes actual cards rather than drawing an u
  const r=setup({phase:2,distance:0,originX:280}),{G,e}=r,side=G.state.enemies.find(c=>c.custardPie?.owner===e&&Math.abs(c.y-e.y)>30),fan=G.state.bossHazards.find(h=>h.kind==='stageCards');assert.ok(side);const count=fan.shots.length;
  splash(r,side);assert.ok(fan.shots.length<count,'every landed choice removes actual pressure');assert.ok(fan.shots.length>0,'the other cards stay active');
 });
+test('the painted passage survives native victory until the last released card leaves',()=>{
+ const r=setup(),{G,e}=r;e.ward.hp=0;splash(r,G.state.enemies.find(c=>c.custardPie?.owner===e));
+ for(let i=0;i<160&&!G.state.projectiles.some(s=>s.stagePassage);i++){r.step(.025);r.drain();}
+ G.combat.damageEnemy(e,{damage:100,type:'sharp',noMana:true});G.updateBossHazards(.001);assert.ok(e.dead);assert.ok(G.state.projectiles.some(s=>s.stagePassage&&!s.dispelled),'native victory preserves released shots');
+ const {createCanvas}=require(require.resolve('@napi-rs/canvas',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES||'node_modules']})),canvas=createCanvas(448,272),c=canvas.getContext('2d');G.drawBossHazards(c);
+ assert.ok(c.getImageData(0,0,448,272).data.some((v,i)=>i%4===3&&v>0),'the actual render still paints the useful path');
+ for(let i=0;i<160&&G.state.projectiles.some(s=>s.stagePassage);i++)G.combat.updateProjectiles(.025);
+ c.clearRect(0,0,448,272);G.drawBossHazards(c);assert.equal(c.getImageData(0,0,448,272).data.some((v,i)=>i%4===3&&v>0),false,'the path retires with its actual shots');
+});
