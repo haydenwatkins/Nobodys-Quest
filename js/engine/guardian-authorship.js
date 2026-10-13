@@ -7,6 +7,7 @@
     const perform=authors.get(owner.def.id)?.actions?.[action];if(!perform)return false;
     perform(owner,p,spawn);return true;
   };
+  G.guardianRepeatVictory=owner=>authors.get(owner.def.id)?.repeatVictory?.(owner);
   G.noteGuardianAuthorDefeat=owner=>{authors.get(owner.def.id)?.defeat?.(owner);G.retireGuardianProps(owner);};
   G.guardianPropLive=e=>{
     const r=e?.guardianProp,owner=r?.owner;

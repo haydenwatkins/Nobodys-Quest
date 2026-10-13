@@ -277,7 +277,7 @@ G.combat = (() => {
               ? enemy.breakwaterCounters>0 ? "The tide caught my shell! Come have a warm biscuit by the fire." : "You found your way through the tide! Come have a warm biscuit by the fire."
             : enemy.sumiLocalRematch
               ? enemy.foldroadCounters>0 ? "You opened my folds! Come have a rice cake by the fire." : "You found a clear step through my cuts! Come have a rice cake by the fire."
-            : `${enemy.def.name} is defeated again.`;
+            : G.guardianRepeatVictory?.(enemy) || `${enemy.def.name} is defeated again.`;
       if (G.ui.dialogue) G.ui.dialogue(`🏆 ${enemy.def.name}`, repeatVictory, {
         accent: enemy.def.boss ? enemy.def.boss.color : "#ffcd75",
       });

@@ -36,7 +36,7 @@
     if(active)G.drawHedgewayBloom?.(c,h);
     else{c.beginPath();c.arc(h.x,h.y,h.radius*Math.min(1,local/h.warning),0,Math.PI*2);c.stroke();}
   }
-  G.registerGuardianAuthor('grandmotherBriar',{actions:{gardenBeds(owner,p,spawn){
+  G.registerGuardianAuthor('grandmotherBriar',{repeatVictory:owner=>owner.briarPrunes>0?"You made room for visitors! Come sit by the fire, dear. We'll tend another garden whenever you like.":"You found your way through my flowers! Come sit by the fire, dear. The biscuits are ready.",actions:{gardenBeds(owner,p,spawn){
     const g=garden(owner,p),cycle=g.cycle++,beds=g.beds.filter(b=>!b.pruned&&(owner.bossPhase!==2||b.index%2===cycle%2));
     for(const bed of beds)spawn(owner,'rootBloom',{x:bed.x,y:bed.y,radius:22,warning:1.1+(owner.bossPhase===3?bed.index*.16:0),active:.8,color:'#a7f070',bloomColor:'#e9a9ce',briarBed:bed,
       guardianActive(h,feet){if(!bed.pruned&&!h.hit&&Math.hypot(feet.x-h.x,feet.y-h.y)<=h.radius&&G.damagePlayer(1,h.x,h.y))h.hit=true;},guardianPaint:paintBloom});

@@ -315,15 +315,15 @@ function makeExpansionTrialArena(variant) {
     exit: { x: 36, y: 24 }, sign: "Dark opens Briar’s ward. Clip a pink bud to keep that path through later blooms. Other flowers continue; the middle stays clear." },
 ].forEach((trial) => registerMap({
   id: trial.id, name: trial.name, visualTheme: trial.theme, playerStart: { x: 3, y: 8 },
-  bossTrial: { ...(['turtleTrial','samuraiTrial','astronomerTrial','druidTrial'].includes(trial.id)?{onlyEngaged:true}:{}), exit: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y }, delay: 1.7 },
+  bossTrial: { onlyEngaged:true, exit: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y }, delay: 1.7 },
   legend: {
     "x": { tile: "floor", portal: { map: "shattercoast", x: trial.exit.x, y: trial.exit.y } },
     "B": { tile: "floor", enemy: trial.boss }, "m": { tile: "floor", message: trial.sign },
     "H": { tile: "floor", chest: { heal: true, name: "a guardian's travel biscuit" } },
     "R": { tile: "rock", on: "floor" },
-    ...(['turtleTrial','samuraiTrial','astronomerTrial','druidTrial'].includes(trial.id)?{"F":{tile:"floor",rest:true,restText:(trial.id==='turtleTrial'?'Marlo’s':trial.id==='samuraiTrial'?'Sumi’s':trial.id==='druidTrial'?'Briar’s':'Nell’s')+' fire restores every heart and all mana.'}}:{}),
+    "F":{tile:"floor",rest:true,restText:(trial.id==='turtleTrial'?'Marlo’s':trial.id==='samuraiTrial'?'Sumi’s':trial.id==='druidTrial'?'Briar’s':'Nell’s')+' fire restores every heart and all mana.'},
   },
-  tiles: makeExpansionTrialArena(trial.variant).map((row,y)=>['turtleTrial','samuraiTrial','astronomerTrial','druidTrial'].includes(trial.id)&&y===11?row.slice(0,3)+'F'+row.slice(4):row),
+  tiles: makeExpansionTrialArena(trial.variant).map((row,y)=>y===11?row.slice(0,3)+'F'+row.slice(4):row),
 }));
 
 registerMap({
