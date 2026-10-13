@@ -1,5 +1,7 @@
 # Tansy’s custard and Card Encore
 
+Historical October 12 specification and release evidence. `STAGE-CARD-PASSAGE.md` supersedes its global-cancellation payoff, attack sequence and current instructions; `CLOUD-ROADMAP.md` owns the next task.
+
 October 12, 2026. The seventh authored guardian response develops the existing Wayward Stage and preserves its Curtain Bell, Trouper discovery and connected Greenfield approach. It applies the shared player-experience and guardian-challenge contracts.
 
 ## What changes in play

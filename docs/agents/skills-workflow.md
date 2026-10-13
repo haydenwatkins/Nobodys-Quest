@@ -25,6 +25,8 @@ Updates are manual with this installation. Use `npx skills@latest update --proje
 
 ## Working on the game
 
+In Codex, name a skill with `$`, for example: `$grill-with-docs Help me choose a useful card passage for Tansy; infer settled decisions from the game docs.` You can also name it in plain language in this conversation. After the design is settled, `$implement` owns the bounded build; its TDD and review steps do not require you to run separate commands or manage the tests.
+
 1. **Brief design conversation:** use `grill-with-docs`, which combines `grilling` and `domain-modeling`. First read the game rules, application ledger, current roadmap and relevant feature docs/code. Ask only unresolved player-experience decisions, recommend a concrete answer and explain the tradeoff. Existing family decisions are facts to recover from docs. Record settled vocabulary in the glossary; use an ADR only for a costly, surprising tradeoff.
 2. **Choose a delivery size:** a bounded change such as Tansy's next card passage goes directly to `implement` in the same conversation. A larger change spanning sessions can use `to-spec` and `to-tickets` to publish self-contained GitHub work with dependencies. Read those skills before using them. Do not manufacture tickets or extra workflow stages for a small change.
 3. **Own implementation:** use `implement` and `tdd` for one behavior at a time: a failing observable-behavior test, the smallest change, then the next slice. Reuse the native runtime/input boundary and browser workflows already established by the game. The agent owns routine test selection under the user's standing authorization; there is no separate approval prompt for every seam or engineering choice. Plain JavaScript/Canvas remains the active game.
