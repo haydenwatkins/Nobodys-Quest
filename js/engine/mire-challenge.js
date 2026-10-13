@@ -95,6 +95,7 @@
   };
   G.breakMireAlongDash=(x,y,x2,y2)=>{
     const dx=x2-x,dy=y2-y,sq=dx*dx+dy*dy;
+    if(sq<1e-8)return;
     for(const e of G.state.enemies||[]){
       if(e.dead||!e.mireCrust)continue;
       const at=sq?G.util.clamp(((e.x-x)*dx+(e.y-y)*dy)/sq,0,1):0;

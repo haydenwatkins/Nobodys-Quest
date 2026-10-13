@@ -871,7 +871,7 @@ G.drawBossHazards = function (ctx) {
       for(let i=0;i<h.count;i++){const angle=a+(i-middle)*14*Math.PI/180;
         ctx.beginPath();ctx.moveTo(e.x,e.y-5);ctx.lineTo(e.x+Math.cos(angle)*100,e.y-5+Math.sin(angle)*100);ctx.stroke();
       }ctx.setLineDash([]);
-      ctx.fillStyle="#302638";ctx.fillRect(e.x-26,e.y+15,52,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"STEP ASIDE",e.x,e.y+23);
+      ctx.fillStyle="#302638";ctx.fillRect(e.x-26,e.y+15,52,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,G.mireShelters?.(G.state.player,e)?"LILY PATH":"STEP ASIDE",e.x,e.y+23);
     } else if (h.kind === "rootBloom") {
       ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#a7f070";ctx.setLineDash(active?[]:[3,2]);ctx.stroke();ctx.setLineDash([]);

@@ -59,3 +59,11 @@ test('lily ground stops before an actual wall instead of promising a walking rou
  const canvas=require(require.resolve('@napi-rs/canvas',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES||'node_modules']})).createCanvas(256,256),ctx=canvas.getContext('2d');
  G.drawMireChannels(ctx);assert.equal(ctx.getImageData(140,152,1,1).data[3],0,'the painted strip does not cover the blocked ground');
 });
+
+test('a non-damaging dash blocked by real terrain cannot grow a route without travelling',()=>{
+ const r=setup(),{G,e}=r;G.state.grid[9][8]={...G.state.grid[9][8],tile:'rock'};
+ G.leaveMireCrust({owner:e,mireAftermath:{x:149,y:152}});
+ const crust=G.state.enemies.find(a=>!a.dead&&a.mireCrust?.owner===e),p=G.state.player;Object.assign(p,{x:149,y:152,dir:{x:-1,y:0},mana:0});
+ G.combat.dash(p,{dist:55,speed:240,damage:0});G.updatePlayer(.025);
+ assert.equal(p.x,149);assert.equal(p.mana,0);assert.equal(crust.dead,false);assert.equal(e.mireCounters||0,0);
+});

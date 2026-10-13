@@ -14,6 +14,7 @@ review({url:process.argv[2]||'https://quest-review.example/',out:process.argv[3]
  }
  let mireReviewTouch;
  async function channelWalk(){
+  await page.evaluate(()=>{window.mireHurts=[];if(!window.mireHurtObserver){window.mireHurtObserver=true;G.events.on('playerHurt',v=>mireHurts.push({...v,queen:v.fromX===reviewQueen.x&&v.fromY===reviewQueen.y}));}});
   assert.equal(await page.evaluate(()=>window.reviewQueen.bossStaggerT||0),0);
   const before=await page.evaluate(()=>{const p=G.state.player,c=reviewQueen.mireChannel,dx=(c.x+c.x2)/2-p.x,dy=(c.y+c.y2)/2-p.y,d=Math.hypot(dx,dy);return{x:p.x,y:p.y,damage:p.damageTaken,vx:dx/d,vy:dy/d};});
   if(mode==='controller')await page.evaluate(({vx,vy})=>window.__nqTvPad(JSON.stringify({t:'s',a:[vx,vy,0,0],b:Array(16).fill(0)})),before);
@@ -25,7 +26,7 @@ review({url:process.argv[2]||'https://quest-review.example/',out:process.argv[3]
   assert.equal(await page.evaluate(()=>G.mireShelters(G.state.player,window.reviewQueen)),true,JSON.stringify(await page.evaluate(()=>({p:{x:G.state.player.x,y:G.state.player.y},path:reviewQueen.mireChannel,queen:{x:reviewQueen.x,y:reviewQueen.y,phase:reviewQueen.bossPhase}}))));
   for(let i=0;i<110&&!await page.evaluate(()=>G.state.projectiles.some(s=>s.owner===window.reviewQueen&&!s.fromPlayer&&!s.dispelled));i++)await frames(1);
   assert.ok(await page.evaluate(()=>G.state.projectiles.some(s=>s.owner===window.reviewQueen&&!s.fromPlayer&&!s.dispelled)),'remaining native reeds still fly');await shot('remaining-reeds-and-lily-path');
-  await frames(40);assert.equal(await page.evaluate(()=>G.state.player.damageTaken),before.damage);assert.equal(await page.evaluate(()=>G.mireShelters(G.state.player,window.reviewQueen)),true,JSON.stringify(await page.evaluate(()=>({p:{x:G.state.player.x,y:G.state.player.y},path:reviewQueen.mireChannel,queen:{x:reviewQueen.x,y:reviewQueen.y,phase:reviewQueen.bossPhase}}))));await shot('path-after-actual-volley');
+  await frames(40);assert.equal(await page.evaluate(()=>mireHurts.filter(v=>v.queen).length),0,'Queen pressure cannot hurt native feet on the channel; other owners remain dangerous');assert.equal(await page.evaluate(()=>G.mireShelters(G.state.player,window.reviewQueen)),true,JSON.stringify(await page.evaluate(()=>({p:{x:G.state.player.x,y:G.state.player.y},path:reviewQueen.mireChannel,queen:{x:reviewQueen.x,y:reviewQueen.y,phase:reviewQueen.bossPhase}}))));await shot('path-after-actual-volley');
  }
  async function bubbles(){
   for(let i=0;i<500&&!await page.evaluate(()=>G.state.bossHazards.some(h=>h.kind==='mirePool'));i++){
