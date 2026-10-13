@@ -5,7 +5,7 @@ const assert=require('node:assert/strict'),runtime=require('./lib/classic-runtim
 const cases=[];for(const form of ['wizard','knight','colossus'])for(const heart of [false,true])for(const guardian of [false,true])cases.push({form,heart,guardian});cases.push({form:'wizard',heart:false,guardian:false,first:true},{form:'wizard',heart:false,guardian:false,walking:true},{form:'colossus',heart:true,guardian:true,walking:true});
 for(const c of (process.argv.includes('--first-only')?cases.filter(c=>c.first):process.argv.includes('--walking-only')?cases.filter(c=>c.walking):cases)){
  const {form,heart,guardian,first=false,walking=false}=c,r=runtime(),{G}=r;let seed=0x12345678;r.context.Math=Object.create(Math);r.context.Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
- Object.assign(G.state.opening,{started:true,version:2,complete:true});G.state.delivery.complete=true;G.state.items.push('trophy-mire-pearl');G.ensureTown().requests.push('beacon');G.state.claimedForms.push('rat','knight','wizard','ranger','frog','alchemist',form);G.questsDone.push(...G.forms.wizard.quests.slice(0,3).map(q=>q.id));G.state.stars=28;if(!first){G.state.items.push('elder-acorn');G.state.claimedForms.push('druid');}G.setForm(form);if(form!=='wizard')G.state.loadouts[form]=[G.forms[form].basic,'curse'];
+ Object.assign(G.state.opening,{started:true,version:2,complete:true});G.state.delivery.complete=true;G.state.items.push('trophy-mire-pearl');G.ensureTown().requests.push('beacon');G.state.claimedForms.push('rat','knight','wizard','ranger','frog','alchemist','stormcaller',form);G.questsDone.push(...G.forms.wizard.quests.slice(0,3).map(q=>q.id));G.state.stars=28;if(!first){G.state.items.push('elder-acorn');G.state.claimedForms.push('druid');}G.setForm(form);if(form!=='wizard')G.state.loadouts[form]=[G.forms[form].basic,'curse'];
  G.setComfortSetting('easyMode',heart);G.setComfortSetting('bossAssistance',guardian);r.load('druidTrial');r.drain();if(!first)assert.ok(G.beginBriarRematch());
  const e=G.state.enemies.find(a=>!a.dead&&a.id==='grandmotherBriar'),p=G.state.player;Object.assign(p,{x:e.x-70,y:e.y,mana:0,manaRegenDelay:1000});G.input.takeAim=()=>({...G.input.aim,dragged:true});
  const hits=[];G.events.on('playerHurt',v=>hits.push({from:v,phase:e.bossPhase,action:e.bossPendingAction,charge:e.bossChargeT,fields:G.state.bossHazards.map(h=>({x:h.x,y:h.y,t:h.t,warning:h.warning})),x:p.x,y:p.y}));
@@ -21,10 +21,10 @@ for(const c of (process.argv.includes('--first-only')?cases.filter(c=>c.first):p
   }else if(!walking&&chosen[phase]&&!used.has(phase)){
    target=chosen[phase];const needed=phase===2?4:2;
    if(fields.some(h=>h.briarBed)&&e.bossPattern>=chosen[phase].pattern+needed){revisited.add(phase);if(Math.hypot(p.x-target.x,p.y-target.y)<16&&fields.some(h=>h.t>h.warning&&h.t<h.warning+h.active))used.add(phase);}
-  }else{attack=(walking||!!chosen[phase])&&Math.hypot(e.x-p.x,e.y-p.y)<(walking?35:115);}
+  }else{attack=(walking?(e.bossRecoverT>.45||e.bossStaggerT>.45):!!chosen[phase])&&Math.hypot(e.x-p.x,e.y-p.y)<(walking?35:115);}
   if(e.bossPendingAction==='charge'||e.bossChargeT>0){const dx=e.bossChargeX||1,dy=e.bossChargeY||0;target={x:p.x-dy*45,y:p.y+dx*45};attack=false;}
   if(!G.world.isSafeSpawn(target.x,target.y))target=G.world.safeArrival(target.x,target.y);
-  const ax=aim.x-p.x,ay=aim.y-p.y,ad=Math.hypot(ax,ay)||1;G.input.aim={x:ax/ad,y:ay/ad};if(attack)r.taps.add(form==='wizard'?'a':'b');
+  const ax=aim.x-p.x,ay=aim.y-p.y,ad=Math.hypot(ax,ay)||1;if(walking&&buds.some(b=>{const bx=b.x-p.x,by=b.y-p.y,along=(bx*ax+by*ay)/ad;return along>0&&along<135&&Math.abs(bx*ay-by*ax)/ad<15;}))attack=false;G.input.aim={x:ax/ad,y:ay/ad};if(attack)r.taps.add(form==='wizard'?'a':'b');
   const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy),desired=d>2?{x:dx/d,y:dy/d}:{x:0,y:0},speed=G.forms[form].speed,choices=[desired,{x:0,y:0},...Array.from({length:16},(_,j)=>({x:Math.cos(j*Math.PI/8),y:Math.sin(j*Math.PI/8)}))];
   const score=v=>{const predicted={...p};let cost=0;for(let j=1;j<=24;j++){const t=j*.025;G.world.moveBox(predicted,v.x*speed*.025,v.y*speed*.025);const x=predicted.x,y=predicted.y;if(j===10)cost+=Math.hypot(x-target.x,y-target.y);
    for(const h of fields){const age=h.t+t-(h.delay||0);if(age>=h.warning&&age<h.warning+h.active)cost+=Math.max(0,h.radius+7-Math.hypot(x-h.x,y-h.y))**2*25;}
@@ -35,8 +35,9 @@ for(const c of (process.argv.includes('--first-only')?cases.filter(c=>c.first):p
  }
  assert.ok(e.dead,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,byPhase,used:[...used],chosen,x:p.x,y:p.y}));assert.equal(e.bossPhase,3);
  if(!walking)for(const phase of [1,2,3]){assert.ok(byPhase[phase]>=1,JSON.stringify({...c,phase,byPhase,chosen,used:[...used]}));assert.ok(revisited.has(phase));assert.ok(used.has(phase));}
+ if(walking)assert.equal(e.briarPrunes||0,0,'walking alternative never needs a clipped bed');
  assert.equal(paid,0);assert.equal(G.state.stars,startStars+earned);assert.equal(gifts,0);assert.deepEqual([...G.state.items],startItems);
- if(first){assert.ok(G.groundRewardFor('elder-acorn'));G.input.vec={x:0,y:0};collect(r,'elder-acorn');assert.equal(gifts,1);assert.equal(G.state.stars,startStars+earned+1);assert.equal(G.briarVisitReady(),false);assert.ok(G.formReady('druid'));assert.ok(G.formEchoFor('druid'));}
+ if(first){assert.ok(G.groundRewardFor('elder-acorn'));G.input.vec={x:0,y:0};collect(r,'elder-acorn');assert.equal(gifts,1);assert.equal(G.state.stars,startStars+earned+1);assert.equal(G.briarVisitReady(),false);assert.ok(G.formReady('druid'));assert.ok(G.formEchoFor('druid'),JSON.stringify({echoes:G.state.formEchoes,ready:G.readyFormsWithoutEcho(),allowed:G.formDiscoveryAllowed(),promise:G.formReturnPromise(),out:G.activeFormOuting(),quests:G.questsDone}));}
  assert.equal(G.comfortSetting('easyMode'),heart);assert.equal(G.comfortSetting('bossAssistance'),guardian);
  console.log(JSON.stringify({...c,seconds:+seconds.toFixed(2),prunes:e.briarPrunes||0,byPhase,revisited:[...revisited],used:[...used],damage:p.damageTaken,paidCasts:paid,ai:'original',respawns:0}));
 }

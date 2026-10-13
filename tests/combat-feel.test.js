@@ -775,7 +775,7 @@ for (const [id, patternIndex, action, projectileCount] of [
   ["admiralTortoise", 0, "shells", 8],
   ["paperRonin", 1, "crescent", 5],
   ["professorPerihelion", 1, "stars", 6],
-  ["grandmotherBriar", 0, "seeds", 3],
+  ["grandmotherBriar", 1, "seeds", 3],
   ["godAvatar", 7, "nova", 12],
 ]) {
   const boss = G.makeEnemy(id, 80, 0);
