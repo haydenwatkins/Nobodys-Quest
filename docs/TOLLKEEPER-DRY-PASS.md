@@ -1,6 +1,6 @@
 # The Tollkeeper’s dry parcel crossing
 
-October14,2026. Next isolated design after Treant; not implemented or published.
+October14,2026. Implemented in isolation after Treant; unpublished, final gates pending.
 
 The actual delivery encounter already uses a fixed dry refuge through a flood, then a committed sweep. The older boss audit described the inherited registry patterns; delivery.js overrides them. Develop that real short road check rather than replacing it with another long duel.
 
@@ -13,3 +13,5 @@ Retire transient pulse/crossing readiness on defeat, phase, knockout and travel.
 Use friendly concrete dialogue about keeping the parcels dry. Teach through the real refuge and footprints, with the existing chosen delivery goal. Keep the book detour and gift collection priorities. Verify native no-attack walking and original combat alternatives, actual slow/favorite bodies, independent help, phase/KO/travel/save/revisit, native first physical reward and both return roads. Read-only Standards/Spec review, complete regression, six supported layout/art workflows, exact Pages bytes and public original-RAF touch/TV input gate publication. Checkpoints and browser automation remain separate from uninterrupted acquisition and physical family sessions.
 
 No code dependency on Treant. Publication follows its verified release #56. Continue Knight/Mira/Bram/Vesper/Marlo/Sumi, Tansy/Queen variation review, Atlas/Meridian combinations and the final all19 earned progression audit; preserve issue50, four specialist roads, sustained builds, reward sources and menu-optional collecting.
+
+Four native cases pass: genuine safe-pulse/outward walking with physical once-only gift collection/save/revisit; rejection of late/protected wet feet and endpoint-only standing; native phase/defeat/KO/travel retirement; and all24 actual earned bodies walking without attacks, paid casts, mana or forced help. The actual standard health40/ward-null stationary Keeper remains. Visible ground footprints and friendly parcel/dry-bank explanations replace the inherited debt language. Complete combat alternatives/help matrix, supported browser/layout input, regression and release gates remain pending; do not count these checks as uninterrupted campaign pacing.
