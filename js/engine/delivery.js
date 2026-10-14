@@ -22,7 +22,7 @@
   function liveKeeper(e){return e&&!e.dead&&!G.state.knockout&&G.state.mapId==='tollCourt'&&!state().keeper&&G.state.enemies.includes(e);}
   function keeperCrossing(){const e=G.state.enemies.find(e=>e.id==='tollkeeper'&&!e.dead),step=e&&crossings.get(e);return liveKeeper(e)&&step?.phase===e.bossPhase?step:null;}
   function completeKeeper(e){const d=state();if(d.keeper||!e||e.def.id!=='tollkeeper')return false;d.keeper=true;d.started=true;d.lamps=[2,2];G.cancelBossHazards(e);G.revealDeliveryReward(e);G.checkUnlocks();G.saveGame();return true;}
-  function offerCrossing(owner,p){for(const dx of [32,48,64])for(const dy of [0,-16,16]){const x=Math.max(owner.x+48,p.x+dx),y=owner.y+12+dy;if(x>=28*16-8||x<p.x+24||!G.world.isSafeSpawn(x,y))continue;crossings.set(owner,{x,y,phase:owner.bossPhase,from:{x:p.x,y:p.y}});return;}}
+  function offerCrossing(owner,p){for(const dx of [32,48,64])for(const dy of [0,-16,16]){const x=Math.max(owner.x+48,p.x+dx),y=owner.y+12+dy;if(x>=28*16-8||x<p.x+24||!G.world.isSafeSpawn(x,y))continue;crossings.set(owner,{x,y,phase:owner.bossPhase,walked:0,from:{x:p.x,y:p.y}});return;}}
   function followDryPulse(h,before,dt,p){const a=dryPulses.get(h);if(!a||!liveKeeper(h.owner)||a.phase!==h.owner.bossPhase)return;const end=h.warn+h.active,left=Math.max(before,h.warn),right=Math.min(h.t,end);if(right>left){const at=t=>({x:a.previous.x+(p.x-a.previous.x)*G.util.clamp((t-before)/(dt||1),0,1),y:a.previous.y+(p.y-a.previous.y)*G.util.clamp((t-before)/(dt||1),0,1)}),first=at(left),last=at(right);a.safe=a.safe&&!G.openingHazardHits(h,first.x,first.y)&&!G.openingHazardHits(h,last.x,last.y);a.seconds+=right-left;}a.previous={x:p.x,y:p.y};if(before<end&&h.t>=end&&a.safe&&a.seconds>=h.active-.000001)offerCrossing(h.owner,p);}
   const oldGround=G.drawOpeningGround;
   G.drawOpeningGround=(c,cam,time)=>{
@@ -31,6 +31,13 @@
     c.save();c.strokeStyle='#384640';c.fillStyle='#ffe4a3';c.lineWidth=1.5;
     for(let d=12,i=0;d<length;d+=13,i++){c.save();c.translate(step.from.x+dx*d/length,step.from.y+dy*d/length);c.rotate(angle);c.beginPath();c.ellipse(0,i%2?3:-3,3.5,2,0,0,Math.PI*2);c.fill();c.stroke();c.restore();}
     c.beginPath();c.arc(step.x,step.y,8,0,Math.PI*2);c.strokeStyle='#ffe4a3';c.lineWidth=2;c.stroke();c.restore();
+  };
+  const oldPlayerUpdate=G.updatePlayer;
+  G.updatePlayer=dt=>{
+    const p=G.state.player,map=G.state.mapId,x=p.x,y=p.y,dash=p.dashing,step=map==='tollCourt'&&keeperCrossing();oldPlayerUpdate(dt);
+    if(!step||G.state.player!==p||G.state.mapId!==map||G.state.knockout||step!==keeperCrossing())return;
+    const directed=dash?dash.dirX>.05:G.input.vec.x>.05;
+    if(directed&&p.x>x&&Math.hypot(p.x-x,p.y-y)>.001)step.walked+=p.x-x;
   };
   const near=(x,y,r=30)=>Math.hypot(G.state.player.x-(x*16+8),G.state.player.y-(y*16+8))<=r;
   const safe=()=>!G.ui.dialogueOpen&&!G.state.knockout&&!G.state.bossCutscene&&!G.state.enemies.some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-G.state.player.x,e.y-G.state.player.y)<88);
@@ -184,11 +191,11 @@
       const [x,y]=i?[40,15]:[14,25];s.entryPoint={x:x*16+8,y:y*16+8};G.sfx.play('unlock');
       say('lit'+i,[['PARCEL',i?'Both lamps are lit! I can see the town windows past the bridge. We’re nearly home!':'That lamp makes such a difference. Thank you! I’ll bring the cart up now.']]);
     }
-    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','Those parcels stayed dry! The bridge is open. Thank you for being so careful.'],['PATCHLING','Thank you! There are people waiting for us in Sunrise.'],['THE TOLLKEEPER',G.groundRewardFor('keeper-lantern')?'Take the lantern on the ground. One star for the road, and three parcels for the people waiting.':'Tell the people in Sunrise the bridge is open. I’m going to help keep it safe.']]);
+    if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','The bridge is open! Thank you for helping me get the road ready for those parcels.'],['PATCHLING','Thank you! There are people waiting for us in Sunrise.'],['THE TOLLKEEPER',G.groundRewardFor('keeper-lantern')?'Take the lantern on the ground. One star for the road, and three parcels for the people waiting.':'Tell the people in Sunrise the bridge is open. I’m going to help keep it safe.']]);
     if(s.mapId==='sunriseQuay'&&d.keeper&&!d.complete)say('quay',[['PARCEL','There’s Sunrise! Brindle’s oven is smoking, and Pip’s waiting by the water. Oh, I’m so relieved!'],['PATCHLING','Let’s go say hello! I want to see Pip open his present.'],['PARCEL','He’s going to love it. Brindle is by the bakery, Mara’s at the blue door, and Pip’s down by the water.']]);
     for(const h of s.openingHazards||[]){const before=h.t;h.t+=dt;followDryPulse(h,before,dt,s.player);if(!h.hit&&h.t>=h.warn&&h.t<h.warn+h.active&&!h.owner.dead&&!s.knockout&&G.openingHazardHits(h,s.player.x,s.player.y))h.hit=!!G.damagePlayer(1,h.owner.x,h.owner.y);}
     s.openingHazards=(s.openingHazards||[]).filter(h=>!h.owner.dead&&h.t<h.warn+h.active);
-    for(const e of s.enemies){const step=crossings.get(e);if(!step)continue;if(!liveKeeper(e)||step.phase!==e.bossPhase){crossings.delete(e);continue;}if(Math.hypot(s.player.x-step.x,s.player.y-step.y)<8&&s.player.x>=step.from.x+24){e.dead=true;crossings.delete(e);completeKeeper(e);G.sfx.play('unlock');G.events.emit('guardianCounter',{guardian:'tollkeeper',kind:'dryPass'});}}
+    for(const e of s.enemies){const step=crossings.get(e);if(!step)continue;if(!liveKeeper(e)||step.phase!==e.bossPhase){crossings.delete(e);continue;}if(Math.hypot(s.player.x-step.x,s.player.y-step.y)<8&&s.player.x>=step.from.x+24&&step.walked>=24){e.dead=true;crossings.delete(e);completeKeeper(e);G.sfx.play('unlock');G.events.emit('guardianCounter',{guardian:'tollkeeper',kind:'dryPass'});}}
   };
   const oldHit=G.openingHazardHits,oldBoss=G.updateOrchardBoss;
   G.openingHazardHits=(h,x,y)=>h.kind==='flood'?Math.hypot(x-h.x,y-h.y)>h.radius:oldHit(h,x,y);
