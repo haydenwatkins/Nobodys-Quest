@@ -323,10 +323,12 @@ G.drawBossHazards(hazardCtx);
 assert.ok(hazardDrawCalls.labels.includes("SAFE"), "the shared wind kernel should label usable refuge");
 assert.ok(hazardDrawCalls.lines >= 3, "gust warnings should draw directional arrows toward the boss");
 
-// Bongle's grid alternates full readable floor bands. It can hurt once after
-// the warning, but dash invulnerability remains a universal game rule.
+// The retained legacy bell-grid kernel alternates full readable floor bands.
+// Bongle's native bellPhrase is tested through actual index/input elsewhere.
+// This explicit old-kernel fixture preserves warning/dash/contact checks.
 G.world.load("frostbellTundra");
 arenaBoss = G.state.enemies.find((enemy) => enemy.def.id === "bellTitan");
+arenaBoss.def={...arenaBoss.def,boss:{...arenaBoss.def.boss,patterns:["stormGrid"]}};
 G.state.player.x = arenaBoss.x - 105;
 G.state.player.y = arenaBoss.y;
 arenaBoss.bossEngaged = true;
