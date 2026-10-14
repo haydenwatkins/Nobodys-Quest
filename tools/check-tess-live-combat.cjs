@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+'use strict';
+// Earned checkpoints and initial poses. Original AI, attacks, health and physics.
+const assert=require('node:assert/strict'),runtime=require('./lib/classic-runtime.cjs'),collect=require('../tests/helpers/collect-treasure.cjs');
+const cases=[];for(const form of ['knight','wizard','colossus'])for(const heart of [false,true])for(const guardian of [false,true])cases.push({form,heart,guardian});cases.push({form:'knight',heart:false,guardian:false,walking:true});
+for(const c of (process.argv.includes('--first-only')?cases.slice(0,1):process.argv.includes('--walking-only')?cases.slice(-1):cases)){
+ const r=runtime(),{G}=r,{form,heart,guardian,walking=false}=c;let seed=0x12345678;r.context.Math=Object.create(Math);r.context.Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+ Object.assign(G.state.opening,{started:true,version:2,complete:true});G.state.delivery.complete=true;G.ensureTown().requests.push('beacon');G.state.stars=50;G.state.items.push('trophy-sky-sovereign','trophy-old-mason',...Object.values(G.enemies).filter(e=>e.miniboss&&e.trophy&&!e.worldbearer&&e.id!=='godAvatar').map(e=>e.trophy));G.state.claimedForms.push(...G.formOrder.slice(0,G.formOrder.indexOf('weaver')),form);G.questsDone.push(...G.forms.golem.quests.slice(0,1).map(q=>q.id));G.setForm(form);G.state.loadouts[form]=[G.forms[form].basic,'curse','arrow'];G.setComfortSetting('easyMode',heart);G.setComfortSetting('bossAssistance',guardian);
+ if(form==='colossus'){
+  G.state.items.push(...Object.keys(G.WORLDWAKE_MARKS));G.state.worldwake=G.normalizeWorldwake(undefined,{items:G.state.items});const pool=G.gauntletBossPool();let gauntletSeed;
+  for(let candidate=1;candidate<10000;candidate++){let n=candidate,a=[...pool];for(let i=a.length-1;i>0;i--){n=(Math.imul(n,1664525)+1013904223)>>>0;const j=Math.floor(n/4294967296*(i+1));[a[i],a[j]]=[a[j],a[i]];}if(a[0]==='silkMatriarch'){gauntletSeed=candidate;break;}}
+  assert.ok(gauntletSeed);seed=gauntletSeed;assert.ok(G.startGauntlet(3,false));G.updateGauntlet(1.2);r.drain();
+ }else{r.load('rootdeepHollow');r.drain();}
+ const e=G.state.enemies.find(e=>e.id==='silkMatriarch'),p=G.state.player;assert.ok(e);Object.assign(p,{x:e.x-60,y:e.y,mana:0,manaRegenDelay:1000});G.input.takeAim=()=>({...G.input.aim,dragged:true});
+ const counters={},used={},stars=G.state.stars,items=[...G.state.items];let lessons=0,paid=0,seconds=0;G.events.on('questDone',()=>lessons++);G.events.on('abilityUse',a=>{if(G.abilityManaCost(G.abilities[a.ability])>0)paid++;});G.events.on('guardianCounter',a=>{if(a.guardian==='silkMatriarch')counters[e.bossPhase]=(counters[e.bossPhase]||0)+1;});
+ let path=[],routeTarget=null;
+ const feet=(x,y)=>[[ -4.5,0],[4.5,0],[-4.5,-7],[4.5,-7]].every(([dx,dy])=>!G.world.solid(x+dx,y+dy));
+ function waypoint(target){const d=Math.hypot(target.x-p.x,target.y-p.y),n=Math.ceil(d/4);if(Array.from({length:n},(_,i)=>feet(p.x+(target.x-p.x)*(i+1)/n,p.y+(target.y-p.y)*(i+1)/n)).every(Boolean))return target;
+  while(path.length&&Math.hypot(path[0].x-p.x,path[0].y-p.y)<5)path.shift();
+  if(!path.length||!routeTarget||Math.hypot(routeTarget.x-target.x,routeTarget.y-target.y)>8||!feet(path[0].x,path[0].y)){
+   routeTarget={...target};const nodes=[{x:p.x,y:p.y,parent:-1,gx:0,gy:0}],seen=new Set(['0,0']);let end=-1;
+   for(let i=0;i<nodes.length&&i<6000;i++){const at=nodes[i];if(Math.hypot(at.x-target.x,at.y-target.y)<9){end=i;break;}for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const gx=at.gx+dx,gy=at.gy+dy,k=gx+','+gy,x=p.x+gx*8,y=p.y+gy*8;if(!seen.has(k)&&Math.abs(gx)<=36&&Math.abs(gy)<=36&&feet(x,y)&&feet((x+at.x)/2,(y+at.y)/2)){seen.add(k);nodes.push({x,y,gx,gy,parent:i});}}}
+   path=[];for(let i=end;i>0;i=nodes[i].parent)path.unshift({x:nodes[i].x,y:nodes[i].y});
+  }return path[0]||target;
+ }
+ for(let i=0;i<18000&&!e.dead;i++){
+  const dt=.025,h=G.state.bossHazards.find(h=>h.owner===e),posts=G.state.enemies.filter(a=>G.guardianPropLive(a)&&a.guardianProp.owner===e),phase=e.bossPhase;let target={x:e.x-38,y:e.y+16},aim=e,attack=false,button='b';
+  const complete=walking||(used[phase]?.size||0)>=(phase===3?2:1);
+  if(!walking&&!complete&&h){const index=h.silk.nodes.findIndex(n=>!n.committed&&n.choice===0);if(index>=0){const offset=h.silk.nodes.slice(0,index).filter(n=>!n.committed).length*2,at=posts[offset];if(at){target={x:at.x-22,y:at.y};aim=at;attack=Math.hypot(at.x-p.x,at.y-p.y)<65;}}else target={x:e.x-38,y:e.y+32};}
+  else attack=complete&&Math.hypot(e.x-p.x,e.y-p.y)<115&&(!walking||posts.every(a=>Math.hypot(a.x-p.x,a.y-p.y)>40));
+  if(!G.world.isSafeSpawn(target.x,target.y))target=G.world.safeArrival(target.x,target.y);
+  const ax=aim.x-p.x,ay=aim.y-p.y,ad=Math.hypot(ax,ay)||1;G.input.aim={x:ax/ad,y:ay/ad};if(attack)r.taps.add(button);
+  const nearby=G.state.enemies.filter(a=>!a.dead&&!a.guardianProp&&!a.def.miniboss&&!a.def.practice&&Math.hypot(a.x-p.x,a.y-p.y)<34).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));if(nearby.length){const at=nearby[0],dx=at.x-p.x,dy=at.y-p.y,d=Math.hypot(dx,dy)||1;G.input.aim={x:dx/d,y:dy/d};r.taps.add(at.ward?.hp>0&&at.ward.types.includes('sharp')?'c':'b');}
+  const route=waypoint(target),dx=route.x-p.x,dy=route.y-p.y,d=Math.hypot(dx,dy),desired=d>2?{x:dx/d,y:dy/d}:{x:0,y:0},speed=G.forms[form].speed,choices=[desired,{x:0,y:0},...Array.from({length:16},(_,j)=>({x:Math.cos(j*Math.PI/8),y:Math.sin(j*Math.PI/8)}))];
+  const score=v=>{let cost=Math.hypot(p.x+v.x*speed*.2-route.x,p.y+v.y*speed*.2-route.y);for(let j=1;j<=16;j++){const t=j*.025,x=p.x+v.x*speed*t,y=p.y+v.y*speed*t;if(t<=.15&&!G.world.isSafeSpawn(x,y))cost+=1000;
+   for(const s of G.state.projectiles)if(!s.fromPlayer&&!s.dispelled&&t>=(s.armT||0)){const scale=G.guidanceProjectileScale?.(s)??1;cost+=Math.max(0,(s.size||3)+11-Math.hypot(x-s.x-s.vx*t*scale,y-5-s.y-s.vy*t*scale))**2*25;}
+   if(h&&!h.silk.finished){const pulse=h.silk.pulse,next=pulse.path[pulse.index],dx=next?next.x-pulse.x:0,dy=next?next.y-pulse.y:0,d=Math.hypot(dx,dy)||1,age=h.t+t-h.warning,moves=age>=0&&pulse.wait<=0;const bx=pulse.x+(moves?dx/d*64*t:0),by=pulse.y+(moves?dy/d*64*t:0);if(age>=0)cost+=Math.max(0,13-Math.hypot(x-bx,y-by))**2*30;}
+   for(const a of G.state.enemies)if(!a.dead&&!a.guardianProp&&!a.def.miniboss&&!a.def.practice)cost+=Math.max(0,17-Math.hypot(x-a.x,y-a.y))**2*15;
+
+  }return cost;};choices.sort((a,b)=>score(a)-score(b));G.input.vec=choices[0];r.step(dt);r.drain();if(h){used[phase]??=new Set();h.silk.nodes.forEach((node,i)=>{if(node.committed&&node.choice===1)used[phase].add(i);});}seconds+=dt;
+  assert.ok(!G.state.knockout,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,damage:p.damageTaken,counters,x:p.x,y:p.y}));
+ }
+ assert.ok(e.dead,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,counters}));assert.equal(e.bossPhase,3);if(!walking)for(const phase of [1,2,3]){assert.ok((used[phase]?.size||0)>=(phase===3?2:1),JSON.stringify({c,counters,used:Object.fromEntries(Object.entries(used).map(([k,v])=>[k,[...v]]))}));}assert.equal(paid,0);if(walking)assert.equal(Object.values(counters).reduce((a,b)=>a+b,0),0);
+ if(form!=='colossus'){assert.ok(G.groundRewardFor('trophy-silk-matriarch'));assert.equal(G.hasWorldMark('thread'),false);assert.equal(G.state.stars,stars+lessons);collect(r,'trophy-silk-matriarch');assert.ok(G.hasWorldMark('thread'));assert.ok(G.formReady('weaver'),JSON.stringify({claimed:G.state.claimedForms,level:G.formLevel('golem'),quests:G.questsDone,items:G.state.items,echoes:G.state.formEchoes,outing:G.activeFormOuting()}));assert.ok(G.formEchoFor('weaver'));const claimed=G.state.stars;r.load('rootdeepHollow');r.drain();assert.ok(!G.state.enemies.some(e=>e.id==='silkMatriarch'));assert.equal(G.state.stars,claimed);}else{assert.deepEqual([...G.state.items],items);assert.equal(G.state.stars,stars+lessons);assert.equal(G.state.gauntletRun.wins,1);}
+ console.log(JSON.stringify({...c,seconds:+seconds.toFixed(2),counters,committed:Object.fromEntries(Object.entries(used).map(([k,v])=>[k,[...v]])),damage:p.damageTaken,paidCasts:paid,ai:'original',context:form==='colossus'?'native Manyfold first round':'native Rootdeep region'}));
+}
