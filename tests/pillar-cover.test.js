@@ -16,7 +16,7 @@ test('solid masonry stops a real intersecting hostile stone while an uncovered l
 test('standard masonry warns before native stones, then crossing lanes and an opened arch develop the placement',()=>{
  for(const phase of [1,2,3]){const r=setup(phase),{G,e}=r,b={x:e.x-28,y:e.y},h=G.state.bossHazards.find(h=>h.owner===e);assert.ok(h,'the standard placement gets its own readable stone warning');assert.equal(G.state.projectiles.filter(p=>p.owner===e).length,0);G.updateBossHazards(h.warning+.01);const rocks=G.state.projectiles.filter(p=>p.owner===e);assert.ok(rocks.length>=2);assert.ok(rocks.every(p=>!p.fromPlayer&&p.shape==='masonryStone'&&p.armT>0));
   if(phase===2){assert.ok(rocks.every(p=>Math.abs(p.vy)>Math.abs(p.vx)),'the next phase crosses the first horizontal stone passage');assert.ok(Math.abs(rocks[0].x-rocks[1].x)>=24,'the two protected columns are actual different choices');assert.equal(rocks[0].range,126,'native stone travel matches the warned endpoint');}else if(phase===1)assert.ok(rocks.every(p=>Math.abs(p.vx)>Math.abs(p.vy)));else assert.ok(rocks.some(p=>Math.abs(p.vx)>1&&Math.abs(p.vy)>1),'opening the middle exposes a crossing stone');
-  if(phase===3){const top=h.launches[0].from;assert.ok(G.world.solid(top.x-52,top.y));assert.ok(G.world.solid(top.x-52,top.y+48));}
+  if(phase===3){const top=h.launches[0].from;assert.ok(G.world.solid(top.x-52,top.y));assert.ok(G.world.solid(top.x-52,top.y+80));}
  }
 });
 test('busy masonry waits, and defeat, phase, travel and knockout release its actual footprint',()=>{
@@ -33,9 +33,9 @@ test('a free handle hit starts a visible physical slide before it earns a comple
  assert.equal(e.masonryMoves||0,0,'an unfinished slide has not earned a completed placement');assert.ok(G.world.solid(original.x,original.y),'the block still overlaps its starting footprint briefly');for(let i=0;i<32;i++)r.step(.025);assert.equal(e.masonryMoves,1);assert.equal(G.world.solid(original.x,original.y),false);
 });
 test('opening the final arch gives up middle protection against an actual crossing stone',()=>{
- const r=setup(3),{G,e}=r,h=G.state.bossHazards.find(h=>h.owner===e),lane=h.launches[1],top=h.launches[0].from,at={x:top.x-52,y:top.y+24},p=G.state.player;
+ const r=setup(3),{G,e}=r,h=G.state.bossHazards.find(h=>h.owner===e),lane=h.launches[1],top=h.launches[0].from,at={x:top.x-52,y:top.y+40},p=G.state.player;
  const send=()=>G.fireGuardianProjectile(e,lane.from,lane.to,{speed:90,range:Math.hypot(lane.to.x-lane.from.x,lane.to.y-lane.from.y),size:4,shape:'masonryStone'});
  Object.assign(p,{x:at.x-24,y:at.y+24});const damage=p.damageTaken,caught=send();for(let i=0;i<55;i++)G.combat.updateProjectiles(.025);assert.ok(!G.state.projectiles.includes(caught));assert.equal(p.damageTaken,damage,'the intact middle catches the crossing');
  const handle=G.state.enemies.find(a=>a.guardianProp?.owner===e);Object.assign(p,{x:handle.x-18,y:handle.y,dir:{x:1,y:0}});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<40;i++)r.step(.025);assert.ok(e.masonryMoves>0);assert.equal(G.world.solid(at.x,at.y),false);
- Object.assign(p,{x:at.x-24,y:at.y+24});send();for(let i=0;i<55;i++)G.combat.updateProjectiles(.025);assert.ok(p.damageTaken>damage,'the moved middle leaves a real recoverable crossing threat');assert.ok(!G.state.knockout);
+ Object.assign(p,{x:at.x-24,y:at.y+24});send();for(let i=0;i<55;i++)G.combat.updateProjectiles(.025);assert.ok(p.damageTaken>damage,JSON.stringify({at,lane,player:{x:p.x,y:p.y,invuln:p.invuln,damage:p.damageTaken},moves:e.masonryMoves,shots:G.state.projectiles.map(s=>({x:s.x,y:s.y,player:s.fromPlayer})),solid:G.world.solid(at.x,at.y)}));assert.ok(!G.state.knockout);
 });

@@ -13,15 +13,25 @@ for(const c of (process.argv.includes('--first-only')?cases.slice(0,1):process.a
  }else{r.load('hangingGardens');r.drain();}
  const e=G.state.enemies.find(e=>e.id==='oldMason'),p=G.state.player;assert.ok(e);Object.assign(p,{x:e.x-60,y:e.y,mana:0,manaRegenDelay:1000});G.input.takeAim=()=>({...G.input.aim,dragged:true});
  const counters={},stars=G.state.stars,items=[...G.state.items];let lessons=0,paid=0,seconds=0;G.events.on('questDone',()=>lessons++);G.events.on('abilityUse',a=>{if(G.abilityManaCost(G.abilities[a.ability])>0)paid++;});G.events.on('guardianCounter',a=>{if(a.guardian==='oldMason')counters[e.bossPhase]=(counters[e.bossPhase]||0)+1;});
+ let path=[],routeTarget=null;
+ const feet=(x,y)=>[[ -4.5,0],[4.5,0],[-4.5,-7],[4.5,-7]].every(([dx,dy])=>!G.world.solid(x+dx,y+dy));
+ function waypoint(target){const d=Math.hypot(target.x-p.x,target.y-p.y),n=Math.ceil(d/4);if(Array.from({length:n},(_,i)=>feet(p.x+(target.x-p.x)*(i+1)/n,p.y+(target.y-p.y)*(i+1)/n)).every(Boolean))return target;
+  while(path.length&&Math.hypot(path[0].x-p.x,path[0].y-p.y)<5)path.shift();
+  if(!path.length||!routeTarget||Math.hypot(routeTarget.x-target.x,routeTarget.y-target.y)>8||!feet(path[0].x,path[0].y)){
+   routeTarget={...target};const nodes=[{x:p.x,y:p.y,parent:-1,gx:0,gy:0}],seen=new Set(['0,0']);let end=-1;
+   for(let i=0;i<nodes.length&&i<6000;i++){const at=nodes[i];if(Math.hypot(at.x-target.x,at.y-target.y)<9){end=i;break;}for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const gx=at.gx+dx,gy=at.gy+dy,k=gx+','+gy,x=p.x+gx*8,y=p.y+gy*8;if(!seen.has(k)&&Math.abs(gx)<=36&&Math.abs(gy)<=36&&feet(x,y)&&feet((x+at.x)/2,(y+at.y)/2)){seen.add(k);nodes.push({x,y,gx,gy,parent:i});}}}
+   path=[];for(let i=end;i>0;i=nodes[i].parent)path.unshift({x:nodes[i].x,y:nodes[i].y});
+  }return path[0]||target;
+ }
  for(let i=0;i<18000&&!e.dead;i++){
   const dt=.025,h=G.state.bossHazards.find(h=>h.owner===e),posts=G.state.enemies.filter(a=>G.guardianPropLive(a)&&a.guardianProp.owner===e),phase=e.bossPhase;let target=walking?{x:e.x+18,y:e.y+22}:{x:e.x-18,y:e.y},aim=e,attack=false;
-  if(!walking&&!counters[phase]&&posts.length){const at=posts[0];target={x:at.x-15,y:at.y};aim=at;attack=Math.hypot(at.x-p.x,at.y-p.y)<26;}
+  if(!walking&&!counters[phase]&&posts.length){const at=posts[0],first=h?.launches[0].from,base=first?{x:first.x-(phase===2?0:52),y:first.y+(phase===2?36:phase===3?40:0)}:e,dx=at.x-base.x,dy=at.y-base.y,d=Math.hypot(dx,dy)||1;target={x:at.x+dx/d*18,y:at.y+dy/d*18};aim=at;attack=Math.hypot(at.x-p.x,at.y-p.y)<24;}
   else attack=Math.hypot(e.x-p.x,e.y-p.y)<32&&(!walking||posts.every(a=>Math.hypot(a.x-p.x,a.y-p.y)>40));
   if(!G.world.isSafeSpawn(target.x,target.y))target=G.world.safeArrival(target.x,target.y);
   const ax=aim.x-p.x,ay=aim.y-p.y,ad=Math.hypot(ax,ay)||1;G.input.aim={x:ax/ad,y:ay/ad};if(attack)r.taps.add('b');
   const nearby=G.state.enemies.filter(a=>!a.dead&&!a.guardianProp&&!a.def.miniboss&&!a.def.practice&&Math.hypot(a.x-p.x,a.y-p.y)<34).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));if(nearby.length){const at=nearby[0],dx=at.x-p.x,dy=at.y-p.y,d=Math.hypot(dx,dy)||1;G.input.aim={x:dx/d,y:dy/d};r.taps.add('b');}
-  const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy),desired=d>2?{x:dx/d,y:dy/d}:{x:0,y:0},speed=G.forms[form].speed,choices=[desired,{x:0,y:0},...Array.from({length:16},(_,j)=>({x:Math.cos(j*Math.PI/8),y:Math.sin(j*Math.PI/8)}))];
-  const score=v=>{let cost=Math.hypot(p.x+v.x*speed*.2-target.x,p.y+v.y*speed*.2-target.y);for(let j=1;j<=16;j++){const t=j*.025,x=p.x+v.x*speed*t,y=p.y+v.y*speed*t;if(t<=.15&&!G.world.isSafeSpawn(x,y))cost+=1000;
+  const route=waypoint(target),dx=route.x-p.x,dy=route.y-p.y,d=Math.hypot(dx,dy),desired=d>2?{x:dx/d,y:dy/d}:{x:0,y:0},speed=G.forms[form].speed,choices=[desired,{x:0,y:0},...Array.from({length:16},(_,j)=>({x:Math.cos(j*Math.PI/8),y:Math.sin(j*Math.PI/8)}))];
+  const score=v=>{let cost=Math.hypot(p.x+v.x*speed*.2-route.x,p.y+v.y*speed*.2-route.y);for(let j=1;j<=16;j++){const t=j*.025,x=p.x+v.x*speed*t,y=p.y+v.y*speed*t;if(t<=.15&&!G.world.isSafeSpawn(x,y))cost+=1000;
    for(const s of G.state.projectiles)if(!s.fromPlayer&&!s.dispelled&&t>=(s.armT||0)){const scale=G.guidanceProjectileScale?.(s)??1;cost+=Math.max(0,(s.size||3)+11-Math.hypot(x-s.x-s.vx*t*scale,y-5-s.y-s.vy*t*scale))**2*25;}
    for(const a of G.state.enemies)if(!a.dead&&!a.guardianProp&&!a.def.miniboss&&!a.def.practice)cost+=Math.max(0,17-Math.hypot(x-a.x,y-a.y))**2*15;
 
