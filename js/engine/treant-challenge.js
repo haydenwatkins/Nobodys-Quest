@@ -2,6 +2,7 @@
    existing arts, hazards, world interactions and adventure save. */
 "use strict";
 (() => {
+  const harvests=new WeakMap();
   const trophy='trophy-heartwood-crown',point=(x,y)=>({x:x*16+8,y:y*16+8});
   const fire=point(12,20),lamp=point(12,19),friend=point(16,19),seat=point(20,20);
   const progress=()=> (G.state.guardianChallenges||(G.state.guardianChallenges=G.makeGuardianChallenges())).treant;
@@ -18,15 +19,17 @@
     if(!G.treantBranchingAvailable()||G.treantRematchActive())return false;
     progress().branching=!progress().branching;G.saveGame();return true;
   };
-  function root(x,y,owner=null){
+  function root(x,y,owner=null,phrase=null){
     const e=G.makeEnemy('orchardTangle',x,y);
     e.id='treantRoot';e.def={...e.def,id:'treantRoot',name:'Cracked root',practice:true,damage:0,speed:0,size:16};
-    e.hp=1;e.ward=null;e.treantRoot={owner,map:G.state.mapId,left:owner?3.2:Infinity};
+    e.hp=1;e.ward=null;e.treantRoot={owner,map:G.state.mapId,phase:owner?.bossPhase,left:owner?3.2:Infinity};
+    if(phrase)harvests.set(e,phrase);
     G.state.enemies.push(e);return e;
   }
   G.treantRootAim=e=>!!e.treantRoot&&!e.dead;
-  G.cancelTreantRoots=owner=>{
+  G.cancelTreantRoots=(owner,keepFruit=false)=>{
     for(const e of G.state.enemies||[])if(e.treantRoot?.owner&&(!owner||e.treantRoot.owner===owner))e.dead=true;
+    if(!keepFruit)G.state.pickups=(G.state.pickups||[]).filter(pk=>!pk.treantFruit||owner&&pk.treantFruitOwner!==owner);
   };
   // Tag the last primary strike, but leave its root at the original player's
   // place. Later phases never ask a slow body to chase a distant outer bloom.
@@ -36,24 +39,26 @@
       const end=h=>(h.delay||0)+(h.warning??h.warn)+h.active;
       return end(a)>end(b)?a:b;
     });
-    last.treantAftermath={x:p.x,y:p.y};
+    const positions=[{x:p.x,y:p.y}],a=Math.atan2(p.y-owner.y,p.x-owner.x)+Math.PI/2,count=owner.bossPhase===1?1:owner.bossPhase;
+    for(const offset of [42,-42,56,-56]){if(positions.length>=count)break;const at={x:p.x+Math.cos(a)*offset,y:p.y+Math.sin(a)*offset};if(positions.some(other=>Math.hypot(at.x-other.x,at.y-other.y)<36))continue;if(Array.from({length:28},(_,i)=>G.world.isSafeSpawn(p.x+(at.x-p.x)*(i+1)/28,p.y+(at.y-p.y)*(i+1)/28)).every(Boolean))positions.push(at);}
+    last.treantAftermath={positions};
     if(!owner.treantBranching||!owner.def.boss.orchard)return;
     const end=Math.max(...fields.map(h=>h.warn+h.active));
     // A second, already-known root circle follows. The first snapped root
-    // cancels it. Its target is committed now; its warning begins later.
+    // leaves it active. Its target is committed now; its warning begins later.
     G.state.openingHazards.push({kind:'roots',owner,t:0,delay:end,warn:end+(G.guardianWarningSeconds?.(.95)??.95),active:.4,
       x:p.x,y:p.y,radius:17,hit:false,treantEcho:true});
   };
   G.leaveTreantRoot=h=>{
     if(!h.treantAftermath||h.treantAftermath.used||h.owner.dead||G.state.knockout)return;
     h.treantAftermath.used=true;const at=h.treantAftermath;
-    if(!G.world.isSafeSpawn(at.x,at.y))return;
-    G.cancelTreantRoots(h.owner);root(at.x,at.y,h.owner);
+    const positions=at.positions.filter(p=>G.world.isSafeSpawn(p.x,p.y));if(!positions.length)return;
+    G.cancelTreantRoots(h.owner,true);const phrase={used:false,roots:[]};for(const p of positions)phrase.roots.push(root(p.x,p.y,h.owner,phrase));
   };
   G.hitTreantRoot=(e,opts)=>{
     const r=e.treantRoot;
-    if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||G.state.knockout||r.owner&&(r.owner.dead||!G.state.enemies.includes(r.owner)))return false;
-    e.dead=true;
+    if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||G.state.knockout||r.owner&&(r.owner.dead||r.owner.bossPhase!==r.phase||!G.state.enemies.includes(r.owner)))return false;
+    const phrase=harvests.get(e);if(phrase?.used)return false;if(phrase){phrase.used=true;for(const other of phrase.roots)other.dead=true;}e.dead=true;
     G.sfx.play('wardBreak');G.state.hitStop=Math.max(G.state.hitStop||0,.04);
     G.spawnFx({kind:'ring',x:e.x,y:e.y-6,color:'#fff3c2',radius:15,dur:.35});
     for(let i=0;i<7;i++)G.spawnFx({kind:'spark',x:e.x,y:e.y-7,color:i%2?'#d8b06a':'#a7f070',vx:(i-3)*9,vy:-22-i*2,dur:.4});
@@ -96,9 +101,10 @@
   const update=G.updateOpening;
   G.updateOpening=dt=>{
     update(dt);
+    G.state.pickups=(G.state.pickups||[]).filter(pk=>!pk.treantFruit||!G.state.knockout&&!pk.treantFruitOwner.dead&&pk.treantFruitPhase===pk.treantFruitOwner.bossPhase&&G.state.enemies.includes(pk.treantFruitOwner));
     for(const e of G.state.enemies||[]){
       const r=e.treantRoot;if(!r||e.dead)continue;
-      if(r.map!==G.state.mapId||r.owner?.dead){e.dead=true;continue;}
+      if(r.map!==G.state.mapId||G.state.knockout||r.owner&&(r.owner.dead||r.owner.bossPhase!==r.phase||!G.state.enemies.includes(r.owner))){e.dead=true;continue;}
       if(r.owner){r.left-=dt;if(r.left<=0)e.dead=true;}
     }
   };
@@ -121,6 +127,8 @@
     }else G.beginTreantRematch();
     G.input.clearTaps();return true;
   };
+  const drawPickup=G.drawPickupArt;
+  G.drawPickupArt=(c,pk)=>{if(!pk.treantFruit)return drawPickup?.(c,pk)||false;const t=pk.t||0;if(!G.reducedMotion&&t>9&&Math.floor(t*8)%2===0)return true;const x=Math.round(pk.x),y=Math.round(pk.y-6+(G.reducedMotion?0:Math.sin(t*5)*2));c.save();if(G.reducedMotion)c.globalAlpha*=Math.min(1,Math.max(0,(12-t)/3));G.drawShadow(c,pk.x,pk.y,10);c.fillStyle='#35413e';c.beginPath();c.arc(x-2,y,6,0,Math.PI*2);c.arc(x+2,y,6,0,Math.PI*2);c.fill();c.fillStyle='#ef7d57';c.beginPath();c.arc(x-2,y,4.5,0,Math.PI*2);c.arc(x+2,y,4.5,0,Math.PI*2);c.fill();c.fillStyle='#fff0dd';c.fillRect(x-3,y-3,2,3);c.strokeStyle='#66513d';c.lineWidth=2;c.beginPath();c.moveTo(x,y-5);c.lineTo(x+1,y-9);c.stroke();c.fillStyle='#a7f070';c.beginPath();c.ellipse(x+4,y-8,3,1.5,-.4,0,Math.PI*2);c.fill();c.restore();return true;};
   function drawRoot(c,e){
     const x=e.x,y=e.y;
     c.save();c.fillStyle='rgba(26,40,32,.25)';c.beginPath();c.ellipse(x,y+2,13,4,0,0,Math.PI*2);c.fill();
