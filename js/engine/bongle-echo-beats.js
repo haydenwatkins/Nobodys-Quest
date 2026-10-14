@@ -1,0 +1,22 @@
+/* One chosen echo rests; the visible bell phrase keeps ringing. */
+"use strict";
+(() => {
+ const props=new WeakMap();let phrases=[];
+ const radius=age=>G.util.clamp(age*90,0,84);
+ const age=h=>h.t-h.warning;
+ const windowLength=()=>.9+(G.comfortSetting('bossAssistance')?.3:0);
+ function retire(note){const prop=props.get(note);if(prop)prop.dead=true;}
+ function ready(h,note){return note.echo&&!note.rested&&!h.rested&&age(h)>=note.delay-windowLength()&&age(h)<note.delay;}
+ function hush(owner,h,note){if(!ready(h,note)){if(age(h)<note.delay-windowLength())G.damageNumber(note.x,note.y-18,'WAIT','#78938a');return;}note.rested=true;h.rested=true;for(const choice of h.notes)retire(choice);owner.hushedEchoes=(owner.hushedEchoes||0)+1;G.damageNumber(note.x,note.y-18,'REST','#fff3c2');G.sfx.play('wardBreak');G.events.emit('guardianCounter',{guardian:'bellTitan',kind:'echo'});}
+ function paintBell(c,e,h,note){const lit=ready(h,note);c.save();c.strokeStyle=lit?'#fff3c2':'#78938a';c.lineWidth=2;c.beginPath();c.moveTo(e.x-7,e.y-4);c.lineTo(e.x-6,e.y-11);c.quadraticCurveTo(e.x,e.y-17,e.x+6,e.y-11);c.lineTo(e.x+7,e.y-4);c.closePath();c.stroke();c.beginPath();c.arc(e.x,e.y-3,2,0,Math.PI*2);c.stroke();c.lineWidth=1;c.beginPath();c.arc(e.x,e.y-8,10,-Math.PI/2,-Math.PI/2+Math.PI*2*G.util.clamp(h.t/(h.warning+note.delay),0,1));c.stroke();c.restore();}
+ function active(h,p,dt){const now=age(h),before=now-dt;for(const note of h.notes){if(note.rested||now<note.delay||before>note.delay+84/90)continue;const low=radius(before-note.delay),high=radius(now-note.delay),d=Math.hypot(p.x-note.x,p.y-note.y);if(!note.hit&&d>=Math.max(0,low-6)&&d<=high+6&&G.damagePlayer(1,note.x,note.y))note.hit=true;}}
+ function paint(c,h){const now=age(h);c.save();for(const note of h.notes){if(note.rested){c.strokeStyle='#78938a';c.globalAlpha=.8;c.lineWidth=2;c.beginPath();c.moveTo(note.x-6,note.y-4);c.lineTo(note.x+6,note.y-4);c.stroke();continue;}const elapsed=now-note.delay;if(elapsed>84/90)continue;c.strokeStyle=note.echo?'#ffcd75':'#fff3c2';if(elapsed<0){if(note.echo&&h.rested)paintBell(c,note,h,note);c.globalAlpha=.2;c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.arc(note.x,note.y,84,0,Math.PI*2);c.stroke();c.setLineDash([]);}else{const r=radius(elapsed);c.globalAlpha=.18;c.lineWidth=12;c.beginPath();c.arc(note.x,note.y,r,0,Math.PI*2);c.stroke();c.globalAlpha=1;c.lineWidth=1;c.beginPath();c.arc(note.x,note.y,Math.max(0,r-6),0,Math.PI*2);c.arc(note.x,note.y,r+6,0,Math.PI*2);c.stroke();}}c.restore();}
+ function placements(owner,p,count){const candidates=[[24,-32],[24,32],[-24,-32],[-24,32],[48,0],[-48,0],[0,48],[0,-48]].map(([dx,dy])=>G.world.safeArrival(p.x+dx,p.y+dy)),chosen=[];for(const at of candidates){if(Math.hypot(at.x-owner.x,at.y-owner.y)<30||chosen.some(other=>Math.hypot(at.x-other.x,at.y-other.y)<36))continue;chosen.push(at);if(chosen.length===count)return chosen;}return null;}
+ G.registerGuardianAuthor('bellTitan',{repeatVictory:e=>e.hushedEchoes>0?'That little rest made room for the whole song. Follow the bell arches home; I’ll keep a soft note for you.':'You found your feet between every note. Follow the bell arches home; I’ll keep a soft note for you.',actions:{bellPhrase(owner,p,spawn){
+  const phase=owner.bossPhase,places=placements(owner,p,phase===1?1:2);if(!places){owner.bossRecoverT=1;return;}
+  const notes=[{x:owner.x,y:owner.y,delay:0,echo:false},...places.map((at,i)=>({...at,echo:true,delay:phase===3?(i===0?.8:2.3):(i===0?1.2:2.8)}))];if(phase===3)notes.push({x:owner.x,y:owner.y,delay:1.5,echo:false});
+  const bounds={left:Math.min(...notes.map(n=>n.x))-91,top:Math.min(...notes.map(n=>n.y))-91,right:Math.max(...notes.map(n=>n.x))+91,bottom:Math.max(...notes.map(n=>n.y))+91},duration=Math.max(...notes.map(n=>n.delay))+84/90+.3;
+  const h=spawn(owner,'bellPhrase',{warning:1.6,active:duration,color:'#fff3c2',bounds,notes,rested:false,guardianActive:active,guardianPaint:paint});phrases.push(h);for(const note of notes)if(note.echo)props.set(note,G.makeGuardianProp(owner,note.x,note.y,{name:'Echo bell',size:16,hit:()=>hush(owner,h,note),paint:(c,e)=>paintBell(c,e,h,note)}));owner.bossRecoverT=h.warning+h.active+.75;
+ }}});
+ const update=G.updateOpening;G.updateOpening=dt=>{update(dt);phrases=phrases.filter(h=>{const live=G.state.bossHazards.includes(h)&&h.mapId===G.state.mapId&&!h.owner.dead&&!G.state.knockout&&G.state.enemies.includes(h.owner);for(const note of h.notes)if(!live||age(h)>=note.delay)retire(note);return live;});};
+})();

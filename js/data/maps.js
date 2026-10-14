@@ -948,7 +948,7 @@ function caravanFenceLayout() {
   },
   {
     id: "frostbellTundra", name: "Frostbell Tundra", biome: "frostbell", variant: 5,
-    message: "Bell arches mark the causeways across the frozen lakes. Bongle waits at the northeast belfry; a chime rests across the southern lake. His Light ward yields to light attacks. Leave the lit strips, wait for the echo, then answer his song.",
+    message: "Bell arches mark the causeways across the frozen lakes. Bongle waits at the northeast belfry; a chime rests across the southern lake. Watch a little bell fill. A free tap while it shines rests that one echo; the other rings keep moving. Step between the waves. Light opens his ward.",
     portals: {
       s: { map: "shattercoast", x: 23, y: 2 }, y: { map: "stormspinePeaks", x: 2, y: 14 },
     },
