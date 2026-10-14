@@ -52,7 +52,7 @@
   };
   G.hitTreantRoot=(e,opts)=>{
     const r=e.treantRoot;
-    if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||r.owner?.dead)return false;
+    if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||G.state.knockout||r.owner&&(r.owner.dead||!G.state.enemies.includes(r.owner)))return false;
     e.dead=true;
     G.sfx.play('wardBreak');G.state.hitStop=Math.max(G.state.hitStop||0,.04);
     G.spawnFx({kind:'ring',x:e.x,y:e.y-6,color:'#fff3c2',radius:15,dur:.35});
@@ -60,12 +60,8 @@
     if(!r.owner){progress().practiceCleared=true;G.saveGame();return false;}
     const owner=r.owner;
     owner.treantCounters=(owner.treantCounters||0)+1;
-    G.guardianCounterOpening(owner);
-    // The root's tug is blunt, regardless of the art that snapped it. Use
-    // the existing ward rule; never turn scenery into hit/mana/mastery credit.
-    if(owner.ward?.hp>0)G.combat.damageEnemy(owner,{damage:1,type:'blunt',ability:null,knockback:0,noMana:true});
-    G.spawnFx({kind:'bolt',x:e.x,y:e.y-6,x2:owner.x,y2:owner.y-8,color:'#a7f070',dur:.3});
-    G.damageNumber(owner.x,owner.y-owner.h()-5,'TUG!','#fff3c2');
+    G.state.pickups.push({kind:'heart',x:e.x,y:e.y,t:0,treantFruit:true,treantFruitOwner:owner,treantFruitPhase:owner.bossPhase});
+    G.damageNumber(e.x,e.y-20,'APPLE!','#ffcd75');
     progress().counterLearned=true;G.saveGame();
     G.events.emit('guardianCounter',{guardian:'ancientTreant',kind:'root'});
     return false;

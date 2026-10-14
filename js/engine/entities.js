@@ -1587,12 +1587,12 @@ G.updatePickups = function (dt) {
     pk.t += dt;
     const d = G.util.dist(pk.x, pk.y, p.x, p.y);
     const magnetRange = p.pantryMagnetT > 0 ? 120 : 30;
-    if (d < magnetRange) { // magnet!
+    if (d < magnetRange && !pk.treantFruit) { // Ordinary drops keep their magnet.
       const a = G.util.angleTo(pk.x, pk.y, p.x, p.y);
       pk.x += Math.cos(a) * 90 * dt;
       pk.y += Math.sin(a) * 90 * dt;
     }
-    if (d < 8) {
+    if (d < 8 && (!pk.treantFruit || G.playerHp() < G.playerMaxHearts())) {
       if (pk.kind === "heart") {
         const healed = G.healPlayer(1, "heart-pickup");
         G.sfx.play("pickup");
