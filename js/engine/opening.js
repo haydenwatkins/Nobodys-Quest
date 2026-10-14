@@ -143,7 +143,7 @@
       if(o.defeated.includes(e.openingKey))e.dead=true;
       if(s.mapId===glade&&e.id==='ancientTreant'){
         e.def=Object.assign({},e.def,{aggro:170,size:34,sprite:G.openingTreantSprite||e.def.sprite,boss:Object.assign({},e.def.boss,{orchard:true,
-          introLines:['I closed the orchard when the root creatures came. I couldn’t bear to see anyone get hurt!','Dodge my strike, then snap a cracked root. It gives me a good tug! Show me you can keep the cart safe.'],
+          introLines:['I closed the orchard when the root creatures came. I couldn’t bear to see anyone get hurt!','Dodge my strike, then snap a cracked root to shake down an apple. Walk over it when you need a heart. My roots keep coming!'],
           phaseLine:'You’re keeping up! I’m going to spread my roots wider. Keep a clear step!',phaseThreeLine:'One more try! I’ll leave you room between the roots.',
           defeatLine:'All right. I was wrong to keep everyone out. I’ll lift the branches. Bring your friends through safely.',
         })});

@@ -353,7 +353,7 @@ registerEnemy({
     introLines: [
       "I shut the road when those thorn creatures arrived. What if someone got hurt?",
       "But Parcel’s cart is still waiting, isn’t it? Show me you can handle my roots.",
-      "Dodge the strike, then snap a cracked root. It gives me a good tug!",
+      "Dodge the strike, then snap a cracked root to shake down an apple. Walk over it when you need a heart; my roots keep coming!",
     ],
     phaseLine: "You’re keeping up! I’m going to spread my roots wider. Keep a clear step!",
     phaseThreeLine: "One more try! I’ll leave you room between the roots.",

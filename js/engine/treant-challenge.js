@@ -83,7 +83,7 @@
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen||G.state.gauntletRun||G.state.expeditionRun)return false;
     const owner=G.makeEnemy('ancientTreant',16*16+8,6*16+8);
     owner.def={...owner.def,aggro:170,size:34,sprite:G.openingTreantSprite||owner.def.sprite,
-      boss:{...owner.def.boss,orchard:true,rematchLine:progress().branching?'Let’s try my branching trick! Snap the first root to stop its follower.':'Ready for another try? My cracked roots still give me a good tug.'}};
+      boss:{...owner.def.boss,orchard:true,rematchLine:progress().branching?'Let’s try my branching trick! The old root will rise again. Choose an apple, then make a clear return.':'Ready for another try? Snap a cracked root and save an apple for the walk back.'}};
     owner.treantLocalRematch=true;owner.treantBranching=G.treantBranchingAvailable()&&progress().branching;
     G.state.enemies.push(owner);
     G.state.openingHazards=[];G.state.bossHazards=[];
@@ -123,7 +123,7 @@
     const a=progress();
     if(a.counterLearned&&!a.invited){
       a.invited=true;G.saveGame();
-      G.ui.dialogue('THE ANCIENT TREANT','You gave my roots a good tug! Want to try my branching trick? Light the crossed-branch lantern by my fire. We can practice with your help lanterns lit, too.',{accent:'#a7f070'});
+      G.ui.dialogue('THE ANCIENT TREANT','You shook an apple loose! Want to try my branching trick? Light the crossed-branch lantern by my fire. We can practice with your help lanterns lit, too.',{accent:'#a7f070'});
     }else G.beginTreantRematch();
     G.input.clearTaps();return true;
   };

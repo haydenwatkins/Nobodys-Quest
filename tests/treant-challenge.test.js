@@ -4,7 +4,7 @@ function setup({phase=1,branching=false,help=false,map='heartwood',form='nobody'
  const r=runtime(),{G}=r;Object.assign(G.state.opening,{started:true,complete:true});G.state.delivery.complete=true;r.load(map);r.drain();
  const e=G.state.enemies.find(e=>e.def.id==='ancientTreant');G.state.enemies=[e];G.state.bossCutscene=null;
  Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),treantBranching:branching});
- G.setComfortSetting('bossAssistance',help);G.setForm(form);Object.assign(G.state.player,{x:map==='mistwood'?e.x-40:e.x,y:map==='mistwood'?e.y-16:e.y+80,mana:0,manaRegenDelay:100,invuln:0,damageTaken:0});
+ G.setComfortSetting('bossAssistance',help);if(!G.state.claimedForms.includes(form))G.state.claimedForms.push(form);G.setForm(form);assert.equal(G.state.formId,form);Object.assign(G.state.player,{x:map==='mistwood'?e.x-40:e.x,y:map==='mistwood'?e.y-16:e.y+80,mana:0,manaRegenDelay:100,invuln:0,damageTaken:0});
  return {...r,e};
 }
 function strike(r){const {G,e}=r;if(e.def.boss.orchard)G.updateOrchardBoss(e,G.state.player,.01);else{e.bossPendingAction='rootBloom';e.bossTelegraphT=.001;G.updateEnemies(.01);}}
@@ -21,13 +21,13 @@ test('safe root teaches a free art, saves a picnic seat, and grants no combat cr
  assert.equal(G.loadSaveData().guardianChallenges.treant.practiceCleared,true);assert.equal(G.treantChallengeStation(),null);
  r.load('heartwood');assert.equal(G.state.enemies.some(e=>e.treantRoot),false);
 });
-test('all root phases leave a stationary counter at the original target in both existing Treant fights',()=>{
+test('all root phases leave a nearby harvest choice at the original target in both existing Treant fights',()=>{
  for(const map of ['heartwood','mistwood'])for(const phase of [1,2,3]){
   const r=setup({map,phase}),{G,e}=r,at={x:G.state.player.x,y:G.state.player.y};strike(r);const root=finish(r);
   assert.ok(root,`${map} ${phase}`);assert.equal(root.x,at.x);assert.equal(root.y,at.y);assert.equal(G.state.player.damageTaken,0);
   const hp=e.hp,ward=e.ward.hp;assert.equal(G.combat.damageEnemy(root,{damage:1,type:'sharp',ability:'slash',noMana:true}),false);
-  assert.equal(e.hp,hp);assert.equal(e.ward.hp,ward-1);assert.equal(e.bossStaggerT,1.6);assert.equal(e.openingTimer,0);assert.equal(e.treantCounters,1);
-  assert.equal(G.state.bossHazards.length+G.state.openingHazards.length,0);assert.equal(G.state.guardianChallenges.treant.counterLearned,true);
+  assert.equal(e.hp,hp);assert.equal(e.ward.hp,ward);assert.equal(e.bossStaggerT||0,0);assert.ok(e.def.boss.orchard?e.openingTimer>0:e.bossRecoverT>0);assert.equal(e.treantCounters,1);
+  assert.equal(G.state.pickups.filter(pk=>pk.treantFruit).length,1);assert.equal(G.state.guardianChallenges.treant.counterLearned,true);
  }
 });
 test('free native basics snap the counter at zero mana in blunt, sharp and slow bodies without hit credit',()=>{
@@ -43,7 +43,7 @@ test('branching follows the committed target, has a helped warning and a complet
   const r=setup({phase,branching:true,help}),{G,e}=r;strike(r);const echo=G.state.openingHazards.find(h=>h.treantEcho);
   assert.ok(echo);assert.ok(Math.abs(echo.warn-echo.delay-(help?1.25:.95))<1e-7);assert.equal(echo.x,G.state.player.x);assert.equal(echo.y,G.state.player.y);
   assert.ok(e.openingTimer>=echo.warn+echo.active+.899);const root=finish(r);assert.ok(root);assert.ok(echo.t<echo.warn);
-  G.combat.damageEnemy(root,{damage:1,type:'blunt',ability:'slap'});assert.equal(G.state.openingHazards.length,0);
+  G.combat.damageEnemy(root,{damage:1,type:'blunt',ability:'slap'});assert.ok(G.state.openingHazards.includes(echo),'harvesting preserves the committed follower');assert.equal(G.state.pickups.filter(pk=>pk.treantFruit).length,1);
  }
 });
 test('ignoring a cracked root leaves a dodgeable follower and expires the prop without a status penalty',()=>{
