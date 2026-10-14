@@ -1087,7 +1087,7 @@ registerEnemy({
       "Choose what to shelter and what to open. Blunt opens my ward; walking around the stone works, too.",
     ],
     phaseLine: "Rubble from the other direction! Put the wall where you need it.",
-    phaseThreeLine: "One last arch! Slide its middle stone for a short approach, or keep the sheltered way.",
+    phaseThreeLine: "One last arch! Slide the middle for a short approach, then step clear of the crossing stone. Or keep the shelter!",
     knockoutLine: "A fallen stone is still useful. Rest. Then become a better arch.",
     defeatLine: "Carry the Stone Mark. Build doors more often than walls.",
     rematchLine: "Inspection day again? Fine. I have reinforced the petunias.",

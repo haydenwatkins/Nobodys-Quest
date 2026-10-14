@@ -1474,7 +1474,7 @@ function enemyShot(state, enemy, angle, opts) {
 }
 
 // Authored launches retain native ownership, arming, help and lifetime.
-G.fireGuardianProjectile=(owner,origin,target,options={})=>enemyShot(G.state,owner,G.util.angleTo(origin.x,origin.y,target.x,target.y),{damage:1,...options,origin});
+G.fireGuardianProjectile=(owner,origin,target,options={})=>{const shot=enemyShot(G.state,owner,G.util.angleTo(origin.x,origin.y,target.x,target.y),{damage:1,...options,origin});shot.startX=shot.x;shot.startY=shot.y;return shot;};
 
 G.updateEnemies = function (dt) {
   const s = G.state;
