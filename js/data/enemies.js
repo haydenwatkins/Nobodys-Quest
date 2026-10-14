@@ -1110,10 +1110,10 @@ registerEnemy({
     introLines: [
       "Welcome, Patchling. Every silver road in Rootdeep carried me your footsteps.",
       "Do not worry. I only eat rude guests, and you wiped your feet.",
-      "Watch where one thread ends and the next begins. That is your opening.",
+      "Watch the bead travel toward a knot. Unhook a bright knot with a free attack; the bead takes the other thread.",
     ],
-    phaseLine: "You cut my favorite thread. It was load-bearing and emotionally important.",
-    phaseThreeLine: "No more neat stitches. Let us make something gloriously tangled.",
+    phaseLine: "A crossing stitch! Choose its next thread before the bead reaches the knot.",
+    phaseThreeLine: "Two knots in one braid! Give the bead a kind way through, and keep the slack thread for your feet.",
     knockoutLine: "The web catches you. See? Hospitality, not lunch.",
     defeatLine: "Take the Thread Mark. Every lonely road deserves a connection.",
     rematchLine: "The web said you were back. It used three exclamation marks.",

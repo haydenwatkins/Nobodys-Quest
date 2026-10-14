@@ -930,7 +930,7 @@ function caravanFenceLayout() {
   },
   {
     id: "rootdeepHollow", name: "Rootdeep Hollow", biome: "rootdeep", variant: 3,
-    message: "Silver roads join the root chambers. Tess waits in the northeast loom; the southern thread leads to her silk cache. Stay close when she draws a tether, then answer when her threads fall.",
+    message: "Silver roads join the root chambers. Tess waits in the northeast loom; the southern thread leads to her silk cache. Follow the traveling bead. Unhook a thread before its knot to send the bead the other way; walk the slack route. Dark opens her ward.",
     portals: {
       x: { map: "hangingGardens", x: 43, y: 14 }, y: { map: "glasswaterDesert", x: 2, y: 14 },
     },

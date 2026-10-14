@@ -263,7 +263,7 @@ assert.equal(G.forms.colossus.speed, 80);
 const arenaPatterns = {
   skySovereign: ["skyFlight"],
   oldMason: ["masonryPassage"],
-  silkMatriarch: ["silkTether", "webGrid"],
+  silkMatriarch: ["silkRoute"],
   bellTitan: ["stormGrid", "echoCross"],
   lanternKeeper: ["safeCircle", "stormGrid"],
   lastWorldbearer: ["worldGrid", "collapseRing", "gustLanes"],
