@@ -1157,7 +1157,7 @@ registerEnemy({
     style: "vampire", color: "#ffcd75", specialEvery: 2.05, domain: "Stormspine Peaks", spriteScale: 2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.5,
     chargeSpeed: 212, chargeDur: 0.3, antiKiteRange: 106, chaseScale: 1.38,
-    patterns: ["safeCircle", "stormGrid", "vampireDash", "stars", "orbit"],
+    patterns: ["warmCrossing"],
     intro: "A SMALL LIGHT CHALLENGES THE WHOLE STORM",
     introLines: [
       "Oh! A visitor. Every lantern in Stormspine is one of my promises.",
