@@ -64,8 +64,8 @@
   ])G.NPCS[id]={...G.NPCS[base],name,chapters:{0:[line]}};
   registerEnemy({...G.enemies.ancientTreant,id:'tollkeeper',name:'The Tollkeeper',hp:40,speed:0,damage:1,size:30,aggro:142,ward:null,trophy:null,trophyName:null,location:'The Old Toll Bridge',
     boss:{...G.enemies.ancientTreant.boss,orchard:true,color:'#e7bd78',
-      introLines:['One copper to cross. Three hundred years of late fees.','The town owes tomorrow. I collect tomorrow.'],
-      phaseLine:'You cannot settle a debt by giving things away!',phaseThreeLine:'The ledger is getting wet. The numbers... I cannot read the numbers.',
+      introLines:['Parcels for Sunrise? Oh, please keep them dry! Stay on the marked bank until the flood passes, then follow my footprints toward the bridge.','We can have a friendly spar, too. Either way, I’ll open the road.'],
+      phaseLine:'Here comes another wave! The dry bank is beside me.',phaseThreeLine:'This wave reaches farther. Come a little closer to the dry bank!',
       knockoutLine:'Parcel catches you beneath the bridge lamps. The deliveries can wait one more try.'},
   });
 })();

@@ -5,7 +5,7 @@ G.JOURNEY_STOPS = [
   {id:"orchardRoad",name:"Orchard Road",icon:"🌳",clue:"Help Parcel, open the mill bridge, and ring the watch bell."},
   {id:"heartwood",name:"The Heartwood",icon:"🌲",clue:"The root arch at the north end of Orchard Road leads to the guardian."},
   {id:"lanternReach",name:"Lantern Reach",icon:"🏮",clue:"Follow Orchard Road east from the cart. Restore both lamps to cross the causeway."},
-  {id:"tollCourt",name:"Old Toll Bridge",icon:"🌧",clue:"East of the lanterns. Defeat the Tollkeeper to open the road to town."},
+  {id:"tollCourt",name:"Old Toll Bridge",icon:"🌧",clue:"East of the lanterns. Keep the parcels dry through the flood, then walk past the Keeper. A friendly spar also opens the road."},
   {id:"sunriseQuay",name:"Sunrise Quay",icon:"☀",clue:"Deliver the parcels, then meet Parcel. The east road joins the town green."},
   {id:"town",name:"Town Green",icon:"🏡",clue:"Build homes and choose projects for the people you brought together."},
 ];
@@ -54,7 +54,7 @@ G.journeyGateReason = (mapId,destination) => {
   if(mapId==="orchardRoad"&&destination==="lanternReach"&&!o.complete&&!d.started)return "Help Parcel reopen the orchard road first.";
   if(mapId==="orchardRoad" && destination==="heartwood" && !o.bell) return "Ring the watch bell to open the root arch.";
   if(mapId==="lanternReach" && destination==="tollCourt" && d.lamps?.[1]!==2) return "Restore both lanterns to open the causeway.";
-  if(mapId==="tollCourt" && destination==="sunriseQuay" && !d.keeper && (s.mapId!==mapId || s.player.x<28*G.TILE)) return "Defeat the Tollkeeper to cross the bridge.";
+  if(mapId==="tollCourt" && destination==="sunriseQuay" && !d.keeper && (s.mapId!==mapId || s.player.x<28*G.TILE)) return "Stay in the dry bank through the flood, then follow the footprints. A friendly spar also opens the bridge.";
   if(mapId==="tollCourt" && destination==="lanternReach" && !d.keeper && s.mapId===mapId && s.player.x>28*G.TILE) return "The Tollkeeper bars this side. Return through the quay.";
   return null;
 };
