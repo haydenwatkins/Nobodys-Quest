@@ -12,7 +12,7 @@ for(const c of (process.argv.includes('--first-only')?cases.slice(0,1):process.a
   assert.ok(gauntletSeed);seed=gauntletSeed;assert.ok(G.startGauntlet(3,false));G.updateGauntlet(1.2);r.drain();
  }else{r.load('rootdeepHollow');r.drain();}
  const e=G.state.enemies.find(e=>e.id==='silkMatriarch'),p=G.state.player;assert.ok(e);Object.assign(p,{x:e.x-60,y:e.y,mana:0,manaRegenDelay:1000});G.input.takeAim=()=>({...G.input.aim,dragged:true});
- const counters={},used={},stars=G.state.stars,items=[...G.state.items];let lessons=0,paid=0,seconds=0;G.events.on('questDone',()=>lessons++);G.events.on('abilityUse',a=>{if(G.abilityManaCost(G.abilities[a.ability])>0)paid++;});G.events.on('guardianCounter',a=>{if(a.guardian==='silkMatriarch')counters[e.bossPhase]=(counters[e.bossPhase]||0)+1;});
+ const counters={},used={},answered={},stars=G.state.stars,items=[...G.state.items];let lessons=0,paid=0,seconds=0;G.events.on('questDone',()=>lessons++);G.events.on('abilityUse',a=>{if(G.abilityManaCost(G.abilities[a.ability])>0)paid++;});G.events.on('guardianCounter',a=>{if(a.guardian==='silkMatriarch')counters[e.bossPhase]=(counters[e.bossPhase]||0)+1;});
  let path=[],routeTarget=null;
  const feet=(x,y)=>[[ -4.5,0],[4.5,0],[-4.5,-7],[4.5,-7]].every(([dx,dy])=>!G.world.solid(x+dx,y+dy));
  function waypoint(target){const d=Math.hypot(target.x-p.x,target.y-p.y),n=Math.ceil(d/4);if(Array.from({length:n},(_,i)=>feet(p.x+(target.x-p.x)*(i+1)/n,p.y+(target.y-p.y)*(i+1)/n)).every(Boolean))return target;
@@ -25,7 +25,7 @@ for(const c of (process.argv.includes('--first-only')?cases.slice(0,1):process.a
  }
  for(let i=0;i<18000&&!e.dead;i++){
   const dt=.025,h=G.state.bossHazards.find(h=>h.owner===e),posts=G.state.enemies.filter(a=>G.guardianPropLive(a)&&a.guardianProp.owner===e),phase=e.bossPhase;let target={x:e.x-38,y:e.y+16},aim=e,attack=false,button='b';
-  const complete=walking||(used[phase]?.size||0)>=(phase===3?2:1);
+  const complete=walking||answered[phase];
   if(!walking&&!complete&&h){const index=h.silk.nodes.findIndex(n=>!n.committed&&n.choice===0);if(index>=0){const offset=h.silk.nodes.slice(0,index).filter(n=>!n.committed).length*2,at=posts[offset];if(at){target={x:at.x-22,y:at.y};aim=at;attack=Math.hypot(at.x-p.x,at.y-p.y)<65;}}else target={x:e.x-38,y:e.y+32};}
   else attack=complete&&Math.hypot(e.x-p.x,e.y-p.y)<115&&(!walking||posts.every(a=>Math.hypot(a.x-p.x,a.y-p.y)>40));
   if(!G.world.isSafeSpawn(target.x,target.y))target=G.world.safeArrival(target.x,target.y);
@@ -37,10 +37,10 @@ for(const c of (process.argv.includes('--first-only')?cases.slice(0,1):process.a
    if(h&&!h.silk.finished){const pulse=h.silk.pulse,next=pulse.path[pulse.index],dx=next?next.x-pulse.x:0,dy=next?next.y-pulse.y:0,d=Math.hypot(dx,dy)||1,age=h.t+t-h.warning,moves=age>=0&&pulse.wait<=0;const bx=pulse.x+(moves?dx/d*64*t:0),by=pulse.y+(moves?dy/d*64*t:0);if(age>=0)cost+=Math.max(0,13-Math.hypot(x-bx,y-by))**2*30;}
    for(const a of G.state.enemies)if(!a.dead&&!a.guardianProp&&!a.def.miniboss&&!a.def.practice)cost+=Math.max(0,17-Math.hypot(x-a.x,y-a.y))**2*15;
 
-  }return cost;};choices.sort((a,b)=>score(a)-score(b));G.input.vec=choices[0];r.step(dt);r.drain();if(h){used[phase]??=new Set();h.silk.nodes.forEach((node,i)=>{if(node.committed&&node.choice===1)used[phase].add(i);});}seconds+=dt;
+  }return cost;};choices.sort((a,b)=>score(a)-score(b));G.input.vec=choices[0];r.step(dt);r.drain();if(h){used[phase]??=new Set();h.silk.nodes.forEach((node,i)=>{if(node.committed&&node.choice===1)used[phase].add(i);});if(h.silk.nodes.every(node=>node.committed&&node.choice===1))answered[phase]=true;}seconds+=dt;
   assert.ok(!G.state.knockout,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,damage:p.damageTaken,counters,x:p.x,y:p.y}));
  }
- assert.ok(e.dead,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,counters}));assert.equal(e.bossPhase,3);if(!walking)for(const phase of [1,2,3]){assert.ok((used[phase]?.size||0)>=(phase===3?2:1),JSON.stringify({c,counters,used:Object.fromEntries(Object.entries(used).map(([k,v])=>[k,[...v]]))}));}assert.equal(paid,0);if(walking)assert.equal(Object.values(counters).reduce((a,b)=>a+b,0),0);
+ assert.ok(e.dead,JSON.stringify({...c,seconds,hp:e.hp,ward:e.ward.hp,counters}));assert.equal(e.bossPhase,3);if(!walking)for(const phase of [1,2,3]){assert.ok(answered[phase]&&(used[phase]?.size||0)>=(phase===3?2:1),JSON.stringify({c,counters,used:Object.fromEntries(Object.entries(used).map(([k,v])=>[k,[...v]]))}));}assert.equal(paid,0);if(walking)assert.equal(Object.values(counters).reduce((a,b)=>a+b,0),0);
  if(form!=='colossus'){assert.ok(G.groundRewardFor('trophy-silk-matriarch'));assert.equal(G.hasWorldMark('thread'),false);assert.equal(G.state.stars,stars+lessons);collect(r,'trophy-silk-matriarch');assert.ok(G.hasWorldMark('thread'));assert.ok(G.formReady('weaver'),JSON.stringify({claimed:G.state.claimedForms,level:G.formLevel('golem'),quests:G.questsDone,items:G.state.items,echoes:G.state.formEchoes,outing:G.activeFormOuting()}));assert.ok(G.formEchoFor('weaver'));const claimed=G.state.stars;r.load('rootdeepHollow');r.drain();assert.ok(!G.state.enemies.some(e=>e.id==='silkMatriarch'));assert.equal(G.state.stars,claimed);}else{assert.deepEqual([...G.state.items],items);assert.equal(G.state.stars,stars+lessons);assert.equal(G.state.gauntletRun.wins,1);}
- console.log(JSON.stringify({...c,seconds:+seconds.toFixed(2),counters,committed:Object.fromEntries(Object.entries(used).map(([k,v])=>[k,[...v]])),damage:p.damageTaken,paidCasts:paid,ai:'original',context:form==='colossus'?'native Manyfold first round':'native Rootdeep region'}));
+ console.log(JSON.stringify({...c,seconds:+seconds.toFixed(2),counters,answered,committed:Object.fromEntries(Object.entries(used).map(([k,v])=>[k,[...v]])),damage:p.damageTaken,paidCasts:paid,ai:'original',context:form==='colossus'?'native Manyfold first round':'native Rootdeep region'}));
 }
