@@ -10,7 +10,7 @@ function setup(phase,action){
  const r=runtime(),{G}=r;r.load('frostbellTundra');r.drain();const e=G.state.enemies.find(e=>e.def.id==='bellTitan');G.state.enemies=[e];Object.assign(G.state.player,{x:e.x-60,y:e.y,invuln:0,meleeGuard:0});G.state.bossCutscene=null;
  Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),bossTelegraphT:.01,bossPendingAction:action});G.updateEnemies(.02);return {...r,e};
 }
-test('Bongle separates his notes and commits until the last echo ends in every phase',()=>{
+test('retained legacy bell-grid kernels separate notes and commit until the last echo ends in every phase',()=>{
  for(const phase of [1,2,3])for(const action of ['stormGrid','echoCross']){const {G,e}=setup(phase,action),fields=[...G.state.bossHazards];assert.equal(fields.length,phase>=2||action==='echoCross'?2:1);
   const first=fields[0],second=fields[1],end=Math.max(...fields.map(h=>h.delay+h.warning+h.active));
   if(second){assert.ok(second.delay>=first.warning+first.active);assert.notEqual(first.axis,second.axis);assert.equal(second.note,2);}
@@ -19,7 +19,7 @@ test('Bongle separates his notes and commits until the last echo ends in every p
   assert.equal(G.state.bossHazards.length,0);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.projectiles.length,0);
  }
 });
-test('both notes have walkable safe ground and interruption cancels the delayed echo',()=>{
+test('both retained legacy grid notes have walkable safe ground and interruption cancels the delayed echo',()=>{
  for(const phase of [1,2,3]){const {G,e}=setup(phase,'echoCross'),fields=[...G.state.bossHazards];
   for(const h of fields){const b=h.bounds;let refuge;
    for(let y=b.top+8;y<b.bottom-8;y+=8)for(let x=b.left+8;x<b.right-8;x+=8){const stripe=Math.floor(((h.axis==='y'?y-b.top:x-b.left))/h.cell);if((stripe&1)!==h.parity&&G.world.isSafeSpawn(x,y))refuge={x,y};}

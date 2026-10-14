@@ -6,7 +6,7 @@
  const age=h=>h.t-h.warning;
  const windowLength=()=>.9+(G.comfortSetting('bossAssistance')?.3:0);
  function retire(note){const prop=props.get(note);if(prop)prop.dead=true;}
- function ready(h,note){return note.echo&&!note.rested&&!h.rested&&age(h)>=note.delay-windowLength()&&age(h)<note.delay;}
+ function ready(h,note){return G.state.bossHazards.includes(h)&&note.echo&&!note.rested&&!h.rested&&age(h)>=note.delay-windowLength()&&age(h)<note.delay;}
  function hush(owner,h,note){if(!ready(h,note)){if(age(h)<note.delay-windowLength())G.damageNumber(note.x,note.y-18,'WAIT','#78938a');return;}note.rested=true;h.rested=true;for(const choice of h.notes)retire(choice);owner.hushedEchoes=(owner.hushedEchoes||0)+1;G.damageNumber(note.x,note.y-18,'REST','#fff3c2');G.sfx.play('wardBreak');G.events.emit('guardianCounter',{guardian:'bellTitan',kind:'echo'});}
  function paintBell(c,e,h,note){const lit=ready(h,note);c.save();c.strokeStyle=lit?'#fff3c2':'#78938a';c.lineWidth=2;c.beginPath();c.moveTo(e.x-7,e.y-4);c.lineTo(e.x-6,e.y-11);c.quadraticCurveTo(e.x,e.y-17,e.x+6,e.y-11);c.lineTo(e.x+7,e.y-4);c.closePath();c.stroke();c.beginPath();c.arc(e.x,e.y-3,2,0,Math.PI*2);c.stroke();c.lineWidth=1;c.beginPath();c.arc(e.x,e.y-8,10,-Math.PI/2,-Math.PI/2+Math.PI*2*G.util.clamp(h.t/(h.warning+note.delay),0,1));c.stroke();c.restore();}
  function active(h,p,dt){const now=age(h),before=now-dt;for(const note of h.notes){if(note.rested||now<note.delay||before>note.delay+84/90)continue;const low=radius(before-note.delay),high=radius(now-note.delay),d=Math.hypot(p.x-note.x,p.y-note.y);if(!note.hit&&d>=Math.max(0,low-6)&&d<=high+6&&G.damagePlayer(1,note.x,note.y))note.hit=true;}}

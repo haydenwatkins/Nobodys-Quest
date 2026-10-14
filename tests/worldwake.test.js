@@ -264,7 +264,7 @@ const arenaPatterns = {
   skySovereign: ["skyFlight"],
   oldMason: ["masonryPassage"],
   silkMatriarch: ["silkRoute"],
-  bellTitan: ["stormGrid", "echoCross"],
+  bellTitan: ["bellPhrase"],
   lanternKeeper: ["safeCircle", "stormGrid"],
   lastWorldbearer: ["worldGrid", "collapseRing", "gustLanes"],
 };
