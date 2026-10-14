@@ -845,7 +845,7 @@ G.combat = (() => {
             if (pr.hitSet) pr.hitSet.add(e);
             G.noteRoadworkRicochet?.(pr, e);
             const hit = damageEnemy(e, {
-                damage: pr.damage, type: pr.type, ability: pr.ability,
+                damage: pr.damage, type: pr.type, ability: pr.ability, guardianAttack: pr,
                 status: pr.status, breaksAnyWard: pr.breaksAnyWard, consumePoison: pr.consumePoison,
                 fromX: pr.startX, fromY: pr.startY,
                 combo: pr.ricochetsMax && pr.ricochets < pr.ricochetsMax ? "ricochet" : undefined,

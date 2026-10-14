@@ -1,18 +1,18 @@
 /* A bead keeps its committed thread; free hits choose its next connection. */
 "use strict";
 (() => {
- const posts=new WeakMap();let phrases=[];
+ const posts=new WeakMap(),chosenProjectiles=new WeakMap();let phrases=[];
  function route(from,to){const nodes=[{...from,parent:-1,gx:0,gy:0}],seen=new Set(['0,0']);for(let i=0;i<nodes.length&&i<6000;i++){const n=nodes[i];if(Math.hypot(n.x-to.x,n.y-to.y)<6){const path=[{...to}];for(let j=i;j>=0;j=nodes[j].parent)path.push({x:nodes[j].x,y:nodes[j].y});return path.reverse();}for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const gx=n.gx+dx,gy=n.gy+dy,k=gx+','+gy,x=from.x+gx*8,y=from.y+gy*8;if(seen.has(k)||Math.abs(gx)>24||Math.abs(gy)>24)continue;seen.add(k);if(G.world.isSafeSpawn(x,y))nodes.push({x,y,gx,gy,parent:i});}}return null;}
  const length=path=>path.slice(1).reduce((sum,at,i)=>sum+Math.hypot(at.x-path[i].x,at.y-path[i].y),0);
  function retire(node){for(const at of posts.get(node)||[])at.dead=true;}
- function choose(owner,node,cut){if(node.committed||node.choice===1-cut)return;node.choice=1-cut;owner.silkChoices=(owner.silkChoices||0)+1;G.damageNumber(node.x,node.y-20,'NEXT','#ffcd75');G.sfx.play('wardBreak');G.events.emit('guardianCounter',{guardian:'silkMatriarch',kind:'thread'});}
+ function choose(owner,node,cut,opts){if(node.committed||node.choice===1-cut||node.choiceTick===G.state.time||opts.guardianAttack&&chosenProjectiles.get(node)?.has(opts.guardianAttack))return;if(opts.guardianAttack){if(!chosenProjectiles.has(node))chosenProjectiles.set(node,new WeakSet());chosenProjectiles.get(node).add(opts.guardianAttack);}node.choiceTick=G.state.time;node.choice=1-cut;owner.silkChoices=(owner.silkChoices||0)+1;G.damageNumber(node.x,node.y-20,'NEXT','#ffcd75');G.sfx.play('wardBreak');G.events.emit('guardianCounter',{guardian:'silkMatriarch',kind:'thread'});}
  function paintKnot(c,e,node,cut){c.save();const taut=cut===node.choice;c.strokeStyle=taut?'#fff3c2':'#78938a';c.lineWidth=3;c.beginPath();c.moveTo(e.x-8,e.y-8);c.lineTo(e.x+8,e.y-8);c.moveTo(e.x,e.y-15);c.lineTo(e.x,e.y-2);c.stroke();c.strokeStyle='#fff3c2';c.lineWidth=1;c.beginPath();c.arc(e.x,e.y-8,5,taut?0:.5,taut?Math.PI*2:Math.PI*1.6);c.stroke();c.restore();}
  function makeNode(owner,at,crossing,along,aside){
   const place=(forward,side)=>G.world.safeArrival(at.x+along.x*forward+aside.x*side,at.y+along.y*forward+aside.y*side);
   const guides=crossing?[place(-24,0),place(24,0)]:[place(0,-24),place(0,24)],ends=crossing?[place(-32,32),place(32,32)]:[place(32,-32),place(32,32)];
   if(Math.hypot(guides[0].x-guides[1].x,guides[0].y-guides[1].y)<16||guides.some(p=>Math.hypot(p.x-owner.x,p.y-owner.y)<30))return null;
   const paths=ends.map((end,i)=>{const first=route(at,guides[i]),last=route(guides[i],end);return first&&last?[...first,...last.slice(1)]:null;});if(paths.some(p=>!p))return null;
-  const node={...at,paths,choice:0,committed:false};posts.set(node,guides.map((place,cut)=>G.makeGuardianProp(owner,place.x,place.y,{name:'Silk connection knot',size:16,hit:()=>choose(owner,node,cut),paint:(c,e)=>paintKnot(c,e,node,cut)})));return node;
+  const node={...at,paths,choice:0,committed:false};posts.set(node,guides.map((place,cut)=>G.makeGuardianProp(owner,place.x,place.y,{name:'Silk connection knot',size:16,hit:(e,opts)=>choose(owner,node,cut,opts),paint:(c,e)=>paintKnot(c,e,node,cut)})));return node;
  }
 
  function distanceToSegment(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,t=G.util.clamp(((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(p.x-a.x-dx*t,p.y-a.y-dy*t);}
