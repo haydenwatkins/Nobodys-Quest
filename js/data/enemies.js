@@ -1161,7 +1161,7 @@ registerEnemy({
     intro: "A SMALL LIGHT CHALLENGES THE WHOLE STORM",
     introLines: [
       "Oh! A visitor. I’m Mallow. I keep the mountain lights burning so nobody gets lost.",
-      "Tap a lantern peg to choose its path. Walk with the warm circle while the lightning keeps going.",
+      "Tap a lantern peg. When the bolts begin, walk with its warm circle—or step clear of the marked lanes.",
       "You can walk the clear gaps, too. Dark opens my ward.",
     ],
     phaseLine: "Two ways through the crossing bolts! Choose where you want the light to go.",
