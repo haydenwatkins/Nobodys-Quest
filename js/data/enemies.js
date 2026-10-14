@@ -1141,7 +1141,7 @@ registerEnemy({
     phaseLine: "Two echoes, one little rest! Choose the bell whose quiet space you want.",
     phaseThreeLine: "An echo before my next note, and one after! Watch their rims; the song can make room for you.",
     knockoutLine: "A soft note for the road back. Even heroes need rests.",
-    defeatLine: "Take the Echo Mark. Please rhyme responsibly.",
+    defeatLine: "Take the Echo Mark. I’ll ring the bridges all the way home.",
     rematchLine: "Encore! I learned what that word means yesterday.",
   },
   trophy: "trophy-bell-titan", trophyName: "Echo Mark", location: "Frostbell Tundra",
