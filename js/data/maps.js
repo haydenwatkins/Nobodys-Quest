@@ -957,7 +957,7 @@ function caravanFenceLayout() {
   },
   {
     id: "stormspinePeaks", name: "Stormspine Peaks", biome: "stormspine", variant: 6,
-    message: "Lanterns trace the passes through the ridges. Mallow waits on the northeast summit; the southern trail reaches a Stormglass Lantern. Dark attacks break his ward. Stay inside his warm circle, then strike as it fades. The eastern gate requires Bongle's Echo Mark.",
+    message: "Lanterns trace the passes through the ridges. Mallow waits on the northeast summit; the southern trail reaches a Stormglass Lantern. Dark attacks break his ward. Tap a destination peg and walk with its moving warm light through the fixed lightning lanes. The clear gaps also work. The eastern gate requires Bongle's Echo Mark.",
     portals: {
       x: { map: "frostbellTundra", x: 43, y: 14 },
       y: { map: "titanGrave", x: 2, y: 14, mark: "echo" },

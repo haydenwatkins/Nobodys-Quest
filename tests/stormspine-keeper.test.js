@@ -6,7 +6,7 @@ test('Stormspine passes reach its camp, summit, cache, gate approach and legends
  for(const stages of Object.values(G.LEGEND_PATHS))for(const stage of stages.filter(s=>s.mapId==='stormspinePeaks')){const p=G.legendSitePoint(stage);assert.ok(seen.has(Math.floor(p.x/16)+','+Math.floor(p.y/16)),stage.name);}
  assert.equal(s.grid[23][38].chest.item,'stormglass-lantern');assert.equal(s.grid[14][45].portal.mark,'echo');assert.ok(G.world.solid(13*16+8,5*16+8));
 });
-test('Mallow holds position through every field and leaves time to counterattack',()=>{
+test('retained legacy storm-light kernels hold position through every field and leaves time to counterattack',()=>{
  for(const phase of [1,2,3])for(const action of ['safeCircle','stormGrid']){
   const r=runtime(),{G}=r;r.load('stormspinePeaks');r.drain();const e=G.state.enemies.find(e=>e.def.id==='lanternKeeper');G.state.enemies=[e];Object.assign(G.state.player,{x:e.x-35,y:e.y,invuln:100});G.state.bossCutscene=null;
   Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),bossTelegraphT:.01,bossPendingAction:action});G.updateEnemies(.02);

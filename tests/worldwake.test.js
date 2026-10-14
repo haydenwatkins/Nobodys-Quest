@@ -265,7 +265,7 @@ const arenaPatterns = {
   oldMason: ["masonryPassage"],
   silkMatriarch: ["silkRoute"],
   bellTitan: ["bellPhrase"],
-  lanternKeeper: ["safeCircle", "stormGrid"],
+  lanternKeeper: ["warmCrossing"],
   lastWorldbearer: ["worldGrid", "collapseRing", "gustLanes"],
 };
 for (const [id, patterns] of Object.entries(arenaPatterns)) {
