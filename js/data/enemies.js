@@ -1105,7 +1105,7 @@ registerEnemy({
     style: "caster", color: "#d9a7ff", specialEvery: 2.2, domain: "Rootdeep Hollow", spriteScale: 2,
     phases: 3, phaseThresholds: [0.68, 0.34], telegraph: 0.55,
     chargeSpeed: 172, chargeDur: 0.32, antiKiteRange: 108, chaseScale: 1.32,
-    patterns: ["silkTether", "webGrid", "cards", "briar", "nova"],
+    patterns: ["silkRoute"],
     intro: "THE LOOM HAS EIGHT HANDS AND ONE OPINION",
     introLines: [
       "Welcome, Patchling. Every silver road in Rootdeep carried me your footsteps.",
