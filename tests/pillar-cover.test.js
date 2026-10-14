@@ -15,8 +15,8 @@ test('solid masonry stops a real intersecting hostile stone while an uncovered l
 });
 test('standard masonry warns before native stones, then crossing lanes and an opened arch develop the placement',()=>{
  for(const phase of [1,2,3]){const r=setup(phase),{G,e}=r,b={x:e.x-28,y:e.y},h=G.state.bossHazards.find(h=>h.owner===e);assert.ok(h,'the standard placement gets its own readable stone warning');assert.equal(G.state.projectiles.filter(p=>p.owner===e).length,0);G.updateBossHazards(h.warning+.01);const rocks=G.state.projectiles.filter(p=>p.owner===e);assert.ok(rocks.length>=2);assert.ok(rocks.every(p=>!p.fromPlayer&&p.shape==='masonryStone'&&p.armT>0));
-  if(phase===2)assert.ok(rocks.every(p=>Math.abs(p.vy)>Math.abs(p.vx)),'the next phase crosses the first horizontal stone passage');else assert.ok(rocks.every(p=>Math.abs(p.vx)>Math.abs(p.vy)));
-  if(phase===3){assert.ok(G.world.solid(b.x,b.y-24));assert.ok(G.world.solid(b.x,b.y+24));}
+  if(phase===2){assert.ok(rocks.every(p=>Math.abs(p.vy)>Math.abs(p.vx)),'the next phase crosses the first horizontal stone passage');assert.ok(Math.abs(rocks[0].x-rocks[1].x)>=24,'the two protected columns are actual different choices');assert.equal(rocks[0].range,126,'native stone travel matches the warned endpoint');}else assert.ok(rocks.every(p=>Math.abs(p.vx)>Math.abs(p.vy)));
+  if(phase===3){const middle=h.launches[1].from;assert.ok(G.world.solid(middle.x-52,middle.y-24));assert.ok(G.world.solid(middle.x-52,middle.y+24));}
  }
 });
 test('busy masonry waits, and defeat, phase, travel and knockout release its actual footprint',()=>{
@@ -26,4 +26,9 @@ test('busy masonry waits, and defeat, phase, travel and knockout release its act
   if(exit==='phase'){e.hp=55;G.updateEnemies(.01);q.drain();}if(exit==='defeat'){G.combat.damageEnemy(e,{damage:8,type:'blunt',ability:'slap'});G.combat.damageEnemy(e,{damage:1000,type:'blunt',ability:'slap'});}if(exit==='travel')q.load('sunstepPrairie');if(exit==='knockout'){G.state.player.invuln=0;G.damagePlayer(100,e.x,e.y);}G.updateOpening(.01);
   if(exit!=='travel')assert.equal(G.world.solid(at.x,at.y),false,exit);assert.ok(!G.state.enemies.some(a=>G.guardianPropLive(a)&&a.guardianProp.owner===e),exit);
  }
+});
+
+test('a free handle hit starts a visible physical slide before it earns a completed placement',()=>{
+ const r=setup(),{G,e}=r,at=G.state.enemies.find(a=>a.guardianProp?.owner===e),original={x:e.x-28,y:e.y};Object.assign(G.state.player,{x:at.x-18,y:at.y,dir:{x:1,y:0}});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<4;i++)r.step(.025);
+ assert.equal(e.masonryMoves||0,0,'an unfinished slide has not earned a completed placement');assert.ok(G.world.solid(original.x,original.y),'the block still overlaps its starting footprint briefly');for(let i=0;i<32;i++)r.step(.025);assert.equal(e.masonryMoves,1);assert.equal(G.world.solid(original.x,original.y),false);
 });
