@@ -1439,13 +1439,14 @@ function bossMoveVector(e, p, dist, dt) {
 }
 
 function enemyShot(state, enemy, angle, opts) {
-  state.projectiles.push({
-    x: enemy.x, y: enemy.y - 6,
+  const origin=opts.origin||enemy;
+  const projectile={
+    x: origin.x, y: origin.y - 6,
     vx: Math.cos(angle) * (opts.speed || 90),
     vy: Math.sin(angle) * (opts.speed || 90),
     damage: opts.damage, size: opts.size || 3,
     color: enemy.def.shotColor || (enemy.def.boss && enemy.def.boss.color) || "#b13e53",
-    startX: enemy.x, startY: enemy.y, range: opts.range || 140,
+    startX: origin.x, startY: origin.y, range: opts.range || 140,
     speed: opts.speed || 90,
     boomerang: !!opts.boomerang,
     returning: false,
@@ -1457,8 +1458,12 @@ function enemyShot(state, enemy, angle, opts) {
     // Give melee-range players a readable instant before a boss shot becomes
     // dangerous. Ordinary enemy shots retain their existing timing.
     armT: enemy.def.miniboss ? (G.guardianWarningSeconds?.(G.BOSS_PROJECTILE_ARM_SECONDS) ?? G.BOSS_PROJECTILE_ARM_SECONDS) : 0,
-  });
+  };
+  state.projectiles.push(projectile);return projectile;
 }
+
+// Authored launches retain native ownership, arming, help and lifetime.
+G.fireGuardianProjectile=(owner,origin,target,options={})=>enemyShot(G.state,owner,G.util.angleTo(origin.x,origin.y,target.x,target.y),{damage:1,...options,origin});
 
 G.updateEnemies = function (dt) {
   const s = G.state;
@@ -1981,6 +1986,8 @@ G.drawProjectiles = function (ctx) {
       ctx.fillRect(x - 3, y - 2, 7, 4);
       ctx.fillStyle = "#f4f4f4";
       ctx.fillRect(x - 2, y - 1, 5, 2);
+    } else if (pr.shape === "masonryStone") {
+      const x=Math.round(pr.x),y=Math.round(pr.y-4);ctx.fillStyle='#483f3d';ctx.fillRect(x-4,y-4,8,8);ctx.fillStyle='#d8b06a';ctx.fillRect(x-3,y-3,6,6);ctx.fillStyle='#ffcd75';ctx.fillRect(x-3,y-3,6,2);ctx.fillStyle='#8a6538';ctx.fillRect(x+1,y,2,3);
     } else if (pr.shape === "fault") {
       const x = Math.round(pr.x), y = Math.round(pr.y - 4);
       ctx.fillRect(x - 4, y - 1, 3, 2);

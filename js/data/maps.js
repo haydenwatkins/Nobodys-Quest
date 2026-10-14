@@ -921,7 +921,7 @@ function caravanFenceLayout() {
   },
   {
     id: "hangingGardens", name: "Hanging Gardens", biome: "gardens", variant: 2,
-    message: "The Old Mason tends the northeast terrace. Broad bridges cross the garden channels; the southern promenade leads to his singing keystone. His Blunt ward yields to heavy blows.",
+    message: "Pillar tends the northeast terrace. Strike a brass handle to slide its stone: shelter one lane and open an approach. Blunt opens his ward. The southern promenade reaches his singing keystone.",
     portals: {
       x: { map: "windscarCanyon", x: 43, y: 14 }, y: { map: "rootdeepHollow", x: 2, y: 14 },
     },

@@ -1855,5 +1855,5 @@ G.world = (() => {
     if (G.drawWorldGuidance) G.drawWorldGuidance(ctx, cam, time);
   }
 
-  return { load, solid, blocksProjectile, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, safeArrival, portalBlockReason, nearPortal };
+  return { load, solid, blocksProjectile, segmentHitsBox:segmentHitsKeepout, moveBox, checkTriggers, draw, cellAt, isSafeSpawn, safeArrival, portalBlockReason, nearPortal };
 })();
