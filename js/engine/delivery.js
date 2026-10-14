@@ -2,6 +2,7 @@
    and three deliveries whose effects remain visible after the chapter. */
 "use strict";
 (() => {
+  const dryPulses=new WeakMap(),crossings=new WeakMap();
   const maps=['lanternReach','tollCourt','sunriseQuay'];
   const here=()=>G.state&&maps.includes(G.state.mapId);
   G.makeDelivery=()=>({version:1,started:false,lamps:[0,0],cleared:[],keeper:false,parcels:[],salvage:false,complete:false,seen:[]});
@@ -18,6 +19,11 @@
     return d;
   };
   const state=()=>G.state.delivery||(G.state.delivery=G.makeDelivery());
+  function liveKeeper(e){return e&&!e.dead&&!G.state.knockout&&G.state.mapId==='tollCourt'&&!state().keeper&&G.state.enemies.includes(e);}
+  function keeperCrossing(){const e=G.state.enemies.find(e=>e.id==='tollkeeper'&&!e.dead),step=e&&crossings.get(e);return liveKeeper(e)&&step?.phase===e.bossPhase?step:null;}
+  function completeKeeper(e){const d=state();if(d.keeper||!e||e.def.id!=='tollkeeper')return false;d.keeper=true;d.started=true;d.lamps=[2,2];G.cancelBossHazards(e);G.revealDeliveryReward(e);G.checkUnlocks();G.saveGame();return true;}
+  function offerCrossing(owner,p){for(const dx of [32,48,64])for(const dy of [0,-16,16]){const x=Math.max(owner.x+48,p.x+dx),y=owner.y+12+dy;if(x>=28*16-8||x<p.x+24||!G.world.isSafeSpawn(x,y))continue;crossings.set(owner,{x,y,phase:owner.bossPhase,from:{x:p.x,y:p.y}});return;}}
+  function followDryPulse(h,before,dt,p){const a=dryPulses.get(h);if(!a||!liveKeeper(h.owner)||a.phase!==h.owner.bossPhase)return;const end=h.warn+h.active,left=Math.max(before,h.warn),right=Math.min(h.t,end);if(right>left){const at=t=>({x:a.previous.x+(p.x-a.previous.x)*G.util.clamp((t-before)/(dt||1),0,1),y:a.previous.y+(p.y-a.previous.y)*G.util.clamp((t-before)/(dt||1),0,1)}),first=at(left),last=at(right);a.safe=a.safe&&!G.openingHazardHits(h,first.x,first.y)&&!G.openingHazardHits(h,last.x,last.y);a.seconds+=right-left;}a.previous={x:p.x,y:p.y};if(before<end&&h.t>=end&&a.safe&&a.seconds>=h.active-.000001)offerCrossing(h.owner,p);}
   const near=(x,y,r=30)=>Math.hypot(G.state.player.x-(x*16+8),G.state.player.y-(y*16+8))<=r;
   const safe=()=>!G.ui.dialogueOpen&&!G.state.knockout&&!G.state.bossCutscene&&!G.state.enemies.some(e=>!e.dead&&!e.def.practice&&Math.hypot(e.x-G.state.player.x,e.y-G.state.player.y)<88);
   function say(key,lines){
@@ -42,7 +48,7 @@
     if(!d.started){mapId='orchardRoad';point=[26,37];short='Meet Parcel beside the east road';objective='Talk to Parcel beside the cart, then follow Orchard Road east toward the lanterns.';value=0;}
     else if(d.lamps[0]<2){mapId='lanternReach';point=[14,24];short=d.lamps[0]?'Clear the first lantern':'Raise the first lantern';objective='Follow the west bank to the unlit lantern. Drive back the creatures its light draws.';value=1;}
     else if(d.lamps[1]<2){mapId='lanternReach';point=[38,12];short=d.lamps[1]?'Clear the second lantern':'Raise the second lantern';objective='The first light opened the causeway. Carry it to the lantern on the far bank.';value=2;}
-    else if(!d.keeper){mapId='tollCourt';point=[18,17];short='Cross the old toll bridge';objective='Follow the lamps east. When the bridge floods, shelter inside the marked lantern circle.';value=3;}
+    else if(!d.keeper){const step=s.mapId==='tollCourt'&&keeperCrossing();mapId='tollCourt';point=step?[step.x/16-.5,step.y/16-.5]:[18,17];short=step?'Walk past the Keeper':'Cross the old toll bridge';objective=step?'The river has ebbed. Follow the footprints past the Keeper; the parcels are ready to cross.':'Keep your feet in the marked dry bank through the flood, then walk past the Keeper. A friendly spar also opens the bridge.';value=3;}
     else if(d.parcels.length<3){const id=['bread','letter','present'].find(x=>!d.parcels.includes(x));mapId='sunriseQuay';point=locations[id];short={bread:'Bring the flour to Baker Brindle',letter:'Give Mara her letter',present:'Bring Pip the birthday present'}[id];objective='The quay is just across the bridge. Deliver the three parcels in any order.';value=4+d.parcels.length;}
     else {mapId='sunriseQuay';point=[8,20];short='Tell Parcel everyone received it';objective='Return to the cart. Three ordinary things have arrived at last.';value=7;}
     return {chapter:1,act:G.STORY_CHAPTERS[1],title:'The Long Way Home',short,objective,reason:'Opening a road matters because someone is waiting at the other end.',mapId,point,destination:G.maps[mapId].name,guide:'opening',progress:{value,total:8,label:'THE LONG WAY HOME'},complete:false};
@@ -153,7 +159,7 @@
     if(!here())return;const s=G.state,d=state();
     const e=s.enemies.find(e=>e.dead&&e.id===data.enemy&&e.x===data.x&&e.y===data.y);
     if(e&&e.deliveryKey&&!d.cleared.includes(e.deliveryKey))d.cleared.push(e.deliveryKey);
-    if(data.enemy==='tollkeeper'&&!d.keeper){d.keeper=true;d.started=true;d.lamps=[2,2];G.cancelBossHazards(e);if(e)G.revealDeliveryReward(e);G.checkUnlocks();}
+    if(data.enemy==='tollkeeper'&&!d.keeper)completeKeeper(e);
     G.saveGame();
   });
   const oldUpdate=G.updateOpening;
@@ -172,8 +178,9 @@
     }
     if(s.mapId==='tollCourt'&&d.keeper)say('keeper',[['THE TOLLKEEPER','I’ve kept everyone waiting over an old toll. I’m sorry. You can cross now.'],['PATCHLING','Thank you! There are people waiting for us in Sunrise.'],['THE TOLLKEEPER',G.groundRewardFor('keeper-lantern')?'Take the lantern on the ground. One star for the road, and three parcels for the people waiting.':'Tell the people in Sunrise the bridge is open. I’m going to help keep it safe.']]);
     if(s.mapId==='sunriseQuay'&&d.keeper&&!d.complete)say('quay',[['PARCEL','There’s Sunrise! Brindle’s oven is smoking, and Pip’s waiting by the water. Oh, I’m so relieved!'],['PATCHLING','Let’s go say hello! I want to see Pip open his present.'],['PARCEL','He’s going to love it. Brindle is by the bakery, Mara’s at the blue door, and Pip’s down by the water.']]);
-    for(const h of s.openingHazards||[]){h.t+=dt;if(!h.hit&&h.t>=h.warn&&h.t<h.warn+h.active&&!h.owner.dead&&!s.knockout&&G.openingHazardHits(h,s.player.x,s.player.y))h.hit=!!G.damagePlayer(1,h.owner.x,h.owner.y);}
+    for(const h of s.openingHazards||[]){const before=h.t;h.t+=dt;followDryPulse(h,before,dt,s.player);if(!h.hit&&h.t>=h.warn&&h.t<h.warn+h.active&&!h.owner.dead&&!s.knockout&&G.openingHazardHits(h,s.player.x,s.player.y))h.hit=!!G.damagePlayer(1,h.owner.x,h.owner.y);}
     s.openingHazards=(s.openingHazards||[]).filter(h=>!h.owner.dead&&h.t<h.warn+h.active);
+    for(const e of s.enemies){const step=crossings.get(e);if(!step)continue;if(!liveKeeper(e)||step.phase!==e.bossPhase){crossings.delete(e);continue;}if(Math.hypot(s.player.x-step.x,s.player.y-step.y)<8&&s.player.x>=step.from.x+24){e.dead=true;crossings.delete(e);completeKeeper(e);G.sfx.play('unlock');G.events.emit('guardianCounter',{guardian:'tollkeeper',kind:'dryPass'});}}
   };
   const oldHit=G.openingHazardHits,oldBoss=G.updateOrchardBoss;
   G.openingHazardHits=(h,x,y)=>h.kind==='flood'?Math.hypot(x-h.x,y-h.y)>h.radius:oldHit(h,x,y);
@@ -205,7 +212,7 @@
       const flood={kind:'flood',owner:e,x:e.x,y:e.y+12,radius:phase===3?57:70,t:0,warn:1.65,active:.65,hit:false};
       floodRefuge(flood,p);
       flood.warn=G.guardianWarningSeconds?.(flood.warn,.4)??flood.warn;
-      hazards.push(flood);e.openingTimer=flood.warn+flood.active+1.3;
+      dryPulses.set(flood,{safe:true,seconds:0,phase:e.bossPhase,previous:{x:p.x,y:p.y}});hazards.push(flood);e.openingTimer=flood.warn+flood.active+1.3;
     }else{
       const a=Math.atan2(p.y-e.y,p.x-e.x),count=phase===1?1:3;
       for(let i=0;i<count;i++){const angle=a+(i-(count-1)/2)*.65;hazards.push({kind:'tollSweep',owner:e,x:e.x,y:e.y,dx:Math.cos(angle),dy:Math.sin(angle),length:155,width:8,t:0,warn,active:.25,hit:false});}
