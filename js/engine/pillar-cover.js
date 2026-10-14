@@ -5,7 +5,6 @@
   const live=y=>y&&!y.owner.dead&&!G.state.knockout&&y.map===G.state.mapId&&y.phase===y.owner.bossPhase&&G.state.enemies.includes(y.owner);
   const box=b=>({left:b.x-8,right:b.x+8,top:b.y-8,bottom:b.y+8});
   const covers=()=>present.filter(live).flatMap(y=>[y.cover,...(y.fixed||[])]);
-  G.pillarCoverFor=owner=>live(yards.get(owner))?yards.get(owner).cover:null;
   const blocked=G.openingCellBlocked;
   G.openingCellBlocked=(x,y)=>!!blocked?.(x,y)||covers().some(b=>Math.abs(x-b.x)<=8&&Math.abs(y-b.y)<=8);
   const terrain=G.world.blocksProjectile;

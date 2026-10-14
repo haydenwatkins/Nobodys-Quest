@@ -1314,6 +1314,17 @@ function updateBossState(e, p, dist, dt) {
     return true;
   }
 
+  // Incapacitation stops the actor's unfinished attack. Already released
+  // projectiles and floor phrases retain their independent native lifetimes.
+  if (e.status?.stun?.dur > 0) {
+    e.bossPendingAction = null;
+    e.bossTelegraphT = e.bossChargeT = 0;
+    e.bossAfterCharge = null;
+    e.bossContactActive = false;
+    e.bossRecoverT = Math.max(e.bossRecoverT || 0, .55);
+    return true;
+  }
+
   if (e.bossStaggerT > 0) {
     e.bossStaggerT = Math.max(0, e.bossStaggerT - dt);
     return true;

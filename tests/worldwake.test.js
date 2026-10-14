@@ -262,7 +262,7 @@ assert.equal(G.forms.colossus.speed, 80);
 // genuine kiting distance, while every floor attack remains one damage.
 const arenaPatterns = {
   skySovereign: ["skyFlight"],
-  oldMason: ["faultGrid", "collapseRing"],
+  oldMason: ["masonryPassage"],
   silkMatriarch: ["silkTether", "webGrid"],
   bellTitan: ["stormGrid", "echoCross"],
   lanternKeeper: ["safeCircle", "stormGrid"],
