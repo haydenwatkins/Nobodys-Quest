@@ -32,3 +32,6 @@ test('a real free choice leaves a slack approach that the player can walk while 
 test('the final silk braid stays visible beyond the default Worldbearer rectangle',()=>{
  const r=setup(3,-60,64),{G}=r,clips=[];let rect;const c=new Proxy({rect:(x,y,w,h)=>rect={left:x,top:y,right:x+w,bottom:y+h},clip:()=>clips.push(rect)},{get:(t,k)=>t[k]||(()=>{}),set:(t,k,v)=>(t[k]=v,true)});G.drawBossHazards(c);assert.ok(clips.length);assert.ok(clips[0].bottom>=304,'the native selectable endpoint at y296 and its eight-pixel bead must be painted');
 });
+test('the northern approach still offers both connected choices in the final braid',()=>{
+ const r=setup(3,-32,-64),{G,e}=r,h=G.state.bossHazards.find(h=>h.owner===e);assert.ok(h,'a second junction near Tess must cause a new clear placement rather than drop the only attack');assert.equal(h.silk.nodes.length,2);assert.equal(G.state.enemies.filter(a=>G.guardianPropLive(a)&&a.guardianProp.owner===e).length,4);
+});
