@@ -3,7 +3,7 @@
 "use strict";
 (() => {
   const profile=mode=>({practiceCleared:false,counterLearned:false,invited:false,[mode]:false,[mode+'Cleared']:false,bestCounters:0});
-  G.makeGuardianChallenges=()=>({treant:profile('branching'),queen:profile('rippling'),knight:profile('crescent'),mira:profile('doubleReturn'),bram:profile('rootRumble'),vesper:profile('secondWaltz'),tansy:profile('encore'),marlo:profile('returningTide'),sumi:profile('crossfold'),nell:{orbitLearned:false,bestCatches:0},briar:{practicePruned:false,gardenLearned:false,bestPrunes:0}});
+  G.makeGuardianChallenges=()=>({treant:profile('branching'),queen:profile('rippling'),knight:profile('crescent'),mira:profile('doubleReturn'),bram:{...profile('rootRumble'),bestTunnelUses:0},vesper:profile('secondWaltz'),tansy:profile('encore'),marlo:profile('returningTide'),sumi:profile('crossfold'),nell:{orbitLearned:false,bestCatches:0},briar:{practicePruned:false,gardenLearned:false,bestPrunes:0}});
   G.normalizeGuardianChallenges=raw=>{
     const out=G.makeGuardianChallenges();
     for(const [id,mode] of [['treant','branching'],['queen','rippling'],['knight','crescent'],['mira','doubleReturn'],['bram','rootRumble'],['vesper','secondWaltz'],['tansy','encore'],['marlo','returningTide'],['sumi','crossfold']]){
@@ -12,6 +12,7 @@
       b[mode]=a?.[mode]===true&&b.counterLearned;
       b.bestCounters=Number.isFinite(a?.bestCounters)?Math.max(0,Math.min(99,Math.floor(a.bestCounters))):0;
     }
+    out.bram.bestTunnelUses=Number.isFinite(raw?.bram?.bestTunnelUses)?Math.max(0,Math.min(99,Math.floor(raw.bram.bestTunnelUses))):0;
     out.nell.orbitLearned=raw?.nell?.orbitLearned===true;
     out.nell.bestCatches=Number.isFinite(raw?.nell?.bestCatches)?Math.max(0,Math.min(99,Math.floor(raw.nell.bestCatches))):0;
     for(const key of ['practicePruned','gardenLearned'])out.briar[key]=raw?.briar?.[key]===true;

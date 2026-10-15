@@ -273,7 +273,10 @@ G.updatePlayer = function (dt) {
   }
 
   /* --- dashing overrides normal movement --- */
-  if (p.dashing) {
+  const walkFromX=p.x,walkFromY=p.y;
+  if (G.advanceBurrowPassage?.(dt)) {
+    p.moving=true;
+  } else if (p.dashing) {
     const d = p.dashing;
     const step = Math.min(d.left, d.speed * dt);
     const beforeX = p.x, beforeY = p.y;
@@ -317,6 +320,8 @@ G.updatePlayer = function (dt) {
       p.anim += dt * (spd / 14);
     }
   }
+
+  G.enterBurrowPassage?.(walkFromX,walkFromY);
 
   /* --- abilities: A / B / C --- */
   const loadout = G.getLoadout(G.state.formId);
@@ -772,6 +777,7 @@ G.updateBossHazards = function (dt) {
       continue;
     }
     if (h.kind === "mirePool" && G.mireShelters?.(p,h.owner)) continue;
+    if (h.kind === "royalStomp" && G.burrowShelters?.(p,h.owner)) continue;
     if (["mirePool","rootBloom","royalStomp","pieRain"].includes(h.kind)) {
       if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
       continue;
@@ -1358,6 +1364,7 @@ function updateBossState(e, p, dist, dt) {
     e.bossChargeT -= dt;
     G.spawnFx({ kind: "puff", x: e.x, y: e.y - 5, color: boss.color, dur: 0.16 });
     if (e.bossChargeT <= 0) {
+      G.finishBurrowPassage?.(e);
       if (e.bossAfterCharge) resolveBossAction(e, p, e.bossAfterCharge);
       e.bossAfterCharge = null;
       e.bossRecoverT = Math.max(e.bossRecoverT, boss.style === "charger" ? 0.55 : 0.38);
