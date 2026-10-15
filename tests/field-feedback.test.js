@@ -33,7 +33,7 @@ test('world interactions reserve their stable full-text dock before promises and
     G.hdPilot = hd; G.input.isTouch = mode === 'touch'; G.input.hasGamepad = mode === 'controller';
     draw(cam); const prompt = G.openingPromptBounds; assert.ok(prompt);
     assert.match(labels.join(' '), /Double Return/);
-    assert.match(labels.join(' '), /Adds a second throw\. Raise a reflector to stop the pair when a blade returns\./);
+    assert.match(labels.join(' '), /Crossing throws\. Raise a reflector to send one returning blade back at Mira; the others keep flying\./);
     assert.ok(prompt.x >= 0 && prompt.x + prompt.w <= G.W && prompt.y >= 0 && prompt.y + prompt.h <= G.H);
     const cards = rects.filter(rect => ['rgba(26,28,44,.9)', 'rgba(26,28,44,0.82)', 'rgba(26,28,44,0.78)'].includes(rect.color));
     for (const card of cards) assert.ok(!overlaps(card, prompt), 'a story, mastery, map or notice card cannot cover the real world prompt');
