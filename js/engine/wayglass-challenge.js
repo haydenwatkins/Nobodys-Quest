@@ -60,7 +60,12 @@
       e.dead=true;shot.dispelled=true;G.sfx.play('wardBreak');
       G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:26,dur:.45});G.damageNumber(e.x,e.y-22,'DING!','#fff3c2');
       if(!r.owner){progress().practiceCleared=true;G.saveGame();return true;}
-      const owner=r.owner;owner.wayglassCounters=(owner.wayglassCounters||0)+1;G.guardianCounterOpening(owner);
+      const owner=r.owner;owner.wayglassCounters=(owner.wayglassCounters||0)+1;
+      // A world blade has no worn-form ability attribution. Only its later
+      // physical flight can hit the original Sharp ward or health.
+      const dx=owner.x-shot.x,dy=owner.y-6-shot.y,d=Math.hypot(dx,dy)||1;
+      G.combat.shoot({x:shot.x,y:shot.y+6,dir:{x:dx/d,y:dy/d}},{damage:1,type:'sharp',speed:140,range:d+30,size:5,color:'#ffdc91',shape:'riftBlade',trail:5});
+      const reflected=G.state.projectiles.at(-1);reflected.wayglassReturnOwner=owner;
       G.spawnFx({kind:'bolt',x:e.x,y:e.y-4,x2:owner.x,y2:owner.y-8,color:'#73eff7',dur:.3});
       // Reflection buys time; Sharp retains its distinct ward purpose.
       progress().counterLearned=true;G.saveGame();G.events.emit('guardianCounter',{guardian:'riftbladeAdept',kind:'reflector'});return true;
