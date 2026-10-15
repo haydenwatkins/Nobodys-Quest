@@ -25,12 +25,6 @@
     G.sfx.play('wardBreak');G.spawnFx({kind:'ring',x:e.x,y:e.y-9,color:'#ffdc91',radius:25,dur:.45});
     G.damageNumber(e.x,e.y-e.h()-5,'CLANG!','#ffdc91');G.state.hitStop=Math.max(G.state.hitStop||0,.04);
   }
-  G.hitEclipseShield=(e,opts)=>{
-    if(!G.eclipseShieldRaised(e)||!(opts.damage>0)||!G.abilities[opts.ability])return false;
-    // This is a tactical opening, never a free ward break or a fake hit/kill.
-    e.eclipseCounters=(e.eclipseCounters||0)+1;G.guardianCounterOpening(e);ring(e);
-    progress().counterLearned=true;G.saveGame();G.events.emit('guardianCounter',{guardian:'eclipseKnight',kind:'shield'});return true;
-  };
   G.hitEclipsePractice=(e,opts)=>{
     if(e.dead||!e.eclipsePractice||!(opts.damage>0))return false;
     e.dead=true;ring(e);progress().practiceCleared=true;G.saveGame();return false;

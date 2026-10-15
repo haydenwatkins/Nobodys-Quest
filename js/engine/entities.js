@@ -656,6 +656,7 @@ G.cancelBossHazards = function (owner) {
   G.cancelStagePies?.(owner);
   G.cancelBreakwaterSluices?.(owner);
   G.cancelFoldroadPapers?.(owner);
+  G.cancelEclipseFacing?.(owner);
   if (G.state.openingHazards) G.state.openingHazards = G.state.openingHazards.filter(h => owner && h.owner !== owner);
   if (!G.state.bossHazards) return;
   G.state.bossHazards = G.state.bossHazards.filter((h) => owner && h.owner !== owner);
