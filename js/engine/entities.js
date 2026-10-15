@@ -777,7 +777,7 @@ G.updateBossHazards = function (dt) {
       continue;
     }
     if (h.kind === "mirePool" && G.mireShelters?.(p,h.owner)) continue;
-    if (h.kind === "royalStomp" && G.burrowShelters?.(p,h.owner)) continue;
+    if (h.kind === "royalStomp" && G.burrowShelters?.(p,h.owner,h)) continue;
     if (["mirePool","rootBloom","royalStomp","pieRain"].includes(h.kind)) {
       if (!h.hit && G.util.dist(p.x, p.y, h.x, h.y) <= h.radius && G.damagePlayer(1, h.x, h.y)) h.hit = true;
       continue;

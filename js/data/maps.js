@@ -184,7 +184,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 40, y: 1 } },
     "B": { tile: "floor", enemy: "moleMonarch" },
-    "m": { tile: "floor", message: "Strike a cracked root plug when Bram stomps to stop him. An old plug can also trip his burrow. Blunt attacks break his ward." },
+    "m": { tile: "floor", message: "Loosen a cracked root, lead Bram through it, then walk into an opening for a shortcut under his stomp. Blunt attacks break his ward." },
     "H": { tile: "floor", chest: { heal: true, name: "an underground shortbread" } },
     "R": { tile: "rock", on: "floor" },
     "F": { tile: "floor", rest: true, restText: "Bram’s fire restores every heart and all mana." },

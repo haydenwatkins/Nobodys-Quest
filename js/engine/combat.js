@@ -268,7 +268,7 @@ G.combat = (() => {
             : enemy.miraLocalRematch
               ? enemy.miraDoubleReturn ? enemy.wayglassCounters>0 ? "You stopped both throws with one ring! Come have a star-cookie by the fire." : "You stepped around both throws! Come have a star-cookie by the fire." : "That was fun! Come have a star-cookie by the fire."
             : enemy.bramLocalRematch
-              ? enemy.bramRootRumble ? enemy.burrowStompCounters>0 ? "You stopped my stomp with a root pop! Come warm up by the fire. The shortbread's ready." : enemy.burrowTripCounters>0 ? "You tripped my burrow! Come warm up by the fire. The shortbread's ready." : "You found a clear step through both stomps! Come warm up by the fire. The shortbread's ready." : "Good practice! Come warm up by the fire. The shortbread's ready."
+              ? enemy.bramRootRumble ? enemy.burrowTunnelUses>0 ? "You found your way through my tunnels! Come warm up by the fire. The shortbread's ready." : "You found a clear step through both stomps! Come warm up by the fire. The shortbread's ready." : "Good practice! Come warm up by the fire. The shortbread's ready."
             : enemy.vesperLocalRematch
               ? enemy.vesperSecondWaltz ? enemy.duskCounters>0 ? "You caught my dash before both waltzes! Come have tea by the fire." : "You found the clear opening in both waltzes! Come have tea by the fire." : "A lovely dance! Come have tea by the fire."
             : enemy.tansyLocalRematch

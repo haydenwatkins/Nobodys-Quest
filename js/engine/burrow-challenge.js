@@ -25,26 +25,40 @@
   G.prepareBurrowCounter=(owner,h,p)=>{
     if(!bram(owner))return;
     for(const e of G.state.enemies||[])if(e.burrowPlug?.owner===owner&&!e.burrowPlug.broken)e.dead=true;
-    const threats=[h];
-    if(owner.bramRootRumble){
-      const delay=h.warning+(G.guardianWarningSeconds?.(0)??0)+h.active+.45;
-      const follow={...h,x:p.x,y:p.y,radius:34,t:0,delay,warning:.9,hit:false,burrowFollower:true};
-      G.state.bossHazards.push(follow);threats.push(follow);
+    const threats=[h],dug=(G.state.enemies||[]).filter(e=>!e.dead&&e.burrowPlug?.owner===owner&&e.burrowPlug.passage);
+    if(dug.length){
+      for(const root of dug){
+        const r=root.burrowPlug,path=r.passage,ends=[];
+        if(owner.bossPhase>=3)ends.push(path.from);
+        if(owner.bramRootRumble)ends.push(path.to);
+        let last=h;
+        for(const end of ends){
+          const follow={...h,x:end.x,y:end.y,radius:18,t:0,delay:(last.delay||0)+(G.guardianWarningSeconds?.(last.warning)??last.warning)+last.active+.55,warning:.9,hit:false,burrowFollower:true,burrowMouth:true};
+          G.state.bossHazards.push(follow);threats.push(follow);last=follow;
+        }
+        path.maxUses=1+ends.length;r.threats=threats;
+      }
+      return;
     }
-    const dug=(G.state.enemies||[]).filter(e=>!e.dead&&e.burrowPlug?.owner===owner&&e.burrowPlug.passage);
-    if(dug.length){for(const e of dug)e.burrowPlug.threats=threats;return;}
-    const a=Math.atan2(p.y-h.y,p.x-h.x);
-    for(const turn of [0,Math.PI/2,-Math.PI/2,Math.PI]){
-      const x=h.x+Math.cos(a+turn)*48,y=h.y+Math.sin(a+turn)*48;
-      if(G.world.isSafeSpawn(x,y)){plug(x,y,owner,threats);break;}
+    const a=Math.atan2(p.y-h.y,p.x-h.x),directions=owner.bossPhase>=3?[0,.9,-.9]:owner.bossPhase===2?[0,.9]:[0];
+    const existing=(G.state.enemies||[]).filter(e=>!e.dead&&e.burrowPlug?.owner===owner&&e.burrowPlug.broken);
+    for(const direction of directions){
+      if(existing.length>=3)break;
+      for(const fallback of [0,Math.PI/2,-Math.PI/2,Math.PI]){
+        const x=h.x+Math.cos(a+direction+fallback)*48,y=h.y+Math.sin(a+direction+fallback)*48;
+        if(G.world.isSafeSpawn(x,y)&&!existing.some(e=>Math.hypot(e.x-x,e.y-y)<32)){existing.push(plug(x,y,owner,threats));break;}
+      }
     }
   };
   G.hitBurrowPlug=(e,opts)=>{
     const r=e.burrowPlug;
     if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||!G.abilities[opts.ability]||r.owner?.dead)return false;
     if(!r.owner){
-      e.dead=true;progress().practiceCleared=true;G.sfx.play('wardBreak');G.damageNumber(e.x,e.y-19,'POP!','#fff3c2');
-      G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#b4d397',radius:21,dur:.45});G.saveGame();return false;
+      if(!r.broken){
+        r.broken=true;r.practiceDig={x:e.x-24,y:e.y,boxW:10,boxH:8,to:{x:e.x+40,y:e.y}};
+        G.sfx.play('hit');
+      }
+      return false;
     }
     if(!r.broken){r.broken=true;G.sfx.play('hit');G.spawnFx({kind:'puff',x:e.x,y:e.y-4,color:'#d8b06a',dur:.3});}
     return false;
@@ -84,18 +98,19 @@
     return !root.dead&&r.map===G.state.mapId&&!G.state.knockout&&(!owner||!owner.dead&&G.state.enemies.includes(owner)&&!(owner.status?.stun?.dur>0)&&!(owner.bossStaggerT>0))&&r.passage;
   }
   function liveStomps(root){return root.burrowPlug.threats.filter(h=>G.state.bossHazards.includes(h)&&h.t<(h.delay||0)+h.warning+h.active);}
+  const usablePassage=root=>!root.burrowPlug.owner||liveStomps(root).length>0;
   function completePassage(transit){
     const root=transit.root,r=root.burrowPlug,path=r.passage,owner=r.owner,p=G.state.player;
     path.uses++;p.burrowArrival={root,end:transit.to};
     if(owner){
       owner.burrowTunnelUses=(owner.burrowTunnelUses||0)+1;const a=progress();a.counterLearned=true;a.bestTunnelUses=Math.max(a.bestTunnelUses||0,owner.burrowTunnelUses);
       G.events.emit('guardianCounter',{guardian:'moleMonarch',kind:'underpass'});
-    }else progress().practiceCleared=true;
+    }else{progress().practiceCleared=true;root.dead=true;}
     G.sfx.play('pickup');G.saveGame();
   }
   G.advanceBurrowPassage=dt=>{
     const p=G.state.player,t=p.burrowTransit;if(!t)return false;
-    if(!passageLive(t.root)||!liveStomps(t.root).length){p.burrowTransit=null;return false;}
+    if(!passageLive(t.root)||!usablePassage(t.root)){p.burrowTransit=null;return false;}
     const dx=t.to.x-p.x,dy=t.to.y-p.y,distance=Math.hypot(dx,dy),step=Math.min(distance,120*dt),x=p.x,y=p.y;
     if(distance>.01)G.world.moveBox(p,dx/distance*step,dy/distance*step);
     if(distance>.01&&Math.hypot(p.x-x,p.y-y)<step-.1){p.burrowTransit=null;return true;}
@@ -106,7 +121,7 @@
   G.enterBurrowPassage=(x,y)=>{
     const p=G.state.player,v=G.input.vec;if(p.dashing||p.burrowTransit||!v||Math.hypot(p.x-x,p.y-y)<.1)return;
     for(const root of G.state.enemies||[]){
-      const path=passageLive(root);if(!path||!liveStomps(root).length||path.uses>=1||p.burrowArrival?.root===root)continue;
+      const path=passageLive(root);if(!path||!usablePassage(root)||path.uses>=(path.maxUses||1)||p.burrowArrival?.root===root)continue;
       for(const [from,to] of [[path.from,path.to],[path.to,path.from]]){
         const dx=to.x-from.x,dy=to.y-from.y,distance=Math.hypot(dx,dy);
         if(Math.hypot(p.x-from.x,p.y-from.y)<=7&&(v.x*dx+v.y*dy)/distance>.5&&Math.hypot(x-from.x,y-from.y)>Math.hypot(p.x-from.x,p.y-from.y)){
@@ -115,10 +130,10 @@
       }
     }
   };
-  G.burrowShelters=(p,owner)=>{
+  G.burrowShelters=(p,owner,h)=>{
     const at=p.burrowTransit||p.burrowArrival,root=at?.root;
-    if(!root||root.burrowPlug.owner!==owner||!passageLive(root)||!liveStomps(root).length)return false;
-    return !!p.burrowTransit||Math.hypot(p.x-at.end.x,p.y-at.end.y)<=12;
+    if(!owner||!root||root.burrowPlug.owner!==owner||!passageLive(root)||!liveStomps(root).length)return false;
+    return !!p.burrowTransit||Math.hypot(p.x-at.end.x,p.y-at.end.y)<=12&&(!h?.burrowMouth||Math.hypot(at.end.x-h.x,at.end.y-h.y)>h.radius);
   };
   G.noteBurrowDefeat=e=>{
     if(!bram(e))return;const a=progress(),n=e.burrowCounters||0;
@@ -128,7 +143,7 @@
   G.beginBurrowRematch=()=>{
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
     const e=G.makeEnemy('moleMonarch',22*16+8,8*16+8);
-    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().rootRumble?'Two stomps this time! The second circle stays where I mark it. Pop the root plug to stop both.':'Welcome back! Pop a root plug when I stomp, or lead my burrow into an old one.'}};
+    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().rootRumble?'Take my shortcut, then watch which end I mark. You can take it back or walk clear.':'Welcome back! Loosen a root, lead me through it, then take the shortcut under my stomp.'}};
     e.guardPost=true;e.bramLocalRematch=true;e.bramRootRumble=progress().rootRumble&&progress().counterLearned;
     e.guardianPracticeExit={map:'moleTrial',x:3,y:11};G.state.enemies.push(e);return true;
   };
@@ -138,21 +153,35 @@
     if(!progress().practiceCleared)plug(practice.x,practice.y);
   });
   const update=G.updateOpening;
-  G.updateOpening=dt=>{update(dt);for(const e of G.state.enemies||[]){const r=e.burrowPlug;if(e.dead||!r?.owner)continue;
-    const interrupted=r.owner.status?.stun?.dur>0||r.owner.bossStaggerT>0;
-    if(r.dig&&(interrupted||r.owner.bossChargeT<=0))r.dig=null;
-    if(r.owner.dead||r.phase!==r.owner.bossPhase||r.map!==G.state.mapId||G.state.knockout||r.passage&&(!passageLive(e)||!liveStomps(e).length))e.dead=true;
-  }};
+  G.updateOpening=dt=>{
+    update(dt);
+    for(const e of G.state.enemies||[]){
+      const r=e.burrowPlug;if(e.dead||!r)continue;
+      if(!r.owner){
+        const dig=r.practiceDig;
+        if(dig&&!r.passage){
+          const before=dig.x;G.world.moveBox(dig,Math.min(80*dt,dig.to.x-dig.x),0);
+          if(dig.x>=dig.to.x-.1&&clearRoute(e,dig.to))r.passage={from:{x:e.x,y:e.y},to:{...dig.to},uses:0};
+          else if(dig.x===before)r.practiceDig=null;
+        }
+        continue;
+      }
+      const interrupted=r.owner.status?.stun?.dur>0||r.owner.bossStaggerT>0;
+      if(r.dig&&(interrupted||r.owner.bossChargeT<=0))r.dig=null;
+      if(r.owner.dead||r.phase!==r.owner.bossPhase||r.map!==G.state.mapId||G.state.knockout||r.passage&&(!passageLive(e)||!liveStomps(e).length))e.dead=true;
+    }
+    const p=G.state.player;if(p.burrowArrival&&(!passageLive(p.burrowArrival.root)||Math.hypot(p.x-p.burrowArrival.end.x,p.y-p.burrowArrival.end.y)>9))p.burrowArrival=null;
+  };
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>{
     const at=candidate();if(at)return at;
     if(!friendly()||G.ui.dialogueOpen||G.ui.menuOpen||G.state.knockout||G.state.bossCutscene||G.state.zoneTransition)return null;
     const p=G.state.player;if(Math.hypot(p.x-friend.x,p.y-friend.y)>18||G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&Math.hypot(s.x-p.x,s.y-p.y)<75))return null;
-    const a=progress();return {id:'bram-rematch',kind:'bram-rematch',...friend,label:a.counterLearned&&!a.invited?'Bram · Say hello':a.rootRumble?'Bram · Try root rumble':'Bram · Practice a duel',hint:a.counterLearned&&!a.invited?'Ask Bram about his two-stomp practice.':a.rootRumbleCleared?`Root rumble cleared. Most root pops: ${a.bestCounters}.`:'Choose a duel here, then walk east.'};
+    const a=progress();return {id:'bram-rematch',kind:'bram-rematch',...friend,label:a.counterLearned&&!a.invited?'Bram · Say hello':a.rootRumble?'Bram · Try root rumble':'Bram · Practice a duel',hint:a.counterLearned&&!a.invited?'Ask Bram about his two-stomp practice.':a.rootRumbleCleared?`Root rumble cleared. Most tunnel trips: ${a.bestTunnelUses||0}.`:'Choose a duel here, then walk east.'};
   };
   G.tryOpeningInteraction=()=>{
     const at=G.openingInteractionCandidate();if(at?.id!=='bram-rematch')return interact();
-    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('BRAM',"You popped my root plug! Want to try my two-stomp trick? Light the Root Rumble lantern by the fire. Keep your help lights if you like. I'll put the shortbread on.",{accent:'#d8b06a'});}else G.beginBurrowRematch();G.input.clearTaps();return true;
+    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('BRAM',"You took my shortcut! Want to try a return trip? Light the Root Rumble lantern by the fire. Keep your help lights if you like. I'll put the shortbread on.",{accent:'#d8b06a'});}else G.beginBurrowRematch();G.input.clearTaps();return true;
   };
   function drawPlug(c,x,y,broken){
     c.save();c.fillStyle='#6b5039';c.beginPath();c.ellipse(x,y,broken?20:15,broken?9:6,0,0,Math.PI*2);c.fill();
@@ -173,6 +202,7 @@
         const t=G.state.player.burrowTransit;if(t?.root===e){c.fillStyle='#fff3c2';c.beginPath();c.ellipse(G.state.player.x,G.state.player.y,7,3,0,0,Math.PI*2);c.fill();}c.restore();
       }});
       else list.push({y:e.y,fn:()=>drawPlug(c,e.x,e.y,e.burrowPlug.broken)});
+      const dig=e.burrowPlug.practiceDig;if(dig&&!path)list.push({y:dig.y,fn:()=>{c.save();c.fillStyle='#d8b06a';c.beginPath();c.ellipse(dig.x,dig.y-2,7,4,0,0,Math.PI*2);c.fill();c.fillStyle='#fff3c2';c.fillRect(dig.x-2,dig.y-6,4,2);c.restore();}});
     }
     if(G.state.mapId!=='moleTrial')return list;
     list.push({y:fire.y,fn:()=>G.drawOpeningProp(c,'camp',fire.x,fire.y,G.state.time)});

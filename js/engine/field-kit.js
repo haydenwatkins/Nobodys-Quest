@@ -172,7 +172,7 @@
     if(near.kind==='breakwaterChallenge')return {...near,id:'field-kit',label:`Returning Tide · ${G.breakwaterReturningLit()?'Put out':'Light'}`,hint:'Adds a tide across the first. Open a driftwood gate; the arriving water stops the pair.'};
     if(near.kind==='stageChallenge')return {...near,id:'field-kit',label:`Card Encore · ${G.stageEncoreLit()?'Put out':'Light'}`,hint:'The cards come twice. Splash a landed pie to open a path through both fans.'};
     if(near.kind==='duskChallenge')return {...near,id:'field-kit',label:`Second Waltz · ${G.duskSecondLit()?'Put out':'Light'}`,hint:'Adds a following waltz. Uncover a moon lamp to stop her dash before both.'};
-    if(near.kind==='burrowChallenge')return {...near,id:'field-kit',label:`Root Rumble · ${G.burrowRumbleLit()?'Put out':'Light'}`,hint:'Adds a second marked stomp. Break the root plug to stop both.'};
+    if(near.kind==='burrowChallenge')return {...near,id:'field-kit',label:`Root Rumble · ${G.burrowRumbleLit()?'Put out':'Light'}`,hint:'Marks a tunnel mouth for another stomp. Take the shortcut back or walk clear.'};
     return {...near,id:'field-kit',hint:lamp?(lamp.key==='easyMode'?'Optional help: hearts grow back, even in fights.':'Optional help: longer warnings; help after retries.'):null,label:lamp?`${lamp.icon} ${lamp.name} · ${G.comfortSetting(lamp.key)?'Put out':'Light'}`:'Camp bag · Pockets'};
   };
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
