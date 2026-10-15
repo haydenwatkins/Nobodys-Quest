@@ -26,16 +26,20 @@
     for(const e of G.state.enemies||[])if(e.wayglassReflector?.owner&&(!owner||e.wayglassReflector.owner===owner))e.dead=true;
     for(const shot of G.state.projectiles||[])if(shot.wayglassReturnOwner&&(!owner||shot.wayglassReturnOwner===owner))shot.dispelled=true;
   };
+  function placeReturnPanels(owner,h){
+    h.wayglassPanelsReady=true;
+    const a=Math.atan2(h.y-h.release.y,h.x-h.release.x),distance=owner.bossPhase>=3?60:54;
+    for(const lane of h.wayglassLanes){const angle=a+lane*Math.PI/180,x=h.release.x+Math.cos(angle)*distance,y=h.release.y-2+Math.sin(angle)*distance;if(!G.world.isSafeSpawn(x,y))continue;const panel=reflector(x,y,owner);panel.wayglassReflector.phrase=h;}
+  }
   G.prepareWayglassCounter=(owner,h)=>{
     if(!mira(owner))return;
-    G.cancelWayglassReflectors(owner);
-    const a=Math.atan2(h.y-owner.y,h.x-owner.x),lanes=owner.bossPhase>=3?[-28,0,28]:owner.bossPhase===2?[-22,22]:[0],distance=owner.bossPhase>=3?60:54;
-    for(const lane of lanes){const angle=a+lane*Math.PI/180,x=owner.x+Math.cos(angle)*distance,y=owner.y-2+Math.sin(angle)*distance;if(G.world.isSafeSpawn(x,y))reflector(x,y,owner);}
-    if(!owner.miraDoubleReturn)return;
-    // Wait for the helped warning and actual slowed flight, then a breather.
-    const scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
-    const delay=h.warning+(G.guardianWarningSeconds?.(0)??0)+164/(120*scale)+.4;
-    G.state.bossHazards.push({...h,t:0,delay,warning:.9,active:.15,fired:false,wayglassFollower:true});
+    G.cancelWayglassReflectors(owner);h.release={x:owner.x,y:owner.y};h.wayglassLanes=owner.bossPhase>=3?[-28,28]:owner.bossPhase===2?[-22,22]:[0];
+    if(owner.bossPhase>=3)h.spreads=[-28,0,28];placeReturnPanels(owner,h);
+    if(owner.bossPhase<3&&!owner.miraDoubleReturn)return;
+    const a=Math.atan2(h.y-owner.y,h.x-owner.x)+(owner.miraDoubleReturn&&owner.bossPhase>=3?Math.PI:Math.PI/2),scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
+    const delay=h.warning+164/(120*scale)+.4,warning=G.guardianWarningSeconds?.(.9)??.9;
+    const next={...h,x:owner.x+Math.cos(a)*82,y:owner.y+Math.sin(a)*82,t:0,delay,warning,active:.15,fired:false,spreads:owner.bossPhase>=3?[-13,13]:[...h.spreads],wayglassLanes:owner.bossPhase>=3?[0]:[...h.wayglassLanes],wayglassPanelsReady:false,wayglassPrimary:h,wayglassFollower:true};
+    G.state.bossHazards.push(next);owner.bossRecoverT=Math.max(owner.bossRecoverT||0,next.delay+next.warning+next.active+.85);
   };
   G.hitWayglassReflector=(e,opts)=>{
     const r=e.wayglassReflector;
@@ -56,7 +60,7 @@
     if(!wasReturning||shot.fromPlayer||shot.dispelled||!shot.boomerang||shot.shape!=='riftBlade'||shot.owner?.dead)return false;
     for(const e of G.state.enemies||[]){
       const r=e.wayglassReflector;
-      if(e.dead||!r?.armed||r.map!==G.state.mapId||shot.owner!==(r.owner||r.practiceSource)||
+      if(e.dead||!r?.armed||r.map!==G.state.mapId||shot.owner!==(r.owner||r.practiceSource)||(r.owner&&shot.wayglassPhrase!==r.phrase)||
         segmentDistance(x,y,shot.x,shot.y,e.x,e.y-4)>18+shot.size)continue;
       e.dead=true;shot.dispelled=true;G.sfx.play('wardBreak');
       G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:26,dur:.45});G.damageNumber(e.x,e.y-22,'DING!','#fff3c2');
@@ -67,8 +71,8 @@
       const dx=owner.x-shot.x,dy=owner.y-6-shot.y,d=Math.hypot(dx,dy)||1;
       G.combat.shoot({x:shot.x,y:shot.y+6,dir:{x:dx/d,y:dy/d}},{damage:1,type:'sharp',speed:140,range:d+30,size:5,color:'#ffdc91',shape:'riftBlade',trail:5});
       const reflected=G.state.projectiles.at(-1);reflected.wayglassReturnOwner=owner;
-      G.spawnFx({kind:'bolt',x:e.x,y:e.y-4,x2:owner.x,y2:owner.y-8,color:'#73eff7',dur:.3});
-      // Reflection buys time; Sharp retains its distinct ward purpose.
+      // Only the later physical contact can pay Sharp ward or health damage.
+
       progress().counterLearned=true;G.saveGame();G.events.emit('guardianCounter',{guardian:'riftbladeAdept',kind:'reflector'});return true;
     }
     return false;
@@ -91,8 +95,13 @@
     if(!progress().practiceCleared)reflector(post.x,post.y);
   });
   const update=G.updateOpening;
-  G.updateOpening=dt=>{update(dt);for(const e of G.state.enemies||[]){const r=e.wayglassReflector;if(e.dead||!r?.owner)continue;
-    if(r.owner.dead||r.map!==G.state.mapId||G.state.knockout||(!G.state.bossHazards.some(h=>h.owner===r.owner)&&!G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&s.owner===r.owner)))e.dead=true;
+  G.updateOpening=dt=>{update(dt);
+    for(const h of G.state.bossHazards||[]){if(!h.wayglassPrimary||h.owner.dead||h.mapId!==G.state.mapId||G.state.knockout||h.t>=h.delay)continue;
+      if(h.wayglassPrimary.fired&&G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&s.owner===h.owner&&s.wayglassPhrase===h.wayglassPrimary))h.delay=Math.max(h.delay,h.t+dt+.4);
+      if(!h.wayglassPanelsReady&&h.t+dt>=h.delay)placeReturnPanels(h.owner,h);
+    }
+    for(const e of G.state.enemies||[]){const r=e.wayglassReflector;if(e.dead||!r?.owner)continue;
+    if(r.owner.dead||r.map!==G.state.mapId||G.state.knockout||(r.phrase?.fired&&!G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&s.owner===r.owner&&s.wayglassPhrase===r.phrase))||(!G.state.bossHazards.some(h=>h.owner===r.owner)&&!G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&s.owner===r.owner)))e.dead=true;
   }};
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>{

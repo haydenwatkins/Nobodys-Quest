@@ -547,14 +547,15 @@ G.updateBossCutscene = function (dt) {
 };
 
 function fireRiftbladeVolley(e, p) {
-  const a = G.util.angleTo(e.x, e.y, p.x, p.y);
-  const spreads = e.bossPhase >= 3 ? [-28, -14, 0, 14, 28]
-    : e.bossPhase === 2 ? [-22, 0, 22] : [-13, 13];
+  const origin=p.release||e,a = G.util.angleTo(origin.x, origin.y, p.x, p.y);
+  const spreads = p.spreads||(e.bossPhase >= 3 ? [-28, -14, 0, 14, 28]
+    : e.bossPhase === 2 ? [-22, 0, 22] : [-13, 13]);
   for (const spread of spreads) {
     enemyShot(G.state, e, a + spread * Math.PI / 180, {
       damage: 1, speed: 120, range: 205, size: 5,
       boomerang: true, outboundRange: 82, shape: "riftBlade",
     });
+    const shot=G.state.projectiles.at(-1);shot.x=shot.startX=origin.x;shot.y=shot.startY=origin.y-6;if(p.kind==='riftVolley')shot.wayglassPhrase=p;
   }
   G.spawnFx({ kind: "ring", x: e.x, y: e.y - 6, color: e.def.boss.color, radius: 20, dur: 0.3 });
 }
@@ -717,7 +718,7 @@ G.updateBossHazards = function (dt) {
       continue;
     }
     if(h.kind === "riftVolley"){
-      if(!h.fired){h.fired=true;fireRiftbladeVolley(h.owner,{x:h.x,y:h.y});}
+      if(!h.fired){h.fired=true;fireRiftbladeVolley(h.owner,h);}
       continue;
     }
     if(h.kind === "stageCards"||h.kind === "stageEncore"){
@@ -829,7 +830,7 @@ G.drawBossHazards = function (ctx) {
     if(h.kind === "stageCards"||h.kind === "stageEncore"){
       ctx.globalAlpha=.9;ctx.strokeStyle="#fff3c2";ctx.lineWidth=1;for(const angle of h.shots){const x=h.x+Math.cos(angle)*42,y=h.y+Math.sin(angle)*42;ctx.save();ctx.translate(x,y);ctx.rotate(angle+Math.PI/2);ctx.fillStyle="#e2c9d6";ctx.fillRect(-3,-5,6,10);ctx.strokeRect(-3,-5,6,10);ctx.fillStyle="#bb8c55";ctx.fillRect(-1,-2,2,4);ctx.restore();}
     }else if(h.kind === "riftVolley"){
-      const e=h.owner,angle=Math.atan2(h.y-e.y,h.x-e.x);ctx.globalAlpha=.85;ctx.strokeStyle="#73eff7";ctx.setLineDash([4,3]);
+      const e=h.release||h.owner,angle=Math.atan2(h.y-e.y,h.x-e.x);ctx.globalAlpha=.85;ctx.strokeStyle="#73eff7";ctx.setLineDash([4,3]);
       for(const spread of h.spreads){const a=angle+spread*Math.PI/180,x=e.x+Math.cos(a)*82,y=e.y-6+Math.sin(a)*82;ctx.beginPath();ctx.moveTo(e.x,e.y-6);ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.stroke();}
       ctx.setLineDash([]);ctx.fillStyle="#263b4b";ctx.fillRect(e.x-28,e.y+16,56,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"THEY RETURN",e.x,e.y+24);
     }else if(h.kind === "foldCut"){
@@ -1105,8 +1106,7 @@ function resolveBossActionPattern(e, p, action) {
   if(G.runGuardianAction?.(e,p,action,spawnBossHazard))return;
   if(action === "blades"&&e.def.id === "riftbladeAdept"){
     const h=spawnBossHazard(e,"riftVolley",{x:p.x,y:p.y,spreads:e.bossPhase>=3?[-28,-14,0,14,28]:e.bossPhase===2?[-22,0,22]:[-13,13],warning:.8,active:.15,color:"#73eff7"});
-    G.prepareWayglassCounter?.(e,h);
-    e.bossRecoverT=.8+2*82/120+.85;return;
+    e.bossRecoverT=.8+2*82/120+.85;G.prepareWayglassCounter?.(e,h);return;
   }
   if(action === "foldCuts"){
     const angle=Math.atan2(p.y-e.y,p.x-e.x),turns=[0,Math.PI/3,-Math.PI/3];
