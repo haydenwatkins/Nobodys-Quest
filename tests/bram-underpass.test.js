@@ -72,3 +72,10 @@ test('later phases offer separated bait routes and the final standard stomp comm
  Object.assign(e,{bossRecoverT:0,bossSpecialT:100,bossTelegraphT:.01,bossPendingAction:'burrow',bossChargeX:Math.cos(angle),bossChargeY:Math.sin(angle)});for(let i=0;i<25&&!root.burrowPlug.passage;i++){r.step(.025);r.drain();}assert.ok(root.burrowPlug.passage,'actual angled native dig creates the chosen route');assert.ok(Math.abs(root.burrowPlug.passage.to.y-root.burrowPlug.passage.from.y)>15);
  const final=dug({phase:3}),path=final.root.burrowPlug.passage,fields=final.root.burrowPlug.threats;assert.equal(fields.length,2);assert.equal(fields[1].x,path.from.x);assert.equal(fields[1].y,path.from.y);assert.equal(fields[1].radius,18);assert.equal(path.maxUses,2);assert.ok(fields[1].delay>=fields[0].warning+fields[0].active+.54);
 });
+test('unrelated real knockback interrupts the short dive without turning supplied endpoint feet into a completed trip',()=>{
+ for(const endpoint of [false,true]){
+  const r=dug(),{G,e,root}=r,path=root.burrowPlug.passage;Object.assign(G.state.player,{x:path.from.x+10,y:path.from.y});G.input.vec={x:-1,y:0};for(let i=0;i<8&&!G.state.player.burrowTransit;i++){r.step(.025);r.drain();}assert.ok(G.state.player.burrowTransit);G.input.vec={x:0,y:0};
+  if(endpoint)Object.assign(G.state.player,{x:path.to.x,y:path.to.y});else{G.state.player.invuln=0;assert.ok(G.damagePlayer(1,G.state.player.x+20,G.state.player.y));}
+  const feet={x:G.state.player.x,y:G.state.player.y};r.step(.025);assert.equal(G.state.player.burrowTransit,null);assert.equal(G.state.guardianChallenges.bram.bestTunnelUses,0);assert.equal(G.state.player.x,feet.x);assert.equal(G.state.player.y,feet.y);assert.equal(e.burrowTunnelUses,undefined);
+ }
+});

@@ -85,8 +85,8 @@
   G.finishBurrowPassage=owner=>{
     for(const e of G.state.enemies||[]){
       const r=e.burrowPlug;if(e.dead||r?.owner!==owner||!r.dig)continue;
-      const from=r.dig.from,to={x:owner.x,y:owner.y};
-      if(Math.hypot(to.x-from.x,to.y-from.y)>=18&&clearRoute(from,to)){
+      const from=r.dig.from,trail=r.dig.trail,to=trail[trail.length-1];
+      if(Math.hypot(to.x-from.x,to.y-from.y)>=18&&trail.every((at,i)=>!i||clearRoute(trail[i-1],at))&&clearRoute(from,to)){
         r.passage={from,to,uses:0};e.x=from.x;e.y=from.y;
         G.spawnFx({kind:'ring',x:to.x,y:to.y-4,color:'#b4d397',radius:14,dur:.4});
       }
@@ -111,9 +111,11 @@
   G.advanceBurrowPassage=dt=>{
     const p=G.state.player,t=p.burrowTransit;if(!t)return false;
     if(!passageLive(t.root)||!usablePassage(t.root)){p.burrowTransit=null;return false;}
+    if(Math.hypot(p.x-t.last.x,p.y-t.last.y)>.1){p.burrowTransit=null;return true;}
     const dx=t.to.x-p.x,dy=t.to.y-p.y,distance=Math.hypot(dx,dy),step=Math.min(distance,120*dt),x=p.x,y=p.y;
     if(distance>.01)G.world.moveBox(p,dx/distance*step,dy/distance*step);
     if(distance>.01&&Math.hypot(p.x-x,p.y-y)<step-.1){p.burrowTransit=null;return true;}
+    t.last={x:p.x,y:p.y};
     G.spawnFx({kind:'puff',x:p.x,y:p.y-3,color:'#d8b06a',dur:.15});
     if(Math.hypot(p.x-t.to.x,p.y-t.to.y)<.1){completePassage(t);p.burrowTransit=null;}
     return true;
@@ -125,7 +127,7 @@
       for(const [from,to] of [[path.from,path.to],[path.to,path.from]]){
         const dx=to.x-from.x,dy=to.y-from.y,distance=Math.hypot(dx,dy);
         if(Math.hypot(p.x-from.x,p.y-from.y)<=7&&(v.x*dx+v.y*dy)/distance>.5&&Math.hypot(x-from.x,y-from.y)>Math.hypot(p.x-from.x,p.y-from.y)){
-          p.burrowTransit={root,to};return;
+          p.burrowTransit={root,to,last:{x:p.x,y:p.y}};return;
         }
       }
     }
