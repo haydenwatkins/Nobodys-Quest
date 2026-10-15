@@ -72,6 +72,7 @@
     if(!bram(owner)||owner.dead||owner.bossChargeT<=0||owner.bossAfterCharge!=='royalStomp')return false;
     for(const e of G.state.enemies||[]){
       const r=e.burrowPlug;if(e.dead||r?.owner!==owner||r.map!==G.state.mapId||!r.broken||r.passage)continue;
+      if(r.dig){const last=r.dig.trail[r.dig.trail.length-1];if(Math.hypot(last.x-x,last.y-y)>.1){r.dig=null;continue;}}
       const dx=owner.x-x,dy=owner.y-y,sq=dx*dx+dy*dy,t=sq?G.util.clamp(((e.x-x)*dx+(e.y-y)*dy)/sq,0,1):0;
       if(!r.dig){
         const from={x:x+dx*t,y:y+dy*t};
@@ -183,7 +184,7 @@
   };
   G.tryOpeningInteraction=()=>{
     const at=G.openingInteractionCandidate();if(at?.id!=='bram-rematch')return interact();
-    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('BRAM',"You took my shortcut! Want to try a return trip? Light the Root Rumble lantern by the fire. Keep your help lights if you like. I'll put the shortbread on.",{accent:'#d8b06a'});}else G.beginBurrowRematch();G.input.clearTaps();return true;
+    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('BRAM',(a.bestTunnelUses>0?"You took my shortcut!":"Welcome back!")+" Want to try a return trip? Light the Root Rumble lantern by the fire. Keep your help lights if you like. I'll put the shortbread on.",{accent:'#d8b06a'});}else G.beginBurrowRematch();G.input.clearTaps();return true;
   };
   function drawPlug(c,x,y,broken){
     c.save();c.fillStyle='#6b5039';c.beginPath();c.ellipse(x,y,broken?20:15,broken?9:6,0,0,Math.PI*2);c.fill();

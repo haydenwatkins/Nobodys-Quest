@@ -273,7 +273,7 @@ G.updatePlayer = function (dt) {
   }
 
   /* --- dashing overrides normal movement --- */
-  const walkFromX=p.x,walkFromY=p.y;
+  const walkFromX=p.x,walkFromY=p.y;let walkedNormally=false;
   if (G.advanceBurrowPassage?.(dt)) {
     p.moving=true;
   } else if (p.dashing) {
@@ -309,7 +309,7 @@ G.updatePlayer = function (dt) {
     }
   } else {
     /* --- normal movement --- */
-    const v = G.input.vec;
+    const v = G.input.vec;walkedNormally=true;
     p.moving = v.x !== 0 || v.y !== 0;
     if (p.moving) {
       p.dir = { x: v.x, y: v.y };
@@ -321,7 +321,7 @@ G.updatePlayer = function (dt) {
     }
   }
 
-  G.enterBurrowPassage?.(walkFromX,walkFromY);
+  if(walkedNormally)G.enterBurrowPassage?.(walkFromX,walkFromY);
 
   /* --- abilities: A / B / C --- */
   const loadout = G.getLoadout(G.state.formId);

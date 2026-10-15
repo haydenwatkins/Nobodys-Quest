@@ -85,3 +85,14 @@ test('a dive started during the actual impact can finish in its clear breather b
  for(let i=0;i<25&&!e.burrowTunnelUses;i++){r.step(.025);r.drain();}G.input.vec={x:0,y:0};assert.equal(e.burrowTunnelUses,1);assert.equal(G.state.player.x,path.to.x);assert.equal(G.state.player.damageTaken,0);assert.equal(G.burrowShelters(G.state.player,e),false,'clear breather grants no lingering shield');
  for(let i=0;i<40;i++){r.step(.025);r.drain();}assert.ok(root.dead);assert.equal(G.state.guardianChallenges.bram.bestTunnelUses,1);
 });
+test('a real Cartwheel ending at the practice mouth cannot count as normal walking entry',()=>{
+ const r=runtime(),{G}=r;r.load('moleTrial');r.drain();const root=G.state.enemies.find(e=>e.burrowPlug&&!e.burrowPlug.owner);Object.assign(G.state.player,{x:root.x-18,y:root.y,dir:{x:1,y:0},mana:0,manaRegenDelay:100});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<70&&!root.burrowPlug.passage;i++){r.step(.025);r.drain();}assert.ok(root.burrowPlug.passage);
+ G.questsDone.push(G.forms.nobody.quests[0].id);G.state.loadouts.nobody=['slap','cartwheel'];assert.equal(G.state.formId,'nobody');assert.equal(G.getLoadout('nobody')[1],'cartwheel');Object.assign(G.state.player,{x:47,y:216,mana:12});G.input.vec={x:1,y:0};r.taps.add('b');r.step(.025);assert.ok(G.state.player.dashing,'native Cartwheel begins');
+ for(let i=0;i<30&&G.state.player.dashing;i++)r.step(.025);assert.ok(!G.state.player.dashing);assert.ok(!G.state.player.burrowTransit,'dash-only movement cannot enter');assert.equal(G.state.guardianChallenges.bram.practiceCleared,false);
+ G.input.vec={x:0,y:0};Object.assign(G.state.player,{x:94,y:216});G.input.vec={x:1,y:0};for(let i=0;i<40&&!G.state.guardianChallenges.bram.practiceCleared;i++)r.step(.025);assert.ok(G.state.guardianChallenges.bram.practiceCleared,'subsequent actual walking remains useful');
+});
+test('a supplied owner jump cannot extend an unfinished real dig into an untraveled connection',()=>{
+ const r=setup(),{G,e,root}=r;Object.assign(G.state.player,{x:root.x-18,y:root.y,dir:{x:1,y:0}});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<12&&!root.burrowPlug.broken;i++){r.step(.025);r.drain();}G.state.player.y+=75;for(let i=0;i<60;i++){r.step(.025);r.drain();}
+ Object.assign(e,{bossRecoverT:0,bossSpecialT:100,bossTelegraphT:.01,bossPendingAction:'burrow',bossChargeX:-1,bossChargeY:0});for(let i=0;i<20&&!root.burrowPlug.dig;i++){r.step(.025);r.drain();}assert.ok(root.burrowPlug.dig);assert.ok(e.bossChargeT>0);e.x-=40;
+ for(let i=0;i<20;i++){r.step(.025);r.drain();}assert.ok(!root.burrowPlug.passage,'only actual continuous charge travel may finish the connection');assert.equal(G.state.guardianChallenges.bram.bestTunnelUses,0);assert.equal(G.state.guardianChallenges.bram.counterLearned,false);
+});
