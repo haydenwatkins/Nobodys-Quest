@@ -26,9 +26,14 @@
     G.sfx.play('wardBreak');G.spawnFx({kind:'ring',x:e.x,y:e.y-9,color:'#ffdc91',radius:25,dur:.45});
     G.damageNumber(e.x,e.y-e.h()-5,'CLANG!','#ffdc91');G.state.hitStop=Math.max(G.state.hitStop||0,.04);
   }
+  G.eclipseContactAngle=(e,opts)=>{
+    const shot=opts.guardianAttack;if(shot&&Number.isFinite(shot.vx)&&Number.isFinite(shot.vy)&&Math.hypot(shot.vx,shot.vy)>.001)return Math.atan2(-shot.vy,-shot.vx);
+    if(!Number.isFinite(opts.fromX)||!Number.isFinite(opts.fromY)||Math.hypot(opts.fromX-e.x,opts.fromY-e.y)<.001)return null;
+    return Math.atan2(opts.fromY-e.y,opts.fromX-e.x);
+  };
   G.hitEclipsePractice=(e,opts)=>{
-    if(e.dead||!e.eclipsePractice||!(opts.damage>0)||!Number.isFinite(opts.fromX)||!Number.isFinite(opts.fromY)||practiceTurns.has(e))return false;
-    practiceTurns.set(e,{front:Math.atan2(opts.fromY-e.y,opts.fromX-e.x),turn:0,map:G.state.mapId});ring(e);G.damageNumber(e.x,e.y-28,'Walk behind','#fff3c2');return false;
+    const angle=G.eclipseContactAngle(e,opts);if(e.dead||!e.eclipsePractice||!(opts.damage>0)||!G.abilities[opts.ability]||angle===null||practiceTurns.has(e))return false;
+    practiceTurns.set(e,{front:angle,turn:0,map:G.state.mapId});ring(e);G.damageNumber(e.x,e.y-28,'Walk behind','#fff3c2');return false;
   };
   const updatePlayer=G.updatePlayer;
   G.updatePlayer=dt=>{const p=G.state.player,x=p.x,y=p.y,map=G.state.mapId,dash=!!p.dashing;updatePlayer(dt);if(G.state.player!==p||G.state.mapId!==map||G.state.knockout||!(dash||p.dashing||Math.hypot(G.input.vec.x,G.input.vec.y)>.05)||Math.hypot(p.x-x,p.y-y)<.001)return;

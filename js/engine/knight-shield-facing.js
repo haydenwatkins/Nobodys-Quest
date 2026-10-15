@@ -7,16 +7,16 @@
  function guardHazard(at){return [at?.hazard,at?.next].find(h=>h&&G.state.bossHazards.includes(h)&&h.t>=(h.delay||0)&&h.t<(h.delay||0)+h.warning+h.active);}
  function recordRing(owner){owner.eclipseCounters=(owner.eclipseCounters||0)+1;G.sfx.play('wardBreak');G.damageNumber(owner.x,owner.y-owner.h()-5,'CLANG!','#ffdc91');G.state.guardianChallenges.knight.counterLearned=true;G.saveGame();G.events.emit('guardianCounter',{guardian:'eclipseKnight',kind:'shield'});}
  G.hitEclipseShield=(owner,opts)=>{
-  if(owner?.def?.id!=='eclipseKnight'||owner.dead||owner.status?.stun?.dur>0||owner.bossStaggerT>0||G.state.knockout||!G.state.enemies.includes(owner)||!(opts.damage>0)||!G.abilities[opts.ability]||!Number.isFinite(opts.fromX)||!Number.isFinite(opts.fromY))return false;
-  const prior=facing(owner),x=opts.fromX,y=opts.fromY,h=guardHazard(prior);
+  if(owner?.def?.id!=='eclipseKnight'||owner.dead||owner.status?.stun?.dur>0||owner.bossStaggerT>0||G.state.knockout||!G.state.enemies.includes(owner)||!(opts.damage>0)||!G.abilities[opts.ability])return false;
+  const angle=G.eclipseContactAngle(owner,opts);if(angle===null)return false;const prior=facing(owner),h=guardHazard(prior);
   if(h){
-   const dx=x-owner.x,dy=y-owner.y,d=Math.hypot(dx,dy),front=d<1||(dx*Math.cos(h.angle)+dy*Math.sin(h.angle))/d>=Math.cos(70*Math.PI/180);
-   if(front&&d>=1&&prior.next&&h===prior.hazard&&!prior.nextChosen&&prior.next.t<prior.next.delay){prior.next.angle=Math.atan2(dy,dx);prior.nextChosen=true;recordRing(owner);}
+   const front=Math.abs(G.util.angleDiff(angle,h.angle))<=70*Math.PI/180;
+   if(front&&prior.next&&h===prior.hazard&&!prior.nextChosen&&prior.next.t<prior.next.delay){prior.next.angle=angle;prior.nextChosen=true;recordRing(owner);}
    return front;
   }
   if(!G.eclipseShieldRaised(owner))return false;
   if(prior?.pattern===owner.bossPattern)return true;
-  facings.set(owner,{angle:Math.atan2(y-owner.y,x-owner.x),pattern:owner.bossPattern,map:G.state.mapId,phase:owner.bossPhase,queued:true});recordRing(owner);return true;
+  facings.set(owner,{angle,pattern:owner.bossPattern,map:G.state.mapId,phase:owner.bossPhase,queued:true});recordRing(owner);return true;
  };
  G.registerGuardianAuthor('eclipseKnight',{actions:{eclipseSweep(owner,p,spawn){
   const previous=facing(owner),angle=previous?.queued?previous.angle:Math.atan2(p.y-owner.y,p.x-owner.x);
