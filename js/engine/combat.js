@@ -827,7 +827,7 @@ G.combat = (() => {
         gone = true;
       } else if (!gone && pr.fromPlayer) {
         for (const e of s.enemies) {
-          if (e.dead) continue;
+          if (e.dead || (pr.wayglassPracticeTarget && e !== pr.wayglassPracticeTarget)) continue;
           if (pr.hitSet && pr.hitSet.has(e)) continue;
           if (pr.hitGroup && e.lastProjectileGroup === pr.hitGroup) continue;
           if (G.util.dist(pr.x, pr.y, e.x, e.y - 4) < pr.size + e.def.size / 2) {

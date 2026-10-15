@@ -54,7 +54,7 @@
       const source={x:e.x-52,y:e.y+2,def:{shotColor:'#73eff7'},dead:false};r.practiceSource=source;
       r.chime=G.makeGuardianProp(null,source.x,source.y,{name:'Practice chime',size:16,hit:(target,hit)=>{
         if(hit.guardianAttack?.wayglassPracticeTarget!==target)return;
-        target.dead=true;source.dead=true;progress().practiceCleared=true;G.sfx.play('unlock');G.spawnFx({kind:'ring',x:target.x,y:target.y-8,color:'#fff3c2',radius:18,dur:.4});G.saveGame();
+        hit.guardianAttack.dispelled=true;target.dead=true;source.dead=true;progress().practiceCleared=true;G.sfx.play('unlock');G.spawnFx({kind:'ring',x:target.x,y:target.y-8,color:'#fff3c2',radius:18,dur:.4});G.saveGame();
       },paint:(c,target)=>{c.strokeStyle='#96765c';c.lineWidth=2;c.beginPath();c.moveTo(target.x-9,target.y+1);c.lineTo(target.x-9,target.y-22);c.lineTo(target.x+9,target.y-22);c.lineTo(target.x+9,target.y+1);c.stroke();c.fillStyle='#ffdc91';c.beginPath();c.arc(target.x,target.y-13,6,Math.PI,0);c.lineTo(target.x+7,target.y-6);c.lineTo(target.x-7,target.y-6);c.closePath();c.fill();c.beginPath();c.arc(target.x,target.y-4,2,0,Math.PI*2);c.fill();}});
       enemyShot(G.state,source,0,{damage:0,speed:90,range:205,size:5,boomerang:true,outboundRange:82,shape:'riftBlade'});
       G.state.projectiles.at(-1).wayglassPractice=true;
