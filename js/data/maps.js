@@ -132,7 +132,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 118, y: 18 } },
     "B": { tile: "floor", enemy: "riftbladeAdept" },
-    "m": { tile: "floor", message: "Sharp attacks break Mira's ward. Strike a reflector to raise it, then step off the marked throws. A returning blade rings it and gives you an opening." },
+    "m": { tile: "floor", message: "Sharp attacks break Mira's ward. Raise a reflector, then dodge the outgoing blades. It sends one returning blade back at her!" },
     "H": { tile: "floor", chest: { heal: true, name: "a perfectly folded star-cookie" } },
     "R": { tile: "rock", on: "floor" },
     "F": { tile: "floor", rest: true, restText: "Mira's fire restores every heart and all mana." },

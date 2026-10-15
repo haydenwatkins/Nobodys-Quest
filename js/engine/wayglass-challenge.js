@@ -37,7 +37,7 @@
     if(owner.bossPhase>=3)h.spreads=[-28,0,28];placeReturnPanels(owner,h);
     if(owner.bossPhase<3&&!owner.miraDoubleReturn)return;
     const a=Math.atan2(h.y-owner.y,h.x-owner.x)+(owner.miraDoubleReturn&&owner.bossPhase>=3?Math.PI:Math.PI/2),scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
-    const delay=h.warning+164/(120*scale)+.4,warning=G.guardianWarningSeconds?.(.9)??.9;
+    const delay=(G.guardianWarningSeconds?.(h.warning)??h.warning)+164/(120*scale)+.4,warning=.9;
     const next={...h,x:owner.x+Math.cos(a)*82,y:owner.y+Math.sin(a)*82,t:0,delay,warning,active:.15,fired:false,spreads:owner.bossPhase>=3?[-13,13]:[...h.spreads],wayglassLanes:owner.bossPhase>=3?[0]:[...h.wayglassLanes],wayglassPanelsReady:false,wayglassPrimary:h,wayglassFollower:true};
     G.state.bossHazards.push(next);owner.bossRecoverT=Math.max(owner.bossRecoverT||0,next.delay+next.warning+next.active+.85);
   };
@@ -92,7 +92,7 @@
   G.beginWayglassRematch=()=>{
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
     const e=G.makeEnemy('riftbladeAdept',21*16+8,8*16+8);
-    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().doubleReturn?'Two throws this time! Raise a reflector to stop the pair when a blade comes back.':'Glad you came back! Raise the reflector, then step away from the blades.'}};
+    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().doubleReturn?'Two crossing throws! Raise a reflector for each return, and let the other blades pass.':'Raise a reflector to send one blade back at me. Keep moving around the others!'}};
     e.guardianPracticeExit={map:'riftbladeTrial',x:3,y:11};e.guardPost=true;e.miraLocalRematch=true;e.miraDoubleReturn=progress().doubleReturn&&progress().counterLearned;G.state.enemies.push(e);return true;
   };
   G.events.on('mapEnter',()=>{
@@ -119,7 +119,7 @@
   };
   G.tryOpeningInteraction=()=>{
     const at=G.openingInteractionCandidate();if(at?.id!=='mira-rematch')return interact();
-    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('MIRA',"That reflector rang beautifully! Want to try two throws? Light the twin-blade lantern by the fire. Your help lights can stay on. I'll set out more star-cookies.",{accent:'#73eff7'});}else G.beginWayglassRematch();G.input.clearTaps();return true;
+    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('MIRA',"That blade came right back to me! Want to try crossing throws? Light the twin-blade lantern by the fire. Keep your help lights if you like. I'll bring star-cookies.",{accent:'#73eff7'});}else G.beginWayglassRematch();G.input.clearTaps();return true;
   };
   function drawReflector(c,x,y,armed){
     c.save();if(armed){c.strokeStyle='#73eff7';c.globalAlpha=.6;c.lineWidth=1;c.beginPath();c.ellipse(x,y-4,18,18,0,0,Math.PI*2);c.stroke();c.globalAlpha=1;}c.fillStyle='#706253';c.fillRect(x-2,y-13,4,16);c.fillRect(x-9,y+1,18,3);
