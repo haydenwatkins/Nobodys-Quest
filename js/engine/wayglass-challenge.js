@@ -41,12 +41,21 @@
     const next={...h,x:owner.x+Math.cos(a)*82,y:owner.y+Math.sin(a)*82,t:0,delay,warning,active:.15,fired:false,spreads:owner.bossPhase>=3?[-13,13]:[...h.spreads],wayglassLanes:owner.bossPhase>=3?[0]:[...h.wayglassLanes],wayglassPanelsReady:false,wayglassPrimary:h,wayglassFollower:true};
     G.state.bossHazards.push(next);owner.bossRecoverT=Math.max(owner.bossRecoverT||0,next.delay+next.warning+next.active+.85);
   };
+  function reflectedBlade(shot,target){
+    const dx=target.x-shot.x,dy=target.y-6-shot.y,d=Math.hypot(dx,dy)||1;
+    G.combat.shoot({x:shot.x,y:shot.y+6,dir:{x:dx/d,y:dy/d}},{damage:1,type:'sharp',speed:140,range:d+30,size:5,color:'#ffdc91',shape:'riftBlade',trail:5});
+    return G.state.projectiles.at(-1);
+  }
   G.hitWayglassReflector=(e,opts)=>{
     const r=e.wayglassReflector;
     if(e.dead||!r||r.map!==G.state.mapId||r.armed||!(opts.damage>0)||!G.abilities[opts.ability]||r.owner?.dead)return false;
     r.armed=true;G.sfx.play('pickup');G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#73eff7',radius:16,dur:.3});
     if(!r.owner){
       const source={x:e.x-52,y:e.y+2,def:{shotColor:'#73eff7'},dead:false};r.practiceSource=source;
+      r.chime=G.makeGuardianProp(null,source.x,source.y,{name:'Practice chime',size:16,hit:(target,hit)=>{
+        if(hit.guardianAttack?.wayglassPracticeTarget!==target)return;
+        target.dead=true;source.dead=true;progress().practiceCleared=true;G.sfx.play('unlock');G.spawnFx({kind:'ring',x:target.x,y:target.y-8,color:'#fff3c2',radius:18,dur:.4});G.saveGame();
+      },paint:(c,target)=>{c.strokeStyle='#96765c';c.lineWidth=2;c.beginPath();c.moveTo(target.x-9,target.y+1);c.lineTo(target.x-9,target.y-22);c.lineTo(target.x+9,target.y-22);c.lineTo(target.x+9,target.y+1);c.stroke();c.fillStyle='#ffdc91';c.beginPath();c.arc(target.x,target.y-13,6,Math.PI,0);c.lineTo(target.x+7,target.y-6);c.lineTo(target.x-7,target.y-6);c.closePath();c.fill();c.beginPath();c.arc(target.x,target.y-4,2,0,Math.PI*2);c.fill();}});
       enemyShot(G.state,source,0,{damage:0,speed:90,range:205,size:5,boomerang:true,outboundRange:82,shape:'riftBlade'});
       G.state.projectiles.at(-1).wayglassPractice=true;
     }
@@ -64,13 +73,11 @@
         segmentDistance(x,y,shot.x,shot.y,e.x,e.y-4)>18+shot.size)continue;
       e.dead=true;shot.dispelled=true;G.sfx.play('wardBreak');
       G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:26,dur:.45});G.damageNumber(e.x,e.y-22,'DING!','#fff3c2');
-      if(!r.owner){progress().practiceCleared=true;G.saveGame();return true;}
+      if(!r.owner){reflectedBlade(shot,r.chime).wayglassPracticeTarget=r.chime;return true;}
       const owner=r.owner;owner.wayglassCounters=(owner.wayglassCounters||0)+1;
       // A world blade has no worn-form ability attribution. Only its later
       // physical flight can hit the original Sharp ward or health.
-      const dx=owner.x-shot.x,dy=owner.y-6-shot.y,d=Math.hypot(dx,dy)||1;
-      G.combat.shoot({x:shot.x,y:shot.y+6,dir:{x:dx/d,y:dy/d}},{damage:1,type:'sharp',speed:140,range:d+30,size:5,color:'#ffdc91',shape:'riftBlade',trail:5});
-      const reflected=G.state.projectiles.at(-1);reflected.wayglassReturnOwner=owner;
+      reflectedBlade(shot,owner).wayglassReturnOwner=owner;
       // Only the later physical contact can pay Sharp ward or health damage.
 
       progress().counterLearned=true;G.saveGame();G.events.emit('guardianCounter',{guardian:'riftbladeAdept',kind:'reflector'});return true;
