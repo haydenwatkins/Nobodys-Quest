@@ -79,3 +79,9 @@ test('unrelated real knockback interrupts the short dive without turning supplie
   const feet={x:G.state.player.x,y:G.state.player.y};r.step(.025);assert.equal(G.state.player.burrowTransit,null);assert.equal(G.state.guardianChallenges.bram.bestTunnelUses,0);assert.equal(G.state.player.x,feet.x);assert.equal(G.state.player.y,feet.y);assert.equal(e.burrowTunnelUses,undefined);
  }
 });
+test('a dive started during the actual impact can finish in its clear breather before the connection retires',()=>{
+ const r=dug(),{G,e,root}=r,path=root.burrowPlug.passage,h=root.burrowPlug.threats[0];Object.assign(G.state.player,G.world.safeArrival(e.x,e.y+75));
+ while(h.t<h.warning+.12){r.step(.025);r.drain();}assert.ok(G.state.bossHazards.includes(h));Object.assign(G.state.player,{x:path.from.x+8,y:path.from.y,invuln:0});G.input.vec={x:-1,y:0};for(let i=0;i<5&&!G.state.player.burrowTransit;i++){r.step(.025);r.drain();}assert.ok(G.state.player.burrowTransit);
+ for(let i=0;i<25&&!e.burrowTunnelUses;i++){r.step(.025);r.drain();}G.input.vec={x:0,y:0};assert.equal(e.burrowTunnelUses,1);assert.equal(G.state.player.x,path.to.x);assert.equal(G.state.player.damageTaken,0);assert.equal(G.burrowShelters(G.state.player,e),false,'clear breather grants no lingering shield');
+ for(let i=0;i<40;i++){r.step(.025);r.drain();}assert.ok(root.dead);assert.equal(G.state.guardianChallenges.bram.bestTunnelUses,1);
+});

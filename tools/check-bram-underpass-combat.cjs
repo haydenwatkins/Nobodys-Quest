@@ -15,6 +15,7 @@ for(const {form,rumble,heart,guardian,first=false,walking=false} of (process.arg
   const dt=.025,roots=G.state.enemies.filter(m=>!m.dead&&m.burrowPlug?.owner===e),root=walking||byPhase[e.bossPhase]&&(!rumble||returnByPhase[e.bossPhase])?null:roots.find(m=>m.burrowPlug.passage)||roots.find(m=>m.burrowPlug.broken)||roots[0],fields=G.state.bossHazards.filter(h=>h.owner===e),charge=(e.bossPendingAction==='burrow'&&e.bossTelegraphT>0)||e.bossChargeT>0;
   r.taps.clear();let target={x:e.x+(e.x>224?-80:80),y:e.y},aim=e,attack=null,tunneling=false;
   const answered=walking||byPhase[e.bossPhase]&&(!rumble||returnByPhase[e.bossPhase]);
+  if(answered&&fields.length){const distance=Math.max(...fields.map(h=>h.radius))+10;target={x:e.x+(p.x<e.x?-distance:distance),y:e.y};}
   if(root&&root.burrowPlug.passage){
     const path=root.burrowPlug.passage,arrival=p.burrowArrival?.root===root,from=path.from,to=path.to,dx=to.x-from.x,dy=to.y-from.y,d=Math.hypot(dx,dy),uses=path.uses;
     if(uses===0){target={x:from.x-dx/d*12,y:from.y-dy/d*12};if(Math.hypot(p.x-target.x,p.y-target.y)<3)approached.add(path);if(approached.has(path))target=to;tunneling=true;}
@@ -27,7 +28,7 @@ for(const {form,rumble,heart,guardian,first=false,walking=false} of (process.arg
     if(!root.burrowPlug.broken&&Math.hypot(p.x-root.x,p.y-root.y)<(form==='colossus'?30:25))attack='a';
   }
   if(charge&&!p.burrowTransit){const nx=-e.bossChargeY,ny=e.bossChargeX,side=(p.x-e.x)*nx+(p.y-e.y)*ny>=0?1:-1;target={x:(root?.x||e.x)+nx*side*32,y:(root?.y||e.y)+ny*side*32};}
-  else if(!root&&answered&&!fields.length&&e.bossRecoverT>.45){const distance=e.ward.hp>0?(form==='colossus'?28:20):65;target={x:e.x+(p.x<e.x?-distance:distance),y:e.y};if(Math.hypot(p.x-e.x,p.y-e.y)<(e.ward.hp>0?(form==='colossus'?35:26):100))attack=e.ward.hp>0?'a':'b';}
+  else if(!root&&answered&&!fields.length){const distance=e.ward.hp>0?(form==='colossus'?28:20):65;target={x:e.x+(p.x<e.x?-distance:distance),y:e.y};if(Math.hypot(p.x-e.x,p.y-e.y)<(e.ward.hp>0?(form==='colossus'?35:26):100))attack=e.ward.hp>0?'a':'b';}
   if(process.argv.includes('--trace')&&i%200===0&&i<6000)console.error(JSON.stringify({seconds,stage:'pilot',byPhase,returnByPhase,e:{x:e.x,y:e.y,pattern:e.bossPattern,pending:e.bossPendingAction,recover:e.bossRecoverT,special:e.bossSpecialT},p:{x:p.x,y:p.y},roots:roots.map(z=>({x:z.x,y:z.y,loose:z.burrowPlug.broken,path:!!z.burrowPlug.passage,dig:!!z.burrowPlug.dig})),target}));
   if(!G.world.isSafeSpawn(target.x,target.y))target=G.world.safeArrival(target.x,target.y);
   const dx=aim.x-p.x,dy=aim.y-p.y,d=Math.hypot(dx,dy)||1;G.input.aim={x:dx/d,y:dy/d};if(attack)r.taps.add(attack);

@@ -36,7 +36,7 @@
           const follow={...h,x:end.x,y:end.y,radius:18,t:0,delay:(last.delay||0)+(G.guardianWarningSeconds?.(last.warning)??last.warning)+last.active+.55,warning:.9,hit:false,burrowFollower:true,burrowMouth:true};
           G.state.bossHazards.push(follow);threats.push(follow);last=follow;
         }
-        path.maxUses=1+ends.length;r.threats=threats;
+        path.maxUses=1+ends.length;r.threats=threats;path.expires=G.state.time+Math.max(...threats.map(h=>(h.delay||0)+(G.guardianWarningSeconds?.(h.warning)??h.warning)+h.active))+.65;
       }
       return;
     }
@@ -98,7 +98,7 @@
     return !root.dead&&r.map===G.state.mapId&&!G.state.knockout&&(!owner||!owner.dead&&G.state.enemies.includes(owner)&&!(owner.status?.stun?.dur>0)&&!(owner.bossStaggerT>0))&&r.passage;
   }
   function liveStomps(root){return root.burrowPlug.threats.filter(h=>G.state.bossHazards.includes(h)&&h.t<(h.delay||0)+h.warning+h.active);}
-  const usablePassage=root=>!root.burrowPlug.owner||liveStomps(root).length>0;
+  const usablePassage=root=>!root.burrowPlug.owner||G.state.time<root.burrowPlug.passage.expires;
   function completePassage(transit){
     const root=transit.root,r=root.burrowPlug,path=r.passage,owner=r.owner,p=G.state.player;
     path.uses++;p.burrowArrival={root,end:transit.to};
@@ -170,7 +170,7 @@
       }
       const interrupted=r.owner.status?.stun?.dur>0||r.owner.bossStaggerT>0;
       if(r.dig&&(interrupted||r.owner.bossChargeT<=0))r.dig=null;
-      if(r.owner.dead||r.phase!==r.owner.bossPhase||r.map!==G.state.mapId||G.state.knockout||r.passage&&(!passageLive(e)||!liveStomps(e).length))e.dead=true;
+      if(r.owner.dead||r.phase!==r.owner.bossPhase||r.map!==G.state.mapId||G.state.knockout||r.passage&&(!passageLive(e)||!usablePassage(e)))e.dead=true;
     }
     const p=G.state.player;if(p.burrowArrival&&(!passageLive(p.burrowArrival.root)||Math.hypot(p.x-p.burrowArrival.end.x,p.y-p.burrowArrival.end.y)>9))p.burrowArrival=null;
   };
