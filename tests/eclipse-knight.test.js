@@ -15,7 +15,7 @@ test('leaving the crescent radius or dashing avoids its hit; interruptions cance
   G.updateBossHazards(.86);assert.equal(G.state.player.damageTaken,damage);if(answer==='stagger')assert.equal(G.state.bossHazards.length,0);
  }
 });
-test('Knight commits to the marked sweep and leaves a recovery opening',()=>{
- const {G,e,h}=setup(3),x=e.x,y=e.y;G.state.player.invuln=100;assert.ok(e.bossRecoverT>=h.warning+h.active+.89);
- for(let t=0;t<1.3;t+=.02){G.updateEnemies(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
+test('Knight holds both marked stances and leaves a recovery after the final cut',()=>{
+ const {G,e,h}=setup(3),x=e.x,y=e.y,fields=[...G.state.bossHazards],last=fields.at(-1);G.state.player.invuln=100;assert.equal(fields.length,2);assert.ok(last.delay>=h.warning+h.active+.5);const end=last.delay+last.warning+last.active;assert.ok(e.bossRecoverT>=end+.89);
+ for(let t=0;t<end+.02;t+=.02){G.updateEnemies(.02);}assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);assert.equal(G.state.projectiles.length,0);
 });

@@ -498,7 +498,7 @@ registerEnemy({
     introLines: [
       "Stop! If I let everyone through, who will look after the last watchfire? I can't let it go out.",
       "Ser Pending says I'm frightening the travelers. I'm trying to keep them safe! Perhaps I've been guarding this court too long.",
-      "My shield rings when it's raised. Strike it before I charge and you'll knock me off balance! Dark magic breaks my ward. Step behind my marked crescent.",
+      "Ring my raised shield to choose where I swing next! My charge keeps going. Step behind my shield to approach; dark magic breaks my ward.",
     ],
     phaseLine: "You can handle yourself. But I'm still worried about that fire!",
     phaseThreeLine: "All right. One last swing, and then I'll listen.",

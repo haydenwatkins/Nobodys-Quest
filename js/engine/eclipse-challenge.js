@@ -3,7 +3,8 @@
 "use strict";
 (() => {
   const trophy='trophy-eclipse-sigil',point=(x,y)=>({x:x*16+8,y:y*16+8});
-  const fire=point(3,11),lamp=point(4,12),friend=point(5,9),post=point(6,14);
+  const fire=point(3,11),lamp=point(4,12),friend=point(5,9),post=point(7,14);
+  const practiceTurns=new WeakMap();
   const knight=e=>e?.def?.id==='eclipseKnight';
   const progress=()=>{
     const all=G.state.guardianChallenges||(G.state.guardianChallenges=G.makeGuardianChallenges());
@@ -26,8 +27,12 @@
     G.damageNumber(e.x,e.y-e.h()-5,'CLANG!','#ffdc91');G.state.hitStop=Math.max(G.state.hitStop||0,.04);
   }
   G.hitEclipsePractice=(e,opts)=>{
-    if(e.dead||!e.eclipsePractice||!(opts.damage>0))return false;
-    e.dead=true;ring(e);progress().practiceCleared=true;G.saveGame();return false;
+    if(e.dead||!e.eclipsePractice||!(opts.damage>0)||!Number.isFinite(opts.fromX)||!Number.isFinite(opts.fromY)||practiceTurns.has(e))return false;
+    practiceTurns.set(e,{front:Math.atan2(opts.fromY-e.y,opts.fromX-e.x),turn:0,map:G.state.mapId});ring(e);G.damageNumber(e.x,e.y-28,'Walk behind','#fff3c2');return false;
+  };
+  const updatePlayer=G.updatePlayer;
+  G.updatePlayer=dt=>{const p=G.state.player,x=p.x,y=p.y,map=G.state.mapId,dash=!!p.dashing;updatePlayer(dt);if(G.state.player!==p||G.state.mapId!==map||G.state.knockout||!(dash||p.dashing||Math.hypot(G.input.vec.x,G.input.vec.y)>.05)||Math.hypot(p.x-x,p.y-y)<.001)return;
+    for(const e of G.state.enemies||[]){const at=practiceTurns.get(e);if(!at||e.dead||at.map!==map)continue;const before=Math.hypot(x-e.x,y-e.y),after=Math.hypot(p.x-e.x,p.y-e.y),angle=Math.atan2(p.y-e.y,p.x-e.x);if(before>=12&&after>=12)at.turn+=G.util.angleDiff(angle,Math.atan2(y-e.y,x-e.x));if(Math.abs(at.turn)>=Math.PI*.55&&Math.abs(G.util.angleDiff(angle,at.front))>=Math.PI*.55&&after<=32){e.dead=true;progress().practiceCleared=true;G.sfx.play('unlock');G.saveGame();}}
   };
   G.noteEclipseDefeat=e=>{
     if(!knight(e))return;
@@ -38,7 +43,7 @@
   G.beginEclipseRematch=()=>{
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
     const e=G.makeEnemy('eclipseKnight',23*16+8,9*16+8);
-    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().crescent?'Ready? I’ll follow my charge with a crescent. Ring my raised shield to stop the pair!':'A practice duel? Ring my raised shield! Dark magic still breaks my ward.'}};
+    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().crescent?'Ready? I’ll follow my charge with a crescent. Ring my shield to choose the next swing, then step behind it!':'A practice duel? Ring my raised shield to choose my next swing. Step behind it; dark magic breaks my ward.'}};
     e.guardPost=true;e.knightLocalRematch=true;e.knightCrescent=progress().crescent&&progress().counterLearned;
     G.state.enemies.push(e);return true;
   };
@@ -63,7 +68,7 @@
   G.tryOpeningInteraction=()=>{
     const at=G.openingInteractionCandidate();if(at?.id!=='knight-rematch')return interact();
     const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();
-      G.ui.dialogue('ECLIPSE KNIGHT','You rang my shield! Want to try my following crescent? Light the crescent lantern by our fire. Keep your help lights if you like. I’ll have the kettle ready.',{accent:'#b58ee6'});
+      G.ui.dialogue('ECLIPSE KNIGHT','You rang my shield! Want to try my following crescent? It links my charge to a guarded swing. Light the crescent lantern by our fire. Keep your help lights if you like. I’ll have the kettle ready.',{accent:'#b58ee6'});
     }else G.beginEclipseRematch();G.input.clearTaps();return true;
   };
   function shield(c,x,y,raised){
@@ -76,7 +81,7 @@
   const draw=G.openingDrawables;
   G.openingDrawables=c=>{const list=draw(c);
     for(const e of G.state.enemies||[]){
-      if(!e.dead&&e.eclipsePractice)list.push({y:e.y,fn:()=>{c.fillStyle='#96765c';c.fillRect(e.x-2,e.y-20,4,23);shield(c,e.x,e.y-2,true);}});
+      if(!e.dead&&e.eclipsePractice)list.push({y:e.y,fn:()=>{c.fillStyle='#96765c';c.fillRect(e.x-2,e.y-20,4,23);const at=practiceTurns.get(e);shield(c,e.x,e.y-2,true);if(at){c.save();c.strokeStyle='#ffdc91';c.lineWidth=2;c.beginPath();c.arc(e.x,e.y-7,17,at.front-1.2,at.front+1.2);c.stroke();c.fillStyle='#fff3c2';const x=e.x-Math.cos(at.front)*21,y=e.y-Math.sin(at.front)*21;c.beginPath();c.ellipse(x-2,y-2,2,3,.3,0,Math.PI*2);c.ellipse(x+3,y+2,2,3,.3,0,Math.PI*2);c.fill();c.restore();}}});
       if(G.eclipseShieldRaised(e))list.push({y:e.y+1,fn:()=>shield(c,e.x+e.bossChargeX*7,e.y+e.bossChargeY*3,true)});
     }
     if(G.state.mapId!=='emberRidge')return list;

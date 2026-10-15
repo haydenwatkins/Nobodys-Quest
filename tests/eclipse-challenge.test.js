@@ -15,6 +15,7 @@ test('western camp, all help switches and spare shield are quiet with every orig
 test('zero-mana native Slap rings safe practice, saves the light, and supplies no false credit',()=>{
  const r=runtime(),{G}=r;r.load('emberRidge');r.drain();const e=G.state.enemies.find(e=>e.eclipsePractice);let credit=0;for(const event of ['hit','kill','guardianCounter'])G.events.on(event,()=>credit++);
  Object.assign(G.state.player,{x:e.x-18,y:e.y,dir:{x:1,y:0},mana:0,manaRegenDelay:100});assert.equal(G.openingInteractionCandidate(),null);r.taps.add('a');for(let i=0;i<15;i++){r.step(.025);r.drain();}
+ assert.equal(e.dead,false);assert.equal(G.state.guardianChallenges.knight.practiceCleared,false);const p=G.state.player;for(const angle of [Math.PI*2/3,Math.PI/3]){const target={x:e.x+Math.cos(angle)*20,y:e.y+Math.sin(angle)*20};for(let i=0;i<90&&!e.dead;i++){const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy);if(d<2)break;G.input.vec={x:dx/d,y:dy/d};r.step(.025);r.drain();}}G.input.vec={x:0,y:0};
  assert.ok(e.dead);assert.equal(credit,0);assert.equal(G.state.player.mana,0);assert.ok(G.loadSaveData().guardianChallenges.knight.practiceCleared);assert.equal(G.state.guardianChallenges.knight.counterLearned,false);
  r.load('emberRidge');assert.equal(G.state.enemies.some(e=>e.eclipsePractice),false);assert.equal(G.eclipseChallengeStation(),null);
 });
@@ -22,13 +23,13 @@ test('free native basics ring raised shields at zero mana in every phase with sl
  for(const form of ['nobody','wizard','colossus'])for(const phase of [1,2,3]){
   const r=setup({form,phase}),{G,e}=r;assert.equal(e.bossPendingAction,'charge');assert.ok(e.bossTelegraphT>=1.1);const hp=e.hp,ward=e.ward.hp;let hits=0;G.events.on('hit',()=>hits++);
   r.taps.add('a');for(let i=0;i<25;i++){r.step(.025);r.drain();}
-  assert.equal(e.eclipseCounters,1,form);assert.equal(e.hp,hp);assert.equal(e.ward.hp,ward);assert.equal(G.state.player.mana,0);assert.equal(hits,0);assert.equal(G.state.player.damageTaken,0);assert.ok(e.bossStaggerT>.9);assert.ok(G.loadSaveData().guardianChallenges.knight.counterLearned);
+  assert.equal(e.eclipseCounters,1,form);assert.equal(e.hp,hp);assert.equal(e.ward.hp,ward);assert.equal(G.state.player.mana,0);assert.equal(hits,0);assert.equal(G.state.player.damageTaken,0);assert.equal(e.bossStaggerT||0,0);assert.equal(e.bossPendingAction,'charge');assert.ok(e.bossTelegraphT>.3);assert.ok(G.loadSaveData().guardianChallenges.knight.counterLearned);
  }
 });
 test('shield only answers a real art during a charge commitment; Dark retains its ordinary ward use',()=>{
  const {G,e}=setup();assert.equal(G.hitEclipseShield(e,{damage:0,ability:'slap'}),false);assert.equal(G.hitEclipseShield(e,{damage:1,ability:null}),false);e.bossPendingAction='eclipseSweep';assert.equal(G.hitEclipseShield(e,{damage:1,ability:'slap'}),false);
  const ward=e.ward.hp;G.combat.damageEnemy(e,{damage:1,type:'blunt',ability:'slap'});assert.equal(e.ward.hp,ward);G.combat.damageEnemy(e,{damage:1,type:'dark',ability:'curse'});assert.equal(e.ward.hp,ward-1);assert.equal(e.eclipseCounters,undefined);
- e.bossPendingAction=null;e.bossTelegraphT=0;e.bossChargeT=.2;assert.ok(G.hitEclipseShield(e,{damage:1,ability:'slap'}));assert.equal(e.bossChargeT,0);assert.equal(e.bossContactActive,false);
+ e.bossPendingAction=null;e.bossTelegraphT=0;e.bossChargeT=.2;assert.ok(G.hitEclipseShield(e,{damage:1,ability:'slap',fromX:G.state.player.x,fromY:G.state.player.y}));assert.equal(e.bossChargeT,.2);assert.equal(e.bossContactActive,false);
 });
 test('chosen crescent follows an unanswered charge; ordinary charges and borrowed-run settings stay unchanged',()=>{
  for(const crescent of [false,true])for(const help of [false,true]){
@@ -36,10 +37,10 @@ test('chosen crescent follows an unanswered charge; ordinary charges and borrowe
   const h=G.state.bossHazards.find(h=>h.owner===e);assert.equal(!!h,crescent);if(h){assert.equal(h.kind,'eclipseSweep');assert.equal(h.warning,help?1.15:.85);assert.ok(e.bossRecoverT>=h.warning+h.active+.64);assert.equal(G.state.player.damageTaken,0);}
  }
 });
-test('ringing the shield clears its follower and only its hostile shots; phases and travel retire the commitment',()=>{
+test('ringing chooses a front without clearing released shots; real phase, stagger and travel retirement remain',()=>{
  for(const action of ['counter','phase','cancel','travel']){
   const r=setup({crescent:true}),{G,e}=r;const hostile={owner:e,fromPlayer:false},friendly={owner:e,fromPlayer:true},other={owner:{},fromPlayer:false};G.state.projectiles.push(hostile,friendly,other);
-  if(action==='counter'){G.combat.damageEnemy(e,{damage:1,ability:'slap',type:'blunt'});assert.ok(hostile.dispelled);assert.ok(!friendly.dispelled);assert.ok(!other.dispelled);assert.equal(e.bossAfterCharge,null);}
+  if(action==='counter'){G.combat.damageEnemy(e,{damage:1,ability:'slap',type:'blunt',fromX:G.state.player.x,fromY:G.state.player.y});assert.ok(!hostile.dispelled);assert.equal(e.bossPendingAction,'charge');assert.ok(!friendly.dispelled);assert.ok(!other.dispelled);assert.equal(e.bossAfterCharge,null);}
   if(action==='phase'){e.hp=e.def.hp*.6;G.updateEnemies(.01);r.drain();assert.equal(e.bossPendingAction,null);assert.equal(e.bossTelegraphT,0);}
   if(action==='cancel'){e.ward.hp=0;e.bossPendingAction='eclipseSweep';e.bossAfterCharge='eclipseSweep';G.combat.meleeArc(G.state.player,{range:32,arc:Math.PI*2,damage:1,type:'dark',ability:'curse',stagger:20});assert.equal(e.bossAfterCharge,null);assert.equal(e.bossPendingAction,null);}
   if(action==='travel'){r.load('overworld');assert.ok(!G.state.enemies.includes(e));}assert.equal(G.state.guardianChallenges.knight.crescentCleared,false);
@@ -70,7 +71,7 @@ test('engaged failures retry at the camp with choices intact; ordinary mishaps a
 test('every earned form has a native zero-mana basic answer to the shield',()=>{
  const r=runtime(),{G}=r;r.load('emberRidge');r.drain();G.state.claimedForms.push(...Object.keys(G.forms));G.input.takeAim=()=>({x:1,y:0,dragged:true});
  for(const form of Object.keys(G.forms)){
-  G.setForm(form);const e=G.makeEnemy('eclipseKnight',376,152);Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPendingAction:'charge',bossTelegraphT:1.1,bossSpecialT:3});G.state.enemies=[e];G.state.bossCutscene=null;G.state.bossHazards=[];G.state.projectiles=[];
+  if(form==='god'){G.state.worldwake.marks=['sky','stone','thread','echo','light','heart'];G.state.items.push('god-spark');G.questsDone.push(...G.formOrder.filter(id=>id!=='god').slice(0,8).flatMap((id,i)=>G.forms[id].quests.slice(0,i<3?4:2).map(q=>q.id)));}G.setForm(form);assert.equal(G.state.formId,form);const e=G.makeEnemy('eclipseKnight',376,152);Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPendingAction:'charge',bossTelegraphT:1.1,bossSpecialT:3});G.state.enemies=[e];G.state.bossCutscene=null;G.state.bossHazards=[];G.state.projectiles=[];
   Object.assign(G.state.player,{x:356,y:152,dir:{x:1,y:0},mana:0,manaRegenDelay:100,damageTaken:0,invuln:0,dashing:null});G.state.player.cooldowns={};r.taps.add('a');
   for(let i=0;i<32&&!e.eclipseCounters;i++){r.step(.025);r.drain();}
   assert.equal(e.eclipseCounters,1,form);assert.equal(G.state.player.mana,0,form);assert.equal(e.hp,42,form);assert.equal(e.ward.hp,6,form);assert.equal(G.state.player.damageTaken,0,form);

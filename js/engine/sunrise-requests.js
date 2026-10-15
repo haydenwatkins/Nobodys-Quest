@@ -34,7 +34,7 @@
       ready:()=>G.state.items.includes("trophy-eclipse-sigil"),
       ask:"I'm worried about the night watch. The Eclipse Knight won't let anyone past his court. He thinks the last light will go out if he leaves. Could you help me talk him into letting people through?",
       tips:["He won't listen while that Dark ward is up. Wizard's Curse and Shadow Bolt can break it. The Ash watchfire is a good place to try your magic first, if you'd like.",
-        "There's a spare shield by our fire. Give it a tap! His shield rings the same way when he raises it to charge. Strike it, or step aside. Bring his Sigil back so I know you've made it safely."],
+        "Ring the spare shield and walk behind it! Ring his raised shield to turn his next swing. Step aside from the charge, then approach behind his shield. Bring his Sigil back to me."],
       thanks:"You're back! I was watching the court and worrying. The Knight has lowered his sword. Thank you. Errata is at Starfall's observatory, south of Greenfield. She needs help getting its lights working again.",
       after:"Two travelers passed the court this morning! I waved so much my glove fell off. If you're going farther, check on Errata at Starfall's observatory."},
     {id:"starfall-lights", npc:"errata", name:"Errata", mapId:"starfallRuins", title:"Lights for the lost road", x:14, y:1, reward:0,

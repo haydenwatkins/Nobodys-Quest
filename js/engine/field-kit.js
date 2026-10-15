@@ -166,7 +166,7 @@
     const lamp=lamps.find(l=>l.key===near.kind);
     if(near.kind==='treantChallenge')return {...near,id:'field-kit',label:`Branching Roots · ${G.treantBranchingLit()?'Put out':'Light'}`,hint:'Adds a following root. Choose an apple, then a clear time to collect it.'};
     if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Adds following reeds. Crack nearby mire, then walk your lily path.'};
-    if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Adds a crescent after his charge. Strike his raised shield to stop the pair.'};
+    if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Links his charge to the guarded swing. Ring his shield to choose the next front, then flank it.'};
     if(near.kind==='wayglassChallenge')return {...near,id:'field-kit',label:`Double Return · ${G.wayglassDoubleLit()?'Put out':'Light'}`,hint:'Adds a second throw. Raise a reflector to stop the pair when a blade returns.'};
     if(near.kind==='foldroadChallenge')return {...near,id:'field-kit',label:`Crossfold · ${G.foldroadCrossfoldLit()?'Put out':'Light'}`,hint:'Adds a crossing cut after a pause. Strike the loose fold, then step away to stop the sequence.'};
     if(near.kind==='breakwaterChallenge')return {...near,id:'field-kit',label:`Returning Tide · ${G.breakwaterReturningLit()?'Put out':'Light'}`,hint:'Adds a tide across the first. Open a driftwood gate; the arriving water stops the pair.'};
