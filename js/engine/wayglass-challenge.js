@@ -24,6 +24,7 @@
   G.wayglassReflectorAim=e=>!!e.wayglassReflector&&!e.dead&&!e.wayglassReflector.armed;
   G.cancelWayglassReflectors=owner=>{
     for(const e of G.state.enemies||[])if(e.wayglassReflector?.owner&&(!owner||e.wayglassReflector.owner===owner))e.dead=true;
+    for(const shot of G.state.projectiles||[])if(shot.wayglassReturnOwner&&(!owner||shot.wayglassReturnOwner===owner))shot.dispelled=true;
   };
   G.prepareWayglassCounter=(owner,h)=>{
     if(!mira(owner))return;
