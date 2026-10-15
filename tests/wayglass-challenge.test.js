@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
 function setup({phase=1,double=false,form='nobody',help=false,retries=0}={}){
- const r=runtime(),{G}=r;G.state.claimedForms.push(form);G.setForm(form);r.load('riftbladeTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='riftbladeAdept');G.state.enemies=[e];G.state.bossCutscene=null;
+ const r=runtime(),{G}=r;G.state.claimedForms.push(...Object.keys(G.forms));if(form==='god'){G.state.worldwake.marks=['sky','stone','thread','echo','light','heart'];G.state.items.push('god-spark');G.questsDone.push(...G.formOrder.filter(id=>id!=='god').slice(0,8).flatMap((id,i)=>G.forms[id].quests.slice(0,i<3?4:2).map(q=>q.id)));}G.setForm(form);assert.equal(G.state.formId,form);r.load('riftbladeTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='riftbladeAdept');G.state.enemies=[e];G.state.bossCutscene=null;
  Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),miraDoubleReturn:double,bossTelegraphT:.01,bossPendingAction:'blades'});
  G.setComfortSetting('bossAssistance',help);G.ensureGuidance().bossRetries.riftbladeTrial=retries;
  Object.assign(G.state.player,{x:e.x-60,y:e.y,dir:{x:1,y:0},mana:0,manaRegenDelay:100,damageTaken:0,invuln:0});G.updateEnemies(.02);
@@ -16,12 +16,12 @@ test('quiet western fire, preparation and real harmless practice persist without
  assert.ok(e.dead);assert.equal(credit,0);assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,0);assert.ok(G.loadSaveData().guardianChallenges.mira.practiceCleared);assert.equal(G.state.guardianChallenges.mira.counterLearned,false);
  r.load('riftbladeTrial');assert.ok(!G.state.enemies.some(e=>e.wayglassReflector));
 });
-test('native free basics raise the same reflector in all 24 bodies; the actual return opens each phase without bypassing Sharp',()=>{
+test('native free basics raise the same reflector in all 24 bodies; the actual return redirects each phase without instant ward damage',()=>{
  const all=Object.keys(runtime().G.forms);
  for(const form of all)for(const phase of form==='nobody'?[1,2,3]:[1]){
   const r=setup({form,phase}),{G,e,mirror}=r;assert.ok(mirror,form);const hp=e.hp,ward=e.ward.hp;arm(r);let outward=false;
   for(let i=0;i<90&&!e.wayglassCounters;i++){r.step(.025);r.drain();if(G.state.projectiles.some(s=>!s.fromPlayer&&!s.returning)){outward=true;assert.equal(e.wayglassCounters,undefined);}}
-  assert.ok(outward);assert.equal(e.wayglassCounters,1,form);assert.ok(mirror.dead);if(form==='nobody'){assert.equal(e.hp,hp,form);assert.equal(e.ward.hp,ward,form);}assert.equal(G.state.player.mana,0,form);assert.equal(G.state.player.damageTaken,0,form);assert.ok(e.bossStaggerT>1.4);assert.ok(G.loadSaveData().guardianChallenges.mira.counterLearned);
+  assert.ok(outward);assert.equal(e.wayglassCounters,1,form);assert.ok(mirror.dead);if(form==='nobody'){assert.equal(e.hp,hp,form);assert.equal(e.ward.hp,ward,form);}assert.equal(G.state.player.mana,0,form);assert.equal(G.state.player.damageTaken,0,form);assert.equal(e.bossStaggerT||0,0);assert.ok(G.state.projectiles.some(s=>s.fromPlayer&&s.shape==='riftBlade'));assert.ok(G.loadSaveData().guardianChallenges.mira.counterLearned);
  }
 });
 test('unraised reflectors permit the unchanged native walking answer and expire after the throw',()=>{
@@ -29,18 +29,18 @@ test('unraised reflectors permit the unchanged native walking answer and expire 
 });
 test('only the correct returning owner crosses the armed catcher; swept collision cannot tunnel',()=>{
  for(const bad of ['outbound','player','other','dispelled','wrongShape','miss','deadOwner','none']){
-  const {G,e,mirror}=setup();G.combat.damageEnemy(mirror,{damage:1,ability:'slap'});const shot={owner:e,fromPlayer:false,dispelled:false,boomerang:true,shape:'riftBlade',size:5,x:mirror.x-50,y:mirror.y-4};
+  const {G,e,mirror}=setup();G.combat.damageEnemy(mirror,{damage:1,ability:'slap'});const shot={owner:e,fromPlayer:false,dispelled:false,boomerang:true,shape:'riftBlade',wayglassPhrase:mirror.wayglassReflector.phrase,size:5,x:mirror.x-50,y:mirror.y-4};
   if(bad==='player')shot.fromPlayer=true;if(bad==='other')shot.owner={};if(bad==='dispelled')shot.dispelled=true;if(bad==='wrongShape')shot.shape='seed';if(bad==='miss')shot.y+=70;if(bad==='deadOwner')e.dead=true;
   assert.equal(G.catchWayglassReturn(shot,mirror.x+50,shot.y,bad!=='outbound'),bad==='none',bad);
   assert.equal(e.wayglassCounters,bad==='none'?1:undefined);
  }
 });
-test('double return waits for helped slowed blades and remains a committed warning; counter cancels the pair',()=>{
+test('double return waits for helped slowed blades and remains a committed warning; a catch keeps the committed crossing throw',()=>{
  for(const help of [false,true])for(const retries of [0,5]){
   const r=setup({double:true,help,retries}),{G,e}=r,[primary,follow]=G.state.bossHazards;assert.equal(primary.warning,help?1.1:.8);assert.equal(follow.warning,help?1.2:.9);assert.ok(follow.delay>primary.warning+164/(120*(G.guidanceProjectileScale({owner:e})||1)));assert.ok(e.bossRecoverT>=follow.delay+follow.warning+follow.active+.64);
   G.state.player.y+=55;for(let i=0;i<Math.floor(follow.delay/.025);i++){r.step(.025);r.drain();}assert.equal(G.state.projectiles.length,0,'the first blades finish before the second warning');const x=follow.x;G.state.player.y+=15;while(!follow.fired){r.step(.025);r.drain();}assert.equal(follow.x,x);assert.ok(G.state.projectiles.length>0);
  }
- const r=setup({double:true}),{G,e,mirror}=r;arm(r);for(let i=0;i<90&&!e.wayglassCounters;i++){r.step(.025);r.drain();}assert.ok(mirror.dead);assert.equal(e.wayglassCounters,1);assert.equal(G.state.bossHazards.length,0);assert.ok(G.state.projectiles.every(s=>s.fromPlayer||s.dispelled));
+ const r=setup({double:true}),{G,e,mirror}=r;arm(r);for(let i=0;i<90&&!e.wayglassCounters;i++){r.step(.025);r.drain();}assert.ok(mirror.dead);assert.equal(e.wayglassCounters,1);assert.ok(G.state.bossHazards.some(h=>h.owner===e&&h.wayglassFollower));assert.ok(G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&s.owner===e));assert.equal(e.bossStaggerT||0,0);
 });
 test('phase, interruption, defeat and travel clear the reflector without learning or a false record',()=>{
  for(const action of ['phase','cancel','death','travel']){const r=setup({double:true}),{G,e,mirror}=r;
