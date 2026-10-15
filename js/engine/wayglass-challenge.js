@@ -29,8 +29,8 @@
   G.prepareWayglassCounter=(owner,h)=>{
     if(!mira(owner))return;
     G.cancelWayglassReflectors(owner);
-    const a=Math.atan2(h.y-owner.y,h.x-owner.x),x=owner.x+Math.cos(a)*48,y=owner.y-2+Math.sin(a)*48;
-    if(G.world.isSafeSpawn(x,y))reflector(x,y,owner);
+    const a=Math.atan2(h.y-owner.y,h.x-owner.x),lanes=owner.bossPhase>=3?[-28,0,28]:owner.bossPhase===2?[-22,22]:[0],distance=owner.bossPhase>=3?60:54;
+    for(const lane of lanes){const angle=a+lane*Math.PI/180,x=owner.x+Math.cos(angle)*distance,y=owner.y-2+Math.sin(angle)*distance;if(G.world.isSafeSpawn(x,y))reflector(x,y,owner);}
     if(!owner.miraDoubleReturn)return;
     // Wait for the helped warning and actual slowed flight, then a breather.
     const scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
@@ -57,7 +57,7 @@
     for(const e of G.state.enemies||[]){
       const r=e.wayglassReflector;
       if(e.dead||!r?.armed||r.map!==G.state.mapId||shot.owner!==(r.owner||r.practiceSource)||
-        segmentDistance(x,y,shot.x,shot.y,e.x,e.y-4)>26+shot.size)continue;
+        segmentDistance(x,y,shot.x,shot.y,e.x,e.y-4)>18+shot.size)continue;
       e.dead=true;shot.dispelled=true;G.sfx.play('wardBreak');
       G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:26,dur:.45});G.damageNumber(e.x,e.y-22,'DING!','#fff3c2');
       if(!r.owner){progress().practiceCleared=true;G.saveGame();return true;}
@@ -106,7 +106,7 @@
     const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('MIRA',"That reflector rang beautifully! Want to try two throws? Light the twin-blade lantern by the fire. Your help lights can stay on. I'll set out more star-cookies.",{accent:'#73eff7'});}else G.beginWayglassRematch();G.input.clearTaps();return true;
   };
   function drawReflector(c,x,y,armed){
-    c.save();if(armed){c.strokeStyle='#73eff7';c.globalAlpha=.6;c.lineWidth=1;c.beginPath();c.ellipse(x,y-4,26,26,0,0,Math.PI*2);c.stroke();c.globalAlpha=1;}c.fillStyle='#706253';c.fillRect(x-2,y-13,4,16);c.fillRect(x-9,y+1,18,3);
+    c.save();if(armed){c.strokeStyle='#73eff7';c.globalAlpha=.6;c.lineWidth=1;c.beginPath();c.ellipse(x,y-4,18,18,0,0,Math.PI*2);c.stroke();c.globalAlpha=1;}c.fillStyle='#706253';c.fillRect(x-2,y-13,4,16);c.fillRect(x-9,y+1,18,3);
     c.fillStyle=armed?'#b7eff4':'#526572';c.strokeStyle=armed?'#fff3c2':'#73eff7';c.lineWidth=2;
     c.beginPath();c.moveTo(x,y-23);c.lineTo(x+10,y-12);c.lineTo(x,y-1);c.lineTo(x-10,y-12);c.closePath();c.fill();c.stroke();
     c.fillStyle=armed?'#fff3c2':'#73eff7';c.beginPath();c.arc(x,y-12,3,0,Math.PI*2);c.fill();
