@@ -111,7 +111,11 @@
       for(const [dx,dy] of [[nx*64,ny*64],[-nx*64,-ny*64],[owner.bossChargeX*64,owner.bossChargeY*64],[-owner.bossChargeX*64,-owner.bossChargeY*64]]){
         const x=source.x+dx,y=source.y+dy;
         if(!G.world.isSafeSpawn(x,y)||!G.combat.clearArc(source.x,source.y,x,y))continue;
-        const next=cover(x,y,owner);next.moonCover.stepChoice=true;dance.options.push(next);
+        let shadow={x:x+root.shadow.x-source.x,y:y+root.shadow.y-source.y};
+        if(!G.world.isSafeSpawn(shadow.x,shadow.y)||!G.combat.clearArc(x,y,shadow.x,shadow.y)||!G.combat.clearArc(root.shadow.x,root.shadow.y,shadow.x,shadow.y)){
+          shadow={x,y};if(!G.combat.clearArc(root.shadow.x,root.shadow.y,x,y))continue;
+        }
+        const next=cover(x,y,owner);Object.assign(next.moonCover,{stepChoice:true,stepShadow:shadow});dance.options.push(next);
         if(dance.options.length===2)break;
       }
       if(dance.options.length){
@@ -135,8 +139,7 @@
       dance.locked=true;dance.target=dance.choice||dance.options[0];
       if(dance.target.dead){owner.duskDance=null;return;}
       dance.from={x:dance.source.x,y:dance.source.y};dance.shadowFrom={...root.shadow};
-      const dx=root.shadow.x-dance.source.x,dy=root.shadow.y-dance.source.y,tx=dance.target.x+dx,ty=dance.target.y+dy;
-      dance.shadowTo=G.world.isSafeSpawn(tx,ty)&&G.combat.clearArc(dance.target.x,dance.target.y,tx,ty)?{x:tx,y:ty}:{x:dance.target.x,y:dance.target.y};
+      dance.shadowTo={...dance.target.moonCover.stepShadow};
       if(owner.bossPhase>=3){
         const angle=Math.atan2(dance.target.y-(owner.y-6),dance.target.x-owner.x),count=8+(owner.bossPhase-1)*4;
         dance.follow.angle=angle;dance.follow.shots=[];
@@ -197,7 +200,7 @@
   function drawDancingShadow(c,at,source,flash){
         c.save();c.globalAlpha=.65;c.strokeStyle='#e2c9d6';c.lineWidth=2;c.setLineDash([3,3]);c.beginPath();c.moveTo(source.x,source.y);c.lineTo(at.x,at.y);c.stroke();c.setLineDash([]);
         c.globalAlpha=.9;c.fillStyle=flash>0?'#e2c9d6':'#302638';c.strokeStyle='#fff3c2';c.lineWidth=1.2;
-        c.beginPath();c.moveTo(at.x-3,at.y-10);c.lineTo(at.x-12,at.y-8);c.lineTo(at.x-13,at.y-2);c.lineTo(at.x-6,at.y-6);c.lineTo(at.x-9,at.y+4);c.quadraticCurveTo(at.x,at.y+1,at.x+9,at.y+4);c.lineTo(at.x+6,at.y-6);c.lineTo(at.x+13,at.y-2);c.lineTo(at.x+12,at.y-8);c.lineTo(at.x+3,at.y-10);c.closePath();c.fill();c.stroke();
+        c.beginPath();c.moveTo(at.x-3,at.y-12);c.lineTo(at.x-12,at.y-8);c.lineTo(at.x-13,at.y-2);c.lineTo(at.x-6,at.y-6);c.lineTo(at.x-9,at.y+4);c.quadraticCurveTo(at.x,at.y+1,at.x+9,at.y+4);c.lineTo(at.x+6,at.y-6);c.lineTo(at.x+13,at.y-2);c.lineTo(at.x+12,at.y-8);c.lineTo(at.x+3,at.y-12);c.closePath();c.fill();c.stroke();
         c.beginPath();c.moveTo(at.x-5,at.y-15);c.lineTo(at.x-5,at.y-22);c.lineTo(at.x-1,at.y-19);c.lineTo(at.x+1,at.y-19);c.lineTo(at.x+5,at.y-22);c.lineTo(at.x+5,at.y-15);c.quadraticCurveTo(at.x,at.y-9,at.x-5,at.y-15);c.fill();c.stroke();
         c.fillStyle='#fff3c2';c.fillRect(at.x-3,at.y-16,2,2);c.fillRect(at.x+1,at.y-16,2,2);c.restore();
   }
