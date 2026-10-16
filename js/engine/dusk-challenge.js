@@ -60,18 +60,26 @@
   };
   G.noteDuskShadowHit=(owner,at)=>{
     if(!at?.duskShadow||!G.duskShadowPoint(owner))return;
-    owner.duskShadowHits=(owner.duskShadowHits||0)+1;
+    owner.duskShadow.flash=.12;owner.duskShadowHits=(owner.duskShadowHits||0)+1;
     progress().bestShadowHits=Math.max(progress().bestShadowHits||0,owner.duskShadowHits);G.saveGame();
   };
+  G.duskShelters=(p,shot)=>{
+    const e=shot?.owner?.duskShadow,r=e?.moonCover;
+    return !!e&&!!G.duskShadowPoint(shot.owner)&&!shot.fromPlayer&&!shot.dispelled&&r.phrases?.includes(shot.duskWaltz)&&Math.hypot(p.x-e.x,p.y-e.y)<=32;
+  };
   G.prepareDuskWaltz=(owner,h)=>{
-    if(!vesper(owner)||!owner.vesperSecondWaltz)return;
+    if(!vesper(owner))return;
     const scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
     const arm=G.guardianWarningSeconds?.(G.BOSS_PROJECTILE_ARM_SECONDS)??G.BOSS_PROJECTILE_ARM_SECONDS;
     const warning=G.guardianWarningSeconds?.(h.warning)??h.warning;
+    const root=owner.duskShadow?.moonCover,flight=155/(92*scale);
+    if(root){root.phrases=[h];root.age=0;root.maxAge=warning+h.active+arm+flight+.65;}
+    if(!owner.vesperSecondWaltz)return;
     // The second committed wedge waits for the first real shots, including
     // retry help, to finish. Its direction never follows moving feet.
     const follow={...h,shots:[...h.shots],t:0,fired:false,delay:warning+h.active+arm+155/(92*scale)+.45,duskFollower:true};
     G.state.bossHazards.push(follow);
+    if(root){root.phrases.push(follow);root.maxAge=follow.delay+warning+h.active+arm+flight+.65;}
   };
   G.noteDuskDefeat=e=>{
     if(!vesper(e))return;const a=progress(),n=e.duskCounters||0;
@@ -93,7 +101,7 @@
   });
   const update=G.updateOpening;
   G.updateOpening=dt=>{update(dt);for(const e of G.state.enemies||[]){const r=e.moonCover;if(e.dead||!r?.owner)continue;
-    r.age+=dt;if(r.owner.dead||r.map!==G.state.mapId||G.state.knockout||r.age>4)e.dead=true;
+    r.age+=dt;if(r.owner.dead||r.map!==G.state.mapId||G.state.knockout||r.age>(r.maxAge||4))e.dead=true;
   }};
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>{
@@ -106,8 +114,8 @@
     const at=G.openingInteractionCandidate();if(at?.id!=='vesper-rematch')return interact();
     const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('VESPER',"You caught my dash in the moonlight! Want to try two waltzes? Light the Second Waltz lantern by the fire. Keep your help lights if you like. I've saved you a cup of tea.",{accent:'#e2c9d6'});}else G.beginDuskRematch();G.input.clearTaps();return true;
   };
-  function drawLamp(c,x,y,lit){
-    c.save();c.fillStyle=lit?'rgba(255,243,194,.22)':'rgba(38,40,57,.3)';c.beginPath();c.ellipse(x,y+2,lit?24:12,lit?12:5,0,0,Math.PI*2);c.fill();
+  function drawLamp(c,x,y,lit,refuge=false){
+    c.save();if(refuge){c.fillStyle='rgba(255,243,194,.13)';c.strokeStyle='#fff3c2';c.lineWidth=1.5;c.beginPath();c.arc(x,y,32,0,Math.PI*2);c.fill();c.stroke();}c.fillStyle=lit?'rgba(255,243,194,.22)':'rgba(38,40,57,.3)';c.beginPath();c.ellipse(x,y+2,lit?24:12,lit?12:5,0,0,Math.PI*2);c.fill();
     if(lit){c.strokeStyle='#fff3c2';c.lineWidth=1.5;c.beginPath();c.ellipse(x,y+2,24,12,0,0,Math.PI*2);c.stroke();}
     c.fillStyle='#42394d';c.fillRect(x-7,y-16,14,17);c.fillStyle='#c2b5b9';c.fillRect(x-8,y,16,3);c.fillRect(x-6,y-17,12,3);
     c.fillStyle=lit?'#fff3c2':'#626278';c.fillRect(x-5,y-12,10,10);
@@ -118,13 +126,14 @@
   const draw=G.openingDrawables;
   G.openingDrawables=c=>{const list=draw(c);
     for(const e of G.state.enemies||[])if(!e.dead&&e.moonCover){
-      list.push({y:e.y,fn:()=>drawLamp(c,e.x,e.y,e.moonCover.lit)});
+      list.push({y:e.y,fn:()=>drawLamp(c,e.x,e.y,e.moonCover.lit,!!G.duskShadowPoint(e.moonCover.owner)&&e.moonCover.owner.duskShadow===e)});
       const owner=e.moonCover.owner,at=G.duskShadowPoint(owner);
       if(at&&owner.duskShadow===e)list.push({y:at.y,fn:()=>{
         c.save();c.globalAlpha=.65;c.strokeStyle='#e2c9d6';c.lineWidth=2;c.setLineDash([3,3]);c.beginPath();c.moveTo(owner.x,owner.y);c.lineTo(at.x,at.y);c.stroke();c.setLineDash([]);
-        c.globalAlpha=.9;c.fillStyle='#302638';c.strokeStyle='#fff3c2';c.lineWidth=1.5;
-        c.beginPath();c.moveTo(at.x-10,at.y+4);c.lineTo(at.x-14,at.y-9);c.lineTo(at.x-5,at.y-6);c.lineTo(at.x,at.y-15);c.lineTo(at.x+5,at.y-6);c.lineTo(at.x+14,at.y-9);c.lineTo(at.x+10,at.y+4);c.closePath();c.fill();c.stroke();
-        c.fillStyle='#fff3c2';c.fillRect(at.x-4,at.y-5,2,2);c.fillRect(at.x+2,at.y-5,2,2);c.restore();
+        c.globalAlpha=.9;c.fillStyle=e.flash>0?'#e2c9d6':'#302638';c.strokeStyle='#fff3c2';c.lineWidth=1.2;
+        c.beginPath();c.moveTo(at.x-3,at.y-10);c.lineTo(at.x-12,at.y-8);c.lineTo(at.x-13,at.y-2);c.lineTo(at.x-6,at.y-6);c.lineTo(at.x-9,at.y+4);c.quadraticCurveTo(at.x,at.y+1,at.x+9,at.y+4);c.lineTo(at.x+6,at.y-6);c.lineTo(at.x+13,at.y-2);c.lineTo(at.x+12,at.y-8);c.lineTo(at.x+3,at.y-10);c.closePath();c.fill();c.stroke();
+        c.beginPath();c.moveTo(at.x-5,at.y-15);c.lineTo(at.x-5,at.y-22);c.lineTo(at.x-1,at.y-19);c.lineTo(at.x+1,at.y-19);c.lineTo(at.x+5,at.y-22);c.lineTo(at.x+5,at.y-15);c.quadraticCurveTo(at.x,at.y-9,at.x-5,at.y-15);c.fill();c.stroke();
+        c.fillStyle='#fff3c2';c.fillRect(at.x-3,at.y-16,2,2);c.fillRect(at.x+1,at.y-16,2,2);c.restore();
       }});
     }
     if(G.state.mapId!=='vampireTrial')return list;

@@ -59,23 +59,18 @@ G.autoAimTarget = function (user, maxRange) {
   let best = null, bestDist = Infinity;
   for (const enemy of G.state.enemies) {
     if (enemy.dead || (enemy.def.practice && !G.guardianPropLive?.(enemy) && !G.roadMechanismAim?.(enemy) && !G.treantRootAim?.(enemy) && !G.mireCrustAim?.(enemy) && !enemy.eclipsePractice && !G.wayglassReflectorAim?.(enemy) && !G.burrowPlugAim?.(enemy) && !G.moonCoverAim?.(enemy) && !G.stagePieAim?.(enemy) && !G.breakwaterSluiceAim?.(enemy) && !G.foldroadPaperAim?.(enemy))) continue;
-    const d = G.util.dist(user.x, user.y, enemy.x, enemy.y);
-    if (d > maxRange + enemy.def.size / 2 || d >= bestDist) continue;
-
-    // Skip enemies hidden behind walls or trees. Sampling is cheap at this
-    // tiny resolution and avoids the frustrating "shoot the wall" lock-on.
-    const steps = Math.max(2, Math.ceil(d / 8));
-    let visible = true;
-    for (let i = 1; i < steps; i++) {
-      const t = i / steps;
-      if (G.world.blocksProjectile(
-        user.x + (enemy.x - user.x) * t,
-        user.y - 5 + (enemy.y - user.y) * t,
-      )) { visible = false; break; }
+    for(const at of G.combat.contactPoints(enemy)){
+      const d=G.util.dist(user.x,user.y,at.x,at.y);
+      if(d>maxRange+enemy.def.size/2||d>=bestDist)continue;
+      // Aim only along the actual clear route to this visible contact.
+      const steps=Math.max(2,Math.ceil(d/8));let visible=true;
+      for(let i=1;i<steps;i++){
+        const t=i/steps;
+        if(G.world.blocksProjectile(user.x+(at.x-user.x)*t,user.y-5+(at.y-user.y)*t)){visible=false;break;}
+      }
+      if(!visible)continue;
+      best=at===enemy?enemy:{...enemy,x:at.x,y:at.y};bestDist=d;
     }
-    if (!visible) continue;
-    best = enemy;
-    bestDist = d;
   }
   return best;
 };
@@ -290,11 +285,14 @@ G.updatePlayer = function (dt) {
         if (e.dead || d.hitSet.has(e)) continue;
         // Test the distance to the travelled segment, not just this frame's endpoint.
         const dx=p.x-beforeX,dy=p.y-beforeY,lengthSq=dx*dx+dy*dy;
-        const along=lengthSq?G.util.clamp(((e.x-beforeX)*dx+(e.y-beforeY)*dy)/lengthSq,0,1):0;
-        if (G.util.dist(beforeX+dx*along,beforeY+dy*along,e.x,e.y) < 6 + e.def.size / 2) {
+        const contact=G.combat.contactPoints(e).find(at=>{
+          const along=lengthSq?G.util.clamp(((at.x-beforeX)*dx+(at.y-beforeY)*dy)/lengthSq,0,1):0;
+          return G.util.dist(beforeX+dx*along,beforeY+dy*along,at.x,at.y)<6+e.def.size/2;
+        });
+        if (contact) {
           d.hitSet.add(e);
           if (G.combat.damageEnemy(e, {
-            damage: d.damage, type: d.type, ability: d.ability,
+            damage: d.damage, type: d.type, ability: d.ability, contactPoint:contact,
             breaksAnyWard: d.breaksAnyWard,
             fromX: beforeX, fromY: beforeY,
             hitStop: d.hitStop, shake: d.shake,
@@ -735,7 +733,7 @@ G.updateBossHazards = function (dt) {
       continue;
     }
     if(h.kind === "crimsonWaltz"){
-      if(!h.fired){h.fired=true;for(const angle of h.shots)enemyShot(G.state,h.owner,angle,{damage:1,speed:92,range:155,size:4});}
+      if(!h.fired){h.fired=true;for(const angle of h.shots){enemyShot(G.state,h.owner,angle,{damage:1,speed:92,range:155,size:4});G.state.projectiles[G.state.projectiles.length-1].duskWaltz=h;}}
       continue;
     }
 

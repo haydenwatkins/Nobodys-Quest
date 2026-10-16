@@ -12,3 +12,59 @@ test('a real light catch keeps the committed dash and waltz, exposing one reacha
  const h=G.state.bossHazards.find(h=>h.owner===e&&h.kind==='crimsonWaltz');assert.ok(h);const shadow=G.duskShadowPoint(e);assert.ok(shadow);assert.ok(Math.hypot(shadow.x-e.x,shadow.y-e.y)>35,'shadow offers a different reachable contact');
  e.ward.hp=0;Object.assign(G.state.player,{x:shadow.x-18,y:shadow.y,dir:{x:1,y:0}});let hits=0,kills=0;G.events.on('hit',a=>{assert.equal(a.enemy,'countessCarmine');hits++;});G.events.on('kill',()=>kills++);G.state.player.cooldowns.slap=0;r.taps.add('a');for(let i=0;i<12&&e.hp===58;i++){r.step(.025);r.drain();}assert.equal(e.hp,57,JSON.stringify({p:{x:G.state.player.x,y:G.state.player.y,cd:G.state.player.cooldowns,dir:G.state.player.dir},shadow,current:G.duskShadowPoint(e),hitStop:G.state.hitStop,stagger:e.bossStaggerT,enemies:G.state.enemies.map(z=>({id:z.id,x:z.x,y:z.y,dead:z.dead})),messages:r.messages.slice(-3)}));assert.equal(hits,1);assert.equal(kills,0);assert.equal(e.duskShadowHits,1);assert.equal(e.bossStaggerT||0,0);assert.ok(G.state.bossHazards.includes(h));assert.ok(G.loadSaveData().guardianChallenges.vesper.bestShadowHits>=1);
 });
+
+test('real ranged shadow contact keeps Dark Ward purpose and cannot count body plus shadow as two targets',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const shadow=G.duskShadowPoint(e);assert.ok(shadow);
+ G.state.claimedForms.push('ranger');G.setForm('ranger');assert.equal(G.state.formId,'ranger');Object.assign(G.state.player,{x:shadow.x+50,y:shadow.y,dir:{x:-1,y:0},mana:0,manaRegenDelay:1000});G.input.takeAim=()=>({x:-1,y:0,dragged:true});let blocked=0,hits=0,multis=0;G.events.on('wardBlocked',a=>{if(a.enemy===e)blocked++;});G.events.on('hit',()=>hits++);G.events.on('multiHit',()=>multis++);
+ r.taps.add('a');for(let i=0;i<35&&!blocked;i++){r.step(.025);r.drain();}assert.equal(blocked,1);assert.equal(e.ward.hp,6);assert.equal(e.hp,58);assert.equal(e.duskShadowHits||0,0);assert.equal(hits,0);
+ G.state.claimedForms.push('wizard');G.setForm('wizard');assert.equal(G.state.formId,'wizard');G.state.player.mana=0;r.taps.add('a');for(let i=0;i<35&&e.ward.hp===6;i++){r.step(.025);r.drain();}assert.equal(e.ward.hp,5);assert.equal(e.duskShadowHits,1);assert.equal(e.hp,58);assert.equal(G.state.player.mana,0);
+ // A native piercing orb crosses shadow and body, but chips this one Ward once.
+ G.questsDone.push(...G.forms.wizard.quests.slice(0,2).map(q=>q.id));G.state.loadouts.wizard=['curse','dark matter'];G.state.player.mana=5;let manaAfterCast=null;G.events.on('abilityUse',a=>{if(a.ability==='dark matter')manaAfterCast=G.state.player.mana;});r.taps.add('b');for(let i=0;i<45;i++){r.step(.025);r.drain();}assert.equal(e.ward.hp,3);assert.equal(e.hp,58);assert.equal(e.duskShadowHits,2);assert.equal(hits,0);assert.equal(multis,0);assert.equal(manaAfterCast,0);
+});
+
+test('a normally paid earned Fester reaches the shadow and a broad cast covering both contacts still hits Vesper once',()=>{
+ for(const position of ['remote','both']){
+  const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);assert.ok(at);e.ward.hp=0;G.state.claimedForms.push('rat');G.questsDone.push(...G.forms.rat.quests.slice(0,2).map(q=>q.id));G.setForm('rat');assert.equal(G.state.formId,'rat');G.state.loadouts.rat=['bite','fester'];
+  Object.assign(G.state.player,{x:position==='remote'?at.x+18:(at.x+e.x)/2,y:at.y,mana:4,dir:{x:-1,y:0}});G.input.takeAim=()=>({x:-1,y:0,dragged:true});let hits=0,multi=0,cost=null;G.events.on('hit',a=>{assert.equal(a.enemy,e.id);hits++;});G.events.on('multiHit',()=>multi++);G.events.on('abilityUse',a=>{if(a.ability==='fester')cost=G.state.player.mana;});r.taps.add('b');for(let i=0;i<20&&e.hp===58;i++){r.step(.025);r.drain();}
+  assert.equal(e.hp,57,position);assert.equal(hits,1,position);assert.equal(multi,0,position);assert.equal(cost,1,position+' pays four, then receives the normal one-hit refill');if(position==='remote')assert.equal(e.duskShadowHits,1);assert.ok(e.status.poison.dur>0);assert.equal(e.bossStaggerT||0,0);
+ }
+});
+
+test('an actually earned Cartwheel hits the remote shadow through real traveled contact once',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);assert.ok(at);e.ward.hp=0;G.questsDone.push(G.forms.nobody.quests[0].id);G.state.loadouts.nobody=['slap','cartwheel'];Object.assign(G.state.player,{x:at.x+30,y:at.y,dir:{x:-1,y:0},mana:2});G.input.takeAim=()=>({x:-1,y:0,dragged:true});let hits=0,casts=0;G.events.on('hit',()=>hits++);G.events.on('abilityUse',a=>{if(a.ability==='cartwheel')casts++;});const from=G.state.player.x;r.taps.add('b');for(let i=0;i<30&&e.hp===58;i++){r.step(.025);r.drain();}assert.equal(e.hp,57);assert.equal(hits,1);assert.equal(e.duskShadowHits,1);assert.equal(casts,1);assert.ok(G.state.player.x<from-10);assert.equal(G.state.player.damageTaken,0);
+});
+
+test('only this actual waltz shelters feet in its lit refuge while other owner pressure remains real',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const h=G.state.bossHazards.find(h=>h.owner===e);assert.ok(h);G.updateBossHazards(h.warning+.02);const shot=G.state.projectiles.find(s=>!s.fromPlayer&&s.owner===e);assert.ok(shot);const p=G.state.player,root=e.duskShadow;
+ Object.assign(p,{x:root.x,y:root.y,invuln:0,damageTaken:0});G.state.projectiles=[shot];Object.assign(shot,{x:p.x,y:p.y-5,vx:0,vy:0,armT:0,travel:0,startX:p.x,startY:p.y-5});G.combat.updateProjectiles(.025);assert.equal(p.damageTaken,0,'actual incoming waltz is sheltered');assert.equal(G.state.projectiles.length,0);
+ const other=G.makeEnemy('countessCarmine',e.x,e.y);const foreign={...shot,owner:other};G.state.projectiles=[foreign];G.combat.updateProjectiles(.025);assert.equal(p.damageTaken,1,'another owner remains dangerous');
+ Object.assign(p,{x:root.x+45,y:root.y,invuln:0});G.state.projectiles=[{...shot,x:p.x,y:p.y-5,startX:p.x,startY:p.y-5}];G.combat.updateProjectiles(.025);assert.equal(p.damageTaken,2,'outside the actual light is open dance floor');assert.equal(e.bossStaggerT||0,0);
+});
+
+test('all24 actually earned worn bodies can strike the reachable shadow with their native zero-cost basic',()=>{
+ for(const form of runtime().G.formOrder){
+  const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);assert.ok(at,form);e.ward.hp=0;G.state.claimedForms.push(form);
+  if(form==='god'){G.state.worldwake.marks=['sky','stone','thread','echo','light','heart'];G.state.items.push('god-spark');G.questsDone.push(...G.formOrder.filter(id=>id!=='god').slice(0,8).flatMap((id,i)=>G.forms[id].quests.slice(0,i<3?4:2).map(q=>q.id)));}
+  G.setForm(form);assert.equal(G.state.formId,form);const basic=G.forms[form].basic;G.state.loadouts[form]=[basic];assert.equal(G.abilityManaCost(G.abilities[basic]),0);Object.assign(G.state.player,{x:at.x+18,y:at.y,dir:{x:-1,y:0},mana:0,manaRegenDelay:1000});G.input.takeAim=()=>({x:-1,y:0,dragged:true});let hits=0;G.events.on('hit',a=>{if(a.enemy===e.id&&a.ability===basic)hits++;});r.taps.add('a');for(let i=0;i<35&&!e.duskShadowHits;i++){r.step(.025);r.drain();}assert.ok(e.duskShadowHits>=1,form);assert.ok(e.hp<58,form);assert.equal(hits,1,form+' one normal actual owner contact');assert.ok(!G.state.knockout,form);
+ }
+});
+
+test('an earned paid chain reaches the shadow along real clear arcs and counts the guardian once',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);assert.ok(at);e.ward.hp=0;G.state.claimedForms.push('stormcaller');G.setForm('stormcaller');assert.equal(G.state.formId,'stormcaller');G.state.loadouts.stormcaller=[G.forms.stormcaller.basic,'chainLightning'];Object.assign(G.state.player,{x:at.x+45,y:at.y,dir:{x:-1,y:0},mana:4});G.input.takeAim=()=>({x:-1,y:0,dragged:true});const small=G.makeEnemy('slime',at.x+18,at.y+28);assert.ok(G.world.isSafeSpawn(small.x,small.y));G.state.enemies.push(small);const hp=small.hp;let ownerHits=0,largest=0;G.events.on('hit',a=>{if(a.enemy===e.id)ownerHits++;});G.events.on('multiHit',a=>{largest=Math.max(largest,a.hits);});r.taps.add('b');for(let i=0;i<20&&e.hp===58;i++){r.step(.025);r.drain();}assert.equal(e.hp,57);assert.equal(small.hp,hp-1);assert.equal(ownerHits,1);assert.equal(e.duskShadowHits,1);assert.equal(largest,2);
+});
+
+test('native ranged tap aiming selects the visible shadow instead of a distant body behind it',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);e.ward.hp=0;G.state.claimedForms.push('ranger');G.setForm('ranger');assert.equal(G.state.formId,'ranger');Object.assign(G.state.player,{x:at.x+10,y:at.y+40,mana:0,manaRegenDelay:1000});assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));const aim=G.autoAimTarget(G.state.player,140);assert.equal(aim.id,e.id);assert.equal(aim.x,at.x);assert.equal(aim.y,at.y);G.input.takeAim=()=>({x:0,y:0,dragged:false});r.taps.add('a');for(let i=0;i<30&&e.hp===58;i++){r.step(.025);r.drain();}assert.equal(e.hp,57);assert.equal(e.duskShadowHits,1);
+});
+
+test('real shadow contact reports the actual nearby hit distance rather than awarding a distant-body shot',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);e.ward.hp=0;G.state.claimedForms.push('ranger');G.setForm('ranger');Object.assign(G.state.player,{x:at.x+18,y:at.y,dir:{x:-1,y:0},mana:0,manaRegenDelay:1000});G.input.takeAim=()=>({x:-1,y:0,dragged:true});let distance=null;G.events.on('hit',a=>{if(a.enemy===e.id)distance=a.dist;});r.taps.add('a');for(let i=0;i<30&&distance===null;i++){r.step(.025);r.drain();}assert.equal(e.hp,57);assert.ok(distance>0&&distance<30,String(distance));
+});
+
+test('a real explosive flask bursts at shadow contact and applies one normal blast to its owner',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);e.ward.hp=0;G.state.claimedForms.push('alchemist');G.setForm('alchemist');assert.equal(G.state.formId,'alchemist');G.state.loadouts.alchemist=['bottleBonk','volatileFlask'];Object.assign(G.state.player,{x:at.x+45,y:at.y,dir:{x:-1,y:0},mana:4});G.input.takeAim=()=>({x:-1,y:0,dragged:true});let hits=0,castMana=null;G.events.on('hit',a=>{if(a.enemy===e.id)hits++;});G.events.on('abilityUse',a=>{if(a.ability==='volatileFlask')castMana=G.state.player.mana;});r.taps.add('b');for(let i=0;i<35&&e.hp===58;i++){r.step(.025);r.drain();}assert.equal(e.hp,56);assert.equal(hits,1);assert.equal(e.duskShadowHits,1);assert.equal(castMana,0);assert.ok(G.state.player.mana>=1);
+});
+
+test('normal near-miss melee assistance approaches the real shadow without a remote-body lunge',()=>{
+ const r=setup(),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const at=G.duskShadowPoint(e);e.ward.hp=0;Object.assign(G.state.player,{x:at.x+28,y:at.y,dir:{x:-1,y:0}});assert.ok(G.world.isSafeSpawn(G.state.player.x,G.state.player.y));G.input.takeAim=()=>({x:-1,y:0,dragged:true});const before=G.state.player.x;r.taps.add('a');for(let i=0;i<15&&e.hp===58;i++){r.step(.025);r.drain();}assert.equal(e.hp,57);assert.ok(G.state.player.x<before);assert.ok(before-G.state.player.x<=G.MELEE_ASSIST_STEP);assert.equal(e.duskShadowHits,1);
+});

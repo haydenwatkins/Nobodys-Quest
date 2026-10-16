@@ -75,6 +75,7 @@ G.combat = (() => {
 
   // One actor, possibly two visible contacts. Attack hit sets still own the actor.
   function contactPoints(enemy) {
+    if(enemy.moonCover?.lit)return [];
     const shadow=G.duskShadowPoint?.(enemy);
     return shadow?[enemy,{...shadow,duskShadow:true}]:[enemy];
   }
@@ -181,7 +182,7 @@ G.combat = (() => {
       ability: opts.ability,
       damageType: type,
       combo: opts.combo,
-      dist: G.util.dist(G.state.player.x, G.state.player.y, enemy.x, enemy.y),
+      dist: G.util.dist(G.state.player.x, G.state.player.y, opts.contactPoint?.x??enemy.x, opts.contactPoint?.y??enemy.y),
     });
 
     if (opts.status) applyStatus(enemy, opts.status.name, { ...opts.status, ability: opts.ability });
@@ -410,12 +411,13 @@ G.combat = (() => {
 
     for (const e of G.state.enemies) {
       if (e.dead || (e.def.miniboss && e.bossIntroT > 0)) continue;
-      const d = G.util.dist(user.x, user.y, e.x, e.y);
-      const reach = range + e.def.size / 2;
-      const a = G.util.angleTo(user.x, user.y, e.x, e.y);
-      if (Math.abs(G.util.angleDiff(facing, a)) > arc / 2) continue;
-      if (d <= reach) { alreadyConnected = true; break; }
-      if (d <= reach + maxStep && d < targetDist) { target = e; targetDist = d; }
+      for(const at of contactPoints(e)){
+        const d=G.util.dist(user.x,user.y,at.x,at.y),reach=range+e.def.size/2,a=G.util.angleTo(user.x,user.y,at.x,at.y);
+        if(Math.abs(G.util.angleDiff(facing,a))>arc/2)continue;
+        if(d<=reach){alreadyConnected=true;break;}
+        if(d<=reach+maxStep&&d<targetDist){target=at===e?e:{...at,def:e.def};targetDist=d;}
+      }
+      if(alreadyConnected)break;
     }
 
     // Never shift a swing that was already going to connect. The assist only
@@ -624,37 +626,37 @@ G.combat = (() => {
     const facing = Math.atan2(user.dir.y, user.dir.x);
     attackPose(user, facing + Math.PI, 1, 0.08);
     G.sfx.attack("chain", type, o.damage || 1);
-    const available = G.state.enemies.filter((e) => {
-      if (e.dead) return false;
-      const d = G.util.dist(user.x, user.y, e.x, e.y);
-      const a = G.util.angleTo(user.x, user.y, e.x, e.y);
-      return d <= range + e.def.size / 2 && (d <= 10 || Math.abs(G.util.angleDiff(facing, a)) <= Math.PI * 0.55) && clearArc(user.x,user.y,e.x,e.y);
-    });
-    available.sort((a, b) => G.util.dist(user.x, user.y, a.x, a.y) - G.util.dist(user.x, user.y, b.x, b.y));
-
-    const used = new Set();
-    let current = available[0];
-    let fromX = user.x, fromY = user.y - 6;
-    let hits = 0, realHits = 0;
-    while (current && used.size < maxTargets) {
-      used.add(current);
-      if (damageEnemy(current, {
-        damage: o.damage || 1, type, ability: o.ability,
-        knockback: o.knockback ?? 35, status: o.status,
-        breaksAnyWard: breaksAnyWard(user), fromX, fromY,
-        hitStop: o.hitStop === undefined ? 0.02 : o.hitStop,
-        shake: o.shake,
-      })) { hits++; if (!current.def.practice) realHits++; }
-      G.spawnFx({ kind: "bolt", x: fromX, y: fromY, x2: current.x, y2: current.y - 5, color, dur: 0.22 });
-      fromX = current.x; fromY = current.y - 5;
-      let next = null, nextDist = Infinity;
-      const reach=jumpRange*(current.status?.stun?.dur>0?(o.stunnedJumpScale||1):1);
-      for (const e of G.state.enemies) {
-        if (e.dead || used.has(e)) continue;
-        const d = G.util.dist(current.x, current.y, e.x, e.y);
-        if (d <= reach + e.def.size / 2 && d < nextDist && clearArc(current.x,current.y,e.x,e.y)) { next = e; nextDist = d; }
+    const available=[];
+    for(const enemy of G.state.enemies){
+      if(enemy.dead)continue;
+      for(const at of contactPoints(enemy)){
+        const d=G.util.dist(user.x,user.y,at.x,at.y),a=G.util.angleTo(user.x,user.y,at.x,at.y);
+        if(d<=range+enemy.def.size/2&&(d<=10||Math.abs(G.util.angleDiff(facing,a))<=Math.PI*.55)&&clearArc(user.x,user.y,at.x,at.y))available.push({enemy,at,d});
       }
-      current = next;
+    }
+    available.sort((a,b)=>a.d-b.d);
+    const used=new Set();
+    let current=available[0],fromX=user.x,fromY=user.y-6,hits=0,realHits=0;
+    while(current&&used.size<maxTargets){
+      const {enemy,at}=current;used.add(enemy);
+      if(damageEnemy(enemy,{
+        damage:o.damage||1,type,ability:o.ability,contactPoint:at,
+        knockback:o.knockback??35,status:o.status,
+        breaksAnyWard:breaksAnyWard(user),fromX,fromY,
+        hitStop:o.hitStop===undefined?.02:o.hitStop,shake:o.shake,
+      })){hits++;if(!enemy.def.practice)realHits++;}
+      G.spawnFx({kind:'bolt',x:fromX,y:fromY,x2:at.x,y2:at.y-5,color,dur:.22});
+      fromX=at.x;fromY=at.y-5;
+      const reach=jumpRange*(enemy.status?.stun?.dur>0?(o.stunnedJumpScale||1):1);
+      let next=null;
+      for(const candidate of G.state.enemies){
+        if(candidate.dead||used.has(candidate))continue;
+        for(const point of contactPoints(candidate)){
+          const d=G.util.dist(at.x,at.y,point.x,point.y);
+          if(d<=reach+candidate.def.size/2&&(!next||d<next.d)&&clearArc(at.x,at.y,point.x,point.y))next={enemy:candidate,at:point,d};
+        }
+      }
+      current=next;
     }
     if (user === G.state.player && G.activeKeepsake?.()?.id === 'clapper' && realHits >= 3 && user.mana < user.manaMax) {
       user.mana = Math.min(user.manaMax, user.mana + 1);
@@ -679,9 +681,11 @@ G.combat = (() => {
     const origins=[{x:user.x,y:user.y,range},...(o.origins||[])];
     G.sfx.attack("melee", type, o.damage || 1);
     for (const e of G.state.enemies) {
-      if (e.dead || !origins.some(at=>G.util.dist(at.x,at.y,e.x,e.y)<=at.range+e.def.size/2)) continue;
+      if(e.dead)continue;
+      const contact=contactPoints(e).find(point=>origins.some(at=>G.util.dist(at.x,at.y,point.x,point.y)<=at.range+e.def.size/2));
+      if(!contact)continue;
       if (damageEnemy(e, {
-        damage: o.damage || 1, type, ability: o.ability,
+        damage: o.damage || 1, type, ability: o.ability, contactPoint:contact,
         knockback: o.pull ? 0 : o.knockback,
         status: o.status, breaksAnyWard: breaksAnyWard(user),
         fromX: user.x, fromY: user.y,
@@ -836,10 +840,11 @@ G.combat = (() => {
         gone = true;
       } else if (!gone && pr.fromPlayer) {
         for (const e of s.enemies) {
-          if (e.dead || e.burrowPlug?.broken || (pr.wayglassPracticeTarget && e !== pr.wayglassPracticeTarget)) continue;
+          if (e.dead || e.burrowPlug?.broken || e.moonCover?.lit || (pr.wayglassPracticeTarget && e !== pr.wayglassPracticeTarget)) continue;
           if (pr.hitSet && pr.hitSet.has(e)) continue;
           if (pr.hitGroup && e.lastProjectileGroup === pr.hitGroup) continue;
-          if (G.util.dist(pr.x, pr.y, e.x, e.y - 4) < pr.size + e.def.size / 2) {
+          const contact=contactPoints(e).find(at=>G.util.dist(pr.x,pr.y,at.x,at.y-4)<pr.size+e.def.size/2);
+          if (contact) {
             if (pr.explodeRadius && !pr.explodeAtEndOnly) {
               // Piercing shockwaves erupt at every new target and keep going.
               // hitSet makes overlapping eruptions damage each foe only once.
@@ -854,7 +859,7 @@ G.combat = (() => {
             if (pr.hitSet) pr.hitSet.add(e);
             G.noteRoadworkRicochet?.(pr, e);
             const hit = damageEnemy(e, {
-                damage: pr.damage, type: pr.type, ability: pr.ability, guardianAttack: pr,
+                damage: pr.damage, type: pr.type, ability: pr.ability, guardianAttack: pr, contactPoint:contact,
                 status: pr.status, breaksAnyWard: pr.breaksAnyWard, consumePoison: pr.consumePoison,
                 fromX: pr.startX, fromY: pr.startY,
                 combo: pr.ricochetsMax && pr.ricochets < pr.ricochetsMax ? "ricochet" : undefined,
@@ -901,7 +906,7 @@ G.combat = (() => {
         }
         const p = s.player;
         if (!gone && G.util.dist(pr.x, pr.y, p.x, p.y - 5) < pr.size + 5) {
-          if (G.mireShelters?.(p,pr.owner)) {
+          if (G.mireShelters?.(p,pr.owner)||G.duskShelters?.(p,pr)) {
             G.spawnFx({kind:"puff",x:pr.x,y:pr.y,color:"#c5e5dd",dur:.2});
           } else G.damagePlayer(pr.damage, pr.owner ? pr.owner.x : pr.x, pr.owner ? pr.owner.y : pr.y);
           // Trial knockouts intentionally clear every shot and start an eject
@@ -922,11 +927,13 @@ G.combat = (() => {
     let hits = 0;
     const targets = [];
     for (const e of G.state.enemies) {
-      if (e.dead || G.util.dist(pr.x, pr.y, e.x, e.y - 4) > pr.explodeRadius + e.def.size / 2) continue;
+      if(e.dead)continue;
+      const contact=contactPoints(e).find(at=>G.util.dist(pr.x,pr.y,at.x,at.y-4)<=pr.explodeRadius+e.def.size/2);
+      if(!contact)continue;
       if (pr.hitSet && pr.hitSet.has(e)) continue;
       if (pr.hitSet) pr.hitSet.add(e);
       if (damageEnemy(e, {
-        damage, type: pr.type, ability: pr.ability,
+        damage, type: pr.type, ability: pr.ability, contactPoint:contact,
         status: pr.status, breaksAnyWard: pr.breaksAnyWard, consumePoison: pr.consumePoison,
         fromX: pr.x, fromY: pr.y,
         knockback: 120,
