@@ -20,7 +20,11 @@
     e.def={...e.def,id:e.id,name:'Covered moon lamp',practice:true,damage:0,speed:0,size:18};e.hp=1;e.ward=null;
     e.moonCover={owner,map:G.state.mapId,lit:false,age:0};G.state.enemies.push(e);return e;
   }
-  G.moonCoverAim=e=>!!e.moonCover&&!e.dead&&(!e.moonCover.lit||e.moonCover.practiceShadow);
+  G.moonCoverAim=e=>{
+    const r=e?.moonCover;if(!r||e.dead)return false;
+    if(r.stepChoice){const dance=r.owner?.duskDance;return !!dance&&!dance.locked&&dance.options.includes(e);}
+    return !r.lit||!!r.practiceShadow;
+  };
   G.cancelMoonCovers=owner=>{
     for(const e of G.state.enemies||[]){
       if(e.moonCover?.owner&&(!owner||e.moonCover.owner===owner))e.dead=true;
@@ -95,6 +99,11 @@
     const e=shot?.owner?.duskShadow,r=e?.moonCover;
     return !!e&&!!G.duskShadowPoint(shot.owner)&&!shot.fromPlayer&&!shot.dispelled&&r.phrases?.includes(shot.duskWaltz)&&Math.hypot(p.x-(r.pool||e).x,p.y-(r.pool||e).y)<=32;
   };
+  function clearStepShadow(source,shadow,destination,preferred){
+    if(!G.world.isSafeSpawn(destination.x,destination.y)||!G.combat.clearArc(source.x,source.y,destination.x,destination.y))return null;
+    if(G.world.isSafeSpawn(preferred.x,preferred.y)&&G.combat.clearArc(destination.x,destination.y,preferred.x,preferred.y)&&G.combat.clearArc(shadow.x,shadow.y,preferred.x,preferred.y))return {...preferred};
+    return G.combat.clearArc(shadow.x,shadow.y,destination.x,destination.y)?{x:destination.x,y:destination.y}:null;
+  }
   G.prepareDuskWaltz=(owner,h)=>{
     if(!vesper(owner))return;
     const scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
@@ -108,13 +117,10 @@
     if(root){
       const dance={owner,source,options:[],choice:null,locked:false,age:0,at:firstEnd+.65,travel:1.2,follow,phase:owner.bossPhase,map:G.state.mapId};
       const nx=-owner.bossChargeY,ny=owner.bossChargeX;
-      for(const [dx,dy] of [[nx*64,ny*64],[-nx*64,-ny*64],[owner.bossChargeX*64,owner.bossChargeY*64],[-owner.bossChargeX*64,-owner.bossChargeY*64]]){
+      for(const [dx,dy] of [[nx*64-owner.bossChargeX*32,ny*64-owner.bossChargeY*32],[-nx*64,-ny*64],[owner.bossChargeX*64,owner.bossChargeY*64],[-owner.bossChargeX*64,-owner.bossChargeY*64]]){
         const x=source.x+dx,y=source.y+dy;
-        if(!G.world.isSafeSpawn(x,y)||!G.combat.clearArc(source.x,source.y,x,y))continue;
-        let shadow={x:x+root.shadow.x-source.x,y:y+root.shadow.y-source.y};
-        if(!G.world.isSafeSpawn(shadow.x,shadow.y)||!G.combat.clearArc(x,y,shadow.x,shadow.y)||!G.combat.clearArc(root.shadow.x,root.shadow.y,shadow.x,shadow.y)){
-          shadow={x,y};if(!G.combat.clearArc(root.shadow.x,root.shadow.y,x,y))continue;
-        }
+        const shadow=clearStepShadow(source,root.shadow,{x,y},{x:x+root.shadow.x-source.x,y:y+root.shadow.y-source.y});
+        if(!shadow)continue;
         const next=cover(x,y,owner);Object.assign(next.moonCover,{stepChoice:true,stepShadow:shadow});dance.options.push(next);
         if(dance.options.length===2)break;
       }
@@ -129,6 +135,28 @@
     owner.bossRecoverT=Math.max(owner.bossRecoverT,follow.delay+warning+h.active+arm+flight+.65);
     G.state.bossHazards.push(follow);
   };
+  function prepareDuskFork(owner,previous){
+    if(!owner.vesperSecondWaltz||owner.bossPhase<2||previous.last)return;
+    const source=owner.duskShadow,root=source.moonCover,options=[];
+    for(const option of [previous.source,...previous.options.filter(e=>e!==source)]){
+      if(option.dead)continue;
+      const preferred=option===previous.source?previous.shadowFrom:option.moonCover.stepShadow;
+      const shadow=clearStepShadow(source,root.shadow,option,preferred);
+      if(!shadow)continue;
+      Object.assign(option.moonCover,{stepChoice:true,stepShadow:shadow});options.push(option);
+    }
+    if(!options.length)return;
+    const h=previous.follow,scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
+    const arm=G.guardianWarningSeconds?.(G.BOSS_PROJECTILE_ARM_SECONDS)??G.BOSS_PROJECTILE_ARM_SECONDS,flight=155/(92*scale);
+    const at=Math.max(0,h.delay-h.t)+h.warning+h.active+arm+flight+.65;
+    const travel=Math.max(...options.map(e=>Math.hypot(e.x-source.x,e.y-source.y)))/80+.4;
+    // h.warning was already helped by the actual first resolution; do not help twice.
+    const last={...h,shots:[...h.shots],t:0,fired:false,delay:at+travel+.1,duskLast:true};
+    owner.duskDance={owner,source,options,choice:null,locked:false,age:0,at,travel,follow:last,phase:owner.bossPhase,map:G.state.mapId,last:true,turnOpening:true};
+    root.phrases.push(last);const life=last.delay+last.warning+last.active+arm+flight+.65;
+    for(const e of G.state.enemies)if(e.moonCover?.owner===owner)e.moonCover.maxAge=e.moonCover.age+life;
+    owner.bossRecoverT=Math.max(owner.bossRecoverT,life);G.state.bossHazards.push(last);
+  }
   function advanceDance(owner,dt){
     const dance=owner.duskDance;if(!dance)return;
     const root=dance.source.moonCover;
@@ -140,7 +168,7 @@
       if(dance.target.dead){owner.duskDance=null;return;}
       dance.from={x:dance.source.x,y:dance.source.y};dance.shadowFrom={...root.shadow};
       dance.shadowTo={...dance.target.moonCover.stepShadow};
-      if(owner.bossPhase>=3){
+      if(owner.bossPhase>=3||dance.turnOpening){
         const angle=Math.atan2(dance.target.y-(owner.y-6),dance.target.x-owner.x),count=8+(owner.bossPhase-1)*4;
         dance.follow.angle=angle;dance.follow.shots=[];
         for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)dance.follow.shots.push(a);}
@@ -152,7 +180,7 @@
     root.shadow={x:dance.shadowFrom.x+(dance.shadowTo.x-dance.shadowFrom.x)*t,y:dance.shadowFrom.y+(dance.shadowTo.y-dance.shadowFrom.y)*t};
     if(t>=1){
       dance.complete=true;root.linked=false;const next=to.moonCover;
-      Object.assign(next,{lit:true,linked:true,stepChoice:false,phase:owner.bossPhase,shadow:{...dance.shadowTo},pool:{x:to.x,y:to.y},phrases:root.phrases,age:root.age,maxAge:root.maxAge});owner.duskShadow=to;
+      Object.assign(next,{lit:true,linked:true,stepChoice:false,phase:owner.bossPhase,shadow:{...dance.shadowTo},pool:{x:to.x,y:to.y},phrases:root.phrases,age:root.age,maxAge:root.maxAge});owner.duskShadow=to;prepareDuskFork(owner,dance);
     }
   }
   G.noteDuskDefeat=e=>{

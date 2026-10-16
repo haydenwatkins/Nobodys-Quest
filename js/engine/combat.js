@@ -75,7 +75,7 @@ G.combat = (() => {
 
   // One actor, possibly two visible contacts. Attack hit sets still own the actor.
   function contactPoints(enemy) {
-    if(enemy.moonCover?.lit&&!enemy.moonCover.practiceShadow)return [];
+    if(enemy.moonCover&&!G.moonCoverAim?.(enemy))return [];
     const shadow=G.duskShadowPoint?.(enemy);
     return shadow?[enemy,{...shadow,duskShadow:true}]:[enemy];
   }
