@@ -1133,7 +1133,7 @@ function resolveBossActionPattern(e, p, action) {
     for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)shots.push(a);}
     const h=spawnBossHazard(e,"crimsonWaltz",{angle,shots,warning:.9,active:.15,color:"#b13e53"});
     G.prepareDuskWaltz?.(e,h);
-    e.bossRecoverT=.9+155/92+.8;return;
+    e.bossRecoverT=Math.max(e.bossRecoverT,.9+155/92+.8);return;
   }
   if(action === "royalStomp"){
     const h=spawnBossHazard(e,"royalStomp",{x:e.x,y:e.y,radius:40+e.bossPhase*6,warning:.85,active:.25,color:"#d8b06a"});
