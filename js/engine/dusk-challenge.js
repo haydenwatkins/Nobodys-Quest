@@ -137,6 +137,11 @@
       dance.from={x:dance.source.x,y:dance.source.y};dance.shadowFrom={...root.shadow};
       const dx=root.shadow.x-dance.source.x,dy=root.shadow.y-dance.source.y,tx=dance.target.x+dx,ty=dance.target.y+dy;
       dance.shadowTo=G.world.isSafeSpawn(tx,ty)&&G.combat.clearArc(dance.target.x,dance.target.y,tx,ty)?{x:tx,y:ty}:{x:dance.target.x,y:dance.target.y};
+      if(owner.bossPhase>=3){
+        const angle=Math.atan2(dance.target.y-(owner.y-6),dance.target.x-owner.x),count=8+(owner.bossPhase-1)*4;
+        dance.follow.angle=angle;dance.follow.shots=[];
+        for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)dance.follow.shots.push(a);}
+      }
 
     }
     const t=Math.min(1,(dance.age-dance.at)/dance.travel),to=dance.target;
