@@ -857,7 +857,7 @@ G.drawBossHazards = function (ctx) {
       ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=.95;ctx.strokeStyle="#ffcd75";ctx.setLineDash(active?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
       for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(h.x+Math.cos(a)*12,h.y+Math.sin(a)*12);ctx.lineTo(h.x+Math.cos(a+.13)*h.radius*.6,h.y+Math.sin(a+.13)*h.radius*.6);ctx.lineTo(h.x+Math.cos(a)*h.radius*.9,h.y+Math.sin(a)*h.radius*.9);ctx.stroke();}
-      ctx.fillStyle="#302638";ctx.fillRect(h.x-22,h.y+h.radius+3,44,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"MOVE OUT",h.x,h.y+h.radius+11);
+      ctx.fillStyle="#302638";ctx.fillRect(h.x-22,h.y+h.radius+3,44,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,G.burrowShelters?.(G.state.player,h.owner,h)?"SAFE HERE":"MOVE OUT",h.x,h.y+h.radius+11);
     }else if(h.kind === "starpathComet"){
       ctx.globalAlpha=.22;ctx.strokeStyle="#ffcd75";ctx.lineWidth=16;
       ctx.beginPath();ctx.moveTo(h.x,h.y);ctx.lineTo(h.x+Math.cos(h.angle)*240,h.y+Math.sin(h.angle)*240);ctx.stroke();

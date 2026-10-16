@@ -100,3 +100,18 @@ test('a loosened walking root yields to a later real free arrow instead of becom
  const r=setup(),{G,e,root}=r;e.ward.hp=0;let hits=0;G.events.on('hit',()=>hits++);Object.assign(G.state.player,{x:root.x-18,y:root.y,mana:0,manaRegenDelay:100});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<12&&!root.burrowPlug.broken;i++){r.step(.025);r.drain();}assert.ok(root.burrowPlug.broken);assert.equal(e.hp,56);assert.equal(hits,0);
  G.state.claimedForms.push('ranger');G.setForm('ranger');assert.equal(G.state.formId,'ranger');Object.assign(G.state.player,{x:root.x-24,y:root.y,mana:0,manaRegenDelay:100});r.taps.add('a');for(let i=0;i<35&&e.hp===56;i++){r.step(.025);r.drain();}assert.equal(e.hp,55,'actual later Arrow reaches the unwarded guardian through the loose root');assert.equal(hits,1,'only the real guardian contact has normal hit credit');assert.equal(G.state.guardianChallenges.bram.counterLearned,false);assert.ok(!root.dead);
 });
+test('native terrain stops an incomplete dig or an entered passage without supplying endpoint credit',()=>{
+ for(const during of [false,true]){
+  const r=during?dug():setup(),{G,e,root}=r;
+  if(!during){Object.assign(G.state.player,{x:root.x-18,y:root.y});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<12&&!root.burrowPlug.broken;i++){r.step(.025);r.drain();}G.state.player.y+=75;for(let i=0;i<60;i++){r.step(.025);r.drain();}}
+  G.state.grid[8][18].tile='rock';assert.ok(G.world.solid(296,136));
+  if(during){const path=root.burrowPlug.passage;Object.assign(G.state.player,{x:path.from.x+10,y:path.from.y});G.input.vec={x:-1,y:0};for(let i=0;i<30;i++){r.step(.025);r.drain();}G.input.vec={x:0,y:0};assert.ok(G.state.player.x>path.to.x+15,'blocked traveler stays on the reached side');assert.ok(!G.state.player.burrowTransit);}
+  else{Object.assign(e,{bossRecoverT:0,bossSpecialT:100,bossTelegraphT:.01,bossPendingAction:'burrow',bossChargeX:-1,bossChargeY:0});for(let i=0;i<25;i++){r.step(.025);r.drain();}assert.ok(!root.burrowPlug.passage,'short terrain-blocked digging makes no connection');}
+  assert.equal(G.state.guardianChallenges.bram.bestTunnelUses,0);assert.equal(G.state.guardianChallenges.bram.counterLearned,false);
+ }
+});
+test('the real stomp label recognizes an earned safe arrival without calling supplied mouth feet protected',()=>{
+ const r=dug(),{G,e,root}=r,path=root.burrowPlug.passage,labels=[],original=G.drawWorldText;G.drawWorldText=(c,text,...args)=>{labels.push(text);return original(c,text,...args);};const noop=()=>{},c=new Proxy({measureText:t=>({width:String(t).length*5})},{get:(o,k)=>o[k]||noop,set:(o,k,v)=>(o[k]=v,true)});
+ Object.assign(G.state.player,{x:path.to.x,y:path.to.y});G.drawBossHazards(c);assert.ok(labels.includes('MOVE OUT'));assert.ok(!labels.includes('SAFE HERE'));
+ Object.assign(G.state.player,{x:path.from.x+10,y:path.from.y});G.input.vec={x:-1,y:0};for(let i=0;i<25&&!e.burrowTunnelUses;i++){r.step(.025);r.drain();}G.input.vec={x:0,y:0};assert.equal(e.burrowTunnelUses,1);labels.length=0;G.drawBossHazards(c);assert.ok(labels.includes('SAFE HERE'),'the real safe-mouth collision rule owns its short feedback');assert.ok(!labels.includes('MOVE OUT'));
+});
