@@ -118,3 +118,18 @@ test('a slow favorite can freely choose the continuing fork with all help combin
   aim(first);for(let i=0;i<30&&!first.moonCover.lit;i++)r.step(.025);assert.ok(first.moonCover.lit);for(let i=0;i<600&&e.duskShadow!==first;i++)walk();G.input.vec={x:0,y:0};assert.equal(e.duskShadow,first);const onward=e.duskDance.options.find(z=>z!==original);assert.ok(onward);aim(onward);for(let i=0;i<50&&e.duskDance.choice!==onward;i++){r.step(.025);r.drain();}assert.equal(e.duskDance.choice===onward,true,'one real free shot can choose the continuing lamp without first choosing the return');for(let i=0;i<700&&e.duskShadow!==onward;i++)walk();G.input.vec={x:0,y:0};assert.equal(e.duskShadow,onward);const last=G.state.bossHazards.find(h=>h.duskLast);assert.ok(last);assert.equal(last.warning,help?1.2:.9);assert.equal(last.fired,false);assert.equal(G.state.player.damageTaken,0);assert.equal(G.state.player.mana,0);assert.equal(e.hp,hp);assert.equal(e.ward.hp,ward);assert.equal(e.duskCounters,1);assert.equal(e.duskShadowHits||0,0);assert.equal(G.comfortSetting('easyMode'),heart);assert.equal(G.comfortSetting('bossAssistance'),help);
  }
 });
+
+test('phase, true stun or Ward break, defeat, knockout and travel retire the actual live shadow and its choices',()=>{
+ for(const action of ['phase','stun','ward','defeat','knockout','travel']){
+  const r=setup(action==='phase'?2:action==='ward'?1:3,{second:true}),{G,e}=r;for(let i=0;i<25&&!G.state.bossHazards.some(h=>h.owner===e);i++)r.step(.025);const root=e.duskShadow;assert.ok(G.duskShadowPoint(e));
+  if(action==='phase'){e.hp=e.def.hp*.3;r.step(.025);}
+  if(action==='stun'){G.combat.applyStatus(e,'stun',{dur:.6});r.step(.025);}
+  if(action==='ward'||action==='defeat'){
+   if(action==='ward'){e.ward.hp=1;G.state.claimedForms.push('wizard');G.setForm('wizard');}else{e.ward.hp=0;e.hp=1;}
+   const at=G.duskShadowPoint(e);Object.assign(G.state.player,{x:at.x+18,y:at.y,dir:{x:-1,y:0}});G.input.takeAim=()=>({x:-1,y:0,dragged:true});G.state.player.cooldowns[G.forms[G.state.formId].basic]=0;r.taps.add('a');for(let i=0;i<30&&G.duskShadowPoint(e);i++){r.step(.025);r.drain();}if(action==='ward')assert.equal(e.ward.hp,0);else assert.ok(e.dead);
+  }
+  if(action==='knockout'){G.state.player.invuln=0;G.damagePlayer(100,e.x,e.y);G.updateOpening(.025);assert.ok(G.state.knockout);}
+  if(action==='travel')r.load('overworld');
+  assert.equal(G.duskShadowPoint(e),null,action);assert.ok(root.dead||!G.state.enemies.includes(root),action);assert.ok(!G.state.enemies.some(z=>!z.dead&&z.moonCover?.owner===e),action);assert.equal(G.state.guardianChallenges.vesper.secondWaltzCleared,false,action);assert.equal(G.state.guardianChallenges.vesper.counterLearned,true,action);
+ }
+});

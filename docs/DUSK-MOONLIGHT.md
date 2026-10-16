@@ -1,5 +1,7 @@
 # Vesper’s moonlight and Second Waltz
 
+Historical October11 implementation and verification. Issue #61’s locally implemented dancing-shadow backfill supersedes its dash-stopping payoff after publication; see `VESPER-DANCING-SHADOW.md` for current scope and release status.
+
 October 11, 2026. The sixth authored guardian response develops Vesper’s existing dash/waltz, preserving the Duskflower Seal, Velvetwing discovery and connected Dusk Court. It applies `GUARDIAN-CHALLENGES.md` and the accumulated player-experience rules.
 
 ## What changes in play

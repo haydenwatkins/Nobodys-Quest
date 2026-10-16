@@ -55,7 +55,7 @@
     r.lit=true;G.sfx.play('wardBreak');G.damageNumber(e.x,e.y-20,'LIGHT!','#fff3c2');
     G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:23,dur:.45});
     if(!r.owner){
-      r.source={x:e.x,y:e.y};r.practiceShadow=true;
+      r.source={x:e.x,y:e.y};r.practiceShadow=true;e.def.name='Practice shadow';
       for(const [dx,dy] of [[32,0],[-32,0],[0,32],[0,-32]])if(G.world.isSafeSpawn(e.x+dx,e.y+dy)&&G.combat.clearArc(e.x,e.y,e.x+dx,e.y+dy)){e.x+=dx;e.y+=dy;break;}
     }
     return false; // Preparing light is not a hit, kill, lesson or counter.
@@ -88,7 +88,7 @@
   };
   G.duskShadowPoint=owner=>{
     const e=owner?.duskShadow,r=e?.moonCover;
-    return e&&!e.dead&&r.linked&&!owner.dead&&r.map===G.state.mapId&&r.phase===owner.bossPhase?r.shadow:null;
+    return e&&!e.dead&&r.linked&&!owner.dead&&G.state.enemies.includes(owner)&&!(owner.status?.stun?.dur>0)&&!(owner.bossStaggerT>0)&&!G.state.knockout&&r.map===G.state.mapId&&r.phase===owner.bossPhase?r.shadow:null;
   };
   G.noteDuskShadowHit=(owner,at)=>{
     if(!at?.duskShadow||!G.duskShadowPoint(owner))return;
@@ -160,7 +160,7 @@
   function advanceDance(owner,dt){
     const dance=owner.duskDance;if(!dance)return;
     const root=dance.source.moonCover;
-    if(owner.dead||dance.source.dead||dance.map!==G.state.mapId||dance.phase!==owner.bossPhase||G.state.knockout){owner.duskDance=null;return;}
+    if(owner.dead||dance.source.dead||dance.map!==G.state.mapId||dance.phase!==owner.bossPhase||owner.status?.stun?.dur>0||owner.bossStaggerT>0||G.state.knockout){G.cancelMoonCovers(owner);return;}
     dance.age+=dt;
     if(dance.age<dance.at||dance.complete)return;
     if(!dance.locked){
@@ -192,7 +192,7 @@
   G.beginDuskRematch=()=>{
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
     const e=G.makeEnemy('countessCarmine',22*16+8,8*16+8);
-    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().secondWaltz?'Two waltzes this time! Their pale openings stay put. Uncover a moon lamp to stop my dash before either begins.':'Welcome back! Uncover a moon lamp and let my dash meet its light. There is tea by the fire.'}};
+    e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().secondWaltz?'Let’s try a longer dance! In the later steps, pick the lamp behind you or the one ahead. I’ll keep the waltz going.':'Back for another dance? Uncover a lamp, step aside, then follow my shadow. There’s tea by the fire.'}};
     e.guardPost=true;e.vesperLocalRematch=true;e.vesperSecondWaltz=progress().secondWaltz&&progress().counterLearned;
     e.guardianPracticeExit={map:'vampireTrial',x:3,y:11};G.state.enemies.push(e);return true;
   };
@@ -203,18 +203,18 @@
   });
   const update=G.updateOpening;
   G.updateOpening=dt=>{update(dt);for(const owner of G.state.enemies||[])if(vesper(owner))advanceDance(owner,dt);for(const e of G.state.enemies||[]){const r=e.moonCover;if(e.dead||!r?.owner)continue;
-    r.age+=dt;if(r.owner.dead||r.map!==G.state.mapId||G.state.knockout||r.age>(r.maxAge||4))e.dead=true;
+    r.age+=dt;if(r.owner.dead||!G.state.enemies.includes(r.owner)||r.owner.status?.stun?.dur>0||r.owner.bossStaggerT>0||r.map!==G.state.mapId||G.state.knockout||r.age>(r.maxAge||4))e.dead=true;
   }};
   const candidate=G.openingInteractionCandidate,interact=G.tryOpeningInteraction;
   G.openingInteractionCandidate=()=>{
     const at=candidate();if(at)return at;
     if(!friendly()||G.ui.dialogueOpen||G.ui.menuOpen||G.state.knockout||G.state.bossCutscene||G.state.zoneTransition)return null;
     const p=G.state.player;if(Math.hypot(p.x-friend.x,p.y-friend.y)>18||G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&Math.hypot(s.x-p.x,s.y-p.y)<75))return null;
-    const a=progress();return {id:'vesper-rematch',kind:'vesper-rematch',...friend,label:a.counterLearned&&!a.invited?'Vesper · Say hello':a.secondWaltz?'Vesper · Try second waltz':'Vesper · Practice a dance',hint:a.counterLearned&&!a.invited?'Ask Vesper about her two-waltz practice.':a.secondWaltzCleared?'Second waltz cleared. Most light catches: '+a.bestCounters+'.':'Choose a dance here, then walk east.'};
+    const a=progress();return {id:'vesper-rematch',kind:'vesper-rematch',...friend,label:a.counterLearned&&!a.invited?'Vesper · Say hello':a.secondWaltz?'Vesper · Try second waltz':'Vesper · Practice a dance',hint:a.counterLearned&&!a.invited?'Ask Vesper about her two-waltz practice.':a.secondWaltzCleared?(a.bestShadowHits>0?'Second Waltz cleared. Most shadow strikes: '+a.bestShadowHits+'.':'Second Waltz cleared. There’s tea by the fire.'):'Choose a dance here, then walk east.'};
   };
   G.tryOpeningInteraction=()=>{
     const at=G.openingInteractionCandidate();if(at?.id!=='vesper-rematch')return interact();
-    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('VESPER',"You caught my dash in the moonlight! Want to try two waltzes? Light the Second Waltz lantern by the fire. Keep your help lights if you like. I've saved you a cup of tea.",{accent:'#e2c9d6'});}else G.beginDuskRematch();G.input.clearTaps();return true;
+    const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('VESPER',"You woke my moon lamps! Want to choose where the dance goes next? Light the Second Waltz lantern by the fire. Keep your help lights if you like. I've saved you a cup of tea.",{accent:'#e2c9d6'});}else G.beginDuskRematch();G.input.clearTaps();return true;
   };
   function drawLamp(c,x,y,lit){
     c.save();c.fillStyle=lit?'rgba(255,243,194,.22)':'rgba(38,40,57,.3)';c.beginPath();c.ellipse(x,y+2,lit?24:12,lit?12:5,0,0,Math.PI*2);c.fill();
@@ -237,6 +237,10 @@
     for(const e of G.state.enemies||[])if(!e.dead&&e.moonCover){
       const source=e.moonCover.source||e;
       list.push({y:source.y,fn:()=>drawLamp(c,source.x,source.y,e.moonCover.lit)});
+      if(e.moonCover.stepChoice&&G.moonCoverAim(e))list.push({y:e.y,fn:()=>{
+        const dance=e.moonCover.owner.duskDance,selected=(dance.choice||dance.options[0])===e;
+        c.save();c.strokeStyle='#fff3c2';c.fillStyle=selected?'#fff3c2':'#51415e';c.lineWidth=1.5;c.beginPath();c.moveTo(e.x,e.y-29);c.lineTo(e.x+4,e.y-25);c.lineTo(e.x,e.y-21);c.lineTo(e.x-4,e.y-25);c.closePath();c.fill();c.stroke();c.restore();
+      }});
       const owner=e.moonCover.owner,at=e.moonCover.practiceShadow?{x:e.x,y:e.y}:G.duskShadowPoint(owner);
       if(at&&owner?.duskShadow===e){const pool=e.moonCover.pool||e;list.push({y:-100000,fn:()=>{c.save();c.fillStyle='rgba(255,243,194,.13)';c.strokeStyle='#fff3c2';c.lineWidth=1.5;c.beginPath();c.arc(pool.x,pool.y,32,0,Math.PI*2);c.fill();c.stroke();c.restore();}});}
       if(at&&(!owner||owner.duskShadow===e))list.push({y:at.y,fn:()=>{

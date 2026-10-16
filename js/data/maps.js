@@ -199,7 +199,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 50, y: 78 } },
     "B": { tile: "floor", enemy: "countessCarmine" },
-    "m": { tile: "floor", message: "Strike a moon lamp cover before Vesper dashes. Its light stops her dash. Dark attacks break her ward." },
+    "m": { tile: "floor", message: "Uncover a moon lamp, then step aside. Strike Vesper’s shadow in the light. Hit a covered lamp to choose the next step. Dark attacks break her ward." },
     "H": { tile: "floor", chest: { heal: true, name: "a suspiciously red velvet cookie" } },
     "F": { tile: "floor", rest: true, restText: "Vesper’s fire restores every heart and all mana." },
     "R": { tile: "rock", on: "floor" },

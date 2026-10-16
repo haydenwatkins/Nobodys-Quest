@@ -279,7 +279,7 @@ G.combat = (() => {
             : enemy.bramLocalRematch
               ? enemy.bramRootRumble ? enemy.burrowTunnelUses>0 ? "You found your way through my tunnels! Come warm up by the fire. The shortbread's ready." : "You found a clear step through both stomps! Come warm up by the fire. The shortbread's ready." : "Good practice! Come warm up by the fire. The shortbread's ready."
             : enemy.vesperLocalRematch
-              ? enemy.vesperSecondWaltz ? enemy.duskCounters>0 ? "You caught my dash before both waltzes! Come have tea by the fire." : "You found the clear opening in both waltzes! Come have tea by the fire." : "A lovely dance! Come have tea by the fire."
+              ? enemy.duskShadowHits>0 ? "You found my dancing shadow! Come have tea by the fire." : "Lovely footsteps! Come have tea by the fire."
             : enemy.tansyLocalRematch
               ? enemy.stageCounters>0 ? "Custard everywhere! Come have a cookie by the fire." : "That was a lovely show! Come have a cookie by the fire."
             : enemy.marloLocalRematch
