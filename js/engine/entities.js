@@ -1503,6 +1503,7 @@ G.updateEnemies = function (dt) {
     if (e.dead) { s.enemies.splice(i, 1); continue; } // poison may have finished it
 
     // knockback slides
+    const beforeSlideX=e.x,beforeSlideY=e.y;
     if (e.kbx || e.kby) {
       G.world.moveBox(e, e.kbx * dt, e.kby * dt);
       e.kbx *= Math.pow(0.002, dt);
@@ -1510,6 +1511,7 @@ G.updateEnemies = function (dt) {
       if (Math.abs(e.kbx) < 4 && Math.abs(e.kby) < 4) e.kbx = e.kby = 0;
     }
 
+    G.trackDuskSlide?.(e,beforeSlideX,beforeSlideY);
     const stunned = e.status && e.status.stun;
     if (!stunned && G.updateOpeningEnemy && G.updateOpeningEnemy(e, p, dt)) continue;
     const d = G.util.dist(e.x, e.y, p.x, p.y);

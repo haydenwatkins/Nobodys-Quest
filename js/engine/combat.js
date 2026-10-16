@@ -75,7 +75,7 @@ G.combat = (() => {
 
   // One actor, possibly two visible contacts. Attack hit sets still own the actor.
   function contactPoints(enemy) {
-    if(enemy.moonCover?.lit)return [];
+    if(enemy.moonCover?.lit&&!enemy.moonCover.practiceShadow)return [];
     const shadow=G.duskShadowPoint?.(enemy);
     return shadow?[enemy,{...shadow,duskShadow:true}]:[enemy];
   }
@@ -840,7 +840,7 @@ G.combat = (() => {
         gone = true;
       } else if (!gone && pr.fromPlayer) {
         for (const e of s.enemies) {
-          if (e.dead || e.burrowPlug?.broken || e.moonCover?.lit || (pr.wayglassPracticeTarget && e !== pr.wayglassPracticeTarget)) continue;
+          if (e.dead || e.burrowPlug?.broken || (pr.wayglassPracticeTarget && e !== pr.wayglassPracticeTarget)) continue;
           if (pr.hitSet && pr.hitSet.has(e)) continue;
           if (pr.hitGroup && e.lastProjectileGroup === pr.hitGroup) continue;
           const contact=contactPoints(e).find(at=>G.util.dist(pr.x,pr.y,at.x,at.y-4)<pr.size+e.def.size/2);

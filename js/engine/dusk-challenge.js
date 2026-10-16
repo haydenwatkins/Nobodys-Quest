@@ -20,11 +20,11 @@
     e.def={...e.def,id:e.id,name:'Covered moon lamp',practice:true,damage:0,speed:0,size:18};e.hp=1;e.ward=null;
     e.moonCover={owner,map:G.state.mapId,lit:false,age:0};G.state.enemies.push(e);return e;
   }
-  G.moonCoverAim=e=>!!e.moonCover&&!e.dead&&!e.moonCover.lit;
+  G.moonCoverAim=e=>!!e.moonCover&&!e.dead&&(!e.moonCover.lit||e.moonCover.practiceShadow);
   G.cancelMoonCovers=owner=>{for(const e of G.state.enemies||[])if(e.moonCover?.owner&&(!owner||e.moonCover.owner===owner))e.dead=true;};
   G.prepareDuskCounter=owner=>{
     if(!vesper(owner))return;
-    G.cancelMoonCovers(owner);
+    G.cancelMoonCovers(owner);owner.duskDashFeet={x:owner.x,y:owner.y};
     for(const d of [34,26,18]){
       const x=owner.x+owner.bossChargeX*d,y=owner.y+owner.bossChargeY*d;
       if(G.world.isSafeSpawn(x,y)){cover(x,y,owner);break;}
@@ -32,21 +32,38 @@
   };
   G.hitMoonCover=(e,opts)=>{
     const r=e.moonCover;
-    if(e.dead||!r||r.lit||r.map!==G.state.mapId||!(opts.damage>0)||!G.abilities[opts.ability]||r.owner?.dead)return false;
+    if(e.dead||!r||r.map!==G.state.mapId||!(opts.damage>0)||!G.abilities[opts.ability]||r.owner?.dead)return false;
+    if(r.practiceShadow){
+      e.dead=true;progress().practiceCleared=true;G.sfx.play('wardBreak');
+      G.spawnFx({kind:'ring',x:r.source.x,y:r.source.y,color:'#fff3c2',radius:24,dur:.5});G.saveGame();return false;
+    }
+    if(r.lit)return false;
     r.lit=true;G.sfx.play('wardBreak');G.damageNumber(e.x,e.y-20,'LIGHT!','#fff3c2');
     G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:23,dur:.45});
-    if(!r.owner){e.dead=true;progress().practiceCleared=true;G.saveGame();}
+    if(!r.owner){
+      r.source={x:e.x,y:e.y};r.practiceShadow=true;
+      for(const [dx,dy] of [[32,0],[-32,0],[0,32],[0,-32]])if(G.world.isSafeSpawn(e.x+dx,e.y+dy)&&G.combat.clearArc(e.x,e.y,e.x+dx,e.y+dy)){e.x+=dx;e.y+=dy;break;}
+    }
     return false; // Preparing light is not a hit, kill, lesson or counter.
+  };
+  // Account for actual engine knockback before tracing the committed body step.
+  G.trackDuskSlide=(owner,x,y)=>{
+    if(!vesper(owner)||!owner.duskDashFeet||!(owner.bossChargeT>0||owner.bossPendingAction==='vampireDash'))return;
+    if(Math.hypot(x-owner.duskDashFeet.x,y-owner.duskDashFeet.y)>.1){G.cancelMoonCovers(owner);owner.duskDashFeet=null;return;}
+    owner.duskDashFeet={x:owner.x,y:owner.y};
   };
   G.catchMoonLight=(owner,x,y)=>{
     if(!vesper(owner)||owner.dead||owner.bossChargeT<=0||owner.bossAfterCharge!=='crimsonWaltz')return false;
+    const feet=owner.duskDashFeet;owner.duskDashFeet={x:owner.x,y:owner.y};
+    if(!feet||Math.hypot(feet.x-x,feet.y-y)>.1||Math.hypot(owner.x-x,owner.y-y)<.1)return false;
     for(const e of G.state.enemies||[]){
       const r=e.moonCover;if(e.dead||r?.owner!==owner||r.linked||!r.lit||r.map!==G.state.mapId)continue;
       const dx=owner.x-x,dy=owner.y-y,sq=dx*dx+dy*dy,t=sq?G.util.clamp(((e.x-x)*dx+(e.y-y)*dy)/sq,0,1):0;
-      if(Math.hypot(x+dx*t-e.x,y+dy*t-e.y)>12+owner.def.size/2)continue;
+      const cx=x+dx*t,cy=y+dy*t;
+      if(Math.hypot(cx-e.x,cy-e.y)>12+owner.def.size/2||!G.combat.clearArc(cx,cy,e.x,e.y))continue;
       r.linked=true;r.phase=owner.bossPhase;r.age=0;
       const sx=e.x-owner.bossChargeX*24,sy=e.y-owner.bossChargeY*24;
-      r.shadow=G.world.isSafeSpawn(sx,sy)?{x:sx,y:sy}: {x:e.x,y:e.y};owner.duskShadow=e;
+      r.shadow=G.world.isSafeSpawn(sx,sy)&&G.combat.clearArc(e.x,e.y,sx,sy)?{x:sx,y:sy}: {x:e.x,y:e.y};owner.duskShadow=e;
       owner.duskCounters=(owner.duskCounters||0)+1;progress().counterLearned=true;
       G.sfx.play('wardBreak');G.damageNumber(e.x,e.y-24,'SHADOW!','#fff3c2');
       G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:28,dur:.5});G.saveGame();
@@ -123,17 +140,21 @@
     if(!lit){c.strokeStyle='#e2c9d6';c.lineWidth=1;c.beginPath();c.moveTo(x-4,y-13);c.lineTo(x,y-9);c.lineTo(x-3,y-6);c.lineTo(x+3,y-2);c.stroke();}
     c.restore();
   }
-  const draw=G.openingDrawables;
-  G.openingDrawables=c=>{const list=draw(c);
-    for(const e of G.state.enemies||[])if(!e.dead&&e.moonCover){
-      list.push({y:e.y,fn:()=>drawLamp(c,e.x,e.y,e.moonCover.lit,!!G.duskShadowPoint(e.moonCover.owner)&&e.moonCover.owner.duskShadow===e)});
-      const owner=e.moonCover.owner,at=G.duskShadowPoint(owner);
-      if(at&&owner.duskShadow===e)list.push({y:at.y,fn:()=>{
-        c.save();c.globalAlpha=.65;c.strokeStyle='#e2c9d6';c.lineWidth=2;c.setLineDash([3,3]);c.beginPath();c.moveTo(owner.x,owner.y);c.lineTo(at.x,at.y);c.stroke();c.setLineDash([]);
-        c.globalAlpha=.9;c.fillStyle=e.flash>0?'#e2c9d6':'#302638';c.strokeStyle='#fff3c2';c.lineWidth=1.2;
+  function drawDancingShadow(c,at,source,flash){
+        c.save();c.globalAlpha=.65;c.strokeStyle='#e2c9d6';c.lineWidth=2;c.setLineDash([3,3]);c.beginPath();c.moveTo(source.x,source.y);c.lineTo(at.x,at.y);c.stroke();c.setLineDash([]);
+        c.globalAlpha=.9;c.fillStyle=flash>0?'#e2c9d6':'#302638';c.strokeStyle='#fff3c2';c.lineWidth=1.2;
         c.beginPath();c.moveTo(at.x-3,at.y-10);c.lineTo(at.x-12,at.y-8);c.lineTo(at.x-13,at.y-2);c.lineTo(at.x-6,at.y-6);c.lineTo(at.x-9,at.y+4);c.quadraticCurveTo(at.x,at.y+1,at.x+9,at.y+4);c.lineTo(at.x+6,at.y-6);c.lineTo(at.x+13,at.y-2);c.lineTo(at.x+12,at.y-8);c.lineTo(at.x+3,at.y-10);c.closePath();c.fill();c.stroke();
         c.beginPath();c.moveTo(at.x-5,at.y-15);c.lineTo(at.x-5,at.y-22);c.lineTo(at.x-1,at.y-19);c.lineTo(at.x+1,at.y-19);c.lineTo(at.x+5,at.y-22);c.lineTo(at.x+5,at.y-15);c.quadraticCurveTo(at.x,at.y-9,at.x-5,at.y-15);c.fill();c.stroke();
         c.fillStyle='#fff3c2';c.fillRect(at.x-3,at.y-16,2,2);c.fillRect(at.x+1,at.y-16,2,2);c.restore();
+  }
+  const draw=G.openingDrawables;
+  G.openingDrawables=c=>{const list=draw(c);
+    for(const e of G.state.enemies||[])if(!e.dead&&e.moonCover){
+      const source=e.moonCover.source||e;
+      list.push({y:source.y,fn:()=>drawLamp(c,source.x,source.y,e.moonCover.lit,!!G.duskShadowPoint(e.moonCover.owner)&&e.moonCover.owner.duskShadow===e)});
+      const owner=e.moonCover.owner,at=e.moonCover.practiceShadow?{x:e.x,y:e.y}:G.duskShadowPoint(owner);
+      if(at&&(!owner||owner.duskShadow===e))list.push({y:at.y,fn:()=>{
+        drawDancingShadow(c,at,owner||e.moonCover.source,e.flash);
       }});
     }
     if(G.state.mapId!=='vampireTrial')return list;
