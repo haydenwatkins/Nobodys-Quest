@@ -73,6 +73,12 @@ G.combat = (() => {
     burst(enemy.x, enemy.y - enemy.h() / 2, color, 4 + power * 2);
   }
 
+  // One actor, possibly two visible contacts. Attack hit sets still own the actor.
+  function contactPoints(enemy) {
+    const shadow=G.duskShadowPoint?.(enemy);
+    return shadow?[enemy,{...shadow,duskShadow:true}]:[enemy];
+  }
+
   function damageEnemy(enemy, opts) {
     // opts: {damage, type, ability, fromX, fromY, knockback, status}
     if (enemy.dead) return false;
@@ -124,6 +130,7 @@ G.combat = (() => {
         && (style === 'melee' || style === 'area') ? 1 : 0;
       const wardDamage = opts.damage + wardBonus;
       enemy.ward.hp -= wardDamage;
+      G.noteDuskShadowHit?.(enemy,opts.contactPoint);
       G.damageNumber(enemy.x, enemy.y - enemy.h(), overrulesWard ? "WAYHEART!" : wardDamage, wardHitColor);
       knockback(enemy, opts, 0.7);
       impactFeedback(enemy, { ...opts, damage: wardDamage, hitStop: Math.min(opts.hitStop || 0.025, 0.025), shake: 0.08 }, wardHitColor);
@@ -155,6 +162,7 @@ G.combat = (() => {
     }
     // Normal damage
     enemy.hp -= opts.damage;
+    G.noteDuskShadowHit?.(enemy,opts.contactPoint);
     enemy.flash = 0.12;
     G.damageNumber(enemy.x, enemy.y - enemy.h(), opts.damage, G.DAMAGE_TYPES[type].color);
     knockback(enemy, opts, 1);
@@ -491,13 +499,14 @@ G.combat = (() => {
     const roadContacts = [];
     for (const e of G.state.enemies) {
       if (e.dead) continue;
-      const d = G.util.dist(user.x, user.y, e.x, e.y);
-      if (d > range + e.def.size / 2) continue;
-      const a = G.util.angleTo(user.x, user.y, e.x, e.y);
-      if (Math.abs(G.util.angleDiff(facing, a)) > arc / 2 && d > 10) continue;
+      const contact=contactPoints(e).find(at=>{
+        const d=G.util.dist(user.x,user.y,at.x,at.y),a=G.util.angleTo(user.x,user.y,at.x,at.y);
+        return d<=range+e.def.size/2&&(d<=10||Math.abs(G.util.angleDiff(facing,a))<=arc/2);
+      });
+      if(!contact)continue;
       if (e.roadMechanism) roadContacts.push(e);
       if (damageEnemy(e, {
-        damage: o.damage, type, ability: o.ability,
+        damage: o.damage, type, ability: o.ability, contactPoint:contact,
         knockback: o.knockback, status: o.status,
         breaksAnyWard: breaksAnyWard(user) || !!o.breaksAnyWard,
         fromX: user.x, fromY: user.y,
@@ -943,5 +952,5 @@ G.combat = (() => {
     return hits;
   }
 
-  return { clearArc, damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, forceEnemies, updateProjectiles };
+  return { clearArc, contactPoints, damageEnemy, applyStatus, updateStatuses, meleeArc, shoot, chain, areaBurst, dash, finishDash, forceEnemies, updateProjectiles };
 })();

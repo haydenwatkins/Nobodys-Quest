@@ -1,4 +1,4 @@
-/* Uncover a moon lamp, then let Vesper's committed dash reach its light. */
+/* A real moonlight catch exposes Vesper’s reachable dancing shadow. */
 "use strict";
 (() => {
   const point=(x,y)=>({x:x*16+8,y:y*16+8}),fire=point(3,11),lamp=point(4,12),friend=point(5,10),practice=point(6,13);
@@ -41,15 +41,27 @@
   G.catchMoonLight=(owner,x,y)=>{
     if(!vesper(owner)||owner.dead||owner.bossChargeT<=0||owner.bossAfterCharge!=='crimsonWaltz')return false;
     for(const e of G.state.enemies||[]){
-      const r=e.moonCover;if(e.dead||r?.owner!==owner||!r.lit||r.map!==G.state.mapId)continue;
+      const r=e.moonCover;if(e.dead||r?.owner!==owner||r.linked||!r.lit||r.map!==G.state.mapId)continue;
       const dx=owner.x-x,dy=owner.y-y,sq=dx*dx+dy*dy,t=sq?G.util.clamp(((e.x-x)*dx+(e.y-y)*dy)/sq,0,1):0;
       if(Math.hypot(x+dx*t-e.x,y+dy*t-e.y)>12+owner.def.size/2)continue;
-      e.dead=true;owner.duskCounters=(owner.duskCounters||0)+1;progress().counterLearned=true;
-      G.guardianCounterOpening(owner);G.sfx.play('wardBreak');G.damageNumber(owner.x,owner.y-24,'CAUGHT!','#fff3c2');
+      r.linked=true;r.phase=owner.bossPhase;r.age=0;
+      const sx=e.x-owner.bossChargeX*24,sy=e.y-owner.bossChargeY*24;
+      r.shadow=G.world.isSafeSpawn(sx,sy)?{x:sx,y:sy}: {x:e.x,y:e.y};owner.duskShadow=e;
+      owner.duskCounters=(owner.duskCounters||0)+1;progress().counterLearned=true;
+      G.sfx.play('wardBreak');G.damageNumber(e.x,e.y-24,'SHADOW!','#fff3c2');
       G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#fff3c2',radius:28,dur:.5});G.saveGame();
-      G.events.emit('guardianCounter',{guardian:'countessCarmine',kind:'moonRefuge'});return true;
+      G.events.emit('guardianCounter',{guardian:'countessCarmine',kind:'moonRefuge'});return false;
     }
     return false;
+  };
+  G.duskShadowPoint=owner=>{
+    const e=owner?.duskShadow,r=e?.moonCover;
+    return e&&!e.dead&&r.linked&&!owner.dead&&r.map===G.state.mapId&&r.phase===owner.bossPhase?r.shadow:null;
+  };
+  G.noteDuskShadowHit=(owner,at)=>{
+    if(!at?.duskShadow||!G.duskShadowPoint(owner))return;
+    owner.duskShadowHits=(owner.duskShadowHits||0)+1;
+    progress().bestShadowHits=Math.max(progress().bestShadowHits||0,owner.duskShadowHits);G.saveGame();
   };
   G.prepareDuskWaltz=(owner,h)=>{
     if(!vesper(owner)||!owner.vesperSecondWaltz)return;
@@ -105,7 +117,16 @@
   }
   const draw=G.openingDrawables;
   G.openingDrawables=c=>{const list=draw(c);
-    for(const e of G.state.enemies||[])if(!e.dead&&e.moonCover)list.push({y:e.y,fn:()=>drawLamp(c,e.x,e.y,e.moonCover.lit)});
+    for(const e of G.state.enemies||[])if(!e.dead&&e.moonCover){
+      list.push({y:e.y,fn:()=>drawLamp(c,e.x,e.y,e.moonCover.lit)});
+      const owner=e.moonCover.owner,at=G.duskShadowPoint(owner);
+      if(at&&owner.duskShadow===e)list.push({y:at.y,fn:()=>{
+        c.save();c.globalAlpha=.65;c.strokeStyle='#e2c9d6';c.lineWidth=2;c.setLineDash([3,3]);c.beginPath();c.moveTo(owner.x,owner.y);c.lineTo(at.x,at.y);c.stroke();c.setLineDash([]);
+        c.globalAlpha=.9;c.fillStyle='#302638';c.strokeStyle='#fff3c2';c.lineWidth=1.5;
+        c.beginPath();c.moveTo(at.x-10,at.y+4);c.lineTo(at.x-14,at.y-9);c.lineTo(at.x-5,at.y-6);c.lineTo(at.x,at.y-15);c.lineTo(at.x+5,at.y-6);c.lineTo(at.x+14,at.y-9);c.lineTo(at.x+10,at.y+4);c.closePath();c.fill();c.stroke();
+        c.fillStyle='#fff3c2';c.fillRect(at.x-4,at.y-5,2,2);c.fillRect(at.x+2,at.y-5,2,2);c.restore();
+      }});
+    }
     if(G.state.mapId!=='vampireTrial')return list;
     list.push({y:fire.y,fn:()=>G.drawOpeningProp(c,'camp',fire.x,fire.y,G.state.time)});
     if(progress().practiceCleared)list.push({y:practice.y,fn:()=>drawLamp(c,practice.x,practice.y,true)});
