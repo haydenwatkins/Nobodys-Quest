@@ -19,11 +19,11 @@
  G.cancelBreakwaterSluices=owner=>{for(const e of G.state.enemies||[])if(e.breakwaterSluice?.owner&&(!owner||e.breakwaterSluice.owner===owner))e.dead=true;};
  G.prepareBreakwaterCounter=(owner,h)=>{
   if(!marlo(owner)||!h.safePoint)return;G.cancelBreakwaterSluices(owner);h.breakwater=true;
-  if(!owner.marloReturningTide)return;
+  if(!owner.marloReturningTide&&owner.bossPhase<3)return;
   const axis=h.axis==='x'?'y':'x',b=h.bounds,p=h.safePoint,span=axis==='x'?b.bottom-b.top:b.right-b.left,at=axis==='x'?p.y-b.top:p.x-b.left;
   // Both channels commit to the same reachable refuge. The second warning
   // starts only after the complete helped first tide and a clear breather.
-  G.state.bossHazards.push({...h,axis,safeLane:G.util.clamp(Math.floor(at/span*h.lanes),0,h.lanes-1),safePoint:{...p},safeRoute:h.safeRoute.map(s=>({...s})),delay:(G.guardianWarningSeconds?.(h.warning)??h.warning)+h.active+.55,warning:h.warning,t:0,hit:false,sluice:null});
+  const follow={...h,axis,safeLane:G.util.clamp(Math.floor(at/span*h.lanes),0,h.lanes-1),safePoint:{...p},safeRoute:h.safeRoute.map(s=>({...s})),delay:(G.guardianWarningSeconds?.(h.warning)??h.warning)+h.active+.55,warning:h.warning,t:0,hit:false,sluice:null};h.breakwaterFollow=follow;G.state.bossHazards.push(follow);
  };
  G.syncBreakwaterSluice=h=>{
   if(!h.breakwater||h.mapId!==G.state.mapId||h.owner.dead||G.state.knockout)return;
@@ -39,7 +39,9 @@
   if(r.owner&&(r.owner.dead||!marlo(r.owner)||r.h.owner!==r.owner||r.h.chosen&&r.h.chosen!==e||!G.state.bossHazards.includes(r.h)||r.h.t-(r.h.delay||0)<0||r.h.t-(r.h.delay||0)>=r.h.warning+r.h.active))return false;
   r.open=true;G.sfx.play('wardBreak');G.damageNumber(e.x,e.y-19,'OPEN!','#fff3c2');G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#73eff7',radius:21,dur:.35});
   if(!r.owner)r.practiceFlow={...current(e,1,0,64,{left:24,right:424,top:24,bottom:248}),practice:e};
-  else{r.h.chosen=r.h.sluice=e;for(const gate of r.h.sluices)if(gate!==e)gate.dead=true;}
+  else{r.h.chosen=r.h.sluice=e;for(const gate of r.h.sluices)if(gate!==e)gate.dead=true;
+   const next=r.h.breakwaterFollow;if(next&&r.owner.bossPhase>=3&&next.t<next.delay){const f=r.outlet,at={x:f.x+f.dx*f.length,y:f.y+f.dy*f.length},b=next.bounds,position=next.axis==='x'?at.y-b.top:at.x-b.left,span=next.axis==='x'?b.bottom-b.top:b.right-b.left;next.safeLane=G.util.clamp(Math.floor(position/span*next.lanes),0,next.lanes-1);next.safePoint=at;next.safeRoute=[...r.h.safeRoute.map(s=>({...s})),{x:e.x,y:e.y},at];}
+  }
   return false; // Opening wood is neither a creature hit nor a learned counter.
  };
  G.catchBreakwaterTide=h=>{
