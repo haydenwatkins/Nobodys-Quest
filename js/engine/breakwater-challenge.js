@@ -1,4 +1,4 @@
-/* Open driftwood; the arriving tide supplies Marlo's counter opening. */
+/* Open driftwood; walk with a real continuing tide through its outlet. */
 "use strict";
 (() => {
  const point=(x,y)=>({x:x*16+8,y:y*16+8}),fire=point(3,11),lamp=point(4,12),friend=point(5,10),practice=point(6,13);
@@ -39,9 +39,18 @@
  };
  G.catchBreakwaterTide=h=>{
   const c=h.sluice,r=c?.breakwaterSluice,t=h.t-(h.delay||0),owner=h.owner;
-  if(!h.breakwater||!c||c.dead||!r.open||r.h!==h||r.map!==G.state.mapId||owner.dead||G.state.knockout||!G.state.bossHazards.includes(h)||t<h.warning||t>=h.warning+h.active)return false;
-  sprays.push({x:c.x,y:c.y,tx:owner.x,ty:owner.y-6,age:0});owner.breakwaterCounters=(owner.breakwaterCounters||0)+1;progress().counterLearned=true;G.guardianCounterOpening(owner);
-  G.damageNumber(owner.x,owner.y-22,'WHOOSH!','#fff3c2');G.spawnFx({kind:'ring',x:owner.x,y:owner.y-5,color:'#73eff7',radius:25,dur:.5});G.sfx.play('wardBreak');G.saveGame();G.events.emit('guardianCounter',{guardian:'admiralTortoise',kind:'openSluice'});return true;
+  if(!h.breakwater||h.breakwaterFlow||!c||c.dead||!r.open||r.h!==h||r.map!==G.state.mapId||owner.dead||G.state.knockout||!G.state.bossHazards.includes(h)||t<h.warning||t>=h.warning+h.active)return false;
+  const dx=h.axis==='y'?(owner.x>=c.x?1:-1):0,dy=h.axis==='x'?(owner.y>=c.y?1:-1):0,b=h.bounds;let length=0;
+  for(let at=1;at<=96;at++){const x=c.x+dx*at,y=c.y+dy*at;if(x<b.left+6||x>b.right-6||y<b.top+8||y>b.bottom-6||!G.world.isSafeSpawn(x,y))break;length=at;}
+  h.breakwaterFlow={x:c.x,y:c.y,dx,dy,length,phase:owner.bossPhase};
+  sprays.push({x:c.x,y:c.y,tx:c.x+dx*length,ty:c.y+dy*length,age:0});owner.breakwaterCounters=(owner.breakwaterCounters||0)+1;progress().counterLearned=true;
+  G.damageNumber(c.x,c.y-22,'FLOW!','#fff3c2');G.sfx.play('wardBreak');G.saveGame();G.events.emit('guardianCounter',{guardian:'admiralTortoise',kind:'openSluice'});return false;
+ };
+ function liveFlow(h){const f=h.breakwaterFlow,t=h.t-(h.delay||0);return f&&h.mapId===G.state.mapId&&G.state.bossHazards.includes(h)&&!h.owner.dead&&G.state.enemies.includes(h.owner)&&!G.state.knockout&&f.phase===h.owner.bossPhase&&t>=h.warning&&t<h.warning+h.active?f:null;}
+ G.breakwaterCurrentShelters=(h,p)=>{const f=liveFlow(h);if(!f)return false;const dx=p.x-f.x,dy=p.y-f.y,along=dx*f.dx+dy*f.dy,across=Math.abs(dx*f.dy-dy*f.dx);return along>=-8&&along<=f.length&&across<=14;};
+ const updatePlayer=G.updatePlayer;
+ G.updatePlayer=dt=>{const p=G.state.player,x=p.x,y=p.y,map=G.state.mapId,dash=!!p.dashing;updatePlayer(dt);if(G.state.player!==p||G.state.mapId!==map||dash||p.dashing||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen||Math.hypot(p.x-x,p.y-y)<.001)return;
+  for(const h of G.state.bossHazards||[]){const f=liveFlow(h);if(!f||!G.breakwaterCurrentShelters(h,p))continue;const along=G.input.vec.x*f.dx+G.input.vec.y*f.dy;if(along<=.1||(p.x-x)*f.dx+(p.y-y)*f.dy<=.001)continue;const left=f.length-((p.x-f.x)*f.dx+(p.y-f.y)*f.dy),step=Math.min(Math.max(0,left),60*along*dt);G.world.moveBox(p,f.dx*step,f.dy*step);break;}
  };
  G.noteBreakwaterDefeat=e=>{if(!marlo(e))return;const a=progress(),n=e.breakwaterCounters||0;if(n>0){a.counterLearned=true;a.bestCounters=Math.max(a.bestCounters,n);}if(e.marloLocalRematch&&e.marloReturningTide&&G.state.mapId==='turtleTrial')a.returningTideCleared=true;G.cancelBreakwaterSluices(e);G.saveGame();};
  G.beginBreakwaterRematch=()=>{if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
@@ -60,6 +69,7 @@
   for(const dx of [-11,9]){c.fillStyle='#48382f';c.fillRect(x+dx,y-13,3,16);c.fillStyle='#c6ac79';c.fillRect(x+dx+1,y-12,1,14);}
   for(const dy of [-10,-5]){c.fillStyle='#8a6538';c.fillRect(x-8,y+dy-(open?7:0),17,4);c.fillStyle='#c6ac79';c.fillRect(x-8,y+dy-(open?7:0),17,1);}c.fillStyle='#fff3c2';c.fillRect(x-2,y-(open?17:10),4,2);c.restore();};
  const draw=G.openingDrawables;G.openingDrawables=c=>{const list=draw(c);for(const e of G.state.enemies||[])if(!e.dead&&e.breakwaterSluice)list.push({y:e.y,fn:()=>G.drawBreakwaterSluice(c,e.x,e.y,e.breakwaterSluice.open)});
+  for(const h of G.state.bossHazards||[]){const f=liveFlow(h);if(!f)continue;list.push({y:-10000,fn:()=>{c.save();c.strokeStyle='#73eff7';c.fillStyle='rgba(115,239,247,.22)';c.lineWidth=2;c.beginPath();c.moveTo(f.x-f.dy*14,f.y+f.dx*14);c.lineTo(f.x+f.dx*f.length-f.dy*14,f.y+f.dy*f.length+f.dx*14);c.lineTo(f.x+f.dx*f.length+f.dy*14,f.y+f.dy*f.length-f.dx*14);c.lineTo(f.x+f.dy*14,f.y-f.dx*14);c.closePath();c.fill();c.stroke();for(let at=12;at<f.length;at+=20){const x=f.x+f.dx*at,y=f.y+f.dy*at;c.beginPath();c.moveTo(x-f.dx*5-f.dy*4,y-f.dy*5+f.dx*4);c.lineTo(x+f.dx*2,y+f.dy*2);c.lineTo(x-f.dx*5+f.dy*4,y-f.dy*5-f.dx*4);c.stroke();}c.restore();}});}
   for(const s of sprays)list.push({y:Math.max(s.y,s.ty),fn:()=>{c.save();for(let i=0;i<8;i++){const f=G.util.clamp(s.age/.45-i*.025,0,1),x=s.x+(s.tx-s.x)*f,y=s.y+(s.ty-s.y)*f-Math.sin(f*Math.PI)*12;c.globalAlpha=(1-s.age/.6)*.85;c.fillStyle=i%2?'#fff3c2':'#73eff7';c.beginPath();c.ellipse(x,y,5,2,0,0,Math.PI*2);c.fill();}c.restore();}});
   if(G.state.mapId!=='turtleTrial')return list;list.push({y:fire.y,fn:()=>G.drawOpeningProp(c,'camp',fire.x,fire.y,G.state.time)});
   if(progress().practiceCleared)list.push({y:practice.y,fn:()=>G.drawBreakwaterSluice(c,practice.x,practice.y,true)});

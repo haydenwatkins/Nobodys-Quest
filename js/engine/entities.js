@@ -739,7 +739,7 @@ G.updateBossHazards = function (dt) {
 
     if (h.kind === "gust") {
       if(G.catchBreakwaterTide?.(h))continue;
-      if (!p.dashing && gustLaneDanger(h, p.x, p.y)) {
+      if (!p.dashing && gustLaneDanger(h, p.x, p.y) && !G.breakwaterCurrentShelters?.(h,p)) {
         const a = G.util.angleTo(p.x, p.y, h.owner.x, h.owner.y);
         const speed = h.push || 58;
         G.world.moveBox(p, Math.cos(a) * speed * dt, Math.sin(a) * speed * dt);
