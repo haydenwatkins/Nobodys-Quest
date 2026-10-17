@@ -284,7 +284,7 @@ G.combat = (() => {
             : enemy.tansyLocalRematch
               ? enemy.stageCounters>0 ? "Custard everywhere! Come have a cookie by the fire." : "That was a lovely show! Come have a cookie by the fire."
             : enemy.marloLocalRematch
-              ? enemy.breakwaterCounters>0 ? "The tide caught my shell! Come have a warm biscuit by the fire." : "You found your way through the tide! Come have a warm biscuit by the fire."
+              ? enemy.breakwaterRides>0 ? "You rode the current! Come have a warm biscuit by the fire." : "You found your way through the tide! Come have a warm biscuit by the fire."
             : enemy.sumiLocalRematch
               ? enemy.foldroadCounters>0 ? "You opened my folds! Come have a rice cake by the fire." : "You found a clear step through my cuts! Come have a rice cake by the fire."
             : G.guardianRepeatVictory?.(enemy) || `${enemy.def.name} is defeated again.`;

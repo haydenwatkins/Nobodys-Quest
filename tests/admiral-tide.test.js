@@ -3,9 +3,9 @@ function setup(phase=1,action='tideWall'){
  const r=runtime(),{G}=r;r.load('turtleTrial');r.drain();const e=G.state.enemies.find(e=>e.def.id==='admiralTortoise');G.state.enemies=[e];Object.assign(G.state.player,{x:e.x-60,y:e.y,invuln:0,meleeGuard:0});G.state.bossCutscene=null;
  Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),bossTelegraphT:.01,bossPendingAction:action});G.updateEnemies(.02);return {...r,e};
 }
-test('Admiral tide marks walkable refuge and keeps it safe in every phase',()=>{
+test('Admiral tide marks walkable refuge through the complete authored phrase in every phase',()=>{
  for(const phase of [1,2,3]){const {G,e}=setup(phase),h=G.state.bossHazards[0];assert.equal(h.lanes,phase+2);assert.ok(h.safePoint);assert.ok(G.world.isSafeSpawn(h.safePoint.x,h.safePoint.y));Object.assign(G.state.player,h.safePoint);
-  const damage=G.state.player.damageTaken,x=e.x,y=e.y;for(let t=0;t<2.3;t+=.02){G.updateEnemies(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
+  const damage=G.state.player.damageTaken,x=e.x,y=e.y,end=Math.max(...G.state.bossHazards.map(f=>(f.delay||0)+f.warning+f.active))+.025;for(let t=0;t<end;t+=.02){G.updateEnemies(.02);}assert.equal(G.state.player.damageTaken,damage);assert.equal(e.x,x);assert.equal(e.y,y);assert.ok(e.bossRecoverT>.6);assert.equal(G.state.bossHazards.length,0);
  }
 });
 test('tide warns before damage and stagger cancels it',()=>{
