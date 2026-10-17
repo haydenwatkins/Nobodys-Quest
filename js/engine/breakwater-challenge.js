@@ -29,6 +29,13 @@
   if(!h.breakwater||h.mapId!==G.state.mapId||h.owner.dead||G.state.knockout)return;
   const t=h.t-(h.delay||0);if(t<0)return;if(t>=h.warning+h.active){G.retireBreakwaterSluice(h);return;}if(h.sluice)return;
   const p=h.safePoint,spots=Array.from({length:16},(_,i)=>({x:p.x+Math.cos(i*Math.PI/8)*22,y:p.y+Math.sin(i*Math.PI/8)*22}));
+  if(h.returnFrom){const from=h.returnFrom;
+   for(const side of [1,-1]){const at={x:p.x-from.dx*16-from.dy*24*side,y:p.y-from.dy*16+from.dx*24*side},dx=from.x-at.x,dy=from.y-at.y,d=Math.hypot(dx,dy),access=Math.hypot(at.x-p.x,at.y-p.y);if(!inChannel(h,at.x,at.y)||!d||current(p,(at.x-p.x)/access,(at.y-p.y)/access,access,h.bounds).length<access-1)continue;const outlet=current(at,dx/d,dy/d,d,h.bounds);if(outlet.length<d-1)continue;
+    const gate=sluice(at.x,at.y,h.owner,h);Object.assign(gate.breakwaterSluice,{returnOutlet:true,outlet:{...outlet,phase:h.owner.bossPhase,owner:h.owner}});h.sluices=[gate];h.sluice=gate;
+    const across={x:p.x-from.dx*56-from.dy*24*side,y:p.y-from.dy*56+from.dx*24*side},reach=Math.hypot(across.x-p.x,across.y-p.y),cx=h.axis==='y'?(h.owner.x>=across.x?1:-1):0,cy=h.axis==='x'?(h.owner.y>=across.y?1:-1):0,crossing=current(across,cx,cy,96,h.bounds);
+    if(inChannel(h,across.x,across.y)&&current(p,(across.x-p.x)/reach,(across.y-p.y)/reach,reach,h.bounds).length>=reach-1&&crossing.length>=24){const choice=sluice(across.x,across.y,h.owner,h);Object.assign(choice.breakwaterSluice,{crossingOutlet:true,outlet:{...crossing,phase:h.owner.bossPhase,owner:h.owner}});h.sluices.push(choice);}return;
+   }
+  }
   const beside=h.axis==='y'?[{x:p.x,y:p.y-24},{x:p.x,y:p.y+24}]:[{x:p.x-24,y:p.y},{x:p.x+24,y:p.y}];
   const choices=h.owner.bossPhase>=2?beside.filter(s=>{if(!inChannel(h,s.x,s.y))return false;const steps=Math.ceil(Math.hypot(s.x-p.x,s.y-p.y));for(let i=0;i<=steps;i++)if(!G.world.isSafeSpawn(p.x+(s.x-p.x)*i/steps,p.y+(s.y-p.y)*i/steps))return false;return true;}):[];
   if(!choices.length)choices.push(spots.find(s=>inChannel(h,s.x,s.y)&&G.world.isSafeSpawn(s.x,s.y))||p);
@@ -40,14 +47,14 @@
   r.open=true;G.sfx.play('wardBreak');G.damageNumber(e.x,e.y-19,'OPEN!','#fff3c2');G.spawnFx({kind:'ring',x:e.x,y:e.y-4,color:'#73eff7',radius:21,dur:.35});
   if(!r.owner)r.practiceFlow={...current(e,1,0,64,{left:24,right:424,top:24,bottom:248}),practice:e};
   else{r.h.chosen=r.h.sluice=e;for(const gate of r.h.sluices)if(gate!==e)gate.dead=true;
-   const next=r.h.breakwaterFollow;if(next&&r.owner.bossPhase>=3&&next.t<next.delay){const f=r.outlet,at={x:f.x+f.dx*f.length,y:f.y+f.dy*f.length},b=next.bounds,position=next.axis==='x'?at.y-b.top:at.x-b.left,span=next.axis==='x'?b.bottom-b.top:b.right-b.left;next.safeLane=G.util.clamp(Math.floor(position/span*next.lanes),0,next.lanes-1);next.safePoint=at;next.safeRoute=[...r.h.safeRoute.map(s=>({...s})),{x:e.x,y:e.y},at];}
+   const next=r.h.breakwaterFollow;if(next&&(r.owner.bossPhase>=3||r.owner.marloReturningTide)&&next.t<next.delay){const f=r.outlet,at={x:f.x+f.dx*f.length,y:f.y+f.dy*f.length},b=next.bounds,position=next.axis==='x'?at.y-b.top:at.x-b.left,span=next.axis==='x'?b.bottom-b.top:b.right-b.left;next.safeLane=G.util.clamp(Math.floor(position/span*next.lanes),0,next.lanes-1);next.safePoint=at;next.safeRoute=[...r.h.safeRoute.map(s=>({...s})),{x:e.x,y:e.y},at];}
   }
   return false; // Opening wood is neither a creature hit nor a learned counter.
  };
  G.catchBreakwaterTide=h=>{
   const c=h.sluice,r=c?.breakwaterSluice,t=h.t-(h.delay||0),owner=h.owner;
   if(!h.breakwater||h.breakwaterFlow||!c||c.dead||!r.open||r.h!==h||r.map!==G.state.mapId||owner.dead||G.state.knockout||!G.state.bossHazards.includes(h)||t<h.warning||t>=h.warning+h.active)return false;
-  h.breakwaterFlow={...r.outlet};const {dx,dy,length}=h.breakwaterFlow;
+  h.breakwaterFlow={...r.outlet,field:h};const {dx,dy,length}=h.breakwaterFlow;
   sprays.push({x:c.x,y:c.y,tx:c.x+dx*length,ty:c.y+dy*length,age:0});owner.breakwaterCounters=(owner.breakwaterCounters||0)+1;progress().counterLearned=true;
   G.damageNumber(c.x,c.y-22,'FLOW!','#fff3c2');G.sfx.play('wardBreak');G.saveGame();G.events.emit('guardianCounter',{guardian:'admiralTortoise',kind:'openSluice'});return false;
  };
@@ -61,7 +68,7 @@
   for(const f of flows()){if(!inFlow(f,p))continue;const along=G.input.vec.x*f.dx+G.input.vec.y*f.dy;if(along<=.1||(p.x-x)*f.dx+(p.y-y)*f.dy<=.001)continue;const left=f.length-((p.x-f.x)*f.dx+(p.y-f.y)*f.dy),step=Math.min(Math.max(0,left),60*along*dt);G.world.moveBox(p,f.dx*step,f.dy*step);f.walked+=Math.max(0,(p.x-x)*f.dx+(p.y-y)*f.dy);
    const distance=(p.x-f.x)*f.dx+(p.y-f.y)*f.dy;
    if(f.practice&&f.walked>=24&&distance>=32){f.practice.dead=true;progress().practiceCleared=true;G.sfx.play('unlock');G.spawnFx({kind:'ring',x:f.x,y:f.y,color:'#fff3c2',radius:24,dur:.5});G.saveGame();}
-   if(f.owner&&!f.rideNoted&&f.walked>=24&&distance>=24){f.rideNoted=true;f.owner.breakwaterRides=(f.owner.breakwaterRides||0)+1;progress().bestRides=Math.max(progress().bestRides||0,f.owner.breakwaterRides);G.saveGame();}break;}
+   if(f.owner&&!f.rideNoted&&f.walked>=24&&distance>=24){f.rideNoted=true;f.owner.breakwaterRides=(f.owner.breakwaterRides||0)+1;progress().bestRides=Math.max(progress().bestRides||0,f.owner.breakwaterRides);const next=f.field.breakwaterFollow;if(f.owner.marloReturningTide&&next&&next.t<next.delay)next.returnFrom={x:f.x,y:f.y,dx:f.dx,dy:f.dy};G.saveGame();}break;}
  };
  G.noteBreakwaterDefeat=e=>{if(!marlo(e))return;const a=progress(),n=e.breakwaterCounters||0;if(n>0){a.counterLearned=true;a.bestCounters=Math.max(a.bestCounters,n);}if(e.marloLocalRematch&&e.marloReturningTide&&G.state.mapId==='turtleTrial')a.returningTideCleared=true;G.cancelBreakwaterSluices(e);G.saveGame();};
  G.beginBreakwaterRematch=()=>{if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
@@ -80,6 +87,7 @@
   for(const dx of [-11,9]){c.fillStyle='#48382f';c.fillRect(x+dx,y-13,3,16);c.fillStyle='#c6ac79';c.fillRect(x+dx+1,y-12,1,14);}
   for(const dy of [-10,-5]){c.fillStyle='#8a6538';c.fillRect(x-8,y+dy-(open?7:0),17,4);c.fillStyle='#c6ac79';c.fillRect(x-8,y+dy-(open?7:0),17,1);}c.fillStyle='#fff3c2';c.fillRect(x-2,y-(open?17:10),4,2);c.restore();};
  const draw=G.openingDrawables;G.openingDrawables=c=>{const list=draw(c);for(const e of G.state.enemies||[])if(!e.dead&&e.breakwaterSluice)list.push({y:e.y,fn:()=>G.drawBreakwaterSluice(c,e.x,e.y,e.breakwaterSluice.open)});
+  for(const gate of G.state.enemies||[]){const r=gate.breakwaterSluice,f=r?.outlet;if(gate.dead||!f||liveFlow(r.h))continue;list.push({y:-10000,fn:()=>{c.save();c.globalAlpha=.65;c.strokeStyle=r.open?'#fff3c2':'#a6dce2';c.lineWidth=1;c.setLineDash([3,3]);c.beginPath();c.moveTo(f.x,f.y);c.lineTo(f.x+f.dx*f.length,f.y+f.dy*f.length);c.stroke();c.setLineDash([]);for(let at=16;at<f.length;at+=28){const x=f.x+f.dx*at,y=f.y+f.dy*at;c.beginPath();c.moveTo(x-f.dx*4-f.dy*3,y-f.dy*4+f.dx*3);c.lineTo(x+f.dx*2,y+f.dy*2);c.lineTo(x-f.dx*4+f.dy*3,y-f.dy*4-f.dx*3);c.stroke();}c.restore();}});}
   for(const f of flows()){list.push({y:-10000,fn:()=>{c.save();c.strokeStyle='#73eff7';c.fillStyle='rgba(115,239,247,.22)';c.lineWidth=2;c.beginPath();c.moveTo(f.x-f.dy*14,f.y+f.dx*14);c.lineTo(f.x+f.dx*f.length-f.dy*14,f.y+f.dy*f.length+f.dx*14);c.lineTo(f.x+f.dx*f.length+f.dy*14,f.y+f.dy*f.length-f.dx*14);c.lineTo(f.x+f.dy*14,f.y-f.dx*14);c.closePath();c.fill();c.stroke();for(let at=12;at<f.length;at+=20){const x=f.x+f.dx*at,y=f.y+f.dy*at;c.beginPath();c.moveTo(x-f.dx*5-f.dy*4,y-f.dy*5+f.dx*4);c.lineTo(x+f.dx*2,y+f.dy*2);c.lineTo(x-f.dx*5+f.dy*4,y-f.dy*5-f.dx*4);c.stroke();}c.restore();}});}
   for(const s of sprays)list.push({y:Math.max(s.y,s.ty),fn:()=>{c.save();for(let i=0;i<8;i++){const f=G.util.clamp(s.age/.45-i*.025,0,1),x=s.x+(s.tx-s.x)*f,y=s.y+(s.ty-s.y)*f-Math.sin(f*Math.PI)*12;c.globalAlpha=(1-s.age/.6)*.85;c.fillStyle=i%2?'#fff3c2':'#73eff7';c.beginPath();c.ellipse(x,y,5,2,0,0,Math.PI*2);c.fill();}c.restore();}});
   if(G.state.mapId!=='turtleTrial')return list;list.push({y:fire.y,fn:()=>G.drawOpeningProp(c,'camp',fire.x,fire.y,G.state.time)});
