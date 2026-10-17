@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
-function setup(phase=1,{help=false,retries=0,startX=null,second=false}={}){
- const r=runtime(),{G}=r;r.load('vampireTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='countessCarmine');G.state.enemies=[e];if(startX!==null)e.x=startX;G.state.bossCutscene=null;G.setComfortSetting('bossAssistance',help);G.state.guidance.bossRetries.vampireTrial=retries;
+function setup(phase=1,{help=false,retries=0,startX=null,startY=null,second=false}={}){
+ const r=runtime(),{G}=r;r.load('vampireTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='countessCarmine');G.state.enemies=[e];if(startX!==null)e.x=startX;if(startY!==null)e.y=startY;G.state.bossCutscene=null;G.setComfortSetting('bossAssistance',help);G.state.guidance.bossRetries.vampireTrial=retries;
  Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPhase:phase,vesperSecondWaltz:second,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),bossSpecialT:.001,bossPattern:0});Object.assign(G.state.player,{x:e.x-60,y:e.y,dir:{x:1,y:0},mana:0,manaRegenDelay:1000,damageTaken:0,invuln:0});r.step(.025);r.drain();const cover=G.state.enemies.find(c=>c.moonCover?.owner===e);assert.ok(cover);
  Object.assign(G.state.player,{x:cover.x-18,y:cover.y,dir:{x:1,y:0}});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<10&&!cover.moonCover.lit;i++){r.step(.025);r.drain();}assert.ok(cover.moonCover.lit);G.state.player.y+=65;
  for(let i=0;i<60&&!e.duskCounters;i++){r.step(.025);r.drain();}assert.equal(e.duskCounters,1);return {...r,e,cover};
@@ -132,4 +132,12 @@ test('phase, true stun or Ward break, defeat, knockout and travel retire the act
   if(action==='travel')r.load('overworld');
   assert.equal(G.duskShadowPoint(e),null,action);assert.ok(root.dead||!G.state.enemies.includes(root),action);assert.ok(!G.state.enemies.some(z=>!z.dead&&z.moonCover?.owner===e),action);assert.equal(G.state.guardianChallenges.vesper.secondWaltzCleared,false,action);assert.equal(G.state.guardianChallenges.vesper.counterLearned,true,action);
  }
+});
+
+test('every offered crossing clears the actual walking feet box beside original court rocks',()=>{
+ const r=setup(2,{startX:328,startY:120}),{G,e}=r;for(let i=0;i<25&&!e.duskDance;i++)r.step(.025);const source=e.duskShadow,shadow=G.duskShadowPoint(e);assert.equal(source.x,294);assert.equal(source.y,120);assert.equal(e.duskDance.options.length,2);
+ for(const destination of e.duskDance.options){for(const [from,to] of [[source,destination],[shadow,destination.moonCover.stepShadow]]){const samples=Math.ceil(Math.hypot(to.x-from.x,to.y-from.y));for(let i=0;i<=samples;i++){const x=from.x+(to.x-from.x)*i/samples,y=from.y+(to.y-from.y)*i/samples;assert.ok(G.world.isSafeSpawn(x,y),JSON.stringify({from:{x:from.x,y:from.y},to:{x:to.x,y:to.y},x,y}));}}}
+ G.state.claimedForms.push('colossus');G.setForm('colossus');assert.equal(G.state.formId,'colossus');const chosen=e.duskDance.options[0];Object.assign(G.state.player,{x:chosen.x-18,y:chosen.y,dir:{x:1,y:0}});G.input.takeAim=()=>({x:1,y:0,dragged:true});r.taps.add('a');for(let i=0;i<20&&e.duskDance.choice!==chosen;i++)r.step(.025);assert.equal(e.duskDance.choice,chosen);Object.assign(G.state.player,{x:source.x,y:source.y});
+ for(let i=0;i<500&&e.duskShadow!==chosen;i++){const pool=source.moonCover.pool||source,p=G.state.player,dx=pool.x-p.x,dy=pool.y-p.y,d=Math.hypot(dx,dy);G.input.vec=d>2?{x:dx/d,y:dy/d}:{x:0,y:0};r.step(.025);r.drain();assert.ok(G.world.isSafeSpawn((source.moonCover.pool||source).x,(source.moonCover.pool||source).y));}
+ G.input.vec={x:0,y:0};assert.equal(e.duskShadow,chosen);assert.ok(Math.hypot(G.state.player.x-chosen.x,G.state.player.y-chosen.y)<8);assert.equal(G.state.player.damageTaken,0);
 });

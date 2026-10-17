@@ -99,10 +99,15 @@
     const e=shot?.owner?.duskShadow,r=e?.moonCover;
     return !!e&&!!G.duskShadowPoint(shot.owner)&&!shot.fromPlayer&&!shot.dispelled&&r.phrases?.includes(shot.duskWaltz)&&Math.hypot(p.x-(r.pool||e).x,p.y-(r.pool||e).y)<=32;
   };
+  function clearWalkingLine(from,to){
+    const steps=Math.max(1,Math.ceil(Math.hypot(to.x-from.x,to.y-from.y)));
+    for(let i=0;i<=steps;i++)if(!G.world.isSafeSpawn(from.x+(to.x-from.x)*i/steps,from.y+(to.y-from.y)*i/steps))return false;
+    return G.combat.clearArc(from.x,from.y,to.x,to.y);
+  }
   function clearStepShadow(source,shadow,destination,preferred){
-    if(!G.world.isSafeSpawn(destination.x,destination.y)||!G.combat.clearArc(source.x,source.y,destination.x,destination.y))return null;
-    if(G.world.isSafeSpawn(preferred.x,preferred.y)&&G.combat.clearArc(destination.x,destination.y,preferred.x,preferred.y)&&G.combat.clearArc(shadow.x,shadow.y,preferred.x,preferred.y))return {...preferred};
-    return G.combat.clearArc(shadow.x,shadow.y,destination.x,destination.y)?{x:destination.x,y:destination.y}:null;
+    if(!clearWalkingLine(source,destination))return null;
+    if(clearWalkingLine(destination,preferred)&&clearWalkingLine(shadow,preferred))return {...preferred};
+    return clearWalkingLine(shadow,destination)?{x:destination.x,y:destination.y}:null;
   }
   G.prepareDuskWaltz=(owner,h)=>{
     if(!vesper(owner))return;
