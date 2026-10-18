@@ -2,6 +2,8 @@
 
 October 12, 2026. The eighth authored guardian response develops the existing Breakwater Bastion and connected Shattercoast approach. The shared player-experience and guardian-challenge contracts apply.
 
+Historical checkpoint: its blanket cancellation/stagger and immediate raised-wood practice are superseded by `MARLO-FLOWING-CHANNEL.md`. The older evidence below describes that previous version. The current actual tide continues, and its physical current rewards voluntary walking.
+
 ## What changes in play
 
 Marlo worries about little boats on a rough shore. He invites the player to make a clear way through, gives practical gate/channel/Blunt advice, offers a warm breather and celebrates helping boats get home. His original 72 health, 46 speed, two damage, seven-point Blunt ward, shell volley, charge and three tide phases remain. Four solid mooring posts, the renewable biscuit pantry, original west return and coastal entry remain.
