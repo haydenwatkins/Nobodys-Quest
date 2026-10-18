@@ -15,3 +15,7 @@ Physical Wayfold Crane/star, Riftblade-level-four prerequisite, Foldstep Fox dis
 Use the established native input/art/contact, actual walking/collision, rendering and save/gift/revisit seams. Start red on the old global opening, then prove actual remaining cuts, real directional road use and unchanged native strength. Follow with later choices, all24 actual earned/worn basics, original-AI favorite/slow/help/walking/first-gift/Manyfold coverage, independent review, six inspected supported layouts, original-RAF touch/TV, complete regression and exact Pages/public input before release. Supplied checkpoints do not establish uninterrupted acquisition, physical-device readability or family enjoyment.
 
 Continue Tansy/Queen’s richer variations, Atlas/Meridian and the all19 anonymous-loop/earned-progression audit. Preserve Worldwake #50, the four specialist roads, sustained mixed builds, reward-source audit and menu-optional collecting.
+
+## Native implementation history
+
+First vertical slice: the new native case fails on the old1.575-second stagger, then passes (2174.418695ms). Actual free contact plus ten outward controlled pixels unfold a directional paper crossing, and ordinary feet occupy the real original cut during its actual impact without damage. The original cut remains; native68HP/seven Sharp Ward/71speed and zero creature hit/kill/mana credit remain. This is the first phase-one slice, not later choices, all-form/native fight, layout, review, regression or publication coverage.

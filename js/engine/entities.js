@@ -765,6 +765,7 @@ G.updateBossHazards = function (dt) {
       continue;
     }
     if(h.kind === "foldCut"){
+      if(G.foldroadCutSafe?.(h,p))continue;
       const dx=p.x-h.x,dy=p.y-h.y,along=dx*Math.cos(h.angle)+dy*Math.sin(h.angle),across=-dx*Math.sin(h.angle)+dy*Math.cos(h.angle);
       if(!h.hit&&Math.abs(along)<=h.length/2&&Math.abs(across)<=h.width/2&&G.damagePlayer(1,h.x,h.y))h.hit=true;
       continue;
@@ -838,6 +839,7 @@ G.drawBossHazards = function (ctx) {
       for(const spread of h.spreads){const a=angle+spread*Math.PI/180,x=e.x+Math.cos(a)*82,y=e.y-6+Math.sin(a)*82;ctx.beginPath();ctx.moveTo(e.x,e.y-6);ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.stroke();}
       ctx.setLineDash([]);ctx.fillStyle="#263b4b";ctx.fillRect(e.x-28,e.y+16,56,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"THEY RETURN",e.x,e.y+24);
     }else if(h.kind === "foldCut"){
+      G.clipFoldroadRoad?.(ctx,h);
       ctx.translate(h.x,h.y);ctx.rotate(h.angle);ctx.globalAlpha=active?.65:.17;ctx.fillRect(-h.length/2,-h.width/2,h.length,h.width);
       ctx.globalAlpha=.9;ctx.strokeStyle=active?"#fff3c2":"#f4f4f4";ctx.setLineDash(active?[]:[4,3]);ctx.strokeRect(-h.length/2,-h.width/2,h.length,h.width);ctx.setLineDash([]);
       if(active){ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-h.length/2,0);ctx.lineTo(h.length/2,0);ctx.stroke();}
