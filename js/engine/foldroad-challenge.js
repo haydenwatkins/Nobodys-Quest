@@ -74,7 +74,7 @@
   if(!directed||G.ui.dialogueOpen||G.ui.menuOpen)return;
   for(const f of roads){if(!liveRoad(f)||f.trip||f.exit===null||!roadContains(f,p)||!roadContains(f,{x,y}))continue;const before=(x-f.x)*f.dx+(y-f.y)*f.dy,after=(p.x-f.x)*f.dx+(p.y-f.y)*f.dy,intent=dash||p.dashing?p.dir.x*f.dx+p.dir.y*f.dy:G.input.vec.x*f.dx+G.input.vec.y*f.dy;
    if(intent<=.1||after-before<=.001)continue;const distance=Math.hypot(p.x-x,p.y-y),through=cutSpan(f.cut,{x,y,dx:(p.x-x)/distance,dy:(p.y-y)/distance});if(through&&through.exit>=0&&through.enter<=distance)f.entered=true;f.walked+=after-before;
-   if(f.entered&&f.walked>=32&&after>=f.exit+2){f.trip=true;f.owner.foldroadTrips=(f.owner.foldroadTrips||0)+1;progress().bestRoadTrips=Math.max(progress().bestRoadTrips,f.owner.foldroadTrips);G.saveGame();
+   if(f.entered&&f.walked>=32&&after>=f.exit+2){f.trip=true;f.owner.foldroadTrips=(f.owner.foldroadTrips||0)+1;progress().bestRoadTrips=Math.min(99,Math.max(progress().bestRoadTrips,f.owner.foldroadTrips));G.saveGame();
     if(f.next&&f.next.t<f.next.delay+f.next.warning){const at={x:f.x+f.dx*f.length,y:f.y+f.dy*f.length},suggested=paperPlan(at,f.next,f.nextCuts.length>1,f);if(suggested){const flap=paper(at.x,at.y,f.owner,f.fields);Object.assign(flap.foldroadPaper,{parentRoad:f,cut:f.next,nextCuts:f.nextCuts.slice(1),suggested});}}
    }
   }
