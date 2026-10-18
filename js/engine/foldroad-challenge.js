@@ -30,7 +30,8 @@
  };
  function clearLength(at,dx,dy,limit){let length=0;for(let i=1;i<=limit;i++){if(!G.world.isSafeSpawn(at.x+dx*i,at.y+dy*i))break;length=i;}return length;}
  function openRoad(e){const p=G.state.player,r=e.foldroadPaper,dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;
-  roads.push({x:e.x,y:e.y,dx:dx/d,dy:dy/d,back:clearLength(e,-dx/d,-dy/d,36),length:clearLength(e,dx/d,dy/d,80),owner:r.owner,fields:r.fields,map:r.map,phase:r.owner.bossPhase});
+  const f={x:e.x,y:e.y,dx:dx/d,dy:dy/d,back:clearLength(e,-dx/d,-dy/d,36),length:clearLength(e,dx/d,dy/d,80),owner:r.owner,fields:r.fields,map:r.map,phase:r.owner.bossPhase,walked:0},h=r.fields[0],nx=-Math.sin(h.angle),ny=Math.cos(h.angle),across=f.dx*nx+f.dy*ny;
+  f.cross=Math.abs(across)>.1?((h.x-f.x)*nx+(h.y-f.y)*ny)/across:null;r.road=f;roads.push(f);
  }
  function liveRoad(f){return f.map===G.state.mapId&&!G.state.knockout&&!f.owner.dead&&G.state.enemies.includes(f.owner)&&f.owner.bossPhase===f.phase&&f.fields.some(h=>G.state.bossHazards.includes(h)&&h.t<(h.delay||0)+h.warning+h.active);}
  function roadContains(f,p){const at=G.util.clamp((p.x-f.x)*f.dx+(p.y-f.y)*f.dy,-f.back,f.length);return Math.hypot(p.x-f.x-f.dx*at,p.y-f.y-f.dy*at)<=12;}
@@ -52,6 +53,11 @@
    const before=r.primedStep===playerStep?r.feet:{x,y},d0=Math.hypot(before.x-e.x,before.y-e.y),d1=Math.hypot(p.x-e.x,p.y-e.y);
    if(!directed||Math.hypot(p.x-before.x,p.y-before.y)<.001)continue;r.pull+=Math.max(0,d1-d0);
    if(r.pull>=10&&d1>=r.dist+10)unfold(e);
+  }
+  if(!directed||G.ui.dialogueOpen||G.ui.menuOpen)return;
+  for(const f of roads){if(!liveRoad(f)||f.trip||f.cross===null||!roadContains(f,p)||!roadContains(f,{x,y}))continue;const before=(x-f.x)*f.dx+(y-f.y)*f.dy,after=(p.x-f.x)*f.dx+(p.y-f.y)*f.dy,intent=dash||p.dashing?p.dir.x*f.dx+p.dir.y*f.dy:G.input.vec.x*f.dx+G.input.vec.y*f.dy;
+   if(intent<=.1||after-before<=.001)continue;if(before<=f.cross-9)f.entered=true;f.walked+=after-before;
+   if(f.entered&&f.walked>=32&&after>=f.cross+9){f.trip=true;f.owner.foldroadTrips=(f.owner.foldroadTrips||0)+1;progress().bestRoadTrips=Math.max(progress().bestRoadTrips,f.owner.foldroadTrips);G.saveGame();}
   }
  };
  G.noteFoldroadDefeat=e=>{
