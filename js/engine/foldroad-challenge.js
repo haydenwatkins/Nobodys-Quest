@@ -19,11 +19,11 @@
  G.prepareFoldroadCounter=(owner,fields)=>{
   if(owner?.def?.id!=='paperRonin'||!fields.length)return;G.cancelFoldroadPapers(owner);const h=fields[0];
   if(owner.sumiCrossfold){const end=Math.max(...fields.map(f=>(f.delay||0)+(G.guardianWarningSeconds?.(f.warning)??f.warning)+f.active));const f={...h,t:0,hit:false,delay:end+.55,warning:.95,angle:h.angle+Math.PI/2,note:fields.length+1};G.state.bossHazards.push(f);fields.push(f);}
-  const spots=Array.from({length:16},(_,i)=>{const a=h.angle+Math.PI/2+(i%2?Math.PI:0)+Math.floor(i/2)*Math.PI/8;return{x:h.x+Math.cos(a)*22,y:h.y+Math.sin(a)*22};});
-  const at=spots.find(s=>paperFits(s,h))||G.world.safeArrival(h.x,h.y),along={x:Math.cos(h.angle)*28,y:Math.sin(h.angle)*28};
-  const choices=owner.bossPhase>=2?[-1,1].map(side=>({x:at.x+along.x*side,y:at.y+along.y*side})).filter(s=>paperFits(s,h)):[];
   const nextCuts=owner.bossPhase>=3?fields.slice(1):owner.sumiCrossfold?[fields.at(-1)]:[];
-  for(const place of choices.length===2?choices:[at])paper(place.x,place.y,owner,fields).foldroadPaper.nextCuts=nextCuts;
+  const spots=[22,38].flatMap(radius=>Array.from({length:16},(_,i)=>{const a=h.angle+Math.PI/2+(i%2?Math.PI:0)+Math.floor(i/2)*Math.PI/8;return{x:h.x+Math.cos(a)*radius,y:h.y+Math.sin(a)*radius};}));
+  let at=null;for(const spot of spots){const suggested=paperPlan(spot,h,nextCuts.length>0);if(suggested){at={...spot,suggested};break;}}if(!at)return;
+  const along={x:Math.cos(h.angle)*28,y:Math.sin(h.angle)*28},choices=owner.bossPhase>=2?[-1,1].map(side=>({x:at.x+along.x*side,y:at.y+along.y*side})).map(s=>({...s,suggested:paperPlan(s,h,nextCuts.length>0)})).filter(s=>s.suggested):[];
+  for(const place of choices.length===2?choices:[at])Object.assign(paper(place.x,place.y,owner,fields).foldroadPaper,{nextCuts,suggested:place.suggested});
  };
  G.hitFoldroadPaper=(e,opts)=>{
   const r=e.foldroadPaper;if(e.dead||!r||r.primed||r.map!==G.state.mapId||!live(r)||!(opts.damage>0)||!G.abilities[opts.ability])return false;
@@ -34,7 +34,14 @@
   for(const [at,step,half] of [[x*c+y*s,f.dx*c+f.dy*s,h.length/2],[-x*s+y*c,-f.dx*s+f.dy*c,h.width/2]]){if(Math.abs(step)<1e-9){if(Math.abs(at)>half)return null;continue;}const a=(-half-at)/step,b=(half-at)/step;enter=Math.max(enter,Math.min(a,b));exit=Math.min(exit,Math.max(a,b));}
   return enter<=exit?{enter,exit}:null;
  }
- function paperFits(at,h){const dx=at.x-h.x,dy=at.y-h.y,d=Math.hypot(dx,dy);return d>0&&d+12<=80&&G.world.isSafeSpawn(at.x,at.y)&&clearLength(at,dx/d,dy/d,36)===36&&clearLength(at,-dx/d,-dy/d,d+12)>=Math.floor(d+12);}
+ function turnRoom(at,dx,dy){return [-1,1].some(side=>clearLength(at,dy*side,-dx*side,36)===36&&clearLength(at,-dy*side,dx*side,20)===20);}
+ function paperPlan(at,h,needsTurn,parent=null){if(!G.world.isSafeSpawn(at.x,at.y))return null;
+  const toward=Math.atan2(h.owner.y-at.y,h.owner.x-at.x),angles=parent?[Math.atan2(parent.dx,-parent.dy),Math.atan2(-parent.dx,parent.dy)]:[Math.atan2(h.y-at.y,h.x-at.x),toward];
+  for(let i=0;i<32;i++)angles.push(toward+i*Math.PI/16);for(let i=0;i<24;i++)angles.push(h.angle+i*Math.PI/12);
+  for(const angle of angles){const dx=Math.cos(angle),dy=Math.sin(angle);if(parent&&Math.abs(dx*parent.dx+dy*parent.dy)>=.45)continue;const span=cutSpan(h,{...at,dx,dy});if(!span||span.exit< -20||span.exit+12>80||clearLength(at,-dx,-dy,36)!==36)continue;
+   const length=clearLength(at,dx,dy,80);if(length<Math.max(20,Math.ceil(span.exit+12)))continue;if(needsTurn&&!turnRoom({x:at.x+dx*length,y:at.y+dy*length},dx,dy))continue;return{dx,dy,length};
+  }return null;
+ }
  function openRoad(e){const p=G.state.player,r=e.foldroadPaper,dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;
   const f={x:e.x,y:e.y,dx:dx/d,dy:dy/d,back:clearLength(e,-dx/d,-dy/d,36),length:clearLength(e,dx/d,dy/d,80),owner:r.owner,fields:r.fields,map:r.map,phase:r.owner.bossPhase,walked:0,parentRoad:r.parentRoad||null,nextCuts:r.nextCuts||[]},h=r.cut||r.fields[0],nx=-Math.sin(h.angle),ny=Math.cos(h.angle),across=f.dx*nx+f.dy*ny;
   f.cross=Math.abs(across)>.1?((h.x-f.x)*nx+(h.y-f.y)*ny)/across:null;r.road=f;roads.push(f);
@@ -68,7 +75,7 @@
   for(const f of roads){if(!liveRoad(f)||f.trip||f.exit===null||!roadContains(f,p)||!roadContains(f,{x,y}))continue;const before=(x-f.x)*f.dx+(y-f.y)*f.dy,after=(p.x-f.x)*f.dx+(p.y-f.y)*f.dy,intent=dash||p.dashing?p.dir.x*f.dx+p.dir.y*f.dy:G.input.vec.x*f.dx+G.input.vec.y*f.dy;
    if(intent<=.1||after-before<=.001)continue;const distance=Math.hypot(p.x-x,p.y-y),through=cutSpan(f.cut,{x,y,dx:(p.x-x)/distance,dy:(p.y-y)/distance});if(through&&through.exit>=0&&through.enter<=distance)f.entered=true;f.walked+=after-before;
    if(f.entered&&f.walked>=32&&after>=f.exit+2){f.trip=true;f.owner.foldroadTrips=(f.owner.foldroadTrips||0)+1;progress().bestRoadTrips=Math.max(progress().bestRoadTrips,f.owner.foldroadTrips);G.saveGame();
-    if(f.next&&f.next.t<f.next.delay+f.next.warning){const flap=paper(f.x+f.dx*f.length,f.y+f.dy*f.length,f.owner,f.fields);Object.assign(flap.foldroadPaper,{parentRoad:f,cut:f.next,nextCuts:f.nextCuts.slice(1)});}
+    if(f.next&&f.next.t<f.next.delay+f.next.warning){const at={x:f.x+f.dx*f.length,y:f.y+f.dy*f.length},suggested=paperPlan(at,f.next,f.nextCuts.length>1,f);if(suggested){const flap=paper(at.x,at.y,f.owner,f.fields);Object.assign(flap.foldroadPaper,{parentRoad:f,cut:f.next,nextCuts:f.nextCuts.slice(1),suggested});}}
    }
   }
  };
@@ -93,6 +100,7 @@
  G.drawFoldroadPaper=(c,x,y,primed)=>{c.save();c.fillStyle='#45414a';c.beginPath();c.ellipse(x,y+2,13,4,0,0,Math.PI*2);c.fill();c.fillStyle='#fff3c2';c.beginPath();c.moveTo(x-11,y);c.lineTo(x-8,y-12);c.lineTo(x+9,y-10);c.lineTo(x+11,y+1);c.closePath();c.fill();c.strokeStyle='#c6ac79';c.lineWidth=1;c.stroke();c.strokeStyle='#73a7b6';c.beginPath();c.moveTo(x-6,y-9);c.lineTo(x+4,y-8);c.lineTo(x-2,y-3);c.lineTo(x+6,y-2);c.stroke();c.fillStyle=primed?'#73eff7':'#ffcd75';c.beginPath();c.moveTo(x+3,y-7);c.lineTo(x+(primed?17:11),y-(primed?14:5));c.lineTo(x+10,y+1);c.closePath();c.fill();c.restore();};
  function crane(c,x,y){c.save();c.fillStyle='#fff3c2';c.beginPath();c.moveTo(x-12,y-6);c.lineTo(x,y);c.lineTo(x+12,y-8);c.lineTo(x+5,y+2);c.lineTo(x-3,y+2);c.closePath();c.fill();c.strokeStyle='#73a7b6';c.lineWidth=1;c.beginPath();c.moveTo(x-5,y);c.lineTo(x+1,y-8);c.lineTo(x+4,y-6);c.stroke();c.restore();}
  const draw=G.openingDrawables;G.openingDrawables=c=>{const list=draw(c);
+  for(const e of G.state.enemies||[]){const r=e.foldroadPaper,f=r?.suggested;if(e.dead||!f||!live(r))continue;list.push({y:-10000,fn:()=>{c.save();c.globalAlpha=.65;c.strokeStyle='#73a7b6';c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.moveTo(e.x,e.y);c.lineTo(e.x+f.dx*f.length,e.y+f.dy*f.length);c.stroke();c.setLineDash([]);for(let at=16;at<f.length;at+=24){const x=e.x+f.dx*at,y=e.y+f.dy*at;c.beginPath();c.moveTo(x-f.dx*4-f.dy*3,y-f.dy*4+f.dx*3);c.lineTo(x+f.dx*2,y+f.dy*2);c.lineTo(x-f.dx*4+f.dy*3,y-f.dy*4-f.dx*3);c.stroke();}c.restore();}});}
   for(const f of roads)if(liveRoad(f))list.push({y:-10000,fn:()=>{c.save();paperFloor(c,f);c.fillStyle='rgba(255,243,194,.7)';c.strokeStyle='#c6ac79';c.lineWidth=1;c.beginPath();roadPath(c,f);c.fill();c.stroke();c.strokeStyle='#73a7b6';c.globalAlpha=.45;for(let at=8-f.back;at<f.length;at+=16){const x=f.x+f.dx*at,y=f.y+f.dy*at;c.beginPath();c.moveTo(x-f.dy*9,y+f.dx*9);c.lineTo(x+f.dy*9,y-f.dx*9);c.stroke();}c.setLineDash([3,5]);c.beginPath();c.moveTo(f.x-f.dx*f.back,f.y-f.dy*f.back);c.lineTo(f.x+f.dx*f.length,f.y+f.dy*f.length);c.stroke();c.restore();}});
   for(const e of G.state.enemies||[]){const r=e.foldroadPaper;if(e.dead||!r||!live(r))continue;list.push({y:e.y,fn:()=>{G.drawFoldroadPaper(c,e.x,e.y,r.primed);const p=G.state.player;if(r.primed&&Math.hypot(p.x-e.x,p.y-e.y)<100){c.save();c.globalAlpha=.7;c.strokeStyle='#73eff7';c.lineWidth=1;c.setLineDash([2,2]);c.beginPath();c.moveTo(e.x+12,e.y-6);c.lineTo(p.x,p.y-5);c.stroke();c.restore();}}});}
   if(G.state.mapId!=='samuraiTrial')return list;list.push({y:fire.y,fn:()=>G.drawOpeningProp(c,'camp',fire.x,fire.y,G.state.time)});

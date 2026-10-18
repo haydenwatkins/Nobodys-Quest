@@ -25,7 +25,7 @@ October 13, 2026. This is the living coverage ledger for `PLAYER-EXPERIENCE-RULE
 
 Marlo’s October18 follow-through is published and verified: a real continuing tide feeds a chosen voluntary current, later outlets commit the next refuge, and actual travel earns Returning Tide’s reverse/crossing decision.933 clean full cases,23 native fights across documented invocations, six layouts,322 inspected local/public views and both zero-finding reviews pass. Exact gameplayef62635/Pages39129214862, built/no-error API, all eight runtime byte matches and public original-RAF touch/TV pass. `MARLO-FLOWING-CHANNEL.md` records native strength, owned shelter, real ride records, physical Shell/star and protected Harborback use/return; Sumi #63 remains isolated next work.
 
-Isolated October18 follow-through: Sumi #63 develops a real direction-shaped paper crossing and connected far-flap turns through continuing cuts. First-road/all24, affected directional/record/wall/recovery native slices and four provisional AI victories pass; final coverage and publication remain queued. `SUMI-UNFOLDED-ROAD.md` records the limits. Marlo is published; Sumi’s remaining western-edge/Manyfold, final layout/input, review, full regression and exact publication gates remain.
+Isolated October18 follow-through: Sumi #63 develops a real direction-shaped paper crossing and connected far-flap turns through continuing cuts. First-road/all24, affected directional/record/wall/recovery native slices and four provisional AI victories pass; final coverage and publication remain queued. `SUMI-UNFOLDED-ROAD.md` records the limits. Marlo is published; Sumi’s remaining final all-help/Manyfold, layout/input, review, full regression and exact publication gates remain.
 
 
 ## Delivery rule
