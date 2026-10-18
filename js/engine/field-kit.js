@@ -168,7 +168,7 @@
     if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Adds following reeds. Crack nearby mire, then walk your lily path.'};
     if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Links his charge to the guarded swing. Ring his shield to choose the next front, then flank it.'};
     if(near.kind==='wayglassChallenge')return {...near,id:'field-kit',label:`Double Return · ${G.wayglassDoubleLit()?'Put out':'Light'}`,hint:'Crossing throws. Raise a reflector to send one returning blade back at Mira; the others keep flying.'};
-    if(near.kind==='foldroadChallenge')return {...near,id:'field-kit',label:`Crossfold · ${G.foldroadCrossfoldLit()?'Put out':'Light'}`,hint:'Adds a crossing cut after a pause. Strike the loose fold, then step away to stop the sequence.'};
+    if(near.kind==='foldroadChallenge')return {...near,id:'field-kit',label:`Crossfold · ${G.foldroadCrossfoldLit()?'Put out':'Light'}`,hint:'Carries your paper road into another turning cut.'};
     if(near.kind==='breakwaterChallenge')return {...near,id:'field-kit',label:`Returning Tide · ${G.breakwaterReturningLit()?'Put out':'Light'}`,hint:'Adds a return-or-cross choice after a real current ride.'};
     if(near.kind==='stageChallenge')return {...near,id:'field-kit',label:`Card Encore · ${G.stageEncoreLit()?'Put out':'Light'}`,hint:'The cards come twice. Splash a landed pie to open a path through both fans.'};
     if(near.kind==='duskChallenge')return {...near,id:'field-kit',label:`Second Waltz · ${G.duskSecondLit()?'Put out':'Light'}`,hint:'Adds a return-or-continue turn. Strike a lamp to choose the next light.'};

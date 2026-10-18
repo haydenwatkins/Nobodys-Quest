@@ -308,7 +308,7 @@ function makeExpansionTrialArena(variant) {
   { id: "turtleTrial", name: "The Breakwater Bastion", theme: "turtle", boss: "admiralTortoise", variant: 0,
     exit: { x: 11, y: 5 }, sign: "Blunt opens Marlo’s ward. Open a driftwood gate, then walk with its current for a quick approach. The marked safe channel is another way through." },
   { id: "samuraiTrial", name: "The Foldroad Hall", theme: "samurai", boss: "paperRonin", variant: 1,
-    exit: { x: 36, y: 5 }, sign: "Sharp attacks break Sumi’s ward. Strike the loose paper fold, then step away to open it and stop her cuts." },
+    exit: { x: 36, y: 5 }, sign: "Sharp breaks Sumi’s ward. Strike a paper flap, then step away to unfold a road through her continuing cuts." },
   { id: "astronomerTrial", name: "The Starpath Observatory", theme: "astronomer", boss: "professorPerihelion", variant: 2,
     exit: { x: 11, y: 24 }, sign: "Light breaks Nell’s ward. Stay between her circles to collect little planets. Carry them close; each catches one of her stars." },
   { id: "druidTrial", name: "The Walking Garden", theme: "druid", boss: "grandmotherBriar", variant: 3,

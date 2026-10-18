@@ -1116,7 +1116,8 @@ function resolveBossActionPattern(e, p, action) {
   }
   if(action === "foldCuts"){
     const angle=Math.atan2(p.y-e.y,p.x-e.x),turns=[0,Math.PI/3,-Math.PI/3];
-    for(let i=0;i<e.bossPhase;i++)spawnBossHazard(e,"foldCut",{x:p.x,y:p.y,angle:angle+turns[i],length:140,width:14,note:i+1,warning:.95+i*.3,active:.18,color:"#f4f4f4"});
+    const turnRoad=e.def.id==='paperRonin'&&e.bossPhase>=3;
+    for(let i=0;i<(turnRoad?2:e.bossPhase);i++)spawnBossHazard(e,"foldCut",{x:p.x,y:p.y,angle:angle+turns[i],length:140,width:14,note:i+1,delay:turnRoad&&i? (G.guardianWarningSeconds?.(.95)??.95)+.18+.55:0,warning:turnRoad?.95:.95+i*.3,active:.18,color:"#f4f4f4"});
     G.prepareFoldroadCounter?.(e,G.state.bossHazards.filter(h=>h.owner===e&&h.kind==='foldCut'&&h.t===0));
     e.bossRecoverT=.95+(e.bossPhase-1)*.3+.18+.9;return;
   }
