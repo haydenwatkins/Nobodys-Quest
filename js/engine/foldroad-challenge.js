@@ -20,7 +20,9 @@
   if(owner?.def?.id!=='paperRonin'||!fields.length)return;G.cancelFoldroadPapers(owner);const h=fields[0];
   if(owner.sumiCrossfold){const end=Math.max(...fields.map(f=>(f.delay||0)+(G.guardianWarningSeconds?.(f.warning)??f.warning)+f.active));const f={...h,t:0,hit:false,delay:end+.55,warning:.95,angle:h.angle+Math.PI/2,note:fields.length+1};G.state.bossHazards.push(f);fields.push(f);}
   const spots=Array.from({length:16},(_,i)=>{const a=h.angle+Math.PI/2+(i%2?Math.PI:0)+Math.floor(i/2)*Math.PI/8;return{x:h.x+Math.cos(a)*22,y:h.y+Math.sin(a)*22};});
-  const at=spots.find(s=>G.world.isSafeSpawn(s.x,s.y))||G.world.safeArrival(h.x,h.y);paper(at.x,at.y,owner,fields);
+  const at=spots.find(s=>G.world.isSafeSpawn(s.x,s.y))||G.world.safeArrival(h.x,h.y),along={x:Math.cos(h.angle)*28,y:Math.sin(h.angle)*28};
+  const choices=owner.bossPhase>=2?[-1,1].map(side=>({x:at.x+along.x*side,y:at.y+along.y*side})).filter(s=>G.world.isSafeSpawn(s.x,s.y)):[];
+  for(const place of choices.length===2?choices:[at])paper(place.x,place.y,owner,fields);
  };
  G.hitFoldroadPaper=(e,opts)=>{
   const r=e.foldroadPaper;if(e.dead||!r||r.primed||r.map!==G.state.mapId||!live(r)||!(opts.damage>0)||!G.abilities[opts.ability])return false;
@@ -36,7 +38,7 @@
  function roadPath(c,f){const a=Math.atan2(f.dy,f.dx),x=f.x-f.dx*f.back,y=f.y-f.dy*f.back,tx=f.x+f.dx*f.length,ty=f.y+f.dy*f.length;c.moveTo(x-f.dy*12,y+f.dx*12);c.lineTo(tx-f.dy*12,ty+f.dx*12);c.arc(tx,ty,12,a+Math.PI/2,a-Math.PI/2,true);c.lineTo(x+f.dy*12,y-f.dx*12);c.arc(x,y,12,a-Math.PI/2,a+Math.PI/2,true);c.closePath();}
  G.clipFoldroadRoad=(c,h)=>{for(const f of roads)if(f.owner===h.owner&&f.fields.includes(h)&&liveRoad(f)){c.beginPath();c.rect(-10000,-10000,20000,20000);roadPath(c,f);c.clip('evenodd');}};
  function unfold(e){const r=e.foldroadPaper;e.dead=true;
-  if(r.owner){openRoad(e);r.owner.foldroadCounters=(r.owner.foldroadCounters||0)+1;progress().counterLearned=true;G.damageNumber(e.x,e.y-22,'ROAD OPEN!','#fff3c2');G.events.emit('guardianCounter',{guardian:'paperRonin',kind:'unfoldPaper'});}else progress().practiceCleared=true;
+  if(r.owner){openRoad(e);for(const other of G.state.enemies)if(other!==e&&other.foldroadPaper?.fields===r.fields)other.dead=true;r.owner.foldroadCounters=(r.owner.foldroadCounters||0)+1;progress().counterLearned=true;G.damageNumber(e.x,e.y-22,'ROAD OPEN!','#fff3c2');G.events.emit('guardianCounter',{guardian:'paperRonin',kind:'unfoldPaper'});}else progress().practiceCleared=true;
   G.sfx.play('wardBreak');for(let i=0;i<6;i++)G.spawnFx({kind:'puff',x:e.x+(i-2.5)*5,y:e.y-6-(i%2)*6,color:i%2?'#73eff7':'#fff3c2',dur:.5});G.saveGame();
  }
  // Credit actual controlled feet after contact, including real dash travel.

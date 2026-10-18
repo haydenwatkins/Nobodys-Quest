@@ -77,6 +77,7 @@ G.combat = (() => {
   function contactPoints(enemy) {
     if(enemy.moonCover&&!G.moonCoverAim?.(enemy))return [];
     if(enemy.breakwaterSluice&&!G.breakwaterSluiceAim?.(enemy))return [];
+    if(enemy.foldroadPaper&&!G.foldroadPaperAim?.(enemy))return [];
     const shadow=G.duskShadowPoint?.(enemy);
     return shadow?[enemy,{...shadow,duskShadow:true}]:[enemy];
   }
