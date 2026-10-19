@@ -25,7 +25,12 @@ for(const c of (process.argv.includes('--encore-pilot')?cases.filter(c=>c.encore
   else if(!walking&&fan){const angle=fan.passages[0],d=fan.fired?20:66;target={x:fan.x+Math.cos(angle)*d,y:fan.y+Math.sin(angle)*d+5};}
   else if(pies.length){const h=pies[0];target={x:h.x,y:h.y+(h.y>136?-70:70)};}
   else if(fields.length||e.bossTelegraphT>0){const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;target={x:p.x-dy/d*55,y:p.y+dx/d*55};}
-  else if(walking||(byPhase[e.bossPhase]||0)>0){attack=Math.hypot(p.x-e.x,p.y-e.y)<30;}
+  else if(walking||(byPhase[e.bossPhase]||0)>0){
+   attack=Math.hypot(p.x-e.x,p.y-e.y)<30;
+   // Walking without pie cover also answers the ordinary aimed shot. Step
+   // sideways before its native launch, then use the clear recovery to close.
+   if(walking&&e.bossRecoverT<=0&&e.shootT<.45){const dx=p.x-e.x,dy=p.y-e.y,d=Math.hypot(dx,dy)||1;target={x:p.x-dy/d*50,y:p.y+dx/d*50};}
+  }
   if(!G.world.isSafeSpawn(target.x,target.y)){const near=Array.from({length:16},(_,i)=>({x:e.x+Math.cos(i*Math.PI/8)*radius,y:e.y+Math.sin(i*Math.PI/8)*radius})).filter(s=>G.world.isSafeSpawn(s.x,s.y));near.sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));target=near[0]||G.world.safeArrival(target.x,target.y);}const dx=aim.x-p.x,dy=aim.y-p.y,d=Math.hypot(dx,dy)||1;G.input.aim={x:dx/d,y:dy/d};if(walking&&((e.bossRecoverT<=0&&e.bossSpecialT<1)||G.state.enemies.some(z=>!z.dead&&z.custardPie?.owner===e&&Math.hypot(z.x-p.x,z.y-p.y)<44)))attack=false;if(aim===e&&(!cardPhases.has(e.bossPhase)||(encore&&!encorePhases.has(e.bossPhase))))attack=false;if(encore&&!walking&&(!(freshByPhase[e.bossPhase]>0)||!(walkedByPhase[e.bossPhase]>0))&&aim===e)attack=false;if(attack)r.taps.add(form==='knight'?'a':'b');
   const vx=target.x-p.x,vy=target.y-p.y,m=Math.hypot(vx,vy),desired=m>2?{x:vx/m,y:vy/m}:{x:0,y:0},speed=G.forms[form].speed,choices=[desired,{x:0,y:0},...Array.from({length:16},(_,j)=>({x:Math.cos(j*Math.PI/8),y:Math.sin(j*Math.PI/8)}))];
   const score=v=>{const toward=m>0?(v.x*vx+v.y*vy)/m:0,travel=toward>.99?Math.min(speed*.2,m):speed*.2;let cost=Math.hypot(p.x+v.x*travel-target.x,p.y+v.y*travel-target.y);const predicted={...p};for(let j=1;j<=12;j++){const t=j*.08;const advance=toward>.99?Math.min(speed*.08,Math.hypot(predicted.x-target.x,predicted.y-target.y)):speed*.08;G.world.moveBox(predicted,v.x*advance,v.y*advance);const x=predicted.x,y=predicted.y;
