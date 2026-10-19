@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const assert=require('node:assert/strict'),review=require('./lib/browser-review.cjs');
-review({url:process.argv[2]||'https://quest-review.example/',out:process.argv[3]||'/tmp/nq-mire-crust',name:'Mire blooming pool',publishedHost:true,modes:process.argv.includes('--portrait')?['touch']:process.argv.includes('--controller-only')?['controller']:['touch','controller'],viewports:process.argv.includes('--portrait')?{touch:{width:768,height:1024}}:{},
+review({url:process.argv[2]||'https://quest-review.example/',out:process.argv[3]||'/tmp/nq-mire-crust',name:'Mire blooming pool',publishedHost:true,modes:process.argv.includes('--portrait')||process.argv.includes('--touch-only')?['touch']:process.argv.includes('--controller-only')?['controller']:['touch','controller'],viewports:process.argv.includes('--portrait')?{touch:{width:768,height:1024}}:{},
  async run({page,mode,frames,next,drain,shot,reload}){
  async function counter(){
   const before=await page.evaluate(()=>window.reviewQueen.mireCounters||0);

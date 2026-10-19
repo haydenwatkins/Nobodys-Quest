@@ -6,7 +6,7 @@ const {chromium}=require(require.resolve('playwright',{paths:[process.env.CODEX_
 const url=process.argv[2]||'http://127.0.0.1:8015/',out=process.argv[3]||'.scratch/verification/queen-bloom/realtime';
 (async()=>{
  fs.mkdirSync(out,{recursive:true});const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
- try{for(const mode of ['touch','controller']){
+ try{for(const mode of (process.argv.includes('--touch-only')?['touch']:process.argv.includes('--controller-only')?['controller']:['touch','controller'])){
   const viewport=mode==='touch'?{width:667,height:375}:{width:1280,height:720},context=await browser.newContext({viewport,hasTouch:mode==='touch',...(mode==='controller'?{userAgent:'NobodysQuestTV/1.0 real-time check'}:{})}),page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${new URL(r.url()).pathname}`);});
   async function pad(axes=[0,0,0,0],pressed=false,index=0){await page.evaluate(({axes,pressed,index})=>{const b=Array(16).fill(0);b[index]=pressed?1:0;window.__nqTvPad(JSON.stringify({t:'s',a:axes,b}));},{axes,pressed,index});}
@@ -28,15 +28,15 @@ const url=process.argv[2]||'http://127.0.0.1:8015/',out=process.argv[3]||'.scrat
 
   await page.evaluate(()=>{Object.assign(G.state.opening,{started:true,version:2,complete:true});G.state.delivery.complete=true;G.state.items.push('trophy-mire-pearl');G.ensureTown().requests.push('beacon');G.state.claimedForms.push('rat','knight','wizard');Object.assign(G.state.guardianChallenges.queen,{counterLearned:true,rippling:true});G.setForm('nobody');G.world.load('sunkenMarsh');});await drain();
   await page.evaluate(()=>{
-   if(!G.beginMireRematch())throw Error('native owned Rippling Mire must start');window.rtQueen=G.state.enemies.find(e=>!e.dead&&e.id==='mireQueen');Object.assign(G.state.player,{x:rtQueen.x+60,y:rtQueen.y,mana:0,manaRegenDelay:1000});
-   window.rtDamage=0;window.rtPaid=0;window.rtHits=0;window.rtKills=0;window.rtWideCatches=0;window.rtWalking=0;
-   G.events.on('playerHurt',v=>rtDamage+=v.damage);G.events.on('hit',()=>rtHits++);G.events.on('kill',()=>rtKills++);G.events.on('abilityUse',v=>{if(G.abilityManaCost(G.abilities[v.ability])>0)rtPaid++;});
+   if(!G.beginMireRematch())throw Error('native owned Rippling Mire must start');window.rtQueen=G.state.enemies.find(e=>!e.dead&&e.id==='mireQueen');Object.assign(G.state.player,{x:rtQueen.x-60,y:rtQueen.y,mana:0,manaRegenDelay:1000});
+   window.rtHurtLog=[];window.rtDamage=0;window.rtPaid=0;window.rtHits=0;window.rtKills=0;window.rtWideCatches=0;window.rtWalking=0;
+   G.events.on('playerHurt',v=>{rtDamage+=v.damage;rtHurtLog.push({...v,p:{x:G.state.player.x,y:G.state.player.y},time:G.state.time});});G.events.on('hit',()=>rtHits++);G.events.on('kill',()=>rtKills++);G.events.on('abilityUse',v=>{if(G.abilityManaCost(G.abilities[v.ability])>0)rtPaid++;});
    const update=G.updatePlayer;G.updatePlayer=dt=>{const p=G.state.player,x=p.x,y=p.y,intent=Math.hypot(G.input.vec.x,G.input.vec.y);update(dt);if(intent>.1&&rtQueen.mireChannel)rtWalking+=Math.hypot(p.x-x,p.y-y);};
    const projectiles=G.combat.updateProjectiles;G.combat.updateProjectiles=dt=>{const before=[...G.state.projectiles],p=G.state.player,damage=p.damageTaken,invuln=p.invuln;projectiles(dt);const c=rtQueen.mireChannel;if(!c?.bloom||p.damageTaken!==damage||invuln>0||!G.mireShelters(p,rtQueen))return;const dx=c.x2-c.x,dy=c.y2-c.y,sq=dx*dx+dy*dy,t=sq?Math.max(0,Math.min(1,((p.x-c.x)*dx+(p.y-c.y)*dy)/sq)):0;if(Math.hypot(p.x-c.x-dx*t,p.y-c.y-dy*t)<=14)return;for(const s of before)if(s.owner===rtQueen&&!s.fromPlayer&&!s.dispelled&&s.armT<=0&&!G.state.projectiles.includes(s)&&s.travel<s.range&&Math.hypot(s.x-p.x,s.y-(p.y-5))<s.size+5)rtWideCatches++;};
    window.rtDecision=()=>{
     const e=rtQueen,p=G.state.player,fields=G.state.bossHazards.filter(h=>h.owner===e),root=G.state.enemies.find(z=>!z.dead&&z.mireCrust?.owner===e),primary=fields.filter(h=>h.kind==='mirePool'&&!h.mireRipple),ripple=fields.find(h=>h.mireRipple),c=e.mireChannel;
     function sides(at){if(!c)return[];const dx=c.x2-c.x,dy=c.y2-c.y,d=Math.hypot(dx,dy)||1;return[-1,1].map(side=>({x:at.x-dy/d*24*side,y:at.y+dx/d*24*side})).filter(at2=>Array.from({length:12},(_,i)=>({x:at.x+(at2.x-at.x)*(i+1)/12,y:at.y+(at2.y-at.y)*(i+1)/12})).every(v=>G.world.isSafeSpawn(v.x,v.y)));}
-    let target={x:e.x+60,y:e.y},aim=e,attack=false;
+    let target={x:e.x-60,y:e.y},aim=e,attack=false;
     if(root){const spots=Array.from({length:16},(_,i)=>({x:root.x+Math.cos(i*Math.PI/8)*20,y:root.y+Math.sin(i*Math.PI/8)*20})).filter(v=>G.world.isSafeSpawn(v.x,v.y));spots.sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));target=spots[0]||target;aim=root;attack=Math.hypot(p.x-target.x,p.y-target.y)<4&&!(p.cooldowns.slap>0);}
     else if(c&&ripple){
      window.rtRipple=ripple;
@@ -53,7 +53,7 @@ const url=process.argv[2]||'http://127.0.0.1:8015/',out=process.argv[3]||'.scrat
   async function drive(v){if(mode==='controller')await pad([v.x,v.y,0,0]);else{const x=joy.x+joy.width/2,y=joy.y+joy.height/2;if(!held){await driveCdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:2}]});held=true;}await driveCdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x+v.x*42,y:y+v.y*42,id:2}]});}const t=await page.evaluate(()=>G.state.time);await page.waitForFunction(t=>G.state.time>=t+.04,t,{timeout:30000,polling:10});}
   const captured=new Set();
   for(let i=0;i<2200&&!await page.evaluate(()=>rtWideCatches>0);i++){
-   assert.equal(await page.evaluate(()=>!!G.state.knockout),false);if(await page.evaluate(()=>G.ui.dialogueOpen)){await release();await drain();}
+   assert.equal(await page.evaluate(()=>!!G.state.knockout),false,JSON.stringify(await page.evaluate(()=>({hurts:rtHurtLog,p:{x:G.state.player.x,y:G.state.player.y},channel:rtQueen.mireChannel,catches:rtWideCatches}))));if(await page.evaluate(()=>G.ui.dialogueOpen)){await release();await drain();}
    const decision=await page.evaluate(()=>rtDecision());if(decision.attack){await release();await art(decision.aim.x,decision.aim.y);}else await drive(decision.v);
    const stages=await page.evaluate(()=>({crust:G.state.enemies.some(z=>!z.dead&&z.mireCrust?.owner===rtQueen),channel:!!rtQueen.mireChannel,warning:!!window.rtRipple?.mireCommitted&&rtRipple.t-(rtRipple.delay||0)>.08&&!rtQueen.mireChannel?.bloom,bloom:!!rtQueen.mireChannel?.bloom}));
    for(const [key,ready] of Object.entries(stages))if(ready&&!captured.has(key)){captured.add(key);await page.screenshot({path:path.join(out,mode+'-'+key+'.png')});}
