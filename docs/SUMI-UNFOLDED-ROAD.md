@@ -1,6 +1,6 @@
 # Sumi’s unfolded road
 
-October 18, 2026. Isolated upgrade under issue #63. Marlo #62 is published and verified at f523a6f. The published `FOLDROAD-PAPER.md` describes the older blanket opening and remains historical evidence.
+October 19, 2026. Upgrade under [issue #63](https://github.com/haydenwatkins/Nobodys-Quest/issues/63). Local acceptance is complete; exact public-release verification is pending. `FOLDROAD-PAPER.md` describes the older blanket opening and remains historical evidence.
 
 Strike a loose paper flap, then take ten actual outward pixels to unfold a short road across Sumi’s cuts. The real pull determines its direction. A thin arrow suggests a route with actual floor and preparation room; it never forces the pull. Walk on the paper while the bright cuts continue on either side. There is no speed boost, forced movement, teleport, automatic damage, blanket cancellation or bespoke stagger. Sharp still opens her original seven-point Ward.
 
@@ -19,6 +19,12 @@ Physical Wayfold Crane/star, real Riftblade-level-four prerequisite and Foldstep
 Use native input/art/contact, actual walking/collision, rendering and save/gift/revisit seams. Before publication require all-24 earned/worn basics, original-AI favorite/slow/all-help/walking/first-gift/Manyfold coverage, independent Spec/Standards review, six inspected supported layouts, original-RAF touch/TV, full regression and exact Pages/public input. Supplied checkpoints do not establish uninterrupted acquisition, physical-device readability or family enjoyment.
 
 Continue Tansy/Queen’s richer variations, Atlas/Meridian and the all-19 anonymous-loop/earned-progression audit. Preserve Worldwake #50, four specialist roads, sustained mixed builds, reward-source audit and menu-optional collecting.
+
+## Accepted local delivery evidence
+
+Runtime remains byte-identical to reviewed3b458a2 across all eight changed page/runtime files. The completed October19 2D sweep has902 passes and one obsolete crescent-fixture failure, zero cancelled/skipped/todo (3213914.147061ms). The complete corrected combat-feel file passes separately (one case,487.849602ms). All44 unchanged isolated3d cases pass separately (1766.182126ms). This supplies947 current regression results across the sweep and reruns; it is explicitly not one clean947-case invocation. The earlier interrupted sweeps remain incomplete evidence. Both final runtime reviews and both subsequent retained-fixture delta review axes have zero remaining findings.
+
+Twenty-three original-AI victories across documented17+2+4 runs pass, including actual first physical Crane/star and protected Foldstep Fox discovery, two genuine zero-paper strategies and four earned Manyfold help combinations. Native68HP/seven Sharp Ward/71speed remain;54.70–109.18 simulated seconds,0–1 incoming versus0 end damage, no paid casts/knockouts. Hits restore mana naturally after a zero-mana start. Six supported phone/TV/portrait × HD/base workflows and local original-RAF touch/TV pass. All246 final layout and eight local real-time views are inspected (254 selected local views). Public deployment/bytes/input and its selected views remain the final release gates. These checkpoints do not establish uninterrupted acquisition, physical devices or family enjoyment.
 
 ## Native implementation history
 

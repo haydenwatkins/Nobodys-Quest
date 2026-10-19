@@ -1,5 +1,7 @@
 # Sumi’s loose paper and Crossfold
 
+**Historical foundation:** this records the earlier blanket-opening version. Current directional roads, continuing cuts, real trips and connected turns are specified and verified in `SUMI-UNFOLDED-ROAD.md`; retain the old evidence below as history.
+
 October 12, 2026. The ninth authored guardian response develops the existing Foldroad Hall and Shattercoast approach. Apply the shared player-experience and guardian-challenge contracts.
 
 ## What changes in play
