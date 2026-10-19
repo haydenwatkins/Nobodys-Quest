@@ -773,7 +773,7 @@ G.enemies.testCaster = {
 for (const [id, patternIndex, action, projectileCount] of [
   ["royalFool", 0, "pieRain", 0],
   ["admiralTortoise", 0, "shells", 8],
-  ["paperRonin", 1, "crescent", 5],
+  ["paperRonin", 0, "foldCuts", 0],
   ["professorPerihelion", 1, "stars", 6],
   ["grandmotherBriar", 1, "seeds", 3],
   ["godAvatar", 7, "nova", 12],
@@ -799,6 +799,15 @@ for (const [id, patternIndex, action, projectileCount] of [
     assert.ok(pies[0].warning>0,"the first pie keeps its actual warning");
     assert.equal(pies[0].x,G.state.player.x);
     assert.equal(pies[0].y,G.state.player.y);
+  }
+  if(id === "paperRonin"){
+    const cuts=G.state.bossHazards.filter(h=>h.owner===boss&&h.kind==="foldCut");
+    assert.equal(cuts.length,1,"Sumi teaches her actual first cut instead of a removed crescent");
+    assert.equal(cuts[0].width,14);
+    assert.equal(cuts[0].length,140);
+    assert.equal(cuts[0].warning,.95);
+    assert.equal(cuts[0].x,G.state.player.x);
+    assert.equal(cuts[0].y,G.state.player.y);
   }
   assert.ok(G.state.projectiles.every((shot) => shot.damage <= 1 || action === "pie"));
 }
