@@ -26,13 +26,20 @@
   h.fullShots=[...h.shots];
   for(const pie of fields){pie.stageCounter=true;pie.landing=.18;pie.cardPassage=h;}
   G.state.bossHazards.push(h);
-  if(owner.tansyEncore){const encore={...h,kind:'stageEncore',shots:[...h.shots],following:h,followingDone:false,delay:h.delay+(G.guardianWarningSeconds?.(h.warning)??h.warning)+175/105+.45};G.state.bossHazards.push(encore);}
+  if(owner.tansyEncore){const encore={...h,kind:'stageEncore',shots:[...h.shots],passages:[],following:h,followingDone:false,delay:h.delay+(G.guardianWarningSeconds?.(h.warning)??h.warning)+175/105+.45};G.state.bossHazards.push(encore);}
  };
  G.waitStageEncore=h=>{
   if(!h.following||h.followingDone)return;
   // Never start the next warning over still-live, possibly helped cards.
   h.delay=h.t+.45;
-  if(h.following.fired&&!G.state.projectiles.some(s=>s.stagePassage===h.following&&!s.dispelled))h.followingDone=true;
+  if(h.following.fired&&!G.state.projectiles.some(s=>s.stagePassage===h.following&&!s.dispelled)){
+   h.followingDone=true;
+   const chosen=h.following.passages[0]??h.following.angle,turn=36*Math.PI/180,warning=G.guardianWarningSeconds?.(1.3)??1.3;
+   const distance=a=>Math.abs(Math.atan2(Math.sin(a-chosen),Math.cos(a-chosen))),choices=h.fullShots.filter(a=>distance(a)>.6);
+   const selected=[];for(const side of [-1,1]){const wanted=chosen+side*turn,rank=a=>Math.abs(Math.atan2(Math.sin(a-wanted),Math.cos(a-wanted)));for(const a of choices.slice().sort((a,b)=>rank(a)-rank(b))){if(selected.some(b=>Math.abs(Math.atan2(Math.sin(a-b),Math.cos(a-b)))<.6))continue;let at=null;for(const radius of [48,36,64]){const x=h.x+Math.cos(a)*radius,y=h.y+Math.sin(a)*radius+5;if(G.world.isSafeSpawn(x,y)&&Array.from({length:16},(_,i)=>({x:x+Math.cos(i*Math.PI/8)*20,y:y+Math.sin(i*Math.PI/8)*20})).some(p=>G.world.isSafeSpawn(p.x,p.y))){at={x,y};break;}}if(!at)continue;
+     selected.push(a);G.state.bossHazards.push({kind:'pieRain',owner:h.owner,mapId:h.mapId,t:0,delay:.45,warning,active:.3,radius:17,color:'#ffcd75',phase:h.phase,stageCounter:true,landing:.18,cardPassage:h,...at});break;}}
+   h.delay=h.t+.45+warning+.3+.45;
+  }
  };
  G.landStagePie=h=>{
   if(!h.stageCounter||h.mapId!==G.state.mapId||h.owner.dead||G.state.knockout)return;
@@ -48,7 +55,7 @@
    // Near Tansy, a side pie can lie beyond the fan. Open its nearest actual
    // lane instead of drawing an unused path that changes no cards.
    const angle=cards.fullShots.reduce((best,a)=>distance(a)<distance(best)?a:best),delta=a=>Math.abs(Math.atan2(Math.sin(a-angle),Math.cos(a-angle)));
-   cards.passages.push(angle);for(const fan of G.state.bossHazards.filter(f=>f===cards||f.following===cards))fan.shots=fan.shots.filter(a=>delta(a)>.4);
+   cards.passages.push(angle);cards.shots=cards.shots.filter(a=>delta(a)>.4);
    e.dead=true;G.state.bossHazards=G.state.bossHazards.filter(other=>other!==h);r.owner.stageCounters=(r.owner.stageCounters||0)+1;progress().counterLearned=true;
    G.damageNumber(e.x,e.y-18,'SPLAT!','#fff3c2');G.spawnFx({kind:'ring',x:e.x,y:e.y-5,color:'#fff3c2',radius:23,dur:.5});
    G.events.emit('guardianCounter',{guardian:'royalFool',kind:'custardSplash'});
@@ -62,7 +69,7 @@
  };
  G.beginStageRematch=()=>{
   if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen)return false;
-  const e=G.makeEnemy('royalFool',22*16+8,8*16+8);e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().encore?'The cards come twice! Splash a landed pie, then follow the crumbs through both fans. Or walk around them.':'Ready for another show? Splash a landed pie to open a path through my cards. The cookie tin is by the fire.'}};
+  const e=G.makeEnemy('royalFool',22*16+8,8*16+8);e.def={...e.def,boss:{...e.def.boss,rematchLine:progress().encore?'Two fans, two paths! Splash a pie for the first gap. Fresh pies choose a different gap in the next fan. Follow the crumbs, or walk clear.':'Ready for another show? Splash a landed pie to open a path through my cards. The cookie tin is by the fire.'}};
   e.guardPost=true;e.tansyLocalRematch=true;e.tansyEncore=progress().encore&&progress().counterLearned;e.guardianPracticeExit={map:'jesterTrial',x:3,y:11};G.state.enemies.push(e);return true;
  };
  G.events.on('mapEnter',()=>{if(G.state.mapId!=='jesterTrial')return;for(const e of G.state.enemies)if(tansy(e)){e.guardPost=true;if(G.state.items.includes('jester-bell'))e.dead=true;}if(!progress().practiceCleared)pie(practice.x,practice.y);});
@@ -74,11 +81,11 @@
   const p=G.state.player;if(Math.hypot(p.x-friend.x,p.y-friend.y)>18||G.state.projectiles.some(s=>!s.fromPlayer&&!s.dispelled&&Math.hypot(s.x-p.x,s.y-p.y)<75))return null;
   const a=progress();return{id:'tansy-rematch',kind:'tansy-rematch',...friend,label:a.counterLearned&&!a.invited?'Tansy · Say hello':a.encore?'Tansy · Try card encore':'Tansy · Practice a show',hint:a.counterLearned&&!a.invited?'Ask Tansy about her card encore.':a.encoreCleared?'Card Encore cleared. Most pie splashes: '+a.bestCounters+'.':'Choose a show here, then walk east.'};
  };
- G.tryOpeningInteraction=()=>{const at=G.openingInteractionCandidate();if(at?.id!=='tansy-rematch')return interact();const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('TANSY',"You got me with custard! Want to try my card encore? Light its lantern by the fire. Keep your help lights if you like. I'll fetch the cookies.",{accent:'#ffcd75'});}else G.beginStageRematch();G.input.clearTaps();return true;};
+ G.tryOpeningInteraction=()=>{const at=G.openingInteractionCandidate();if(at?.id!=='tansy-rematch')return interact();const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();G.ui.dialogue('TANSY',"You got me with custard! Want to try my card encore? Fresh pies open a new path through the second fan. Its lantern is by the fire. I'll fetch the cookies.",{accent:'#ffcd75'});}else G.beginStageRematch();G.input.clearTaps();return true;};
  function drawPie(c,x,y){if(G.drawStagePie?.(c,x,y))return;c.save();c.fillStyle='#bb8c55';c.fillRect(x-8,y-3,16,6);c.fillStyle='#fff3c2';c.fillRect(x-7,y-6,14,4);c.fillStyle='#e9a9ce';c.fillRect(x-3,y-8,6,3);c.restore();}
  G.drawStagePassages=c=>{
-  const fans=new Set((G.state.bossHazards||[]).filter(h=>!h.owner.dead&&(h.kind==='stageCards'||h.kind==='stageEncore')).map(h=>h.following||h));
-  for(const s of G.state.projectiles)if(s.stagePassage&&!s.dispelled)fans.add(s.stagePassage.following||s.stagePassage);
+  const fans=new Set((G.state.bossHazards||[]).filter(h=>!h.owner.dead&&(h.kind==='stageCards'||h.kind==='stageEncore')));
+  for(const s of G.state.projectiles)if(s.stagePassage&&!s.dispelled)fans.add(s.stagePassage);
   c.save();c.strokeStyle='#fff3c2';c.fillStyle='#fff3c2';c.lineWidth=1;
   // Released cards keep their native danger after victory, so their route
   // remains useful until those actual shots leave, even with a dead owner.

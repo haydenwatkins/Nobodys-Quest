@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),runtime=require('../tools/lib/classic-runtime.cjs');
 function setup({phase=1,encore=false,form='nobody',help=false}={}){
- const r=runtime(),{G}=r;G.state.claimedForms.push(form);G.setForm(form);r.load('jesterTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='royalFool');G.state.enemies=[e];G.state.bossCutscene=null;
+ const r=runtime(),{G}=r;G.state.claimedForms.push(form);if(form==='god'){G.state.worldwake.marks=['sky','stone','thread','echo','light','heart'];G.state.items.push('god-spark');G.questsDone.push(...G.formOrder.filter(id=>id!=='god').slice(0,8).flatMap((id,i)=>G.forms[id].quests.slice(0,i<3?4:2).map(q=>q.id)));}G.setForm(form);assert.equal(G.state.formId,form);r.load('jesterTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='royalFool');G.state.enemies=[e];G.state.bossCutscene=null;
  Object.assign(e,{bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),tansyEncore:encore,bossTelegraphT:.01,bossPendingAction:'pieRain'});G.setComfortSetting('bossAssistance',help);Object.assign(G.state.player,{x:e.x-60,y:e.y,mana:0,manaRegenDelay:100,damageTaken:0,invuln:0});G.updateEnemies(.02);return {...r,e,h:G.state.bossHazards[0]};
 }
 function landed(r){for(let i=0;i<12&&!r.h.stagePie;i++){r.step(.025);r.drain();}assert.ok(r.h.stagePie);return r.h.stagePie;}
