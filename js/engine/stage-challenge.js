@@ -21,8 +21,8 @@
  G.prepareStageCounter=(owner,fields,p)=>{
   if(!tansy(owner))return;G.cancelStagePies(owner);
   if(!fields.length)return;
-  const count=owner.bossPhase*2+3,angle=Math.atan2(p.y-5-(owner.y-6),p.x-owner.x);
-  const h={kind:'stageCards',owner,mapId:G.state.mapId,t:0,delay:Math.max(...fields.map(h=>(G.guardianWarningSeconds?.(h.warning)??h.warning)+h.active))+.45,warning:.85,active:.15,color:'#ffcd75',phase:owner.bossPhase,angle,shots:Array.from({length:count},(_,i)=>angle+(i-(count-1)/2)*18*Math.PI/180),x:owner.x,y:owner.y-6,fired:false,passages:[]};
+  const origin=G.world.safeArrival(owner.x,owner.y-6),count=owner.bossPhase*2+3,angle=Math.atan2(p.y-5-origin.y,p.x-origin.x);
+  const h={kind:'stageCards',owner,mapId:G.state.mapId,t:0,delay:Math.max(...fields.map(h=>(G.guardianWarningSeconds?.(h.warning)??h.warning)+h.active))+.45,warning:.85,active:.15,color:'#ffcd75',phase:owner.bossPhase,angle,shots:Array.from({length:count},(_,i)=>angle+(i-(count-1)/2)*18*Math.PI/180),x:origin.x,y:origin.y,fired:false,passages:[]};
   h.fullShots=[...h.shots];
   for(const pie of fields){pie.stageCounter=true;pie.landing=.18;pie.cardPassage=h;}
   G.state.bossHazards.push(h);
