@@ -165,7 +165,7 @@
     if(npc&&Math.hypot(npc.x-p.x,npc.y-p.y)<near.d+6)return null;
     const lamp=lamps.find(l=>l.key===near.kind);
     if(near.kind==='treantChallenge')return {...near,id:'field-kit',label:`Branching Roots · ${G.treantBranchingLit()?'Put out':'Light'}`,hint:'Adds a following root. Choose an apple, then a clear time to collect it.'};
-    if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Adds following reeds. Crack nearby mire, then walk your lily path.'};
+    if(near.kind==='mireChallenge')return {...near,id:'field-kit',label:`Rippling Mire · ${G.mireRipplingLit()?'Put out':'Light'}`,hint:'Lead the next bubble onto your lily path to grow a wider flower pool.'};
     if(near.kind==='eclipseChallenge')return {...near,id:'field-kit',label:`Following Crescent · ${G.eclipseCrescentLit()?'Put out':'Light'}`,hint:'Links his charge to the guarded swing. Ring his shield to choose the next front, then flank it.'};
     if(near.kind==='wayglassChallenge')return {...near,id:'field-kit',label:`Double Return · ${G.wayglassDoubleLit()?'Put out':'Light'}`,hint:'Crossing throws. Raise a reflector to send one returning blade back at Mira; the others keep flying.'};
     if(near.kind==='foldroadChallenge')return {...near,id:'field-kit',label:`Crossfold · ${G.foldroadCrossfoldLit()?'Put out':'Light'}`,hint:'Carries your paper road into another turning cut.'};

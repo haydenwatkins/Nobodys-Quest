@@ -700,6 +700,7 @@ G.updateBossHazards = function (dt) {
     h.t += dt;
     if(h.cancelled){hazards.splice(i,1);continue;}
     if(h.kind==="stageEncore")G.waitStageEncore?.(h);
+    if(h.mireRipple)G.waitMireRipple?.(h,p);
     G.trackStarpathOrbit?.(h);
     if (h.mapId !== G.state.mapId || !h.owner || h.owner.dead
       || h.t >= (h.delay || 0) + h.warning + h.active) {
@@ -775,6 +776,7 @@ G.updateBossHazards = function (dt) {
       if(!h.hit&&(d<h.inner||d>h.outer)&&G.damagePlayer(1,h.x,h.y))h.hit=true;
       continue;
     }
+    if(h.mireRipple)G.bloomMireRipple?.(h);
     if (h.kind === "mirePool" && G.mireShelters?.(p,h.owner)) continue;
     if (h.kind === "royalStomp" && G.burrowShelters?.(p,h.owner,h)) continue;
     if (["mirePool","rootBloom","royalStomp","pieRain"].includes(h.kind)) {

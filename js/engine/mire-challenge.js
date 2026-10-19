@@ -31,11 +31,23 @@
     const end=h=>(h.delay||0)+h.warning+h.active;
     const last=fields.reduce((a,b)=>end(a)>end(b)?a:b);last.mireAftermath={x:p.x,y:p.y};
     if(!owner.queenRippling)return;
-    // Existing resolveBossAction applies help to each new warning afterward.
-    // Delay must also wait for the helped primary bubble to finish.
-    const delay=end(last)+(G.guardianWarningSeconds?.(0)??0);
-    G.state.bossHazards.push({...last,kind:'mireVolley',t:0,delay,warning:.95,active:.15,
-      x:p.x,y:p.y,count:owner.bossPhase>=3?7:owner.bossPhase===2?5:3,hit:false,fired:false,mireAftermath:null,mireRipple:true});
+    // Each new warning receives help once in resolveBossAction. The ripple
+    // waits on the actual primary fields before its separate preparation.
+    G.state.bossHazards.push({...last,t:0,delay:end(last)+1.6,warning:.95,active:.35,
+      x:p.x,y:p.y,hit:false,mireAftermath:null,mireRipple:fields.slice(),mireCommitted:false});
+  };
+  G.waitMireRipple=(h,p)=>{
+    if(!h.mireRipple||h.mireCommitted)return;
+    if(h.mireRipple.some(primary=>!primary.cancelled&&G.state.bossHazards.includes(primary))){h.delay=h.t+1.6;return;}
+    h.mireReadyAt??=h.t+1.6;h.delay=h.mireReadyAt;
+    if(h.t<h.mireReadyAt)return;
+    h.x=p.x;h.y=p.y;h.mireCommitted=true;h.mireChannel=liveChannel(h.owner);
+  };
+  G.bloomMireRipple=h=>{
+    if(!h.mireCommitted||h.mireBloomed)return;h.mireBloomed=true;
+    const c=liveChannel(h.owner);if(!c||c!==h.mireChannel||!G.world.isSafeSpawn(h.x,h.y)||!onChannel(c,h))return;
+    c.bloom={x:h.x,y:h.y,radius:28};
+    G.spawnFx({kind:'ring',x:h.x,y:h.y,color:'#c5e5dd',radius:28,dur:.5});
   };
   G.leaveMireCrust=h=>{
     const at=h.mireAftermath;
@@ -59,20 +71,28 @@
     const c=owner?.mireChannel;
     return c&&!owner.dead&&!G.state.knockout&&c.map===G.state.mapId&&c.phase===owner.bossPhase?c:null;
   }
-  G.mireShelters=(p,owner)=>{
-    const c=liveChannel(owner);if(!c||!G.world.isSafeSpawn(p.x,p.y))return false;
+  function onChannel(c,p){
     const dx=c.x2-c.x,dy=c.y2-c.y,sq=dx*dx+dy*dy,at=sq?G.util.clamp(((p.x-c.x)*dx+(p.y-c.y)*dy)/sq,0,1):0;
     return Math.hypot(p.x-c.x-dx*at,p.y-c.y-dy*at)<=14;
+  }
+  function bloomReach(b,a){
+    let reach=0;for(let d=2;d<=b.radius;d+=2){if(!G.world.isSafeSpawn(b.x+Math.cos(a)*d,b.y+Math.sin(a)*d))break;reach=d;}return reach;
+  }
+  G.mireShelters=(p,owner)=>{
+    const c=liveChannel(owner);if(!c||!G.world.isSafeSpawn(p.x,p.y))return false;
+    return onChannel(c,p)||!!c.bloom&&Math.hypot(p.x-c.bloom.x,p.y-c.bloom.y)<=bloomReach(c.bloom,Math.atan2(p.y-c.bloom.y,p.x-c.bloom.x));
   };
   G.drawMireChannels=c=>{
     for(const owner of G.state.enemies||[]){const path=liveChannel(owner);if(!path)continue;
       c.save();c.beginPath();
       // Keep a near-wall crust's rounded edge off solid scenery too.
-      for(let y=Math.floor((Math.min(path.y,path.y2)-18)/16);y<=Math.floor((Math.max(path.y,path.y2)+18)/16);y++)
-        for(let x=Math.floor((Math.min(path.x,path.x2)-18)/16);x<=Math.floor((Math.max(path.x,path.x2)+18)/16);x++)
+      const margin=path.bloom?32:18;
+      for(let y=Math.floor((Math.min(path.y,path.y2)-margin)/16);y<=Math.floor((Math.max(path.y,path.y2)+margin)/16);y++)
+        for(let x=Math.floor((Math.min(path.x,path.x2)-margin)/16);x<=Math.floor((Math.max(path.x,path.x2)+margin)/16);x++)
           if(!G.world.solid(x*16+8,y*16+8))c.rect(x*16,y*16,16,16);
       c.clip();c.strokeStyle='#b7d9d4';c.lineWidth=28;c.lineCap='round';c.globalAlpha=.38;
-      c.beginPath();c.moveTo(path.x,path.y);c.lineTo(path.x2,path.y2);c.stroke();c.globalAlpha=1;
+      c.beginPath();c.moveTo(path.x,path.y);c.lineTo(path.x2,path.y2);c.stroke();
+      if(path.bloom){const b=path.bloom;c.beginPath();for(let i=0;i<=64;i++){const a=i*Math.PI/32,d=bloomReach(b,a),x=b.x+Math.cos(a)*d,y=b.y+Math.sin(a)*d;i?c.lineTo(x,y):c.moveTo(x,y);}c.closePath();c.fillStyle='#b7d9d4';c.fill();c.save();c.clip();c.globalAlpha=1;flower(c,b.x,b.y+4);flower(c,b.x-12,b.y+10);flower(c,b.x+12,b.y-3);c.restore();}c.globalAlpha=1;
       const dx=path.x2-path.x,dy=path.y2-path.y,length=Math.hypot(dx,dy),ux=length?dx/length:1,uy=length?dy/length:0;
       for(let d=0;d<=length;d+=16){for(const side of [-14,14]){
         c.fillStyle='#c5e5dd';c.beginPath();c.ellipse(path.x+ux*d-uy*side,path.y+uy*d+ux*side,3,2,0,0,Math.PI*2);c.fill();
@@ -111,7 +131,7 @@
   G.beginMireRematch=()=>{
     if(!friendly()||G.state.knockout||G.ui.dialogueOpen||G.ui.menuOpen||G.state.gauntletRun||G.state.expeditionRun)return false;
     const owner=G.makeEnemy('mireQueen',6*16+8,9*16+8);
-    owner.def={...owner.def,boss:{...owner.def.boss,rematchLine:progress().rippling?'Let’s try my ripple! Crack the mire, then use your lily path through my following reeds.':'Ready for another splash? My veil still needs dark magic.'}};
+    owner.def={...owner.def,boss:{...owner.def.boss,rematchLine:progress().rippling?'Let’s grow a flower pool! Crack the mire, then lead my next bubble onto your lily path. Its splash makes room to move.':'Ready for another splash? My veil still needs dark magic.'}};
     owner.guardPost=true;owner.queenLocalRematch=true;owner.queenRippling=progress().rippling&&progress().counterLearned;
     G.state.enemies.push(owner);G.applyMarshSluices();return true;
   };
@@ -142,7 +162,7 @@
   G.tryOpeningInteraction=()=>{
     const at=G.openingInteractionCandidate();if(at?.id!=='queen-rematch')return interact();
     const a=progress();if(a.counterLearned&&!a.invited){a.invited=true;G.saveGame();
-      G.ui.dialogue('MIRE QUEEN','You grew a lily path! Want to walk it through my ripple? Light the ripple lantern by my fire. Bring your help lights, too. I’ve got a towel ready.',{accent:'#b29bdf'});
+      G.ui.dialogue('MIRE QUEEN','You grew a lily path! Want to make it bloom? Light my ripple lantern, then lead the next bubble onto your path. Its splash grows a wider flower pool. I’ve got a towel ready.',{accent:'#b29bdf'});
     }else G.beginMireRematch();G.input.clearTaps();return true;
   };
   function drawCrust(c,e){const x=e.x,y=e.y;c.save();
