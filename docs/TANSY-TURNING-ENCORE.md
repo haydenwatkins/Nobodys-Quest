@@ -1,6 +1,9 @@
 # Tansy’s turning Encore
 
-October 18, 2026. Isolated next variation while Sumi #63 completes its frozen release gates. Standard Tansy already turns landed pie splashes into real card passages. Her old Encore repeats the same fan with the same automatically inherited opening; that remains a documented identity gap.
+October 19, 2026. [Issue #64](https://github.com/haydenwatkins/Nobodys-Quest/issues/64). Local acceptance is complete; exact Pages and public input verification are pending for this release. Standard Tansy already turns landed pie splashes into real card passages. Encore now asks for a fresh splash and a different approach after the complete first flight, rather than inheriting the same opening.
+
+The frozen runtime4847672 passes one clean complete952-case 2D/unchanged3D integration invocation (2760113.89345ms), zero failed/cancelled/skipped/todo. Twenty-three native victories across the documented runs, both zero-finding review axes, six supported layout workflows and all160 selected local captures are complete. The earlier interrupted sweep has no final result and is excluded. Only documentation and Sumi’s already-reviewed real-time helper changed during the successful resumed sweep; all nine frozen runtime hashes remain identical. Public deployment/input evidence will be recorded after the exact release is built.
+
 
 Keep the standard show, native 54 HP / six Sharp Ward / speed 54 / damage 1, four solid travel cases, camp and pantry. Card Encore remains a deliberately chosen local variation with independent help, equal rewards, saved old practice/preferences/clears and actual normal Ward/HP arts.
 
@@ -12,7 +15,7 @@ Keep physical Curtain Bell/star, Trouper eligibility/discovery/useful outing/cho
 
 Use the already authorized native input/art/contact, walking/collision, render, save/gift/revisit boundaries. Build one failing behavior slice at a time, then native full-strength standard/Encore favorite/slow/all-help/zero-pie/first-gift/run coverage, independent Spec/Standards review, supported phone/TV/portrait × HD/base inspection and original-RAF input. Run one full regression after findings settle, then exact Pages/public verification before the per-boss main push. Controlled fixtures and automation do not establish physical-device or continuous family enjoyment.
 
-## Implementation evidence in progress
+## Historical development evidence
 
 The first native independence case fails on the old automatic second-fan gap, then passes. The fresh-preparation case fails on zero new pies, then two first/fresh cases pass together (10257.350018 ms). Fresh pies wait until the actual first flight has left. Each opens only its own fan; the second gap is two actual card spacings to a side of the first, and the old center retains a real card. Actual slow-body input/walking passes eight early/final × guardian-help × two-choice fixtures (36822.806604 ms), with zero damage/mana and native HP/Sharp Ward, fixed commitments and real moving-card approaches.
 

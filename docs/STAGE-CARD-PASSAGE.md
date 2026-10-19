@@ -1,5 +1,7 @@
 # Tansy's card passage
 
+The standard passage foundation remains valid; [Tansy’s turning Encore](TANSY-TURNING-ENCORE.md) supersedes the old repeated Encore with fresh-pie route choices and records current release evidence.
+
 October 13, 2026. The brief Matt Pocock `grill-with-docs` conversation settled the next boss-identity backfill: **splash a landed pie to choose an opening in the next card fan, then walk through it toward Tansy while her act continues**. Later phases offer different pies and approaches. Walking around remains a complete alternative. This supersedes the global-stagger payoff in `STAGE-CUSTARD.md`, whose original release evidence remains historical.
 
 ## Player-facing contract
