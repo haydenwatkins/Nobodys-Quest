@@ -422,7 +422,7 @@ G.makeEnemy = function (id, x, y) {
     bossEngaged: false,
     bossIntroT: 0,
     bossPhase: 1,
-    bossSpecialT: def.boss ? def.boss.specialEvery : 0,
+    bossSpecialT: def.boss ? (def.boss.openingDelay ?? def.boss.specialEvery) : 0,
     bossTelegraphT: 0,
     bossChargeT: 0,
     bossRecoverT: 0,
@@ -462,6 +462,7 @@ function engageBoss(e) {
   const boss = e.def.boss;
   const rematch = (G.state.items || []).includes(e.def.trophy);
   const lines = boss.introLines && boss.introLines.length ? boss.introLines : [boss.intro];
+  G.prepareAtlasCourt?.(e,G.state.player);
   e.bossIntroT = rematch ? 0.35 : Math.max(G.BOSS_CUTSCENE_LINE_SECONDS, lines.length * G.BOSS_CUTSCENE_LINE_SECONDS);
   e.shootT = Math.max(e.shootT, e.bossIntroT + 0.35);
   G.state.hitStop = Math.max(G.state.hitStop || 0, rematch ? 0.03 : 0.08);

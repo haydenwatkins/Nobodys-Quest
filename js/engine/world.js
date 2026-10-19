@@ -379,7 +379,7 @@ G.world = (() => {
     // even if the door is drawn on a normally-solid tile like a tree.
     if (cell.portal) return !portalOpen(cell);
     if (SOLID[cell.tile]) return true;
-    return false;
+    return !!G.atlasGapBlocked?.(px, py);
   }
 
   function campFenceKeepouts(fences) {

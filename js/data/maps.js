@@ -967,7 +967,7 @@ function caravanFenceLayout() {
   },
   {
     id: "titanGrave", name: "Titan Grave", biome: "titan", variant: 7,
-    message: "Broken ribs shelter the pilgrim roads. The northern spine returns to Glasswater; the southern memorial road holds the Titan's Smallest Memory. The Last Worldbearer waits northeast. Break his Blunt ward, read each field, and answer in the quiet afterward.",
+    message: "Broken ribs shelter the pilgrim roads. The northern spine returns to Glasswater; the southern memorial road holds the Titan's Smallest Memory. The Last Worldbearer waits northeast. Tap a loose stone to rebuild a crossing over a crack, or walk around its ends. Your bridges stay when the next crack turns. Step out of each falling stone’s fixed circle. Blunt opens his ward.",
     portals: {
       x: { map: "stormspinePeaks", x: 43, y: 14 },
       n: { map: "glasswaterDesert", x: 23, y: 27 },

@@ -25,3 +25,5 @@ _Avoid_: Automatically assigned chore
 **Card Encore**: Tansy's deliberately chosen local practice variation with a following card passage; help and rewards remain independent.
 
 **Mire channel**: Queen’s fixed lily-lined ground, made by breaking nearby landed crust. It shelters feet from her bubbles and reeds while her court continues fighting; other enemies keep their danger.
+
+**Rebuilt ground**: Atlas’s small lasting stone crossings. They restore actual feet through later cracks; falling stones and ordinary projectiles remain dangerous.
