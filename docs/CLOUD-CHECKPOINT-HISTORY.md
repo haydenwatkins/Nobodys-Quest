@@ -131,3 +131,5 @@ Thirteen original-AI fights pass across three bodies/all help combinations and a
 
 
 October20: Queen’s blooming-pool local release gate passes959 distinct frozen-source results across preserved-prefix and complete resumed-file runs,23 native victories, clean32 affected, both reviews and137 inspected local views. Duplicate unchanged3D runs are excluded. Exact separate public verification follows. Atlas #66/Meridian #67 are unpublished with full sweeps running; all19 #68 retains actual scenery/HUD/control gaps and earned progression review.
+
+Queen #65 public checkpoint: gameplayfb79341/Pages39363369509/API/all ten bytes verified; original-RAF touch/TV each actual bloom+wide catch,0damage/mana/paid/errors,helpsOff.12 public captures inspected,149selected total. Atlas66/Meridian67 remain unpublished; #68 shared roster audit follows.

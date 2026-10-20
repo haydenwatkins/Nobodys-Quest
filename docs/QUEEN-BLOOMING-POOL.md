@@ -1,6 +1,6 @@
 # Queen’s blooming pool
 
-October 19, 2026. [Issue #65](https://github.com/haydenwatkins/Nobodys-Quest/issues/65). Complete local acceptance after Tansy #64; separate public verification is next. Standard Queen’s usable lily channel is published under #48. The old Rippling Mire merely adds a following reed fan and remains partial against the boss-identity rule.
+October 19, 2026. [Issue #65](https://github.com/haydenwatkins/Nobodys-Quest/issues/65). Published and verified after Tansy #64. Standard Queen’s usable lily channel is published under #48. The old Rippling Mire merely adds a following reed fan and remains partial against the boss-identity rule.
 
 Keep standard bubble-to-reed play and the real landed crust/free damaging art or travelled dash that makes fixed lily-lined ground toward Queen. Native36HP/five Darkveil, nine regional enemies, ordinary walking, original preparation/camp/retry and all actual contact/ownership/terrain rules remain. The strip remains fourteen pixels to each side. Dark still opens the original veil; nothing automatically damages it, globally cancels pressure or stuns Queen.
 
@@ -50,3 +50,12 @@ All11 successful original-RAF captures are inspected individually: six touch and
 All959 distinct2D/unchanged3D regression cases pass with frozen source unchanged. The earlier combined process ended without a final result; its cause was not diagnosed. Preserve its definitely completed ordered prefix of588 cases across171 files (including44 unchanged3D cases, which Node runs first), then run all98 remaining2D files in complete native TAP invocations:371 additional passes, zero failures/cancellations/skips/todos. This is a resumed complete sweep, not one clean combined959-case invocation. A mistaken resume inventory also repeats the five3D files; their44 duplicate passes are explicitly excluded from the959 total after matching the exact saved-prefix test titles. Atomic file exits, source hashes and the corrected unique report are retained in verification artifacts.
 
 Merge the latest published Tansy documentation without changing any of the ten frozen runtime files. Separate Queen publication, exact Pages/build API/all-ten-byte verification and public original-RAF touch/TV remain pending at this commit. Atlas and Meridian remain separate unpublished follow-ups; the final all19 review must fix the recorded court-edge and actor/cue visibility gaps. No physical-device or continuous family-play claim is made.
+
+
+## Exact public verification
+
+Gameplayfb79341f6c0b31873bdc9c128f27ffd7ba7ea2f8 is published. Exact Pages39363369509 completes successfully; the Pages API reports that same commit built with no error, and all ten frozen runtime files match the public build byte-for-byte.
+
+Public original-RAF touch and TV each create an actual narrow channel, bait a real flower pool and catch a reed on the wider portion while Queen continues. Touch records218.63999 controlled pixels, TV128.0; each records one actual crust counter/one wide-only catch, zero incoming/end damage, zero mana/paid casts/hits/kills/knockouts/errors and both help lights off. Native36HP/five Darkveil/32speed remain. The earned owned-Ripple chapter and initial pose are supplied; actual mode-UI handoffs are covered separately by the six local workflows. These are original real-time AI/input proofs, not complete browser fights or physical-device sessions.
+
+All12 successful public images are inspected on a contact sheet: six touch and six TV, including both crust checkpoints this time. The startup image per mode is before Queen. Together with137 selected local images,149 selected views are inspected; failed earlier pilots are excluded. All19 court-edge/HUD/scenery clearance remains #68, along with the wider progression obligations. This documentation-only checkpoint still requires its own exact Pages/byte verification before the issue closes.
