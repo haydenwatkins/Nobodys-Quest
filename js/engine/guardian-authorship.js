@@ -3,10 +3,11 @@
 (() => {
   const authors=new Map();
   G.registerGuardianAuthor=(id,actions)=>authors.set(id,actions);
-  G.runGuardianAction=(owner,p,action,spawn)=>{
-    const perform=authors.get(owner.def.id)?.actions?.[action];if(!perform)return false;
-    perform(owner,p,spawn);return true;
+  G.runGuardianLesson=(id,owner,p,action,spawn,layout)=>{
+    const perform=authors.get(id)?.actions?.[action];if(!perform)return false;
+    perform(owner,p,spawn,layout);return true;
   };
+  G.runGuardianAction=(owner,p,action,spawn)=>G.runGuardianLesson(owner.def.id,owner,p,action,spawn);
   G.guardianRepeatVictory=owner=>authors.get(owner.def.id)?.repeatVictory?.(owner);
   G.noteGuardianAuthorDefeat=owner=>{authors.get(owner.def.id)?.defeat?.(owner);G.retireGuardianProps(owner);};
   G.guardianPropLive=e=>{

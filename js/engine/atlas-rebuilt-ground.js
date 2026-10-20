@@ -24,7 +24,7 @@
  function rebuild(s,h,at){if(!live(s)||!fields(s).includes(h)||h.rebuilt)return;h.rebuilt=true;
   const bridge=bridgeAt(s,h.vertical,at);if(restored(s,bridge))return;
   s.bridges.push(bridge);for(const prop of h.stones)prop.dead=true;s.owner.atlasRepairs=(s.owner.atlasRepairs||0)+1;
-  G.sfx.play('wardBreak');G.spawnFx({kind:'puff',x:at.x,y:at.y,color:'#dfbb80',dur:.35});G.events.emit('guardianCounter',{guardian:'lastWorldbearer',kind:'rebuiltGround'});
+  G.sfx.play('wardBreak');G.spawnFx({kind:'puff',x:at.x,y:at.y,color:'#dfbb80',dur:.35});G.events.emit('guardianCounter',{guardian:s.owner.def.id,kind:'rebuiltGround'});
  }
  function feetOverlap(g,a){const hw=(a.boxW||10)/2,bh=a.boxH||8;return a.x+hw>=g.left&&a.x-hw<=g.right&&a.y>=g.top&&a.y-bh<=g.bottom;}
  function departing(d,h){return !d.actor.dead&&(d.actor===G.state.player||G.state.enemies.includes(d.actor)||(G.state.npcs||[]).includes(d.actor))&&h.gaps.some(g=>feetOverlap(g,d.actor));}
