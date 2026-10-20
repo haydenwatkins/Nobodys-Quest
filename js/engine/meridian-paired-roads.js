@@ -9,7 +9,8 @@
   const gap=fault.gaps[0],center={x:(gap.left+gap.right)/2,y:(gap.top+gap.bottom)/2},along=fault.vertical?{x:p.x<center.x?1:-1,y:0}:{x:0,y:p.y<center.y?1:-1};
   for(const side of [1,-1]){
    const direction={x:along.x*side,y:along.y*side};
-   G.runGuardianLesson('silkMatriarch',owner,p,'silkRoute',remember,{junction:{x:center.x-direction.x*48,y:center.y-direction.y*48},along:direction,forward:80});
+   const perpendicular={x:-direction.y,y:direction.x};
+   G.runGuardianLesson('silkMatriarch',owner,p,'silkRoute',remember,{junction:{x:center.x-direction.x*48,y:center.y-direction.y*48},along:direction,forward:80,second:{junction:{x:center.x-perpendicular.x*48,y:center.y-perpendicular.y*48},along:perpendicular,forward:80}});
    if(silk)break;
   }
   if(!silk){fault.cancelled=true;for(const stone of fault.stones)stone.dead=true;G.state.bossHazards=G.state.bossHazards.filter(h=>h!==fault);owner.bossRecoverT=1;return;}

@@ -29,7 +29,7 @@
   for(const at of (layout?[layout.junction]:[primary,-56,-80].map(offset=>G.world.safeArrival(p.x+along.x*offset,p.y+along.y*offset)))){
    const incoming=route(owner,at);if(!incoming)continue;
    const first=makeNode(owner,at,!layout&&owner.bossPhase===2,along,aside,layout?.forward);if(!first)continue;const nodes=[first];
-   if(owner.bossPhase===3){const second=makeNode(owner,G.world.safeArrival(at.x+aside.x*64,at.y+aside.y*64),false,along,aside),joined=second&&first.paths.map(path=>{const tail=route(path.at(-1),second);return tail?[...path,...tail.slice(1)]:null;});if(!second||joined.some(path=>!path)){retire(first);if(second)retire(second);continue;}first.paths=joined;nodes.push(second);}
+   if(owner.bossPhase===3){const next=layout?.second,secondAlong=next?.along||along,secondAside={x:-secondAlong.y,y:secondAlong.x},second=makeNode(owner,next?.junction||G.world.safeArrival(at.x+aside.x*64,at.y+aside.y*64),false,secondAlong,secondAside,next?.forward),joined=second&&first.paths.map(path=>{const tail=route(path.at(-1),second);return tail?[...path,...tail.slice(1)]:null;});if(!second||joined.some(path=>!path)){retire(first);if(second)retire(second);continue;}first.paths=joined;nodes.push(second);}
    return {incoming,nodes};
   }return null;
  }

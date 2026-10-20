@@ -19,24 +19,26 @@ test('every registered guardian clears its old commitment and hostile shots befo
 });
 
 test('Guardian help lengthens every standard guardian commitment and every authored floor phrase, including early-return patterns',()=>{
- const r=runtime(),{G}=r;r.load('sunkenMarsh');let patterns=0;
+ const r=runtime(),{G}=r;r.load('godTrial');const floorActions=new Set();
+ // A real clear court lets spatial authors actually place their native fields.
+ const prepareHere=id=>{const e=prepare(G,id);Object.assign(e,{x:360,y:136});Object.assign(G.state.player,{x:272,y:136});return e;};
  for(const d of Object.values(G.enemies).filter(d=>d.miniboss&&!d.boss.orchard)){
   for(const help of [false,true]){
-   G.setComfortSetting('bossAssistance',help);const e=prepare(G,d.id);G.updateEnemies(.01);
+   G.setComfortSetting('bossAssistance',help);const e=prepareHere(d.id);G.updateEnemies(.01);
    assert.ok(Math.abs(e.bossTelegraphT-(e.bossPendingAction==='charge'?(d.boss.chargeTelegraph??d.boss.telegraph):d.boss.telegraph)-(help?.3:0))<1e-8,d.id);
   }
   for(const action of new Set(d.boss.patterns||(d.boss.style==='riftblade'?['charge','blades']:['charge']))){
    const samples=[];
    for(const help of [false,true]){
-    G.setComfortSetting('bossAssistance',help);const e=prepare(G,d.id);Object.assign(e,{bossTelegraphT:.001,bossPendingAction:action});G.updateEnemies(.01);
-    const fields=G.state.bossHazards.filter(h=>h.owner===e);samples.push(fields.map(h=>h.warning));
+    G.setComfortSetting('bossAssistance',help);const e=prepareHere(d.id);Object.assign(e,{bossTelegraphT:.001,bossPendingAction:action});G.updateEnemies(.01);
+    const fields=G.state.bossHazards.filter(h=>h.owner===e);if(fields.length)floorActions.add(action);samples.push(fields.map(h=>h.warning));
     for(const h of fields)assert.ok(e.bossRecoverT>=(h.delay||0)+h.warning+h.active+.64,`${d.id} ${action} waits for its real warning`);
    }
    assert.equal(samples[1].length,samples[0].length);
-   for(let i=0;i<samples[0].length;i++){patterns++;assert.ok(Math.abs(samples[1][i]-samples[0][i]-.3)<1e-8,`${d.id} ${action}`);}
+   for(let i=0;i<samples[0].length;i++){assert.ok(Math.abs(samples[1][i]-samples[0][i]-.3)<1e-8,`${d.id} ${action}`);}
   }
  }
- assert.ok(patterns>=25,'the whole pattern registry, not one demonstration fight');
+ for(const action of ['rootBloom','mireVolley','eclipseSweep','royalStomp','crimsonWaltz','pieRain','tideWall','foldCuts','orbitalBand','gardenBeds','skyFlight','masonryPassage','silkRoute','bellPhrase','warmCrossing','atlasFault','atlasWeight','meridianRoad'])assert.ok(floorActions.has(action),action+' must really place a native floor phrase for both warning checks');
 });
 
 test('actual slowed guardian volleys finish before another attack, with a clear opening after the last shot',()=>{
