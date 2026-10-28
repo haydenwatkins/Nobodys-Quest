@@ -812,6 +812,29 @@ function punishBossHazard(h) {
   return true;
 }
 
+// The caption sits on the actual safe annulus and keeps its anchor while it
+// remains visible, so a small camera movement does not make the words jump.
+const orbitLabelAnchors = new WeakMap();
+G.orbitLabelPosition = function (h) {
+  const cam=G.fieldCamera(), b=arenaBounds(h), radius=(h.inner+h.outer)/2;
+  let right=G.W-4;
+  if(G.input.isTouch&&!G.input.hasGamepad){
+    const game=document.getElementById('game').getBoundingClientRect(),controls=document.getElementById('btn-zone').getBoundingClientRect();
+    if(game.width>0&&controls.width>0&&controls.top<game.top+game.height&&controls.top+controls.height>game.top){
+      const left=(controls.left-game.left)*G.W/game.width;if(left>G.W/2)right=Math.min(right,left-8);
+    }
+  }
+  const safe={left:Math.max(b.left,cam.x+4),right:Math.min(b.right,cam.x+right),top:Math.max(b.top,cam.y+26),bottom:Math.min(b.bottom,cam.y+G.H-23)};
+  const fits=q=>q.x-25>=safe.left&&q.x+25<=safe.right&&q.y-5>=safe.top&&q.y+6<=safe.bottom;
+  const prior=orbitLabelAnchors.get(h);if(prior&&fits(prior))return prior;
+  let best=null;
+  for(let i=0;i<72;i++){
+    const angle=Math.PI/2+i*Math.PI/36,q={x:h.x+Math.cos(angle)*radius,y:h.y+Math.sin(angle)*radius};
+    if(!fits(q))continue;
+    const distance=Math.min(i,72-i);if(!best||distance<best.distance)best={...q,distance};
+  }
+  const result=best||{x:h.x,y:h.y+radius};orbitLabelAnchors.set(h,result);return result;
+};
 G.drawBossHazards = function (ctx) {
   G.drawMireChannels?.(ctx);
   const hazards = G.state.bossHazards || [];
@@ -873,8 +896,9 @@ G.drawBossHazards = function (ctx) {
       ctx.moveTo(h.x+h.inner,h.y);ctx.arc(h.x,h.y,h.inner,0,Math.PI*2);ctx.fill("evenodd");
       ctx.globalAlpha=.95;ctx.strokeStyle="#73eff7";ctx.lineWidth=2;
       for(const radius of [h.inner,h.outer]){ctx.beginPath();ctx.arc(h.x,h.y,radius,0,Math.PI*2);ctx.stroke();}
-      ctx.fillStyle="#263b4b";ctx.fillRect(h.x-25,h.y+(h.inner+h.outer)/2-5,50,11);
-      ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"SAFE ORBIT",h.x,h.y+(h.inner+h.outer)/2+3);
+      const label=G.orbitLabelPosition(h);
+      ctx.fillStyle="#263b4b";ctx.fillRect(label.x-25,label.y-5,50,11);
+      ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"SAFE ORBIT",label.x,label.y+3);
     }else if(h.kind === "eclipseSweep"){
       ctx.globalAlpha=active?.32:.18;ctx.beginPath();ctx.moveTo(h.x,h.y);
       ctx.arc(h.x,h.y,h.radius,h.angle-h.halfAngle,h.angle+h.halfAngle);ctx.closePath();ctx.fill();

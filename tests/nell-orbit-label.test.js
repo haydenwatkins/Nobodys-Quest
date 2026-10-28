@@ -1,0 +1,12 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const runtime=require('../tools/lib/classic-runtime.cjs'),{createCanvas}=require('@napi-rs/canvas');
+test('Nell names a visible part of the real safe orbit at each court edge without jittering on a small step',()=>{
+ const r=runtime(createCanvas),{G}=r;r.load('astronomerTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='professorPerihelion'),p=G.state.player;G.state.enemies=[e];G.state.bossCutscene=null;
+ r.context.document.getElementById('game').getBoundingClientRect=()=>({left:0,top:0,width:640,height:360});r.context.document.getElementById('btn-zone').getBoundingClientRect=()=>({left:500,top:100,width:132,height:244});
+ for(const touch of [false,true])for(const phase of [1,2,3])for(const [x,y,px,py] of [[224,28,224,84],[224,244,224,188],[420,136,364,136],[28,136,84,136]]){
+  G.input.isTouch=touch;G.input.hasGamepad=!touch;Object.assign(e,{x,y,bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),bossTelegraphT:.01,bossPendingAction:'orbitalBand',bossRecoverT:0});Object.assign(p,{x:px,y:py});G.state.bossHazards=[];G.updateEnemies(.02);const h=G.state.bossHazards.find(h=>h.kind==='orbitalBand');assert.ok(h);
+  const c=createCanvas(320,180).getContext('2d');let placed;const fillText=c.fillText.bind(c);c.fillText=(text,x,y,...args)=>{if(text==='SAFE ORBIT')placed={x,y};return fillText(text,x,y,...args);};G.drawBossHazards(c);assert.ok(placed);const cam=G.fieldCamera();
+  assert.ok(placed.x-25>=Math.max(cam.x+4,24)&&placed.x+25<=Math.min(cam.x+(touch?242:316),(G.state.mapW-1.5)*16)&&placed.y-8>=Math.max(cam.y+26,24)&&placed.y+2<=Math.min(cam.y+157,(G.state.mapH-1.5)*16),JSON.stringify({touch,phase,x,y,cam,placed}));
+  const d=Math.hypot(placed.x-h.x,placed.y-3-h.y);assert.ok(d>h.inner&&d<h.outer,'caption names the actual safe band');const before={...placed};p.x+=1;G.drawBossHazards(c);assert.deepEqual(placed,before,'a small step preserves a still-visible label');
+ }
+});
