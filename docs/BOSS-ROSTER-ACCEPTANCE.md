@@ -85,3 +85,31 @@ The read-only `tools/audit-boss-roster.cjs` reads the actual registry and confir
 Treant's Crown, Queen's Pearl, Knight's Sigil and the Keeper's Lantern do not manufacture new bodies. Pearl retains Pebble's beacon return, and the delivery retains its physical bridge and chosen return. The four coast gifts also retain their Chronicle/cairn purposes. Each World Mark restores its existing regional road; its corresponding worn form has an authored useful outing. Existing exploration remains an alternative to optional promises. A ready chosen return can hold later discovery; Set aside releases it deliberately, and earlier waiting echoes are not deleted. Wayheart retains all six Marks and the eight/three portfolio rather than a full-roster grind.
 
 This registry comparison and individual checkpoint cases support the ordering audit. Issue #50 remains the required genuinely earned uninterrupted Worldwake acquisition, outing and return review. Harborback, Foldstep Fox, Skylens Mapper and Hedgehare still need their four stronger specialist roads; sustained mixed builds, reward sources and menu-optional collecting remain in the roadmap.
+
+## Compare the decisions without the names
+
+This compares the current source, including Atlas and Meridian before their separate publication gates. It does not claim human memorability or a complete earned campaign. The individual boss specifications record the native fights, help, walking, gift and return checks.
+
+| Encounter | Decision and consequence | Developed choice |
+| --- | --- | --- |
+| Treant | Dodge the committed strike, harvest a cracked root, and return for its recovery apple while attacks continue. | Later roots choose the harvest location; a continuing branch makes return timing matter. |
+| Tollkeeper | Keep actual feet on a dry bank through a complete flood, then walk outward. | A committed sweep develops holding versus leaving; an ordinary spar remains an alternative. |
+| Queen | Crack landed crust for fixed narrow shelter; lead a committed ripple onto it to grow a local pool. | Choose a close approach or wider refuge, then keep or replace the old channel. Only her bubbles and reeds are sheltered. |
+| Knight | Ring the raised shield to choose its next defended front, then flank it. | A first-front contact can select the following warning while the current charge continues. |
+| Mira | Place a reflector to catch a real returning blade and send one physical Sharp flight back. | Separated lanes and crossing returns make catch position matter while other blades continue. |
+| Bram | Loosen a root, lead an actual completed burrow through it and enter the resulting tunnel. | Bait locations and real mouth impacts develop the shortcut while stomps continue. |
+| Vesper | Uncover light, lead an actual dash through it, then use normal attacks on the reachable shadow. | Lamps move the refuge and contact point; later forks offer a return or continuation while the waltz continues. |
+| Tansy | Splash a landed pie to open one passage in moving cards, then walk through it. | Encore waits for the first cards to leave and offers fresh pies for a different second approach. |
+| Marlo | Choose a gate and voluntarily walk with its physical current through the continuing tide. | Later outlets commit a refuge; real travel earns reverse or crossing choices. |
+| Sumi | Strike a fold and take a real outward step to unfold an approach through cuts. | Traveled roads earn connected far-flap turns; later creases change direction. |
+| Nell | Remain in the fixed safe orbit through the pulse, then carry finite planets that intercept real shots. | Use the cover during stars and walk clear of a committed comet. |
+| Briar | Clip a planted bud so that bed stays absent through later blooms. | Alternating sides and rolling blooms develop a persistent chosen path while other flowers continue. |
+| Aurelia | Choose a feather landing, leave her committed flight and use its wind to approach the arrival. | Crosswind and near/long landing choices develop destination planning. |
+| Pillar | Slide real solid masonry to shelter one stone lane and open an approach. | Separate columns and a final arch exchange middle protection for a diagonal crossing. |
+| Tess | Unhook a future silk connection before its bead reaches the knot. | A crossing fork and linked braid move the next connected segment onto a sister route while the current segment finishes. |
+| Bongle | Read a filling bell rim and choose one echo to rest before it rings. | Two echoes offer one rest; final echoes straddle another main note. The timing remains visual on mute. |
+| Mallow | Choose a lantern destination and walk with its moving warm circle through fixed lightning. | Two routes and a traveled-only warm return develop an escort rather than carried shot interception. |
+| Atlas | Restore a small actual walking crossing through a finite crack, then leave a committed falling weight. | Turned and crossed cracks reuse lasting repairs; repaired ground does not stop projectiles or falling weights. |
+| Meridian | Give a connected bead one road while restoring and walking another across a real crack. | Turned floor and two linked junctions retain both earlier consequences as a deliberate final remix. |
+
+These source loops no longer share the former universal “hit a prop, cancel the whole phrase, strike a stunned boss” payoff. They still share readable warnings, familiar controls and optional help. This comparison needs the remaining all-edge visual/input acceptance and separate Atlas/Meridian releases before it can be treated as the completed roster delivery.
