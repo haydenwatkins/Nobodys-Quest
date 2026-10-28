@@ -833,7 +833,8 @@ G.orbitLabelPosition = function (h) {
     if(!fits(q))continue;
     const distance=Math.min(i,72-i);if(!best||distance<best.distance)best={...q,distance};
   }
-  const result=best||{x:h.x,y:h.y+radius};orbitLabelAnchors.set(h,result);return result;
+  if(!best){orbitLabelAnchors.delete(h);return null;}
+  orbitLabelAnchors.set(h,best);return best;
 };
 G.drawBossHazards = function (ctx) {
   G.drawMireChannels?.(ctx);
@@ -897,8 +898,8 @@ G.drawBossHazards = function (ctx) {
       ctx.globalAlpha=.95;ctx.strokeStyle="#73eff7";ctx.lineWidth=2;
       for(const radius of [h.inner,h.outer]){ctx.beginPath();ctx.arc(h.x,h.y,radius,0,Math.PI*2);ctx.stroke();}
       const label=G.orbitLabelPosition(h);
-      ctx.fillStyle="#263b4b";ctx.fillRect(label.x-25,label.y-5,50,11);
-      ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"SAFE ORBIT",label.x,label.y+3);
+      if(label){ctx.fillStyle="#263b4b";ctx.fillRect(label.x-25,label.y-5,50,11);
+      ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"SAFE ORBIT",label.x,label.y+3);}
     }else if(h.kind === "eclipseSweep"){
       ctx.globalAlpha=active?.32:.18;ctx.beginPath();ctx.moveTo(h.x,h.y);
       ctx.arc(h.x,h.y,h.radius,h.angle-h.halfAngle,h.angle+h.halfAngle);ctx.closePath();ctx.fill();
