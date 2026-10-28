@@ -11,5 +11,5 @@
  G.drawFrostbellFence=(c,fence)=>here()?G.drawCaravanFence(c,fence):false;
  G.drawFrostbellCamp=(c,time)=>here()?G.drawCaravanCamp(c,time):false;
  const old=G.openingDrawables;
- G.openingDrawables=c=>{const list=old(c);if(!here())return list;for(const [tx,ty]of [[3,5],[20,24],[42,4]])if(G.state.grid[ty][tx].tile==='grass'){const x=tx*16+8,y=ty*16+8;list.push({y,fn:()=>{c.save();const hidden=a=>a&&Math.abs(a.x-x)<25&&a.y<y&&a.y>y-54;if(hidden(G.state.player)||(G.state.npcs||[]).some(hidden))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.pine,G.reducedMotion?0:Math.floor(G.state.time*.2+tx)%4,x,y+4,false);c.restore();}});}return list;};
+ G.openingDrawables=c=>{const list=old(c);if(!here())return list;for(const [tx,ty]of [[3,5],[20,24],[42,4]])if(G.state.grid[ty][tx].tile==='grass'){const x=tx*16+8,y=ty*16+8;list.push({y,fn:()=>{c.save();const hidden=a=>a&&Math.abs(a.x-x)<25&&a.y<y&&a.y>y-54;if(G.sceneryActors().some(hidden))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.pine,G.reducedMotion?0:Math.floor(G.state.time*.2+tx)%4,x,y+4,false);c.restore();}});}return list;};
 })();

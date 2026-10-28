@@ -15,7 +15,7 @@
  G.drawGardensPost=(c,post,awake,near)=>{if(!here())return false;G.drawSprite(c,G.greenfieldScenery[awake?'postAwake':'postSleeping'],0,Math.round(post.x),Math.round(post.y)+6,false);if(near){rect(c,post.x-9,post.y-20,18,1,'#d4d8bb');rect(c,post.x-9,post.y-20,1,4,'#d4d8bb');rect(c,post.x+8,post.y-20,1,4,'#d4d8bb');}return true;};
  G.drawGardensFence=(c,fence)=>here()?G.drawCaravanFence(c,fence):false;
  G.drawGardensCamp=(c,time)=>here()?G.drawCaravanCamp(c,time):false;
- function yielding(c,s,x,y,range){c.save();const behind=a=>a&&Math.abs(a.x-x)<range&&a.y<y&&a.y>y-(s==='arch'?43:50);if(behind(G.state.player,x,y)||(G.state.npcs||[]).some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S[s],G.reducedMotion?0:Math.floor(G.state.time*.3+x)%4,x,y,false);c.restore();}
+ function yielding(c,s,x,y,range){c.save();const behind=a=>a&&Math.abs(a.x-x)<range&&a.y<y&&a.y>y-(s==='arch'?43:50);if(G.sceneryActors().some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S[s],G.reducedMotion?0:Math.floor(G.state.time*.3+x)%4,x,y,false);c.restore();}
  G.drawGardenArch=(c,x,y)=>{if(!here())return false;yielding(c,'arch',x,y+4,35);return true;};
  G.drawGardenPlanter=(c,x,y)=>{if(!here())return false;yielding(c,'planter',x,y+4,18);return true;};
  G.drawGardenRaisedStep=(c,x,y)=>{if(!here())return false;G.drawSprite(c,S.raisedStep,0,x,y+8,false);return true;};

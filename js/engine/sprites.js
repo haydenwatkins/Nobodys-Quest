@@ -243,3 +243,8 @@ G.upgradeSpriteCatalog = function () {
   for (const npc of Object.values(G.NPCS || {})) upgrade(npc.sprite, "detail");
   return upgraded;
 };
+
+// Foreground art yields to everyone who can participate in the scene.
+G.sceneryActors = function () {
+  return [G.state.player, ...(G.state.npcs || []), ...(G.state.enemies || []).filter(e => !e.dead && !e.roadMechanism)];
+};

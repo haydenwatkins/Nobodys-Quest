@@ -60,7 +60,7 @@
     if(freshOrchard()&&G.openingScenery){
       const sprite=G.openingScenery[G.state.mapId==='heartwood'?'heartwood':apple?'apple':'forest'];
       const behind=a=>a&&Math.abs(a.x-x)<24&&a.y<y&&a.y>y-44;
-      c.save();if(behind(G.state.player)||(G.state.npcs||[]).some(behind))c.globalAlpha=Math.min(typeof c.globalAlpha==='number'?c.globalAlpha:1,.35);
+      c.save();if(G.sceneryActors().some(behind))c.globalAlpha=Math.min(typeof c.globalAlpha==='number'?c.globalAlpha:1,.35);
       ellipse(c,x+3,y+2,18,5,'rgba(25,43,37,.23)');G.drawSprite(c,sprite,G.reducedMotion?0:Math.floor((G.state.time||0)*.55+seed)%4,x,y+3,false);c.restore();return;
     }
     ellipse(c,x+4,y+2,18,5,'rgba(25,43,37,.23)');

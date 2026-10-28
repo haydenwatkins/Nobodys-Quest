@@ -1827,7 +1827,7 @@ G.drawEnemy = function (ctx, e) {
   // Only its sprite yields; native hitboxes, Ward and warnings stay intact.
   const player = G.state.player;
   let overlap = false;
-  if (e.def.miniboss && drawY > player.y) {
+  if (e.def.miniboss && e.y > player.y) {
     const bossArt = G.spriteMetrics(e.def.sprite), playerArt = G.spriteMetrics(G.playerForm().sprite);
     overlap = drawX - bossArt.w * spriteScale / 2 < player.x + playerArt.w / 2 &&
       drawX + bossArt.w * spriteScale / 2 > player.x - playerArt.w / 2 &&

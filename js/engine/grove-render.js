@@ -15,7 +15,7 @@
  G.drawGrovePantry=(c,ch)=>{if(!here()||!ch.food)return false;G.drawSprite(c,G.homeScenery[ch.opened?'pantryEmpty':'pantryReady'],0,ch.x*16+8,ch.y*16+16,false);if(ch.opened){const p=1-Math.min(1,Math.max(0,(ch.readyAt||0)-Date.now())/G.PANTRY_REFILL_MS);rect(c,ch.x*16+3,ch.y*16+14,10,1,'#334b43');rect(c,ch.x*16+3,ch.y*16+14,Math.round(p*10),1,'#ae8d62');}return true;};
  G.drawGrovePost=(c,post,awake,near)=>{if(!here())return false;G.drawSprite(c,G.greenfieldScenery[awake?'postAwake':'postSleeping'],0,Math.round(post.x),Math.round(post.y)+6,false);if(near){rect(c,post.x-9,post.y-20,18,1,'#d7ba82');rect(c,post.x-9,post.y-20,1,4,'#d7ba82');rect(c,post.x+8,post.y-20,1,4,'#d7ba82');}return true;};
  const behind=(a,x,y)=>a&&Math.abs(a.x-x)<24&&a.y<y-12&&a.y>y-60;
- function tree(c,x,y){c.save();if(behind(G.state.player,x,y)||(G.state.npcs||[]).some(a=>behind(a,x,y)))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.shelterTree,G.reducedMotion?0:Math.floor(G.state.time*.6+x)%4,x,y+6,false);c.restore();}
+ function tree(c,x,y){c.save();if(G.sceneryActors().some(a=>behind(a,x,y)))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.shelterTree,G.reducedMotion?0:Math.floor(G.state.time*.6+x)%4,x,y+6,false);c.restore();}
  G.drawGroveShelter=(c,x,y,planted)=>{if(!here())return false;if(planted)tree(c,x,y);else G.drawSprite(c,S.stump,0,x,y+12,false);return true;};
  G.drawGroveFlower=(c,x,y)=>{if(!here())return false;G.drawSprite(c,S.flower,Math.floor(G.util.hash2(x,y)*8),x,y+5,false);return true;};
  const old=G.openingDrawables;

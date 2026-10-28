@@ -4,7 +4,7 @@
  const here=()=>G.state?.mapId==='manyfoldExpedition',S=G.shiftingScenery;
  const rect=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
  const hidden=(sprite,x,y,a)=>{const m=G.spriteMetrics(sprite);return a&&Math.abs(a.x-x)<m.w/2+8&&a.y>y-m.h-2&&a.y<y+4;};
- const yielding=(c,sprite,x,y,fn)=>{c.save();if(hidden(sprite,x,y,G.state.player)||(G.state.npcs||[]).some(a=>hidden(sprite,x,y,a)))c.globalAlpha*=.35;fn();c.restore();};
+ const yielding=(c,sprite,x,y,fn)=>{c.save();if(G.sceneryActors().some(a=>hidden(sprite,x,y,a)))c.globalAlpha*=.35;fn();c.restore();};
  G.drawShiftingTile=(c,cell,x,y)=>{if(!here()||!['floor','wall','rock'].includes(cell.tile))return false;const px=x*16,py=y*16,r=G.util.hash2(x+373,y+151)*2,patch=G.util.hash2(Math.floor(x/5)+53,Math.floor(y/4)+97)*2;rect(c,px,py,16,16,['#858d87','#8b928a','#7e8883'][Math.floor(patch*3)]);if(cell.tile==='wall')G.drawSprite(c,S.wall,Math.floor(r*4),px+8,py+16,false);else if(r>.85){rect(c,px+4,py+10,5,1,'#a2a799');rect(c,px+9,py+11,3,1,'#737f7b');}return true;};
  G.drawShiftingNotice=(c,cell,x,y)=>{if(!here()||!cell.message)return false;const px=x*16+8,py=y*16+16;yielding(c,S.notice,px,py,()=>G.drawSprite(c,S.notice,0,px,py,false));return true;};
  const old=G.openingDrawables;
