@@ -481,12 +481,10 @@
     const p = s.player;
     G.text.beginWorldFrame(ctx);
 
-    // camera follows the player, clamped to the map edges
-    const maxX = Math.max(0, s.mapW * G.TILE - G.W);
-    const maxY = Math.max(0, s.mapH * G.TILE - G.H);
+    // Quiet travel keeps its clamp; an engaged court reserves room for actors.
+    const camera = G.fieldCamera();
     const cameraSnap = G.hdPilot ? (value) => Math.round(value * 2) / 2 : Math.round;
-    let camX = cameraSnap(G.util.clamp(p.x - G.W / 2, 0, maxX));
-    let camY = cameraSnap(G.util.clamp(p.y - G.H / 2 - 4, 0, maxY));
+    let camX = cameraSnap(camera.x), camY = cameraSnap(camera.y);
     camX += Math.round(s.cameraKickX);
     camY += Math.round(s.cameraKickY);
     if (s.shake > 0) {
