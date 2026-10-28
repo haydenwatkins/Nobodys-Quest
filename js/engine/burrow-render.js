@@ -7,5 +7,26 @@
  G.drawBurrowNotice=(c,cell,x,y)=>{if(!here()||!cell.message)return false;G.drawSprite(c,S.notice,0,x*16+8,y*16+16,false);return true;};
  G.drawBurrowCache=(c,ch)=>{if(!here())return false;const x=ch.x*16+8,y=ch.y*16+16;G.drawSprite(c,S.shortbread,ch.opened?1:0,x,y,false);if(ch.food&&ch.opened){const progress=1-Math.min(1,Math.max(0,(ch.readyAt||0)-Date.now())/G.PANTRY_REFILL_MS);rect(c,x-10,y-5,20,1,'#493e3c');rect(c,x-10,y-5,Math.round(20*progress),1,'#b2c0a0');}return true;};
  const old=G.openingDrawables;
- G.openingDrawables=c=>{const list=old(c);if(!here())return list;for(let ty=0;ty<G.state.mapH;ty++)for(let tx=0;tx<G.state.mapW;tx++)if(G.state.grid[ty][tx].tile==='rock'){const x=tx*16+8,y=ty*16+16;list.push({y:y-1,fn:()=>{c.save();const hidden=a=>a&&Math.abs(a.x-x)<14&&a.y<y&&a.y>y-30;if(G.sceneryActors().some(hidden))c.globalAlpha*=.35;G.drawSprite(c,S.rootStone,0,x,y,false);c.restore();}});}for(const [id,tx,bottom]of [['tools',9,32],['oven',18,40]]){const x=tx*16+8,y=bottom;list.push({y:16,fn:()=>{c.save();const hidden=a=>a&&Math.abs(a.x-x)<26&&a.y<y&&a.y>y-38;if(G.sceneryActors().some(hidden))c.globalAlpha*=.35;G.drawSprite(c,S[id],G.reducedMotion?0:Math.floor(G.state.time*.3)%4,x,y,false);c.restore();}});}return list;};
+ function warningOverlaps(id,x,y){
+  const m=G.spriteMetrics(S[id]);
+  return (G.state.bossHazards||[]).some(h=>{
+   if(h.kind!=='royalStomp'||h.cancelled||h.owner?.def?.id!=='moleMonarch'||h.owner.dead)return false;
+   const local=h.t-(h.delay||0);if(local<0||local>=h.warning+h.active)return false;
+   const label=G.ringLabelPosition(h,h.radius+8,22);return label&&x+m.w/2>label.x-22&&x-m.w/2<label.x+22&&y>label.y-5&&y-m.h<label.y+6;
+  });
+ }
+ G.openingDrawables=c=>{
+  const list=old(c);if(!here())return list;
+  const prop=(id,x,y,depth,hidden)=>list.push({y:depth,fn:()=>{
+   c.save();if(warningOverlaps(id,x,y))c.globalAlpha*=.15;else if(G.sceneryActors().some(hidden))c.globalAlpha*=.35;
+   G.drawSprite(c,S[id],id==='rootStone'?0:G.reducedMotion?0:Math.floor(G.state.time*.3)%4,x,y,false);c.restore();
+  }});
+  for(let ty=0;ty<G.state.mapH;ty++)for(let tx=0;tx<G.state.mapW;tx++)if(G.state.grid[ty][tx].tile==='rock'){
+   const x=tx*16+8,y=ty*16+16;prop('rootStone',x,y,y-1,a=>a&&Math.abs(a.x-x)<14&&a.y<y&&a.y>y-30);
+  }
+  for(const [id,tx,bottom]of [['tools',9,32],['oven',18,40]]){
+   const x=tx*16+8,y=bottom;prop(id,x,y,16,a=>a&&Math.abs(a.x-x)<26&&a.y<y&&a.y>y-38);
+  }
+  return list;
+ };
 })();

@@ -1,5 +1,5 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
-const runtime=require('../tools/lib/classic-runtime.cjs'),{createCanvas}=require('@napi-rs/canvas');
+const runtime=require('../tools/lib/classic-runtime.cjs'),{createCanvas}=require(require.resolve('@napi-rs/canvas',{paths:[process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES||'node_modules']}));
 const overlap=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
 test('the native flood names its real shelter without covering the fight or fixed controls at every court edge',()=>{
  for(const touch of [false,true])for(const [x,y,px,py] of [[272,80,272,136],[272,416,272,360],[496,232,440,232],[64,232,120,232]]){
