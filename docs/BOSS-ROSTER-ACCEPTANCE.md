@@ -113,3 +113,9 @@ This compares the current source, including Atlas and Meridian before their sepa
 | Meridian | Give a connected bead one road while restoring and walking another across a real crack. | Turned floor and two linked junctions retain both earlier consequences as a deliberate final remix. |
 
 These source loops no longer share the former universal “hit a prop, cancel the whole phrase, strike a stunned boss” payoff. They still share readable warnings, familiar controls and optional help. This comparison needs the remaining all-edge visual/input acceptance and separate Atlas/Meridian releases before it can be treated as the completed roster delivery.
+
+### Court-edge visual checkpoint
+
+The reconstructed court review exercised the native first committed action at four independently supplied floor poses for each of the 19 guardians, in phone touch and TV controller at both render settings and portrait touch at both settings. All six browser workflows completed, and the 456 selected action captures were inspected. These are supplied-state, first-action samples, not complete fights, later phases, continuous earned progression or physical-device/family play. The Worldbearer samples use their regional home-court windows.
+
+That inspection found the Tollkeeper's pending celebration obscuring the flood, his shelter wording colliding with the fixed controller legend or foreground, Nell's safe-orbit wording leaving the view, and Bram's stomp warning colliding with the legend or leaving the view. The isolated fixes are backed up on `boss-toll-hud`, `boss-nell-label` and `boss-bram-label`, and remain unpublished pending their independent reviews, integration and release gates. The Tollkeeper warning-to-active transition and Nell's visible-band and body clearance also received targeted native tests after review findings. These observations do not establish that every later cue, moving-camera state or full encounter is clear.
