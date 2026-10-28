@@ -1,0 +1,13 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const runtime=require('../tools/lib/classic-runtime.cjs'),{createCanvas}=require('@napi-rs/canvas');
+test('Bram’s real stomp warning remains visible near the impact at every court edge',()=>{
+ const r=runtime(createCanvas),{G}=r;r.load('moleTrial');r.drain();const e=G.state.enemies.find(e=>e.id==='moleMonarch'),p=G.state.player;G.state.enemies=[e];G.state.bossCutscene=null;
+ r.context.document.getElementById('game').getBoundingClientRect=()=>({left:0,top:0,width:640,height:360});r.context.document.getElementById('btn-zone').getBoundingClientRect=()=>({left:500,top:100,width:132,height:244});
+ for(const touch of [false,true])for(const phase of [1,2,3])for(const [x,y,px,py] of [[224,28,224,84],[224,240,224,184],[420,136,364,136],[28,136,84,136]]){
+  G.input.isTouch=touch;G.input.hasGamepad=!touch;Object.assign(e,{x,y,bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:e.def.hp*(phase===3?.3:phase===2?.6:1),bossTelegraphT:.01,bossPendingAction:'royalStomp',bossRecoverT:0});Object.assign(p,{x:px,y:py});G.state.bossHazards=[];G.updateEnemies(.02);const h=G.state.bossHazards.find(h=>h.kind==='royalStomp');assert.ok(h);
+  const c=createCanvas(320,180).getContext('2d');let placed;const fillText=c.fillText.bind(c);c.fillText=(text,x,y,...args)=>{if(text==='MOVE OUT'||text==='SAFE HERE')placed={text,x,y};return fillText(text,x,y,...args);};G.drawBossHazards(c);assert.equal(placed?.text,'MOVE OUT');const cam=G.fieldCamera();
+  assert.ok(placed.x-22>=Math.max(cam.x+4,24)&&placed.x+22<=Math.min(cam.x+(touch?242:316),(G.state.mapW-1.5)*16)&&placed.y-8>=Math.max(cam.y+26,24)&&placed.y+3<=Math.min(cam.y+157,(G.state.mapH-1.5)*16),JSON.stringify({touch,phase,x,y,cam,placed}));
+  assert.ok(Math.abs(Math.hypot(placed.x-h.x,placed.y-3-h.y)-(h.radius+8))<.01,'warning stays adjacent to the real impact ring');const before={...placed};p.x+=1;G.drawBossHazards(c);assert.deepEqual(placed,before,'a small step preserves a still-visible warning');
+ }
+ Object.assign(e,{x:224,y:120,bossPhase:1,hp:e.def.hp,bossTelegraphT:.01,bossPendingAction:'royalStomp',bossRecoverT:0});Object.assign(p,{x:224,y:173});assert.ok(G.world.isSafeSpawn(p.x,p.y));G.state.bossHazards=[];G.updateEnemies(.02);const h=G.state.bossHazards.find(h=>h.kind==='royalStomp');assert.ok(h);const c=createCanvas(320,180).getContext('2d');let label;const paint=c.fillText.bind(c);c.fillText=(text,x,y,...args)=>{if(text==='MOVE OUT'||text==='SAFE HERE')label={x,y};return paint(text,x,y,...args);};G.drawBossHazards(c);assert.ok(label);const m=G.spriteMetrics(G.forms[G.state.formId].sprite);assert.ok(!(label.x-22<p.x+m.w/2&&label.x+22>p.x-m.w/2&&label.y-8<p.y&&label.y+3>p.y-m.h),'warning clears the worn body');
+});

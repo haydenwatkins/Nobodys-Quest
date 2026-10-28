@@ -812,11 +812,11 @@ function punishBossHazard(h) {
   return true;
 }
 
-// The caption sits on the actual safe annulus and keeps its anchor while it
-// remains visible, so a small camera movement does not make the words jump.
-const orbitLabelAnchors = new WeakMap();
-G.orbitLabelPosition = function (h) {
-  const cam=G.fieldCamera(), b=arenaBounds(h), radius=(h.inner+h.outer)/2;
+// Ring captions keep their anchor while it remains visible, so a small camera
+// movement does not make the words jump away from the committed warning.
+const ringLabelAnchors = new WeakMap();
+G.ringLabelPosition = function (h,radius,halfWidth) {
+  const cam=G.fieldCamera(), b=arenaBounds(h);
   let right=G.W-4;
   if(G.input.isTouch&&!G.input.hasGamepad){
     const game=document.getElementById('game').getBoundingClientRect(),controls=document.getElementById('btn-zone').getBoundingClientRect();
@@ -825,17 +825,20 @@ G.orbitLabelPosition = function (h) {
     }
   }
   const safe={left:Math.max(b.left,cam.x+4),right:Math.min(b.right,cam.x+right),top:Math.max(b.top,cam.y+26),bottom:Math.min(b.bottom,cam.y+G.H-23)};
-  const fits=q=>q.x-25>=safe.left&&q.x+25<=safe.right&&q.y-5>=safe.top&&q.y+6<=safe.bottom;
-  const prior=orbitLabelAnchors.get(h);if(prior&&fits(prior))return prior;
+  const s=G.state,actors=[{actor:s.player,def:G.forms[s.formId]},...s.enemies.filter(e=>!e.dead).map(actor=>({actor,def:actor.def}))];
+  const bodies=actors.map(({actor,def})=>{const m=G.spriteMetrics(def.sprite),scale=def.boss?.spriteScale||1;return {left:actor.x-m.w*scale/2-2,right:actor.x+m.w*scale/2+2,top:actor.y-m.h*scale-2,bottom:actor.y+2};});
+  const fits=q=>q.x-halfWidth>=safe.left&&q.x+halfWidth<=safe.right&&q.y-5>=safe.top&&q.y+6<=safe.bottom&&!bodies.some(a=>q.x-halfWidth<a.right&&q.x+halfWidth>a.left&&q.y-5<a.bottom&&q.y+6>a.top);
+  const prior=ringLabelAnchors.get(h);if(prior&&fits(prior))return prior;
   let best=null;
   for(let i=0;i<72;i++){
     const angle=Math.PI/2+i*Math.PI/36,q={x:h.x+Math.cos(angle)*radius,y:h.y+Math.sin(angle)*radius};
     if(!fits(q))continue;
     const distance=Math.min(i,72-i);if(!best||distance<best.distance)best={...q,distance};
   }
-  if(!best){orbitLabelAnchors.delete(h);return null;}
-  orbitLabelAnchors.set(h,best);return best;
+  if(!best){ringLabelAnchors.delete(h);return null;}
+  ringLabelAnchors.set(h,best);return best;
 };
+G.orbitLabelPosition = h => G.ringLabelPosition(h,(h.inner+h.outer)/2,25);
 G.drawBossHazards = function (ctx) {
   G.drawMireChannels?.(ctx);
   const hazards = G.state.bossHazards || [];
@@ -884,7 +887,8 @@ G.drawBossHazards = function (ctx) {
       ctx.globalAlpha=active?.3:.16;ctx.beginPath();ctx.arc(h.x,h.y,h.radius,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=.95;ctx.strokeStyle="#ffcd75";ctx.setLineDash(active?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
       for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(h.x+Math.cos(a)*12,h.y+Math.sin(a)*12);ctx.lineTo(h.x+Math.cos(a+.13)*h.radius*.6,h.y+Math.sin(a+.13)*h.radius*.6);ctx.lineTo(h.x+Math.cos(a)*h.radius*.9,h.y+Math.sin(a)*h.radius*.9);ctx.stroke();}
-      ctx.fillStyle="#302638";ctx.fillRect(h.x-22,h.y+h.radius+3,44,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,G.burrowShelters?.(G.state.player,h.owner,h)?"SAFE HERE":"MOVE OUT",h.x,h.y+h.radius+11);
+      const label=G.ringLabelPosition(h,h.radius+8,22);
+      if(label){ctx.fillStyle="#302638";ctx.fillRect(label.x-22,label.y-5,44,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,G.burrowShelters?.(G.state.player,h.owner,h)?"SAFE HERE":"MOVE OUT",label.x,label.y+3);}
     }else if(h.kind === "starpathComet"){
       ctx.globalAlpha=.22;ctx.strokeStyle="#ffcd75";ctx.lineWidth=16;
       ctx.beginPath();ctx.moveTo(h.x,h.y);ctx.lineTo(h.x+Math.cos(h.angle)*240,h.y+Math.sin(h.angle)*240);ctx.stroke();
