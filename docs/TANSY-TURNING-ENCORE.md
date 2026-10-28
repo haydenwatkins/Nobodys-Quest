@@ -1,6 +1,9 @@
 # Tansy’s turning Encore
 
-October 18, 2026. Isolated next variation while Sumi #63 completes its frozen release gates. Standard Tansy already turns landed pie splashes into real card passages. Her old Encore repeats the same fan with the same automatically inherited opening; that remains a documented identity gap.
+October 19, 2026. [Issue #64](https://github.com/haydenwatkins/Nobodys-Quest/issues/64). Published and verified. Gameplaybcf42e974f0473532245a37f26800df1c1ceff57 passes exact Pages39326471394, built/no-error API and all nine frozen runtime byte matches. Standard Tansy already turns landed pie splashes into real card passages. Encore now asks for a fresh splash and a different approach after the complete first flight, rather than inheriting the same opening.
+
+The frozen runtime4847672 passes one clean complete952-case 2D/unchanged3D integration invocation (2760113.89345ms), zero failed/cancelled/skipped/todo. Twenty-three native victories across the documented runs, both zero-finding review axes, six supported layout workflows and all160 selected local captures are complete. The earlier interrupted sweep has no final result and is excluded. Only documentation and Sumi’s already-reviewed real-time helper changed during the successful resumed sweep; all nine frozen runtime hashes remain identical. Public original-RAF touch/TV also pass, as recorded below.
+
 
 Keep the standard show, native 54 HP / six Sharp Ward / speed 54 / damage 1, four solid travel cases, camp and pantry. Card Encore remains a deliberately chosen local variation with independent help, equal rewards, saved old practice/preferences/clears and actual normal Ward/HP arts.
 
@@ -12,7 +15,7 @@ Keep physical Curtain Bell/star, Trouper eligibility/discovery/useful outing/cho
 
 Use the already authorized native input/art/contact, walking/collision, render, save/gift/revisit boundaries. Build one failing behavior slice at a time, then native full-strength standard/Encore favorite/slow/all-help/zero-pie/first-gift/run coverage, independent Spec/Standards review, supported phone/TV/portrait × HD/base inspection and original-RAF input. Run one full regression after findings settle, then exact Pages/public verification before the per-boss main push. Controlled fixtures and automation do not establish physical-device or continuous family enjoyment.
 
-## Implementation evidence in progress
+## Historical development evidence
 
 The first native independence case fails on the old automatic second-fan gap, then passes. The fresh-preparation case fails on zero new pies, then two first/fresh cases pass together (10257.350018 ms). Fresh pies wait until the actual first flight has left. Each opens only its own fan; the second gap is two actual card spacings to a side of the first, and the old center retains a real card. Actual slow-body input/walking passes eight early/final × guardian-help × two-choice fixtures (36822.806604 ms), with zero damage/mana and native HP/Sharp Ward, fixed commitments and real moving-card approaches.
 
@@ -36,3 +39,14 @@ Both delta review axes at4847672 have zero findings; Spec independently reruns t
 Final native acceptance on frozen runtime4847672 completes23 fights across three runs:16 full-strength Knight/Colossus × standard/Encore × independent helps plus the first physical Bell/star/Trouper discovery in `native-matrix-safe-origin.log`; two zero-pie Knight strategies in `native-walking-aimed-shot.log`; and four earned Manyfold Ranger rounds in `native-manyfold-final.log`. The first zero-pie pilot is knocked out because it closes on ordinary aimed launches. Its driver now steps sideways before those native launches, then closes during clear recovery; runtime strength/timing and knockout assertions are unchanged. Both zero-pie victories take six and five incoming/end damage respectively (71.97/105.33 simulated seconds), so they establish a complete demanding alternative, not effortless accessibility. Every Encore counter strategy uses a real fresh pie and at least32 controlled inward pixels while actual second cards remain in each phase. Manyfold uses native shuffle seed5 and retains the saved local preference while its actual round remains standard. No paid casts or knockouts occur in the accepted victories; ordinary hits restore mana naturally after a zero-mana start. The earlier stalled/knocked-out pilots are not included among the23 accepted fights.
 
 All six refreshed phone/TV/portrait × HD/base workflows pass. All150 final layout captures were inspected on18 aspect-preserving sheets, plus the ten individually inspected original-RAF local views:160 selected local views total. Supplied earned checkpoints/initial poses and the deterministic render clock remain distinct from continuous acquisition or hardware play. Full regression, exact public release/bytes and public real-time input remain pending.
+
+Independent final helper/docs delta reviews at302d12f each report zero findings. Spec confirms all native assertions and the23 accepted log outcomes remain intact; Standards finds no documented breach or actionable baseline smell. Runtime remains exactly4847672. Both axes retain the demanding walking damage and unresolved boundary-HUD review as honest limitations.
+
+
+## Published acceptance
+
+Exact gameplaybcf42e974f0473532245a37f26800df1c1ceff57 and Pages39326471394 complete successfully; the Pages API reports the same SHA built with no error. All nine frozen runtime files match the published bytes, including the three changed since Sumi (index, stage challenge and field hint). `gameplay.json` and the final documentation release verification are under `.scratch/verification/tansy-published/`.
+
+Public original-RAF touch and TV both use actual free first/fresh splashes from the same pair and controlled inward walking while actual second cards remain. Touch records46.63 inward pixels/two splashes/two live cards; TV34.53 pixels/three splashes/three live cards. Both retain native54HP/six Sharp Ward/54speed, zero damage/end damage/mana/paid casts/hits/kills/knockout, independent helps off and no errors. Earned owned local Encore and initial pose are supplied; native title/opening movement is separate evidence. These runs do not establish fresh campaign acquisition.
+
+All ten successful public images are inspected individually and hashed in `inspected-public.json`:170 selected local/public views total. The TV fresh-splash pose partly hides Tansy’s lower body behind a solid case. That actor/scenery clearance joins the previously observed northern HUD/splash overlap in the shared all19 audit. No physical-device or continuous family-play verdict is claimed. One clean952-case full integration,23 accepted native victories across documented runs, both independent zero-finding review axes, six supported layout workflows and local/public original-RAF inputs are complete.
