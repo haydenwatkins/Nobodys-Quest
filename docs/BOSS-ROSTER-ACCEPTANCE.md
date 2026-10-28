@@ -47,3 +47,41 @@ The retained camera/depth/Stage invocation passes all8 cases (77216.048645ms). A
 The recovered source still described retired guardian samplers in optional Journey guidance, incorrectly said Meridian's Ward changes, and called the Spark's actual Wayheart path Roadlight. The guidance now describes the implemented Mason, Tess, Bongle, Mallow and Atlas decisions; Meridian's entrance identifies the bead/stone pair and unchanged Light-or-Dark Ward; the Spark names Wayheart. This is copy-only and does not grant a form or change a Ward. Native retained and supported-layout/full-text inspection remain pending.
 
 The recovered four-edge launch audit helper exercises each real action scheduler against actual walkable floor in each phase, measures the native projectile collision envelope, and reports observed launches independently. Regional Worldbearers are limited to their documented home-court window; each fixture observes three seconds, not an entire encounter or a continuous earned adventure. Its current-source run is in progress; no aggregate result is claimed yet.
+
+
+## Current recovery evidence
+
+The reconstructed exact-envelope audit passes396 independent native action/phase/edge fixtures and observes708 actual launches, none born inside a wall. It observes three seconds per supplied initial pose, not complete fights, every full phrase or a continuous earned campaign. Regional Worldbearers use their home-court window. The additional northern Pillar 60Hz regression covers a narrow position outside those four samples.
+
+The optional Journey-copy change passes nine retained cases and six phone/TV/portrait × HD/base workflows. The30 selected guidance views are inspected:20 phone/TV on two sheets,10 portrait on two sheets, plus a full-size TV view. Both independent reviews report zero findings. These are supplied chapter fixtures and actual optional menu controls; physical devices and family reading remain untested.
+
+## Actual gift and next-use inventory
+
+The read-only `tools/audit-boss-roster.cjs` reads the actual registry and confirms19 distinct physical gifts with existing purpose text. The table does not claim a new pickup, uninterrupted acquisition, or that a gift alone satisfies the additional prerequisites. Existing boss-specific first-gift proofs remain separate evidence. Each form's useful outing and a chosen ready good-news return must get room before another discovery or optional practice competes for attention.
+
+| Guardian | Physical gift | Additional form prerequisite and first useful role, if any |
+| --- | --- | --- |
+| Ancient Treant | Heartwood Crown | No direct form unlock in the registry; +1 star · try its gift in Pockets. |
+| Mire Queen | Mire Pearl | No direct form unlock in the registry; +1 star · light Pebble's beacon. |
+| Eclipse Knight | Eclipse Sigil | No direct form unlock in the registry; +1 star · try its gift in Pockets. |
+| Mira, Wayglass Keeper | Wayglass Sigil | Hearthdrake level 2 → Wayglass Duelist: Rush through a crowded approach. |
+| Bram, Tunnelwarden | Copper Root Crown | Frog level 3 → Tunneltuft: Scatter a group with a ground tremor. |
+| Vesper, Dusk Host | Duskflower Seal | Starwick Sage level 3 → Velvetwing: Recover while keeping close to foes. |
+| Tansy, Caravan Star | Curtain Bell | Copperwick Brewer level 3 or Wayglass Duelist level 3 → Pocket Trouper: Bounce a card through a pair of foes. |
+| Marlo, Breakwater Keeper | Tide Shell | Knight level 4 → Harborback: Hold a busy road behind your shell. |
+| Sumi, Foldroad Keeper | Wayfold Crane | Wayglass Duelist level 4 → Foldstep Fox: Cut past a foe without stopping. |
+| Nell, Starpath Keeper | Orrery Key | Cloudcap Conductor level 4 → Skylens Mapper: Gather scattered foes into an orbit. |
+| Grandmother Briar | Elder Acorn | Frog level 4 or Starwick Sage level 4 → Hedgehare: Let one afflicted foe seed the next. |
+| Aurelia, Sky Sovereign | Sky Mark | Bramble Scout level 3 or Foldstep Fox level 3 → Galecrest Courier: Carry a tailwind through the postroad. |
+| Pillar, the Old Mason | Stone Mark | Galecrest Courier level 2 → Cobblekin: Make cover on the exposed brook road. |
+| Tess, Silk Matriarch | Thread Mark | Cobblekin level 2 → Silkstep: Bring the tangled road's foes together. |
+| Bongle, Bell Titan | Echo Mark | Silkstep level 2 → Chimelet: Make space by changing your song. |
+| Mallow, Lantern Keeper | Lantern Mark | Chimelet level 2 → Wickling: Make a safe place amid flying sparks. |
+| Atlas, Last Worldbearer | Worldheart Mark | Wickling level 3 → Cragback: Push through the heavy procession. |
+| Meridian, the Perfect Map | Spark of Every Form | eight learned bodies at level 3 and three favorites at level 5 → Wayheart: Bring your favorite answers home. |
+| The Tollkeeper | Keeper's Lantern | No direct form unlock in the registry; +1 star · a keepsake of the opened bridge. |
+
+
+Treant's Crown, Queen's Pearl, Knight's Sigil and the Keeper's Lantern do not manufacture new bodies. Pearl retains Pebble's beacon return, and the delivery retains its physical bridge and chosen return. The four coast gifts also retain their Chronicle/cairn purposes. Each World Mark restores its existing regional road; its corresponding worn form has an authored useful outing. Existing exploration remains an alternative to optional promises. A ready chosen return can hold later discovery; Set aside releases it deliberately, and earlier waiting echoes are not deleted. Wayheart retains all six Marks and the eight/three portfolio rather than a full-roster grind.
+
+This registry comparison and individual checkpoint cases support the ordering audit. Issue #50 remains the required genuinely earned uninterrupted Worldwake acquisition, outing and return review. Harborback, Foldstep Fox, Skylens Mapper and Hedgehare still need their four stronger specialist roads; sustained mixed builds, reward sources and menu-optional collecting remain in the roadmap.
