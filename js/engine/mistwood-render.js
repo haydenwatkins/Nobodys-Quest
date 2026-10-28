@@ -19,9 +19,9 @@
  G.drawMistwoodBell=(c,bell,lit)=>{if(!here())return false;const id=bell.id.includes('west')?'fernBell':bell.id.includes('east')?'mothBell':'rootBell';G.drawSprite(c,S[id],lit?1:0,bell.x*16+8,bell.y*16+12,false);return true;};
  const oldDraw=G.openingDrawables;
  G.openingDrawables=c=>{const list=oldDraw(c);if(!here())return list;const s=G.state;
-  for(let y=3;y<s.mapH-2;y+=4)for(let x=3;x<s.mapW-2;x+=4){if(s.grid[y][x].tile!=='tree')continue;const px=x*16+8,py=y*16+8;list.push({y:py,fn:()=>{const behind=a=>a&&Math.abs(a.x-px)<19&&a.y<py&&a.y>py-43;c.save();if(behind(s.player)||(s.npcs||[]).some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.tree,G.reducedMotion?0:Math.floor(s.time*.55+x+y)%4,px,py+3,false);c.restore();}});}
+  for(let y=3;y<s.mapH-2;y+=4)for(let x=3;x<s.mapW-2;x+=4){if(s.grid[y][x].tile!=='tree')continue;const px=x*16+8,py=y*16+8;list.push({y:py,fn:()=>{const behind=a=>a&&Math.abs(a.x-px)<19&&a.y<py&&a.y>py-43;c.save();if(G.sceneryActors().some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.tree,G.reducedMotion?0:Math.floor(s.time*.55+x+y)%4,px,py+3,false);c.restore();}});}
   // The one-tile root ridge gets deliberate larger trunks rather than foliage noise.
-  for(const y of [3,8,12,15])if(s.grid[y][14].tile==='tree'){const px=14*16+8,py=y*16+8;list.push({y:py,fn:()=>{const behind=a=>a&&Math.abs(a.x-px)<19&&a.y<py&&a.y>py-43;c.save();if(behind(s.player)||(s.npcs||[]).some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.tree,G.reducedMotion?0:Math.floor(s.time*.55+y)%4,px,py+3,false);c.restore();}});}
+  for(const y of [3,8,12,15])if(s.grid[y][14].tile==='tree'){const px=14*16+8,py=y*16+8;list.push({y:py,fn:()=>{const behind=a=>a&&Math.abs(a.x-px)<19&&a.y<py&&a.y>py-43;c.save();if(G.sceneryActors().some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,S.tree,G.reducedMotion?0:Math.floor(s.time*.55+y)%4,px,py+3,false);c.restore();}});}
   return list;
  };
 })();

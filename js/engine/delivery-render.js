@@ -35,8 +35,8 @@
     }
     const art=G.deliveryScenery;
     if(art){
-      if(kind==='apple'){const behind=a=>a&&Math.abs(a.x-x)<24&&a.y<y&&a.y>y-44;c.save();if(behind(s.player)||(s.npcs||[]).some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,G.openingScenery.apple,G.reducedMotion?0:Math.floor(t*.55+x)%4,x,y+3,false);c.restore();return true;}
-      if(kind==='willow'){const behind=a=>a&&Math.abs(a.x-x)<32&&a.y<y&&a.y>y-53;c.save();if(behind(s.player)||(s.npcs||[]).some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);oval(c,x,y+2,21,5,'rgba(25,36,43,.24)');G.drawSprite(c,art.willow,G.reducedMotion?0:Math.floor(t*.6+x)%4,x,y+3,false);c.restore();return true;}
+      if(kind==='apple'){const behind=a=>a&&Math.abs(a.x-x)<24&&a.y<y&&a.y>y-44;c.save();if(G.sceneryActors().some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);G.drawSprite(c,G.openingScenery.apple,G.reducedMotion?0:Math.floor(t*.55+x)%4,x,y+3,false);c.restore();return true;}
+      if(kind==='willow'){const behind=a=>a&&Math.abs(a.x-x)<32&&a.y<y&&a.y>y-53;c.save();if(G.sceneryActors().some(behind))c.globalAlpha=Math.min(c.globalAlpha,.35);oval(c,x,y+2,21,5,'rgba(25,36,43,.24)');G.drawSprite(c,art.willow,G.reducedMotion?0:Math.floor(t*.6+x)%4,x,y+3,false);c.restore();return true;}
       if(kind==='rainGate'||kind==='tollArch'){const open=kind==='tollArch'?p.keeper:p.lamps[x<500?0:1]===2;G.drawSprite(c,art[open?'gateOpen':'gateClosed'],0,x,y+26,false);return true;}
       const id=kind==='ledger'?'milepost':kind;
       if(art[id]){if(kind==='satchel'&&p.salvage)return true;let oy=kind==='reed'?3:kind==='milepost'||kind==='ledger'?3:kind==='boat'||kind==='wreck'?4:kind==='bunting'?0:3;G.drawSprite(c,art[id],G.reducedMotion?0:Math.floor(t*.7)%4,x,y+oy,false);return true;}
