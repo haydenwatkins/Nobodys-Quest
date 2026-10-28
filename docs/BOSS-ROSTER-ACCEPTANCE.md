@@ -1,6 +1,6 @@
 # All nineteen: identity, progression and readable courts
 
-October20,2026. [Issue #68](https://github.com/haydenwatkins/Nobodys-Quest/issues/68). Queued final cross-roster batch after the independently verified Queen #65, Atlas #66 and Meridian #67 releases. This is a concrete acceptance plan, not evidence that all nineteen fights or a continuous family adventure already pass.
+October20,2026. Queued final cross-roster batch after the independently verified Queen #65, Atlas #66 and Meridian #67 releases. This is a concrete acceptance plan, not evidence that all nineteen fights or a continuous family adventure already pass.
 
 Compare all nineteen definitions by the player's decision, the danger that continues, the specific useful consequence and its developed phase choice. Remove names, colors and props from that comparison. Shared free controls, warnings, help and reward bookkeeping remain useful; repeated global cancellation, following targets, unrelated final samplers or a renamed identical payoff are gaps to fix. A final deliberate remix keeps the actual earlier responses and consequences.
 
@@ -13,10 +13,16 @@ Concrete known backfills:
 - Tansy's northern splash cue can sit under the fixed boss header. A solid travel case also covers her lower body at an actual fresh-pie approach. Her northern projectile launch itself is already fixed; retain that real-wall regression.
 - Sumi's northern body and unfolded road can overlap the boss header.
 - Atlas can obscure Patchling immediately beyond a real rebuilt crossing. Preserve physical depth without hiding feet or the worn body during the useful response.
-- Meridian’s phase2/3 phone route can place his body under the existing Quick Mix control. The Spark cue still calls Wayheart’s path “Roadlight”; align that reward purpose with the actual form name.
 - Audit essential body, prop, route and warning clearance against scenery, boss/heart/task panels and existing touch controls across the roster. Change the shared rule where appropriate, then backfill authored exceptions; do not add another permanent HUD button.
 - Atlas's optional Journey paragraph still refers to the retired gust refuge. Meridian's entrance notice still suggests a changing Ward. Replace those inherited sampler instructions with the actual current actions and unchanged Ward rules, then audit other affected old guidance.
 
 Native checks must demonstrate the changed behavior at actual input/contact, walking/collision, rendering and save/revisit seams. Retain ordinary ranged creatures' simple firing and visible projectiles, enjoyable walking, zero-mana answers, independent default-off help, equal once-only rewards and local practice/run ownership. Run relevant regression, independent Spec/Standards review, exact Pages/public bytes and public real-time touch/TV for the final changes. Keep each boss upgrade independently reviewable and published; this shared audit follows those releases.
 
 Update BOSS-IDENTITY.md, BOSS-PROGRESSION-PLAN.md, DESIGN-APPLICATION.md and CLOUD-ROADMAP.md with observed coverage and actual remaining gaps. Preserve Worldwake #50 as the separate uninterrupted acquisition/pacing milestone; earlier six-outing and guardian checkpoint proofs are supporting evidence. Preserve Harborback/Foldstep Fox/Skylens Mapper/Hedgehare roads, sustained mixed builds, reward-source audit and menu-optional collecting/item aspirations. No unattended worker or live usage reading is implied.
+
+
+## Recovery checkpoint, October 28
+
+The earlier separate Atlas, Meridian and roster worktrees and their scratch verification artifacts were absent when this environment started. Atlas and Meridian were recovered from their pushed branches, merged with the published Queen documentation, and backed up again. Their full regression sweeps are being rerun; do not treat the missing earlier partial logs as a completed sweep. The prior roster-audit implementation was not on a remote branch and must be reconstructed and independently verified. Previous conversation evidence remains historical, not a substitute for final current-source acceptance.
+
+The first reconstructed fix addresses a real Pillar court-edge problem: the northern phase-two track released stones into the wall. A native 60Hz collision test reproduces the failure; track selection now checks the real shot spawn and collision offsets and radius before committing one of the existing tracks. It preserves physical masonry, normal danger, Ward and the free handle response. The focused northern case passes; complete retained tests, independent review, supported input/layouts, full integration and public gates are still pending. Do not publish this shared batch ahead of Atlas and Meridian.
