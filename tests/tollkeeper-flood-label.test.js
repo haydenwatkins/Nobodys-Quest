@@ -1,0 +1,15 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const runtime=require('../tools/lib/classic-runtime.cjs'),{createCanvas}=require('@napi-rs/canvas');
+const overlap=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+test('the native flood names its real shelter without covering the fight or fixed controls at every court edge',()=>{
+ for(const touch of [false,true])for(const [x,y,px,py] of [[272,80,272,136],[272,416,272,360],[496,232,440,232],[64,232,120,232]]){
+  const r=runtime(createCanvas),{G}=r;r.load('tollCourt');r.drain();const e=G.state.enemies.find(e=>e.id==='tollkeeper'),p=G.state.player;G.state.enemies=[e];G.state.bossCutscene=null;Object.assign(e,{x,y,bossEngaged:true,bossIntroT:0,openingTimer:0,openingBeat:0});Object.assign(p,{x:px,y:py});G.input.isTouch=touch;G.input.hasGamepad=!touch;
+  r.context.document.getElementById('game').getBoundingClientRect=()=>({left:0,top:0,width:640,height:360});r.context.document.getElementById('btn-zone').getBoundingClientRect=()=>({left:500,top:100,width:132,height:244});
+  G.updateOrchardBoss(e,p,.01);const h=G.state.openingHazards.find(h=>h.kind==='flood');assert.ok(h?.safePoint);const c=createCanvas(320,180).getContext('2d');let placed;G.drawWorldText=(ctx,text,x,y)=>{if(text==='SHELTER IN THE LIGHT')placed={x,y,width:ctx.measureText(text).width};};G.drawDeliveryHazard(c,h);assert.ok(placed);
+  const cam=G.fieldCamera(),label={left:placed.x-placed.width/2-3,right:placed.x+placed.width/2+3,top:placed.y-1,bottom:placed.y+9},m=G.spriteMetrics(e.def.sprite),body=G.spriteMetrics(G.forms[G.state.formId].sprite);
+  assert.ok(label.left>=cam.x+4&&label.right<=cam.x+(touch?242:316)&&label.top>=cam.y+26&&label.bottom<=cam.y+157,JSON.stringify({touch,x,y,cam,label}));
+  for(const actor of [{left:p.x-body.w/2-2,right:p.x+body.w/2+2,top:p.y-body.h-2,bottom:p.y+2},{left:e.x-m.w/2-2,right:e.x+m.w/2+2,top:e.y-m.h-2,bottom:e.y+2}])assert.ok(!overlap(label,actor),'the label clears actual actors');
+  for(const [,tx,ty] of G.state.mapDef.openingProps){const x=tx*16+8,y=ty*16+8;assert.ok(!overlap(label,{left:x-20,right:x+20,top:y-34,bottom:y+8}),'the label clears foreground scenery');}
+  const original={...placed},refuge=JSON.stringify(h.safePoint);p.x+=1;G.drawDeliveryHazard(c,h);assert.deepEqual(placed,original,'a small walk cannot reshuffle a still-readable caption');assert.equal(JSON.stringify(h.safePoint),refuge,'painting cannot move the refuge');
+ }
+});
