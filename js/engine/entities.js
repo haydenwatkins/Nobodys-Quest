@@ -1823,6 +1823,18 @@ G.drawEnemy = function (ctx, e) {
     ctx.fillRect(Math.round(e.x - width / 2 + 1), Math.round(e.y - e.def.size - 10), Math.max(0, Math.round((width - 2) * e.hp / Math.max(1, e.def.hp))), 2);
   }
 
+  // A foreground guardian should not erase the worn body at a crossing.
+  // Only its sprite yields; native hitboxes, Ward and warnings stay intact.
+  const player = G.state.player;
+  let overlap = false;
+  if (e.def.miniboss && drawY > player.y) {
+    const bossArt = G.spriteMetrics(e.def.sprite), playerArt = G.spriteMetrics(G.playerForm().sprite);
+    overlap = drawX - bossArt.w * spriteScale / 2 < player.x + playerArt.w / 2 &&
+      drawX + bossArt.w * spriteScale / 2 > player.x - playerArt.w / 2 &&
+      drawY - bossArt.h * spriteScale < player.y && drawY > player.y - playerArt.h;
+  }
+  ctx.save();
+  if (overlap) ctx.globalAlpha *= .4;
   if (e.flash > 0) {
     // white flash when hurt — redraw sprite silhouette in white
     ctx.save();
@@ -1832,6 +1844,8 @@ G.drawEnemy = function (ctx, e) {
   } else {
     G.drawSprite(ctx, e.def.sprite, frame, drawX, drawY, e.dir.x < 0, spriteScale);
   }
+
+  ctx.restore();
 
   // poison bubbles tint
   if (e.status && e.status.poison && Math.floor(e.anim * 3) % 3 === 0) {
