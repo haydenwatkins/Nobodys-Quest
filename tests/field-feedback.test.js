@@ -113,3 +113,6 @@ test('the native destination label yields to field notices and returns when thei
   G.requestGuidance(false); draw();
   assert.ok(!labels.some(label=>label.includes('ROOTDEEP HOLLOW')),'destination instructions belong in the fixed task dock, not another moving screen label');
 });
+test('the delivery court paper banner waits through the actual Tollkeeper encounter and retains its reading time',()=>{
+ const {r,G,labels,draw}=fixture();G.state.delivery.complete=false;r.load('tollCourt');r.drain();const e=G.state.enemies.find(e=>e.id==='tollkeeper');assert.ok(e);e.bossEngaged=true;G.state.bossCutscene=null;G.ui.banner('A PROMISE KEPT','Your gift waits for a quiet moment.');draw();assert.ok(!labels.includes('A PROMISE KEPT'),'a celebration cannot cover the flood');G.ui.update(10);draw();assert.ok(!labels.includes('A PROMISE KEPT'));e.dead=true;draw();G.ui.update(.3);draw();assert.ok(labels.includes('A PROMISE KEPT'),'fighting did not consume the celebration');G.ui.update(3.3);draw();assert.ok(!labels.includes('A PROMISE KEPT'));
+});

@@ -77,6 +77,10 @@ G.ui = (() => {
     if (toasts.length > 3) toasts.shift();
   }
 
+  function guardianEngaged() {
+    return G.state.enemies.some(enemy=>!enemy.dead&&enemy.def.miniboss&&enemy.bossEngaged);
+  }
+
   function banner(title, sub) {
     bannerData = { title, sub: sub || "", t: 0, visible: false };
   }
@@ -172,7 +176,7 @@ G.ui = (() => {
       if (toasts[i].t > toasts[i].dur) toasts.splice(i, 1);
     }
     if (bannerData) {
-      if (bannerData.visible || G.state?.mapDef?.openingLandscape) bannerData.t += dt;
+      if (bannerData.visible || (G.state?.mapDef?.openingLandscape && !guardianEngaged())) bannerData.t += dt;
       bannerData.visible = false;
       if (bannerData.t > 3.2) bannerData = null;
     }
@@ -555,7 +559,7 @@ G.ui = (() => {
   function planFieldFeedback(c, cam) {
     const plan = [];
     if (dialogueData || menuOpen || G.state.bossCutscene ||
-        G.state.enemies.some(enemy => !enemy.dead && enemy.def.miniboss && enemy.bossEngaged)) return plan;
+        guardianEngaged()) return plan;
     const right = G.W - (G.input.isTouch ? 68 : 5);
     function place(notice, heading, text) {
       if(notice.layout && notice.layout.touch===G.input.isTouch){
@@ -983,7 +987,7 @@ G.ui = (() => {
     drawFieldFeedback(c, fieldFeedback);
 
     /* banner (quest done / new form!) */
-    if (openingHud && bannerData) {
+    if (openingHud && bannerData && !guardianEngaged()) {
       const b = bannerData;
       const alpha = b.t < 0.2 ? b.t / 0.2 : b.t > 2.7 ? (3.2 - b.t) / 0.5 : 1;
       c.globalAlpha = Math.max(0, alpha);

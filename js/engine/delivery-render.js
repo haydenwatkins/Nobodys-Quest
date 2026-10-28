@@ -132,6 +132,33 @@
     const patch=G.util.hash2(Math.floor((x+(Math.floor(y/4)%2)*2)/5),Math.floor(y/4));rect(c,px,py,16,16,patch>.5?'#61786e':'#5d746b');if(r>.25){const xx=px+3+r*7,yy=py+3+r*5;rect(c,xx,yy,1,4,'#8aa18a');rect(c,xx+2,yy+2,1,3,'#8aa18a');rect(c,xx-2,yy+3,1,2,'#47685c');}
     if(r>.9){rect(c,px+10,py+7,1,4,C.green);rect(c,px+9,py+6,3,2,'#b6b7a0');}return true;
   };
+  // Keep the shelter caption readable as the camera moves; its pointer still
+  // leads to the real walkable refuge rather than moving the refuge itself.
+  const floodLabels=new WeakMap();
+  function floodLabel(c,h,text){
+    const cam=G.fieldCamera(),s=G.state,p=s.player,width=c.measureText(text).width+6;
+    let right=G.W-4;
+    if(G.input.isTouch&&!G.input.hasGamepad){
+      const game=document.getElementById('game').getBoundingClientRect(),controls=document.getElementById('btn-zone').getBoundingClientRect();
+      if(game.width>0&&controls.width>0&&controls.top<game.top+game.height&&controls.top+controls.height>game.top){
+        const left=(controls.left-game.left)*G.W/game.width;if(left>G.W/2)right=Math.min(right,left-8);
+      }
+    }
+    const safe={left:cam.x+4,right:cam.x+right,top:cam.y+26,bottom:cam.y+G.H-23};
+    const actors=[{actor:p,def:G.forms[s.formId]},...s.enemies.filter(e=>!e.dead).map(actor=>({actor,def:actor.def}))];
+    const obstacles=actors.map(({actor,def})=>{const m=G.spriteMetrics(def.sprite),scale=def.boss?.spriteScale||1;return {left:actor.x-m.w*scale/2-3,right:actor.x+m.w*scale/2+3,top:actor.y-m.h*scale-3,bottom:actor.y+3};});
+    for(const [,tx,ty] of s.mapDef.openingProps||[]){const x=tx*16+8,y=ty*16+8;obstacles.push({left:x-20,right:x+20,top:y-34,bottom:y+8});}
+    const box=(x,y)=>({left:x-width/2,right:x+width/2,top:y-1,bottom:y+9});
+    const fits=(x,y)=>{const b=box(x,y);return b.left>=safe.left&&b.right<=safe.right&&b.top>=safe.top&&b.bottom<=safe.bottom&&!obstacles.some(o=>b.left<o.right&&b.right>o.left&&b.top<o.bottom&&b.bottom>o.top);};
+    const old=floodLabels.get(h);if(old&&fits(old.x,old.y))return old;
+    const target=h.safePoint||h,preferred={x:target.x,y:target.y+(h.safePoint?14:32)};
+    let best=null;
+    for(let y=safe.top+1;y+9<=safe.bottom;y+=4)for(let x=safe.left+width/2;x+width/2<=safe.right;x+=4){
+      if(!fits(x,y))continue;const cost=(x-preferred.x)**2+(y-preferred.y)**2;if(!best||cost<best.cost)best={x,y,cost,text};
+    }
+    if(!best)best={x:Math.max(safe.left+width/2,Math.min(safe.right-width/2,preferred.x)),y:Math.max(safe.top+1,Math.min(safe.bottom-9,preferred.y)),text};
+    floodLabels.set(h,best);return best;
+  }
   G.drawDeliveryHazard=(c,h)=>{
     if(!here())return false;const active=h.t>=h.warn;
     c.save();
@@ -144,11 +171,12 @@
         for(const point of h.safeRoute||[])rect(c,Math.round(point.x)-1,Math.round(point.y)-1,2,2,C.gold);
         const point=h.safePoint;rect(c,point.x-5,point.y-5,10,10,C.ink);rect(c,point.x-3,point.y-3,6,6,C.paper);rect(c,point.x-1,point.y-1,2,2,C.gold);
       }
-      const label=h.safePoint||h;
-      const text=active?'DRY GROUND':'SHELTER IN THE LIGHT',labelY=label.y+(h.safePoint?14:32);
+      const text=active?'DRY GROUND':'SHELTER IN THE LIGHT';
       c.font=G.text.font(8, 700);c.textAlign='center';c.textBaseline='top';
-      const width=c.measureText(text).width;rect(c,label.x-width/2-3,labelY-1,width+6,10,C.ink);
-      c.fillStyle=C.paper;G.drawWorldText(c,text,label.x,labelY);
+      const label=floodLabel(c,h,text),target=h.safePoint||h,width=c.measureText(text).width;
+      c.strokeStyle=C.gold;c.lineWidth=1;c.beginPath();c.moveTo(label.x,label.y+5);c.lineTo(target.x,target.y);c.stroke();
+      rect(c,label.x-width/2-3,label.y-1,width+6,10,C.ink);
+      c.fillStyle=C.paper;G.drawWorldText(c,text,label.x,label.y);
     }else{
       c.translate(h.x,h.y);c.rotate(Math.atan2(h.dy,h.dx));rect(c,0,-h.width,h.length,h.width*2,active?'rgba(229,188,114,.68)':'rgba(229,188,114,.16)');
       rect(c,0,-h.width,h.length,1,C.gold);rect(c,0,h.width,h.length,1,C.gold);for(let i=8;i<h.length;i+=16)rect(c,i,-1,6,2,active?C.paper:C.gold);
