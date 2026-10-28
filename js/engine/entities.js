@@ -825,7 +825,9 @@ G.orbitLabelPosition = function (h) {
     }
   }
   const safe={left:Math.max(b.left,cam.x+4),right:Math.min(b.right,cam.x+right),top:Math.max(b.top,cam.y+26),bottom:Math.min(b.bottom,cam.y+G.H-23)};
-  const fits=q=>q.x-25>=safe.left&&q.x+25<=safe.right&&q.y-5>=safe.top&&q.y+6<=safe.bottom;
+  const s=G.state,actors=[{actor:s.player,def:G.forms[s.formId]},...s.enemies.filter(e=>!e.dead).map(actor=>({actor,def:actor.def}))];
+  const bodies=actors.map(({actor,def})=>{const m=G.spriteMetrics(def.sprite),scale=def.boss?.spriteScale||1;return {left:actor.x-m.w*scale/2-2,right:actor.x+m.w*scale/2+2,top:actor.y-m.h*scale-2,bottom:actor.y+2};});
+  const fits=q=>q.x-25>=safe.left&&q.x+25<=safe.right&&q.y-5>=safe.top&&q.y+6<=safe.bottom&&!bodies.some(a=>q.x-25<a.right&&q.x+25>a.left&&q.y-5<a.bottom&&q.y+6>a.top);
   const prior=orbitLabelAnchors.get(h);if(prior&&fits(prior))return prior;
   let best=null;
   for(let i=0;i<72;i++){
