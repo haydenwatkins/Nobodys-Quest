@@ -35,3 +35,5 @@ The final all19 presentation/launch audit must exercise actual projectile origin
 
 
 Public Tansy Encore review also records a solid travel case partly covering her lower body at one fresh-splash pose. The all19 presentation audit must check actor clearance against authored scenery at actual route choices as well as all four arena edges and the fixed HUD. The cue and moving-card passage remain readable in the selected public workflow; this is an uncovered presentation combination, not a claim of complete clearance.
+
+October 28 recovery: Atlas’s rebuilt-ground fight and Meridian’s paired actual bead/ground roads are implemented on recovered branches, with separate full/public release gates pending. Issue #68 continues the anonymous decision, actual gift, protected next-use and four-edge presentation review; it does not replace the independently open uninterrupted acquisition milestone #50. The four coastal specialist roads, mixed builds, reward sources and menu-optional collecting remain queued.
