@@ -150,7 +150,7 @@
     for(const [,tx,ty] of s.mapDef.openingProps||[]){const x=tx*16+8,y=ty*16+8;obstacles.push({left:x-20,right:x+20,top:y-34,bottom:y+8});}
     const box=(x,y)=>({left:x-width/2,right:x+width/2,top:y-1,bottom:y+9});
     const fits=(x,y)=>{const b=box(x,y);return b.left>=safe.left&&b.right<=safe.right&&b.top>=safe.top&&b.bottom<=safe.bottom&&!obstacles.some(o=>b.left<o.right&&b.right>o.left&&b.top<o.bottom&&b.bottom>o.top);};
-    const old=floodLabels.get(h);if(old&&old.text===text&&fits(old.x,old.y))return old;
+    const old=floodLabels.get(h);if(old&&fits(old.x,old.y))return old;
     const target=h.safePoint||h,preferred={x:target.x,y:target.y+(h.safePoint?14:32)};
     let best=null;
     for(let y=safe.top+1;y+9<=safe.bottom;y+=4)for(let x=safe.left+width/2;x+width/2<=safe.right;x+=4){
