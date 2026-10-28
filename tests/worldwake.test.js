@@ -266,7 +266,7 @@ const arenaPatterns = {
   silkMatriarch: ["silkRoute"],
   bellTitan: ["bellPhrase"],
   lanternKeeper: ["warmCrossing"],
-  lastWorldbearer: ["worldGrid", "collapseRing", "gustLanes"],
+  lastWorldbearer: ["atlasFault", "atlasWeight"],
 };
 for (const [id, patterns] of Object.entries(arenaPatterns)) {
   const boss = G.enemies[id].boss;
