@@ -8,7 +8,9 @@ review({url:process.argv[2]||'https://quest-review.example/',out:process.argv[3]
   const roster=await page.evaluate(()=>Object.values(G.enemies).filter(d=>d.miniboss).map(d=>({id:d.id,map:Object.values(G.maps).find(m=>Object.values(m.legend||{}).some(c=>c.enemy===d.id))?.id})));
   assert.equal(roster.length,19);assert.ok(roster.every(d=>d.map));
   const requested=process.argv.find(a=>a.startsWith('--only='))?.slice(7).split(',');
+  if(requested){assert.ok(requested.length&&requested.every(id=>id&&roster.some(d=>d.id===id)),`unknown or empty guardian selection: ${requested.join(',')}`);}
   const ids=process.argv.includes('--pilot')?roster.filter(d=>['royalFool','paperRonin','lastWorldbearer','godAvatar'].includes(d.id)):requested?roster.filter(d=>requested.includes(d.id)):roster;
+  assert.ok(ids.length,'guardian selection cannot be empty');
   if(process.argv.includes('--heartwood'))for(const d of ids)if(d.id==='ancientTreant')d.map='heartwood';
   for(const {id,map}of ids)for(const edge of (process.argv.includes('--pilot')?['north']:['north','south','east','west'])){
    const fixture=await page.evaluate(({id,map,edge})=>{

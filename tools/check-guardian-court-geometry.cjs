@@ -4,7 +4,12 @@
 // and initial poses are supplied; actual warnings and projectile collision run.
 const assert=require('node:assert/strict'),runtime=require('./lib/classic-runtime.cjs'),r=runtime(),{G}=r;
 Object.assign(G.state.opening,{started:true,version:2,complete:true});G.state.claimedForms=G.formOrder.slice();G.questsDone.push(...G.formOrder.flatMap(id=>G.forms[id].quests.map(q=>q.id)));G.setForm('nobody');
-const roster=Object.values(G.enemies).filter(e=>e.miniboss),results=[],failures=[];assert.equal(roster.length,19);
+const all=Object.values(G.enemies).filter(e=>e.miniboss),results=[],failures=[];assert.equal(all.length,19);
+const requested=process.argv.find(a=>a.startsWith('--only='))?.slice(7).split(',');
+if(requested)assert.ok(requested.length&&requested.every(id=>id&&all.some(d=>d.id===id)),'unknown or empty guardian selection');
+const roster=requested?all.filter(d=>requested.includes(d.id)):all;
+const required={'royalFool':'card','oldMason':'masonryStone'},untilShots=process.argv.includes('--until-shots');
+if(untilShots)assert.ok(roster.every(d=>required[d.id]),'until-shots requires a guardian with a defined projectile');
 let observe=null;const update=G.updateEnemies;G.updateEnemies=dt=>{const arr=G.state.projectiles,push=arr.push,added=[];arr.push=function(...shots){added.push(...shots);return push.apply(this,shots);};try{update(dt);}finally{arr.push=push;}if(observe)for(const q of added)if(q.owner===observe.owner)observe.shots.push({x:q.x,y:q.y,blocked:G.world.blocksProjectile(q.x,q.y-4,q.x,q.y-4,q.size),shape:q.shape||'shot',size:q.size});};
 for(const def of roster){const map=Object.values(G.maps).find(m=>Object.values(m.legend||{}).some(c=>c.enemy===def.id));assert.ok(map,def.id);
  for(const edge of ['north','south','east','west'])for(const phase of (process.argv.includes('--all-phases')?[1,2,3]:[1]))for(const action of (def.id==='tollkeeper'?['courteous-native-opening']:def.boss.patterns||['charge','blades'])){
@@ -14,8 +19,8 @@ for(const def of roster){const map=Object.values(G.maps).find(m=>Object.values(m
   const clear=(x,y,z)=>[-z,z].every(dx=>[-z,z].every(dy=>!G.world.solid(x+dx,y+dy)));let best=null;
   for(let y=b.top+4;y<=b.bottom-4;y+=4)for(let x=b.left+4;x<=b.right-4;x+=4){const q={x:x+dir.x*56,y:y+dir.y*56};if(!clear(x,y,def.size/2)||!clear(q.x,q.y,6))continue;const cost=Math.hypot(x-target.x,y-target.y);if(!best||cost<best.cost)best={x,y,p:q,cost};}
   assert.ok(best,def.id+'/'+edge);Object.assign(e,{x:best.x,y:best.y,bossEngaged:true,bossIntroT:0,bossPhase:phase,hp:def.hp*(phase===1?1:phase===2?.6:.3),bossSpecialT:.001,bossRecoverT:0,bossPendingAction:null,bossTelegraphT:0,bossPattern:Math.max(0,(def.boss.patterns||['charge','blades']).indexOf(action))});Object.assign(p,{...best.p,mana:0,manaRegenDelay:1000,damageTaken:0});G.state.bossCutscene=null;observe={owner:e,shots:[]};r.step(.01);r.drain();const fields=new Set([...G.state.bossHazards,...G.state.openingHazards].filter(h=>h.owner===e).map(h=>h.kind));
-  for(let i=0;i<120&&!G.state.knockout;i++){r.step(.025);r.drain();for(const h of [...G.state.bossHazards,...G.state.openingHazards])if(h.owner===e)fields.add(h.kind);}
-  const data={id:def.id,map:map.id,edge,phase,action,pose:{x:best.x,y:best.y},scope:def.worldbearer?'regional home-court native floor':'trial/road native floor',shots:observe.shots,fields:[...fields],knockout:!!G.state.knockout,damage:p.damageTaken};if(data.shots.some(q=>q.blocked))failures.push(data);results.push(data);console.log(JSON.stringify(data));observe=null;
+  for(let i=0;i<(untilShots?480:120)&&!G.state.knockout;i++){r.step(.025);r.drain();for(const h of [...G.state.bossHazards,...G.state.openingHazards])if(h.owner===e)fields.add(h.kind);if(untilShots&&observe.shots.some(q=>q.shape===required[def.id]))break;}
+  const data={id:def.id,map:map.id,edge,phase,action,pose:{x:best.x,y:best.y},scope:def.worldbearer?'regional home-court native floor':'trial/road native floor',shots:observe.shots,fields:[...fields],knockout:!!G.state.knockout,damage:p.damageTaken};if(data.shots.some(q=>q.blocked)||(untilShots&&!data.shots.some(q=>q.shape===required[def.id])))failures.push(data);results.push(data);console.log(JSON.stringify(data));observe=null;
  }
 }
 console.log(JSON.stringify({guardians:roster.length,actionFixtures:results.length,actualLaunches:results.reduce((n,r)=>n+r.shots.length,0),failures:failures.length,scope:'Independent native-action fixtures, not complete fights, whole attack cycles or a continuous earned campaign.'}));assert.equal(failures.length,0,JSON.stringify(failures));
