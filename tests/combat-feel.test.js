@@ -776,7 +776,7 @@ for (const [id, patternIndex, action, projectileCount] of [
   ["paperRonin", 0, "foldCuts", 0],
   ["professorPerihelion", 1, "stars", 6],
   ["grandmotherBriar", 1, "seeds", 3],
-  ["godAvatar", 7, "nova", 12],
+  ["godAvatar", 0, "meridianRoad", 0],
 ]) {
   const boss = G.makeEnemy(id, 80, 0);
   boss.bossEngaged = true;
