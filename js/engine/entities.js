@@ -735,7 +735,7 @@ G.updateBossHazards = function (dt) {
       continue;
     }
     if(h.kind === "crimsonWaltz"){
-      if(!h.fired){h.fired=true;for(const angle of h.shots){enemyShot(G.state,h.owner,angle,{damage:1,speed:92,range:155,size:4});G.state.projectiles[G.state.projectiles.length-1].duskWaltz=h;}}
+      if(!h.fired){h.fired=true;for(const angle of h.shots){enemyShot(G.state,h.owner,angle,{damage:1,speed:92,range:155,size:4,origin:h.release||h.owner});G.state.projectiles[G.state.projectiles.length-1].duskWaltz=h;}}
       continue;
     }
 
@@ -852,7 +852,7 @@ G.drawBossHazards = function (ctx) {
       if(active){if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,h.y,true)){ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-12,h.y-3,24,6);ctx.fillRect(h.x-5,h.y-8,10,16);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-6,h.y-4,12,8);}}
       else{const py=h.y-30*(1-Math.min(1,local/(h.landing||h.warning)));if(!G.drawStagePie||!G.drawStagePie(ctx,h.x,py)){ctx.fillStyle="#bb8c55";ctx.fillRect(h.x-8,py-3,16,6);ctx.fillStyle="#fff3c2";ctx.fillRect(h.x-7,py-6,14,4);ctx.fillStyle="#e9a9ce";ctx.fillRect(h.x-3,py-8,6,3);}}
     }else if(h.kind === "crimsonWaltz"){
-      const e=h.owner;ctx.globalAlpha=.7;ctx.strokeStyle="#e9a9ce";ctx.setLineDash([3,3]);
+      const e=h.release||h.owner;ctx.globalAlpha=.7;ctx.strokeStyle="#e9a9ce";ctx.setLineDash([3,3]);
       for(const a of h.shots){ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*14,e.y-6+Math.sin(a)*14);ctx.lineTo(e.x+Math.cos(a)*95,e.y-6+Math.sin(a)*95);ctx.stroke();}
       ctx.setLineDash([]);ctx.strokeStyle="#fff3c2";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(e.x+Math.cos(h.angle-.55)*90,e.y-6+Math.sin(h.angle-.55)*90);ctx.lineTo(e.x,e.y-6);ctx.lineTo(e.x+Math.cos(h.angle+.55)*90,e.y-6+Math.sin(h.angle+.55)*90);ctx.stroke();
       const x=e.x+Math.cos(h.angle)*64,y=e.y-6+Math.sin(h.angle)*64;ctx.globalAlpha=.95;ctx.fillStyle="#302638";ctx.fillRect(x-17,y+7,34,11);ctx.fillStyle="#fff3c2";ctx.font=G.text.font(7, 700);ctx.textAlign="center";G.drawWorldText(ctx,"OPENING",x,y+15);
@@ -1138,7 +1138,7 @@ function resolveBossActionPattern(e, p, action) {
     const angle=Math.atan2(p.y-(e.y-6),p.x-e.x),count=8+(e.bossPhase-1)*4,shots=[];
     for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)shots.push(a);}
     const h=spawnBossHazard(e,"crimsonWaltz",{angle,shots,warning:.9,active:.15,color:"#b13e53"});
-    G.prepareDuskWaltz?.(e,h);
+    if(G.prepareDuskWaltz?.(e,h)===false){G.state.bossHazards.splice(G.state.bossHazards.indexOf(h),1);e.bossRecoverT=1;return;}
     e.bossRecoverT=Math.max(e.bossRecoverT,.9+155/92+.8);return;
   }
   if(action === "royalStomp"){

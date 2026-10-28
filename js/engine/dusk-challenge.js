@@ -109,8 +109,23 @@
     if(clearWalkingLine(destination,preferred)&&clearWalkingLine(shadow,preferred))return {...preferred};
     return clearWalkingLine(shadow,destination)?{x:destination.x,y:destination.y}:null;
   }
+  function waltzRelease(owner){
+    const clear=at=>!G.world.blocksProjectile(at.x,at.y-10,at.x,at.y-10,4)&&G.combat.clearArc(owner.x,owner.y-4,at.x,at.y-10);
+    if(clear(owner))return {x:owner.x,y:owner.y};
+    // Choose a nearby connected release before committing the warning.
+    for(const distance of [4,8,12])for(const [dx,dy]of [[0,1],[-1,0],[1,0],[0,-1],[-.707,.707],[.707,.707],[-.707,-.707],[.707,-.707]]){
+      const at={x:owner.x+dx*distance,y:owner.y+dy*distance};if(clear(at))return at;
+    }
+    return null;
+  }
+  function aimWaltz(owner,h,target){
+    const source=h.release||owner,angle=Math.atan2(target.y-(source.y-6),target.x-source.x),count=8+(owner.bossPhase-1)*4;
+    h.angle=angle;h.shots=[];for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)h.shots.push(a);}
+  }
   G.prepareDuskWaltz=(owner,h)=>{
     if(!vesper(owner))return;
+    const release=waltzRelease(owner);if(!release)return false;
+    h.release=release;aimWaltz(owner,h,G.state.player);
     const scale=G.guidanceProjectileScale?.({owner,fromPlayer:false})??1;
     const arm=G.guardianWarningSeconds?.(G.BOSS_PROJECTILE_ARM_SECONDS)??G.BOSS_PROJECTILE_ARM_SECONDS;
     const warning=G.guardianWarningSeconds?.(h.warning)??h.warning,flight=155/(92*scale);
@@ -174,9 +189,7 @@
       dance.from={x:dance.source.x,y:dance.source.y};dance.shadowFrom={...root.shadow};
       dance.shadowTo={...dance.target.moonCover.stepShadow};
       if(owner.bossPhase>=3||dance.turnOpening){
-        const angle=Math.atan2(dance.target.y-(owner.y-6),dance.target.x-owner.x),count=8+(owner.bossPhase-1)*4;
-        dance.follow.angle=angle;dance.follow.shots=[];
-        for(let i=0;i<count;i++){const a=angle+i*Math.PI*2/count,delta=Math.atan2(Math.sin(a-angle),Math.cos(a-angle));if(Math.abs(delta)>.55)dance.follow.shots.push(a);}
+        aimWaltz(owner,dance.follow,dance.target);
       }
 
     }
