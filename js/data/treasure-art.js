@@ -20,7 +20,7 @@
     "mole-crown": { name: "Copper Root Crown", purpose: "+1 star · Tunneltuft path", shape: "copperCrown" },
     "crimson-seal": { name: "Duskflower Seal", purpose: "+1 star · Velvetwing path", shape: "waxSeal" },
     "jester-bell": { name: "Curtain Bell", purpose: "+1 star · Pocket Trouper path", shape: "curtainBell" },
-    "god-spark": { name: "Spark of Every Form", purpose: "+1 star · Roadlight path · story ending", shape: "livingSpark" },
+    "god-spark": { name: "Spark of Every Form", purpose: "+1 star · Wayheart path · story ending", shape: "livingSpark" },
     "keeper-lantern": { name: "Keeper's Lantern", purpose: "+1 star · a keepsake of the opened bridge", shape: "bridgeLamp" },
     "orchard-ribbon": { name: "Orchard Ribbon", purpose: "+5 town spirit · a keepsake of Parcel's open road", shape: "orchardBow" },
     "sunrise-seal": { name: "Sunrise Seal", purpose: "+8 town spirit · a keepsake of three deliveries", shape: "sunriseSeal" },

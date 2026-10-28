@@ -1,5 +1,5 @@
 /* ============================================================
-   GOD - the final form, earned by learning every path and mastering six.
+   GOD - the final form, earned with a portfolio of favorite forms and the Spark.
    ============================================================ */
 
 "use strict";

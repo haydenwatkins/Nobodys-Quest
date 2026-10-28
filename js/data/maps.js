@@ -229,7 +229,7 @@ registerMap({
   legend: {
     "x": { tile: "floor", portal: { map: "overworld", x: 110, y: 1 } },
     "B": { tile: "floor", enemy: "godAvatar" },
-    "m": { tile: "floor", message: `You've learned ${G.PACING.finalBreadth} shapes and mastered ${G.PACING.finalSpecialists} favorites. Now use what you've learned to reach Meridian. Try different damage types when his ward changes.` },
+    "m": { tile: "floor", message: `You've learned ${G.PACING.finalBreadth} shapes and mastered ${G.PACING.finalSpecialists} favorites. Now use what you've learned to reach Meridian. Unhook a silk knot to guide the bead, then rebuild a crossing with a loose stone. Light or Dark can break his ward.` },
     "H": { tile: "floor", chest: { heal: true, name: "the last cookie (allegedly)" } },
     "R": { tile: "rock", on: "floor" },
   },

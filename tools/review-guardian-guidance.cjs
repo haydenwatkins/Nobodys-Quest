@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+'use strict';
+// Supplied chapter; actual optional Journey DOM and touch/TV controls.
+const assert=require('node:assert/strict'),review=require('./lib/browser-review.cjs');
+const notes=[['hangingGardens',"THE MASON'S TERRACES",'Strike a brass handle to slide its stone.'],['rootdeepHollow','THE SILVER ROADS','Unhook a connection before the traveling bead reaches its knot.'],['frostbellTundra','THE FROZEN BELFRY','Watch a little bell fill, then tap it while it shines to rest that echo.'],['stormspinePeaks','THE LANTERN PASSES','Tap a destination peg and walk with the moving warm light'],['titanGrave',"THE WORLDBEARER'S ROAD",'Tap a loose stone to rebuild a crossing']];
+review({url:process.argv[2]||'https://quest-review.example/',out:process.argv[3]||'/tmp/nq-guidance',name:'Guardian optional guidance',publishedHost:true,modes:process.argv.includes('--portrait')?['touch']:['touch','controller'],viewports:process.argv.includes('--portrait')?{touch:{width:768,height:1024}}:{},
+ async run({page,mode,frames,drain,shot,pad}){
+  await page.evaluate(()=>{Object.assign(G.state.opening,{started:true,version:2,complete:true});G.state.delivery.complete=true;G.state.stars=50;});
+  for(const [map,heading,expected]of notes){await page.evaluate(map=>G.world.load(map),map);await drain();if(mode==='touch'){const b=await page.locator('#btn-pause').boundingBox();assert.ok(b);await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);await frames(4);}else await pad(9,4);assert.equal(await page.evaluate(()=>G.ui.menuOpen),true);const card=page.locator('.journey-road').filter({hasText:heading});await card.scrollIntoViewIfNeeded();await frames(2);assert.ok((await card.innerText()).includes(expected));const box=await card.evaluate(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight,overflow:el.scrollWidth>el.clientWidth};});assert.equal(box.overflow,false);assert.ok(box.left>=0&&box.right<=box.width&&box.top>=0&&box.bottom<=box.height,JSON.stringify({map,box}));await shot(map+'-full-guidance');await page.evaluate(()=>G.ui.closeMenu());await frames(2);}
+ }
+}).catch(e=>{console.error(e);process.exitCode=1;});
